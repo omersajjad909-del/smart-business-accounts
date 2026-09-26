@@ -33,11 +33,11 @@ type Log = {
 /** Colour the badge by what the action does, not by which module it came from. */
 function actionTone(action: string): { color: string; bg: string } {
   const a = action.toUpperCase();
-  if (a.includes("DELETE") || a.includes("REMOVE") || a.includes("REJECT")) return { color: "#f87171", bg: "rgba(248,113,113,.12)" };
-  if (a.includes("CREATE") || a.includes("ADD") || a.includes("ACTIVATED") || a.includes("APPROVE")) return { color: "#34d399", bg: "rgba(52,211,153,.12)" };
-  if (a.includes("UPDATE") || a.includes("EDIT") || a.includes("CONFIG")) return { color: "#fbbf24", bg: "rgba(251,191,36,.12)" };
-  if (a.includes("LOGIN") || a.includes("LOGOUT") || a.includes("AUTH")) return { color: "#38bdf8", bg: "rgba(56,189,248,.12)" };
-  return { color: "#818cf8", bg: "rgba(129,140,248,.12)" };
+  if (a.includes("DELETE") || a.includes("REMOVE") || a.includes("REJECT")) return { color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)" };
+  if (a.includes("CREATE") || a.includes("ADD") || a.includes("ACTIVATED") || a.includes("APPROVE")) return { color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)" };
+  if (a.includes("UPDATE") || a.includes("EDIT") || a.includes("CONFIG")) return { color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)" };
+  if (a.includes("LOGIN") || a.includes("LOGOUT") || a.includes("AUTH")) return { color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)" };
+  return { color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.12)" };
 }
 
 /** Activity details are stored as a JSON blob. Show it as readable pairs. */
@@ -79,7 +79,7 @@ function DetailsCell({ details }: { details: string | null }) {
       {pairs.length > 3 && (
         <button
           onClick={() => setOpen(o => !o)}
-          style={{ alignSelf: "flex-start", marginTop: 2, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: ff, fontSize: 11.5, fontWeight: 600, color: "#818cf8" }}>
+          style={{ alignSelf: "flex-start", marginTop: 2, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: ff, fontSize: 11.5, fontWeight: 600, color: "var(--tx-818cf8, #818cf8)" }}>
           {open ? "Show less" : `+${pairs.length - 3} more`}
         </button>
       )}
@@ -164,7 +164,7 @@ export default function ActivityLogsPage() {
   if (error) {
     return (
       <div style={{ padding: isMobile ? "13px" : "24px 28px", fontFamily: ff }}>
-        <div style={{ maxWidth: 560, margin: "40px auto", padding: "18px 20px", borderRadius: 14, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.25)", color: "#f87171", display: "flex", gap: 12, alignItems: "center" }}>
+        <div style={{ maxWidth: 560, margin: "40px auto", padding: "18px 20px", borderRadius: 14, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.25)", color: "var(--tx-f87171, #f87171)", display: "flex", gap: 12, alignItems: "center" }}>
           <span style={{ fontSize: 20 }}>⚠️</span>
           <span style={{ fontSize: 13.5, fontWeight: 600 }}>{error}</span>
         </div>
@@ -186,7 +186,7 @@ export default function ActivityLogsPage() {
         </div>
         <div style={{ padding: "9px 16px", borderRadius: 11, background: "var(--panel-bg)", border: "1px solid var(--border)", textAlign: "right" }}>
           <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "var(--text-muted)" }}>Total entries</div>
-          <div style={{ fontSize: 19, fontWeight: 900, color: "#818cf8", lineHeight: 1.2 }}>{logs.length}</div>
+          <div style={{ fontSize: 19, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)", lineHeight: 1.2 }}>{logs.length}</div>
         </div>
       </div>
 

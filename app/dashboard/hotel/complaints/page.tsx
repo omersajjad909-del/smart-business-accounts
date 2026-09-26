@@ -6,18 +6,18 @@ import { getCurrentUser } from "@/lib/auth";
 import { hotelFont, hotelMuted } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 const inp: React.CSSProperties = {
   width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
   borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14, boxSizing: "border-box",
 };
 
-const PRIORITIES = { low: { label: "Low", color: "#34d399" }, medium: { label: "Medium", color: "#f59e0b" }, high: { label: "High", color: "#f87171" } };
+const PRIORITIES = { low: { label: "Low", color: "var(--tx-34d399, #34d399)" }, medium: { label: "Medium", color: "var(--tx-f59e0b, #f59e0b)" }, high: { label: "High", color: "var(--tx-f87171, #f87171)" } };
 const STATUSES = {
-  open:        { label: "Open",        color: "#f87171", bg: "rgba(239,68,68,.12)" },
-  in_progress: { label: "In Progress", color: "#f59e0b", bg: "rgba(245,158,11,.12)" },
-  resolved:    { label: "Resolved",    color: "#34d399", bg: "rgba(52,211,153,.12)" },
+  open:        { label: "Open",        color: "var(--tx-f87171, #f87171)", bg: "rgba(239,68,68,.12)" },
+  in_progress: { label: "In Progress", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)" },
+  resolved:    { label: "Resolved",    color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)" },
 };
 const CATEGORIES = ["Room Issue", "Food & Beverage", "Service", "Noise", "Maintenance", "Billing", "Other"];
 
@@ -130,7 +130,7 @@ export default function ComplaintsPage() {
                   <td style={{ padding: "12px 16px", fontWeight: 600, maxWidth: 180 }}>{c.title}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13 }}>{c.guestName || "—"}</td>
                   <td style={{ padding: "12px 16px" }}>
-                    {c.room && <span style={{ background: "rgba(99,102,241,.12)", color: "#a5b4fc", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Room {c.room}</span>}
+                    {c.room && <span style={{ background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Room {c.room}</span>}
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 12, color: hotelMuted }}>{c.category}</td>
                   <td style={{ padding: "12px 16px" }}>
@@ -144,22 +144,22 @@ export default function ComplaintsPage() {
                     <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                       {c.status === "open" && (
                         <button onClick={() => changeStatus(c.id, "in_progress")}
-                          style={{ padding: "4px 8px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", borderRadius: 6, fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
+                          style={{ padding: "4px 8px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.3)", color: "var(--tx-f59e0b, #f59e0b)", borderRadius: 6, fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
                           In Progress
                         </button>
                       )}
                       {c.status === "in_progress" && (
                         <button onClick={() => changeStatus(c.id, "resolved")}
-                          style={{ padding: "4px 8px", background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
+                          style={{ padding: "4px 8px", background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.3)", color: "var(--tx-34d399, #34d399)", borderRadius: 6, fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
                           ✓ Resolve
                         </button>
                       )}
                       <button onClick={() => openEdit(c)}
-                        style={{ padding: "4px 8px", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", color: "#818cf8", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>
+                        style={{ padding: "4px 8px", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", color: "var(--tx-818cf8, #818cf8)", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>
                         Edit
                       </button>
                       <button onClick={() => remove(c.id)}
-                        style={{ padding: "4px 8px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>
+                        style={{ padding: "4px 8px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 10, cursor: "pointer" }}>
                         ✕
                       </button>
                     </div>

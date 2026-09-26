@@ -146,12 +146,12 @@ export default function HSCodesPage() {
                 <td style={{ padding: "12px 16px", fontFamily: "monospace", fontWeight: 700, color: accent }}>{c.code}</td>
                 <td style={{ padding: "12px 16px", fontSize: 14 }}>{c.description}</td>
                 <td style={{ padding: "12px 16px", fontSize: 12, color: "var(--text-muted)" }}>{c.category || "—"}</td>
-                <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: c.dutyRate > 0 ? "#f59e0b" : "#10b981" }}>{c.dutyRate}%</td>
+                <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: c.dutyRate > 0 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-10b981, #10b981)" }}>{c.dutyRate}%</td>
                 <td style={{ padding: "12px 16px", fontSize: 12, color: "var(--text-muted)" }}>{c.unit || "—"}</td>
                 <td style={{ padding: "12px 16px" }}>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button style={{ ...ghost, padding: "4px 12px", fontSize: 12 }} onClick={() => startEdit(c)}>Edit</button>
-                    <button style={{ ...ghost, padding: "4px 12px", fontSize: 12, color: "#f87171", borderColor: "#f8717144" }} onClick={() => del(c.id)}>Delete</button>
+                    <button style={{ ...ghost, padding: "4px 12px", fontSize: 12, color: "var(--tx-f87171, #f87171)", borderColor: "#f8717144" }} onClick={() => del(c.id)}>Delete</button>
                   </div>
                 </td>
               </tr>

@@ -188,10 +188,10 @@ export default function LoyaltyPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Customers", value: activeCustomers.length, color: "#818cf8", icon: "👥" },
-          { label: "Points in Circulation", value: totalPoints.toLocaleString(), color: "#f59e0b", icon: "⭐" },
-          { label: "Total Redeemed", value: `${totalRedeemed.toLocaleString()} pts`, color: "#34d399", icon: "🔄" },
-          { label: "Total Customer Spend", value: `Rs. ${totalSpent.toLocaleString()}`, color: "#a5b4fc", icon: "💰" },
+          { label: "Total Customers", value: activeCustomers.length, color: "var(--tx-818cf8, #818cf8)", icon: "👥" },
+          { label: "Points in Circulation", value: totalPoints.toLocaleString(), color: "var(--tx-f59e0b, #f59e0b)", icon: "⭐" },
+          { label: "Total Redeemed", value: `${totalRedeemed.toLocaleString()} pts`, color: "var(--tx-34d399, #34d399)", icon: "🔄" },
+          { label: "Total Customer Spend", value: `Rs. ${totalSpent.toLocaleString()}`, color: "var(--tx-a5b4fc, #a5b4fc)", icon: "💰" },
         ].map(s => (
           <div key={s.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{s.icon} {s.label}</div>
@@ -204,8 +204,8 @@ export default function LoyaltyPage() {
       {showConfig && (
         <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px", marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "#818cf8" }}>⚙ Loyalty Settings</div>
-            {configSaved && <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>✓ Saved</span>}
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>⚙ Loyalty Settings</div>
+            {configSaved && <span style={{ fontSize: 12, color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>✓ Saved</span>}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 18 }}>
             {[
@@ -242,7 +242,7 @@ export default function LoyaltyPage() {
               Cancel
             </button>
             {configError && (
-              <span style={{ fontSize: 12, color: "#f87171", fontWeight: 600 }}>✕ {configError}</span>
+              <span style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", fontWeight: 600 }}>✕ {configError}</span>
             )}
           </div>
         </div>
@@ -251,7 +251,7 @@ export default function LoyaltyPage() {
       {/* Search */}
       <div style={{ marginBottom: 14 }}>
         <div style={{ position: "relative", maxWidth: 380 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5"
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2.5"
             style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
@@ -289,11 +289,11 @@ export default function LoyaltyPage() {
                     <span style={{ fontWeight: 600, fontSize: 13 }}>{c.name}</span>
                   </div>
                 </td>
-                <td style={{ padding: "13px 16px", fontSize: 12, color: "#f59e0b", fontWeight: 700 }}>{c.cardNo || "—"}</td>
+                <td style={{ padding: "13px 16px", fontSize: 12, color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{c.cardNo || "—"}</td>
                 <td style={{ padding: "13px 16px", fontSize: 13, color: "rgba(var(--ink),.6)" }}>{c.phone}</td>
                 <td style={{ padding: "13px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{c.points.toLocaleString()}</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{c.points.toLocaleString()}</span>
                     <span style={{ fontSize: 10, color: "rgba(var(--ink),.3)" }}>pts</span>
                   </div>
                 </td>
@@ -302,11 +302,11 @@ export default function LoyaltyPage() {
                 <td style={{ padding: "13px 16px" }} onClick={e => e.stopPropagation()}>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={() => setDetailId(c.id)} className="lc-btn"
-                      style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                      style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "var(--tx-818cf8, #818cf8)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
                       History
                     </button>
                     <button onClick={() => toggleCustomer(c.id, false)} className="lc-btn"
-                      style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>
+                      style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: ff }}>
                       Deactivate
                     </button>
                   </div>
@@ -326,7 +326,7 @@ export default function LoyaltyPage() {
             <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 6 }}>Register New Customer</div>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 22 }}>A loyalty card number will be auto-generated.</div>
             {regError && (
-              <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12 }}>{regError}</div>
+              <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{regError}</div>
             )}
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Full Name *</label>
@@ -341,7 +341,7 @@ export default function LoyaltyPage() {
                 onKeyDown={e => e.key === "Enter" && registerCustomer()} />
             </div>
             <div style={{ padding: "12px 14px", background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.18)", borderRadius: 9, marginBottom: 20, fontSize: 12, color: "rgba(var(--ink),.55)" }}>
-              Card will be generated: <span style={{ fontWeight: 700, color: "#f59e0b" }}>{generateCardNo()}</span>
+              Card will be generated: <span style={{ fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)" }}>{generateCardNo()}</span>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={registerCustomer} disabled={registering} className="lc-btn"
@@ -371,7 +371,7 @@ export default function LoyaltyPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: 17, fontWeight: 800 }}>{detailCustomer.name}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 1 }}>{detailCustomer.phone} · Card: <span style={{ color: "#f59e0b" }}>{detailCustomer.cardNo}</span></div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 1 }}>{detailCustomer.phone} · Card: <span style={{ color: "var(--tx-f59e0b, #f59e0b)" }}>{detailCustomer.cardNo}</span></div>
                 </div>
               </div>
               <button onClick={() => setDetailId(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.4)", fontSize: 22, cursor: "pointer" }}>✕</button>
@@ -380,9 +380,9 @@ export default function LoyaltyPage() {
             {/* Stats */}
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 0, borderBottom: "1px solid rgba(var(--ink),.07)", flexShrink: 0 }}>
               {[
-                { label: "Points Balance", value: `${detailCustomer.points.toLocaleString()} pts`, color: "#f59e0b" },
-                { label: "Total Spent", value: `Rs. ${detailCustomer.totalSpent.toLocaleString()}`, color: "#a5b4fc" },
-                { label: "Last Purchase", value: dateStr(detailCustomer.lastPurchase), color: "#34d399" },
+                { label: "Points Balance", value: `${detailCustomer.points.toLocaleString()} pts`, color: "var(--tx-f59e0b, #f59e0b)" },
+                { label: "Total Spent", value: `Rs. ${detailCustomer.totalSpent.toLocaleString()}`, color: "var(--tx-a5b4fc, #a5b4fc)" },
+                { label: "Last Purchase", value: dateStr(detailCustomer.lastPurchase), color: "var(--tx-34d399, #34d399)" },
               ].map((s, i) => (
                 <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: i < 2 ? "1px solid rgba(var(--ink),.06)" : "none" }}>
                   <div style={{ fontSize: 10, color: "rgba(var(--ink),.35)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".07em" }}>{s.label}</div>
@@ -399,14 +399,14 @@ export default function LoyaltyPage() {
               ) : [...detailCustomer.history].reverse().map((h, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 6, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.05)", borderRadius: 9 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{h.saleRef}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{h.saleRef}</div>
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 1 }}>{dateStr(h.date)}</div>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)" }}>Rs. {(h.amount || 0).toLocaleString()}</div>
                     <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 2 }}>
-                      {h.earned > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>+{h.earned} pts</span>}
-                      {h.redeemed > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#f87171" }}>−{h.redeemed} pts</span>}
+                      {h.earned > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>+{h.earned} pts</span>}
+                      {h.redeemed > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>−{h.redeemed} pts</span>}
                     </div>
                   </div>
                 </div>

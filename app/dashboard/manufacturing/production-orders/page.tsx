@@ -11,8 +11,8 @@ import {
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const statusColor: Record<string, string> = { planned: "#818cf8", in_progress: "#f59e0b", running: "#f59e0b", completed: "#22c55e", cancelled: "#6b7280" };
 
 type ProductionOrder = ReturnType<typeof mapProductionOrderRecord>;
@@ -367,10 +367,10 @@ export default function ProductionOrdersPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Total Orders", value: orders.length, color: "#f97316" },
-          { label: "Planned", value: orders.filter((item) => item.status === "planned").length, color: "#818cf8" },
-          { label: "In Progress", value: orders.filter((item) => item.status === "in_progress" || item.status === "running").length, color: "#f59e0b" },
-          { label: "Completed To FG", value: orders.filter((item) => item.status === "completed").length, color: "#22c55e" },
+          { label: "Total Orders", value: orders.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Planned", value: orders.filter((item) => item.status === "planned").length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "In Progress", value: orders.filter((item) => item.status === "in_progress" || item.status === "running").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Completed To FG", value: orders.filter((item) => item.status === "completed").length, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
@@ -403,20 +403,20 @@ export default function ProductionOrdersPage() {
                   <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
                     {order.orderId} • BOM {linkedBom?.version || order.bomVersion || "Not linked"} • Qty {order.completed.toLocaleString()}/{order.quantity.toLocaleString()}
                     {remaining > 0 && order.status !== "cancelled" && (
-                      <span style={{ color: "#fbbf24", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
+                      <span style={{ color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 700 }}> • {remaining.toLocaleString()} left to make</span>
                     )}
                     {/* The count is met and the order is still open, which
                         looks stuck until it says why: a job has not been done
                         on every piece yet, so the order is held to carry it. */}
                     {remaining === 0 && jobsBehind.length > 0 && order.status !== "cancelled" && (
-                      <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                      <span style={{ color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 700 }}>
                         {" "}• all {order.quantity.toLocaleString()} made, but{" "}
                         {jobsBehind.map((j) => `${j[0]} is short ${(order.quantity - j[1]).toLocaleString()}`).join(", ")}
                       </span>
                     )}
                   </div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: statusColor[order.status] || "#94a3b8" }}>{order.status.replace("_", " ").toUpperCase()}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: statusColor[order.status] || "var(--tx-94a3b8, #94a3b8)" }}>{order.status.replace("_", " ").toUpperCase()}</div>
               </div>
               <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 10 }}>
                 Due {order.plannedDate || "Not set"} • Assigned {order.assignedTo || "Unassigned"} • {fgCreated ? "Finished goods batch created" : "FG pending"} • Work orders open {incompleteWorkOrders}
@@ -449,13 +449,13 @@ export default function ProductionOrdersPage() {
                           {qty.toLocaleString()}/{order.quantity.toLocaleString()}
                         </span>
                         {ahead > 0 && (
-                          <span style={{ color: "#7dd3fc", fontWeight: 700 }}>+{ahead.toLocaleString()} part-made</span>
+                          <span style={{ color: "var(--tx-7dd3fc, #7dd3fc)", fontWeight: 700 }}>+{ahead.toLocaleString()} part-made</span>
                         )}
                         {/* Behind the order, not merely behind the finished
                             count: these are pieces the order still owes this
                             job, and the reason it has not closed. */}
                         {qty < order.quantity && (
-                          <span style={{ color: "#fbbf24", fontWeight: 700 }}>
+                          <span style={{ color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 700 }}>
                             {(order.quantity - qty).toLocaleString()} still to do
                           </span>
                         )}
@@ -487,7 +487,7 @@ export default function ProductionOrdersPage() {
                   </button>
                 )}
                 {order.status !== "completed" && order.status !== "cancelled" && (
-                  <button onClick={() => orderStore.update(order.id, { status: "cancelled" })} style={{ padding: "7px 14px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#ef4444", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>
+                  <button onClick={() => orderStore.update(order.id, { status: "cancelled" })} style={{ padding: "7px 14px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-ef4444, #ef4444)", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>
                     Cancel
                   </button>
                 )}
@@ -647,18 +647,18 @@ export default function ProductionOrdersPage() {
                             <td style={{ padding: "10px 14px", fontSize: 12.5 }}>
                               {line.itemName}
                               {line.leftoverQty > 0 && (
-                                <div style={{ fontSize: 11, color: "#34d399", marginTop: 3 }}>
+                                <div style={{ fontSize: 11, color: "var(--tx-34d399, #34d399)", marginTop: 3 }}>
                                   {line.leftoverQty.toFixed(2)}{line.unit} stays as open stock
                                 </div>
                               )}
                             </td>
                             <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: "rgba(var(--ink),.62)" }}>{line.exactQty.toFixed(2)}{line.unit}</td>
-                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: line.fromRemnantQty > 0 ? "#34d399" : "rgba(var(--ink),.25)" }}>
+                            <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", color: line.fromRemnantQty > 0 ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.25)" }}>
                               {line.fromRemnantQty > 0 ? `${line.fromRemnantQty.toFixed(2)}${line.unit}` : "—"}
                             </td>
                             <td style={{ padding: "10px 14px", fontSize: 12.5, textAlign: "right", fontWeight: 700 }}>
                               {line.requiredQty}{line.unit}
-                              <div style={{ fontSize: 11, fontWeight: 400, color: short ? "#fca5a5" : "rgba(var(--ink),.35)", marginTop: 3 }}>
+                              <div style={{ fontSize: 11, fontWeight: 400, color: short ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),.35)", marginTop: 3 }}>
                                 have {line.availableQty}{line.unit}
                               </div>
                             </td>
@@ -672,7 +672,7 @@ export default function ProductionOrdersPage() {
 
                 {runQuote.shortages.length > 0 && (
                   <div style={{ marginBottom: 14, padding: "12px 14px", borderRadius: 10, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.26)" }}>
-                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 6 }}>Not enough material in {runLocation} for {runQuote.shortages.length} item(s)</div>
+                    <div style={{ fontSize: 12.5, color: "var(--tx-fca5a5, #fca5a5)", fontWeight: 700, marginBottom: 6 }}>Not enough material in {runLocation} for {runQuote.shortages.length} item(s)</div>
                     {runQuote.shortages.some((l) => (l.elsewhere?.length ?? 0) > 0) && (
                       <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginBottom: 8, lineHeight: 1.7 }}>
                         {runQuote.shortages.filter((l) => (l.elsewhere?.length ?? 0) > 0).map((l) => (
@@ -695,12 +695,12 @@ export default function ProductionOrdersPage() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                     <span style={{ fontSize: 13, fontWeight: 700 }}>Labour for this run</span>
                     {labourTotal > 0 && (
-                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(labourTotal).toLocaleString()}</span>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--tx-22c55e, #22c55e)" }}>Rs. {Math.round(labourTotal).toLocaleString()}</span>
                     )}
                   </div>
                   {!labourList.length && (
                     <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginBottom: 8 }}>
-                      No labour added yet — add one on the <a href="/dashboard/manufacturing/labour" style={{ color: "#fb923c", fontWeight: 700 }}>Labour</a> page.
+                      No labour added yet — add one on the <a href="/dashboard/manufacturing/labour" style={{ color: "var(--tx-fb923c, #fb923c)", fontWeight: 700 }}>Labour</a> page.
                     </div>
                   )}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -777,7 +777,7 @@ export default function ProductionOrdersPage() {
                     job names were missing. */}
                 {jobNamesMissing && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", marginBottom: 14 }}>
-                    <div style={{ fontSize: 12.5, color: "#fca5a5", fontWeight: 700, marginBottom: 5 }}>
+                    <div style={{ fontSize: 12.5, color: "var(--tx-fca5a5, #fca5a5)", fontWeight: 700, marginBottom: 5 }}>
                       Name the job on each row — the boxes marked in red
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>
@@ -796,7 +796,7 @@ export default function ProductionOrdersPage() {
                     rather than the entry refused. */}
                 {!jobNamesMissing && labourPieces && labourPieces.under.length > 0 && (
                   <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", marginBottom: 14 }}>
-                    <div style={{ fontSize: 12.5, color: "#fbbf24", fontWeight: 700, marginBottom: 5 }}>
+                    <div style={{ fontSize: 12.5, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 700, marginBottom: 5 }}>
                       This run finishes {runQty.toLocaleString()} pieces, but {labourPieces.under.map((g) => `${g.operation} is paid for ${g.total.toLocaleString()}`).join("; ")}
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>
@@ -834,7 +834,7 @@ export default function ProductionOrdersPage() {
                 <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.22)", marginBottom: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                     <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>Total cost of this run</span>
-                    <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>Rs. {Math.round(labourRows.length ? runQuote.totalCost - runQuote.labourCost + labourTotal : runQuote.totalCost).toLocaleString()}</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-22c55e, #22c55e)" }}>Rs. {Math.round(labourRows.length ? runQuote.totalCost - runQuote.labourCost + labourTotal : runQuote.totalCost).toLocaleString()}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),.42)" }}>
                     <span>Material</span><span>Rs. {Math.round(runQuote.materialCost).toLocaleString()}</span>
@@ -851,12 +851,12 @@ export default function ProductionOrdersPage() {
                     </div>
                   )}
                   {runQuote.remnantUsedCost > 0 && (
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#34d399" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-34d399, #34d399)" }}>
                       <span>…of which from open stock</span><span>Rs. {Math.round(runQuote.remnantUsedCost).toLocaleString()}</span>
                     </div>
                   )}
                   {runQuote.remnantCreatedCost > 0 && (
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#34d399" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-34d399, #34d399)" }}>
                       <span>Kept back as open stock</span><span>Rs. {Math.round(runQuote.remnantCreatedCost).toLocaleString()}</span>
                     </div>
                   )}

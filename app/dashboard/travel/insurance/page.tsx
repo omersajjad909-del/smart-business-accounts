@@ -97,7 +97,7 @@ export default function TravelInsurancePage() {
           label: "Margin",
           render: (row) => {
             const margin = Number(row.margin) || 0;
-            return <span style={{ color: margin > 0 ? "#34d399" : "#f87171", fontWeight: 700 }}>{margin.toLocaleString()}</span>;
+            return <span style={{ color: margin > 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>{margin.toLocaleString()}</span>;
           },
         },
         { key: "status", label: "Status" },
@@ -133,10 +133,10 @@ export default function TravelInsurancePage() {
 
         return [
           { label: "Policies", value: rows.length, color: travelAccent },
-          { label: "Active", value: active.length, color: "#34d399" },
-          { label: "No Policy Number", value: noPolicyNo, color: noPolicyNo ? "#f87171" : "#34d399" },
-          { label: "Cover Ends in 7 Days", value: endingSoon, color: endingSoon ? "#fbbf24" : "#34d399" },
-          { label: "Margin", value: margin.toLocaleString(), color: margin >= 0 ? "#34d399" : "#f87171" },
+          { label: "Active", value: active.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "No Policy Number", value: noPolicyNo, color: noPolicyNo ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" },
+          { label: "Cover Ends in 7 Days", value: endingSoon, color: endingSoon ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" },
+          { label: "Margin", value: margin.toLocaleString(), color: margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" },
         ];
       }}
     />

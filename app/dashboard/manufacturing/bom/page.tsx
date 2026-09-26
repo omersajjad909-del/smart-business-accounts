@@ -18,8 +18,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 import toast from "react-hot-toast";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", background: bg, border: `1px solid ${border}`,
@@ -532,7 +532,7 @@ function BOMPageInner() {
       {noItems && (
         <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(249,115,22,.09)", border: "1px solid rgba(249,115,22,.25)", fontSize: 13, color: "rgba(var(--ink),.62)" }}>
           No inventory items yet. Add your raw materials and finished products on the{" "}
-          <a href="/dashboard/manufacturing/raw-materials" style={{ color: "#fb923c", fontWeight: 700 }}>Raw Materials</a>{" "}
+          <a href="/dashboard/manufacturing/raw-materials" style={{ color: "var(--tx-fb923c, #fb923c)", fontWeight: 700 }}>Raw Materials</a>{" "}
           page first — a BOM consumes real stock, so it needs real items.
         </div>
       )}
@@ -545,10 +545,10 @@ function BOMPageInner() {
           something to act on; a zero here is good news and reads as such. */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Total BOMs", value: boms.length, color: "#f97316" },
-          { label: "Products In Production", value: new Set(orders.map((o) => o.product)).size, color: "#38bdf8" },
-          { label: "Raw Materials", value: rawMaterials.length, color: "#22c55e" },
-          { label: "Materials Low On Stock", value: lowMaterials, color: lowMaterials ? "#f59e0b" : "#22c55e" },
+          { label: "Total BOMs", value: boms.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Products In Production", value: new Set(orders.map((o) => o.product)).size, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Raw Materials", value: rawMaterials.length, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Materials Low On Stock", value: lowMaterials, color: lowMaterials ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
@@ -580,7 +580,7 @@ function BOMPageInner() {
                         screen, and up here it only competed with the name of
                         the product for attention. Yield also stops repeating
                         itself: it was in the line above as well. */}
-                    <div style={{ color: "#38bdf8", fontSize: 15, fontWeight: 800 }}>{bom.yieldUnits.toLocaleString()}</div>
+                    <div style={{ color: "var(--tx-38bdf8, #38bdf8)", fontSize: 15, fontWeight: 800 }}>{bom.yieldUnits.toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>{yieldUnit} per batch</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
                       {/* The whole run from here: raise the order, start it and
@@ -589,7 +589,7 @@ function BOMPageInner() {
                           comes back to — this is for the far commoner case
                           where the order is simply made. */}
                       <button onClick={() => openMake(bom)}
-                        style={{ padding: "4px 13px", borderRadius: 7, border: "1px solid rgba(34,197,94,.4)", background: "rgba(34,197,94,.12)", color: "#4ade80", fontFamily: "inherit", fontSize: 11.5, fontWeight: 800, cursor: "pointer" }}>
+                        style={{ padding: "4px 13px", borderRadius: 7, border: "1px solid rgba(34,197,94,.4)", background: "rgba(34,197,94,.12)", color: "var(--tx-4ade80, #4ade80)", fontFamily: "inherit", fontSize: 11.5, fontWeight: 800, cursor: "pointer" }}>
                         Make
                       </button>
                       <button onClick={() => startEdit(bom)}
@@ -597,7 +597,7 @@ function BOMPageInner() {
                         Edit
                       </button>
                       <button onClick={() => removeBom(bom, linkedOrders)}
-                        style={{ padding: "4px 11px", borderRadius: 7, border: "1px solid rgba(239,68,68,.35)", background: "rgba(239,68,68,.08)", color: "#fca5a5", fontFamily: "inherit", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+                        style={{ padding: "4px 11px", borderRadius: 7, border: "1px solid rgba(239,68,68,.35)", background: "rgba(239,68,68,.08)", color: "var(--tx-fca5a5, #fca5a5)", fontFamily: "inherit", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
                         Delete
                       </button>
                     </div>
@@ -611,7 +611,7 @@ function BOMPageInner() {
                       return (
                         <span key={`${bom.id}-${line.itemId}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: low ? "rgba(239,68,68,.12)" : "rgba(34,197,94,.12)", color: low ? "#fca5a5" : "#22c55e", borderRadius: 999, padding: "5px 11px", fontSize: 12, fontWeight: 600 }}>
                           {item?.name ?? "(deleted item)"} × {line.qty}{item?.unit ?? ""}
-                          {low ? <span style={{ color: "#ef4444" }}>Low</span> : null}
+                          {low ? <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>Low</span> : null}
                         </span>
                       );
                     })}
@@ -643,7 +643,7 @@ function BOMPageInner() {
               {rawMaterials.length ? rawMaterials.slice(0, 10).map((item) => (
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
                   <span style={{ color: "rgba(var(--ink),.62)" }}>{item.name}</span>
-                  <span style={{ color: item.isLow ? "#fca5a5" : "#38bdf8", fontWeight: 700 }}>
+                  <span style={{ color: item.isLow ? "var(--tx-fca5a5, #fca5a5)" : "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>
                     {item.currentStock}{item.unit} · Rs. {formatRate(item.unitCost)}
                   </span>
                 </div>
@@ -700,7 +700,7 @@ function BOMPageInner() {
 
             {/* Said plainly, because posting an order size as though it were
                 made is how finished goods nobody has produced get into stock. */}
-            <div style={{ fontSize: 11.5, color: partial ? "#fbbf24" : "rgba(var(--ink),.32)", marginTop: 6, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 11.5, color: partial ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.32)", marginTop: 6, lineHeight: 1.6 }}>
               {partial
                 ? `${pendingQty.toLocaleString()} left over — the order stays open on Production Orders, and tomorrow's run carries on from there with its own labour.`
                 : "The whole order is finished in this run. Making only part of it today? Put that in “Finished today”."}
@@ -727,7 +727,7 @@ function BOMPageInner() {
                   // reads as though the run consumes a single roll.
                   return (
                     <div key={line.itemId} style={{ padding: "5px 0", fontSize: 12.5 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, color: short ? "#fca5a5" : "rgba(var(--ink),.75)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, color: short ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),.75)" }}>
                         <span>{line.itemName}{short ? ` — only ${line.availableQty.toLocaleString()}${line.unit} in stock` : ""}</span>
                         <span style={{ fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", fontWeight: 700 }}>
                           {line.requiredQty.toLocaleString()} {line.unit}
@@ -751,7 +751,7 @@ function BOMPageInner() {
                   {/* Named workers replace the BOM's labour figure, so the
                       total has to follow them or the number on screen is not
                       the number that posts. */}
-                  <span style={{ fontSize: 17, fontWeight: 800, color: "#22c55e", fontFamily: "ui-monospace, monospace" }}>
+                  <span style={{ fontSize: 17, fontWeight: 800, color: "var(--tx-22c55e, #22c55e)", fontFamily: "ui-monospace, monospace" }}>
                     Rs. {Math.round(
                       labourRows.length
                         ? makeQuote.totalCost - makeQuote.labourCost + labourTotal
@@ -761,7 +761,7 @@ function BOMPageInner() {
                 </div>
 
                 {makeQuote.shortages.length > 0 && (
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontSize: 12, color: "#fbbf24", cursor: "pointer" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", cursor: "pointer" }}>
                     <input type="checkbox" checked={makeShort} onChange={(e) => setMakeShort(e.target.checked)} />
                     Make it anyway — the short material will show as negative stock
                   </label>
@@ -787,7 +787,7 @@ function BOMPageInner() {
                   {labourList.length === 0 ? (
                     <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>
                       No workers added yet — add them on the{" "}
-                      <a href="/dashboard/manufacturing/labour" style={{ color: "#fb923c", fontWeight: 700 }}>Labour</a> page.
+                      <a href="/dashboard/manufacturing/labour" style={{ color: "var(--tx-fb923c, #fb923c)", fontWeight: 700 }}>Labour</a> page.
                     </div>
                   ) : (
                     <>
@@ -830,7 +830,7 @@ function BOMPageInner() {
                         ))}
                       </div>
                       {incompleteLabour && (
-                        <div style={{ marginTop: 8, fontSize: 11.5, color: "#fbbf24" }}>
+                        <div style={{ marginTop: 8, fontSize: 11.5, color: "var(--tx-fbbf24, #fbbf24)" }}>
                           A worker is named with no pieces or no rate. Fill both in, or take the row out —
                           left as it is, the run would post with no labour cost and nobody owed.
                         </div>
@@ -848,7 +848,7 @@ function BOMPageInner() {
                             {jobsToday.map(([job, qty]) => (
                               <span key={job} style={{ fontSize: 12, color: "rgba(var(--ink),.72)" }}>
                                 {job}{" "}
-                                <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: qty === slowestJob ? "#38bdf8" : "rgba(var(--ink),.55)" }}>
+                                <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: qty === slowestJob ? "var(--tx-38bdf8, #38bdf8)" : "rgba(var(--ink),.55)" }}>
                                   {qty.toLocaleString()}
                                 </span>
                               </span>
@@ -856,7 +856,7 @@ function BOMPageInner() {
                           </div>
                           <div style={{ fontSize: 11.5, lineHeight: 1.65, color: "rgba(var(--ink),.55)" }}>
                             A piece is finished only once every job is done on it, so{" "}
-                            <strong style={{ color: "#38bdf8" }}>{slowestJob.toLocaleString()}</strong> are
+                            <strong style={{ color: "var(--tx-38bdf8, #38bdf8)" }}>{slowestJob.toLocaleString()}</strong> are
                             finished today. The other {(fastestJob - slowestJob).toLocaleString()} are
                             part-made — they keep the work already done on them and finish first thing in
                             the next run. Everyone above is paid for what they did either way.

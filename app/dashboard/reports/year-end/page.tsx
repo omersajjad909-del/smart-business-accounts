@@ -187,7 +187,7 @@ export default function YearEndClosingPage() {
 
           {[
             { label: "Total Income",  val: result.incomeTotal,  color: SUCCESS },
-            { label: "Total Expenses", val: result.expenseTotal, color: "#f87171" },
+            { label: "Total Expenses", val: result.expenseTotal, color: "var(--tx-f87171, #f87171)" },
           ].map(({ label, val, color }) => (
             <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid rgba(52,211,153,0.2)", fontSize: 14 }}>
               <span style={{ color: "var(--text-muted)" }}>{label}</span>
@@ -197,7 +197,7 @@ export default function YearEndClosingPage() {
 
           <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0 0", fontSize: 16, fontWeight: 700 }}>
             <span>{(result.profit ?? 0) >= 0 ? "Net Profit Transferred" : "Net Loss Transferred"}</span>
-            <span style={{ color: (result.profit ?? 0) >= 0 ? SUCCESS : "#f87171" }}>
+            <span style={{ color: (result.profit ?? 0) >= 0 ? SUCCESS : "var(--tx-f87171, #f87171)" }}>
               {fmt(result.profit ?? 0)}
             </span>
           </div>

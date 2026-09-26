@@ -133,7 +133,7 @@ export function AttentionPanel() {
   // says so once and quietly.
   if (!groups.length) {
     return (
-      <div style={{ border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", borderRadius: 13, padding: "12px 15px", fontSize: 12.5, color: "#34d399", marginBottom: 18 }}>
+      <div style={{ border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", borderRadius: 13, padding: "12px 15px", fontSize: 12.5, color: "var(--tx-34d399, #34d399)", marginBottom: 18 }}>
         ✓ Nothing needs attention — no passport under six months, no transfer without a driver, nothing flying this week uninvoiced.
       </div>
     );

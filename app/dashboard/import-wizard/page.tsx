@@ -452,7 +452,7 @@ function ImportWizardInner() {
       {error && (
         <div style={{
           ...card, borderColor: "rgba(239,68,68,.3)", background: "rgba(239,68,68,.09)",
-          padding: "12px 16px", marginBottom: 18, fontSize: 12.5, color: "#fca5a5", lineHeight: 1.6,
+          padding: "12px 16px", marginBottom: 18, fontSize: 12.5, color: "var(--tx-fca5a5, #fca5a5)", lineHeight: 1.6,
         }}>{error}</div>
       )}
 
@@ -527,7 +527,7 @@ function ImportWizardInner() {
           </div>
           <div style={{ marginTop: 14, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>
             Not sure which report to run in your old system?{" "}
-            <Link href="/dashboard/import/guide" style={{ color: "#818cf8", fontWeight: 700 }}>
+            <Link href="/dashboard/import/guide" style={{ color: "var(--tx-818cf8, #818cf8)", fontWeight: 700 }}>
               The import guides
             </Link>{" "}
             name the exact screen and options for every file, in each of these systems.
@@ -726,7 +726,7 @@ function ImportWizardInner() {
                 </ol>
                 <Link href={`/dashboard/import/guide/${sourceDef.id}`} style={{
                   display: "inline-block", marginTop: 11, fontSize: 12,
-                  fontWeight: 700, color: "#818cf8", textDecoration: "none",
+                  fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textDecoration: "none",
                 }}>
                   The exact report for {typeDef.name}, and what to set on it →
                 </Link>
@@ -739,7 +739,7 @@ function ImportWizardInner() {
                   <span key={c} style={{
                     padding: "4px 9px", borderRadius: 7, fontSize: 11, fontFamily: MONO,
                     background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
-                    color: typeDef.required.includes(c) ? "#f59e0b" : "var(--text-muted)",
+                    color: typeDef.required.includes(c) ? "var(--tx-f59e0b, #f59e0b)" : "var(--text-muted)",
                   }}>{c}{typeDef.required.includes(c) ? " *" : ""}</span>
                 ))}
               </div>
@@ -748,7 +748,7 @@ function ImportWizardInner() {
                 <code style={{ fontFamily: MONO }}>Account Name</code> and{" "}
                 <code style={{ fontFamily: MONO }}>Ledger Name</code> all resolve to the same column.
                 Anything unrecognised is ignored, so extra columns are harmless.
-                <span style={{ color: "#f59e0b" }}> *</span> is required.
+                <span style={{ color: "var(--tx-f59e0b, #f59e0b)" }}> *</span> is required.
               </div>
             </div>
           </div>
@@ -761,9 +761,9 @@ function ImportWizardInner() {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10, marginBottom: 14 }}>
             {[
               { label: "Rows in file", value: preview.total, color: "var(--text-primary)" },
-              { label: "Will import", value: preview.ok, color: "#22c55e" },
-              { label: "Will be skipped", value: preview.failed, color: preview.failed ? "#ef4444" : "var(--text-muted)" },
-              { label: "Warnings", value: preview.warnings, color: preview.warnings ? "#f59e0b" : "var(--text-muted)" },
+              { label: "Will import", value: preview.ok, color: "var(--tx-22c55e, #22c55e)" },
+              { label: "Will be skipped", value: preview.failed, color: preview.failed ? "var(--tx-ef4444, #ef4444)" : "var(--text-muted)" },
+              { label: "Warnings", value: preview.warnings, color: preview.warnings ? "var(--tx-f59e0b, #f59e0b)" : "var(--text-muted)" },
             ].map((s) => (
               <div key={s.label} style={{ ...card, padding: "14px 16px" }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 5 }}>{s.label}</div>
@@ -815,10 +815,10 @@ function ImportWizardInner() {
                       <td style={{ padding: "9px 14px", color: "var(--text-muted)", fontFamily: MONO }}>{row.line}</td>
                       <td style={{ padding: "9px 14px", whiteSpace: "nowrap" }}>
                         {row.error
-                          ? <span style={{ color: "#ef4444", fontWeight: 700 }}>✗ skip</span>
+                          ? <span style={{ color: "var(--tx-ef4444, #ef4444)", fontWeight: 700 }}>✗ skip</span>
                           : row.warning
-                            ? <span style={{ color: "#f59e0b", fontWeight: 700 }}>! check</span>
-                            : <span style={{ color: "#22c55e", fontWeight: 700 }}>✓ ok</span>}
+                            ? <span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>! check</span>
+                            : <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 700 }}>✓ ok</span>}
                       </td>
                       <td style={{ padding: "9px 14px" }}>
                         <div style={{ fontFamily: MONO, fontSize: 11.5, lineHeight: 1.7, wordBreak: "break-word" }}>
@@ -833,15 +833,15 @@ function ImportWizardInner() {
                             : "—"}
                         </div>
                         {row.matched && (
-                          <div style={{ fontSize: 11, color: "#22c55e", marginTop: 3 }}>
+                          <div style={{ fontSize: 11, color: "var(--tx-22c55e, #22c55e)", marginTop: 3 }}>
                             → matches <b>{row.matched}</b>
                           </div>
                         )}
                         {row.error && (
-                          <div style={{ fontSize: 11, color: "#ef4444", marginTop: 3 }}>{row.error}</div>
+                          <div style={{ fontSize: 11, color: "var(--tx-ef4444, #ef4444)", marginTop: 3 }}>{row.error}</div>
                         )}
                         {row.warning && !row.error && (
-                          <div style={{ fontSize: 11, color: "#f59e0b", marginTop: 3 }}>{row.warning}</div>
+                          <div style={{ fontSize: 11, color: "var(--tx-f59e0b, #f59e0b)", marginTop: 3 }}>{row.warning}</div>
                         )}
                       </td>
                     </tr>
@@ -854,7 +854,7 @@ function ImportWizardInner() {
           {/* Every failure, including the ones past the preview window */}
           {preview.issues.length > 0 && (
             <div style={{ ...card, borderColor: "rgba(239,68,68,.28)", padding: "16px 18px", marginBottom: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#ef4444" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: "var(--tx-ef4444, #ef4444)" }}>
                 {preview.failed} row{preview.failed === 1 ? "" : "s"} will be skipped
               </div>
               <div style={{ maxHeight: 220, overflowY: "auto", fontSize: 11.5, lineHeight: 1.8, color: "var(--text-muted)" }}>
@@ -877,7 +877,7 @@ function ImportWizardInner() {
               ...card, borderColor: "rgba(245,158,11,.32)", background: "rgba(245,158,11,.07)",
               padding: "16px 18px", marginBottom: 14,
             }}>
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, color: "#f59e0b" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, color: "var(--tx-f59e0b, #f59e0b)" }}>
                 This file was already partly imported
               </div>
               <div style={{ fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12 }}>
@@ -938,7 +938,7 @@ function ImportWizardInner() {
               borderRadius: 10, border: "1px solid rgba(245,158,11,.28)",
               background: "rgba(245,158,11,.07)", padding: "13px 15px", marginBottom: 18,
             }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: "#f59e0b", marginBottom: 6 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)", marginBottom: 6 }}>
                 Skipped rows
               </div>
               <div style={{ maxHeight: 200, overflowY: "auto", fontSize: 11.5, lineHeight: 1.75, color: "var(--text-muted)" }}>

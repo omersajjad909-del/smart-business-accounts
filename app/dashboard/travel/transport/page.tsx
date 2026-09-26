@@ -94,7 +94,7 @@ export default function TravelTransportPage() {
             const driver = String(row.driver || "");
             if (driver) return `${driver}${row.driverPhone ? ` · ${row.driverPhone}` : ""}`;
             // The thing that goes wrong, said in red rather than left blank.
-            return <span style={{ color: "#f87171", fontWeight: 700 }}>Not assigned</span>;
+            return <span style={{ color: "var(--tx-f87171, #f87171)", fontWeight: 700 }}>Not assigned</span>;
           },
         },
         { key: "supplier", label: "Supplier" },
@@ -104,7 +104,7 @@ export default function TravelTransportPage() {
           label: "Margin",
           render: (row) => {
             const margin = Number(row.margin) || 0;
-            return <span style={{ color: margin > 0 ? "#34d399" : "#f87171", fontWeight: 700 }}>{margin.toLocaleString()}</span>;
+            return <span style={{ color: margin > 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>{margin.toLocaleString()}</span>;
           },
         },
         { key: "status", label: "Status" },
@@ -141,10 +141,10 @@ export default function TravelTransportPage() {
 
         return [
           { label: "Transfers", value: rows.length, color: travelAccent },
-          { label: "Live", value: live.length, color: "#60a5fa" },
-          { label: "No Driver Yet", value: unassigned, color: unassigned ? "#f87171" : "#34d399" },
-          { label: "Tomorrow", value: dueTomorrow, color: dueTomorrow ? "#fbbf24" : "#34d399" },
-          { label: "Margin", value: margin.toLocaleString(), color: margin >= 0 ? "#34d399" : "#f87171" },
+          { label: "Live", value: live.length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "No Driver Yet", value: unassigned, color: unassigned ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" },
+          { label: "Tomorrow", value: dueTomorrow, color: dueTomorrow ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" },
+          { label: "Margin", value: margin.toLocaleString(), color: margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" },
         ];
       }}
     />

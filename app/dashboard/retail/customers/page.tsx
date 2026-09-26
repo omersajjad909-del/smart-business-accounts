@@ -63,10 +63,10 @@ export default function RetailCustomersPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total Customers", val: customers.length, color: "#818cf8" },
-          { label: "Active", val: customers.filter(c => c.status === "active").length, color: "#10b981" },
-          { label: "Outstanding Balance", val: `Rs ${totalBalance.toLocaleString()}`, color: "#f59e0b" },
-          { label: "Total Sales (All Time)", val: `Rs ${totalSales.toLocaleString()}`, color: "#6366f1" },
+          { label: "Total Customers", val: customers.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active", val: customers.filter(c => c.status === "active").length, color: "var(--tx-10b981, #10b981)" },
+          { label: "Outstanding Balance", val: `Rs ${totalBalance.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Total Sales (All Time)", val: `Rs ${totalSales.toLocaleString()}`, color: "var(--tx-6366f1, #6366f1)" },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
@@ -104,12 +104,12 @@ export default function RetailCustomersPage() {
                 <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{c.phone}</td>
                 <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{c.city}</td>
                 <td style={{ padding: "11px 14px" }}>{c.creditLimit > 0 ? `Rs ${c.creditLimit.toLocaleString()}` : "—"}</td>
-                <td style={{ padding: "11px 14px", fontWeight: 600, color: c.balance > 0 ? "#f59e0b" : "var(--text-muted)" }}>
+                <td style={{ padding: "11px 14px", fontWeight: 600, color: c.balance > 0 ? "var(--tx-f59e0b, #f59e0b)" : "var(--text-muted)" }}>
                   {c.balance > 0 ? `Rs ${c.balance.toLocaleString()}` : "—"}
                 </td>
                 <td style={{ padding: "11px 14px" }}>Rs {c.totalSales.toLocaleString()}</td>
                 <td style={{ padding: "11px 14px" }}>
-                  {c.loyaltyPoints > 0 && <span style={{ background: "rgba(251,191,36,.1)", color: "#fbbf24", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>⭐ {c.loyaltyPoints}</span>}
+                  {c.loyaltyPoints > 0 && <span style={{ background: "rgba(251,191,36,.1)", color: "var(--tx-fbbf24, #fbbf24)", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>⭐ {c.loyaltyPoints}</span>}
                 </td>
                 <td style={{ padding: "11px 14px" }}>
                   <span style={{ background: c.status === "active" ? "rgba(16,185,129,.1)" : "rgba(100,116,139,.1)", color: c.status === "active" ? "#10b981" : "#94a3b8", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
@@ -118,7 +118,7 @@ export default function RetailCustomersPage() {
                 </td>
                 <td style={{ padding: "11px 14px" }}>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <Link prefetch={false} href={`/dashboard/reports/ledger?account=${c.id}`} style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
+                    <Link prefetch={false} href={`/dashboard/reports/ledger?account=${c.id}`} style={{ background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
                   </div>
                 </td>
               </tr>

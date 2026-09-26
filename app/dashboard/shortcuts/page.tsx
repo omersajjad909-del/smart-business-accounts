@@ -94,7 +94,7 @@ function KeyRecorder({ value, onChange }: { value: string[]; onChange: (keys: st
         }}
       >
         {recording ? (
-          <span style={{ fontSize: 12, color: "#818cf8", fontWeight: 600, animation: "pulse 1s infinite" }}>
+          <span style={{ fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 600, animation: "pulse 1s infinite" }}>
             🎹 Press keys…
           </span>
         ) : current.length === 0 ? (
@@ -162,12 +162,12 @@ function ShortcutRow({
         </div>
 
         {conflict && (
-          <span style={{ fontSize: 10, color: "#f87171", fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)" }}>
+          <span style={{ fontSize: 10, color: "var(--tx-f87171, #f87171)", fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)" }}>
             ⚠ Conflict
           </span>
         )}
         {browserReserved && !conflict && (
-          <span title="This key combo is reserved by the browser and may not work" style={{ fontSize: 10, color: "#fb923c", fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "rgba(251,146,60,0.1)", border: "1px solid rgba(251,146,60,0.25)" }}>
+          <span title="This key combo is reserved by the browser and may not work" style={{ fontSize: 10, color: "var(--tx-fb923c, #fb923c)", fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "rgba(251,146,60,0.1)", border: "1px solid rgba(251,146,60,0.25)" }}>
             🌐 Browser Key
           </span>
         )}
@@ -362,20 +362,20 @@ export default function ShortcutsPage() {
       <div style={{ ...card, background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.2)", marginBottom: 20 }}>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            <strong style={{ color: "#818cf8" }}>How it works:</strong> Toggle ON/OFF any shortcut. Click <strong>Edit</strong> to change the key combo or action. Click a key field then press your desired keys to record. Changes are saved per company.
+            <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>How it works:</strong> Toggle ON/OFF any shortcut. Click <strong>Edit</strong> to change the key combo or action. Click a key field then press your desired keys to record. Changes are saved per company.
           </div>
         </div>
         <div style={{ marginTop: 10, display: "flex", gap: 16, flexWrap: "wrap", fontSize: 11, color: "var(--text-muted)" }}>
           <span>🔍 <strong>Focus Search</strong> — opens search bar</span>
           <span>◀ <strong>Toggle Sidebar</strong> — collapse/expand sidebar</span>
           <span>🔗 <strong>Navigate</strong> — go to any page</span>
-          <span>🌐 <strong style={{ color: "#fb923c" }}>Browser Key</strong> — reserved by browser (Ctrl+N, Ctrl+P etc.) — use Alt+key instead</span>
+          <span>🌐 <strong style={{ color: "var(--tx-fb923c, #fb923c)" }}>Browser Key</strong> — reserved by browser (Ctrl+N, Ctrl+P etc.) — use Alt+key instead</span>
         </div>
       </div>
 
       {/* Built-in Voucher Shortcuts */}
       <div style={{ ...card, background: "rgba(20,184,166,0.04)", border: "1px solid rgba(20,184,166,0.2)", marginBottom: 20 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: "#14b8a6", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-14b8a6, #14b8a6)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>
           Built-in Voucher Query Shortcuts (Oracle F7/F8 Mode)
         </div>
         <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 14px" }}>
@@ -390,7 +390,7 @@ export default function ShortcutsPage() {
             { key: "Escape",   desc: "Cancel / Exit Query Mode",  detail: "Returns to normal entry mode" },
           ].map(({ key, desc, detail }) => (
             <div key={key} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", borderRadius: 8, background: "var(--app-bg)", border: "1px solid var(--border)" }}>
-              <kbd style={{ padding: "3px 9px", borderRadius: 6, background: "rgba(20,184,166,0.12)", border: "1px solid rgba(20,184,166,0.3)", fontSize: 11, fontWeight: 800, color: "#14b8a6", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}>
+              <kbd style={{ padding: "3px 9px", borderRadius: 6, background: "rgba(20,184,166,0.12)", border: "1px solid rgba(20,184,166,0.3)", fontSize: 11, fontWeight: 800, color: "var(--tx-14b8a6, #14b8a6)", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}>
                 {key}
               </kbd>
               <div>
@@ -404,7 +404,7 @@ export default function ShortcutsPage() {
 
       {/* Shortcuts list */}
       {!isAdmin && (
-        <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", fontSize: 13, color: "#fbbf24", marginBottom: 16 }}>
+        <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", marginBottom: 16 }}>
           ⚠ Only Admins can edit shortcuts. You can view the current shortcuts below.
         </div>
       )}
@@ -444,7 +444,7 @@ export default function ShortcutsPage() {
                 <div style={{ display: "flex", gap: 3 }}>
                   {s.keys.map((k, i) => (
                     <span key={i}>
-                      <kbd style={{ padding: "2px 6px", borderRadius: 4, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", fontSize: 10, fontWeight: 700, color: "#818cf8", fontFamily: "inherit" }}>{k}</kbd>
+                      <kbd style={{ padding: "2px 6px", borderRadius: 4, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", fontSize: 10, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", fontFamily: "inherit" }}>{k}</kbd>
                       {i < s.keys.length - 1 && <span style={{ fontSize: 9, color: "var(--text-muted)", margin: "0 1px" }}>+</span>}
                     </span>
                   ))}

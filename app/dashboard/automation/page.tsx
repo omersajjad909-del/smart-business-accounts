@@ -25,11 +25,11 @@ function authHeaders(): Record<string, string> {
 function UpsellGate() {
   const { isMobile } = useResponsive();
   const FEATURES = [
-    { icon: "🔔", title: "Overdue Invoice Reminders", color: "#22c55e", desc: "See every overdue invoice in one place and send a reminder with one click." },
-    { icon: "📦", title: "Low Stock Reorder Alerts", color: "#38bdf8", desc: "Set a reorder point per item and get notified before you run out." },
-    { icon: "📊", title: "Scheduled Financial Reports", color: "#a78bfa", desc: "A real business summary, delivered to your inbox weekly or monthly." },
-    { icon: "🔗", title: "Zapier / Make Webhooks", color: "#34d399", desc: "Connect FinovaOS events to 5,000+ business apps." },
-    { icon: "📈", title: "Google Sheets Sync", color: "#fbbf24", desc: "Push invoices, inventory & contacts to a live spreadsheet." },
+    { icon: "🔔", title: "Overdue Invoice Reminders", color: "var(--tx-22c55e, #22c55e)", desc: "See every overdue invoice in one place and send a reminder with one click." },
+    { icon: "📦", title: "Low Stock Reorder Alerts", color: "var(--tx-38bdf8, #38bdf8)", desc: "Set a reorder point per item and get notified before you run out." },
+    { icon: "📊", title: "Scheduled Financial Reports", color: "var(--tx-a78bfa, #a78bfa)", desc: "A real business summary, delivered to your inbox weekly or monthly." },
+    { icon: "🔗", title: "Zapier / Make Webhooks", color: "var(--tx-34d399, #34d399)", desc: "Connect FinovaOS events to 5,000+ business apps." },
+    { icon: "📈", title: "Google Sheets Sync", color: "var(--tx-fbbf24, #fbbf24)", desc: "Push invoices, inventory & contacts to a live spreadsheet." },
   ];
 
   return (
@@ -70,7 +70,7 @@ function UpsellGate() {
 
       {AUTOMATION_ADDON_ENABLED ? (
         <div style={{ marginTop: 14, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(var(--ink),.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
-          <div style={{ fontSize: 13, fontWeight: 900, color: "#22c55e" }}>$79/mo</div>
+          <div style={{ fontSize: 13, fontWeight: 900, color: "var(--tx-22c55e, #22c55e)" }}>$79/mo</div>
           <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
             Get Started →
           </a>
@@ -159,7 +159,7 @@ export default function AutomationPage() {
   ];
 
   return (
-    <div style={{ fontFamily: FONT, color: "#e2e8f0", minHeight: "100vh", padding: isMobile ? "12px" : "24px" }}>
+    <div style={{ fontFamily: FONT, color: "var(--tx-e2e8f0, #e2e8f0)", minHeight: "100vh", padding: isMobile ? "12px" : "24px" }}>
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 26, fontWeight: 700, margin: 0, background: "linear-gradient(135deg,#a78bfa,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
@@ -175,7 +175,7 @@ export default function AutomationPage() {
         <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1))", border: "1px solid rgba(34,197,94,.35)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 22 }}>🎉</span>
           <div>
-            <div style={{ fontWeight: 700, color: "#22c55e", fontSize: 15 }}>Business Automation Activated!</div>
+            <div style={{ fontWeight: 700, color: "var(--tx-22c55e, #22c55e)", fontSize: 15 }}>Business Automation Activated!</div>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),0.6)", marginTop: 2 }}>All automation tools are now unlocked for your account.</div>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function AutomationPage() {
         <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "linear-gradient(135deg,rgba(251,191,36,.12),rgba(217,119,6,.08))", border: "1px solid rgba(251,191,36,.3)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 22 }}>⏳</span>
           <div>
-            <div style={{ fontWeight: 700, color: "#fbbf24", fontSize: 15 }}>Payment received — activating your add-on…</div>
+            <div style={{ fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", fontSize: 15 }}>Payment received — activating your add-on…</div>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),0.6)", marginTop: 2 }}>We&apos;re confirming your payment with the billing provider. This usually takes under a minute.</div>
           </div>
         </div>
@@ -238,7 +238,7 @@ function Input({ label, ...props }: { label: string } & React.InputHTMLAttribute
       <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>{label}</label>
       <input {...props} style={{
         width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
-        background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT,
+        background: "rgba(var(--ink),0.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: FONT,
         outline: "none", boxSizing: "border-box", ...props.style,
       }} />
     </div>
@@ -251,7 +251,7 @@ function Textarea({ label, ...props }: { label: string } & React.TextareaHTMLAtt
       <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>{label}</label>
       <textarea {...props} style={{
         width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
-        background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT,
+        background: "rgba(var(--ink),0.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: FONT,
         outline: "none", resize: "vertical", boxSizing: "border-box", ...props.style,
       }} />
     </div>
@@ -263,7 +263,7 @@ function Btn({ children, variant = "primary", loading = false, ...props }: {
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const bg = variant === "primary" ? "linear-gradient(135deg,#7c3aed,#2563eb)"
     : variant === "danger" ? "rgba(239,68,68,0.15)"
-    : "rgba(255,255,255,0.07)";
+    : "rgba(var(--ink),0.07)";
   return (
     <button {...props} disabled={loading || props.disabled} style={{
       padding: "8px 18px", borderRadius: 8, border: variant === "danger" ? "1px solid rgba(239,68,68,0.3)" : "none",
@@ -291,11 +291,11 @@ function Toast({ msg, ok }: { msg: string; ok: boolean }) {
 // ─── OVERVIEW ─────────────────────────────────────────────────────────────────
 function OverviewTab({ onNavigate }: { onNavigate: (t: Tab) => void }) {
   const features = [
-    { id: "reminders" as Tab, icon: "🔔", title: "Overdue Invoice Reminders", desc: "See every overdue invoice in one place and send a reminder with one click.", color: "#22c55e" },
-    { id: "lowstock" as Tab, icon: "📦", title: "Low Stock Reorder Alerts", desc: "Set a reorder point per item and get notified before you run out.", color: "#38bdf8" },
-    { id: "reports" as Tab, icon: "📊", title: "Scheduled Financial Reports", desc: "A real business summary — sales, purchases, receivables, payables — delivered on a schedule.", color: "#a78bfa" },
-    { id: "webhooks" as Tab, icon: "🔗", title: "Zapier / Make Webhooks", desc: "Send & receive data to/from 5,000+ apps via outbound and inbound webhooks.", color: "#34d399" },
-    { id: "sheets" as Tab, icon: "📈", title: "Google Sheets Sync", desc: "Sync your invoices, inventory, and contacts to Google Sheets automatically.", color: "#fbbf24" },
+    { id: "reminders" as Tab, icon: "🔔", title: "Overdue Invoice Reminders", desc: "See every overdue invoice in one place and send a reminder with one click.", color: "var(--tx-22c55e, #22c55e)" },
+    { id: "lowstock" as Tab, icon: "📦", title: "Low Stock Reorder Alerts", desc: "Set a reorder point per item and get notified before you run out.", color: "var(--tx-38bdf8, #38bdf8)" },
+    { id: "reports" as Tab, icon: "📊", title: "Scheduled Financial Reports", desc: "A real business summary — sales, purchases, receivables, payables — delivered on a schedule.", color: "var(--tx-a78bfa, #a78bfa)" },
+    { id: "webhooks" as Tab, icon: "🔗", title: "Zapier / Make Webhooks", desc: "Send & receive data to/from 5,000+ apps via outbound and inbound webhooks.", color: "var(--tx-34d399, #34d399)" },
+    { id: "sheets" as Tab, icon: "📈", title: "Google Sheets Sync", desc: "Sync your invoices, inventory, and contacts to Google Sheets automatically.", color: "var(--tx-fbbf24, #fbbf24)" },
   ];
 
   return (
@@ -379,7 +379,7 @@ function RemindersTab() {
                   <td style={{ padding: "10px" }}>{row.invoiceNo}</td>
                   <td style={{ padding: "10px" }}>{row.customerName}</td>
                   <td style={{ padding: "10px" }}>{row.total.toLocaleString()}</td>
-                  <td style={{ padding: "10px", color: row.daysOverdue >= 30 ? "#f87171" : row.daysOverdue >= 15 ? "#fbbf24" : "#e2e8f0" }}>{row.daysOverdue}d</td>
+                  <td style={{ padding: "10px", color: row.daysOverdue >= 30 ? "var(--tx-f87171, #f87171)" : row.daysOverdue >= 15 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-e2e8f0, #e2e8f0)" }}>{row.daysOverdue}d</td>
                   <td style={{ padding: "10px", color: "rgba(var(--ink),0.4)" }}>
                     {row.lastReminderSentAt ? new Date(row.lastReminderSentAt).toLocaleDateString() : "—"}
                   </td>
@@ -452,7 +452,7 @@ function LowStockTab() {
           <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>Item</label>
           <select value={form.itemId} onChange={e => setForm(f => ({ ...f, itemId: e.target.value }))} style={{
             width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
-            background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT, outline: "none",
+            background: "rgba(var(--ink),0.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: FONT, outline: "none",
           }}>
             <option value="">Select an item…</option>
             {items.map(i => <option key={i.id} value={i.id} style={{ color: "#000" }}>{i.name} ({i.code})</option>)}
@@ -488,7 +488,7 @@ function LowStockTab() {
               <div key={a.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 13, fontWeight: 700 }}>{a.itemName}</span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#f87171" }}>{a.currentStock} left</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>{a.currentStock} left</span>
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),0.4)", marginTop: 3 }}>Reorder point: {a.reorderPoint} · Suggested qty: {a.reorderQty}</div>
               </div>
@@ -549,7 +549,7 @@ function ReportsTab() {
         <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.5)", marginBottom: 5 }}>Frequency</label>
         <select value={cfg.frequency} onChange={e => setCfg(c => ({ ...c, frequency: e.target.value as "weekly" | "monthly" }))} style={{
           width: "100%", maxWidth: 240, padding: "9px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
-          background: "rgba(var(--ink),0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: FONT, outline: "none",
+          background: "rgba(var(--ink),0.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: FONT, outline: "none",
         }}>
           <option value="weekly" style={{ color: "#000" }}>Weekly</option>
           <option value="monthly" style={{ color: "#000" }}>Monthly</option>
@@ -631,7 +631,7 @@ function WebhooksTab() {
               <div key={w.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),0.04)", marginBottom: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 14, fontWeight: 600 }}>{w.name}</span>
-                  <span style={{ fontSize: 11, color: w.active ? "#22c55e" : "#888" }}>{w.active ? "Active" : "Off"}</span>
+                  <span style={{ fontSize: 11, color: w.active ? "var(--tx-22c55e, #22c55e)" : "var(--tx-888888, #888)" }}>{w.active ? "Active" : "Off"}</span>
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),0.35)", marginTop: 3 }}>{w.url.slice(0, 50)}...</div>
                 {w.lastFired && <div style={{ fontSize: 11, color: "rgba(var(--ink),0.3)", marginTop: 3 }}>Last fired: {new Date(w.lastFired).toLocaleString()}</div>}
@@ -651,7 +651,7 @@ function WebhooksTab() {
           {inbound.map(t => (
             <div key={t.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),0.04)", marginBottom: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{t.name}</div>
-              <div style={{ fontSize: 11, color: "#a78bfa", wordBreak: "break-all" }}>
+              <div style={{ fontSize: 11, color: "var(--tx-a78bfa, #a78bfa)", wordBreak: "break-all" }}>
                 {typeof window !== "undefined" ? window.location.origin : ""}/api/automation/webhooks/inbound?token={t.token}
               </div>
               <div style={{ fontSize: 11, color: "rgba(var(--ink),0.3)", marginTop: 4 }}>Hits: {t.hitCount}</div>
@@ -710,7 +710,7 @@ function SheetsTab() {
           Uses a Google Service Account to write data directly to your spreadsheet.
         </p>
         {status?.configured && (
-          <div style={{ marginBottom: 14, padding: "8px 12px", borderRadius: 8, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", fontSize: 12, color: "#22c55e" }}>
+          <div style={{ marginBottom: 14, padding: "8px 12px", borderRadius: 8, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", fontSize: 12, color: "var(--tx-22c55e, #22c55e)" }}>
             Connected to: {status.spreadsheetId}
           </div>
         )}

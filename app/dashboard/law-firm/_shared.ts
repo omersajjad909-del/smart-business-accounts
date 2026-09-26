@@ -3,9 +3,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const lawFont = "'Outfit','Inter',sans-serif";
-export const lawBg = "rgba(255,255,255,.03)";
-export const lawBorder = "rgba(255,255,255,.07)";
-export const lawMuted = "rgba(255,255,255,.58)";
+export const lawBg = "rgba(var(--ink),.03)";
+export const lawBorder = "rgba(var(--ink),.07)";
+export const lawMuted = "rgba(var(--ink),.58)";
 
 export type LawCase = {
   id: string;

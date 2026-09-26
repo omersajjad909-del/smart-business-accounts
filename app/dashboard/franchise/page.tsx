@@ -64,7 +64,7 @@ export default function FranchiseOverviewPage() {
           };
 
   return (
-    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>{franchiseConfig.title}</h1>
@@ -85,11 +85,11 @@ export default function FranchiseOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: franchiseConfig.outletLabel, value: summary.outlets, color: "#22c55e" },
-          { label: "Active Outlets", value: summary.activeOutlets, color: "#60a5fa" },
-          { label: "Monthly Sales", value: summary.monthlySales.toLocaleString(), color: "#fbbf24" },
-          { label: "Royalty Value", value: summary.royaltyValue.toLocaleString(), color: "#a78bfa" },
-          { label: "Received Cycles", value: summary.receivedCycles, color: "#34d399" },
+          { label: franchiseConfig.outletLabel, value: summary.outlets, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Active Outlets", value: summary.activeOutlets, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Monthly Sales", value: summary.monthlySales.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Royalty Value", value: summary.royaltyValue.toLocaleString(), color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Received Cycles", value: summary.receivedCycles, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>

@@ -52,9 +52,9 @@ export default function TravelSettlementsPage() {
         const totalPayable = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
         return [
           { label: "Settlements", value: rows.length, color: travelAccent },
-          { label: "Pending", value: rows.filter((row) => String(row.status) === "pending").length, color: "#fbbf24" },
-          { label: "Settled", value: rows.filter((row) => String(row.status) === "settled").length, color: "#34d399" },
-          { label: "Exposure", value: totalPayable.toLocaleString(), color: "#60a5fa" },
+          { label: "Pending", value: rows.filter((row) => String(row.status) === "pending").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Settled", value: rows.filter((row) => String(row.status) === "settled").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Exposure", value: totalPayable.toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ];
       }}
     />

@@ -75,7 +75,7 @@ export default function EcommerceAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ecommerceFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Ecommerce Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Ecommerce Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Revenue, returns, and fulfillment performance</h1>
         <p style={{ margin: 0, fontSize: 14, color: ecommerceMuted, maxWidth: 760 }}>
           Online store performance across platform, product, and fulfillment is now driven by the dedicated ecommerce control center.
@@ -91,7 +91,7 @@ export default function EcommerceAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Platform Contribution</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Platform Contribution</div>
           <div style={{ display: "grid", gap: 12 }}>
             {platformData.length === 0 ? (
               <div style={{ fontSize: 13, color: ecommerceMuted }}>No platform sales data available yet.</div>
@@ -113,20 +113,20 @@ export default function EcommerceAnalyticsPage() {
         </div>
 
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Return Pressure</div>
+          <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Return Pressure</div>
           <div style={{ display: "grid", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ecommerceMuted }}>Total return value</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#f87171" }}>Rs. {totalReturns.toLocaleString()}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>Rs. {totalReturns.toLocaleString()}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ecommerceMuted }}>Cancelled orders</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b" }}>{cancelled}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{cancelled}</span>
             </div>
             {returnReasonData.slice(0, 4).map(([reason, count]) => (
               <div key={reason} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13 }}>{reason}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#c7d2fe" }}>{count} cases</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-c7d2fe, #c7d2fe)" }}>{count} cases</span>
               </div>
             ))}
           </div>
@@ -135,7 +135,7 @@ export default function EcommerceAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Revenue Products</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Revenue Products</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topProducts.length === 0 ? (
               <div style={{ color: ecommerceMuted, fontSize: 13 }}>Add product and sales activity to see top revenue products.</div>
@@ -145,14 +145,14 @@ export default function EcommerceAnalyticsPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{product.name}</div>
                   <div style={{ fontSize: 12, color: ecommerceMuted }}>{product.platform} | {product.sales} units</div>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {product.revenue.toLocaleString()}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {product.revenue.toLocaleString()}</div>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Fulfillment pressure", value: `${data.shipments.filter((shipment) => shipment.status === "processing" || shipment.status === "dispatched").length} open shipments`, tone: "#60a5fa" },

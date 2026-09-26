@@ -222,9 +222,9 @@ export default function StockOnVanPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Load Entries", value: loads.length, color: "#f97316" },
-          { label: "Total Loaded Qty", value: totalLoaded, color: "#38bdf8" },
-          { label: "On-Van Balance", value: totalBalance, color: "#34d399" },
+          { label: "Load Entries", value: loads.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Total Loaded Qty", value: totalLoaded, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "On-Van Balance", value: totalBalance, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
@@ -250,16 +250,16 @@ export default function StockOnVanPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{load.routeName || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{load.van || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{load.itemName}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#38bdf8", fontWeight: 700 }}>{load.loadQty}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{load.soldQty}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f59e0b", fontWeight: 700 }}>{load.returnedQty}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: load.balanceQty >= 0 ? "#a5b4fc" : "#f87171", fontWeight: 700 }}>{load.balanceQty}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>{load.loadQty}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{load.soldQty}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{load.returnedQty}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: load.balanceQty >= 0 ? "var(--tx-a5b4fc, #a5b4fc)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>{load.balanceQty}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{load.date || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", display: "flex", gap: 8 }}>
                   <button onClick={() => editLoad(load)} style={{ padding: "6px 10px", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#a5b4fc", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Edit
                   </button>
-                  <button onClick={async () => { if (await confirmToast(`Delete van load for ${load.itemName}?`)) void stockRecords.remove(load.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={async () => { if (await confirmToast(`Delete van load for ${load.itemName}?`)) void stockRecords.remove(load.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

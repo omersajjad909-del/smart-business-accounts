@@ -52,10 +52,10 @@ const DOC_TYPES: DocType[] = [
 ];
 
 const STATUS_META: Record<DocStatus, { label: string; color: string; bg: string; border: string }> = {
-  DRAFT:     { label: "Draft",     color: "#9ca3af", bg: "rgba(156,163,175,.12)", border: "rgba(156,163,175,.35)" },
-  SUBMITTED: { label: "Submitted", color: "#fbbf24", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
-  APPROVED:  { label: "Approved",  color: "#4ade80", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
-  REJECTED:  { label: "Rejected",  color: "#f87171", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
+  DRAFT:     { label: "Draft",     color: "var(--tx-9ca3af, #9ca3af)", bg: "rgba(156,163,175,.12)", border: "rgba(156,163,175,.35)" },
+  SUBMITTED: { label: "Submitted", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
+  APPROVED:  { label: "Approved",  color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
+  REJECTED:  { label: "Rejected",  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
   CANCELLED: { label: "Cancelled", color: "#6b7280", bg: "rgba(107,114,128,.12)",  border: "rgba(107,114,128,.35)" },
 };
 
@@ -238,11 +238,11 @@ export default function ExportDocumentationPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Docs",  value: kpis.total,     color: "#a78bfa" },
-          { label: "Approved",    value: kpis.approved,  color: "#4ade80" },
-          { label: "Submitted",   value: kpis.submitted, color: "#fbbf24" },
-          { label: "Draft",       value: kpis.draft,     color: "#9ca3af" },
-          { label: "Rejected",    value: kpis.rejected,  color: "#f87171" },
+          { label: "Total Docs",  value: kpis.total,     color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Approved",    value: kpis.approved,  color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Submitted",   value: kpis.submitted, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Draft",       value: kpis.draft,     color: "var(--tx-9ca3af, #9ca3af)" },
+          { label: "Rejected",    value: kpis.rejected,  color: "var(--tx-f87171, #f87171)" },
         ].map(k => (
           <div key={k.label} style={s.kpi as React.CSSProperties}>
             <div style={{ fontSize: 22, fontWeight: 800, color: k.color, marginBottom: 4 }}>{k.value}</div>
@@ -291,11 +291,11 @@ export default function ExportDocumentationPage() {
                 const sm = STATUS_META[d.status];
                 return (
                   <tr key={d.id}
-                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
-                    <td style={{ ...s.td, fontWeight: 700, color: "#10b981" }}>{d.docNo}</td>
-                    <td style={s.td}><span style={{ background: "rgba(16,185,129,.1)", color: "#34d399", border: "1px solid rgba(16,185,129,.25)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{DOC_ICON[d.docType]} {d.docType}</span></td>
+                    <td style={{ ...s.td, fontWeight: 700, color: "var(--tx-10b981, #10b981)" }}>{d.docNo}</td>
+                    <td style={s.td}><span style={{ background: "rgba(16,185,129,.1)", color: "var(--tx-34d399, #34d399)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{DOC_ICON[d.docType]} {d.docType}</span></td>
                     <td style={{ ...s.td, fontWeight: 600 }}>{d.exporterName || "—"}</td>
                     <td style={s.td}>{d.importerName || "—"}</td>
                     <td style={s.td}>
@@ -311,7 +311,7 @@ export default function ExportDocumentationPage() {
                       {d.hsCode && <div style={{ fontSize: 11, color: "var(--text-muted)" }}>HS: {d.hsCode}</div>}
                     </td>
                     <td style={{ ...s.td, textAlign: "right" }}>{d.packages || "—"}</td>
-                    <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "#4ade80" }}>
+                    <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "var(--tx-4ade80, #4ade80)" }}>
                       {d.declaredValue ? `${d.currency} ${d.declaredValue.toLocaleString()}` : "—"}
                     </td>
                     <td style={s.td}>{d.etd || "—"}</td>
@@ -345,7 +345,7 @@ export default function ExportDocumentationPage() {
             <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 22 }}>This action cannot be undone.</div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => doDelete(confirmDel)} style={{ ...s.btn("#ef4444"), flex: 1 }}>Delete</button>
-              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(255,255,255,.08)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(var(--ink),.08)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -443,14 +443,14 @@ export default function ExportDocumentationPage() {
             </div>
 
             {error && (
-              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "#fca5a5" }}>{error}</div>
+              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>
             )}
 
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} disabled={saving} style={{ ...s.btn("#10b981"), flex: 1, opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : editId ? "Update Document" : "Create Document"}
               </button>
-              <button onClick={closeModal} style={{ ...s.btn("rgba(255,255,255,.07)"), flex: 0.4 }}>Cancel</button>
+              <button onClick={closeModal} style={{ ...s.btn("rgba(var(--ink),.07)"), flex: 0.4 }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -66,10 +66,10 @@ export default function PharmacyAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Stock Units", value: drugs.reduce((sum, row) => sum + row.stock, 0), color: "#fb7185" },
-          { label: "Inventory Value", value: `Rs. ${drugs.reduce((sum, row) => sum + row.stock * row.unitPrice, 0).toLocaleString()}`, color: "#34d399" },
-          { label: "Expired Lines", value: drugs.filter((row) => row.isExpired).length, color: "#f87171" },
-          { label: "Prescription Volume", value: prescriptions.length, color: "#60a5fa" },
+          { label: "Total Stock Units", value: drugs.reduce((sum, row) => sum + row.stock, 0), color: "var(--tx-fb7185, #fb7185)" },
+          { label: "Inventory Value", value: `Rs. ${drugs.reduce((sum, row) => sum + row.stock * row.unitPrice, 0).toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Expired Lines", value: drugs.filter((row) => row.isExpired).length, color: "var(--tx-f87171, #f87171)" },
+          { label: "Prescription Volume", value: prescriptions.length, color: "var(--tx-60a5fa, #60a5fa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: pharmacyMuted, marginBottom: 8 }}>{card.label}</div>
@@ -97,7 +97,7 @@ export default function PharmacyAnalyticsPage() {
             {demandRows.map((row) => (
               <div key={row.name} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.name}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{row.count}</span>
               </div>
             ))}
             {demandRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No prescription data available.</div>}
@@ -110,7 +110,7 @@ export default function PharmacyAnalyticsPage() {
             {paymentRows.map((row) => (
               <div key={row.method} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, textTransform: "capitalize" }}>{row.method}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {row.amount.toLocaleString()}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {row.amount.toLocaleString()}</span>
               </div>
             ))}
             {paymentRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No counter sales recorded yet.</div>}

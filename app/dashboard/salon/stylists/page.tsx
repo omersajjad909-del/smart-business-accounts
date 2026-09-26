@@ -109,12 +109,12 @@ export default function StylistsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Stylists</div><div style={{ fontSize: 28, fontWeight: 800 }}>{stylistsWithLiveStats.length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Today</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{active}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Earnings</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>Rs. {avgEarnings.toLocaleString()}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Top Earner</div><div style={{ fontSize: 18, fontWeight: 800, color: "#ec4899" }}>{top?.name || "-"}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Today</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{active}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Earnings</div><div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>Rs. {avgEarnings.toLocaleString()}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Top Earner</div><div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-ec4899, #ec4899)" }}>{top?.name || "-"}</div></div>
       </div>
 
-      {error && <div style={{ marginBottom: 14, fontSize: 12, color: "#fda4af" }}>{error}</div>}
+      {error && <div style={{ marginBottom: 14, fontSize: 12, color: "var(--tx-fda4af, #fda4af)" }}>{error}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 20 }}>
         {!stylistsHook.loading && stylistsWithLiveStats.length === 0 && (
@@ -133,7 +133,7 @@ export default function StylistsPage() {
             <div style={{ display: "grid", gap: 8, fontSize: 13, color: "rgba(var(--ink),.7)" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Phone</span><span>{stylist.phone}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Appointments Today</span><span style={{ color: "var(--ink-solid, #fff)", fontWeight: 700 }}>{stylist.appointmentsToday}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Revenue</span><span style={{ color: "#34d399", fontWeight: 700 }}>Rs. {stylist.monthlyEarnings.toLocaleString()}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Revenue</span><span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {stylist.monthlyEarnings.toLocaleString()}</span></div>
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
               <button style={{ flex: 1, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, #fff)", borderRadius: 8, padding: "8px", fontSize: 13, cursor: "pointer" }}>View Schedule</button>

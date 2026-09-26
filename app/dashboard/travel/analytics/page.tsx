@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const panelBg = "rgba(255,255,255,.03)";
-const panelBorder = "rgba(255,255,255,.07)";
+const panelBg = "rgba(var(--ink),.03)";
+const panelBorder = "rgba(var(--ink),.07)";
 const ACCENT = "#38bdf8";
 
 type AnalyticsData = {
@@ -55,15 +55,15 @@ export default function TravelAnalyticsPage() {
 
   const moduleLinks = [
     { label: "Airline Tickets", href: "/dashboard/travel/tickets", color: ACCENT },
-    { label: "Visa Cases", href: "/dashboard/travel/visas", color: "#a78bfa" },
-    { label: "Hotel Packages", href: "/dashboard/travel/hotel-packages", color: "#a78bfa" },
-    { label: "Group Tours", href: "/dashboard/travel/tours", color: "#f97316" },
-    { label: "Settlements", href: "/dashboard/travel/settlements", color: "#f87171" },
-    { label: "Passports", href: "/dashboard/travel/passports", color: "#34d399" },
+    { label: "Visa Cases", href: "/dashboard/travel/visas", color: "var(--tx-a78bfa, #a78bfa)" },
+    { label: "Hotel Packages", href: "/dashboard/travel/hotel-packages", color: "var(--tx-a78bfa, #a78bfa)" },
+    { label: "Group Tours", href: "/dashboard/travel/tours", color: "var(--tx-f97316, #f97316)" },
+    { label: "Settlements", href: "/dashboard/travel/settlements", color: "var(--tx-f87171, #f87171)" },
+    { label: "Passports", href: "/dashboard/travel/passports", color: "var(--tx-34d399, #34d399)" },
   ];
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--tx-e2e8f0, #e2e8f0)" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 28 }}>
         <div>
@@ -86,13 +86,13 @@ export default function TravelAnalyticsPage() {
           {/* KPI Row */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 24 }}>
             {[
-              { label: "Total Revenue", value: `Rs. ${summary.totalRevenue.toLocaleString()}`, color: "#34d399" },
-              { label: "Total Cost", value: `Rs. ${summary.totalCost.toLocaleString()}`, color: "#f87171" },
-              { label: "Gross Margin", value: `Rs. ${summary.totalMargin.toLocaleString()}`, color: "#60a5fa" },
-              { label: "Margin %", value: `${marginPct}%`, color: marginPct >= 15 ? "#34d399" : "#fbbf24" },
-              { label: "Supplier Exposure", value: `Rs. ${summary.supplierExposure.toLocaleString()}`, color: "#f97316" },
-              { label: "Pending Invoices", value: summary.pendingInvoices, color: "#fbbf24" },
-              { label: "Pending Settlements", value: summary.pendingSettlements, color: "#f87171" },
+              { label: "Total Revenue", value: `Rs. ${summary.totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+              { label: "Total Cost", value: `Rs. ${summary.totalCost.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
+              { label: "Gross Margin", value: `Rs. ${summary.totalMargin.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Margin %", value: `${marginPct}%`, color: marginPct >= 15 ? "var(--tx-34d399, #34d399)" : "var(--tx-fbbf24, #fbbf24)" },
+              { label: "Supplier Exposure", value: `Rs. ${summary.supplierExposure.toLocaleString()}`, color: "var(--tx-f97316, #f97316)" },
+              { label: "Pending Invoices", value: summary.pendingInvoices, color: "var(--tx-fbbf24, #fbbf24)" },
+              { label: "Pending Settlements", value: summary.pendingSettlements, color: "var(--tx-f87171, #f87171)" },
             ].map(k => (
               <div key={k.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{k.label}</div>
@@ -136,7 +136,7 @@ export default function TravelAnalyticsPage() {
                     <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink-solid, #fff)" }}>{s.name}</div>
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{s.count} settlement{s.count !== 1 ? "s" : ""}</div>
                   </div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171" }}>Rs. {s.exposure.toLocaleString()}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>Rs. {s.exposure.toLocaleString()}</div>
                 </div>
               ))}
             </div>
@@ -174,7 +174,7 @@ export default function TravelAnalyticsPage() {
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{a.type} | {a.customer}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>Rs. {a.amount.toLocaleString()}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Rs. {a.amount.toLocaleString()}</div>
                     <div style={{ fontSize: 10, background: `${a.color}18`, color: a.color, borderRadius: 10, padding: "2px 8px", marginTop: 3, fontWeight: 700 }}>{a.status}</div>
                   </div>
                 </div>

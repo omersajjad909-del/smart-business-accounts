@@ -51,9 +51,9 @@ export default function PharmacyPurchasesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
         {[
-          { label: "Purchase Lines", value: purchases.length, color: "#60a5fa" },
-          { label: "Units Received", value: purchases.reduce((sum, row) => sum + row.quantity, 0), color: "#22c55e" },
-          { label: "Purchase Value", value: `Rs. ${purchases.reduce((sum, row) => sum + row.totalCost, 0).toLocaleString()}`, color: "#f59e0b" },
+          { label: "Purchase Lines", value: purchases.length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Units Received", value: purchases.reduce((sum, row) => sum + row.quantity, 0), color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Purchase Value", value: `Rs. ${purchases.reduce((sum, row) => sum + row.totalCost, 0).toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((card) => (
           <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: pharmacyMuted, marginBottom: 8 }}>{card.label}</div>
@@ -106,7 +106,7 @@ export default function PharmacyPurchasesPage() {
                 </div>
               ))}
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fca5a5", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: "none", background: "#22c55e", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save Purchase</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 18px", borderRadius: 8, border: `1px solid ${pharmacyBorder}`, background: "transparent", color: "var(--ink-solid, #fff)", cursor: "pointer" }}>Cancel</button>

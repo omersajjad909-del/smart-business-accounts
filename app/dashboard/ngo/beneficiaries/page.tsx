@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 const catColor: Record<string,string> = { orphan:"#6366f1", widow:"#f59e0b", disabled:"#3b82f6", student:"#22c55e", family:"#f97316" };
 const catLabel: Record<string,string> = { orphan:"Orphan", widow:"Widow", disabled:"Disabled", student:"Student", family:"Family" };
@@ -72,10 +72,10 @@ export default function BeneficiariesPage() {
 
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
-          { label:"Total Beneficiaries", value:beneficiaries.length, color:"#6366f1" },
-          { label:"Active", value:beneficiaries.filter(b=>b.status==="active").length, color:"#22c55e" },
-          { label:"Monthly Aid Total", value:`Rs. ${totalMonthlyAid.toLocaleString()}`, color:"#f59e0b" },
-          { label:"New This Month", value:thisMonthEnrolled, color:"#3b82f6" },
+          { label:"Total Beneficiaries", value:beneficiaries.length, color:"var(--tx-6366f1, #6366f1)" },
+          { label:"Active", value:beneficiaries.filter(b=>b.status==="active").length, color:"var(--tx-22c55e, #22c55e)" },
+          { label:"Monthly Aid Total", value:`Rs. ${totalMonthlyAid.toLocaleString()}`, color:"var(--tx-f59e0b, #f59e0b)" },
+          { label:"New This Month", value:thisMonthEnrolled, color:"var(--tx-3b82f6, #3b82f6)" },
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:26, fontWeight:700, color:s.color }}>{s.value}</div>
@@ -86,7 +86,7 @@ export default function BeneficiariesPage() {
 
       <div style={{ display:"flex", gap:8, marginBottom:20 }}>
         {["all","orphan","widow","disabled","student","family"].map(c=>(
-          <button key={c} onClick={()=>setFilterCat(c)} style={{ ...btn(filterCat===c?"#6366f1":"rgba(255,255,255,.07)"), padding:"8px 16px", textTransform:"capitalize" }}>{c==="all"?"All":catLabel[c]}</button>
+          <button key={c} onClick={()=>setFilterCat(c)} style={{ ...btn(filterCat===c?"#6366f1":"rgba(var(--ink),.07)"), padding:"8px 16px", textTransform:"capitalize" }}>{c==="all"?"All":catLabel[c]}</button>
         ))}
       </div>
 
@@ -117,11 +117,11 @@ export default function BeneficiariesPage() {
                 </div>
               </div>
               <div style={{ textAlign:"right", flexShrink:0 }}>
-                <div style={{ fontSize:18, fontWeight:700, color:"#22c55e" }}>Rs. {b.monthlyAid.toLocaleString()}</div>
+                <div style={{ fontSize:18, fontWeight:700, color:"var(--tx-22c55e, #22c55e)" }}>Rs. {b.monthlyAid.toLocaleString()}</div>
                 <div style={{ fontSize:11, color:"rgba(var(--ink),.4)", marginBottom:10 }}>Monthly Aid</div>
                 <div style={{ display:"flex", gap:6 }}>
-                  <button style={{ ...btn("rgba(255,255,255,.07)"), padding:"7px 12px", fontSize:12 }}>Profile</button>
-                  <button style={{ ...btn("rgba(34,197,94,.2)"), padding:"7px 12px", fontSize:12, color:"#22c55e" }}>Disburse</button>
+                  <button style={{ ...btn("rgba(var(--ink),.07)"), padding:"7px 12px", fontSize:12 }}>Profile</button>
+                  <button style={{ ...btn("rgba(34,197,94,.2)"), padding:"7px 12px", fontSize:12, color:"var(--tx-22c55e, #22c55e)" }}>Disburse</button>
                 </div>
               </div>
             </div>

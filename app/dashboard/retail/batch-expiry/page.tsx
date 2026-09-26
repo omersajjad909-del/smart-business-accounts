@@ -14,10 +14,10 @@ function daysUntil(expDate: string) {
 }
 
 function getExpiryStatus(days: number) {
-  if (days <= 0) return { bg: "#ef444420", color: "#ef4444", label: "EXPIRED", statusKey: "EXPIRED" };
-  if (days <= 7) return { bg: "#ef444420", color: "#ef4444", label: "CRITICAL", statusKey: "CRITICAL" };
-  if (days <= 30) return { bg: "#f59e0b20", color: "#f59e0b", label: "EXPIRING_SOON", statusKey: "EXPIRING_SOON" };
-  return { bg: "#10b98120", color: "#10b981", label: "OK", statusKey: "OK" };
+  if (days <= 0) return { bg: "#ef444420", color: "var(--tx-ef4444, #ef4444)", label: "EXPIRED", statusKey: "EXPIRED" };
+  if (days <= 7) return { bg: "#ef444420", color: "var(--tx-ef4444, #ef4444)", label: "CRITICAL", statusKey: "CRITICAL" };
+  if (days <= 30) return { bg: "#f59e0b20", color: "var(--tx-f59e0b, #f59e0b)", label: "EXPIRING_SOON", statusKey: "EXPIRING_SOON" };
+  return { bg: "#10b98120", color: "var(--tx-10b981, #10b981)", label: "OK", statusKey: "OK" };
 }
 
 export default function BatchExpiryPage() {
@@ -129,10 +129,10 @@ export default function BatchExpiryPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total Batches", val: batches.length, color: "#818cf8" },
-          { label: "Critical (≤7 days)", val: batches.filter(b => b.daysLeft <= 7).length, color: "#ef4444" },
-          { label: "Expiring Soon (≤30d)", val: batches.filter(b => b.daysLeft > 7 && b.daysLeft <= 30).length, color: "#f59e0b" },
-          { label: "Safe Stock", val: batches.filter(b => b.daysLeft > 30).length, color: "#10b981" },
+          { label: "Total Batches", val: batches.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Critical (≤7 days)", val: batches.filter(b => b.daysLeft <= 7).length, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Expiring Soon (≤30d)", val: batches.filter(b => b.daysLeft > 7 && b.daysLeft <= 30).length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Safe Stock", val: batches.filter(b => b.daysLeft > 30).length, color: "var(--tx-10b981, #10b981)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{k.label}</div>
@@ -176,11 +176,11 @@ export default function BatchExpiryPage() {
                   </td>
                   <td style={{ padding: "11px 14px", display: "flex", gap: 6 }}>
                     {b.daysLeft <= 0 && b.qty > 0 ? (
-                      <button onClick={() => handleWriteOff(b)} disabled={writingOff === b.id} style={{ background: "rgba(239,68,68,.12)", color: "#ef4444", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", fontWeight: 700, opacity: writingOff === b.id ? 0.6 : 1 }}>
+                      <button onClick={() => handleWriteOff(b)} disabled={writingOff === b.id} style={{ background: "rgba(239,68,68,.12)", color: "var(--tx-ef4444, #ef4444)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", fontWeight: 700, opacity: writingOff === b.id ? 0.6 : 1 }}>
                         {writingOff === b.id ? "…" : "Write-off"}
                       </button>
                     ) : (
-                      <button onClick={() => remove(b.id)} style={{ background: "rgba(239,68,68,.08)", color: "#ef4444", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Remove</button>
+                      <button onClick={() => remove(b.id)} style={{ background: "rgba(239,68,68,.08)", color: "var(--tx-ef4444, #ef4444)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Remove</button>
                     )}
                   </td>
                 </tr>

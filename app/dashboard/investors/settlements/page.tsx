@@ -272,7 +272,7 @@ export default function InvestorSettlementsPage() {
                   <td style={numTd}>{fmtQty(s.totalQty)}</td>
                   <td style={numTd}>{fmtMoney(s.profitDue)}</td>
                   <td style={numTd}>{fmtMoney(s.cashReceived)}</td>
-                  <td style={{ ...numTd, fontWeight: 700, color: s.closingBalance > 0 ? "#fbbf24" : undefined }}>
+                  <td style={{ ...numTd, fontWeight: 700, color: s.closingBalance > 0 ? "var(--tx-fbbf24, #fbbf24)" : undefined }}>
                     {fmtMoney(s.closingBalance)}
                   </td>
                   <td style={{ ...tdStyle, textAlign: "right" }}>

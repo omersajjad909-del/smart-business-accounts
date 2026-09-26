@@ -50,17 +50,17 @@ const ALL_STATUSES: ShipmentStatus[] = [
 ];
 
 const STATUS_META: Record<ShipmentStatus, { label: string; color: string; bg: string; border: string }> = {
-  BOOKING:    { label: "Booking",    color: "#a78bfa", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
-  IN_TRANSIT: { label: "In Transit", color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  AT_PORT:    { label: "At Port",    color: "#fbbf24", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)"  },
-  CUSTOMS:    { label: "Customs",    color: "#fb923c", bg: "rgba(251,146,60,.12)",   border: "rgba(251,146,60,.35)"  },
-  CLEARED:    { label: "Cleared",    color: "#4ade80", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
-  DELAYED:    { label: "Delayed",    color: "#f87171", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
+  BOOKING:    { label: "Booking",    color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
+  IN_TRANSIT: { label: "In Transit", color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  AT_PORT:    { label: "At Port",    color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)"  },
+  CUSTOMS:    { label: "Customs",    color: "var(--tx-fb923c, #fb923c)", bg: "rgba(251,146,60,.12)",   border: "rgba(251,146,60,.35)"  },
+  CLEARED:    { label: "Cleared",    color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
+  DELAYED:    { label: "Delayed",    color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
 };
 
 const TYPE_META: Record<ShipmentType, { color: string; bg: string; border: string }> = {
-  Import: { color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  Export: { color: "#4ade80", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
+  Import: { color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  Export: { color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
 };
 
 const INCOTERMS: Incoterm[]       = ["FOB", "CIF", "EXW", "CFR", "DAP", "DDP", "FCA"];
@@ -228,7 +228,7 @@ function ViewModal({ ship, onClose }: { ship: Shipment; onClose: () => void }) {
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <StatusBadge status={ship.status} />
-            <button onClick={onClose} style={btn("rgba(255,255,255,.08)", { padding: "6px 14px", fontSize: 13 })}>
+            <button onClick={onClose} style={btn("rgba(var(--ink),.08)", { padding: "6px 14px", fontSize: 13 })}>
               Close
             </button>
           </div>
@@ -327,7 +327,7 @@ function EditStatusModal({
           />
         </div>
 
-        {error && <div style={{ fontSize: 12, color: "#f87171", marginBottom: 10 }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", marginBottom: 10 }}>{error}</div>}
 
         <div style={{ display: "flex", gap: 10 }}>
           <button
@@ -337,7 +337,7 @@ function EditStatusModal({
           >
             {saving ? "Saving…" : "Save Status"}
           </button>
-          <button onClick={onClose} style={{ ...btn("rgba(255,255,255,.08)"), flex: 1 }}>
+          <button onClick={onClose} style={{ ...btn("rgba(var(--ink),.08)"), flex: 1 }}>
             Cancel
           </button>
         </div>
@@ -481,7 +481,7 @@ function NewShipmentModal({
           </div>
         </div>
 
-        {error && <div style={{ fontSize: 12, color: "#f87171", marginTop: 12 }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", marginTop: 12 }}>{error}</div>}
 
         <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
           <button
@@ -491,7 +491,7 @@ function NewShipmentModal({
           >
             {saving ? "Creating…" : "Create Shipment"}
           </button>
-          <button onClick={onClose} style={{ ...btn("rgba(255,255,255,.08)"), flex: 1 }}>
+          <button onClick={onClose} style={{ ...btn("rgba(var(--ink),.08)"), flex: 1 }}>
             Cancel
           </button>
         </div>
@@ -609,12 +609,12 @@ function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => v
               {["Shipper's Signature", "Carrier's Signature", "Consignee's Signature"].map(s => (
                 <div key={s}>
                   <div style={{ borderTop: "1px solid var(--dkb-000000, #000)", paddingTop: 8, fontSize: 11, color: "#555" }}>{s}</div>
-                  <div style={{ marginTop: 24, fontSize: 10, color: "#999" }}>Date: _______________</div>
+                  <div style={{ marginTop: 24, fontSize: 10, color: "var(--tx-999999, #999)" }}>Date: _______________</div>
                 </div>
               ))}
             </div>
 
-            <div style={{ textAlign: "center", fontSize: 9, color: "#999", borderTop: "1px solid #ddd", paddingTop: 10, marginTop: 24 }}>
+            <div style={{ textAlign: "center", fontSize: 9, color: "var(--tx-999999, #999)", borderTop: "1px solid #ddd", paddingTop: 10, marginTop: 24 }}>
               This document is generated by FinovaOS. Subject to standard terms and conditions of carriage.
             </div>
           </div>
@@ -736,11 +736,11 @@ export default function ShipmentsPage() {
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Shipments", value: kpis.total,                            color: "#60a5fa" },
-          { label: "In Transit",      value: kpis.inTransit,                        color: "#3b82f6" },
-          { label: "Cleared",         value: kpis.cleared,                          color: "#4ade80" },
-          { label: "Delayed",         value: kpis.delayed,                          color: "#f87171" },
-          { label: "Total Value",     value: `$${kpis.totalValue.toLocaleString()}`, color: "#fbbf24" },
+          { label: "Total Shipments", value: kpis.total,                            color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "In Transit",      value: kpis.inTransit,                        color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Cleared",         value: kpis.cleared,                          color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Delayed",         value: kpis.delayed,                          color: "var(--tx-f87171, #f87171)" },
+          { label: "Total Value",     value: `$${kpis.totalValue.toLocaleString()}`, color: "var(--tx-fbbf24, #fbbf24)" },
         ].map((k) => (
           <div key={k.label} style={kpiCard}>
             <div style={{ fontSize: 26, fontWeight: 700, color: k.color }}>{k.value}</div>
@@ -757,7 +757,7 @@ export default function ShipmentsPage() {
               key={t.key}
               onClick={() => setActiveTab(t.key)}
               style={btn(
-                activeTab === t.key ? "#2563eb" : "rgba(255,255,255,.07)",
+                activeTab === t.key ? "#2563eb" : "rgba(var(--ink),.07)",
                 { padding: "7px 14px", fontSize: 13, fontWeight: activeTab === t.key ? 700 : 500 }
               )}
             >
@@ -814,7 +814,7 @@ export default function ShipmentsPage() {
                     <tr
                       key={s.id}
                       style={{ borderBottom: "1px solid var(--border)", transition: "background .1s" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     >
                       {/* Ref */}
@@ -883,7 +883,7 @@ export default function ShipmentsPage() {
                             onClick={() => setEditTarget(s)}
                             style={btn("rgba(37,99,235,.15)", {
                               padding: "5px 11px", fontSize: 12,
-                              color:  "#60a5fa",
+                              color:  "var(--tx-60a5fa, #60a5fa)",
                               border: "1px solid rgba(37,99,235,.4)",
                             })}
                           >
@@ -891,7 +891,7 @@ export default function ShipmentsPage() {
                           </button>
                           <button
                             onClick={() => setViewTarget(s)}
-                            style={btn("rgba(255,255,255,.06)", {
+                            style={btn("rgba(var(--ink),.06)", {
                               padding: "5px 11px", fontSize: 12,
                               color:  "var(--text-muted)",
                               border: "1px solid var(--border)",
@@ -903,7 +903,7 @@ export default function ShipmentsPage() {
                             onClick={() => setBlTarget(s)}
                             style={btn("rgba(74,222,128,.1)", {
                               padding: "5px 11px", fontSize: 12,
-                              color:  "#4ade80",
+                              color:  "var(--tx-4ade80, #4ade80)",
                               border: "1px solid rgba(74,222,128,.35)",
                             })}
                           >

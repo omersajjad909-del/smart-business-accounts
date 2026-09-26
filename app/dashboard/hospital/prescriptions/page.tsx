@@ -7,8 +7,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 20, fontFamily: ff };
 
 type Medicine = { name: string; dosage: string; frequency: string; duration: string; qty: number };
@@ -104,10 +104,10 @@ export default function PrescriptionsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total", value: total, color: "#a78bfa" },
-          { label: "Active", value: active, color: "#22c55e" },
-          { label: "Dispensed", value: dispensedToday, color: "#3b82f6" },
-          { label: "Pending Dispensing", value: pending, color: "#f59e0b" },
+          { label: "Total", value: total, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active", value: active, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Dispensed", value: dispensedToday, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Pending Dispensing", value: pending, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -137,7 +137,7 @@ export default function PrescriptionsPage() {
           <div key={rx.id} style={{ ...card }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }} onClick={() => setExpanded(expanded === rx.id ? null : rx.id)}>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <span style={{ color: "#a78bfa", fontWeight: 700, fontSize: 15 }}>{rx.rxNo}</span>
+                <span style={{ color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700, fontSize: 15 }}>{rx.rxNo}</span>
                 <span style={{ fontWeight: 600 }}>{rx.patient}</span>
                 <span style={{ color: "rgba(var(--ink),0.45)", fontSize: 13 }}>{rx.doctor}</span>
                 <span style={{ color: "rgba(var(--ink),0.35)", fontSize: 12 }}>{rx.date}</span>
@@ -173,7 +173,7 @@ export default function PrescriptionsPage() {
                           <td style={{ padding: "9px 12px", color: "rgba(var(--ink),0.6)" }}>{m.dosage}</td>
                           <td style={{ padding: "9px 12px", color: "rgba(var(--ink),0.6)" }}>{m.frequency}</td>
                           <td style={{ padding: "9px 12px", color: "rgba(var(--ink),0.6)" }}>{m.duration}</td>
-                          <td style={{ padding: "9px 12px", color: "#34d399", fontWeight: 600 }}>{m.qty}</td>
+                          <td style={{ padding: "9px 12px", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>{m.qty}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -184,7 +184,7 @@ export default function PrescriptionsPage() {
                     <button onClick={() => void changeStatus(rx.id, "completed")}
                       style={{ padding: "7px 16px", background: "rgba(34,197,94,0.15)", border: `1px solid rgba(34,197,94,0.3)`, color: "#22c55e", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 600 }}>Mark Dispensed</button>
                     <button onClick={() => void changeStatus(rx.id, "cancelled")}
-                      style={{ padding: "7px 16px", background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`, color: "#ef4444", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12 }}>Cancel</button>
+                      style={{ padding: "7px 16px", background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`, color: "var(--tx-ef4444, #ef4444)", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12 }}>Cancel</button>
                   </div>
                 )}
               </div>
@@ -202,7 +202,7 @@ export default function PrescriptionsPage() {
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
               {([["Patient Name", "patient"], ["Doctor", "doctor"], ["Date", "date"], ["Diagnosis", "diagnosis"]] as [string, string][]).map(([label, key]) => (
                 <div key={key} style={{ gridColumn: key === "diagnosis" ? "span 2" : "span 1" }}>
                   <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>{label}</label>
@@ -230,7 +230,7 @@ export default function PrescriptionsPage() {
                 ))}
                 <input type="number" value={m.qty} onChange={e => updateMed(i, "qty", Number(e.target.value))} placeholder="Qty"
                   style={{ background: bg, border: `1px solid ${border}`, borderRadius: 6, padding: "7px 8px", color: "#fff", fontFamily: ff, fontSize: 13, boxSizing: "border-box" }} />
-                <button onClick={() => removeMed(i)} style={{ background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>✕</button>
+                <button onClick={() => removeMed(i)} style={{ background: "rgba(239,68,68,0.1)", border: "none", color: "var(--tx-ef4444, #ef4444)", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>✕</button>
               </div>
             ))}
 

@@ -133,10 +133,10 @@ export default function StockTransferPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total Transfers", val: transfers.length, color: "#818cf8" },
-          { label: "Pending", val: transfers.filter(t => t.status === "PENDING").length, color: "#6366f1" },
-          { label: "In Transit", val: transfers.filter(t => t.status === "IN_TRANSIT").length, color: "#f59e0b" },
-          { label: "Completed", val: transfers.filter(t => t.status === "COMPLETED").length, color: "#10b981" },
+          { label: "Total Transfers", val: transfers.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Pending", val: transfers.filter(t => t.status === "PENDING").length, color: "var(--tx-6366f1, #6366f1)" },
+          { label: "In Transit", val: transfers.filter(t => t.status === "IN_TRANSIT").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Completed", val: transfers.filter(t => t.status === "COMPLETED").length, color: "var(--tx-10b981, #10b981)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{k.label}</div>
@@ -162,7 +162,7 @@ export default function StockTransferPage() {
             <tbody>
               {transfers.map((row, i) => (
                 <tr key={row.id} style={{ borderTop: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(99,102,241,.02)" }}>
-                  <td style={{ padding: "11px 14px", fontWeight: 700, color: "#818cf8" }}>{row.transferId}</td>
+                  <td style={{ padding: "11px 14px", fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{row.transferId}</td>
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{row.date}</td>
                   <td style={{ padding: "11px 14px" }}>{row.fromBranch}</td>
                   <td style={{ padding: "11px 14px" }}>{row.toBranch}</td>
@@ -172,10 +172,10 @@ export default function StockTransferPage() {
                   </td>
                   <td style={{ padding: "11px 14px", display: "flex", gap: 6 }}>
                     {row.status === "PENDING" && (
-                      <button onClick={() => setStatus(row.id, "IN_TRANSIT")} style={{ background: "rgba(245,158,11,.1)", color: "#f59e0b", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Dispatch</button>
+                      <button onClick={() => setStatus(row.id, "IN_TRANSIT")} style={{ background: "rgba(245,158,11,.1)", color: "var(--tx-f59e0b, #f59e0b)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Dispatch</button>
                     )}
                     {row.status === "IN_TRANSIT" && (
-                      <button onClick={() => handleComplete(row)} disabled={completing === row.id} style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", opacity: completing === row.id ? 0.6 : 1 }}>
+                      <button onClick={() => handleComplete(row)} disabled={completing === row.id} style={{ background: "rgba(16,185,129,.1)", color: "var(--tx-10b981, #10b981)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", opacity: completing === row.id ? 0.6 : 1 }}>
                         {completing === row.id ? "…" : "Receive"}
                       </button>
                     )}
@@ -234,18 +234,18 @@ export default function StockTransferPage() {
                             {results.map(item => (
                               <button key={item.id} onMouseDown={() => selectItem(idx, item)} style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 12px", background: "none", border: "none", color: "var(--text-primary)", cursor: "pointer", fontSize: 12 }}>
                                 {item.name} {item.code && <span style={{ color: "var(--text-muted)" }}>({item.code})</span>}
-                                <span style={{ float: "right", color: "#10b981" }}>Qty: {item.qty ?? "?"}</span>
+                                <span style={{ float: "right", color: "var(--tx-10b981, #10b981)" }}>Qty: {item.qty ?? "?"}</span>
                               </button>
                             ))}
                           </div>
                         )}
                       </div>
                       <input type="number" value={row.qty} onChange={e => updateRow(idx, "qty", e.target.value)} placeholder="Qty" style={{ ...inp, textAlign: "right" }} />
-                      <button onClick={() => removeRow(idx)} style={{ background: "rgba(239,68,68,.1)", color: "#ef4444", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button>
+                      <button onClick={() => removeRow(idx)} style={{ background: "rgba(239,68,68,.1)", color: "var(--tx-ef4444, #ef4444)", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button>
                     </div>
                   );
                 })}
-                <button onClick={addRow} style={{ fontSize: 12, color: "#6366f1", background: "none", border: "1px dashed var(--border)", borderRadius: 8, padding: "6px 14px", cursor: "pointer", width: "100%" }}>+ Add Item</button>
+                <button onClick={addRow} style={{ fontSize: 12, color: "var(--tx-6366f1, #6366f1)", background: "none", border: "1px dashed var(--border)", borderRadius: 8, padding: "6px 14px", cursor: "pointer", width: "100%" }}>+ Add Item</button>
               </div>
 
               <div>

@@ -13,11 +13,11 @@ interface Row { supplierName: string; totalOrders: number; onTimeDelivery: numbe
 // not a word. The map used to be keyed "excellent"/"good"/"average"/"poor", so
 // every lookup missed and the page crashed before rendering a single row.
 const RATING: Record<string, Badge> = {
-  "5": { label: "Excellent ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  "4": { label: "Good",         color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  "3": { label: "Average",      color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  "2": { label: "Weak",         color: "#fb923c", bg: "rgba(251,146,60,.1)" },
-  "1": { label: "Poor",         color: "#f87171", bg: "rgba(248,113,113,.1)" },
+  "5": { label: "Excellent ⭐", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
+  "4": { label: "Good",         color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" },
+  "3": { label: "Average",      color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" },
+  "2": { label: "Weak",         color: "var(--tx-fb923c, #fb923c)", bg: "rgba(251,146,60,.1)" },
+  "1": { label: "Poor",         color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function SupplierPerformancePage() {
@@ -52,7 +52,7 @@ export default function SupplierPerformancePage() {
         <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.2)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>⚠️</span>
           <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
-            <span style={{ fontWeight: 700, color: "#f87171" }}>{poorSuppliers} supplier{poorSuppliers > 1 ? "s" : ""}</span> rated poor — consider switching vendors
+            <span style={{ fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>{poorSuppliers} supplier{poorSuppliers > 1 ? "s" : ""}</span> rated poor — consider switching vendors
           </span>
         </div>
       )}
@@ -88,7 +88,7 @@ export default function SupplierPerformancePage() {
                     </div>
                   </td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.qualityRejectCount || "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.rejectRatePct > 5 ? "#f87171" : "var(--text-muted)" }}>{r.rejectRatePct > 0 ? `${r.rejectRatePct.toFixed(1)}%` : "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.rejectRatePct > 5 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>{r.rejectRatePct > 0 ? `${r.rejectRatePct.toFixed(1)}%` : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.avgLeadDays} days</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700 }}>{cur} {fmt(r.totalPurchased)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>

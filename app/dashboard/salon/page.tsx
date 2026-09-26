@@ -56,7 +56,7 @@ export default function SalonOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: salonFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#f472b6", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon / Beauty</div>
+        <div style={{ fontSize: 12, color: "var(--tx-f472b6, #f472b6)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon / Beauty</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Owner Beauty Desk</h1>
         <p style={{ margin: 0, fontSize: 14, color: salonMuted, maxWidth: 760 }}>
           Appointment se service delivery aur counter billing tak poora salon flow ek hi workspace me manage karein. Team capacity, service mix, aur daily revenue ek nazar me dekhein.
@@ -73,7 +73,7 @@ export default function SalonOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(244,114,182,.14), rgba(129,140,248,.11))", border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbcfe8", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbcfe8, #fbcfe8)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Book Slot", body: "Client, stylist, date, aur service ke saath appointment schedule." },
@@ -91,7 +91,7 @@ export default function SalonOverviewPage() {
         </div>
 
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/salon/appointments", label: "Open Appointment Desk", hint: "Bookings, confirmations, visit flow" },
@@ -111,7 +111,7 @@ export default function SalonOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Service Cards</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Service Cards</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topServices.length === 0 ? (
               <div style={{ color: salonMuted, fontSize: 13 }}>Abhi service menu build nahi hua. Pehle services add karein phir yahan top cards aayenge.</div>
@@ -122,7 +122,7 @@ export default function SalonOverviewPage() {
                   <div style={{ fontSize: 12, color: salonMuted }}>{service.category} · {service.duration} min</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {service.price.toLocaleString()}</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {service.price.toLocaleString()}</div>
                   <div style={{ fontSize: 12, color: salonMuted }}>{service.status}</div>
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function SalonOverviewPage() {
         </div>
 
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Confirmed queue", value: `${appointments.filter((appointment) => appointment.status === "confirmed").length} ready to start`, tone: "#60a5fa" },

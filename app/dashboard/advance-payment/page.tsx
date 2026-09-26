@@ -216,7 +216,7 @@ export default function AdvancePaymentPage() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: queryMode ? "#facc15" : accent }}>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: queryMode ? "var(--tx-facc15, #facc15)" : accent }}>
             {queryMode ? "🔍 QUERY MODE — Advance Payments" : "Advance Payments"}
           </h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>
@@ -241,23 +241,23 @@ export default function AdvancePaymentPage() {
       {queryMode && (
         <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
           <div style={{ marginBottom: 20 }}>
-            <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+            <span style={{ fontSize: 12, color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&lt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;=</b> for date range.</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
             <div>
-              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Advance # (e.g. ADV-1)</label>
+              <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Advance # (e.g. ADV-1)</label>
               <input autoFocus value={queryAdvNo} onChange={e => setQueryAdvNo(e.target.value)} placeholder="ADV-1 or blank for all…"
                 style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryAdvNo, queryDate, querySupplier); } if (e.key === "Escape") exitQueryMode(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+              <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
               <input value={queryDate} onChange={e => setQueryDate(e.target.value)} placeholder=">010125 or 01-01-2025 or blank…"
                 style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryAdvNo, queryDate, querySupplier); } if (e.key === "Escape") exitQueryMode(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Supplier (name)</label>
+              <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Supplier (name)</label>
               <input value={querySupplier} onChange={e => setQuerySupplier(e.target.value)} placeholder="e.g. Ahmed & Co., or blank…"
                 style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryAdvNo, queryDate, querySupplier); } if (e.key === "Escape") exitQueryMode(); }} />
@@ -270,8 +270,8 @@ export default function AdvancePaymentPage() {
               Execute Query
             </button>
             <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
-            <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>
-              Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>010425</b> (exact)
+            <span style={{ fontSize: 11, color: "rgba(var(--txr-facc15, 250,204,21),.4)", marginLeft: 8 }}>
+              Operators: <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>010425</b> (exact)
             </span>
           </div>
         </div>
@@ -355,10 +355,10 @@ export default function AdvancePaymentPage() {
         <div style={{ ...panel, padding: 0, overflow: "hidden" }}>
           {queryResults !== null && (
             <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", background: "rgba(250,204,21,.04)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 13, color: "#facc15", fontWeight: 700 }}>
+              <span style={{ fontSize: 13, color: "var(--tx-facc15, #facc15)", fontWeight: 700 }}>
                 {queryResults.length} result{queryResults.length !== 1 ? "s" : ""} found
               </span>
-              <button onClick={exitQueryMode} style={{ background: "transparent", border: "1px solid rgba(250,204,21,.3)", borderRadius: 6, padding: "4px 12px", fontSize: 12, color: "#facc15", cursor: "pointer", fontFamily: ff }}>✕ Clear Filter</button>
+              <button onClick={exitQueryMode} style={{ background: "transparent", border: "1px solid rgba(250,204,21,.3)", borderRadius: 6, padding: "4px 12px", fontSize: 12, color: "var(--tx-facc15, #facc15)", cursor: "pointer", fontFamily: ff }}>✕ Clear Filter</button>
             </div>
           )}
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -380,8 +380,8 @@ export default function AdvancePaymentPage() {
                     <td style={{ padding: "13px 16px", fontSize: 13, color: "var(--text-muted)" }}>{fmtDate(adv.date)}</td>
                     <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600 }}>{adv.supplier.name}</td>
                     <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600, textAlign: "right" }}>{fmt(adv.amount)}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 13, textAlign: "right", color: "#818cf8" }}>{fmt(adv.adjustedAmount)}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "#22c55e" }}>{fmt(adv.balance)}</td>
+                    <td style={{ padding: "13px 16px", fontSize: 13, textAlign: "right", color: "var(--tx-818cf8, #818cf8)" }}>{fmt(adv.adjustedAmount)}</td>
+                    <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-22c55e, #22c55e)" }}>{fmt(adv.balance)}</td>
                     <td style={{ padding: "13px 16px" }}>
                       <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: sc.bg, color: sc.text }}>{adv.status}</span>
                     </td>
@@ -390,7 +390,7 @@ export default function AdvancePaymentPage() {
                         {adv.status !== "CLOSED" && (
                           <button style={{ background: "transparent", border: `1px solid ${accent}55`, borderRadius: 6, padding: "4px 12px", fontSize: 12, color: accent, cursor: "pointer", fontFamily: ff }} onClick={() => { setSelAdvance(adv); setShowAdjForm(true); }}>Adjust</button>
                         )}
-                        <button style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 12px", fontSize: 12, color: "#f87171", cursor: "pointer", fontFamily: ff }} onClick={() => handleDelete(adv.id)}>Delete</button>
+                        <button style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 12px", fontSize: 12, color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontFamily: ff }} onClick={() => handleDelete(adv.id)}>Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -409,7 +409,7 @@ export default function AdvancePaymentPage() {
       {/* ── Shortcuts Bar ── */}
       <div style={{ display: "flex", gap: 6, marginTop: 16, flexWrap: "wrap" }}>
         {(queryMode ? [
-          { key: "F8", label: "Execute Query", color: "#facc15" },
+          { key: "F8", label: "Execute Query", color: "var(--tx-facc15, #facc15)" },
           { key: "Esc", label: "Cancel Query", color: undefined },
         ] : [
           { key: "F7", label: "Query Mode", color: accent },

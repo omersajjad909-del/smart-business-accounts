@@ -61,10 +61,10 @@ export default function FuelPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "This Month Cost", value: `Rs. ${monthCost.toLocaleString()}`, color: "#ef4444" },
-          { label: "Total Liters", value: `${monthLiters.toLocaleString()} L`, color: "#3b82f6" },
-          { label: "Avg Mileage", value: `${avgPerKm.toFixed(1)} km/L`, color: "#22c55e" },
-          { label: "Vehicles Tracked", value: vehicleCount, color: "#f59e0b" },
+          { label: "This Month Cost", value: `Rs. ${monthCost.toLocaleString()}`, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Total Liters", value: `${monthLiters.toLocaleString()} L`, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Avg Mileage", value: `${avgPerKm.toFixed(1)} km/L`, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Vehicles Tracked", value: vehicleCount, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((s) => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 26, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -118,9 +118,9 @@ export default function FuelPage() {
                   </td>
                   <td style={{ padding: "10px 12px" }}>{r.liters} L</td>
                   <td style={{ padding: "10px 12px", color: "rgba(var(--ink),.6)" }}>Rs. {r.pricePerLiter}</td>
-                  <td style={{ padding: "10px 12px", fontWeight: 600, color: "#ef4444" }}>Rs. {r.totalCost.toLocaleString()}</td>
+                  <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--tx-ef4444, #ef4444)" }}>Rs. {r.totalCost.toLocaleString()}</td>
                   <td style={{ padding: "10px 12px", color: "rgba(var(--ink),.6)", fontSize: 12 }}>{r.station || "-"}</td>
-                  <td style={{ padding: "10px 12px", color: r.mileage && r.mileage < 8 ? "#ef4444" : "#22c55e" }}>{r.mileage ? `${r.mileage} km/L` : "-"}</td>
+                  <td style={{ padding: "10px 12px", color: r.mileage && r.mileage < 8 ? "var(--tx-ef4444, #ef4444)" : "var(--tx-22c55e, #22c55e)" }}>{r.mileage ? `${r.mileage} km/L` : "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -146,10 +146,10 @@ export default function FuelPage() {
                 </select>
               </div>
             </div>
-            {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
               <button onClick={addRecord} style={{ ...btn("#2563eb"), flex: 1 }}>Add Record</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(255,255,255,.07)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(var(--ink),.07)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>

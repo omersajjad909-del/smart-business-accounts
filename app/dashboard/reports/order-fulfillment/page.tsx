@@ -15,9 +15,9 @@ interface Row { orderId: string; customerName: string; orderDate: string; promis
 // has no "delayed" or "cancelled" — lateness is `daysVariance`, which the
 // Delayed tile below now uses instead.
 const STATUS: Record<string, Badge> = {
-  fulfilled: { label: "Fulfilled", color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  delivered: { label: "Delivered", color: "#38bdf8", bg: "rgba(56,189,248,.1)" },
-  pending:   { label: "Pending",   color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+  fulfilled: { label: "Fulfilled", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
+  delivered: { label: "Delivered", color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.1)" },
+  pending:   { label: "Pending",   color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" },
 };
 
 export default function OrderFulfillmentPage() {
@@ -64,9 +64,9 @@ export default function OrderFulfillmentPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "On-Time Rate",    value: `${onTimeRate.toFixed(1)}%`,    color: onTimeRate >= 90 ? "#34d399" : onTimeRate >= 70 ? "#fbbf24" : "#f87171", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
-          { label: "Delayed Orders",  value: `${delayedCount} orders`,        color: delayedCount > 0 ? "#f87171" : "#34d399",   bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
-          { label: "Total Orders",    value: `${data.length}`,                color: "#818cf8",  bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+          { label: "On-Time Rate",    value: `${onTimeRate.toFixed(1)}%`,    color: onTimeRate >= 90 ? "var(--tx-34d399, #34d399)" : onTimeRate >= 70 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-f87171, #f87171)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+          { label: "Delayed Orders",  value: `${delayedCount} orders`,        color: delayedCount > 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)",   bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Total Orders",    value: `${data.length}`,                color: "var(--tx-818cf8, #818cf8)",  bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -94,7 +94,7 @@ export default function OrderFulfillmentPage() {
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8" }}>{r.orderId}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)" }}>{r.orderId}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.customerName}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.orderDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.promisedDate)}</td>

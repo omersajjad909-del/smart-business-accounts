@@ -38,7 +38,7 @@ export default function IspOverviewPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ispFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP / Cable Network</div>
+          <div style={{ fontSize: 12, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP / Cable Network</div>
           <h1 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 900 }}>Connections, billing, and service reliability command center</h1>
           <p style={{ margin: 0, fontSize: 14, color: ispMuted, maxWidth: 760 }}>
             Packages, customer connections, recurring billing, aur support pressure ko ek operational feed me monitor karein.
@@ -61,11 +61,11 @@ export default function IspOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Active Packages", value: summary.activePackages, color: "#60a5fa" },
-          { label: "Active Connections", value: summary.activeConnections, color: "#34d399" },
-          { label: "Suspended", value: summary.suspendedConnections, color: "#f97316" },
-          { label: "Open Tickets", value: summary.openTickets, color: "#c084fc" },
-          { label: "Collected", value: `Rs. ${summary.paidRevenue.toLocaleString()}`, color: "#22c55e" },
+          { label: "Active Packages", value: summary.activePackages, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Active Connections", value: summary.activeConnections, color: "var(--tx-34d399, #34d399)" },
+          { label: "Suspended", value: summary.suspendedConnections, color: "var(--tx-f97316, #f97316)" },
+          { label: "Open Tickets", value: summary.openTickets, color: "var(--tx-c084fc, #c084fc)" },
+          { label: "Collected", value: `Rs. ${summary.paidRevenue.toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ispMuted, marginBottom: 8 }}>{card.label}</div>
@@ -76,7 +76,7 @@ export default function IspOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(59,130,246,.14), rgba(14,165,233,.08))", border: `1px solid ${ispBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#bfdbfe", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Service Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-bfdbfe, #bfdbfe)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Service Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Package Setup", body: "Bandwidth plans, quotas, and monthly rates define karein." },
@@ -95,7 +95,7 @@ export default function IspOverviewPage() {
 
         <div style={{ display: "grid", gap: 18 }}>
           <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 20, padding: 22 }}>
-            <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Collection Watchlist</div>
+            <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Collection Watchlist</div>
             <div style={{ display: "grid", gap: 10 }}>
               {bills.length === 0 ? (
                 <div style={{ color: ispMuted, fontSize: 13 }}>The collection watchlist will appear after monthly billing records are added.</div>
@@ -103,7 +103,7 @@ export default function IspOverviewPage() {
                 <div key={bill.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{bill.customer}</div>
                   <div style={{ fontSize: 12, color: ispMuted }}>{bill.invoiceNo} | {bill.cycle || "Current cycle"}</div>
-                  <div style={{ fontSize: 12, color: bill.status === "overdue" ? "#fca5a5" : "#93c5fd", marginTop: 6 }}>
+                  <div style={{ fontSize: 12, color: bill.status === "overdue" ? "var(--tx-fca5a5, #fca5a5)" : "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>
                     Rs. {bill.amount.toLocaleString()} | {bill.status}
                   </div>
                 </div>
@@ -112,7 +112,7 @@ export default function IspOverviewPage() {
           </div>
 
           <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 20, padding: 22 }}>
-            <div style={{ fontSize: 13, color: "#facc15", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Ops Reading</div>
+            <div style={{ fontSize: 13, color: "var(--tx-facc15, #facc15)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Ops Reading</div>
             <div style={{ display: "grid", gap: 12 }}>
               {[
                 { label: "Connected base", value: `${summary.connections} total`, tone: "#60a5fa" },

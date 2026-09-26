@@ -116,7 +116,7 @@ export function PrintActionBar({
 
 const ghostBtn: React.CSSProperties = {
   background: "transparent",
-  color: "var(--text-muted, #888)",
+  color: "var(--text-muted, var(--tx-888888, #888))",
   border: "1px solid var(--border, var(--dkb-333333, #333))",
   borderRadius: 8,
   padding: "9px 16px",
@@ -141,14 +141,14 @@ function DropItem({
         border: "none",
         padding: "10px 16px",
         cursor: loading ? "not-allowed" : "pointer",
-        color: "var(--text-primary, #f0f0f0)",
+        color: "var(--text-primary, var(--tx-f0f0f0, #f0f0f0))",
         fontSize: 13,
         fontFamily: ff,
         textAlign: "left",
         opacity: loading ? 0.5 : 1,
         transition: "background 0.1s",
       }}
-      onMouseEnter={e => { if (!loading) (e.currentTarget).style.background = "rgba(255,255,255,0.06)"; }}
+      onMouseEnter={e => { if (!loading) (e.currentTarget).style.background = "rgba(var(--ink),0.06)"; }}
       onMouseLeave={e => { (e.currentTarget).style.background = "none"; }}
     >
       <span style={{ fontSize: 15, minWidth: 20 }}>{icon}</span>

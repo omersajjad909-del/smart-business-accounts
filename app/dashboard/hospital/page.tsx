@@ -78,10 +78,10 @@ export default function HospitalOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Active Patients", value: summary.activePatients, color: "#3b82f6" },
-          { label: "Today's Appointments", value: summary.todayAppointments, color: "#a78bfa" },
-          { label: "Active Prescriptions", value: summary.activePrescriptions, color: "#22c55e" },
-          { label: "Pending Labs", value: summary.pendingLabs, color: "#f59e0b" },
+          { label: "Active Patients", value: summary.activePatients, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Today's Appointments", value: summary.todayAppointments, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active Prescriptions", value: summary.activePrescriptions, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Pending Labs", value: summary.pendingLabs, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((card) => (
           <div key={card.label} style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: hospitalMuted, marginBottom: 8 }}>{card.label}</div>
@@ -94,7 +94,7 @@ export default function HospitalOverviewPage() {
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${hospitalBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ fontSize: 15, fontWeight: 800 }}>{isClinic ? "Today's OPD Queue" : "Today's Front Desk Queue"}</div>
-            <Link prefetch={false} href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+            <Link prefetch={false} href="/dashboard/hospital/appointments" style={{ color: "var(--tx-93c5fd, #93c5fd)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
               Open schedule
             </Link>
           </div>
@@ -102,12 +102,12 @@ export default function HospitalOverviewPage() {
             {upcomingAppointments.length === 0 && <div style={{ color: "rgba(var(--ink),.28)", textAlign: "center", padding: 24 }}>No active appointments for today.</div>}
             {upcomingAppointments.map((row) => (
               <div key={row.id} style={{ display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 12, alignItems: "center", padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
-                <div style={{ fontSize: 18, fontWeight: 800, color: "#c4b5fd" }}>{row.time || "--:--"}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-c4b5fd, #c4b5fd)" }}>{row.time || "--:--"}</div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{row.patient}</div>
                   <div style={{ fontSize: 12, color: hospitalMuted }}>{row.doctor} · {row.department || "General"}</div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: row.status === "confirmed" ? "#3b82f6" : "#f59e0b" }}>{row.status}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: row.status === "confirmed" ? "var(--tx-3b82f6, #3b82f6)" : "var(--tx-f59e0b, #f59e0b)" }}>{row.status}</div>
               </div>
             ))}
           </div>
@@ -131,9 +131,9 @@ export default function HospitalOverviewPage() {
             <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>{isClinic ? "OPD Throughput Snapshot" : "Throughput Snapshot"}</div>
             <div style={{ display: "grid", gap: 10 }}>
               {[
-                { label: "Completed appointments", value: summary.completedAppointments, color: "#22c55e" },
-                { label: "Lab processing", value: labs.filter((row) => row.status === "processing").length, color: "#3b82f6" },
-                { label: "Prescriptions dispensed", value: summary.completedPrescriptions, color: "#a78bfa" },
+                { label: "Completed appointments", value: summary.completedAppointments, color: "var(--tx-22c55e, #22c55e)" },
+                { label: "Lab processing", value: labs.filter((row) => row.status === "processing").length, color: "var(--tx-3b82f6, #3b82f6)" },
+                { label: "Prescriptions dispensed", value: summary.completedPrescriptions, color: "var(--tx-a78bfa, #a78bfa)" },
               ].map((row) => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>

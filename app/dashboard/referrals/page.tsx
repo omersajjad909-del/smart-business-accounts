@@ -21,9 +21,9 @@ type Stats = {
 };
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  pending:   { label: "Invited",   color: "#818cf8" },
-  signed_up: { label: "Signed Up", color: "#fbbf24" },
-  converted: { label: "Converted", color: "#34d399" },
+  pending:   { label: "Invited",   color: "var(--tx-818cf8, #818cf8)" },
+  signed_up: { label: "Signed Up", color: "var(--tx-fbbf24, #fbbf24)" },
+  converted: { label: "Converted", color: "var(--tx-34d399, #34d399)" },
 };
 
 export default function ReferralsPage() {
@@ -88,10 +88,10 @@ export default function ReferralsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Invited",  value: stats?.total     ?? 0, color: "#818cf8" },
-          { label: "Signed Up",      value: stats?.signed_up ?? 0, color: "#fbbf24" },
-          { label: "Converted",      value: stats?.converted ?? 0, color: "#34d399" },
-          { label: "Rewards ($)",    value: `$${(stats?.rewards ?? 0).toFixed(0)}`, color: "#f472b6" },
+          { label: "Total Invited",  value: stats?.total     ?? 0, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Signed Up",      value: stats?.signed_up ?? 0, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Converted",      value: stats?.converted ?? 0, color: "var(--tx-34d399, #34d399)" },
+          { label: "Rewards ($)",    value: `$${(stats?.rewards ?? 0).toFixed(0)}`, color: "var(--tx-f472b6, #f472b6)" },
         ].map(s => (
           <div key={s.label} style={{ borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, fontWeight: 600 }}>{s.label}</div>
@@ -119,7 +119,7 @@ export default function ReferralsPage() {
             </div>
             <div style={{ marginTop: 12, display: "flex", gap: 20 }}>
               <span style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>
-                Your code: <span style={{ color: "#818cf8", fontFamily: "monospace", fontWeight: 700, letterSpacing: "1px" }}>{referralCode}</span>
+                Your code: <span style={{ color: "var(--tx-818cf8, #818cf8)", fontFamily: "monospace", fontWeight: 700, letterSpacing: "1px" }}>{referralCode}</span>
               </span>
             </div>
 
@@ -172,7 +172,7 @@ export default function ReferralsPage() {
                     <td style={{ padding: "12px 20px" }}>
                       <span style={{ padding: "3px 10px", borderRadius: 20, background: `${sm.color}18`, color: sm.color, fontSize: 11, fontWeight: 700 }}>{sm.label}</span>
                     </td>
-                    <td style={{ padding: "12px 20px", color: r.reward ? "#34d399" : "rgba(var(--ink),.25)" }}>
+                    <td style={{ padding: "12px 20px", color: r.reward ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.25)" }}>
                       {r.reward ? `$${r.reward}` : "—"}
                     </td>
                     <td style={{ padding: "12px 20px", color: "rgba(var(--ink),.35)" }}>

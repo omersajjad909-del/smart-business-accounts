@@ -112,7 +112,7 @@ export default function MemberAccessPage() {
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.title}</div>
                     <div style={{ fontSize: 12, color: saasMuted, marginTop: 6 }}>{String(row.data?.subscriberEmail || "-")}</div>
-                    <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{String(row.data?.tierName || "-")} | Valid until {String(row.data?.validUntil || "-")}</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 8 }}>{String(row.data?.tierName || "-")} | Valid until {String(row.data?.validUntil || "-")}</div>
                   </div>
                   <span style={{ padding: "4px 10px", borderRadius: 999, background: `${saasStatusColor(row.status)}20`, color: saasStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
                 </div>

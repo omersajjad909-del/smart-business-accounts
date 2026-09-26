@@ -159,7 +159,7 @@ export function VoucherPrint({ voucher, companyName }: { voucher: UmrahVoucher; 
       >
         {/* Letterhead */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-          <div style={{ width: 74, height: 56, border: "1px solid #bbb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#999", textAlign: "center" }}>
+          <div style={{ width: 74, height: 56, border: "1px solid #bbb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "var(--tx-999999, #999)", textAlign: "center" }}>
             Company<br />Logo
           </div>
           <div style={{ flex: 1, textAlign: "center" }}>

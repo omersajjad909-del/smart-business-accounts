@@ -70,7 +70,7 @@ function HealthArc({ score, label, color }: { score: number; label: string; colo
   const off = 2 * Math.PI * R * 0.125;
   return (
     <svg width={128} height={108} viewBox="0 0 128 108">
-      <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="11"
+      <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(var(--ink),.06)" strokeWidth="11"
         strokeDasharray={`${ARC} ${2 * Math.PI * R}`} strokeDashoffset={off}
         strokeLinecap="round" transform={`rotate(135 ${CX} ${CY})`} />
       {score > 0 && (
@@ -131,7 +131,7 @@ const SPIN_CSS = `@keyframes spin{to{transform:rotate(360deg)}}`;
 const UNIVERSAL_QUICK = [
   { label: "Payment Follow-up",    href: "/dashboard/payment-followup",     color: T.rose,    icon: <><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></> },
   { label: "Profit & Loss",        href: "/dashboard/reports/profit-loss",  color: T.cyan,    icon: <><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></> },
-  { label: "Balance Sheet",        href: "/dashboard/reports/balance-sheet",color: "#a78bfa", icon: <><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></> },
+  { label: "Balance Sheet",        href: "/dashboard/reports/balance-sheet",color: "var(--tx-a78bfa, #a78bfa)", icon: <><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></> },
   { label: "Trial Balance",        href: "/dashboard/reports/trial-balance",color: T.emerald, icon: <><path d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></> },
 ];
 

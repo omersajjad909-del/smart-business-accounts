@@ -73,10 +73,10 @@ export default function TradingDispatchBoardPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Sales Invoices", value: salesInvoices.length, color: "#38bdf8" },
-          { label: "Pending Challans", value: pendingChallans.length, color: "#f59e0b" },
-          { label: "Delivered Challans", value: deliveredChallans.length, color: "#34d399" },
-          { label: "Outward Entries", value: outward.length, color: "#a78bfa" },
+          { label: "Sales Invoices", value: salesInvoices.length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Pending Challans", value: pendingChallans.length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Delivered Challans", value: deliveredChallans.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Outward Entries", value: outward.length, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
@@ -101,7 +101,7 @@ export default function TradingDispatchBoardPage() {
                 <tr key={row.id}>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.challanNo}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customer?.name || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: String(row.status || "").toUpperCase() === "DELIVERED" ? "#34d399" : "#f59e0b", fontWeight: 700 }}>{row.status || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: String(row.status || "").toUpperCase() === "DELIVERED" ? "var(--tx-34d399, #34d399)" : "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{row.status || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.driverName || row.vehicleNo || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
                 </tr>

@@ -31,7 +31,7 @@ export default function ComingSoonSubscribe({ list, accent = "#818cf8", dark = t
     }
   }
 
-  const inputBg = dark ? "rgba(255,255,255,.06)" : "var(--surface, #f8fafc)";
+  const inputBg = dark ? "rgba(var(--ink),.06)" : "var(--surface, #f8fafc)";
   const inputBorder = dark ? "1px solid rgba(255,255,255,.15)" : "1px solid var(--border, #e2e8f0)";
   const inputColor = dark ? "white" : "var(--text-primary, #0f172a)";
 

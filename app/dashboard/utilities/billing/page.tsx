@@ -45,10 +45,10 @@ export default function UtilityBillingPage() {
       summarize={(rows) => {
         const amount = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
         return [
-          { label: "Bills", value: rows.length, color: "#38bdf8" },
-          { label: "Open", value: rows.filter((row) => String(row.status) === "open").length, color: "#fbbf24" },
-          { label: "Paid", value: rows.filter((row) => String(row.status) === "paid").length, color: "#34d399" },
-          { label: "Billed Value", value: amount.toLocaleString(), color: "#a78bfa" },
+          { label: "Bills", value: rows.length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Open", value: rows.filter((row) => String(row.status) === "open").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Paid", value: rows.filter((row) => String(row.status) === "paid").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Billed Value", value: amount.toLocaleString(), color: "var(--tx-a78bfa, #a78bfa)" },
         ];
       }}
     />

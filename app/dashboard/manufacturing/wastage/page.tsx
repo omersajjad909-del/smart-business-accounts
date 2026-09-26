@@ -5,8 +5,8 @@ import { loadManufacturingItems, type ManufacturingItem } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const red = "#f87171";
 
 const inputStyle: React.CSSProperties = {
@@ -106,10 +106,10 @@ export default function WastagePage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Wastage Entries", value: entries.length, color: "#f87171" },
-          { label: "Total Qty Wasted", value: totalQty.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: "#fb923c" },
-          { label: "Value Lost", value: `Rs. ${Math.round(totalValue).toLocaleString()}`, color: "#f87171" },
-          { label: "This Month", value: `Rs. ${Math.round(thisMonthValue).toLocaleString()}`, color: "#fb923c" },
+          { label: "Wastage Entries", value: entries.length, color: "var(--tx-f87171, #f87171)" },
+          { label: "Total Qty Wasted", value: totalQty.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: "var(--tx-fb923c, #fb923c)" },
+          { label: "Value Lost", value: `Rs. ${Math.round(totalValue).toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
+          { label: "This Month", value: `Rs. ${Math.round(thisMonthValue).toLocaleString()}`, color: "var(--tx-fb923c, #fb923c)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
@@ -168,10 +168,10 @@ export default function WastagePage() {
           two are one keystroke apart in an operator's mind and a world apart in
           the ledger. */}
       <div style={{ marginTop: 12, padding: "13px 18px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.2)", fontSize: 12.5, color: "rgba(var(--ink),.55)", lineHeight: 1.7 }}>
-        <strong style={{ color: "#7dd3fc" }}>Left over is not wasted.</strong> When a run needs 12.66 rolls and 13 come off the rack,
+        <strong style={{ color: "var(--tx-7dd3fc, #7dd3fc)" }}>Left over is not wasted.</strong> When a run needs 12.66 rolls and 13 come off the rack,
         the 0.34 that is left stays yours: it is held as <strong style={{ color: "rgba(var(--ink),.75)" }}>open stock</strong> under
         Material Remnants and the next run uses it before opening a new roll. You will find it in the Open Stock column on{" "}
-        <a href="/dashboard/manufacturing/raw-materials" style={{ color: "#fb923c", fontWeight: 700 }}>Raw Materials</a>, not here.
+        <a href="/dashboard/manufacturing/raw-materials" style={{ color: "var(--tx-fb923c, #fb923c)", fontWeight: 700 }}>Raw Materials</a>, not here.
         Log it here only if it is too small to ever use again.
       </div>
 
@@ -208,7 +208,7 @@ export default function WastagePage() {
               </div>
             </div>
             {selected && Number(form.qty) > selected.currentStock && (
-              <div style={{ marginTop: 12, fontSize: 12, color: "#fca5a5" }}>
+              <div style={{ marginTop: 12, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>
                 Only {selected.currentStock} {selected.unit} of {selected.name} in stock.
               </div>
             )}

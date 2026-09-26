@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 20, fontFamily: ff };
 
 const statusColors: Record<string, string> = { scheduled: "#f59e0b", confirmed: "#3b82f6", completed: "#22c55e", cancelled: "#6b7280", no_show: "#ef4444" };
@@ -95,10 +95,10 @@ export default function AppointmentsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Today Total", value: todayTotal, color: "#a78bfa" },
-          { label: "Confirmed", value: confirmed, color: "#3b82f6" },
-          { label: "Completed", value: completed, color: "#22c55e" },
-          { label: "Cancelled / No Show", value: cancelled, color: "#ef4444" },
+          { label: "Today Total", value: todayTotal, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Confirmed", value: confirmed, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Completed", value: completed, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Cancelled / No Show", value: cancelled, color: "var(--tx-ef4444, #ef4444)" },
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -139,7 +139,7 @@ export default function AppointmentsPage() {
               <div style={{ fontSize: 13, color: "rgba(var(--ink),0.5)" }}>{appt.doctor} &nbsp;·&nbsp; {appt.department}</div>
               {appt.notes && <div style={{ fontSize: 12, color: "rgba(var(--ink),0.35)", marginTop: 4 }}>{appt.notes}</div>}
             </div>
-            <div style={{ color: "#a78bfa", fontSize: 12, fontWeight: 600 }}>{appt.apptNo}</div>
+            <div style={{ color: "var(--tx-a78bfa, #a78bfa)", fontSize: 12, fontWeight: 600 }}>{appt.apptNo}</div>
             <div style={{ display: "flex", gap: 8 }}>
               {appt.status === "scheduled" && (
                 <button onClick={() => updateStatus(appt.id, "confirmed")}
@@ -151,7 +151,7 @@ export default function AppointmentsPage() {
               )}
               {(appt.status === "scheduled" || appt.status === "confirmed") && (
                 <button onClick={() => updateStatus(appt.id, "cancelled")}
-                  style={{ padding: "6px 12px", background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`, color: "#ef4444", borderRadius: 6, cursor: "pointer", fontFamily: ff, fontSize: 12 }}>Cancel</button>
+                  style={{ padding: "6px 12px", background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`, color: "var(--tx-ef4444, #ef4444)", borderRadius: 6, cursor: "pointer", fontFamily: ff, fontSize: 12 }}>Cancel</button>
               )}
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function AppointmentsPage() {
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Book Appointment</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
-            {formError && <div style={{ marginBottom: "14px", padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: "14px", padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Patient Name", "patient"], ["Date", "date"], ["Time", "time"]].map(([label, key]) => (
                 <div key={key}>

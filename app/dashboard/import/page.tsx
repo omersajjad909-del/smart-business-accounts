@@ -97,17 +97,17 @@ export default function ImportCenterPage() {
           </div>
           <div style={{ display: "flex", gap: 16, marginTop: 10, flexWrap: "wrap" }}>
             <Link href="/dashboard/import/oracle-guide" style={{
-              fontSize: 12.5, fontWeight: 700, color: "#818cf8", textDecoration: "none",
+              fontSize: 12.5, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textDecoration: "none",
             }}>
               The cutover plan →
             </Link>
             <Link href="/dashboard/import/guide" style={{
-              fontSize: 12.5, fontWeight: 700, color: "#818cf8", textDecoration: "none",
+              fontSize: 12.5, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textDecoration: "none",
             }}>
               How to export from your system →
             </Link>
             <Link href="/dashboard/import/guide/fields" style={{
-              fontSize: 12.5, fontWeight: 700, color: "#818cf8", textDecoration: "none",
+              fontSize: 12.5, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textDecoration: "none",
             }}>
               Column reference →
             </Link>
@@ -126,7 +126,7 @@ export default function ImportCenterPage() {
         }}>
           <div style={{
             fontSize: 13.5, fontWeight: 700, marginBottom: 4,
-            color: status.trialBalance.balanced ? "#22c55e" : "#ef4444",
+            color: status.trialBalance.balanced ? "var(--tx-22c55e, #22c55e)" : "var(--tx-ef4444, #ef4444)",
           }}>
             {status.trialBalance.balanced
               ? "✓ Opening trial balance is balanced"
@@ -182,7 +182,7 @@ export default function ImportCenterPage() {
               <div style={{ textAlign: isMobile ? "left" : "right", minWidth: 92 }}>
                 <div style={{
                   fontSize: 18, fontWeight: 800,
-                  color: done ? "#22c55e" : "var(--text-muted)",
+                  color: done ? "var(--tx-22c55e, #22c55e)" : "var(--text-muted)",
                 }}>
                   {loading ? "—" : count.toLocaleString("en-PK")}
                 </div>

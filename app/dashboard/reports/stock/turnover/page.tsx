@@ -39,12 +39,12 @@ export default function StockTurnoverPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
         <div style={{ background: "rgba(129,140,248,.07)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Avg Turnover Ratio</div>
-          <div style={{ fontSize: 28, fontWeight: 900, color: "#818cf8" }}>{fmt(avgTurnover, 2)}x</div>
+          <div style={{ fontSize: 28, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)" }}>{fmt(avgTurnover, 2)}x</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Higher = better. Industry avg: 4–8x</div>
         </div>
         <div style={{ background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Formula</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399", lineHeight: 1.6 }}>Turnover = COGS ÷ Avg Inventory</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)", lineHeight: 1.6 }}>Turnover = COGS ÷ Avg Inventory</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Days on Hand = 365 ÷ Turnover Ratio</div>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function StockTurnoverPage() {
             {loading ? <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</td></tr>
             : data.length === 0 ? <tr><td colSpan={7} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>No turnover data</td></tr>
             : [...data].sort((a, b) => b.turnoverRatio - a.turnoverRatio).map((r, i) => {
-              const rating = r.turnoverRatio >= 8 ? { label: "Excellent ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" } : r.turnoverRatio >= 4 ? { label: "Good", color: "#818cf8", bg: "rgba(129,140,248,.1)" } : r.turnoverRatio >= 2 ? { label: "Average", color: "#fbbf24", bg: "rgba(251,191,36,.1)" } : { label: "Poor ⚠️", color: "#f87171", bg: "rgba(248,113,113,.1)" };
+              const rating = r.turnoverRatio >= 8 ? { label: "Excellent ⭐", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" } : r.turnoverRatio >= 4 ? { label: "Good", color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" } : r.turnoverRatio >= 2 ? { label: "Average", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" } : { label: "Poor ⚠️", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" };
               return (
                 <tr key={i} style={{ borderBottom: i < data.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}

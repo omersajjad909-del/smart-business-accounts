@@ -106,11 +106,11 @@ export default function GroupToursPage() {
         const totalCost = rows.reduce((s, r) => s + Number(r.cost || 0), 0);
         const totalPax = rows.reduce((s, r) => s + Number(r.pax || 0), 0);
         return [
-          { label: "Tours", value: rows.length, color: "#f97316" },
+          { label: "Tours", value: rows.length, color: "var(--tx-f97316, #f97316)" },
           { label: "Total Passengers", value: totalPax, color: travelAccent },
-          { label: "Confirmed", value: rows.filter(r => String(r.status) === "confirmed").length, color: "#34d399" },
-          { label: "Invoice Pending", value: rows.filter(r => !String(r.invoiceNo || "")).length, color: "#fbbf24" },
-          { label: "Margin", value: (totalSale - totalCost).toLocaleString(), color: "#60a5fa" },
+          { label: "Confirmed", value: rows.filter(r => String(r.status) === "confirmed").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Invoice Pending", value: rows.filter(r => !String(r.invoiceNo || "")).length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Margin", value: (totalSale - totalCost).toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ];
       }}
     />

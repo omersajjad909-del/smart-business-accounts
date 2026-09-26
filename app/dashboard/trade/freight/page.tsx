@@ -51,12 +51,12 @@ const INCOTERMS = ["FOB","CIF","EXW","CFR","DAP","DDP","FCA","CPT","CIP","FAS"];
 const CURRENCIES = ["USD","EUR","GBP","AED","PKR","CNY","SGD","CAD","AUD"];
 
 const STATUS_META: Record<FreightStatus, { label: string; color: string; bg: string; border: string }> = {
-  QUOTED:     { label: "Quoted",     color: "#a78bfa", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
-  BOOKED:     { label: "Booked",     color: "#38bdf8", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.35)"  },
-  IN_TRANSIT: { label: "In Transit", color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  ARRIVED:    { label: "Arrived",    color: "#fbbf24", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)"  },
-  DELIVERED:  { label: "Delivered",  color: "#4ade80", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
-  CANCELLED:  { label: "Cancelled",  color: "#f87171", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
+  QUOTED:     { label: "Quoted",     color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
+  BOOKED:     { label: "Booked",     color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.35)"  },
+  IN_TRANSIT: { label: "In Transit", color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  ARRIVED:    { label: "Arrived",    color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)"  },
+  DELIVERED:  { label: "Delivered",  color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
+  CANCELLED:  { label: "Cancelled",  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
 };
 
 const MODE_ICON: Record<FreightMode, string> = {
@@ -264,12 +264,12 @@ export default function FreightManagementPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Shipments", value: kpis.total,     color: "#a78bfa" },
-          { label: "In Transit",      value: kpis.inTransit, color: "#60a5fa" },
-          { label: "🚢 Sea",          value: kpis.sea,        color: "#38bdf8" },
-          { label: "✈️ Air",          value: kpis.air,        color: "#fbbf24" },
-          { label: "🚛 Land",         value: kpis.land,       color: "#4ade80" },
-          { label: "Total Cost (USD)", value: `$${Math.round(kpis.totalCost).toLocaleString()}`, color: "#6366f1" },
+          { label: "Total Shipments", value: kpis.total,     color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "In Transit",      value: kpis.inTransit, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "🚢 Sea",          value: kpis.sea,        color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "✈️ Air",          value: kpis.air,        color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "🚛 Land",         value: kpis.land,       color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Total Cost (USD)", value: `$${Math.round(kpis.totalCost).toLocaleString()}`, color: "var(--tx-6366f1, #6366f1)" },
         ].map(k => (
           <div key={k.label} style={s.kpi as React.CSSProperties}>
             <div style={{ fontSize: 20, fontWeight: 800, color: k.color, marginBottom: 4 }}>{k.value}</div>
@@ -321,14 +321,14 @@ export default function FreightManagementPage() {
                 const sm = STATUS_META[f.status];
                 return (
                   <tr key={f.id}
-                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
                     <td style={s.td}>
                       <span style={{ fontSize: 18 }}>{MODE_ICON[f.mode]}</span>{" "}
                       <span style={{ fontSize: 12, fontWeight: 600 }}>{f.mode}</span>
                     </td>
-                    <td style={{ ...s.td, fontWeight: 700, color: "#6366f1" }}>{f.carrier || "—"}</td>
+                    <td style={{ ...s.td, fontWeight: 700, color: "var(--tx-6366f1, #6366f1)" }}>{f.carrier || "—"}</td>
                     <td style={s.td}>
                       <div>{f.originPort} → {f.destinationPort}</div>
                       {(f.originCountry || f.destCountry) && (
@@ -339,12 +339,12 @@ export default function FreightManagementPage() {
                       <div>{f.shipmentRef || "—"}</div>
                       {f.blAwbNo && <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{f.blAwbNo}</div>}
                     </td>
-                    <td style={s.td}><span style={{ background: "rgba(99,102,241,.12)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{f.incoterm}</span></td>
+                    <td style={s.td}><span style={{ background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", border: "1px solid rgba(99,102,241,.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{f.incoterm}</span></td>
                     <td style={s.td}>{f.currency}</td>
                     <td style={{ ...s.td, textAlign: "right" }}>{f.freightRate.toLocaleString()}</td>
                     <td style={{ ...s.td, textAlign: "right", color: "var(--text-muted)" }}>{f.surcharges.toLocaleString()}</td>
                     <td style={{ ...s.td, textAlign: "right", color: "var(--text-muted)" }}>{f.insurance.toLocaleString()}</td>
-                    <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "#4ade80" }}>{fmtAmt(f.totalCost, f.currency)}</td>
+                    <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "var(--tx-4ade80, #4ade80)" }}>{fmtAmt(f.totalCost, f.currency)}</td>
                     <td style={s.td}>{f.etd || "—"}</td>
                     <td style={s.td}>{f.eta || "—"}</td>
                     <td style={{ ...s.td, textAlign: "right" }}>{f.transitDays ? `${f.transitDays}d` : "—"}</td>
@@ -376,7 +376,7 @@ export default function FreightManagementPage() {
             <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 22 }}>This action cannot be undone.</div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => doDelete(confirmDel)} style={{ ...s.btn("#ef4444"), flex: 1 }}>Delete</button>
-              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(255,255,255,.08)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(var(--ink),.08)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -453,7 +453,7 @@ export default function FreightManagementPage() {
 
             {/* Costs */}
             <div style={{ background: "rgba(99,102,241,.04)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px", marginBottom: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#a5b4fc", marginBottom: 12 }}>Cost Breakdown</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", marginBottom: 12 }}>Cost Breakdown</div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr 1fr", gap: 14 }}>
                 <div><label style={s.label}>Currency</label>
                   <select value={String(form.currency)} onChange={e => sf("currency", e.target.value)} style={s.inp}>
@@ -470,7 +470,7 @@ export default function FreightManagementPage() {
               </div>
               <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Total Cost:</span>
-                <span style={{ fontSize: 20, fontWeight: 800, color: "#4ade80" }}>
+                <span style={{ fontSize: 20, fontWeight: 800, color: "var(--tx-4ade80, #4ade80)" }}>
                   {String(form.currency || "USD")} {calcTotal(form).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -483,14 +483,14 @@ export default function FreightManagementPage() {
             </div>
 
             {error && (
-              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "#fca5a5" }}>{error}</div>
+              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>
             )}
 
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} disabled={saving} style={{ ...s.btn("#6366f1"), flex: 1, opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : editId ? "Update Freight" : "Create Freight Booking"}
               </button>
-              <button onClick={closeModal} style={{ ...s.btn("rgba(255,255,255,.07)"), flex: 0.4 }}>Cancel</button>
+              <button onClick={closeModal} style={{ ...s.btn("rgba(var(--ink),.07)"), flex: 0.4 }}>Cancel</button>
             </div>
           </div>
         </div>

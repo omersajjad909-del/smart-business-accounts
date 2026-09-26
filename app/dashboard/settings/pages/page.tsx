@@ -16,8 +16,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 type Page = {
   id: string;
@@ -132,7 +132,7 @@ export default function PagePrefsPage() {
           </p>
         </div>
         <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "#22c55e" }}>{shownCount}</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--tx-22c55e, #22c55e)" }}>{shownCount}</div>
           <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>of {pages.length} shown</div>
         </div>
       </div>
@@ -143,12 +143,12 @@ export default function PagePrefsPage() {
         </div>
       )}
       {error && (
-        <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5 }}>
+        <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12.5 }}>
           {error}
         </div>
       )}
       {note && (
-        <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.28)", color: "#86efac", fontSize: 12.5 }}>
+        <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.28)", color: "var(--tx-86efac, #86efac)", fontSize: 12.5 }}>
           {note}
         </div>
       )}
@@ -239,7 +239,7 @@ export default function PagePrefsPage() {
         <div style={{
           position: "fixed", bottom: 18, left: "50%", transform: "translateX(-50%)",
           display: "flex", alignItems: "center", gap: 12, padding: "11px 16px",
-          borderRadius: 14, background: "rgba(10,13,32,.95)", border: `1px solid ${border}`,
+          borderRadius: 14, background: "rgba(var(--dkr-0a0d20, 10,13,32),0.95)", border: `1px solid ${border}`,
           backdropFilter: "blur(10px)", boxShadow: "0 12px 40px rgba(0,0,0,.45)", zIndex: 50,
         }}>
           <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)", whiteSpace: "nowrap" }}>

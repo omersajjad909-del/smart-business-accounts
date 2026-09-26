@@ -45,10 +45,10 @@ export default function MediaPlanPage() {
       summarize={(rows) => {
         const spend = rows.reduce((sum, row) => sum + Number(row.spend || 0), 0);
         return [
-          { label: "Plans", value: rows.length, color: "#a78bfa" },
-          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "#60a5fa" },
-          { label: "Live", value: rows.filter((row) => String(row.status) === "live").length, color: "#34d399" },
-          { label: "Planned Spend", value: spend.toLocaleString(), color: "#fbbf24" },
+          { label: "Plans", value: rows.length, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Live", value: rows.filter((row) => String(row.status) === "live").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Planned Spend", value: spend.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

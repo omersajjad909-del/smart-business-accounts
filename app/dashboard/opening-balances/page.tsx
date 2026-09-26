@@ -160,11 +160,11 @@ export default function OpeningBalancesPage() {
       {/* Result banner */}
       {result && (
         <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 20 }}>
-          <div style={{ fontWeight: 700, color: "#4ade80", marginBottom: 4 }}>✓ Opening balances saved successfully</div>
+          <div style={{ fontWeight: 700, color: "var(--tx-4ade80, #4ade80)", marginBottom: 4 }}>✓ Opening balances saved successfully</div>
           <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Updated: {result.updated} accounts · Skipped: {result.skipped}</div>
           {result.errors?.length ? (
             <details style={{ marginTop: 8 }}>
-              <summary style={{ fontSize: 12, cursor: "pointer", color: "#fbbf24" }}>View {result.errors.length} warnings</summary>
+              <summary style={{ fontSize: 12, cursor: "pointer", color: "var(--tx-fbbf24, #fbbf24)" }}>View {result.errors.length} warnings</summary>
               <ul style={{ margin: "8px 0 0 16px", fontSize: 11, color: "var(--text-muted)" }}>
                 {result.errors.map((e, i) => <li key={i}>{e}</li>)}
               </ul>
@@ -174,7 +174,7 @@ export default function OpeningBalancesPage() {
       )}
 
       {error && (
-        <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "12px 18px", marginBottom: 20, color: "#f87171", fontSize: 13 }}>
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "12px 18px", marginBottom: 20, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -214,7 +214,7 @@ export default function OpeningBalancesPage() {
                             onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,0.1)")}
                             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                           >
-                            <span style={{ fontFamily: "monospace", fontSize: 11, color: "#a5b4fc", minWidth: 70 }}>{acc.code}</span>
+                            <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--tx-a5b4fc, #a5b4fc)", minWidth: 70 }}>{acc.code}</span>
                             <span style={{ flex: 1 }}>{acc.name}</span>
                             <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{acc.type}</span>
                           </div>
@@ -241,7 +241,7 @@ export default function OpeningBalancesPage() {
                   {/* Remove */}
                   <td style={{ padding: "8px 12px", textAlign: "center" }}>
                     {rows.length > 1 && (
-                      <button onClick={() => removeRow(i)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 17, lineHeight: 1, fontFamily: FONT }}>×</button>
+                      <button onClick={() => removeRow(i)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 17, lineHeight: 1, fontFamily: FONT }}>×</button>
                     )}
                   </td>
                 </tr>
@@ -250,12 +250,12 @@ export default function OpeningBalancesPage() {
             <tfoot>
               <tr style={{ background: "rgba(var(--ink),0.02)" }}>
                 <td style={{ padding: "12px 12px", fontSize: 13, fontWeight: 700 }}>
-                  <button onClick={addRow} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#a5b4fc", fontFamily: FONT }}>
+                  <button onClick={addRow} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--tx-a5b4fc, #a5b4fc)", fontFamily: FONT }}>
                     + Add Row
                   </button>
                 </td>
-                <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "#10b981" }}>{totalDebit.toFixed(2)}</td>
-                <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "#f87171" }}>{totalCredit.toFixed(2)}</td>
+                <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "var(--tx-10b981, #10b981)" }}>{totalDebit.toFixed(2)}</td>
+                <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "var(--tx-f87171, #f87171)" }}>{totalCredit.toFixed(2)}</td>
                 <td />
               </tr>
               {/* Balance indicator */}
@@ -265,8 +265,8 @@ export default function OpeningBalancesPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: isBalanced ? "#4ade80" : "#f87171" }} />
                       {isBalanced
-                        ? <span style={{ fontSize: 12, color: "#4ade80", fontWeight: 600 }}>Balanced — debits equal credits</span>
-                        : <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 600 }}>Difference: {Math.abs(totalDebit - totalCredit).toFixed(2)} — must be 0 before saving</span>
+                        ? <span style={{ fontSize: 12, color: "var(--tx-4ade80, #4ade80)", fontWeight: 600 }}>Balanced — debits equal credits</span>
+                        : <span style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 600 }}>Difference: {Math.abs(totalDebit - totalCredit).toFixed(2)} — must be 0 before saving</span>
                       }
                     </div>
                     <button onClick={submitManual} disabled={saving || !isBalanced || rows.every(r => !r.accountId)}
@@ -285,7 +285,7 @@ export default function OpeningBalancesPage() {
       {tab === "csv" && (
         <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "13px 13px" : "24px 28px" }}>
           <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.7 }}>
-            Paste CSV with columns: <code style={{ background: "rgba(99,102,241,0.12)", padding: "2px 7px", borderRadius: 4, fontSize: 12, color: "#a5b4fc" }}>code,debit,credit</code><br />
+            Paste CSV with columns: <code style={{ background: "rgba(99,102,241,0.12)", padding: "2px 7px", borderRadius: 4, fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)" }}>code,debit,credit</code><br />
             Use the account <strong style={{ color: "var(--text-primary)" }}>code</strong> from your Chart of Accounts (not the name).
           </div>
           <textarea value={csv} onChange={e => setCsv(e.target.value)} rows={12}

@@ -46,14 +46,14 @@ interface ContainerRecord extends ContainerData {
 const CONTAINER_TYPES: ContainerType[] = ["20ft","40ft","40ft HC","20ft Reefer","40ft Reefer","20ft OT","40ft OT","Flat Rack"];
 
 const STATUS_META: Record<ContainerStatus, { label: string; color: string; bg: string; border: string }> = {
-  BOOKING:    { label: "Booking",    color: "#a78bfa", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
-  LOADED:     { label: "Loaded",     color: "#38bdf8", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.35)"  },
-  IN_TRANSIT: { label: "In Transit", color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  AT_PORT:    { label: "At Port",    color: "#fbbf24", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)"  },
-  CUSTOMS:    { label: "Customs",    color: "#fb923c", bg: "rgba(251,146,60,.12)",   border: "rgba(251,146,60,.35)"  },
-  RELEASED:   { label: "Released",   color: "#4ade80", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
-  RETURNED:   { label: "Returned",   color: "#94a3b8", bg: "rgba(148,163,184,.12)",  border: "rgba(148,163,184,.35)" },
-  DAMAGED:    { label: "Damaged",    color: "#f87171", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
+  BOOKING:    { label: "Booking",    color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
+  LOADED:     { label: "Loaded",     color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.35)"  },
+  IN_TRANSIT: { label: "In Transit", color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  AT_PORT:    { label: "At Port",    color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)"  },
+  CUSTOMS:    { label: "Customs",    color: "var(--tx-fb923c, #fb923c)", bg: "rgba(251,146,60,.12)",   border: "rgba(251,146,60,.35)"  },
+  RELEASED:   { label: "Released",   color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
+  RETURNED:   { label: "Returned",   color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)",  border: "rgba(148,163,184,.35)" },
+  DAMAGED:    { label: "Damaged",    color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
 };
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -228,11 +228,11 @@ export default function ContainerManagementPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Containers", value: kpis.total,     color: "#a78bfa" },
-          { label: "In Transit",       value: kpis.inTransit, color: "#60a5fa" },
-          { label: "At Port / Customs",value: kpis.atPort,    color: "#fbbf24" },
-          { label: "Released",         value: kpis.released,  color: "#4ade80" },
-          { label: "Total CBM",        value: kpis.totalCbm.toFixed(1), color: "#14b8a6" },
+          { label: "Total Containers", value: kpis.total,     color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "In Transit",       value: kpis.inTransit, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "At Port / Customs",value: kpis.atPort,    color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Released",         value: kpis.released,  color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Total CBM",        value: kpis.totalCbm.toFixed(1), color: "var(--tx-14b8a6, #14b8a6)" },
         ].map(k => (
           <div key={k.label} style={s.kpi as React.CSSProperties}>
             <div style={{ fontSize: 22, fontWeight: 800, color: k.color, marginBottom: 4 }}>{k.value}</div>
@@ -282,17 +282,17 @@ export default function ContainerManagementPage() {
                 return (
                   <>
                     <tr key={c.id}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      <td style={{ ...s.td, fontWeight: 700, color: "#14b8a6" }}>
+                      <td style={{ ...s.td, fontWeight: 700, color: "var(--tx-14b8a6, #14b8a6)" }}>
                         <button onClick={() => setExpandedId(isExpanded ? null : c.id)}
-                          style={{ background: "none", border: "none", color: "#14b8a6", cursor: "pointer", fontWeight: 700, fontSize: 12, fontFamily: FONT, padding: 0 }}>
+                          style={{ background: "none", border: "none", color: "var(--tx-14b8a6, #14b8a6)", cursor: "pointer", fontWeight: 700, fontSize: 12, fontFamily: FONT, padding: 0 }}>
                           {c.containerNo} {isExpanded ? "▲" : "▼"}
                         </button>
                       </td>
                       <td style={s.td}>{c.sealNo || "—"}</td>
-                      <td style={s.td}><span style={{ background: "rgba(20,184,166,.12)", color: "#14b8a6", border: "1px solid rgba(20,184,166,.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{c.type}</span></td>
+                      <td style={s.td}><span style={{ background: "rgba(20,184,166,.12)", color: "var(--tx-14b8a6, #14b8a6)", border: "1px solid rgba(20,184,166,.3)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{c.type}</span></td>
                       <td style={s.td}>{c.lineOperator || "—"}</td>
                       <td style={s.td}>
                         <div style={{ fontSize: 12 }}>{c.originPort || "—"}</div>
@@ -328,7 +328,7 @@ export default function ContainerManagementPage() {
                     {isExpanded && c.tracking.length > 0 && (
                       <tr key={`${c.id}-track`}>
                         <td colSpan={13} style={{ padding: "12px 20px", background: "rgba(20,184,166,.04)", borderBottom: "1px solid var(--border)" }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#14b8a6", marginBottom: 8 }}>Tracking History</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-14b8a6, #14b8a6)", marginBottom: 8 }}>Tracking History</div>
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             {[...c.tracking].reverse().map((t, i) => (
                               <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -358,7 +358,7 @@ export default function ContainerManagementPage() {
             <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 22 }}>This action cannot be undone.</div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => doDelete(confirmDel)} style={{ ...s.btn("#ef4444"), flex: 1 }}>Delete</button>
-              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(255,255,255,.08)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(var(--ink),.08)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -446,14 +446,14 @@ export default function ContainerManagementPage() {
             </div>
 
             {error && (
-              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "#fca5a5" }}>{error}</div>
+              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>
             )}
 
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} disabled={saving} style={{ ...s.btn("#14b8a6"), flex: 1, opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : editId ? "Update Container" : "Create Container"}
               </button>
-              <button onClick={closeModal} style={{ ...s.btn("rgba(255,255,255,.07)"), flex: 0.4 }}>Cancel</button>
+              <button onClick={closeModal} style={{ ...s.btn("rgba(var(--ink),.07)"), flex: 0.4 }}>Cancel</button>
             </div>
           </div>
         </div>

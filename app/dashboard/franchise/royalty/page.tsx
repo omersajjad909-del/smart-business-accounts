@@ -63,9 +63,9 @@ export default function FranchiseRoyaltyPage() {
         const value = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
         return [
           { label: "Cycles", value: rows.length, color: accent },
-          { label: "Invoiced", value: rows.filter((row) => String(row.status) === "invoiced").length, color: "#60a5fa" },
-          { label: "Received", value: rows.filter((row) => String(row.status) === "received").length, color: "#34d399" },
-          { label: "Royalty Value", value: value.toLocaleString(), color: "#fbbf24" },
+          { label: "Invoiced", value: rows.filter((row) => String(row.status) === "invoiced").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Received", value: rows.filter((row) => String(row.status) === "received").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Royalty Value", value: value.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

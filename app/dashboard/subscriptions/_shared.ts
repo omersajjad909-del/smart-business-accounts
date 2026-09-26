@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const saasFont = "'Outfit','Inter',sans-serif";
-export const saasBg = "rgba(255,255,255,.03)";
-export const saasBorder = "rgba(255,255,255,.07)";
-export const saasMuted = "rgba(255,255,255,.56)";
+export const saasBg = "rgba(var(--ink),.03)";
+export const saasBorder = "rgba(var(--ink),.07)";
+export const saasMuted = "rgba(var(--ink),.56)";
 
 export type SaaSPlanStatus = "active" | "draft" | "retired";
 export type SaaSSubscriberStatus = "trial" | "active" | "past_due" | "cancelled";

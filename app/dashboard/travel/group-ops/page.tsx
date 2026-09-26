@@ -316,7 +316,7 @@ export default function GroupOpsPage() {
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text }}>
-                          {row.pilgrim.name || <span style={{ color: "#f87171" }}>Unnamed pilgrim</span>}
+                          {row.pilgrim.name || <span style={{ color: "var(--tx-f87171, #f87171)" }}>Unnamed pilgrim</span>}
                         </div>
                         <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
                           {row.party} · {row.bookingNo}
@@ -329,15 +329,15 @@ export default function GroupOpsPage() {
                         </span>
                         {/* The party owes, not the person — a family pays together. */}
                         {row.overdue > 0 ? (
-                          <span style={{ fontSize: 10.5, fontWeight: 700, color: "#f87171", border: "1px solid rgba(248,113,113,.35)", background: "rgba(248,113,113,.12)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap" }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--tx-f87171, #f87171)", border: "1px solid rgba(248,113,113,.35)", background: "rgba(248,113,113,.12)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap" }}>
                             💰 {money(row.overdue)} overdue
                           </span>
                         ) : row.balance > 0 ? (
-                          <span style={{ fontSize: 10.5, fontWeight: 700, color: "#f4c25b", border: "1px solid rgba(244,194,91,.35)", background: "rgba(244,194,91,.12)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap" }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--tx-f4c25b, #f4c25b)", border: "1px solid rgba(244,194,91,.35)", background: "rgba(244,194,91,.12)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap" }}>
                             {row.paidPercent}% paid · {money(row.balance)} left
                           </span>
                         ) : (
-                          <span style={{ fontSize: 10.5, fontWeight: 700, color: "#34d399", border: "1px solid rgba(52,211,153,.35)", background: "rgba(52,211,153,.12)", borderRadius: 999, padding: "3px 9px" }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--tx-34d399, #34d399)", border: "1px solid rgba(52,211,153,.35)", background: "rgba(52,211,153,.12)", borderRadius: 999, padding: "3px 9px" }}>
                             Paid in full
                           </span>
                         )}

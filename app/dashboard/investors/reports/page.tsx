@@ -335,7 +335,7 @@ export default function InvestorReportsPage() {
                     <td style={numTd}>{fmtQty(l.qty)}</td>
                     <td style={numTd}>{party?.profitModel === "percentage" ? fmtMoney(l.baseProfit) : fmtMoney(l.rate)}</td>
                     <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(l.amount)}</td>
-                    <td style={{ ...tdStyle, color: l.settlementId ? MUTED : "#2dd4bf" }}>{l.settlementId ? "settled" : "open"}</td>
+                    <td style={{ ...tdStyle, color: l.settlementId ? MUTED : "var(--tx-2dd4bf, #2dd4bf)" }}>{l.settlementId ? "settled" : "open"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -498,7 +498,7 @@ export default function InvestorReportsPage() {
                       <td style={numTd}>{fmtMoney(s.profitDue)}</td>
                       <td style={numTd}>{fmtMoney(s.cashReceived)}</td>
                       <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(s.closingBalance)}</td>
-                      <td style={{ ...numTd, color: waited > 7 ? "#fbbf24" : MUTED }}>{waited} d</td>
+                      <td style={{ ...numTd, color: waited > 7 ? "var(--tx-fbbf24, #fbbf24)" : MUTED }}>{waited} d</td>
                     </tr>
                   );
                 })}
@@ -579,7 +579,7 @@ export default function InvestorReportsPage() {
                         style={{
                           ...numTd,
                           color:
-                            r.lineCount === 0 ? MUTED : r.recoveryPct > 100 ? "#f87171" : r.recoveryPct === 100 ? undefined : "#fbbf24",
+                            r.lineCount === 0 ? MUTED : r.recoveryPct > 100 ? "var(--tx-f87171, #f87171)" : r.recoveryPct === 100 ? undefined : "var(--tx-fbbf24, #fbbf24)",
                         }}
                       >
                         {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
@@ -715,7 +715,7 @@ export default function InvestorReportsPage() {
                 padding: "12px 14px",
                 fontSize: 12.5,
                 lineHeight: 1.6,
-                color: "#fbbf24",
+                color: "var(--tx-fbbf24, #fbbf24)",
                 maxWidth: 620,
               }}
             >

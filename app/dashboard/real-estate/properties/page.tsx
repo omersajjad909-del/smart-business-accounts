@@ -6,15 +6,15 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 type PropStatus = "vacant" | "rented" | "maintenance" | "for_sale";
 const STATUS_META: Record<PropStatus, { label: string; color: string; bg: string; emoji: string }> = {
-  vacant:      { label: "Vacant",      color: "#34d399", bg: "rgba(52,211,153,.12)",  emoji: "🟢" },
-  rented:      { label: "Rented",      color: "#818cf8", bg: "rgba(129,140,248,.12)", emoji: "🔵" },
-  maintenance: { label: "Maintenance", color: "#f59e0b", bg: "rgba(245,158,11,.12)",  emoji: "🟡" },
-  for_sale:    { label: "For Sale",    color: "#38bdf8", bg: "rgba(56,189,248,.12)",  emoji: "🔷" },
+  vacant:      { label: "Vacant",      color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)",  emoji: "🟢" },
+  rented:      { label: "Rented",      color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.12)", emoji: "🔵" },
+  maintenance: { label: "Maintenance", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)",  emoji: "🟡" },
+  for_sale:    { label: "For Sale",    color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)",  emoji: "🔷" },
 };
 
 export default function PropertiesPage() {
@@ -82,7 +82,7 @@ export default function PropertiesPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Properties", val: properties.length, color: "#818cf8" }, { label: "Rented", val: occupied, color: "#818cf8" }, { label: "Vacant", val: properties.filter(p => p.status === "vacant").length, color: "#34d399" }, { label: "Monthly Income", val: `Rs. ${totalRent.toLocaleString()}`, color: "#34d399" }].map(s => (
+        {[{ label: "Total Properties", val: properties.length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Rented", val: occupied, color: "var(--tx-818cf8, #818cf8)" }, { label: "Vacant", val: properties.filter(p => p.status === "vacant").length, color: "var(--tx-34d399, #34d399)" }, { label: "Monthly Income", val: `Rs. ${totalRent.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginTop: 3 }}>{s.label}</div>
@@ -113,7 +113,7 @@ export default function PropertiesPage() {
                 </div>
                 <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 8 }}>{prop.type} · {prop.size}</div>
                 <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 12 }}>📍 {prop.address}</div>
-                <div style={{ fontWeight: 700, color: "#34d399" }}>Rs. {prop.rent.toLocaleString()}/mo</div>
+                <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Rs. {prop.rent.toLocaleString()}/mo</div>
                 {prop.tenant && <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 6 }}>Tenant: {prop.tenant}</div>}
               </div>
             );
@@ -148,7 +148,7 @@ export default function PropertiesPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 480, fontFamily: ff }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 20, fontWeight: 700 }}>Add Property</h2>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Property Name", "name"], ["Address", "address"], ["Size", "size"]].map(([label, key]) => (
                 <div key={key} style={{ gridColumn: key === "address" ? "span 2" : undefined }}>

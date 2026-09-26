@@ -141,10 +141,10 @@ export default function TravelSchedulesPage() {
 
         return [
           { label: "Flights", value: rows.length, color: travelAccent },
-          { label: "Active", value: active.length, color: "#34d399" },
-          { label: "Sectors Covered", value: sectors.size, color: "#60a5fa" },
-          { label: "Airlines", value: airlines.size, color: "#a78bfa" },
-          { label: "Expiring in 30 Days", value: soon, color: soon ? "#fbbf24" : "#34d399" },
+          { label: "Active", value: active.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Sectors Covered", value: sectors.size, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Airlines", value: airlines.size, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Expiring in 30 Days", value: soon, color: soon ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" },
         ];
       }}
     />

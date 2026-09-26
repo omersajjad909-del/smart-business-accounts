@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const pharmacyFont = "'Outfit','Inter',sans-serif";
-export const pharmacyBg = "rgba(255,255,255,0.03)";
-export const pharmacyBorder = "rgba(255,255,255,0.07)";
-export const pharmacyMuted = "rgba(255,255,255,0.45)";
+export const pharmacyBg = "rgba(var(--ink),0.03)";
+export const pharmacyBorder = "rgba(var(--ink),0.07)";
+export const pharmacyMuted = "rgba(var(--ink),0.45)";
 
 export type PharmacyDrug = ReturnType<typeof mapDrugRecords>[number];
 export type PharmacyPrescription = ReturnType<typeof mapPrescriptionRecords>[number];

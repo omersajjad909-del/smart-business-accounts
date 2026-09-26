@@ -236,7 +236,7 @@ export default function LedgerReportPage() {
                       onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,.15)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
-                      {a.code && <span style={{ fontFamily:"monospace", fontSize:11, color:"#818cf8", marginRight:8 }}>{a.code}</span>}
+                      {a.code && <span style={{ fontFamily:"monospace", fontSize:11, color:"var(--tx-818cf8, #818cf8)", marginRight:8 }}>{a.code}</span>}
                       {a.name}
                     </div>
                   ))}
@@ -244,7 +244,7 @@ export default function LedgerReportPage() {
               )}
               {accountId && (
                 <div style={{ marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div style={{ fontSize: 11, color: "#818cf8" }}>
+                  <div style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)" }}>
                     ✓ {acctCode && <span style={{ fontFamily:"monospace", marginRight:5 }}>{acctCode}</span>}{acctName}
                   </div>
                   {previewLoading ? (
@@ -259,7 +259,7 @@ export default function LedgerReportPage() {
                       <span style={{ fontSize: 10, color: "rgba(var(--ink),.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>
                         Current Balance
                       </span>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: previewBal >= 0 ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: previewBal >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontFamily: "monospace" }}>
                         {fmt(previewBal)} {previewBal >= 0 ? "Dr" : "Cr"}
                       </span>
                     </div>
@@ -309,13 +309,13 @@ export default function LedgerReportPage() {
                   Debit: r.debit || 0, Credit: r.credit || 0, Balance: r.balance,
                 })), "ledger-report")} style={{
                   padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)",
-                  cursor: "pointer", background: "rgba(52,211,153,.08)", color: "#34d399",
+                  cursor: "pointer", background: "rgba(52,211,153,.08)", color: "var(--tx-34d399, #34d399)",
                   fontSize: 12, fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap",
                 }}>↓ Export CSV</button>
               )}
               <button onClick={() => window.print()} style={{
                 padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(99,102,241,.3)",
-                cursor: "pointer", background: "rgba(99,102,241,.08)", color: "#818cf8",
+                cursor: "pointer", background: "rgba(99,102,241,.08)", color: "var(--tx-818cf8, #818cf8)",
                 fontSize: 12, fontWeight: 600, fontFamily: "inherit",
               }}>🖨 Print</button>
             </div>
@@ -339,12 +339,12 @@ export default function LedgerReportPage() {
                   {companyInfo?.name || "—"}
                 </div>
                 <div style={{ width: 1, height: 16, background: "rgba(var(--ink),.1)" }}/>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8" }}>{acctName}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{acctName}</div>
                 {openingBal !== null && rows.length > 0 && (
                   <>
                     <div style={{ width: 1, height: 16, background: "rgba(var(--ink),.1)" }}/>
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>
-                      Opening: <span style={{ fontWeight: 700, color: openingBal >= 0 ? "#34d399" : "#f87171" }}>
+                      Opening: <span style={{ fontWeight: 700, color: openingBal >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                         {fmt(openingBal, cur)} {openingBal >= 0 ? "Dr" : "Cr"}
                       </span>
                     </div>
@@ -387,9 +387,9 @@ export default function LedgerReportPage() {
                       <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.55)", fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.date}</td>
                       <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.3)", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>OP</td>
                       <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.8)", fontWeight: 700, borderRight: "1px solid rgba(var(--ink),.04)", maxWidth: 360 }}>Opening Balance</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.debit ? "#34d399" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.debit ? fmt(openingRow.debit) : "—"}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.credit ? "#f87171" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.credit ? fmt(openingRow.credit) : "—"}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: openingRow.balance >= 0 ? "#34d399" : "#f87171" }}>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.debit ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.debit ? fmt(openingRow.debit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: openingRow.credit ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{openingRow.credit ? fmt(openingRow.credit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: openingRow.balance >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                         {fmt(openingRow.balance, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{openingRow.balance >= 0 ? "Dr" : "Cr"}</span>
                       </td>
                     </tr>
@@ -409,14 +409,14 @@ export default function LedgerReportPage() {
                       transition: "background .15s",
                     }}
                       onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.06)")}
-                      onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)")}
+                      onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(var(--ink),.015)")}
                     >
                       <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.45)", fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.date}</td>
-                      <td style={{ padding: "11px 16px", color: "#818cf8", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.voucherNo}</td>
+                      <td style={{ padding: "11px 16px", color: "var(--tx-818cf8, #818cf8)", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.voucherNo}</td>
                       <td style={{ padding: "11px 16px", color: "rgba(var(--ink),.65)", borderRight: "1px solid rgba(var(--ink),.04)", maxWidth: 360 }}>{r.narration}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.debit ? "#34d399" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.debit ? fmt(r.debit) : "—"}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.credit ? "#f87171" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.credit ? fmt(r.credit) : "—"}</td>
-                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: r.balance >= 0 ? "#34d399" : "#f87171" }}>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.debit ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.debit ? fmt(r.debit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.credit ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.18)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap" }}>{r.credit ? fmt(r.credit) : "—"}</td>
+                      <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: r.balance >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                         {fmt(r.balance, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{r.balance >= 0 ? "Dr" : "Cr"}</span>
                       </td>
                     </tr>
@@ -426,9 +426,9 @@ export default function LedgerReportPage() {
                   <tfoot>
                     <tr style={{ borderTop: "1px solid rgba(var(--ink),.12)", background: "rgba(99,102,241,.06)" }}>
                       <td colSpan={3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".06em", textTransform: "uppercase" }}>Period Totals</td>
-                      <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "#34d399", fontSize: 14, whiteSpace: "nowrap" }}>{fmt(totalDebit, cur)}</td>
-                      <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "#f87171", fontSize: 14, whiteSpace: "nowrap" }}>{fmt(totalCredit, cur)}</td>
-                      <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 900, fontSize: 15, color: finalBal >= 0 ? "#34d399" : "#f87171", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "var(--tx-34d399, #34d399)", fontSize: 14, whiteSpace: "nowrap" }}>{fmt(totalDebit, cur)}</td>
+                      <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "var(--tx-f87171, #f87171)", fontSize: 14, whiteSpace: "nowrap" }}>{fmt(totalCredit, cur)}</td>
+                      <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 900, fontSize: 15, color: finalBal >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", whiteSpace: "nowrap" }}>
                         {fmt(finalBal, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{finalBal >= 0 ? "Dr" : "Cr"}</span>
                       </td>
                     </tr>

@@ -80,10 +80,10 @@ export default function TradingOutstandingsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Customers", value: customers.length, color: "#38bdf8" },
-          { label: "Suppliers", value: suppliers.length, color: "#34d399" },
-          { label: "Receivable Exposure", value: formatMoney(customerReceivable), color: "#f59e0b" },
-          { label: "Payable Exposure", value: formatMoney(supplierPayable), color: "#f87171" },
+          { label: "Customers", value: customers.length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Suppliers", value: suppliers.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Receivable Exposure", value: formatMoney(customerReceivable), color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Payable Exposure", value: formatMoney(supplierPayable), color: "var(--tx-f87171, #f87171)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
@@ -109,7 +109,7 @@ export default function TradingOutstandingsPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.name}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.phone || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.creditDays || 0}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f59e0b", fontWeight: 700 }}>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>
                     {formatMoney(Math.max(Number(row.openDebit || 0) - Number(row.openCredit || 0), 0))}
                   </td>
                 </tr>
@@ -131,7 +131,7 @@ export default function TradingOutstandingsPage() {
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontWeight: 700 }}>{row.name}</span>
-                    <span style={{ color: "#f87171", fontWeight: 800 }}>
+                    <span style={{ color: "var(--tx-f87171, #f87171)", fontWeight: 800 }}>
                       {formatMoney(Math.max(Number(row.openCredit || 0) - Number(row.openDebit || 0), 0))}
                     </span>
                   </div>
@@ -149,7 +149,7 @@ export default function TradingOutstandingsPage() {
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.16)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontWeight: 700 }}>{row.receiptNo}</span>
-                    <span style={{ color: "#34d399", fontWeight: 800 }}>{formatMoney(row.amount)}</span>
+                    <span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 800 }}>{formatMoney(row.amount)}</span>
                   </div>
                   <div style={{ fontSize: 12, color: tradingMuted, marginTop: 4 }}>{row.party?.name || "-"}</div>
                   <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{formatDate(row.date)} · {row.paymentMode || "Mode"} · {row.status || "Status"}</div>

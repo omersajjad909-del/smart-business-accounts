@@ -25,9 +25,9 @@ function deriveStatus(usedPct: number): "OK" | "WARNING" | "EXCEEDED" {
 
 function statusBadge(status: "OK" | "WARNING" | "EXCEEDED") {
   const map = {
-    OK:       { bg: "rgba(16,185,129,.15)",  color: "#10b981" },
-    WARNING:  { bg: "rgba(251,191,36,.15)",  color: "#fbbf24" },
-    EXCEEDED: { bg: "rgba(239,68,68,.15)",   color: "#ef4444" },
+    OK:       { bg: "rgba(16,185,129,.15)",  color: "var(--tx-10b981, #10b981)" },
+    WARNING:  { bg: "rgba(251,191,36,.15)",  color: "var(--tx-fbbf24, #fbbf24)" },
+    EXCEEDED: { bg: "rgba(239,68,68,.15)",   color: "var(--tx-ef4444, #ef4444)" },
   };
   const s = map[status];
   return (
@@ -115,9 +115,9 @@ export default function CreditLimitsPage() {
 
   const kpis = [
     { label: "Total Customers", value: totalCustomers, color: ACCENT },
-    { label: "Within Limit",    value: withinLimit,    color: "#10b981" },
-    { label: "Over Limit",      value: overLimit,      color: "#ef4444" },
-    { label: "Total Exposure",  value: `$${totalExposure.toLocaleString()}`, color: "#a78bfa" },
+    { label: "Within Limit",    value: withinLimit,    color: "var(--tx-10b981, #10b981)" },
+    { label: "Over Limit",      value: overLimit,      color: "var(--tx-ef4444, #ef4444)" },
+    { label: "Total Exposure",  value: `$${totalExposure.toLocaleString()}`, color: "var(--tx-a78bfa, #a78bfa)" },
   ];
 
   function setField<K extends keyof FormState>(k: K, v: FormState[K]) {
@@ -271,7 +271,7 @@ export default function CreditLimitsPage() {
                 </tr>
               ) : rows.map((r) => (
                 <tr key={r.id}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <td style={{ ...cell, fontWeight: 600 }}>{r.customerName}</td>
@@ -298,7 +298,7 @@ export default function CreditLimitsPage() {
                         style={{
                           padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 600,
                           border: "1px solid rgba(56,189,248,.4)", background: "transparent",
-                          color: "#38bdf8", cursor: syncingId === r.id ? "not-allowed" : "pointer",
+                          color: "var(--tx-38bdf8, #38bdf8)", cursor: syncingId === r.id ? "not-allowed" : "pointer",
                           opacity: syncingId === r.id ? 0.6 : 1,
                         }}
                       >
@@ -310,7 +310,7 @@ export default function CreditLimitsPage() {
                       style={{
                         padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 600,
                         border: "1px solid rgba(239,68,68,.4)", background: "transparent",
-                        color: "#ef4444", cursor: "pointer",
+                        color: "var(--tx-ef4444, #ef4444)", cursor: "pointer",
                       }}
                     >
                       Delete
@@ -340,7 +340,7 @@ export default function CreditLimitsPage() {
             {error && (
               <div style={{
                 background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)",
-                color: "#f87171", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16,
+                color: "var(--tx-f87171, #f87171)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16,
               }}>{error}</div>
             )}
 

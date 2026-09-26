@@ -264,7 +264,7 @@ export default function HolidaysPage() {
                     <button onClick={() => remove(h.id)} style={{
                       padding: "6px 10px", borderRadius: 8,
                       background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)",
-                      color: "#f87171", cursor: "pointer", fontSize: 11, fontWeight: 700, fontFamily: ff,
+                      color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 11, fontWeight: 700, fontFamily: ff,
                     }}>Remove</button>
                   )}
                 </div>

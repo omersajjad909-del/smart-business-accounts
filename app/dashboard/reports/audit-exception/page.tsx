@@ -13,9 +13,9 @@ interface Row { id: string; type: string; description: string; referenceNo: stri
 // The map was keyed "critical"/"warning"/"info", so no row ever matched and the
 // page crashed reading `.bg` off undefined.
 const SEV: Record<string, Badge> = {
-  high:   { label: "Critical", color: "#ef4444", bg: "rgba(239,68,68,.1)" },
-  medium: { label: "Warning",  color: "#f59e0b", bg: "rgba(245,158,11,.1)" },
-  low:    { label: "Info",     color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+  high:   { label: "Critical", color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.1)" },
+  medium: { label: "Warning",  color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.1)" },
+  low:    { label: "Info",     color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" },
 };
 
 export default function AuditExceptionPage() {
@@ -60,7 +60,7 @@ export default function AuditExceptionPage() {
       {criticalCount > 0 && (
         <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(239,68,68,.07)", border: "1px solid rgba(239,68,68,.25)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>🚨</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#ef4444" }}>{criticalCount} critical exception{criticalCount > 1 ? "s" : ""} require immediate attention</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-ef4444, #ef4444)" }}>{criticalCount} critical exception{criticalCount > 1 ? "s" : ""} require immediate attention</span>
         </div>
       )}
 
@@ -82,7 +82,7 @@ export default function AuditExceptionPage() {
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8", fontWeight: 600 }}>{r.type}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>{r.type}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13 }}>{r.description}</td>
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)" }}>{r.referenceNo || "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.amount > 0 ? `${cur} ${fmt(r.amount)}` : "—"}</td>
@@ -92,8 +92,8 @@ export default function AuditExceptionPage() {
                   </td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     {r.resolvedAt
-                      ? <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(52,211,153,.1)", color: "#34d399" }}>Resolved</span>
-                      : <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(248,113,113,.1)", color: "#f87171" }}>Open</span>}
+                      ? <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(52,211,153,.1)", color: "var(--tx-34d399, #34d399)" }}>Resolved</span>
+                      : <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(248,113,113,.1)", color: "var(--tx-f87171, #f87171)" }}>Open</span>}
                   </td>
                 </tr>
               );

@@ -23,8 +23,8 @@ import { bookingMoney, readBooking } from "@/lib/umrahBooking";
 import { costDeparture, occupancyName, readDeparture, seatPosition } from "@/lib/umrahPackage";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.08)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.08)";
 const accent = "#38bdf8";
 
 type Tab = "profit" | "owing" | "manifest";
@@ -215,14 +215,14 @@ export default function TravelReportsPage() {
                   <td style={num}>{p.pax}</td>
                   <td style={num}>{p.revenue.toLocaleString()}</td>
                   <td style={{ ...num, color: "rgba(var(--ink),.5)" }}>{p.cost.toLocaleString()}</td>
-                  <td style={{ ...num, fontWeight: 700, color: p.margin >= 0 ? "#34d399" : "#fca5a5" }}>
+                  <td style={{ ...num, fontWeight: 700, color: p.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)" }}>
                     {p.margin.toLocaleString()}
                   </td>
                   <td style={{ ...num, color: "rgba(var(--ink),.5)" }}>{p.marginPercent}%</td>
                   <td style={num}>
                     {p.collected.toLocaleString()}
                     {p.revenue > p.collected && (
-                      <div style={{ fontSize: 10.5, color: "#fbbf24" }}>
+                      <div style={{ fontSize: 10.5, color: "var(--tx-fbbf24, #fbbf24)" }}>
                         {(p.revenue - p.collected).toLocaleString()} out
                       </div>
                     )}
@@ -249,7 +249,7 @@ export default function TravelReportsPage() {
             {buckets.map((b) => (
               <div key={b.key} style={{ background: bg, border: `1px solid ${b.key === "current" ? border : "rgba(239,68,68,.2)"}`, borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.45)", marginBottom: 5 }}>{b.label}</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: b.key === "current" ? "rgba(var(--ink),.75)" : b.total > 0 ? "#fca5a5" : "rgba(var(--ink),.3)" }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: b.key === "current" ? "rgba(var(--ink),.75)" : b.total > 0 ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),.3)" }}>
                   {b.total.toLocaleString()}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{b.count} instalment{b.count === 1 ? "" : "s"}</div>
@@ -273,7 +273,7 @@ export default function TravelReportsPage() {
                     <td style={{ ...td, fontWeight: 700 }}>{l.name}</td>
                     <td style={{ ...td, color: "rgba(var(--ink),.5)" }}>{l.departure}</td>
                     <td style={td}>{l.due || "—"}</td>
-                    <td style={{ ...num, color: l.daysLate > 0 ? "#fca5a5" : "rgba(var(--ink),.35)", fontWeight: l.daysLate > 0 ? 700 : 400 }}>
+                    <td style={{ ...num, color: l.daysLate > 0 ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),.35)", fontWeight: l.daysLate > 0 ? 700 : 400 }}>
                       {l.daysLate > 0 ? `${l.daysLate}d` : "—"}
                     </td>
                     <td style={{ ...num, fontWeight: 700 }}>{l.amount.toLocaleString()}</td>
@@ -341,7 +341,7 @@ export default function TravelReportsPage() {
                       {/* Blank rather than a dash: a manifest goes to the
                           embassy, and an empty cell is a missing passport
                           somebody has to chase, not a formatting choice. */}
-                      <td style={{ ...td, fontFamily: "ui-monospace, monospace", color: p.passportNo ? "inherit" : "#fca5a5" }}>
+                      <td style={{ ...td, fontFamily: "ui-monospace, monospace", color: p.passportNo ? "inherit" : "var(--tx-fca5a5, #fca5a5)" }}>
                         {p.passportNo || "MISSING"}
                       </td>
                       <td style={td}>{p.gender}</td>

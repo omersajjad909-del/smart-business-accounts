@@ -119,9 +119,9 @@ export default function BillingPage() {
 
       <div style={S.stats}>
         <div style={S.stat}><div style={S.statLabel}>Total Billed</div><div style={{ ...S.statVal, fontSize: 22 }}>Rs. {totalBilled.toLocaleString()}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Received</div><div style={{ ...S.statVal, color: '#34d399', fontSize: 22 }}>Rs. {received.toLocaleString()}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Pending</div><div style={{ ...S.statVal, color: '#fbbf24', fontSize: 22 }}>Rs. {pending.toLocaleString()}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Overdue</div><div style={{ ...S.statVal, color: '#f87171', fontSize: 22 }}>Rs. {overdue.toLocaleString()}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Received</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)', fontSize: 22 }}>Rs. {received.toLocaleString()}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Pending</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)', fontSize: 22 }}>Rs. {pending.toLocaleString()}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Overdue</div><div style={{ ...S.statVal, color: 'var(--tx-f87171, #f87171)', fontSize: 22 }}>Rs. {overdue.toLocaleString()}</div></div>
       </div>
 
       <div style={S.tabs}>
@@ -155,8 +155,8 @@ export default function BillingPage() {
                 <td style={S.td}><span style={S.badge(STATUS_COLOR[i.status])}>{i.status}</span></td>
                 <td style={S.td}>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    {i.status === 'Draft' && <button style={{ ...S.actBtn, color: '#38bdf8' }} onClick={() => sendInvoice(i.id)}>Send</button>}
-                    {(i.status === 'Sent' || i.status === 'Overdue') && <button style={{ ...S.actBtn, color: '#34d399' }} onClick={() => markPaid(i.id)}>Mark Paid</button>}
+                    {i.status === 'Draft' && <button style={{ ...S.actBtn, color: 'var(--tx-38bdf8, #38bdf8)' }} onClick={() => sendInvoice(i.id)}>Send</button>}
+                    {(i.status === 'Sent' || i.status === 'Overdue') && <button style={{ ...S.actBtn, color: 'var(--tx-34d399, #34d399)' }} onClick={() => markPaid(i.id)}>Mark Paid</button>}
                   </div>
                 </td>
               </tr>

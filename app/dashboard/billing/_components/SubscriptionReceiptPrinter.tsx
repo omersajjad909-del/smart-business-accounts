@@ -222,7 +222,7 @@ export function SubscriptionReceiptPrinter({
       onClick={(e) => { if (e.target === e.currentTarget && stage === "done") onClose(); }}
       style={{
         position: "fixed", inset: 0, zIndex: 3000,
-        background: "rgba(6,8,16,.82)", backdropFilter: "blur(10px)",
+        background: "rgba(var(--dkr-060810, 6,8,16),0.82)", backdropFilter: "blur(10px)",
         display: "flex", alignItems: "flex-start", justifyContent: "center",
         padding: "40px 16px", overflowY: "auto",
         animation: "fnvRcptFade .35s ease",
@@ -265,7 +265,7 @@ export function SubscriptionReceiptPrinter({
             ) : (
               <span style={{ width: 15, height: 15, borderRadius: "50%", border: "2px solid rgba(var(--ink),.16)", borderTopColor: "#818cf8", animation: "fnvRcptSpin .7s linear infinite", flexShrink: 0 }} />
             )}
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: stage === "done" ? "#34d399" : "rgba(var(--ink),.6)" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: stage === "done" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.6)" }}>
               {statusText}
             </span>
             {stage !== "done" && (

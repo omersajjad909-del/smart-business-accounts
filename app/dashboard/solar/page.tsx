@@ -23,7 +23,7 @@ export default function SolarOverviewPage() {
   const { summary, projects, equipment, amc } = data;
 
   return (
-    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>Solar Command Center</h1>
@@ -36,7 +36,7 @@ export default function SolarOverviewPage() {
             { label: "AMC Schedule", href: "/dashboard/solar/amc" },
             { label: "Analytics", href: "/dashboard/solar/analytics" },
           ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "#fde68a", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "var(--tx-fde68a, #fde68a)", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -46,10 +46,10 @@ export default function SolarOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Projects", value: summary.projects, color: solarAccent },
-          { label: "Installing", value: summary.liveProjects, color: "#60a5fa" },
-          { label: "Commissioned", value: summary.commissionedProjects, color: "#34d399" },
-          { label: "Low Stock", value: summary.lowStockEquipment, color: "#f97316" },
-          { label: "Pipeline Budget", value: summary.pipelineBudget.toLocaleString(), color: "#fbbf24" },
+          { label: "Installing", value: summary.liveProjects, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Commissioned", value: summary.commissionedProjects, color: "var(--tx-34d399, #34d399)" },
+          { label: "Low Stock", value: summary.lowStockEquipment, color: "var(--tx-f97316, #f97316)" },
+          { label: "Pipeline Budget", value: summary.pipelineBudget.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -66,7 +66,7 @@ export default function SolarOverviewPage() {
               <div key={item.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.project}</div>
                 <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 4 }}>{item.customer || "-"} | {item.site || "-"}</div>
-                <div style={{ fontSize: 12, color: "#fde68a", marginTop: 6 }}>{item.deadline || "-"} | {item.status}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-fde68a, #fde68a)", marginTop: 6 }}>{item.deadline || "-"} | {item.status}</div>
               </div>
             ))}
           </div>

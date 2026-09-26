@@ -8,7 +8,7 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 
 interface Row { productName: string; category: string; revenue: number; cogs: number; grossProfit: number; marginPct: number; unitsSold: number; avgPrice: number; }
 
-const signal = (m: number) => m >= 40 ? { label: "High Margin ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" } : m >= 20 ? { label: "Healthy", color: "#818cf8", bg: "rgba(129,140,248,.1)" } : m >= 0 ? { label: "Low Margin", color: "#fbbf24", bg: "rgba(251,191,36,.1)" } : { label: "Loss Maker", color: "#f87171", bg: "rgba(248,113,113,.1)" };
+const signal = (m: number) => m >= 40 ? { label: "High Margin ⭐", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" } : m >= 20 ? { label: "Healthy", color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" } : m >= 0 ? { label: "Low Margin", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" } : { label: "Loss Maker", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" };
 
 export default function ProductProfitabilityPage() {
   const { isMobile } = useResponsive();
@@ -45,9 +45,9 @@ export default function ProductProfitabilityPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Total Revenue",   value: `${cur} ${fmt(totals.revenue)}`, color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
-          { label: "Total Profit",    value: `${cur} ${fmt(totals.profit)}`,  color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
-          { label: "Avg Margin",      value: `${avgMargin.toFixed(1)}%`,      color: "#fbbf24", bg: "rgba(251,191,36,.07)", border: "rgba(251,191,36,.2)" },
+          { label: "Total Revenue",   value: `${cur} ${fmt(totals.revenue)}`, color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+          { label: "Total Profit",    value: `${cur} ${fmt(totals.profit)}`,  color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
+          { label: "Avg Margin",      value: `${avgMargin.toFixed(1)}%`,      color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.07)", border: "rgba(251,191,36,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -78,8 +78,8 @@ export default function ProductProfitabilityPage() {
                   <td style={{ padding: "11px 14px", fontSize: 13, fontWeight: 600 }}>{r.productName}</td>
                   <td style={{ padding: "11px 14px", fontSize: 12, color: "var(--text-muted)" }}>{r.category || "—"}</td>
                   <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.revenue)}</td>
-                  <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, color: "#f87171" }}>{cur} {fmt(r.cogs)}</td>
-                  <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#34d399" }}>{cur} {fmt(r.grossProfit)}</td>
+                  <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.cogs)}</td>
+                  <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{cur} {fmt(r.grossProfit)}</td>
                   <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 14, fontWeight: 900, color: s.color }}>{r.marginPct.toFixed(1)}%</td>
                   <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13 }}>{fmt(r.unitsSold)}</td>
                   <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.avgPrice)}</td>

@@ -47,10 +47,10 @@ export default function MrrArrPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "MRR", value: formatMoney(Math.round(mrr)), color: "#34d399" },
-          { label: "ARR", value: formatMoney(Math.round(arr)), color: "#60a5fa" },
-          { label: "Collected", value: formatMoney(Math.round(collected)), color: "#c084fc" },
-          { label: "Churn", value: `${churn}%`, color: "#f59e0b" },
+          { label: "MRR", value: formatMoney(Math.round(mrr)), color: "var(--tx-34d399, #34d399)" },
+          { label: "ARR", value: formatMoney(Math.round(arr)), color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Collected", value: formatMoney(Math.round(collected)), color: "var(--tx-c084fc, #c084fc)" },
+          { label: "Churn", value: `${churn}%`, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((card) => (
           <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: saasMuted, marginBottom: 8 }}>{card.label}</div>
@@ -69,7 +69,7 @@ export default function MrrArrPage() {
               return (
                 <div key={planName} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                   <span style={{ fontSize: 13, color: saasMuted }}>{planName}</span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: "#bfdbfe" }}>{list.length} accounts | {formatMoney(value)}</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-bfdbfe, #bfdbfe)" }}>{list.length} accounts | {formatMoney(value)}</span>
                 </div>
               );
             })}
@@ -81,10 +81,10 @@ export default function MrrArrPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Revenue Pressure</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Past due exposure", value: formatMoney(Math.round(overdue)), color: "#f97316" },
-              { label: "Trial to active pipeline", value: subscribers.filter((item) => item.status === "trial").length, color: "#60a5fa" },
-              { label: "Cancelled accounts", value: subscribers.filter((item) => item.status === "cancelled").length, color: "#f87171" },
-              { label: "Active accounts", value: subscribers.filter((item) => item.status === "active").length, color: "#34d399" },
+              { label: "Past due exposure", value: formatMoney(Math.round(overdue)), color: "var(--tx-f97316, #f97316)" },
+              { label: "Trial to active pipeline", value: subscribers.filter((item) => item.status === "trial").length, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Cancelled accounts", value: subscribers.filter((item) => item.status === "cancelled").length, color: "var(--tx-f87171, #f87171)" },
+              { label: "Active accounts", value: subscribers.filter((item) => item.status === "active").length, color: "var(--tx-34d399, #34d399)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: saasMuted }}>{row.label}</span>

@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 const statusColor: Record<string,string> = { active:"#22c55e", completed:"#6b7280", pending_report:"#f59e0b", closed:"#6b7280" };
 const statusLabel: Record<string,string> = { active:"Active", completed:"Completed", pending_report:"Report Due", closed:"Closed" };
@@ -70,10 +70,10 @@ export default function GrantsPage() {
 
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
-          { label:"Active Grants", value:grants.filter(g=>g.status==="active").length, color:"#22c55e" },
-          { label:"Total Received", value:`Rs. ${(totalReceived/1000000).toFixed(1)}M`, color:"#3b82f6" },
-          { label:"Total Spent", value:`Rs. ${(totalSpent/1000000).toFixed(1)}M`, color:"#f59e0b" },
-          { label:"Pending Reports", value:pendingReports, color:"#ef4444" },
+          { label:"Active Grants", value:grants.filter(g=>g.status==="active").length, color:"var(--tx-22c55e, #22c55e)" },
+          { label:"Total Received", value:`Rs. ${(totalReceived/1000000).toFixed(1)}M`, color:"var(--tx-3b82f6, #3b82f6)" },
+          { label:"Total Spent", value:`Rs. ${(totalSpent/1000000).toFixed(1)}M`, color:"var(--tx-f59e0b, #f59e0b)" },
+          { label:"Pending Reports", value:pendingReports, color:"var(--tx-ef4444, #ef4444)" },
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:28, fontWeight:700, color:s.color }}>{s.value}</div>
@@ -106,7 +106,7 @@ export default function GrantsPage() {
               <div style={{ marginBottom:12 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, marginBottom:4 }}>
                   <span style={{ color:"rgba(var(--ink),.5)" }}>Spent: Rs. {g.spent.toLocaleString()}</span>
-                  <span style={{ fontWeight:600, color:utilPct>90?"#ef4444":utilPct>70?"#f59e0b":"#22c55e" }}>{utilPct.toFixed(0)}%</span>
+                  <span style={{ fontWeight:600, color:utilPct>90?"var(--tx-ef4444, #ef4444)":utilPct>70?"var(--tx-f59e0b, #f59e0b)":"var(--tx-22c55e, #22c55e)" }}>{utilPct.toFixed(0)}%</span>
                   <span style={{ color:"rgba(var(--ink),.5)" }}>Total: Rs. {g.amount.toLocaleString()}</span>
                 </div>
                 <div style={{ height:8, background:"rgba(var(--ink),.1)", borderRadius:4, overflow:"hidden" }}>
@@ -116,20 +116,20 @@ export default function GrantsPage() {
 
               <div style={{ display:"flex", gap:12, fontSize:12, color:"rgba(var(--ink),.5)", marginBottom:12 }}>
                 <span>📅 {g.startDate} → {g.endDate}</span>
-                {days !== null && <span style={{ color:days<30?"#ef4444":days<90?"#f59e0b":"rgba(var(--ink),.5)" }}>{days>0?`${days}d left`:"Ended"}</span>}
+                {days !== null && <span style={{ color:days<30?"var(--tx-ef4444, #ef4444)":days<90?"var(--tx-f59e0b, #f59e0b)":"rgba(var(--ink),.5)" }}>{days>0?`${days}d left`:"Ended"}</span>}
               </div>
 
               {g.reportDue && (
                 <div style={{ background:reportDays!<0?"rgba(239,68,68,.1)":reportDays!<14?"rgba(245,158,11,.1)":"rgba(var(--ink),.04)", border:`1px solid ${reportDays!<0?"#ef444440":reportDays!<14?"#f59e0b40":border}`, borderRadius:8, padding:"6px 10px", fontSize:12, marginBottom:12 }}>
-                  <span style={{ color:reportDays!<0?"#ef4444":reportDays!<14?"#f59e0b":"rgba(var(--ink),.5)" }}>
+                  <span style={{ color:reportDays!<0?"var(--tx-ef4444, #ef4444)":reportDays!<14?"var(--tx-f59e0b, #f59e0b)":"rgba(var(--ink),.5)" }}>
                     📋 Report Due: {g.reportDue} {reportDays!<0?"(Overdue)":reportDays!<14?`(${reportDays}d left)`:""}
                   </span>
                 </div>
               )}
 
               <div style={{ display:"flex", gap:8 }}>
-                <button style={{ ...btn("rgba(99,102,241,.2)"), flex:1, padding:"8px", fontSize:13, color:"#818cf8" }}>Submit Report</button>
-                <button style={{ ...btn("rgba(255,255,255,.07)"), flex:1, padding:"8px", fontSize:13 }}>Add Expense</button>
+                <button style={{ ...btn("rgba(99,102,241,.2)"), flex:1, padding:"8px", fontSize:13, color:"var(--tx-818cf8, #818cf8)" }}>Submit Report</button>
+                <button style={{ ...btn("rgba(var(--ink),.07)"), flex:1, padding:"8px", fontSize:13 }}>Add Expense</button>
               </div>
             </div>
           );

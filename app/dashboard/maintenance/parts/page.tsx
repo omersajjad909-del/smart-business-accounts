@@ -46,10 +46,10 @@ export default function MaintenancePartsPage() {
         },
       })}
       summarize={(rows) => [
-        { label: "Parts", value: rows.length, color: "#34d399" },
-        { label: "Low Stock", value: rows.filter((row) => row.status === "low_stock" || Number(row.quantity || 0) <= Number(row.reorderLevel || 0)).length, color: "#f59e0b" },
-        { label: "Reserved", value: rows.filter((row) => row.status === "reserved").length, color: "#60a5fa" },
-        { label: "Stock Value", value: `Rs. ${rows.reduce((sum, row) => sum + Number(row.cost || 0) * Number(row.quantity || 0), 0).toLocaleString()}`, color: "#22c55e" },
+        { label: "Parts", value: rows.length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Low Stock", value: rows.filter((row) => row.status === "low_stock" || Number(row.quantity || 0) <= Number(row.reorderLevel || 0)).length, color: "var(--tx-f59e0b, #f59e0b)" },
+        { label: "Reserved", value: rows.filter((row) => row.status === "reserved").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "Stock Value", value: `Rs. ${rows.reduce((sum, row) => sum + Number(row.cost || 0) * Number(row.quantity || 0), 0).toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
       ]}
     />
   );

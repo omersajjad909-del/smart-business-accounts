@@ -220,11 +220,11 @@ export default function ExportPerformancePage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Export Revenue", value: fmt(kpis.total),     color: "#10b981" },
-          { label: "Total Orders",         value: kpis.orders,         color: "#60a5fa" },
-          { label: "Countries Served",     value: kpis.countries,      color: "#a78bfa" },
-          { label: "Active Customers",     value: kpis.customers,      color: "#fbbf24" },
-          { label: "Avg Order Value",      value: fmt(kpis.avgOrder),  color: "#f472b6" },
+          { label: "Total Export Revenue", value: fmt(kpis.total),     color: "var(--tx-10b981, #10b981)" },
+          { label: "Total Orders",         value: kpis.orders,         color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Countries Served",     value: kpis.countries,      color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active Customers",     value: kpis.customers,      color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Avg Order Value",      value: fmt(kpis.avgOrder),  color: "var(--tx-f472b6, #f472b6)" },
         ].map(k => (
           <div key={k.label} style={s.kpi as React.CSSProperties}>
             <div style={{ fontSize: 22, fontWeight: 800, color: k.color, marginBottom: 4 }}>{k.value}</div>
@@ -291,7 +291,7 @@ export default function ExportPerformancePage() {
                 <tbody>
                   {countryPerf.map((c, i) => (
                     <tr key={c.country}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
                       <td style={{ ...s.td, color: "var(--text-muted)", width: 36 }}>{i + 1}</td>
@@ -303,7 +303,7 @@ export default function ExportPerformancePage() {
                       <td style={{ ...s.td, textAlign: "right" }}>{c.orders}</td>
                       <td style={{ ...s.td, textAlign: "right" }}>{fmt(c.avgOrder)}</td>
                       <td style={s.td}>
-                        <span style={{ color: c.growth >= 0 ? "#4ade80" : "#f87171", fontWeight: 700 }}>{fmtPct(c.growth)}</span>
+                        <span style={{ color: c.growth >= 0 ? "var(--tx-4ade80, #4ade80)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>{fmtPct(c.growth)}</span>
                       </td>
                     </tr>
                   ))}
@@ -326,7 +326,7 @@ export default function ExportPerformancePage() {
                 <tbody>
                   {customerPerf.map((c, i) => (
                     <tr key={c.customer}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
                       <td style={{ ...s.td, color: "var(--text-muted)", width: 36 }}>{i + 1}</td>
@@ -360,12 +360,12 @@ export default function ExportPerformancePage() {
                 <tbody>
                   {productPerf.map((p, i) => (
                     <tr key={p.product}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
                       <td style={{ ...s.td, color: "var(--text-muted)", width: 36 }}>{i + 1}</td>
                       <td style={{ ...s.td, fontWeight: 700 }}>{p.product}</td>
-                      <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 8px", fontSize: 11 }}>{p.hsCode}</span></td>
+                      <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "var(--tx-a78bfa, #a78bfa)", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 8px", fontSize: 11 }}>{p.hsCode}</span></td>
                       <td style={{ ...s.td, minWidth: 200 }}>{buildBar(p.revenue, maxProductRev, "#a78bfa")}</td>
                       <td style={{ ...s.td, textAlign: "right" }}>
                         {kpis.total > 0 ? ((p.revenue / kpis.total) * 100).toFixed(1) : 0}%
@@ -397,27 +397,27 @@ export default function ExportPerformancePage() {
                   <tbody>
                     {filtered.map(r => (
                       <tr key={r.id}
-                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                         onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                       >
-                        <td style={{ ...s.td, fontWeight: 700, color: "#10b981" }}>{r.invoiceNo}</td>
+                        <td style={{ ...s.td, fontWeight: 700, color: "var(--tx-10b981, #10b981)" }}>{r.invoiceNo}</td>
                         <td style={s.td}>{r.date}</td>
                         <td style={{ ...s.td, fontWeight: 600 }}>{r.customer}</td>
                         <td style={s.td}>{r.country}</td>
                         <td style={s.td}>{r.product}</td>
-                        <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "#a78bfa", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 7px", fontSize: 11 }}>{r.hsCode}</span></td>
+                        <td style={s.td}><span style={{ background: "rgba(167,139,250,.12)", color: "var(--tx-a78bfa, #a78bfa)", border: "1px solid rgba(167,139,250,.3)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 7px", fontSize: 11 }}>{r.hsCode}</span></td>
                         <td style={{ ...s.td, textAlign: "right" }}>{r.qty.toLocaleString()} {r.unit}</td>
                         <td style={s.td}>{r.currency}</td>
-                        <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "#4ade80" }}>{fmt(r.amountUsd)}</td>
+                        <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "var(--tx-4ade80, #4ade80)" }}>{fmt(r.amountUsd)}</td>
                         <td style={s.td}>{r.shipmentRef}</td>
-                        <td style={s.td}><span style={{ background: "rgba(74,222,128,.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 8px", fontSize: 11, fontWeight: 700 }}>{r.status}</span></td>
+                        <td style={s.td}><span style={{ background: "rgba(74,222,128,.1)", color: "var(--tx-4ade80, #4ade80)", border: "1px solid rgba(74,222,128,.25)", borderRadius: 6, padding: isMobile ? "8px 8px" : "2px 8px", fontSize: 11, fontWeight: 700 }}>{r.status}</span></td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
                     <tr style={{ background: "rgba(16,185,129,.06)" }}>
                       <td colSpan={8} style={{ ...s.td, fontWeight: 700, borderTop: "1px solid var(--border)", borderBottom: "none" }}>Total ({filtered.length} records)</td>
-                      <td style={{ ...s.td, textAlign: "right", fontWeight: 800, color: "#10b981", fontSize: 14, borderTop: "1px solid var(--border)", borderBottom: "none" }}>
+                      <td style={{ ...s.td, textAlign: "right", fontWeight: 800, color: "var(--tx-10b981, #10b981)", fontSize: 14, borderTop: "1px solid var(--border)", borderBottom: "none" }}>
                         {fmt(filtered.reduce((s, r) => s + r.amountUsd, 0))}
                       </td>
                       <td colSpan={2} style={{ borderTop: "1px solid var(--border)", borderBottom: "none" }} />

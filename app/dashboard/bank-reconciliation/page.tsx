@@ -180,9 +180,9 @@ export default function BankReconciliationPage() {
   const isBalanced  = difference < 0.01;
   const currency    = companyInfo?.baseCurrency || "PKR";
   const confidenceTone = (confidence: number) =>
-    confidence >= 90 ? { color: "#22c55e", bg: "rgba(34,197,94,.1)", border: "rgba(34,197,94,.25)" } :
-    confidence >= 70 ? { color: "#f59e0b", bg: "rgba(245,158,11,.1)", border: "rgba(245,158,11,.25)" } :
-    { color: "#f87171", bg: "rgba(248,113,113,.1)", border: "rgba(248,113,113,.25)" };
+    confidence >= 90 ? { color: "var(--tx-22c55e, #22c55e)", bg: "rgba(34,197,94,.1)", border: "rgba(34,197,94,.25)" } :
+    confidence >= 70 ? { color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.1)", border: "rgba(245,158,11,.25)" } :
+    { color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)", border: "rgba(248,113,113,.25)" };
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
   const inp:   React.CSSProperties = { width: "100%", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
@@ -313,8 +313,8 @@ export default function BankReconciliationPage() {
                 <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px" }}>
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{a.bankName} — {a.accountNo}</span>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button type="button" onClick={() => handleEditBank(a)} style={{ background: "transparent", border: "none", color: "#818cf8", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Edit</button>
-                    <button type="button" onClick={() => handleDeleteBank(a.id)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Delete</button>
+                    <button type="button" onClick={() => handleEditBank(a)} style={{ background: "transparent", border: "none", color: "var(--tx-818cf8, #818cf8)", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Edit</button>
+                    <button type="button" onClick={() => handleDeleteBank(a.id)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Delete</button>
                   </div>
                 </div>
               ))}
@@ -343,7 +343,7 @@ export default function BankReconciliationPage() {
       <div style={{ background: isBalanced ? "rgba(34,197,94,0.12)" : "rgba(248,113,113,0.12)", border: `1px solid ${isBalanced ? "rgba(34,197,94,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 10, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
         <span style={{ fontSize: 20 }}>{isBalanced ? "✓" : "✗"}</span>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: isBalanced ? "#22c55e" : "#f87171" }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: isBalanced ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f87171, #f87171)" }}>
             Difference: {currency} {fmt(difference)} — {isBalanced ? "Balanced" : "Not Balanced"}
           </div>
           {!isBalanced && <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Adjust System Balance or Bank Balance until difference is 0.00</div>}

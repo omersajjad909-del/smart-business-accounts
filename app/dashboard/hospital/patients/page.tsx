@@ -7,8 +7,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 20, fontFamily: ff };
 
 const statusColor: Record<string, string> = { admitted: "#3b82f6", discharged: "#22c55e", icu: "#ef4444", opd: "#f59e0b" };
@@ -103,11 +103,11 @@ export default function PatientsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total Patients", value: total, color: "#a78bfa" },
-          { label: "Admitted", value: admitted, color: "#3b82f6" },
-          { label: "ICU", value: icu, color: "#ef4444" },
-          { label: "OPD Today", value: opd, color: "#f59e0b" },
-          { label: "Discharged", value: discharged, color: "#22c55e" },
+          { label: "Total Patients", value: total, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Admitted", value: admitted, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "ICU", value: icu, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "OPD Today", value: opd, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Discharged", value: discharged, color: "var(--tx-22c55e, #22c55e)" },
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -147,7 +147,7 @@ export default function PatientsPage() {
               )}
               {filtered.map(p => (
                 <tr key={p.id} onClick={() => setSelected(p.id === selected ? null : p.id)} style={{ borderBottom: `1px solid ${border}`, cursor: "pointer", background: selected === p.id ? "rgba(59,130,246,0.08)" : "transparent", transition: "background 0.15s" }}>
-                  <td style={{ padding: "13px 16px", color: "#a78bfa", fontWeight: 600 }}>{p.mrNo}</td>
+                  <td style={{ padding: "13px 16px", color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 600 }}>{p.mrNo}</td>
                   <td style={{ padding: "13px 16px", fontWeight: 500 }}>{p.name}</td>
                   <td style={{ padding: "13px 16px", color: "rgba(var(--ink),0.6)" }}>{p.age}y / {p.gender}</td>
                   <td style={{ padding: "13px 16px" }}>
@@ -159,7 +159,7 @@ export default function PatientsPage() {
                     <span style={{ background: `${statusColor[p.status]}22`, color: statusColor[p.status], padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{statusLabel[p.status] || p.status}</span>
                   </td>
                   <td style={{ padding: "13px 16px" }}>
-                    <span style={{ color: p.insurance ? "#22c55e" : "rgba(var(--ink),0.3)", fontSize: 16 }}>{p.insurance ? "✓" : "✗"}</span>
+                    <span style={{ color: p.insurance ? "var(--tx-22c55e, #22c55e)" : "rgba(var(--ink),0.3)", fontSize: 16 }}>{p.insurance ? "✓" : "✗"}</span>
                   </td>
                 </tr>
               ))}
@@ -176,7 +176,7 @@ export default function PatientsPage() {
               {selectedPatient.insurance && <span style={{ marginLeft: 8, background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "4px 10px", borderRadius: 20, fontSize: 12 }}>Insured</span>}
             </div>
             <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 700 }}>{selectedPatient.name}</h2>
-            <p style={{ margin: "0 0 16px", color: "#a78bfa", fontSize: 13, fontWeight: 600 }}>{selectedPatient.mrNo}</p>
+            <p style={{ margin: "0 0 16px", color: "var(--tx-a78bfa, #a78bfa)", fontSize: 13, fontWeight: 600 }}>{selectedPatient.mrNo}</p>
             {[
               ["Age / Gender", `${selectedPatient.age} years / ${selectedPatient.gender}`],
               ["Blood Group", selectedPatient.bloodGroup],
@@ -195,7 +195,7 @@ export default function PatientsPage() {
               <button onClick={() => { setFormError(""); setForm({ id: selectedPatient.id, mrNo: selectedPatient.mrNo, name: selectedPatient.name, age: selectedPatient.age, gender: selectedPatient.gender, bloodGroup: selectedPatient.bloodGroup, phone: selectedPatient.phone, address: selectedPatient.address, diagnosis: selectedPatient.diagnosis, doctor: selectedPatient.doctor, admitDate: selectedPatient.admitDate, status: selectedPatient.status, insurance: selectedPatient.insurance }); setShowModal(true); }}
                 style={{ flex: 1, padding: "9px 0", background: "rgba(59,130,246,0.15)", border: `1px solid rgba(59,130,246,0.3)`, color: "#3b82f6", borderRadius: 8, cursor: "pointer", fontFamily: ff, fontSize: 13, fontWeight: 600 }}>Edit Patient</button>
               <button onClick={() => { void removePatient(selectedPatient.id, selectedPatient.name); setSelected(null); }}
-                style={{ padding: "9px 16px", background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`, color: "#ef4444", borderRadius: 8, cursor: "pointer", fontFamily: ff, fontSize: 13 }}>Remove</button>
+                style={{ padding: "9px 16px", background: "rgba(239,68,68,0.1)", border: `1px solid rgba(239,68,68,0.2)`, color: "var(--tx-ef4444, #ef4444)", borderRadius: 8, cursor: "pointer", fontFamily: ff, fontSize: 13 }}>Remove</button>
             </div>
           </div>
         )}
@@ -209,7 +209,7 @@ export default function PatientsPage() {
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{form.id ? "Edit Patient" : "Add Patient"}</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {([["MR No", "mrNo"], ["Full Name", "name"], ["Phone", "phone"]] as [string, string][]).map(([label, key]) => (
                 <div key={key}>

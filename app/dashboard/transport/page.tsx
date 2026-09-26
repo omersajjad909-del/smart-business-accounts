@@ -53,11 +53,11 @@ export default function TransportOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Fleet Size", value: summary.fleetSize, color: "#60a5fa" },
-          { label: "Active Trips", value: summary.activeTrips, color: "#22c55e" },
-          { label: "Drivers", value: summary.drivers, color: "#f59e0b" },
-          { label: "Fuel Cost", value: `Rs. ${summary.fuelCost.toLocaleString()}`, color: "#f87171" },
-          { label: "Net Revenue", value: `Rs. ${summary.netRevenue.toLocaleString()}`, color: "#34d399" },
+          { label: "Fleet Size", value: summary.fleetSize, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Active Trips", value: summary.activeTrips, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Drivers", value: summary.drivers, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Fuel Cost", value: `Rs. ${summary.fuelCost.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
+          { label: "Net Revenue", value: `Rs. ${summary.netRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 14, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{card.label}</div>
@@ -74,7 +74,7 @@ export default function TransportOverviewPage() {
               <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.tripNo}</div>
                 <div style={{ fontSize: 12, color: transportMuted, marginTop: 4 }}>{row.vehicle || "-"} | {row.driver || "-"}</div>
-                <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>{row.from} to {row.to}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>{row.from} to {row.to}</div>
               </div>
             ))}
             {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No active transport movement right now.</div>}
@@ -85,12 +85,12 @@ export default function TransportOverviewPage() {
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Vehicles available", value: summary.availableVehicles, color: "#22c55e" },
-              { label: "Vehicles in maintenance", value: summary.maintenanceVehicles, color: "#f59e0b" },
-              { label: "Drivers on duty", value: summary.driversOnDuty, color: "#60a5fa" },
-              { label: "Active dispatches", value: summary.activeDispatches, color: "#38bdf8" },
-              { label: "Maintenance cost", value: `Rs. ${summary.maintenanceCost.toLocaleString()}`, color: "#fb7185" },
-              { label: "Trip expenses booked", value: `Rs. ${summary.expenseBooked.toLocaleString()}`, color: "#f97316" },
+              { label: "Vehicles available", value: summary.availableVehicles, color: "var(--tx-22c55e, #22c55e)" },
+              { label: "Vehicles in maintenance", value: summary.maintenanceVehicles, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Drivers on duty", value: summary.driversOnDuty, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Active dispatches", value: summary.activeDispatches, color: "var(--tx-38bdf8, #38bdf8)" },
+              { label: "Maintenance cost", value: `Rs. ${summary.maintenanceCost.toLocaleString()}`, color: "var(--tx-fb7185, #fb7185)" },
+              { label: "Trip expenses booked", value: `Rs. ${summary.expenseBooked.toLocaleString()}`, color: "var(--tx-f97316, #f97316)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: transportMuted }}>{row.label}</span>

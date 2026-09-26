@@ -122,9 +122,9 @@ export default function AuditPlanningPage() {
 
       <div style={S.kpiGrid}>
         <div style={S.kpi}><div style={S.kpiLabel}>Total Plans</div><div style={S.kpiVal}>{kpis.total}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Fieldwork</div><div style={{ ...S.kpiVal, color: "#f59e0b" }}>{kpis.fieldwork}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Review</div><div style={{ ...S.kpiVal, color: "#a78bfa" }}>{kpis.review}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Closed</div><div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.closed}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Fieldwork</div><div style={{ ...S.kpiVal, color: "var(--tx-f59e0b, #f59e0b)" }}>{kpis.fieldwork}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Review</div><div style={{ ...S.kpiVal, color: "var(--tx-a78bfa, #a78bfa)" }}>{kpis.review}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Closed</div><div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.closed}</div></div>
       </div>
 
       <div style={S.panel}>

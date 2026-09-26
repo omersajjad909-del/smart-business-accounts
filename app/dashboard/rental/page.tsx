@@ -48,25 +48,25 @@ export default function RentalOverviewPage() {
   }, []);
 
   return (
-    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>Rental Command Center</h1>
           <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>Bookings and agreements for vehicle or equipment rentals.</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link prefetch={false} href="/dashboard/rental/bookings" style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Bookings</Link>
-          <Link prefetch={false} href="/dashboard/rental/agreements" style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Agreements</Link>
+          <Link prefetch={false} href="/dashboard/rental/bookings" style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "var(--tx-86efac, #86efac)", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Bookings</Link>
+          <Link prefetch={false} href="/dashboard/rental/agreements" style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "var(--tx-86efac, #86efac)", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Agreements</Link>
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Bookings", value: data.summary.bookings, color: rentalAccent },
-          { label: "Active Bookings", value: data.summary.activeBookings, color: "#60a5fa" },
-          { label: "Agreements", value: data.summary.agreements, color: "#34d399" },
-          { label: "Active Agreements", value: data.summary.activeAgreements, color: "#fbbf24" },
-          { label: "Booking Value", value: data.summary.bookingValue.toLocaleString(), color: "#f97316" },
+          { label: "Active Bookings", value: data.summary.activeBookings, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Agreements", value: data.summary.agreements, color: "var(--tx-34d399, #34d399)" },
+          { label: "Active Agreements", value: data.summary.activeAgreements, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Booking Value", value: data.summary.bookingValue.toLocaleString(), color: "var(--tx-f97316, #f97316)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>

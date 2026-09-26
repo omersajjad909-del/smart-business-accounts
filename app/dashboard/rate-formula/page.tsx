@@ -587,7 +587,7 @@ export default function RateFormulaPage() {
                     title="Remove column"
                     style={{
                       width: 30, height: 34, borderRadius: 7, border: "1.5px solid rgba(248,113,113,.4)",
-                      background: "transparent", color: "#f87171", cursor: "pointer", fontSize: 13,
+                      background: "transparent", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 13,
                     }}
                   >
                     ✕
@@ -673,7 +673,7 @@ export default function RateFormulaPage() {
                   Set on the item, read-only on documents
                 </label>
                 {keyErrors[i] && (
-                  <span style={{ fontSize: 12, color: "#f87171", fontWeight: 600 }}>{keyErrors[i]}</span>
+                  <span style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", fontWeight: 600 }}>{keyErrors[i]}</span>
                 )}
                 {!f.affectsRate && !keyErrors[i] && (
                   <span style={{ fontSize: 12, color: MUTED }}>
@@ -733,7 +733,7 @@ export default function RateFormulaPage() {
           {problems
             .filter((p) => p.field === "expression")
             .map((p, i) => (
-              <div key={i} style={{ fontSize: 12, color: "#f87171", marginTop: 6, fontWeight: 600 }}>
+              <div key={i} style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", marginTop: 6, fontWeight: 600 }}>
                 {p.message}
               </div>
             ))}
@@ -877,7 +877,7 @@ export default function RateFormulaPage() {
                 </div>
               </div>
               {testResult?.error && (
-                <div style={{ alignSelf: "center", fontSize: 12.5, color: "#f87171", fontWeight: 600 }}>
+                <div style={{ alignSelf: "center", fontSize: 12.5, color: "var(--tx-f87171, #f87171)", fontWeight: 600 }}>
                   {testResult.error}
                 </div>
               )}
@@ -940,7 +940,7 @@ export default function RateFormulaPage() {
           flexWrap: "wrap",
         }}
       >
-        <div style={{ fontSize: 12.5, color: problems.length && settings.enabled ? "#f87171" : MUTED, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 12.5, color: problems.length && settings.enabled ? "var(--tx-f87171, #f87171)" : MUTED, lineHeight: 1.5 }}>
           {settings.enabled
             ? problems.length
               ? problems[0].message

@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 export default function FieldsPage() {
   const { isMobile } = useResponsive();
@@ -50,7 +50,7 @@ export default function FieldsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Fields", val: fields.length, color: "#34d399" }, { label: "Active", val: fields.filter(f => f.status === "active").length, color: "#818cf8" }, { label: "Total Area", val: `${totalArea.toFixed(1)} acres`, color: "#f59e0b" }].map(s => (
+        {[{ label: "Total Fields", val: fields.length, color: "var(--tx-34d399, #34d399)" }, { label: "Active", val: fields.filter(f => f.status === "active").length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Total Area", val: `${totalArea.toFixed(1)} acres`, color: "var(--tx-f59e0b, #f59e0b)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>

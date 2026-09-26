@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const transportFont = "'Outfit','Inter',sans-serif";
-export const transportBg = "rgba(255,255,255,.03)";
-export const transportBorder = "rgba(255,255,255,.07)";
-export const transportMuted = "rgba(255,255,255,.45)";
+export const transportBg = "rgba(var(--ink),.03)";
+export const transportBorder = "rgba(var(--ink),.07)";
+export const transportMuted = "rgba(var(--ink),.45)";
 
 export type TransportVehicle = ReturnType<typeof mapVehicleRecords>[number];
 export type TransportDriver = ReturnType<typeof mapDriverRecords>[number];

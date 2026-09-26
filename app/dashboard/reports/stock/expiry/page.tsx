@@ -13,10 +13,10 @@ interface ExpiryRow { itemName: string; batchNo: string; qty: number; expiryDate
 // Keys match what the route sends today; badgeFor keeps the page alive if that
 // ever drifts, the way it did on seven other reports.
 const STATUS: Record<string, Badge> = {
-  expired:  { label: "Expired 💀",    color: "#f87171", bg: "rgba(248,113,113,.1)" },
-  critical: { label: "< 30 days 🚨",  color: "#f97316", bg: "rgba(249,115,22,.1)" },
-  warning:  { label: "< 90 days ⚠️",  color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  ok:       { label: "OK ✅",          color: "#34d399", bg: "rgba(52,211,153,.1)" },
+  expired:  { label: "Expired 💀",    color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" },
+  critical: { label: "< 30 days 🚨",  color: "var(--tx-f97316, #f97316)", bg: "rgba(249,115,22,.1)" },
+  warning:  { label: "< 90 days ⚠️",  color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" },
+  ok:       { label: "OK ✅",          color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
 };
 
 export default function StockExpiryPage() {
@@ -44,7 +44,7 @@ export default function StockExpiryPage() {
 
       {atRisk > 0 && (
         <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.2)" }}>
-          <span style={{ fontWeight: 700, color: "#f87171" }}>⚠️ At-risk stock value: {cur} {fmt(atRisk)}</span>
+          <span style={{ fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>⚠️ At-risk stock value: {cur} {fmt(atRisk)}</span>
           <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 12 }}>— Take action before expiry</span>
         </div>
       )}
@@ -74,7 +74,7 @@ export default function StockExpiryPage() {
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.itemName}</td>
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8", fontWeight: 700 }}>{r.batchNo}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700 }}>{r.batchNo}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{fmt(r.qty)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.value)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12 }}>{fmtDate(r.expiryDate)}</td>

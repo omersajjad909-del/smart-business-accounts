@@ -43,9 +43,9 @@ export default function DiscountAnalysisPage() {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Gross Sales",      value: `${cur} ${fmt(totals.gross)}`, color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
-          { label: "Total Discounts",  value: `${cur} ${fmt(totals.disc)}`,  color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
-          { label: "Net Sales",        value: `${cur} ${fmt(totals.net)}`,   color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
+          { label: "Gross Sales",      value: `${cur} ${fmt(totals.gross)}`, color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+          { label: "Total Discounts",  value: `${cur} ${fmt(totals.disc)}`,  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Net Sales",        value: `${cur} ${fmt(totals.net)}`,   color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -71,9 +71,9 @@ export default function DiscountAnalysisPage() {
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                 <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.name}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.grossSales)}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#f87171" }}>{cur} {fmt(r.discountAmount)}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.discountAmount)}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: r.discountPct > 20 ? "#f87171" : r.discountPct > 10 ? "#fbbf24" : "#34d399" }}>{r.discountPct.toFixed(1)}%</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: r.discountPct > 20 ? "var(--tx-f87171, #f87171)" : r.discountPct > 10 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>{r.discountPct.toFixed(1)}%</span>
                 </td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700 }}>{cur} {fmt(r.netSales)}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--text-muted)" }}>{r.invoiceCount}</td>

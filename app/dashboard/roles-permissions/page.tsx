@@ -104,7 +104,7 @@ export default function RolePermissionManager() {
 
   if (!user) return <div style={{ color: "rgba(var(--ink),0.4)", padding: 32 }}>Loading…</div>;
   if (user.role !== "ADMIN") return (
-    <div style={{ padding: 32, color: "#f87171" }}>Only ADMIN can manage roles.</div>
+    <div style={{ padding: 32, color: "var(--tx-f87171, #f87171)" }}>Only ADMIN can manage roles.</div>
   );
 
   return (
@@ -142,7 +142,7 @@ export default function RolePermissionManager() {
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setRolePermissions([...availablePermissions])}
-                  style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "#a5b4fc", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
                   ✓ Select All
                 </button>
                 <button onClick={() => setRolePermissions([])}
@@ -160,7 +160,7 @@ export default function RolePermissionManager() {
                     <input type="checkbox" checked={checked} onChange={() =>
                       setRolePermissions(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
                     } style={{ accentColor: "#6366f1", width: 15, height: 15 }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: checked ? "#c7d2fe" : "rgba(var(--ink),0.55)" }}>{p}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: checked ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),0.55)" }}>{p}</span>
                   </label>
                 );
               })}
@@ -171,7 +171,7 @@ export default function RolePermissionManager() {
                 style={{ padding: "10px 24px", borderRadius: 9, border: "none", background: saving ? "rgba(99,102,241,0.4)" : "linear-gradient(135deg,#4f46e5,#6366f1)", color: "white", fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit" }}>
                 {saving ? "Saving…" : "💾 Save Permissions"}
               </button>
-              {msg && <span style={{ fontSize: 13, color: msg.includes("success") ? "#34d399" : "#f87171" }}>{msg}</span>}
+              {msg && <span style={{ fontSize: 13, color: msg.includes("success") ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{msg}</span>}
             </div>
           </div>
         </div>

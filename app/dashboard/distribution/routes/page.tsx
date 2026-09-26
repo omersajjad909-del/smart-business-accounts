@@ -116,9 +116,9 @@ export default function DistributionRoutesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Routes", value: routes.length, color: "#f97316" },
-          { label: "Active Routes", value: activeRoutes, color: "#34d399" },
-          { label: "Planned Stops", value: totalStops, color: "#818cf8" },
+          { label: "Total Routes", value: routes.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Active Routes", value: activeRoutes, color: "var(--tx-34d399, #34d399)" },
+          { label: "Planned Stops", value: totalStops, color: "var(--tx-818cf8, #818cf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
@@ -168,7 +168,7 @@ export default function DistributionRoutesPage() {
                   <button onClick={() => update(route.id, { status: route.status === "active" ? "inactive" : "active" })} style={{ padding: "6px 10px", background: "rgba(249,115,22,.15)", border: "1px solid rgba(249,115,22,.3)", color: "#f97316", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     {route.status === "active" ? "Pause" : "Activate"}
                   </button>
-                  <button onClick={async () => { if (await confirmToast(`Delete route ${route.name}?`)) void remove(route.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={async () => { if (await confirmToast(`Delete route ${route.name}?`)) void remove(route.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

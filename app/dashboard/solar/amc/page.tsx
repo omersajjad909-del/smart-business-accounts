@@ -47,10 +47,10 @@ export default function SolarAmcPage() {
         const dueSoon = rows.filter((row) => String(row.status) === "scheduled").length;
         const completed = rows.filter((row) => String(row.status) === "completed").length;
         return [
-          { label: "Contracts", value: rows.length, color: "#fbbf24" },
-          { label: "Scheduled", value: dueSoon, color: "#60a5fa" },
-          { label: "Completed", value: completed, color: "#34d399" },
-          { label: "Contract Value", value: contractValue.toLocaleString(), color: "#f59e0b" },
+          { label: "Contracts", value: rows.length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Scheduled", value: dueSoon, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Completed", value: completed, color: "var(--tx-34d399, #34d399)" },
+          { label: "Contract Value", value: contractValue.toLocaleString(), color: "var(--tx-f59e0b, #f59e0b)" },
         ];
       }}
     />

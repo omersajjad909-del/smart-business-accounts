@@ -63,9 +63,9 @@ function readConsumables(raw: string | null): JobWorkConsumable[] {
 }
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
-const dim = "rgba(255,255,255,.45)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
+const dim = "rgba(var(--ink),.45)";
 const teal = "#5eead4";
 const amber = "#fbbf24";
 const red = "#f87171";
@@ -1125,7 +1125,7 @@ function IssueTab({
                         Edit
                       </button>
                       <button
-                        style={{ ...btn(false), padding: "5px 11px", fontSize: 12, color: "#f87171" }}
+                        style={{ ...btn(false), padding: "5px 11px", fontSize: 12, color: "var(--tx-f87171, #f87171)" }}
                         onClick={() => cancelChallan(c)}
                         disabled={busy}
                       >

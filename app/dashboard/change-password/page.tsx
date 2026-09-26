@@ -110,7 +110,7 @@ export default function ChangePasswordPage() {
         alignItems: "center",
         gap: "8px",
         fontSize: "13px",
-        color: met ? "#86efac" : "rgba(var(--ink),.4)",
+        color: met ? "var(--tx-86efac, #86efac)" : "rgba(var(--ink),.4)",
         marginBottom: "6px",
         transition: "color .2s",
       }}
@@ -175,7 +175,7 @@ export default function ChangePasswordPage() {
             borderRadius: "10px",
             background: "rgba(16,185,129,.12)",
             border: "1px solid rgba(16,185,129,.25)",
-            color: "#6ee7b7",
+            color: "var(--tx-6ee7b7, #6ee7b7)",
             fontSize: "13px",
             fontWeight: 600,
           }}
@@ -193,7 +193,7 @@ export default function ChangePasswordPage() {
             borderRadius: "10px",
             background: "rgba(239,68,68,.12)",
             border: "1px solid rgba(239,68,68,.25)",
-            color: "#fca5a5",
+            color: "var(--tx-fca5a5, #fca5a5)",
             fontSize: "13px",
             fontWeight: 600,
           }}
@@ -220,13 +220,13 @@ export default function ChangePasswordPage() {
                   (e.target as HTMLInputElement).style.borderColor =
                     "rgba(99,102,241,.4)";
                   (e.target as HTMLInputElement).style.background =
-                    "rgba(255,255,255,.05)";
+                    "rgba(var(--ink),.05)";
                 }}
                 onBlur={(e) => {
                   (e.target as HTMLInputElement).style.borderColor =
-                    "rgba(255,255,255,.1)";
+                    "rgba(var(--ink),.1)";
                   (e.target as HTMLInputElement).style.background =
-                    "rgba(255,255,255,.03)";
+                    "rgba(var(--ink),.03)";
                 }}
               />
               <button
@@ -265,13 +265,13 @@ export default function ChangePasswordPage() {
                   (e.target as HTMLInputElement).style.borderColor =
                     "rgba(99,102,241,.4)";
                   (e.target as HTMLInputElement).style.background =
-                    "rgba(255,255,255,.05)";
+                    "rgba(var(--ink),.05)";
                 }}
                 onBlur={(e) => {
                   (e.target as HTMLInputElement).style.borderColor =
-                    "rgba(255,255,255,.1)";
+                    "rgba(var(--ink),.1)";
                   (e.target as HTMLInputElement).style.background =
-                    "rgba(255,255,255,.03)";
+                    "rgba(var(--ink),.03)";
                 }}
               />
               <button
@@ -347,11 +347,11 @@ export default function ChangePasswordPage() {
                 }}
                 onFocus={(e) => {
                   (e.target as HTMLInputElement).style.background =
-                    "rgba(255,255,255,.05)";
+                    "rgba(var(--ink),.05)";
                 }}
                 onBlur={(e) => {
                   (e.target as HTMLInputElement).style.background =
-                    "rgba(255,255,255,.03)";
+                    "rgba(var(--ink),.03)";
                 }}
               />
               <button
@@ -377,7 +377,7 @@ export default function ChangePasswordPage() {
               <div
                 style={{
                   fontSize: "12px",
-                  color: "#fca5a5",
+                  color: "var(--tx-fca5a5, #fca5a5)",
                   marginTop: "6px",
                   fontWeight: 500,
                 }}
@@ -438,7 +438,7 @@ export default function ChangePasswordPage() {
           style={{
             fontSize: "12px",
             fontWeight: 700,
-            color: "rgba(52,211,153,.8)",
+            color: "rgba(var(--txr-34d399, 52,211,153),.8)",
             marginBottom: "8px",
             textTransform: "uppercase",
             letterSpacing: ".06em",

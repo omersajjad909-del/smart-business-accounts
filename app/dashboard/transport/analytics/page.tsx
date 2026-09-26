@@ -56,10 +56,10 @@ export default function TransportAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Trips Logged", value: trips.length, color: "#60a5fa" },
-          { label: "Completed Trips", value: trips.filter((row) => row.status === "completed").length, color: "#22c55e" },
-          { label: "Fuel Spend", value: `Rs. ${fuelLogs.reduce((sum, row) => sum + row.totalCost, 0).toLocaleString()}`, color: "#f87171" },
-          { label: "Fleet Capacity Units", value: vehicles.length, color: "#f59e0b" },
+          { label: "Trips Logged", value: trips.length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Completed Trips", value: trips.filter((row) => row.status === "completed").length, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Fuel Spend", value: `Rs. ${fuelLogs.reduce((sum, row) => sum + row.totalCost, 0).toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
+          { label: "Fleet Capacity Units", value: vehicles.length, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((card) => (
           <div key={card.label} style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{card.label}</div>
@@ -75,7 +75,7 @@ export default function TransportAnalyticsPage() {
             {typeMix.map((row) => (
               <div key={row.type} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, textTransform: "capitalize" }}>{row.type}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{row.count}</span>
               </div>
             ))}
           </div>
@@ -100,7 +100,7 @@ export default function TransportAnalyticsPage() {
             {fuelByVehicle.map((row) => (
               <div key={row.vehicle} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.vehicle}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#f87171" }}>Rs. {row.amount.toLocaleString()}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>Rs. {row.amount.toLocaleString()}</span>
               </div>
             ))}
             {fuelByVehicle.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No fuel data available.</div>}

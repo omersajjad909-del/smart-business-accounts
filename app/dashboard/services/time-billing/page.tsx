@@ -6,8 +6,8 @@ import { mapServiceProjectRecord, mapServiceTimesheetRecord } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 function getToday() {
   return new Date().toISOString().slice(0, 10);
@@ -99,10 +99,10 @@ export default function ServiceTimeBillingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 22 }}>
         {[
-          { label: "Billable Hours", value: totalHours.toLocaleString(), color: "#38bdf8" },
-          { label: "Billable Value", value: `Rs. ${totalValue.toLocaleString()}`, color: "#22c55e" },
-          { label: "Approved Entries", value: approvedCount, color: "#f59e0b" },
-          { label: "Draft Entries", value: draftCount, color: "#f97316" },
+          { label: "Billable Hours", value: totalHours.toLocaleString(), color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Billable Value", value: `Rs. ${totalValue.toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Approved Entries", value: approvedCount, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Draft Entries", value: draftCount, color: "var(--tx-f97316, #f97316)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
@@ -126,7 +126,7 @@ export default function ServiceTimeBillingPage() {
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: entry.status === "approved" ? "#22c55e" : "#f59e0b" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: entry.status === "approved" ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f59e0b, #f59e0b)" }}>
                 {entry.status.toUpperCase()}
               </div>
               <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 4 }}>

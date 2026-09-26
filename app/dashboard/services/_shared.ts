@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const serviceFont = "'Outfit','Inter',sans-serif";
-export const serviceBg = "rgba(255,255,255,0.03)";
-export const serviceBorder = "rgba(255,255,255,0.07)";
-export const serviceMuted = "rgba(255,255,255,.55)";
+export const serviceBg = "rgba(var(--ink),0.03)";
+export const serviceBorder = "rgba(var(--ink),0.07)";
+export const serviceMuted = "rgba(var(--ink),.55)";
 
 export type ServiceCatalogItem = {
   id: string;

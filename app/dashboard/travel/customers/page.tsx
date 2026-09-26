@@ -153,7 +153,7 @@ export default function TravelCustomersPage() {
               </div>
 
               {timeline.followUp ? (
-                <div style={{ border: "1px solid rgba(167,139,250,.4)", background: "rgba(167,139,250,.1)", borderRadius: 12, padding: "10px 14px", fontSize: 12.5, color: "#a78bfa" }}>
+                <div style={{ border: "1px solid rgba(167,139,250,.4)", background: "rgba(167,139,250,.1)", borderRadius: 12, padding: "10px 14px", fontSize: 12.5, color: "var(--tx-a78bfa, #a78bfa)" }}>
                   💬 Follow-up due {String(timeline.followUp).slice(0, 10)}
                 </div>
               ) : null}

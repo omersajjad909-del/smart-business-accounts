@@ -26,9 +26,9 @@ const today = new Date().toISOString().slice(0, 10);
 
 const NUM_COLS = ["opDr", "opCr", "trDr", "trCr", "clDr", "clCr"];
 const GROUPS = [
-  { label: "Opening Balance",     color: "rgba(129,140,248,.5)" },
-  { label: "Period Transactions", color: "rgba(52,211,153,.4)" },
-  { label: "Closing Balance",     color: "rgba(251,191,36,.4)" },
+  { label: "Opening Balance",     color: "rgba(var(--txr-818cf8, 129,140,248),.5)" },
+  { label: "Period Transactions", color: "rgba(var(--txr-34d399, 52,211,153),.4)" },
+  { label: "Closing Balance",     color: "rgba(var(--txr-fbbf24, 251,191,36),.4)" },
 ];
 
 // The report prints as a plain black-on-white sheet. `print-doc-a4` on the card
@@ -146,7 +146,7 @@ export default function TrialBalancePage() {
       {/* ── MODAL ── */}
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-          <div style={{ width:"100%", maxWidth:460, background:"rgba(10,13,32,.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
+          <div style={{ width:"100%", maxWidth:460, background:"rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
             <button onClick={() => rows.length > 0 ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>⚖️</div>
@@ -183,7 +183,7 @@ export default function TrialBalancePage() {
             <div style={{ display:"flex", gap:8 }}>
               {rows.length > 0 && (
                 <button onClick={() => exportToCSV(rows.map(r => ({ Category:r.category, Code:r.code, Account:r.name, "Op Dr":r.opDebit, "Op Cr":r.opCredit, "Tr Dr":r.transDebit, "Tr Cr":r.transCredit, "Cl Dr":r.clDebit, "Cl Cr":r.clCredit })), "trial-balance")}
-                  style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                  style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
                   ↓ Export CSV
                 </button>
               )}
@@ -194,12 +194,12 @@ export default function TrialBalancePage() {
                 onClick={cleanOrphans}
                 disabled={cleaning}
                 title="Delete voucher entries of deleted invoices"
-                style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(248,113,113,.25)", background:"rgba(248,113,113,.06)", color:"#f87171", fontSize:12, fontWeight:700, cursor: cleaning ? "not-allowed" : "pointer", fontFamily:"inherit", opacity: cleaning ? 0.6 : 1 }}
+                style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(248,113,113,.25)", background:"rgba(248,113,113,.06)", color:"var(--tx-f87171, #f87171)", fontSize:12, fontWeight:700, cursor: cleaning ? "not-allowed" : "pointer", fontFamily:"inherit", opacity: cleaning ? 0.6 : 1 }}
               >
                 {cleaning ? "Cleaning…" : "🧹 Fix Orphans"}
               </button>
               {cleanMsg && (
-                <span style={{ fontSize:12, color:"#34d399", fontWeight:600, alignSelf:"center" }}>{cleanMsg}</span>
+                <span style={{ fontSize:12, color:"var(--tx-34d399, #34d399)", fontWeight:600, alignSelf:"center" }}>{cleanMsg}</span>
               )}
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function TrialBalancePage() {
                   <div style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),.3)", letterSpacing:".14em", textTransform:"uppercase", marginTop:5 }}>{companyInfo?.country || "Global"} Operations</div>
                 </div>
                 <div style={{ textAlign:"right" }}>
-                  <div style={{ fontSize:14, fontWeight:800, color:"#818cf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:6 }}>Trial Balance</div>
+                  <div style={{ fontSize:14, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".06em", textTransform:"uppercase", marginBottom:6 }}>Trial Balance</div>
                   <div style={{ fontSize:10, color:"rgba(var(--ink),.3)", fontWeight:600, textTransform:"uppercase", letterSpacing:".08em", marginBottom:3 }}>Reporting Period</div>
                   <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.7)" }}>{fromDate} <span style={{ color:"rgba(var(--ink),.25)" }}>—</span> {toDate}</div>
                   <div style={{ fontSize:11, color:"rgba(var(--ink),.25)", marginTop:8 }}>Generated: {fmtDate(new Date())}</div>
@@ -247,10 +247,10 @@ export default function TrialBalancePage() {
                         <th style={thStyle()}>Code</th>
                         <th style={thStyle()}>Account Name</th>
                         <th style={thStyle(true)}>Op Dr</th><th style={thStyle(true)}>Op Cr</th>
-                        <th style={{ ...thStyle(true), color:"rgba(52,211,153,.6)" }}>Tr Dr</th>
-                        <th style={{ ...thStyle(true), color:"rgba(52,211,153,.6)" }}>Tr Cr</th>
-                        <th style={{ ...thStyle(true), color:"rgba(251,191,36,.6)" }}>Cl Dr</th>
-                        <th style={{ ...thStyle(true), color:"rgba(251,191,36,.6)", borderRight:"none" }}>Cl Cr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(var(--txr-34d399, 52,211,153),.6)" }}>Tr Dr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(var(--txr-34d399, 52,211,153),.6)" }}>Tr Cr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(var(--txr-fbbf24, 251,191,36),.6)" }}>Cl Dr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(var(--txr-fbbf24, 251,191,36),.6)", borderRight:"none" }}>Cl Cr</th>
                       </tr>
                     </thead>
                     {categories.map(cat => {
@@ -259,30 +259,30 @@ export default function TrialBalancePage() {
                       return (
                         <tbody key={cat} className="tb-cat">
                           <tr>
-                            <td colSpan={8} className="tb-cat-title" style={{ padding:"10px 20px", fontSize:10, fontWeight:800, color:"#818cf8", letterSpacing:".1em", textTransform:"uppercase", background:"rgba(99,102,241,.06)", borderTop:"1px solid rgba(var(--ink),.06)", borderBottom:"1px solid rgba(var(--ink),.05)" }}>{cat}</td>
+                            <td colSpan={8} className="tb-cat-title" style={{ padding:"10px 20px", fontSize:10, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".1em", textTransform:"uppercase", background:"rgba(99,102,241,.06)", borderTop:"1px solid rgba(var(--ink),.06)", borderBottom:"1px solid rgba(var(--ink),.05)" }}>{cat}</td>
                           </tr>
                           {list.map((r, i) => (
                             <tr key={i} style={{ background: i%2===0 ? "transparent" : "rgba(var(--ink),.012)" }}
                               onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.05)")}
-                              onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.012)")}>
-                              <td style={{ ...tdStyle(), color:"#818cf8", fontWeight:600, fontSize:11 }}>{r.code}</td>
+                              onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(var(--ink),.012)")}>
+                              <td style={{ ...tdStyle(), color:"var(--tx-818cf8, #818cf8)", fontWeight:600, fontSize:11 }}>{r.code}</td>
                               <td style={{ ...tdStyle(), color:"rgba(var(--ink),.8)", fontWeight:600, overflow:"hidden", textOverflow:"ellipsis" }} title={r.name}>{r.name}</td>
                               <td style={tdStyle(true)}>{r.opDebit  ? fmt(r.opDebit)  : "—"}</td>
                               <td style={tdStyle(true)}>{r.opCredit ? fmt(r.opCredit) : "—"}</td>
-                              <td style={{ ...tdStyle(true), color:r.transDebit  ? "#34d399":"rgba(var(--ink),.2)" }}>{r.transDebit  ? fmt(r.transDebit)  : "—"}</td>
-                              <td style={{ ...tdStyle(true), color:r.transCredit ? "#f87171":"rgba(var(--ink),.2)" }}>{r.transCredit ? fmt(r.transCredit) : "—"}</td>
-                              <td style={{ ...tdStyle(true,true), color:r.clDebit  ? "#fbbf24":"rgba(var(--ink),.2)" }}>{r.clDebit  ? fmt(r.clDebit)  : "—"}</td>
-                              <td style={{ ...tdStyle(true,true), color:r.clCredit ? "#fbbf24":"rgba(var(--ink),.2)", borderRight:"none" }}>{r.clCredit ? fmt(r.clCredit) : "—"}</td>
+                              <td style={{ ...tdStyle(true), color:r.transDebit  ? "var(--tx-34d399, #34d399)":"rgba(var(--ink),.2)" }}>{r.transDebit  ? fmt(r.transDebit)  : "—"}</td>
+                              <td style={{ ...tdStyle(true), color:r.transCredit ? "var(--tx-f87171, #f87171)":"rgba(var(--ink),.2)" }}>{r.transCredit ? fmt(r.transCredit) : "—"}</td>
+                              <td style={{ ...tdStyle(true,true), color:r.clDebit  ? "var(--tx-fbbf24, #fbbf24)":"rgba(var(--ink),.2)" }}>{r.clDebit  ? fmt(r.clDebit)  : "—"}</td>
+                              <td style={{ ...tdStyle(true,true), color:r.clCredit ? "var(--tx-fbbf24, #fbbf24)":"rgba(var(--ink),.2)", borderRight:"none" }}>{r.clCredit ? fmt(r.clCredit) : "—"}</td>
                             </tr>
                           ))}
                           <tr className="tb-subtotal" style={{ background:"rgba(var(--ink),.03)" }}>
                             <td colSpan={2} style={{ ...tdStyle(), fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".06em", textTransform:"uppercase" }}>{cat} Subtotal</td>
                             <td style={{ ...tdStyle(true,true), color:"rgba(var(--ink),.5)" }}>{fmt(sub.opD)}</td>
                             <td style={{ ...tdStyle(true,true), color:"rgba(var(--ink),.5)" }}>{fmt(sub.opC)}</td>
-                            <td style={{ ...tdStyle(true,true), color:"#34d399" }}>{fmt(sub.trD)}</td>
-                            <td style={{ ...tdStyle(true,true), color:"#f87171" }}>{fmt(sub.trC)}</td>
-                            <td style={{ ...tdStyle(true,true), color:"#fbbf24" }}>{fmt(sub.clD)}</td>
-                            <td style={{ ...tdStyle(true,true), color:"#fbbf24", borderRight:"none" }}>{fmt(sub.clC)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"var(--tx-34d399, #34d399)" }}>{fmt(sub.trD)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"var(--tx-f87171, #f87171)" }}>{fmt(sub.trC)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"var(--tx-fbbf24, #fbbf24)" }}>{fmt(sub.clD)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"var(--tx-fbbf24, #fbbf24)", borderRight:"none" }}>{fmt(sub.clC)}</td>
                           </tr>
                         </tbody>
                       );
@@ -294,15 +294,15 @@ export default function TrialBalancePage() {
                         </td>
                         <td style={{ ...grandTd, color:"rgba(var(--ink),.7)" }}>{fmt(t.opDebit)}</td>
                         <td style={{ ...grandTd, color:"rgba(var(--ink),.7)" }}>{fmt(t.opCredit)}</td>
-                        <td style={{ ...grandTd, color:"#34d399" }}>{fmt(t.transDebit)}</td>
-                        <td style={{ ...grandTd, color:"#f87171" }}>{fmt(t.transCredit)}</td>
-                        <td style={{ ...grandTd, color:"#fbbf24" }}>{fmt(t.clDebit)}</td>
-                        <td style={{ ...grandTd, color:"#fbbf24", borderRight:"none" }}>{fmt(t.clCredit)}</td>
+                        <td style={{ ...grandTd, color:"var(--tx-34d399, #34d399)" }}>{fmt(t.transDebit)}</td>
+                        <td style={{ ...grandTd, color:"var(--tx-f87171, #f87171)" }}>{fmt(t.transCredit)}</td>
+                        <td style={{ ...grandTd, color:"var(--tx-fbbf24, #fbbf24)" }}>{fmt(t.clDebit)}</td>
+                        <td style={{ ...grandTd, color:"var(--tx-fbbf24, #fbbf24)", borderRight:"none" }}>{fmt(t.clCredit)}</td>
                       </tr>
                       <tr>
                         <td colSpan={8} className="tb-diff" style={{ padding:"14px 20px", textAlign:"right", background:isBalanced?"rgba(52,211,153,.07)":"rgba(248,113,113,.07)", borderTop:`1px solid ${isBalanced?"rgba(52,211,153,.25)":"rgba(248,113,113,.25)"}` }}>
                           <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".1em", textTransform:"uppercase", marginRight:14 }}>Difference</span>
-                          <span style={{ fontSize:16, fontWeight:900, color:isBalanced?"#34d399":"#f87171" }}>{isBalanced ? "✓ Balanced" : fmt(Math.abs(difference), cur)}</span>
+                          <span style={{ fontSize:16, fontWeight:900, color:isBalanced?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" }}>{isBalanced ? "✓ Balanced" : fmt(Math.abs(difference), cur)}</span>
                         </td>
                       </tr>
                     </tfoot>

@@ -266,7 +266,7 @@ export default function PackagesPage() {
                   type="button"
                   onClick={() => setComponents((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev))}
                   disabled={components.length <= 1}
-                  style={{ height: 36, padding: "0 10px", borderRadius: 9, border: "none", background: "transparent", color: components.length <= 1 ? T.muted : "#f87171", fontSize: 12, fontWeight: 700, cursor: components.length <= 1 ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+                  style={{ height: 36, padding: "0 10px", borderRadius: 9, border: "none", background: "transparent", color: components.length <= 1 ? T.muted : "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: components.length <= 1 ? "not-allowed" : "pointer", fontFamily: "inherit" }}
                 >
                   Remove
                 </button>
@@ -286,7 +286,7 @@ export default function PackagesPage() {
               <span style={{ color: T.muted }}>For</span>
               <input type="number" min={1} value={pax} onChange={(e) => setPax(Number(e.target.value) || 1)} style={{ ...cell, width: 64, textAlign: "center" }} className="fl-in" />
               <span style={{ color: T.muted }}>people: <strong style={{ color: T.text }}>{money(draft.sale)}</strong></span>
-              <span style={{ color: draft.margin >= 0 ? "#34d399" : "#f87171", fontWeight: 800 }}>margin {money(draft.margin)}</span>
+              <span style={{ color: draft.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 800 }}>margin {money(draft.margin)}</span>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <GhostButton onClick={() => setBuilding(false)}>Cancel</GhostButton>
@@ -294,7 +294,7 @@ export default function PackagesPage() {
             </div>
           </div>
 
-          {error ? <div style={{ fontSize: 12.5, color: "#f87171" }}>{error}</div> : null}
+          {error ? <div style={{ fontSize: 12.5, color: "var(--tx-f87171, #f87171)" }}>{error}</div> : null}
         </section>
       ) : null}
 
@@ -318,7 +318,7 @@ export default function PackagesPage() {
               {busy ? "Building…" : "Create the trip"}
             </PrimaryButton>
           </div>
-          {error ? <div style={{ fontSize: 12.5, color: "#f87171" }}>{error}</div> : null}
+          {error ? <div style={{ fontSize: 12.5, color: "var(--tx-f87171, #f87171)" }}>{error}</div> : null}
         </section>
       ) : null}
 
@@ -362,7 +362,7 @@ export default function PackagesPage() {
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", borderTop: `1px solid ${T.border}`, paddingTop: 12 }}>
-                  <span style={{ fontSize: 12.5, color: per2.margin >= 0 ? "#34d399" : "#f87171", fontWeight: 800 }}>
+                  <span style={{ fontSize: 12.5, color: per2.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 800 }}>
                     Margin {money(per2.margin)} on 2
                   </span>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -374,7 +374,7 @@ export default function PackagesPage() {
                         await remove(pack.record.id);
                         await refetch();
                       }}
-                      style={{ border: "none", background: "transparent", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                      style={{ border: "none", background: "transparent", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                     >
                       Remove
                     </button>

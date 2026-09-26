@@ -85,7 +85,7 @@ const PLAN_CONFIG = {
   starter: {
     name: "Starter",
     tagline: "Perfect for growing businesses",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.35)",
     dim: "rgba(129,140,248,.1)",
     border: "rgba(129,140,248,.3)",
@@ -100,7 +100,7 @@ const PLAN_CONFIG = {
   pro: {
     name: "Professional",
     tagline: "For established teams that need more",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.35)",
     dim: "rgba(52,211,153,.1)",
     border: "rgba(52,211,153,.3)",
@@ -115,7 +115,7 @@ const PLAN_CONFIG = {
   enterprise: {
     name: "Enterprise",
     tagline: "Tailored for complex organizations",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.35)",
     dim: "rgba(251,191,36,.1)",
     border: "rgba(251,191,36,.3)",
@@ -130,7 +130,7 @@ const PLAN_CONFIG = {
   custom: {
     name: "Custom Plan",
     tagline: "Tailored to your specific needs",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.35)",
     dim: "rgba(52,211,153,.1)",
     border: "rgba(52,211,153,.3)",
@@ -161,7 +161,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
       </div>
       <span style={{
         fontSize:9, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase",
-        color: active ? "#a5b4fc" : done ? "#6ee7b7" : "rgba(var(--ink),.22)",
+        color: active ? "var(--tx-a5b4fc, #a5b4fc)" : done ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),.22)",
       }}>
         {label}
       </span>
@@ -263,7 +263,7 @@ function FloatingInput({
         fontSize: lifted ? 10 : 14,
         letterSpacing: lifted ? ".08em" : "0",
         textTransform: lifted ? "uppercase" : "none",
-        color: focused ? "#a5b4fc" : "rgba(var(--ink),.3)",
+        color: focused ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),.3)",
       }}>
         {label}
       </label>
@@ -280,8 +280,8 @@ function PhoneInput({
   color: string; country: string;
 }) {
   const [focused, setFocused] = useState<"dial"|"phone"|null>(null);
-  const borderColor = focused ? "rgba(129,140,248,.6)" : "rgba(255,255,255,.09)";
-  const bg         = focused ? "rgba(99,102,241,.08)"  : "rgba(255,255,255,.04)";
+  const borderColor = focused ? "rgba(129,140,248,.6)" : "rgba(var(--ink),.09)";
+  const bg         = focused ? "rgba(99,102,241,.08)"  : "rgba(var(--ink),.04)";
 
   const groups = PHONE_FORMATS[country];
   const placeholder = groups
@@ -529,10 +529,10 @@ export default function SignupByPlanPage() {
 
   const strengthMeta = [
     { label:"", color:"transparent" },
-    { label:"Weak",   color:"#f87171" },
-    { label:"Fair",   color:"#fbbf24" },
-    { label:"Good",   color:"#818cf8" },
-    { label:"Strong", color:"#34d399" },
+    { label:"Weak",   color:"var(--tx-f87171, #f87171)" },
+    { label:"Fair",   color:"var(--tx-fbbf24, #fbbf24)" },
+    { label:"Good",   color:"var(--tx-818cf8, #818cf8)" },
+    { label:"Strong", color:"var(--tx-34d399, #34d399)" },
   ];
   const customModules = searchParams.get("modules") || "";
   const customPrice = searchParams.get("price") || "0";
@@ -711,7 +711,7 @@ export default function SignupByPlanPage() {
       {/* â”€â”€ HEADER â”€â”€ */}
       <header className="fu" style={{
         borderBottom:"1px solid rgba(var(--ink),.06)",
-        background:"rgba(8,12,30,.85)", backdropFilter:"blur(20px)",
+        background:"rgba(var(--dkr-080c1e, 8,12,30),0.85)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:50,
       }}>
         <div className="signup-header" style={{
@@ -746,8 +746,8 @@ export default function SignupByPlanPage() {
             background:"rgba(var(--ink),.04)",
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
-            onMouseEnter={e=>{e.currentTarget.style.color="white";e.currentTarget.style.borderColor="rgba(255,255,255,.25)";}}
-            onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.55)";e.currentTarget.style.borderColor="rgba(255,255,255,.1)";}}
+            onMouseEnter={e=>{e.currentTarget.style.color="white";e.currentTarget.style.borderColor="rgba(var(--ink),.25)";}}
+            onMouseLeave={e=>{e.currentTarget.style.color="rgba(var(--ink),.55)";e.currentTarget.style.borderColor="rgba(var(--ink),.1)";}}
           >
             Back
           </button>
@@ -767,7 +767,7 @@ export default function SignupByPlanPage() {
               display:"inline-flex", alignItems:"center", gap:7,
               padding:"5px 14px", borderRadius:22,
               background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)",
-              fontSize:10.5, fontWeight:700, color:"#a5b4fc",
+              fontSize:10.5, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)",
               letterSpacing:".09em", textTransform:"uppercase", marginBottom:16,
             }}>
               <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
@@ -910,7 +910,7 @@ export default function SignupByPlanPage() {
               <div style={{
                 marginBottom:20, padding:"12px 16px", borderRadius:12,
                 background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.3)",
-                color:"#f87171", fontSize:13, fontWeight:500,
+                color:"var(--tx-f87171, #f87171)", fontSize:13, fontWeight:500,
                 display:"flex", alignItems:"center", gap:8,
               }}>
                 <span>!</span> {error}
@@ -947,7 +947,7 @@ export default function SignupByPlanPage() {
                   {emailWarning && (
                     <div style={{ marginTop: 6, padding: "8px 12px", borderRadius: 8, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", display: "flex", alignItems: "flex-start", gap: 8 }}>
                       <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
-                      <span style={{ fontSize: 12, color: "#fbbf24", lineHeight: 1.5 }}>{emailWarning}</span>
+                      <span style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.5 }}>{emailWarning}</span>
                     </div>
                   )}
                 </div>
@@ -981,7 +981,7 @@ export default function SignupByPlanPage() {
                       fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s",
                     }}
                     onFocus={e=>(e.target.style.borderColor="rgba(129,140,248,.6)")}
-                    onBlur={e=>(e.target.style.borderColor="rgba(255,255,255,.09)")}
+                    onBlur={e=>(e.target.style.borderColor="rgba(var(--ink),.09)")}
                   >
                     {sortCountries().map(c => (
                       <option key={c.code} value={c.code}>{c.name}</option>
@@ -1027,7 +1027,7 @@ export default function SignupByPlanPage() {
                     letterSpacing:".08em", textTransform:"uppercase",
                     color:"rgba(var(--ink),.3)", marginBottom:6,
                   }}>
-                    Business Type <span style={{color:"#f87171"}}>*</span>
+                    Business Type <span style={{color:"var(--tx-f87171, #f87171)"}}>*</span>
                   </label>
                   <select
                     value={businessType}
@@ -1042,7 +1042,7 @@ export default function SignupByPlanPage() {
                       fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s",
                     }}
                     onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
-                    onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,.09)")}
+                    onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                   >
                     <option value="">Select your business type</option>
                     {liveTypes.map((bt) => (
@@ -1066,7 +1066,7 @@ export default function SignupByPlanPage() {
                 {false && (
                 <div>
                   <div style={{ fontSize:11,fontWeight:700,color:"rgba(var(--ink),.4)",letterSpacing:".07em",textTransform:"uppercase",marginBottom:10 }}>
-                    Business Type <span style={{color:"#f87171"}}>*</span>
+                    Business Type <span style={{color:"var(--tx-f87171, #f87171)"}}>*</span>
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:8}}>
                     {[
@@ -1102,13 +1102,13 @@ export default function SignupByPlanPage() {
                           }}>
                           <span style={{fontSize:16}}>{bt.icon}</span>
                           {bt.label}
-                          {sel && <span style={{marginLeft:"auto",fontSize:10,color:"#818cf8"}}>âœ“</span>}
+                          {sel && <span style={{marginLeft:"auto",fontSize:10,color:"var(--tx-818cf8, #818cf8)"}}>âœ“</span>}
                         </button>
                       );
                     })}
                   </div>
                   {!businessType && (
-                    <div style={{fontSize:11,color:"rgba(248,113,113,.6)",marginTop:6}}>Please select your business type</div>
+                    <div style={{fontSize:11,color:"rgba(var(--txr-f87171, 248,113,113),.6)",marginTop:6}}>Please select your business type</div>
                   )}
                 </div>
                 )}
@@ -1124,7 +1124,7 @@ export default function SignupByPlanPage() {
                       onChange={e => setTeamSize(e.target.value)}
                       style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: teamSize ? "white" : "rgba(var(--ink),.35)", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
                       onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
-                      onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,.09)")}
+                      onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                     >
                       <option value="">Select team size</option>
                       <option value="1">1 — Just me</option>
@@ -1146,7 +1146,7 @@ export default function SignupByPlanPage() {
                       onChange={e => setReferralSource(e.target.value)}
                       style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: referralSource ? "white" : "rgba(var(--ink),.35)", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
                       onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
-                      onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,.09)")}
+                      onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                     >
                       <option value="">Select an option</option>
                       <option value="google">Google / Search</option>
@@ -1176,7 +1176,7 @@ export default function SignupByPlanPage() {
                       color:"rgba(var(--ink),.3)", fontSize:16, transition:"color .2s",
                     }}
                       onMouseEnter={e=>(e.currentTarget.style.color="#818cf8")}
-                      onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.3)")}
+                      onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),.3)")}
                     >
                       {showPass ? "Hide" : "Show"}
                     </button>
@@ -1232,7 +1232,7 @@ export default function SignupByPlanPage() {
                       </div>
                       <span style={{ fontSize:13, color:"rgba(var(--ink),.5)", fontWeight:400 }}>
                         {label}{" "}
-                        <a href={href} onClick={e=>e.stopPropagation()} style={{ color:"#818cf8", fontWeight:600, textDecoration:"underline" }}>
+                        <a href={href} onClick={e=>e.stopPropagation()} style={{ color:"var(--tx-818cf8, #818cf8)", fontWeight:600, textDecoration:"underline" }}>
                           {link}
                         </a>
                       </span>
@@ -1283,7 +1283,7 @@ export default function SignupByPlanPage() {
                 <div style={{ textAlign:"center", fontSize:12.5, color:"rgba(var(--ink),.25)" }}>
                   Already have an account?{" "}
                   <button type="button" onClick={() => router.push("/login")} style={{
-                    color:"#818cf8", fontWeight:600, background:"none", border:"none",
+                    color:"var(--tx-818cf8, #818cf8)", fontWeight:600, background:"none", border:"none",
                     cursor:"pointer", fontFamily:"inherit", fontSize:"inherit",
                   }}>
                     Sign in

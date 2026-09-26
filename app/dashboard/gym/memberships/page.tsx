@@ -106,9 +106,9 @@ export default function MembershipsPage() {
 
       <div style={S.stats}>
         <div style={S.card}><div style={S.statLabel}>Total Members</div><div style={S.statVal}>{members.length}</div></div>
-        <div style={S.card}><div style={S.statLabel}>Active</div><div style={{ ...S.statVal, color: '#34d399' }}>{active}</div></div>
-        <div style={S.card}><div style={S.statLabel}>Expiring This Week</div><div style={{ ...S.statVal, color: '#f87171' }}>{expiring}</div></div>
-        <div style={S.card}><div style={S.statLabel}>Revenue This Month</div><div style={{ ...S.statVal, color: '#16a34a', fontSize: 22 }}>Rs. {revenue.toLocaleString()}</div></div>
+        <div style={S.card}><div style={S.statLabel}>Active</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{active}</div></div>
+        <div style={S.card}><div style={S.statLabel}>Expiring This Week</div><div style={{ ...S.statVal, color: 'var(--tx-f87171, #f87171)' }}>{expiring}</div></div>
+        <div style={S.card}><div style={S.statLabel}>Revenue This Month</div><div style={{ ...S.statVal, color: 'var(--tx-16a34a, #16a34a)', fontSize: 22 }}>Rs. {revenue.toLocaleString()}</div></div>
       </div>
 
       <div style={S.tabs}>
@@ -142,7 +142,7 @@ export default function MembershipsPage() {
                 <td style={S.td}>{m.plan}</td>
                 <td style={S.td}>{m.startDate}</td>
                 <td style={S.td}>{m.endDate}</td>
-                <td style={S.td}><span style={{ color: m.daysLeft < 0 ? '#f87171' : m.daysLeft <= 7 ? '#fbbf24' : '#34d399', fontWeight: 600 }}>{m.daysLeft < 0 ? `${Math.abs(m.daysLeft)}d ago` : `${m.daysLeft}d`}</span></td>
+                <td style={S.td}><span style={{ color: m.daysLeft < 0 ? 'var(--tx-f87171, #f87171)' : m.daysLeft <= 7 ? 'var(--tx-fbbf24, #fbbf24)' : 'var(--tx-34d399, #34d399)', fontWeight: 600 }}>{m.daysLeft < 0 ? `${Math.abs(m.daysLeft)}d ago` : `${m.daysLeft}d`}</span></td>
                 <td style={S.td}>Rs. {m.fee.toLocaleString()}</td>
                 <td style={S.td}><span style={S.badge(STATUS_COLOR[m.status] || '#6b7280')}>{m.status}</span></td>
                 <td style={S.td}>

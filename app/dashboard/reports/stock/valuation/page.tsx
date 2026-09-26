@@ -40,7 +40,7 @@ export default function StockValuationPage() {
       <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "18px 22px", borderRadius: 14, background: "rgba(129,140,248,.07)", border: "1px solid rgba(129,140,248,.2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Total Inventory Value ({method === "avg" ? "Weighted Average" : "FIFO"})</div>
-          <div style={{ fontSize: 28, fontWeight: 900, color: "#818cf8" }}>{cur} {fmt(totalValue)}</div>
+          <div style={{ fontSize: 28, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)" }}>{cur} {fmt(totalValue)}</div>
         </div>
         <div style={{ fontSize: 12, color: "var(--text-muted)", maxWidth: 260 }}>
           {method === "avg" ? "Weighted Average: (Opening Stock × Cost + Purchases × Cost) ÷ Total Units" : "FIFO: First purchased stock is first to be sold — oldest cost used first"}
@@ -72,9 +72,9 @@ export default function StockValuationPage() {
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)" }}>{r.category || "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{fmt(r.stockQty)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(cost, 2)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#818cf8" }}>{cur} {fmt(value)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{cur} {fmt(value)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.marketPrice > 0 ? `${cur} ${fmt(r.marketPrice, 2)}` : "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: gainLoss >= 0 ? "#34d399" : "#f87171" }}>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: gainLoss >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                     {r.marketPrice > 0 ? `${gainLoss >= 0 ? "+" : ""}${cur} ${fmt(Math.abs(gainLoss))}` : "—"}
                   </td>
                 </tr>

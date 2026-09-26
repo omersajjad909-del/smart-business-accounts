@@ -120,7 +120,7 @@ export default function TravelFareSheetPage() {
           render: (row) => {
             const margin = Number(row.margin) || 0;
             return (
-              <span style={{ color: margin > 0 ? "#34d399" : "#f87171", fontWeight: 700 }}>
+              <span style={{ color: margin > 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                 {margin.toLocaleString()}
               </span>
             );
@@ -171,10 +171,10 @@ export default function TravelFareSheetPage() {
 
         return [
           { label: "Fares", value: rows.length, color: travelAccent },
-          { label: "Active", value: active.length, color: "#34d399" },
-          { label: "Avg Margin / Adult", value: avg.toLocaleString(), color: avg > 0 ? "#60a5fa" : "#f87171" },
-          { label: "At or Below Cost", value: thin, color: thin ? "#f87171" : "#34d399" },
-          { label: "Expiring in 14 Days", value: soon, color: soon ? "#fbbf24" : "#34d399" },
+          { label: "Active", value: active.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Avg Margin / Adult", value: avg.toLocaleString(), color: avg > 0 ? "var(--tx-60a5fa, #60a5fa)" : "var(--tx-f87171, #f87171)" },
+          { label: "At or Below Cost", value: thin, color: thin ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" },
+          { label: "Expiring in 14 Days", value: soon, color: soon ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" },
         ];
       }}
     />

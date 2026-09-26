@@ -217,10 +217,10 @@ export default function ExpenseVouchersPage() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: queryMode ? "#facc15" : accent }}>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: queryMode ? "var(--tx-facc15, #facc15)" : accent }}>
             {queryMode ? "🔍 QUERY MODE — Expense Vouchers" : "Expense Vouchers"}
           </h1>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: queryMode ? "rgba(250,204,21,.5)" : "var(--text-muted)" }}>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: queryMode ? "rgba(var(--txr-facc15, 250,204,21),.5)" : "var(--text-muted)" }}>
             {queryMode ? "Enter search criteria then press F8 to execute" : "Record and track business expenses with approval workflow"}
           </p>
         </div>
@@ -230,7 +230,7 @@ export default function ExpenseVouchersPage() {
               <button onClick={() => evNavTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
               <span style={{ fontSize: 12, color: accent, fontWeight: 700, minWidth: 80, textAlign: "center" }}>{queryResults[queryIdx]?.voucherNo} · {queryIdx+1}/{queryResults.length}</span>
               <button onClick={() => evNavTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===queryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx===queryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
-              <button onClick={evExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
+              <button onClick={evExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
             </div>
           )}
           <button onClick={queryMode ? evExitQuery : evEnterQuery}
@@ -248,23 +248,23 @@ export default function ExpenseVouchersPage() {
       {queryMode && (
         <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
           <div style={{ marginBottom: 18 }}>
-            <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+            <span style={{ fontSize: 12, color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&lt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;=</b> for date range.</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
             <div>
-              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Voucher # (e.g. EV-5)</label>
+              <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Voucher # (e.g. EV-5)</label>
               <input autoFocus value={queryVNo} onChange={e=>setQueryVNo(e.target.value)} placeholder="EV-1 or blank…"
                 style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();evExecuteQuery(queryVNo,queryDate,queryDesc);} if(e.key==="Escape")evExitQuery(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+              <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
               <input value={queryDate} onChange={e=>setQueryDate(e.target.value)} placeholder=">010125 or blank…"
                 style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();evExecuteQuery(queryVNo,queryDate,queryDesc);} if(e.key==="Escape")evExitQuery(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Description / Account</label>
+              <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Description / Account</label>
               <input value={queryDesc} onChange={e=>setQueryDesc(e.target.value)} placeholder="e.g. Travel, Rent, or blank…"
                 style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();evExecuteQuery(queryVNo,queryDate,queryDesc);} if(e.key==="Escape")evExitQuery(); }} />
@@ -347,7 +347,7 @@ export default function ExpenseVouchersPage() {
                       </td>
                       <td style={{ padding: "8px 14px", textAlign: "center" }}>
                         <button type="button" onClick={() => setItems(items.filter((_, i) => i !== idx))}
-                          style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 14, padding: "2px 6px" }}>✕</button>
+                          style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 14, padding: "2px 6px" }}>✕</button>
                       </td>
                     </tr>
                   ))}
@@ -389,7 +389,7 @@ export default function ExpenseVouchersPage() {
       {/* Shortcuts Bar */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
         {(queryMode ? [
-          { key: "F8", label: "Execute Query", color: "#facc15" },
+          { key: "F8", label: "Execute Query", color: "var(--tx-facc15, #facc15)" },
           { key: "Esc", label: "Cancel Query", color: undefined },
         ] : queryIdx >= 0 ? [
           { key: "F7", label: "New Query", color: accent },
@@ -435,14 +435,14 @@ export default function ExpenseVouchersPage() {
                   </td>
                   <td style={{ padding: "13px 16px" }}>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <button onClick={() => handleEdit(v)} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#818cf8", cursor: "pointer", fontFamily: ff }}>Edit</button>
+                      <button onClick={() => handleEdit(v)} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)", cursor: "pointer", fontFamily: ff }}>Edit</button>
                       {v.approvalStatus === "DRAFT" && (
-                        <button onClick={() => handleStatusChange(v.id, "PENDING")} style={{ background: "transparent", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#fbbf24", cursor: "pointer", fontFamily: ff }}>Submit</button>
+                        <button onClick={() => handleStatusChange(v.id, "PENDING")} style={{ background: "transparent", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", cursor: "pointer", fontFamily: ff }}>Submit</button>
                       )}
                       {v.approvalStatus === "PENDING" && (
-                        <button onClick={() => handleStatusChange(v.id, "APPROVED")} style={{ background: "transparent", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#22c55e", cursor: "pointer", fontFamily: ff }}>Approve</button>
+                        <button onClick={() => handleStatusChange(v.id, "APPROVED")} style={{ background: "transparent", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-22c55e, #22c55e)", cursor: "pointer", fontFamily: ff }}>Approve</button>
                       )}
-                      <button onClick={() => handleDelete(v.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#f87171", cursor: "pointer", fontFamily: ff }}>Delete</button>
+                      <button onClick={() => handleDelete(v.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontFamily: ff }}>Delete</button>
                     </div>
                   </td>
                 </tr>

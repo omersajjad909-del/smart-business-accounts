@@ -686,7 +686,7 @@ export default function QuotationPage() {
                     <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 14px", marginBottom: 10, background: "rgba(var(--ink),0.02)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
-                        <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "transparent", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: rows.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+                        <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "transparent", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: rows.length === 1 ? "var(--text-muted)" : "var(--tx-f87171, #f87171)", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
                       </div>
                       <ItemPicker
                         items={items as any}
@@ -707,7 +707,7 @@ export default function QuotationPage() {
                         </div>
                       </div>
                       {(Number(r.qty) > 0 || Number(r.rate) > 0) && (
-                        <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: "#6366f1" }}>= {(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</div>
+                        <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: "var(--tx-6366f1, #6366f1)" }}>= {(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</div>
                       )}
                     </div>
                   ))}
@@ -745,7 +745,7 @@ export default function QuotationPage() {
                           </td>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 14px", textAlign: "right", fontWeight: 700 }}>{(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</td>
                           <td style={{ padding: isMobile ? "8px 8px" : "8px 8px", textAlign: "center" }}>
-                            <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
+                            <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "var(--tx-f87171, #f87171)", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </td>
                         </tr>
                       ))}

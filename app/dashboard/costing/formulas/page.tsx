@@ -34,8 +34,8 @@ import {
 import { FORMULA_CATEGORIES, FORMULA_TEMPLATES } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 
-const CARD = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.09)";
+const CARD = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.09)";
 const FONT = "'Outfit','DM Sans',system-ui,sans-serif";
 const MONO = "ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace";
 
@@ -518,7 +518,7 @@ export default function FormulasPage() {
           <select
             value={String(inp.defaultValue ?? 0)}
             onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
-            style={{ ...input, cursor: "pointer", color: "#fbbf24" }}
+            style={{ ...input, cursor: "pointer", color: "var(--tx-fbbf24, #fbbf24)" }}
             title="Which option the formula opens on. The boxes underneath change with it."
           >
             {inp.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
@@ -589,7 +589,7 @@ export default function FormulasPage() {
                 x.inputs.forEach((r) => { if (r.showWhen?.key === row.key) delete r.showWhen; });
               }
             })}
-            style={{ ...input, color: inp.options ? "#fbbf24" : inp.isList ? "#a5b4fc" : "white" }}
+            style={{ ...input, color: inp.options ? "var(--tx-fbbf24, #fbbf24)" : inp.isList ? "var(--tx-a5b4fc, #a5b4fc)" : "white" }}
             title="Number = one value. List = several stock sizes to pick between. Choice = one option or the other, and other boxes can follow it."
           >
             <option value="number">Number</option>
@@ -606,7 +606,7 @@ export default function FormulasPage() {
                 const [key, at] = e.target.value.split(":");
                 x.inputs[i].showWhen = { key, is: Number(at) };
               })}
-              style={{ ...input, color: inp.showWhen ? "#fbbf24" : "rgba(var(--ink),.5)" }}
+              style={{ ...input, color: inp.showWhen ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.5)" }}
               title="Leave on Always unless this box belongs to one branch of a choice. The steps still have to zero the other branch out with if()."
             >
               <option value={ALWAYS}>Always</option>
@@ -625,7 +625,7 @@ export default function FormulasPage() {
               : "The operator is asked for this on every run. Click to fix it here instead."}
             onClick={() => patch((x) => { x.inputs[i].askOnRun = x.inputs[i].askOnRun === false; })}
             style={{ ...iconBtn, padding: "8px 9px", fontSize: 11,
-              color: inp.askOnRun === false ? "rgba(var(--ink),.42)" : "#34d399" }}>
+              color: inp.askOnRun === false ? "rgba(var(--ink),.42)" : "var(--tx-34d399, #34d399)" }}>
             {inp.askOnRun === false ? "Fixed" : "Ask"}
           </button>
           {removeBtn}
@@ -652,7 +652,7 @@ export default function FormulasPage() {
         <div style={{ ...label, marginBottom: 12 }}>Live result</div>
         {preview?.ok === false && (
           <div style={{
-            fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.6,
+            fontSize: 12, color: "var(--tx-f87171, #f87171)", marginBottom: 12, lineHeight: 1.6,
             padding: "9px 11px", borderRadius: 9,
             background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.25)",
           }}>
@@ -683,7 +683,7 @@ export default function FormulasPage() {
                   <span style={{
                     fontFamily: MONO, fontVariantNumeric: "tabular-nums",
                     fontSize: o.primary ? 17 : 13, fontWeight: 700,
-                    color: o.primary ? "#34d399" : "rgba(var(--ink),.85)",
+                    color: o.primary ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.85)",
                   }}>
                     {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginLeft: 4 }}>{o.unit}</span>
                   </span>
@@ -841,7 +841,7 @@ export default function FormulasPage() {
                 marginTop: 5, padding: "13px 14px", borderRadius: 11,
                 background: "rgba(52,211,153,.05)", border: "1px solid rgba(52,211,153,.22)",
               }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>Profit</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Profit</div>
                 <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)", marginTop: 2, lineHeight: 1.6, marginBottom: 10 }}>
                   Added on top of the starred output to make the sale rate — Rs 2 a piece, or 15% of cost.
                   This is the formula&rsquo;s usual profit; whoever runs it can still change it for one quote.
@@ -881,7 +881,7 @@ export default function FormulasPage() {
                   ) : (
                     <>
                       {fmt(baseRate)} + {fmt(profitAmount)} ={" "}
-                      <strong style={{ color: "#34d399", fontSize: 13.5 }}>{fmt(saleRate)}</strong>
+                      <strong style={{ color: "var(--tx-34d399, #34d399)", fontSize: 13.5 }}>{fmt(saleRate)}</strong>
                       {primaryOut?.unit && <span style={{ color: "rgba(var(--ink),.3)" }}> {primaryOut.unit}</span>}
                     </>
                   )}
@@ -956,7 +956,7 @@ export default function FormulasPage() {
                       <div style={{
                         minWidth: 108, textAlign: "right", fontFamily: MONO, fontSize: 12.5,
                         fontVariantNumeric: "tabular-nums",
-                        color: stepErr ? "#f87171" : "#34d399", fontWeight: 700,
+                        color: stepErr ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", fontWeight: 700,
                       }}>
                         {stepErr ? "error" : fmt(result?.value)}
                         {!stepErr && st.unit && (
@@ -964,7 +964,7 @@ export default function FormulasPage() {
                         )}
                       </div>
                     </div>
-                    {stepErr && <div style={{ fontSize: 11.5, color: "#f87171", paddingLeft: 30 }}>{stepErr}</div>}
+                    {stepErr && <div style={{ fontSize: 11.5, color: "var(--tx-f87171, #f87171)", paddingLeft: 30 }}>{stepErr}</div>}
                   </div>
                 );
               })}
@@ -1022,7 +1022,7 @@ export default function FormulasPage() {
                 const starBtn = (
                   <button title="Show as the headline number" onClick={() => patch((x) => {
                     x.outputs.forEach((o, j) => { o.primary = j === i ? !o.primary : false; });
-                  })} style={{ ...iconBtn, padding: "8px 11px", color: out.primary ? "#fbbf24" : "rgba(var(--ink),.35)" }}>★</button>
+                  })} style={{ ...iconBtn, padding: "8px 11px", color: out.primary ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.35)" }}>★</button>
                 );
                 const removeBtn = (
                   <button title="Remove" onClick={() => patch((x) => { x.outputs.splice(i, 1); })}
@@ -1082,7 +1082,7 @@ export default function FormulasPage() {
                       ...btn(), padding: "6px 9px", fontSize: 11.5, fontFamily: MONO,
                       cursor: activeStep === null ? "default" : "pointer",
                       opacity: activeStep === null ? .5 : 1,
-                      color: "#a5b4fc", display: "flex", gap: 6, alignItems: "baseline",
+                      color: "var(--tx-a5b4fc, #a5b4fc)", display: "flex", gap: 6, alignItems: "baseline",
                     }}>
                     {r.key}
                     <span style={{ color: "rgba(var(--ink),.35)" }}>{fmt(preview?.values[r.key])}</span>
@@ -1100,7 +1100,7 @@ export default function FormulasPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 11, maxHeight: 380, overflowY: "auto" }}>
                 {FUNCTIONS.map((f) => (
                   <div key={f.name}>
-                    <div style={{ fontFamily: MONO, fontSize: 12, color: "#818cf8" }}>{f.signature}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 12, color: "var(--tx-818cf8, #818cf8)" }}>{f.signature}</div>
                     <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", lineHeight: 1.6 }}>{f.description}</div>
                   </div>
                 ))}
@@ -1124,7 +1124,7 @@ export default function FormulasPage() {
           <h1 style={{ fontSize: 23, fontWeight: 800, margin: "0 0 4px" }}>Formulas</h1>
           <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Write how your products are costed. Use them on the{" "}
-            <Link href="/dashboard/costing" style={{ color: "#818cf8" }}>Costing</Link> page.
+            <Link href="/dashboard/costing" style={{ color: "var(--tx-818cf8, #818cf8)" }}>Costing</Link> page.
           </p>
         </div>
         <button onClick={() => setEditing({ id: null, draft: emptyDraft(category || "General") })} style={btn("primary")}>
@@ -1281,7 +1281,7 @@ function CategoryBox({ label: text, count, active, onClick }: {
       borderRadius: 12, padding: "13px 14px", cursor: "pointer",
       textAlign: "left", fontFamily: FONT, transition: "all .15s",
     }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: active ? "#a5b4fc" : "white" }}>{text}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: active ? "var(--tx-a5b4fc, #a5b4fc)" : "white" }}>{text}</div>
       <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.33)", marginTop: 2 }}>
         {count} {count === 1 ? "formula" : "formulas"}
       </div>

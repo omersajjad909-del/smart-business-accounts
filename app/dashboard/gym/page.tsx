@@ -58,7 +58,7 @@ export default function GymOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: gymFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym / Fitness</div>
+        <div style={{ fontSize: 12, color: "var(--tx-86efac, #86efac)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym / Fitness</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Owner Fitness Desk</h1>
         <p style={{ margin: 0, fontSize: 14, color: gymMuted, maxWidth: 760 }}>
           Manage membership renewals, trainer utilization, class occupancy, and fitness revenue from one command center.
@@ -75,7 +75,7 @@ export default function GymOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(34,197,94,.12), rgba(59,130,246,.1))", border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#bbf7d0", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-bbf7d0, #bbf7d0)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Sell Membership", body: "Choose a plan, onboard the member, and track payment status." },
@@ -93,7 +93,7 @@ export default function GymOverviewPage() {
         </div>
 
         <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/gym/memberships", label: "Open Membership Desk", hint: "Plans, renewals, and payment tracking" },
@@ -113,7 +113,7 @@ export default function GymOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Occupancy Classes</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Occupancy Classes</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topClasses.length === 0 ? (
               <div style={{ color: gymMuted, fontSize: 13 }}>Abhi classes add nahi hui. Schedule build hone par yahan top occupancy classes dikhengi.</div>
@@ -133,7 +133,7 @@ export default function GymOverviewPage() {
         </div>
 
         <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Class occupancy", value: `${summary.occupancyRate}% seats engaged`, tone: "#60a5fa" },

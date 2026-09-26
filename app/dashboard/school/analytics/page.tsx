@@ -63,7 +63,7 @@ export default function SchoolAnalyticsPage() {
             {Object.entries(classMix).sort((a, b) => b[1] - a[1]).map(([className, count]) => (
               <div key={className} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>Class {className}</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#a5b4fc" }}>{count}</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{count}</span>
               </div>
             ))}
             {Object.keys(classMix).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No student records yet.</div>}
@@ -78,7 +78,7 @@ export default function SchoolAnalyticsPage() {
               return (
                 <div key={day} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <span style={{ fontSize: 13 }}>{day}</span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>{count}</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{count}</span>
                 </div>
               );
             })}
@@ -93,7 +93,7 @@ export default function SchoolAnalyticsPage() {
             {Object.entries(feeByMonth).sort((a, b) => b[1] - a[1]).map(([month, amount]) => (
               <div key={month} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{month}</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#60a5fa" }}>Rs. {amount.toLocaleString()}</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>Rs. {amount.toLocaleString()}</span>
               </div>
             ))}
             {Object.keys(feeByMonth).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No fee records yet.</div>}
@@ -108,7 +108,7 @@ export default function SchoolAnalyticsPage() {
               return (
                 <div key={className} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <span style={{ fontSize: 13 }}>Class {className}</span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: avg >= 50 ? "#34d399" : "#f87171" }}>{avg}%</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: avg >= 50 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{avg}%</span>
                 </div>
               );
             })}

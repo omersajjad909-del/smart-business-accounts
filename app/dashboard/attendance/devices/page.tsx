@@ -720,7 +720,7 @@ export default function BiometricDevicesPage() {
                         style={{
                           color:
                             d.lastSeenAt && Date.now() - new Date(d.lastSeenAt).getTime() < 30 * 60_000
-                              ? "#34d399"
+                              ? "var(--tx-34d399, #34d399)"
                               : "var(--text-muted)",
                         }}
                       >
@@ -749,7 +749,7 @@ export default function BiometricDevicesPage() {
                           ...btnGhost,
                           padding: "5px 9px",
                           fontSize: 11.5,
-                          color: "#f87171",
+                          color: "var(--tx-f87171, #f87171)",
                           borderColor: "rgba(248,113,113,.35)",
                         }}
                         disabled={busy === d.id}
@@ -808,7 +808,7 @@ export default function BiometricDevicesPage() {
               background: "rgba(251,191,36,.08)",
             }}
           >
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: "#fbbf24", marginBottom: 6 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", marginBottom: 6 }}>
               Ye enrollment numbers punch kar rahe hain lekin kisi employee se jure nahi
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -1204,7 +1204,7 @@ export default function BiometricDevicesPage() {
                       {p.employee ? (
                         `${p.employee.firstName} ${p.employee.lastName}`
                       ) : (
-                        <span style={{ color: "#fbbf24" }}>unmapped</span>
+                        <span style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>unmapped</span>
                       )}
                     </td>
                     <td style={td}>#{p.biometricId}</td>
@@ -1212,7 +1212,7 @@ export default function BiometricDevicesPage() {
                     <td style={{ ...td, fontSize: 11.5 }}>{p.direction}</td>
                     <td style={{ ...td, fontSize: 11.5, color: "var(--text-muted)" }}>{p.source}</td>
                     <td style={td}>
-                      <span style={{ color: p.processed ? "#34d399" : "var(--text-muted)", fontSize: 11.5 }}>
+                      <span style={{ color: p.processed ? "var(--tx-34d399, #34d399)" : "var(--text-muted)", fontSize: 11.5 }}>
                         {p.processed ? "yes" : "pending"}
                       </span>
                     </td>

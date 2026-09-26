@@ -225,10 +225,10 @@ export default function RestaurantOrdersPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Draft Orders", value: orders.filter((row) => row.status === "draft").length, color: "#94a3b8" },
-          { label: "Kitchen Queue", value: orders.filter((row) => row.status === "in_kitchen").length, color: "#f59e0b" },
-          { label: "Served", value: orders.filter((row) => row.status === "served").length, color: "#34d399" },
-          { label: "Ticket Value", value: `Rs. ${orders.reduce((sum, row) => sum + row.total, 0).toLocaleString()}`, color: "#fca5a5" },
+          { label: "Draft Orders", value: orders.filter((row) => row.status === "draft").length, color: "var(--tx-94a3b8, #94a3b8)" },
+          { label: "Kitchen Queue", value: orders.filter((row) => row.status === "in_kitchen").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Served", value: orders.filter((row) => row.status === "served").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Ticket Value", value: `Rs. ${orders.reduce((sum, row) => sum + row.total, 0).toLocaleString()}`, color: "var(--tx-fca5a5, #fca5a5)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8 }}>{card.label}</div>
@@ -254,15 +254,15 @@ export default function RestaurantOrdersPage() {
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "capitalize" }}>{order.serviceMode.replace("_", " ")}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.guests}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", maxWidth: 260, color: "rgba(var(--ink),.65)" }}>{order.itemsSummary}</td>
-                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {order.total.toLocaleString()}</td>
-                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "uppercase", fontSize: 11, color: "#fca5a5", fontWeight: 700 }}>{order.status}</td>
+                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {order.total.toLocaleString()}</td>
+                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "uppercase", fontSize: 11, color: "var(--tx-fca5a5, #fca5a5)", fontWeight: 700 }}>{order.status}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={() => editOrder(order)} style={{ padding: "6px 10px", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#c7d2fe", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Edit</button>
                   {order.status === "draft" && <button onClick={() => void moveOrder(order, "confirmed")} style={{ padding: "6px 10px", background: "rgba(59,130,246,.15)", border: "1px solid rgba(59,130,246,.3)", color: "#38bdf8", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Confirm</button>}
                   {order.status === "confirmed" && <button onClick={() => void moveOrder(order, "in_kitchen")} style={{ padding: "6px 10px", background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Send Kitchen</button>}
                   {order.status === "in_kitchen" && <button onClick={() => void moveOrder(order, "served")} style={{ padding: "6px 10px", background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Serve</button>}
                   {order.status === "served" && <button onClick={() => void moveOrder(order, "closed")} style={{ padding: "6px 10px", background: "rgba(148,163,184,.15)", border: "1px solid rgba(148,163,184,.3)", color: "#cbd5e1", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Close</button>}
-                  <button onClick={() => void removeOrder(order)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Delete</button>
+                  <button onClick={() => void removeOrder(order)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -279,7 +279,7 @@ export default function RestaurantOrdersPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 40 }}>
           <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>{editingId ? "Edit Order" : "New Order"}</h2>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Service Mode</label>

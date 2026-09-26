@@ -46,8 +46,8 @@ import { AirportInput, PartyInput, readParties, type PartyChoice } from "../_fli
 import { TRAVEL_SUPPLIER_KIND, partyKindHeading } from "@/lib/partyVocabulary";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.08)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.08)";
 const accent = "#38bdf8";
 
 const input: React.CSSProperties = {
@@ -415,7 +415,7 @@ export default function DeparturesPage() {
 
                       {legs.length > 1 ? (
                         <button type="button" onClick={() => setLegs(legs.filter((row) => row.id !== leg.id))}
-                          style={{ marginTop: 6, background: "none", border: "none", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                          style={{ marginTop: 6, background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
                           Remove this flight
                         </button>
                       ) : null}
@@ -609,7 +609,7 @@ export default function DeparturesPage() {
                     style={{ ...input, textAlign: "right", padding: "6px 9px" }} />
                 )}
               </span>
-              <span style={{ textAlign: "right", fontFamily: "ui-monospace, monospace", fontWeight: 700, color: t.marginPerPilgrim >= 0 ? "#34d399" : "#fca5a5" }}>
+              <span style={{ textAlign: "right", fontFamily: "ui-monospace, monospace", fontWeight: 700, color: t.marginPerPilgrim >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)" }}>
                 {t.marginPerPilgrim.toLocaleString()}
               </span>
               <span style={{ textAlign: "right", fontSize: 12, color: "rgba(var(--ink),.45)" }}>{t.marginPercent}%</span>
@@ -629,12 +629,12 @@ export default function DeparturesPage() {
         )}
 
         {problems.length > 0 && (
-          <div style={{ marginTop: 18, padding: "12px 15px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "#fbbf24", fontSize: 12.5, lineHeight: 1.8 }}>
+          <div style={{ marginTop: 18, padding: "12px 15px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 12.5, lineHeight: 1.8 }}>
             {problems.map((p) => <div key={p}>{p}</div>)}
           </div>
         )}
         {error && (
-          <div style={{ marginTop: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5 }}>{error}</div>
+          <div style={{ marginTop: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12.5 }}>{error}</div>
         )}
 
         <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
@@ -673,7 +673,7 @@ export default function DeparturesPage() {
                     <span style={{ color: "rgba(var(--ink),.62)" }}>
                       <strong style={{ color: "var(--ink-solid, #fff)" }}>{s.title}</strong> · {s.componentLabel} · {s.supplierName}
                     </span>
-                    <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: s.status === "settled" ? "#34d399" : "#fbbf24" }}>
+                    <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: s.status === "settled" ? "var(--tx-34d399, #34d399)" : "var(--tx-fbbf24, #fbbf24)" }}>
                       {s.amount.toLocaleString()} {s.status === "settled" ? "paid" : "owing"}
                     </span>
                   </div>
@@ -794,8 +794,8 @@ export default function DeparturesPage() {
                 <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>
                   <strong style={{ color: "var(--ink-solid, #fff)" }}>{seats.sold}</strong> of {seats.quota} sold ·{" "}
                   {seats.over > 0
-                    ? <span style={{ color: "#fca5a5", fontWeight: 700 }}>{seats.over} over quota</span>
-                    : <span style={{ color: seats.left === 0 ? "#fbbf24" : "inherit" }}>{seats.left} left</span>}
+                    ? <span style={{ color: "var(--tx-fca5a5, #fca5a5)", fontWeight: 700 }}>{seats.over} over quota</span>
+                    : <span style={{ color: seats.left === 0 ? "var(--tx-fbbf24, #fbbf24)" : "inherit" }}>{seats.left} left</span>}
                 </div>
                 <button onClick={() => setEditing({ id: row.id, d: row.d })}
                   style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
@@ -809,7 +809,7 @@ export default function DeparturesPage() {
                     <span key={t.occupancy} style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 999, background: "rgba(var(--ink),.04)", border: `1px solid ${border}`, color: "rgba(var(--ink),.62)" }}>
                       {occupancyName(t.occupancy)}{" "}
                       <strong style={{ color: "var(--ink-solid, #fff)", fontFamily: "ui-monospace, monospace" }}>{t.sellPerPilgrim.toLocaleString()}</strong>
-                      <span style={{ color: t.marginPerPilgrim >= 0 ? "#34d399" : "#fca5a5", marginLeft: 6 }}>+{t.marginPercent}%</span>
+                      <span style={{ color: t.marginPerPilgrim >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)", marginLeft: 6 }}>+{t.marginPercent}%</span>
                     </span>
                   ))}
                 </div>

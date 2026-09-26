@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const ispFont = "'Outfit','Inter',sans-serif";
-export const ispBg = "rgba(255,255,255,.03)";
-export const ispBorder = "rgba(255,255,255,.07)";
-export const ispMuted = "rgba(255,255,255,.56)";
+export const ispBg = "rgba(var(--ink),.03)";
+export const ispBorder = "rgba(var(--ink),.07)";
+export const ispMuted = "rgba(var(--ink),.56)";
 
 export type IspPackageStatus = "active" | "draft" | "retired";
 export type IspConnectionStatus = "pending" | "active" | "suspended" | "closed";

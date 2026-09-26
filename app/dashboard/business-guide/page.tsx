@@ -533,7 +533,7 @@ export default function BusinessGuidePage() {
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
       <div style={{
         borderRadius: 24, padding: isMobile ? "18px 16px" : "32px 36px", marginBottom: 24,
-        background: `linear-gradient(135deg, rgba(${businessMeta.color === "#818cf8" ? "99,102,241" : "99,102,241"},.15) 0%, rgba(8,10,28,.95) 60%)`,
+        background: `linear-gradient(135deg, rgba(${businessMeta.color === "#818cf8" ? "99,102,241" : "99,102,241"},.15) 0%, rgba(var(--dkr-080a1c, 8,10,28),0.95) 60%)`,
         border: "1px solid rgba(var(--ink),.08)",
         position: "relative", overflow: "hidden",
         animation: "fadeUp .5s ease",
@@ -576,10 +576,10 @@ export default function BusinessGuidePage() {
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, minWidth: 200 }}>
             {[
-              { label: "Modules Available", val: String(businessMeta.modules.length), color: "#a5b4fc" },
-              { label: "Workflow Steps", val: String(flow.length), color: "#34d399" },
-              { label: "AI Features", val: String(enabledAiTools.length || "…"), color: "#f59e0b" },
-              { label: "Reports Available", val: "15+", color: "#38bdf8" },
+              { label: "Modules Available", val: String(businessMeta.modules.length), color: "var(--tx-a5b4fc, #a5b4fc)" },
+              { label: "Workflow Steps", val: String(flow.length), color: "var(--tx-34d399, #34d399)" },
+              { label: "AI Features", val: String(enabledAiTools.length || "…"), color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Reports Available", val: "15+", color: "var(--tx-38bdf8, #38bdf8)" },
             ].map((s) => (
               <div key={s.label} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "center" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
@@ -627,12 +627,12 @@ export default function BusinessGuidePage() {
           {/* Quick links */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
             {[
-              { label: "Go to Dashboard", href: "/dashboard", icon: "⚡", color: "#6366f1" },
-              { label: "Open AI Center", href: "/dashboard/ai", icon: "🤖", color: "#a78bfa" },
-              { label: "Create Invoice", href: "/dashboard/sales-invoice", icon: "🧾", color: "#34d399" },
-              { label: "View Reports", href: "/dashboard/reports/trial-balance", icon: "📊", color: "#38bdf8" },
-              { label: "Business Settings", href: "/dashboard/business-settings", icon: "⚙️", color: "#fbbf24" },
-              { label: "Team Management", href: "/dashboard/team", icon: "👥", color: "#f87171" },
+              { label: "Go to Dashboard", href: "/dashboard", icon: "⚡", color: "var(--tx-6366f1, #6366f1)" },
+              { label: "Open AI Center", href: "/dashboard/ai", icon: "🤖", color: "var(--tx-a78bfa, #a78bfa)" },
+              { label: "Create Invoice", href: "/dashboard/sales-invoice", icon: "🧾", color: "var(--tx-34d399, #34d399)" },
+              { label: "View Reports", href: "/dashboard/reports/trial-balance", icon: "📊", color: "var(--tx-38bdf8, #38bdf8)" },
+              { label: "Business Settings", href: "/dashboard/business-settings", icon: "⚙️", color: "var(--tx-fbbf24, #fbbf24)" },
+              { label: "Team Management", href: "/dashboard/team", icon: "👥", color: "var(--tx-f87171, #f87171)" },
             ].map((link) => (
               <Link prefetch={false} key={link.href} href={link.href} style={{
                 display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14, textDecoration: "none",
@@ -640,11 +640,11 @@ export default function BusinessGuidePage() {
                 transition: "all .2s",
               }}
                 onMouseEnter={e => { e.currentTarget.style.background = `${link.color}10`; e.currentTarget.style.borderColor = `${link.color}30`; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.07)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--ink),.03)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.07)"; }}
               >
                 <span style={{ fontSize: 20 }}>{link.icon}</span>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>{link.label}</span>
-                <svg style={{ marginLeft: "auto" }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                <svg style={{ marginLeft: "auto" }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </Link>
             ))}
           </div>
@@ -687,7 +687,7 @@ export default function BusinessGuidePage() {
                         <span style={{ fontSize: 15, fontWeight: 800 }}>{step.step}</span>
                       </div>
                       <Link prefetch={false} href={step.link} style={{
-                        fontSize: 11, fontWeight: 700, color: "#a5b4fc", textDecoration: "none",
+                        fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none",
                         background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", padding: "4px 12px", borderRadius: 20,
                         whiteSpace: "nowrap",
                       }}>Open →</Link>
@@ -720,7 +720,7 @@ export default function BusinessGuidePage() {
                     <div style={{ fontSize: 26, marginBottom: 12 }}>{mod.icon}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 6 }}>{mod.label}</div>
                     <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", lineHeight: 1.6 }}>{mod.desc}</div>
-                    <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#6366f1", fontWeight: 700 }}>
+                    <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--tx-6366f1, #6366f1)", fontWeight: 700 }}>
                       Open module
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                     </div>
@@ -751,7 +751,7 @@ export default function BusinessGuidePage() {
                   fontSize: 12.5, fontWeight: 600, color: "rgba(var(--ink),.7)", transition: "all .2s",
                 }}
                   onMouseEnter={e => { e.currentTarget.style.color = "#a5b4fc"; e.currentTarget.style.borderColor = "rgba(99,102,241,.25)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,.7)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.06)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),.7)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.06)"; }}
                 >
                   {r.label}
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -768,7 +768,7 @@ export default function BusinessGuidePage() {
           {/* AI Hero */}
           <div style={{
             borderRadius: 20, padding: isMobile ? "18px 16px" : "32px 36px", marginBottom: 20,
-            background: "linear-gradient(135deg, rgba(167,139,250,.12), rgba(99,102,241,.08), rgba(8,10,28,.95))",
+            background: "linear-gradient(135deg, rgba(167,139,250,.12), rgba(99,102,241,.08), rgba(var(--dkr-080a1c, 8,10,28),0.95))",
             border: "1px solid rgba(167,139,250,.2)",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
@@ -790,7 +790,7 @@ export default function BusinessGuidePage() {
                 { val: "0", label: "External API Required*" },
               ].map((s) => (
                 <div key={s.label} style={{ background: "rgba(var(--ink),.04)", borderRadius: 12, padding: "14px", textAlign: "center" }}>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: "#a5b4fc" }}>{s.val}</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{s.val}</div>
                   <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)", marginTop: 3 }}>{s.label}</div>
                 </div>
               ))}
@@ -808,7 +808,7 @@ export default function BusinessGuidePage() {
                     <div style={{ fontSize: 28, marginBottom: 12 }}>{meta.icon}</div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 8 }}>{meta.label}</div>
                     <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>{meta.desc}</div>
-                    <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, color: "#a78bfa", display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, color: "var(--tx-a78bfa, #a78bfa)", display: "flex", alignItems: "center", gap: 6 }}>
                       Explore
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                     </div>
@@ -837,7 +837,7 @@ export default function BusinessGuidePage() {
             {/* Progress bar */}
             <div style={{ marginBottom: 28 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>{completedTasks.length} of {checklist.length} completed</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{completedTasks.length} of {checklist.length} completed</span>
                 <span style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>{Math.round((completedTasks.length / checklist.length) * 100)}%</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: "rgba(var(--ink),.08)", overflow: "hidden" }}>
@@ -879,7 +879,7 @@ export default function BusinessGuidePage() {
                     )}
 
                     <Link prefetch={false} href={item.link} onClick={(e) => e.stopPropagation()} style={{
-                      fontSize: 11, fontWeight: 700, color: "#a5b4fc", textDecoration: "none",
+                      fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none",
                       padding: "4px 12px", borderRadius: 20, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", whiteSpace: "nowrap",
                     }}>Go →</Link>
                   </div>
@@ -890,7 +890,7 @@ export default function BusinessGuidePage() {
             {completedTasks.length === checklist.length && (
               <div style={{ marginTop: 20, padding: isMobile ? "12px 11px" : "20px 24px", borderRadius: 14, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#6ee7b7" }}>Setup Complete!</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-6ee7b7, #6ee7b7)" }}>Setup Complete!</div>
                 <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginTop: 4 }}>Your business is now fully configured. Head to the dashboard to get started.</div>
                 <Link prefetch={false} href="/dashboard" style={{ display: "inline-block", marginTop: 14, padding: "10px 24px", borderRadius: 10, background: "#10b981", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Go to Dashboard →</Link>
               </div>
@@ -900,9 +900,9 @@ export default function BusinessGuidePage() {
           {/* Help Resources */}
           <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
             {[
-              { icon: "🤖", title: "Ask AI for Help", desc: "Chat with AI to understand any feature instantly.", href: "/dashboard/ai?tab=chat", color: "#a78bfa" },
-              { icon: "📧", title: "Contact Support", desc: "Our team is available 24/7 to assist you.", href: "mailto:finovaos.app@gmail.com", color: "#34d399" },
-              { icon: "📹", title: "Video Tutorials", desc: "Watch step-by-step walkthroughs for each module.", href: "/help", color: "#38bdf8" },
+              { icon: "🤖", title: "Ask AI for Help", desc: "Chat with AI to understand any feature instantly.", href: "/dashboard/ai?tab=chat", color: "var(--tx-a78bfa, #a78bfa)" },
+              { icon: "📧", title: "Contact Support", desc: "Our team is available 24/7 to assist you.", href: "mailto:finovaos.app@gmail.com", color: "var(--tx-34d399, #34d399)" },
+              { icon: "📹", title: "Video Tutorials", desc: "Watch step-by-step walkthroughs for each module.", href: "/help", color: "var(--tx-38bdf8, #38bdf8)" },
             ].map((r) => (
               <Link prefetch={false} key={r.title} href={r.href} style={{ textDecoration: "none" }}>
                 <div style={{ background: "rgba(var(--ink),.03)", border: `1px solid ${r.color}18`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", transition: "all .2s" }}

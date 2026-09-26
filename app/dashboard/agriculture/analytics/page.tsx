@@ -69,7 +69,7 @@ export default function AgricultureAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: agricultureFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-86efac, #86efac)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Yield, land utilization, and farm-side revenue</h1>
         <p style={{ margin: 0, fontSize: 14, color: agricultureMuted, maxWidth: 760 }}>
           This board shows crop mix, top buyers, and active land productivity from the live farm records.
@@ -85,7 +85,7 @@ export default function AgricultureAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Crop Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Crop Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {cropMix.length === 0 ? (
               <div style={{ color: agricultureMuted, fontSize: 13 }}>Add crop cycles to see the crop mix here.</div>
@@ -107,14 +107,14 @@ export default function AgricultureAnalyticsPage() {
         </div>
 
         <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Buyers</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Buyers</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topBuyers.length === 0 ? (
               <div style={{ color: agricultureMuted, fontSize: 13 }}>Add harvest sales to see buyer revenue here.</div>
             ) : topBuyers.map(([buyer, value]) => (
               <div key={buyer} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{buyer}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {value.toLocaleString()}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {value.toLocaleString()}</div>
               </div>
             ))}
           </div>

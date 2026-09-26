@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", background: bg, border: `1px solid ${border}`,
@@ -232,9 +232,9 @@ export default function LabourPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Workers", value: rows.length, color: "#f97316" },
-          { label: "Owed right now", value: `Rs. ${Math.round(totalOwed).toLocaleString()}`, color: "#f59e0b" },
-          { label: "Fully paid", value: rows.filter((r) => (r.balance || 0) <= 0).length, color: "#22c55e" },
+          { label: "Workers", value: rows.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Owed right now", value: `Rs. ${Math.round(totalOwed).toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Fully paid", value: rows.filter((r) => (r.balance || 0) <= 0).length, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
@@ -254,13 +254,13 @@ export default function LabourPage() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: (r.balance || 0) > 0 ? "#f59e0b" : "#22c55e" }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: (r.balance || 0) > 0 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" }}>
                   Rs. {Math.round(r.balance || 0).toLocaleString()}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>owed</div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <a href={`/dashboard/reports/ledger?accountId=${r.accountId}`} style={{ padding: "7px 14px", background: "rgba(56,189,248,.12)", border: "1px solid rgba(56,189,248,.3)", color: "#38bdf8", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+                <a href={`/dashboard/reports/ledger?accountId=${r.accountId}`} style={{ padding: "7px 14px", background: "rgba(56,189,248,.12)", border: "1px solid rgba(56,189,248,.3)", color: "var(--tx-38bdf8, #38bdf8)", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
                   Ledger
                 </a>
                 <a href="/dashboard/cpv" style={{ padding: "7px 14px", background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.3)", color: "#22c55e", borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
@@ -317,7 +317,7 @@ export default function LabourPage() {
             {entryTotals.map((t) => (
               <div key={t.labourId} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.55)" }}>{t.name}</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#f59e0b", marginTop: 2 }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)", marginTop: 2 }}>
                   Rs. {Math.round(t.amount).toLocaleString()}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),.33)", marginTop: 1 }}>
@@ -350,13 +350,13 @@ export default function LabourPage() {
                   <td style={{ ...cell, color: "rgba(var(--ink),.45)" }}>{e.product || "—"}</td>
                   <td style={cellNum}>{e.qty.toLocaleString()}</td>
                   <td style={cellNum}>{e.rate}</td>
-                  <td style={{ ...cellNum, fontWeight: 800, color: "#f59e0b" }}>Rs. {Math.round(e.amount).toLocaleString()}</td>
+                  <td style={{ ...cellNum, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>Rs. {Math.round(e.amount).toLocaleString()}</td>
                 </tr>
               ))}
               {visibleEntries.length > 0 && (
                 <tr>
                   <td colSpan={6} style={{ ...cell, textAlign: "right", fontWeight: 700, color: "rgba(var(--ink),.5)" }}>Total</td>
-                  <td style={{ ...cellNum, fontWeight: 800, color: "#f59e0b" }}>
+                  <td style={{ ...cellNum, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>
                     Rs. {Math.round(visibleEntries.reduce((s, e) => s + e.amount, 0)).toLocaleString()}
                   </td>
                 </tr>

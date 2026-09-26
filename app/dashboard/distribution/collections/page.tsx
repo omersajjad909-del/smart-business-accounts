@@ -267,9 +267,9 @@ export default function DistributionCollectionsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Entries", value: collections.length, color: "#f97316" },
-          { label: "Total Collected", value: `Rs. ${totalCollected.toLocaleString()}`, color: "#34d399" },
-          { label: "Reconciled", value: `Rs. ${settledAmount.toLocaleString()}`, color: "#38bdf8" },
+          { label: "Entries", value: collections.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Total Collected", value: `Rs. ${totalCollected.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Reconciled", value: `Rs. ${settledAmount.toLocaleString()}`, color: "var(--tx-38bdf8, #38bdf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
@@ -296,7 +296,7 @@ export default function DistributionCollectionsPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{row.routeName || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{row.invoiceRef || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{row.paymentMode}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {row.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {row.amount.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{row.receiptNo || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{row.date || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
@@ -313,7 +313,7 @@ export default function DistributionCollectionsPage() {
                       Mark Reconciled
                     </button>
                   )}
-                  <button onClick={() => void removeCollection(row)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={() => void removeCollection(row)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

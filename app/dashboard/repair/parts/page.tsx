@@ -46,9 +46,9 @@ export default function RepairPartsPage() {
         const cost = rows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
         return [
           { label: "Part Lines", value: rows.length, color: repairAccent },
-          { label: "Available", value: rows.filter((row) => String(row.status) === "available").length, color: "#34d399" },
-          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "#60a5fa" },
-          { label: "Parts Cost", value: cost.toLocaleString(), color: "#fbbf24" },
+          { label: "Available", value: rows.filter((row) => String(row.status) === "available").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Parts Cost", value: cost.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

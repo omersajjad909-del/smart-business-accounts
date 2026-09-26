@@ -67,9 +67,9 @@ export default function DrawingsPage() {
       <div style={S.header}><h1 style={S.title}>Architectural Drawings</h1><button style={S.btn} onClick={() => { setForm({ ...EMPTY }); setShowModal(true); }}>+ New Drawing Set</button></div>
       <div style={S.kpiGrid}>
         <div style={S.kpi}><div style={S.kpiLabel}>Total Sets</div><div style={S.kpiVal}>{kpis.total}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Draft</div><div style={{ ...S.kpiVal, color: "#94a3b8" }}>{kpis.draft}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Submitted</div><div style={{ ...S.kpiVal, color: "#38bdf8" }}>{kpis.submitted}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Approved</div><div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.approved}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Draft</div><div style={{ ...S.kpiVal, color: "var(--tx-94a3b8, #94a3b8)" }}>{kpis.draft}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Submitted</div><div style={{ ...S.kpiVal, color: "var(--tx-38bdf8, #38bdf8)" }}>{kpis.submitted}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Approved</div><div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.approved}</div></div>
       </div>
       <div style={S.panel}>
         {loading ? <div style={S.loading}>Loading drawings…</div> : <table style={S.table}>

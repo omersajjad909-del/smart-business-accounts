@@ -78,7 +78,7 @@ export default function SalonAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: salonFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#f472b6", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-f472b6, #f472b6)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Revenue, stylist load, aur service mix</h1>
         <p style={{ margin: 0, fontSize: 14, color: salonMuted, maxWidth: 760 }}>
           This view helps the salon owner see which services generate the most revenue, which stylist is carrying the heaviest load, and how much pressure cancellations are creating.
@@ -94,7 +94,7 @@ export default function SalonAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Revenue Services</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Revenue Services</div>
           <div style={{ display: "grid", gap: 12 }}>
             {serviceMix.length === 0 ? (
               <div style={{ color: salonMuted, fontSize: 13 }}>Abhi completed service revenue data available nahi hai.</div>
@@ -116,7 +116,7 @@ export default function SalonAnalyticsPage() {
         </div>
 
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Stylist Utilization</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Stylist Utilization</div>
           <div style={{ display: "grid", gap: 10 }}>
             {stylistLoad.length === 0 ? (
               <div style={{ color: salonMuted, fontSize: 13 }}>Stylist load show karne ke liye appointments add karein.</div>
@@ -126,7 +126,7 @@ export default function SalonAnalyticsPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{stylist}</div>
                   <div style={{ fontSize: 12, color: salonMuted }}>{summary.count} total bookings</div>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {summary.revenue.toLocaleString()}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {summary.revenue.toLocaleString()}</div>
               </div>
             ))}
           </div>

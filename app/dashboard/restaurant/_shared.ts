@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const restaurantFont = "'Outfit','Inter',sans-serif";
-export const restaurantBg = "rgba(255,255,255,0.03)";
-export const restaurantBorder = "rgba(255,255,255,0.07)";
-export const restaurantMuted = "rgba(255,255,255,.45)";
+export const restaurantBg = "rgba(var(--ink),0.03)";
+export const restaurantBorder = "rgba(var(--ink),0.07)";
+export const restaurantMuted = "rgba(var(--ink),.45)";
 
 export type RestaurantTableStatus = "available" | "occupied" | "reserved" | "cleaning";
 export type KitchenOrderStatus = "pending" | "preparing" | "ready" | "served";

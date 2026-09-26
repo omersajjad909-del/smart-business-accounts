@@ -177,13 +177,13 @@ export function ScheduleImport() {
           </datalist>
 
           {error ? (
-            <div style={{ border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.1)", color: "#f87171", borderRadius: 11, padding: "11px 14px", fontSize: 12.5, lineHeight: 1.5 }}>
+            <div style={{ border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.1)", color: "var(--tx-f87171, #f87171)", borderRadius: 11, padding: "11px 14px", fontSize: 12.5, lineHeight: 1.5 }}>
               {error}
             </div>
           ) : null}
 
           {saved ? (
-            <div style={{ border: "1px solid rgba(52,211,153,.4)", background: "rgba(52,211,153,.1)", color: "#34d399", borderRadius: 11, padding: "11px 14px", fontSize: 12.5 }}>
+            <div style={{ border: "1px solid rgba(52,211,153,.4)", background: "rgba(52,211,153,.1)", color: "var(--tx-34d399, #34d399)", borderRadius: 11, padding: "11px 14px", fontSize: 12.5 }}>
               {saved} Refreshing…
             </div>
           ) : null}
@@ -191,7 +191,7 @@ export function ScheduleImport() {
           {warnings.length ? (
             <ul style={{ margin: 0, paddingLeft: 17, display: "grid", gap: 5 }}>
               {warnings.map((note) => (
-                <li key={note} style={{ fontSize: 11.5, color: "#f4c25b", lineHeight: 1.5 }}>{note}</li>
+                <li key={note} style={{ fontSize: 11.5, color: "var(--tx-f4c25b, #f4c25b)", lineHeight: 1.5 }}>{note}</li>
               ))}
             </ul>
           ) : null}
@@ -233,7 +233,7 @@ export function ScheduleImport() {
                         style={{ ...cell, width: 82, textAlign: "center" }} className="fl-in" />
                     </div>
                     <div style={{ display: "grid", gap: 3 }}>
-                      <span style={{ fontSize: 10, color: row.arriveAt ? T.muted : "#f4c25b", textTransform: "uppercase", letterSpacing: ".05em" }}>
+                      <span style={{ fontSize: 10, color: row.arriveAt ? T.muted : "var(--tx-f4c25b, #f4c25b)", textTransform: "uppercase", letterSpacing: ".05em" }}>
                         Arrives{row.arriveAt ? "" : " *"}
                       </span>
                       <input value={row.arriveAt} placeholder="--:--"

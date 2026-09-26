@@ -6,8 +6,8 @@ import { ManufacturingControlCenter, fetchJson } from "./_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 const emptyState: ManufacturingControlCenter = {
   summary: { bomCount: 0, plannedProduction: 0, runningProduction: 0, completedProduction: 0, openWorkOrders: 0, blockedProduction: 0, lowMaterials: 0, materialValue: 0, finishedQuantity: 0, passedChecks: 0, rejectedChecks: 0 },
@@ -55,11 +55,11 @@ export default function ManufacturingOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "BOM", value: summary.bomCount, color: "#60a5fa" },
-          { label: "Running", value: summary.runningProduction, color: "#34d399" },
-          { label: "Blocked", value: summary.blockedProduction, color: "#ef4444" },
-          { label: "Low Materials", value: summary.lowMaterials, color: "#f59e0b" },
-          { label: "Finished Qty", value: summary.finishedQuantity, color: "#a78bfa" },
+          { label: "BOM", value: summary.bomCount, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Running", value: summary.runningProduction, color: "var(--tx-34d399, #34d399)" },
+          { label: "Blocked", value: summary.blockedProduction, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Low Materials", value: summary.lowMaterials, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Finished Qty", value: summary.finishedQuantity, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 8 }}>{card.label}</div>
@@ -78,7 +78,7 @@ export default function ManufacturingOverviewPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{item.product}</div>
                   <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.orderId} | {item.completed}/{item.quantity}</div>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: item.status === "completed" ? "#34d399" : item.status === "in_progress" ? "#60a5fa" : "#f59e0b" }}>{item.status}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: item.status === "completed" ? "var(--tx-34d399, #34d399)" : item.status === "in_progress" ? "var(--tx-60a5fa, #60a5fa)" : "var(--tx-f59e0b, #f59e0b)" }}>{item.status}</div>
               </div>
             ))}
             {production.length === 0 && <div style={{ color: "rgba(var(--ink),.45)", fontSize: 13 }}>No production orders yet.</div>}
@@ -89,10 +89,10 @@ export default function ManufacturingOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Operations Reading</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Material value", value: `Rs. ${summary.materialValue.toLocaleString()}`, color: "#60a5fa" },
-              { label: "Open work orders", value: summary.openWorkOrders, color: "#f59e0b" },
-              { label: "Passed checks", value: summary.passedChecks, color: "#34d399" },
-              { label: "Rejected checks", value: summary.rejectedChecks, color: "#ef4444" },
+              { label: "Material value", value: `Rs. ${summary.materialValue.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Open work orders", value: summary.openWorkOrders, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Passed checks", value: summary.passedChecks, color: "var(--tx-34d399, #34d399)" },
+              { label: "Rejected checks", value: summary.rejectedChecks, color: "var(--tx-ef4444, #ef4444)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ color: "rgba(var(--ink),.45)" }}>{row.label}</span>

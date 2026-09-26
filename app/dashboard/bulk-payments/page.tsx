@@ -192,13 +192,13 @@ export default function BulkPaymentsPage() {
 
       {!activeBatch ? (
         <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--text-muted)", fontSize: 15 }}>
-          No batches yet. Click <strong style={{ color: "#818cf8" }}>+ New Batch</strong> to create one.
+          No batches yet. Click <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>+ New Batch</strong> to create one.
         </div>
       ) : (
         <>
           {/* Batch Info */}
           <div style={{ padding: "12px 18px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", marginBottom: 20, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" as const }}>
-            <div style={{ fontWeight: 700, color: "#818cf8", fontSize: 14 }}>{activeBatch.name}</div>
+            <div style={{ fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", fontSize: 14 }}>{activeBatch.name}</div>
             <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Created: {fmtDate(activeBatch.createdAt)}</div>
             <div style={{ marginLeft: "auto", padding: "3px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(129,140,248,.2)", color: "#818cf8" }}>{activeBatch.status}</div>
           </div>
@@ -217,16 +217,16 @@ export default function BulkPaymentsPage() {
             </div>
             <div style={s.card}>
               <div style={s.clabel}>Selected</div>
-              <div style={{ ...s.cval, color: "#818cf8" }}>Rs. {selectedAmt.toLocaleString()}</div>
+              <div style={{ ...s.cval, color: "var(--tx-818cf8, #818cf8)" }}>Rs. {selectedAmt.toLocaleString()}</div>
               <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>{selected.size} rows</div>
             </div>
             <div style={s.card}>
               <div style={s.clabel}>Processed</div>
-              <div style={{ ...s.cval, color: "#34d399" }}>Rs. {processedAmt.toLocaleString()}</div>
+              <div style={{ ...s.cval, color: "var(--tx-34d399, #34d399)" }}>Rs. {processedAmt.toLocaleString()}</div>
             </div>
             <div style={s.card}>
               <div style={s.clabel}>Pending</div>
-              <div style={{ ...s.cval, color: "#fbbf24" }}>{pendingPayments.length} rows</div>
+              <div style={{ ...s.cval, color: "var(--tx-fbbf24, #fbbf24)" }}>{pendingPayments.length} rows</div>
             </div>
           </div>
 
@@ -238,7 +238,7 @@ export default function BulkPaymentsPage() {
             </div>
             {activeBatch.rows.length === 0 ? (
               <div style={{ textAlign: "center", padding: isMobile ? "26px 10px" : "48px 20px", color: "var(--text-muted)", fontSize: 14 }}>
-                No rows yet. Click <strong style={{ color: "#818cf8" }}>+ Add Row</strong> to add payments.
+                No rows yet. Click <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>+ Add Row</strong> to add payments.
               </div>
             ) : (
               <table style={s.table}>

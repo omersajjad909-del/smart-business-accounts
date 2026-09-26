@@ -1074,7 +1074,7 @@ export function ItemPicker({
                               padding: "1px 6px",
                               borderRadius: 5,
                               background: "rgba(52,211,153,.12)",
-                              color: "#34d399",
+                              color: "var(--tx-34d399, #34d399)",
                             }}
                           >
                             {text}
@@ -1194,7 +1194,7 @@ export function ItemPicker({
                           background:
                             "rgba(52,211,153,.12)",
                           color:
-                            "#34d399",
+                            "var(--tx-34d399, #34d399)",
                         }}
                       >
                         {text}
@@ -1408,7 +1408,7 @@ export function ItemPicker({
                   fontWeight: 700,
                   cursor: "pointer",
                   background: "transparent",
-                  color: "var(--danger, #f87171)",
+                  color: "var(--danger, var(--tx-f87171, #f87171))",
                   border:
                     "1px solid var(--danger, #f87171)",
                 }}

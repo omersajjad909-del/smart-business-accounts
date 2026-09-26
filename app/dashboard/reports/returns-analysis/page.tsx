@@ -44,8 +44,8 @@ export default function ReturnsAnalysisPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Total Returns Value", value: `${cur} ${fmt(totals.value)}`, color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
-          { label: "Total Return Count",  value: fmt(totals.count),             color: "#fbbf24", bg: "rgba(251,191,36,.07)",  border: "rgba(251,191,36,.2)" },
+          { label: "Total Returns Value", value: `${cur} ${fmt(totals.value)}`, color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Total Return Count",  value: fmt(totals.count),             color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.07)",  border: "rgba(251,191,36,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -74,7 +74,7 @@ export default function ReturnsAnalysisPage() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.name}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.returnCount}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#f87171" }}>{cur} {fmt(r.returnValue)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.returnValue)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.salesValue)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: rateColor }}>{r.returnRatePct.toFixed(1)}%</span>

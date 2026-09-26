@@ -513,7 +513,7 @@ export default function GRNPage() {
       {/* ── Query bar (F7) ── */}
       {queryMode && (
         <div className="no-print" style={{ background: "rgba(250,204,21,.07)", border: "1px solid rgba(250,204,21,.3)", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "#facc15", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--tx-facc15, #facc15)", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 10 }}>
             Query Mode — fill any field, then press F8
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr auto", gap: 10, alignItems: "end" }}>
@@ -612,7 +612,7 @@ export default function GRNPage() {
                         <span style={{ display: "inline-flex", gap: 6 }}>
                           <button onClick={() => openGrn(grn)} style={{ padding: "5px 13px", borderRadius: 6, border: `1px solid ${BORDER}`, background: "rgba(99,102,241,0.07)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Open</button>
                           {user?.role === "ADMIN" && (
-                            <button onClick={() => handleDelete(grn.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                            <button onClick={() => handleDelete(grn.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "var(--tx-f87171, #f87171)", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
                           )}
                         </span>
                       </td>
@@ -713,7 +713,7 @@ export default function GRNPage() {
                         <div key={idx} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                             <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const }}>Item {idx + 1}</span>
-                            <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
+                            <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "var(--tx-f87171, #f87171)", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </div>
                           <ItemPicker
                             items={allowedItems as any}
@@ -732,7 +732,7 @@ export default function GRNPage() {
                               <RateFormulaMobileFields settings={rf} meta={row.meta} onChange={(key, value) => updateRowMeta(idx, key, value)} />
                             )}
                             <div><Label>Ordered</Label><input type="number" step="any" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
-                            <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" step="any" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
+                            <div><Label><span style={{ color: isShort ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>Received</span></Label><input type="number" step="any" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)", fontWeight: 700 })} /></div>
                           </div>
                         </div>
                       );
@@ -776,14 +776,14 @@ export default function GRNPage() {
                                 <RateFormulaRowCells settings={rf} meta={row.meta} rowIndex={idx} onChange={(key, value) => updateRowMeta(idx, key, value)} />
                               )}
                               <td style={{ padding: "6px 8px" }}><input type="number" step="any" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
-                              <td style={{ padding: "6px 8px" }}><input type="number" step="any" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>
+                              <td style={{ padding: "6px 8px" }}><input type="number" step="any" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)", fontWeight: 700 })} /></td>
                               {rfActive && (
                                 <td style={{ padding: "6px 8px", width: 94 }}>
                                   <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} readOnly={!rf.rateEditable} title={!rf.rateEditable ? "Worked out by your rate formula" : undefined} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", ...(rf.rateEditable ? {} : { opacity: 0.75, cursor: "not-allowed" }) })} />
                                 </td>
                               )}
                               <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); focusItemRow(idx + 1); } }} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>
-                              <td style={{ padding: "6px 8px" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button></td>
+                              <td style={{ padding: "6px 8px" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--tx-f87171, #f87171)", fontSize: 16, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button></td>
                             </tr>
                           );
                         })}

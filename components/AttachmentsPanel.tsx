@@ -121,7 +121,7 @@ export default function AttachmentsPanel({ entityType, entityId, compact = false
           accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
         />
         {uploading ? (
-          <div style={{ color: "#6366f1", fontSize: 12, fontWeight: 600 }}>Uploading…</div>
+          <div style={{ color: "var(--tx-6366f1, #6366f1)", fontSize: 12, fontWeight: 600 }}>Uploading…</div>
         ) : (
           <>
             <div style={{ fontSize: 18, marginBottom: 4 }}>📎</div>
@@ -134,7 +134,7 @@ export default function AttachmentsPanel({ entityType, entityId, compact = false
       </div>
 
       {error && (
-        <div style={{ fontSize: 12, color: "#f87171", marginBottom: 10, padding: "8px 12px", background: "rgba(239,68,68,0.08)", borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)" }}>
+        <div style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", marginBottom: 10, padding: "8px 12px", background: "rgba(239,68,68,0.08)", borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)" }}>
           {error}
         </div>
       )}
@@ -150,7 +150,7 @@ export default function AttachmentsPanel({ entityType, entityId, compact = false
             <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 9 }}>
               <span style={{ fontSize: 16, flexShrink: 0 }}>{fileIcon(a.fileType)}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <a href={a.fileUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, fontWeight: 600, color: "#a5b4fc", textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>
+                <a href={a.fileUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>
                   {a.fileName}
                 </a>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>
@@ -160,7 +160,7 @@ export default function AttachmentsPanel({ entityType, entityId, compact = false
               <a href={a.fileUrl} target="_blank" rel="noreferrer" download title="Download"
                 style={{ color: "var(--text-muted)", fontSize: 14, textDecoration: "none", flexShrink: 0 }}>⬇</a>
               <button onClick={() => handleDelete(a.id)} title="Delete"
-                style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 15, padding: "0 2px", flexShrink: 0, lineHeight: 1, fontFamily: FONT }}>
+                style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 15, padding: "0 2px", flexShrink: 0, lineHeight: 1, fontFamily: FONT }}>
                 ×
               </button>
             </div>

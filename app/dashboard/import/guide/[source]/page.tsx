@@ -34,7 +34,7 @@ function Section({ n, title, tint, children }: {
     <div style={{ ...card, padding: "20px 22px", marginBottom: 12, borderColor: tint ?? "var(--border)" }}>
       <div style={{ display: "flex", gap: 12, alignItems: "baseline", marginBottom: 13 }}>
         <span style={{
-          fontSize: 12, fontWeight: 800, color: tint ? "#f59e0b" : "#818cf8",
+          fontSize: 12, fontWeight: 800, color: tint ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-818cf8, #818cf8)",
           fontFamily: MONO, flexShrink: 0,
         }}>{n}</span>
         <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{title}</h2>
@@ -164,7 +164,7 @@ export default function SourceGuidePage() {
               border: "1px solid var(--border)", background: "var(--app-bg)",
             }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{route.title}</div>
-              <div style={{ fontSize: 11.5, color: "#818cf8", marginBottom: 9, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 11.5, color: "var(--tx-818cf8, #818cf8)", marginBottom: 9, lineHeight: 1.5 }}>
                 {route.who}
               </div>
               <ol style={{
@@ -181,7 +181,7 @@ export default function SourceGuidePage() {
       {/* ── 03 File by file ── */}
       <div style={{ ...card, padding: "20px 22px", marginBottom: 12 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "baseline", marginBottom: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#818cf8", fontFamily: MONO }}>03</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)", fontFamily: MONO }}>03</span>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>
             The {files.length} files, in the order they go in
           </h2>
@@ -259,7 +259,7 @@ export default function SourceGuidePage() {
                           fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.7,
                           display: "flex", gap: 8,
                         }}>
-                          <span style={{ color: "#818cf8", flexShrink: 0 }}>›</span>
+                          <span style={{ color: "var(--tx-818cf8, #818cf8)", flexShrink: 0 }}>›</span>
                           <span>{n}</span>
                         </div>
                       ))}
@@ -276,7 +276,7 @@ export default function SourceGuidePage() {
                         position: "absolute", top: 9, right: 9, zIndex: 1,
                         padding: "5px 11px", borderRadius: 7, fontSize: 11, cursor: "pointer",
                         border: "1px solid var(--border)", background: "var(--panel-bg)",
-                        color: copied === key ? "#22c55e" : "var(--text-muted)", fontFamily: FONT,
+                        color: copied === key ? "var(--tx-22c55e, #22c55e)" : "var(--text-muted)", fontFamily: FONT,
                       }}
                     >{copied === key ? "Copied" : "Copy"}</button>
                     <pre style={{
@@ -301,7 +301,7 @@ export default function SourceGuidePage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {guide.quirks.map((q) => (
             <div key={q.what} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-              <span style={{ color: "#22c55e", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>✓</span>
+              <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>✓</span>
               <div>
                 <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 2 }}>{q.what}</div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.7 }}>{q.why}</div>
@@ -316,7 +316,7 @@ export default function SourceGuidePage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {guide.troubles.map((t) => (
             <div key={t.symptom} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-              <span style={{ color: "#f59e0b", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>!</span>
+              <span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>!</span>
               <div>
                 <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 3 }}>{t.symptom}</div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.75 }}>{t.fix}</div>
@@ -340,9 +340,9 @@ export default function SourceGuidePage() {
             { r: "Receivables Ageing", href: "/dashboard/reports/ageing", m: "Party by party, and bucket by bucket. The total must equal the receivables control account on the trial balance." },
           ].map((item) => (
             <div key={item.r} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-              <span style={{ color: "#22c55e", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>✓</span>
+              <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>✓</span>
               <div style={{ fontSize: 12.5, lineHeight: 1.7 }}>
-                <Link href={item.href} style={{ color: "#818cf8", fontWeight: 700 }}>{item.r}</Link>
+                <Link href={item.href} style={{ color: "var(--tx-818cf8, #818cf8)", fontWeight: 700 }}>{item.r}</Link>
                 {" — "}<span style={{ color: "var(--text-muted)" }}>{item.m}</span>
               </div>
             </div>
@@ -373,7 +373,7 @@ export default function SourceGuidePage() {
         }}>
           This guide covers {files.length} of the {IMPORT_DATA_TYPES.length} import files. For the
           rest, use the{" "}
-          <Link href="/dashboard/import/guide/csv" style={{ color: "#818cf8" }}>generic guide</Link>{" "}
+          <Link href="/dashboard/import/guide/csv" style={{ color: "var(--tx-818cf8, #818cf8)" }}>generic guide</Link>{" "}
           — any system that can produce a spreadsheet can produce them.
         </div>
       )}

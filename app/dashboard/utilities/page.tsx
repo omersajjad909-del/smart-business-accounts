@@ -51,7 +51,7 @@ export default function UtilitiesOverviewPage() {
           };
 
   return (
-    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>{utilityConfig.title}</h1>
@@ -64,7 +64,7 @@ export default function UtilitiesOverviewPage() {
             { label: utilityConfig.meterLabel, href: "/dashboard/utilities/meters" },
             { label: "Analytics", href: "/dashboard/utilities/analytics" },
           ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "#bae6fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", color: "var(--tx-bae6fd, #bae6fd)", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -73,11 +73,11 @@ export default function UtilitiesOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Active Accounts", value: summary.activeAccounts, color: "#38bdf8" },
-          { label: "Pending Accounts", value: summary.pendingAccounts, color: "#fbbf24" },
-          { label: "Open Bills", value: summary.openBills, color: "#f87171" },
-          { label: "Verified Readings", value: summary.verifiedReadings, color: "#34d399" },
-          { label: "Billed Value", value: summary.billedValue.toLocaleString(), color: "#60a5fa" },
+          { label: "Active Accounts", value: summary.activeAccounts, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Pending Accounts", value: summary.pendingAccounts, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Open Bills", value: summary.openBills, color: "var(--tx-f87171, #f87171)" },
+          { label: "Verified Readings", value: summary.verifiedReadings, color: "var(--tx-34d399, #34d399)" },
+          { label: "Billed Value", value: summary.billedValue.toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -94,7 +94,7 @@ export default function UtilitiesOverviewPage() {
               <div key={item.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.invoice}</div>
                 <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 4 }}>{item.account || "-"} | {item.billingMonth || "-"}</div>
-                <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>Amount {item.amount.toLocaleString()} | {item.status}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>Amount {item.amount.toLocaleString()} | {item.status}</div>
               </div>
             ))}
             {bills.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No utility bills available yet.</div>}

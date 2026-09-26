@@ -379,7 +379,7 @@ export default function CurrenciesPage() {
                         </button>
                         <button
                           onClick={() => handleDelete(currency.id)}
-                          style={{ padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.4)", background: "rgba(248,113,113,0.1)", color: "#f87171", fontFamily: FONT, fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                          style={{ padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.4)", background: "rgba(248,113,113,0.1)", color: "var(--tx-f87171, #f87171)", fontFamily: FONT, fontSize: 12, fontWeight: 600, cursor: "pointer" }}
                         >
                           Delete
                         </button>
@@ -466,7 +466,7 @@ export default function CurrenciesPage() {
             {fxForm.fcyAmount && fxForm.originalRate && fxForm.currentRate && (
               <div style={{ background: fxGainLoss >= 0 ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)", border: `1px solid ${fxGainLoss >= 0 ? "rgba(52,211,153,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 8, padding: "12px 16px", marginBottom: 14 }}>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 4 }}>Calculated FX {fxGainLoss >= 0 ? "Gain" : "Loss"}</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: fxGainLoss >= 0 ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
+                <div style={{ fontSize: 22, fontWeight: 700, color: fxGainLoss >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontFamily: "monospace" }}>
                   {fxGainLoss >= 0 ? "+" : ""}{fmtNum(fxGainLoss)}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>
@@ -518,12 +518,12 @@ export default function CurrenciesPage() {
                       <td style={{ padding: "10px 14px", fontFamily: "monospace", textAlign: "right" }}>{fmtNum(entry.fcyAmount)}</td>
                       <td style={{ padding: "10px 14px", fontFamily: "monospace", textAlign: "right" }}>{entry.originalRate.toFixed(4)}</td>
                       <td style={{ padding: "10px 14px", fontFamily: "monospace", textAlign: "right" }}>{entry.currentRate.toFixed(4)}</td>
-                      <td style={{ padding: "10px 14px", fontFamily: "monospace", fontWeight: 700, color: entry.gainLoss >= 0 ? "#34d399" : "#f87171", textAlign: "right" }}>
+                      <td style={{ padding: "10px 14px", fontFamily: "monospace", fontWeight: 700, color: entry.gainLoss >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", textAlign: "right" }}>
                         {entry.gainLoss >= 0 ? "+" : ""}{fmtNum(entry.gainLoss)}
                       </td>
                       <td style={{ padding: "10px 14px", color: "var(--text-muted)", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.description || "—"}</td>
                       <td style={{ padding: "10px 14px" }}>
-                        <button onClick={() => deleteFxEntry(entry.id)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.4)", background: "rgba(248,113,113,0.1)", color: "#f87171", fontFamily: FONT, fontSize: 12, cursor: "pointer" }}>Del</button>
+                        <button onClick={() => deleteFxEntry(entry.id)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.4)", background: "rgba(248,113,113,0.1)", color: "var(--tx-f87171, #f87171)", fontFamily: FONT, fontSize: 12, cursor: "pointer" }}>Del</button>
                       </td>
                     </tr>
                   ))}
@@ -537,9 +537,9 @@ export default function CurrenciesPage() {
                   const net = totalGain + totalLoss;
                   return (
                     <>
-                      <div><span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>TOTAL GAIN </span><span style={{ fontFamily: "monospace", fontWeight: 700, color: "#34d399" }}>+{fmtNum(totalGain)}</span></div>
-                      <div><span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>TOTAL LOSS </span><span style={{ fontFamily: "monospace", fontWeight: 700, color: "#f87171" }}>{fmtNum(totalLoss)}</span></div>
-                      <div><span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>NET </span><span style={{ fontFamily: "monospace", fontWeight: 700, color: net >= 0 ? "#34d399" : "#f87171" }}>{net >= 0 ? "+" : ""}{fmtNum(net)}</span></div>
+                      <div><span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>TOTAL GAIN </span><span style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>+{fmtNum(totalGain)}</span></div>
+                      <div><span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>TOTAL LOSS </span><span style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>{fmtNum(totalLoss)}</span></div>
+                      <div><span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>NET </span><span style={{ fontFamily: "monospace", fontWeight: 700, color: net >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{net >= 0 ? "+" : ""}{fmtNum(net)}</span></div>
                     </>
                   );
                 })()}

@@ -52,10 +52,10 @@ export default function RecipeCostingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Recipes", val: recipes.length, color: "#f87171" },
-          { label: "Avg Margin", val: `${avgMargin}%`, color: "#34d399" },
-          { label: "High Margin (>60%)", val: recipes.filter((recipe) => recipe.margin > 60).length, color: "#fbbf24" },
-          { label: "Low Margin (<30%)", val: recipes.filter((recipe) => recipe.margin < 30).length, color: "#f87171" },
+          { label: "Total Recipes", val: recipes.length, color: "var(--tx-f87171, #f87171)" },
+          { label: "Avg Margin", val: `${avgMargin}%`, color: "var(--tx-34d399, #34d399)" },
+          { label: "High Margin (>60%)", val: recipes.filter((recipe) => recipe.margin > 60).length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Low Margin (<30%)", val: recipes.filter((recipe) => recipe.margin < 30).length, color: "var(--tx-f87171, #f87171)" },
         ].map((cardItem) => (
           <div key={cardItem.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{cardItem.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: cardItem.color }}>{cardItem.val}</div></div>
         ))}
@@ -74,8 +74,8 @@ export default function RecipeCostingPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{recipe.servings}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: restaurantMuted }}>{recipe.ingredients.slice(0, 3).join(", ")}{recipe.ingredients.length > 3 ? "..." : ""}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>Rs. {recipe.totalCost.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 600 }}>Rs. {recipe.sellingPrice.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}><span style={{ color: recipe.margin > 60 ? "#34d399" : recipe.margin > 30 ? "#f59e0b" : "#ef4444", fontWeight: 700 }}>{recipe.margin}%</span></td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>Rs. {recipe.sellingPrice.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}><span style={{ color: recipe.margin > 60 ? "var(--tx-34d399, #34d399)" : recipe.margin > 30 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)", fontWeight: 700 }}>{recipe.margin}%</span></td>
               </tr>
             ))}
             {!loading && recipes.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No recipes yet.</td></tr>}

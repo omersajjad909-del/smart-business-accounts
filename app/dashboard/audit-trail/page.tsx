@@ -6,10 +6,10 @@ import { useResponsive } from "@/hooks/useResponsive";
 const FONT = "'Outfit','Inter',sans-serif";
 
 const ACTION_PALETTE: Record<string, { bg: string; color: string }> = {
-  CREATE: { bg: "rgba(34,197,94,0.12)",   color: "#4ade80" },
-  UPDATE: { bg: "rgba(251,191,36,0.12)",  color: "#fbbf24" },
-  DELETE: { bg: "rgba(239,68,68,0.12)",   color: "#f87171" },
-  READ:   { bg: "rgba(99,102,241,0.12)",  color: "#a5b4fc" },
+  CREATE: { bg: "rgba(34,197,94,0.12)",   color: "var(--tx-4ade80, #4ade80)" },
+  UPDATE: { bg: "rgba(251,191,36,0.12)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  DELETE: { bg: "rgba(239,68,68,0.12)",   color: "var(--tx-f87171, #f87171)" },
+  READ:   { bg: "rgba(99,102,241,0.12)",  color: "var(--tx-a5b4fc, #a5b4fc)" },
 };
 
 interface AuditLog {
@@ -26,7 +26,7 @@ interface AuditLog {
 }
 
 function Badge({ label }: { label: string }) {
-  const style = ACTION_PALETTE[label] ?? { bg: "rgba(120,120,120,0.12)", color: "#aaa" };
+  const style = ACTION_PALETTE[label] ?? { bg: "rgba(120,120,120,0.12)", color: "var(--tx-aaaaaa, #aaa)" };
   return (
     <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: style.bg, color: style.color, letterSpacing: 0.3 }}>
       {label}
@@ -47,10 +47,10 @@ function DiffViewer({ before, after }: { before: string | null; after: string | 
         const bv = b[k], av = a[k];
         const changed = JSON.stringify(bv) !== JSON.stringify(av);
         return (
-          <div key={k} style={{ marginBottom: 4, color: changed ? "#fbbf24" : "rgba(var(--ink),0.4)" }}>
-            <span style={{ color: "#a5b4fc" }}>{k}</span>:{" "}
-            {changed && bv !== undefined && <><span style={{ color: "#f87171", textDecoration: "line-through" }}>{JSON.stringify(bv)}</span>{" → "}</>}
-            <span style={{ color: changed ? "#4ade80" : "rgba(var(--ink),0.5)" }}>{JSON.stringify(av ?? bv)}</span>
+          <div key={k} style={{ marginBottom: 4, color: changed ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),0.4)" }}>
+            <span style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>{k}</span>:{" "}
+            {changed && bv !== undefined && <><span style={{ color: "var(--tx-f87171, #f87171)", textDecoration: "line-through" }}>{JSON.stringify(bv)}</span>{" → "}</>}
+            <span style={{ color: changed ? "var(--tx-4ade80, #4ade80)" : "rgba(var(--ink),0.5)" }}>{JSON.stringify(av ?? bv)}</span>
           </div>
         );
       })}
@@ -113,10 +113,10 @@ export default function AuditTrailPage() {
       {/* KPI */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
-          { label: "Total Events", value: total, color: "#6366f1" },
-          { label: "Current Page", value: `${logs.length} shown`, color: "#a5b4fc" },
-          { label: "Entities Tracked", value: ENTITIES.length + "+", color: "#10b981" },
-          { label: "Retention", value: "90 days", color: "#fbbf24" },
+          { label: "Total Events", value: total, color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Current Page", value: `${logs.length} shown`, color: "var(--tx-a5b4fc, #a5b4fc)" },
+          { label: "Entities Tracked", value: ENTITIES.length + "+", color: "var(--tx-10b981, #10b981)" },
+          { label: "Retention", value: "90 days", color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
@@ -177,7 +177,7 @@ export default function AuditTrailPage() {
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
                     <td style={td}><Badge label={log.action} /></td>
-                    <td style={{ ...td, fontSize: 12, color: "#a5b4fc", fontWeight: 600 }}>{log.entity}</td>
+                    <td style={{ ...td, fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 600 }}>{log.entity}</td>
                     <td style={{ ...td, fontSize: 11, fontFamily: "monospace", color: "var(--text-muted)" }}>
                       {log.entityId.slice(0, 12)}…
                     </td>

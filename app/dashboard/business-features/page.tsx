@@ -52,7 +52,7 @@ const FEATURE_CARDS = [
       note: "Formal procurement with full audit trail.",
     },
     unlocks: ["Purchase Orders (PO)", "GRN — Goods Receipt Note", "PO ↔ Invoice matching"],
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     bg: "rgba(99,102,241,.08)",
     border: "rgba(99,102,241,.2)",
   },
@@ -76,7 +76,7 @@ const FEATURE_CARDS = [
       note: "Multi-location inventory with transfer tracking.",
     },
     unlocks: ["Warehouses management", "Stock Transfer between branches", "Per-location stock reports"],
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     bg: "rgba(52,211,153,.07)",
     border: "rgba(52,211,153,.2)",
   },
@@ -100,7 +100,7 @@ const FEATURE_CARDS = [
       note: "Controlled spending with full accountability.",
     },
     unlocks: ["PO Approval queue for managers", "Reject / Approve actions", "Approval audit log"],
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     bg: "rgba(245,158,11,.07)",
     border: "rgba(245,158,11,.2)",
   },
@@ -124,7 +124,7 @@ const FEATURE_CARDS = [
       note: "Prevents over-exposure to slow-paying customers.",
     },
     unlocks: ["Credit limit field on customer profile", "Over-limit block at invoice creation", "Manager override on blocked sales"],
-    color: "#fb923c",
+    color: "var(--tx-fb923c, #fb923c)",
     bg: "rgba(251,146,60,.07)",
     border: "rgba(251,146,60,.2)",
   },
@@ -148,7 +148,7 @@ const FEATURE_CARDS = [
       note: "Mandatory for pharma, medical devices, and electronics.",
     },
     unlocks: ["Batch number on purchase receipt", "Serial number capture on sale", "Expiry date tracking & alerts"],
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     bg: "rgba(56,189,248,.07)",
     border: "rgba(56,189,248,.2)",
   },
@@ -172,7 +172,7 @@ const FEATURE_CARDS = [
       note: "Essential for clothing, shoes, beverages with sizes.",
     },
     unlocks: ["Variant attribute builder (Size, Color, Weight)", "Per-variant pricing & stock", "Variant-wise sales analytics"],
-    color: "#e879f9",
+    color: "var(--tx-e879f9, #e879f9)",
     bg: "rgba(232,121,249,.07)",
     border: "rgba(232,121,249,.2)",
   },
@@ -196,7 +196,7 @@ const FEATURE_CARDS = [
       note: "Structured promotions with full audit trail.",
     },
     unlocks: ["Promotions rule manager", "BOGO & bundle pricing engine", "Category-wise % discount rules"],
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
     bg: "rgba(249,115,22,.07)",
     border: "rgba(249,115,22,.2)",
   },
@@ -220,7 +220,7 @@ const FEATURE_CARDS = [
       note: "Required for FBR/GST-registered businesses.",
     },
     unlocks: ["Tax class setup (Standard, Zero-rated, Exempt)", "Auto tax on sales & purchase invoices", "Tax summary report for filing"],
-    color: "#4ade80",
+    color: "var(--tx-4ade80, #4ade80)",
     bg: "rgba(74,222,128,.07)",
     border: "rgba(74,222,128,.2)",
   },
@@ -244,7 +244,7 @@ const FEATURE_CARDS = [
       note: "Requires WhatsApp Business API or SMS gateway setup.",
     },
     unlocks: ["WhatsApp receipt on sale completion", "Payment due reminders to customers", "Low-stock owner alerts"],
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     bg: "rgba(52,211,153,.07)",
     border: "rgba(52,211,153,.2)",
   },
@@ -345,7 +345,7 @@ export default function BusinessFeaturesPage() {
 
   if (!isAdmin) return (
     <div style={{ padding: isMobile ? "22px 13px" : "40px 28px", fontFamily: ff }}>
-      <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "#f87171" }}>
+      <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "var(--tx-f87171, #f87171)" }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Admin Only</div>
         <div style={{ fontSize: 13, color: "#475569" }}>Only admins can configure business features.</div>
@@ -377,7 +377,7 @@ export default function BusinessFeaturesPage() {
         <div style={{ marginTop: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", display: "flex", gap: 14, alignItems: "flex-start" }}>
           <span style={{ fontSize: 22, flexShrink: 0 }}>🧠</span>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 4 }}>One system. Adaptive workflow.</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", marginBottom: 4 }}>One system. Adaptive workflow.</div>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
               Every feature uses the <strong style={{ color: "rgba(var(--ink),.6)" }}>same database and backend</strong> — only the screen and workflow adapts.
               Simple 2-click flow for small shops. Full approval + audit trail for enterprise.
@@ -397,7 +397,7 @@ export default function BusinessFeaturesPage() {
           {["🛍️ Products & Catalog", "📦 Inventory & Stock", "💳 Sales & POS", "👥 Customers & CRM", "💰 Payments", "📊 Reports"].map(f => (
             <div key={f} style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#34d399", flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#34d399" }}>{f}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-34d399, #34d399)" }}>{f}</span>
             </div>
           ))}
         </div>
@@ -426,7 +426,7 @@ export default function BusinessFeaturesPage() {
                     <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: `${fc.whoColor}18`, color: fc.whoColor, border: `1px solid ${fc.whoColor}30` }}>
                       {fc.who}
                     </span>
-                    {isOn && <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(16,185,129,.12)", color: "#10b981", border: "1px solid rgba(16,185,129,.25)" }}>✓ ENABLED</span>}
+                    {isOn && <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(16,185,129,.12)", color: "var(--tx-10b981, #10b981)", border: "1px solid rgba(16,185,129,.25)" }}>✓ ENABLED</span>}
                   </div>
                   <div style={{ fontSize: 12, color: "#475569", marginTop: 3 }}>{fc.subtitle}</div>
                   <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginTop: 6, lineHeight: 1.6 }}>{fc.description}</div>
@@ -440,7 +440,7 @@ export default function BusinessFeaturesPage() {
                 <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRight: "1px solid rgba(var(--ink),.05)", background: !isOn ? "rgba(52,211,153,.04)" : "transparent" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                     <div style={{ width: 7, height: 7, borderRadius: "50%", background: !isOn ? "#34d399" : "#334155" }} />
-                    <div style={{ fontSize: 10, fontWeight: 800, color: !isOn ? "#34d399" : "#334155", textTransform: "uppercase", letterSpacing: ".06em" }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: !isOn ? "var(--tx-34d399, #34d399)" : "#334155", textTransform: "uppercase", letterSpacing: ".06em" }}>
                       {!isOn ? "✓ Active Now" : "Simple Mode"}
                     </div>
                   </div>
@@ -480,7 +480,7 @@ export default function BusinessFeaturesPage() {
       {/* ── Save bar ── */}
       {hasChanges && (
         <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 999, display: "flex", alignItems: "center", gap: 14, padding: "12px 24px", borderRadius: 14, background: "var(--dk-0f172a, #0f172a)", border: "1px solid rgba(99,102,241,.35)", boxShadow: "0 8px 40px rgba(0,0,0,.5)" }}>
-          <span style={{ fontSize: 13, color: "#818cf8", fontWeight: 600 }}>Unsaved changes</span>
+          <span style={{ fontSize: 13, color: "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>Unsaved changes</span>
           <button onClick={() => setFeatures({ ...saved })} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: "#475569", fontFamily: ff, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Discard</button>
           <button onClick={save} disabled={saving} style={{ padding: "7px 20px", borderRadius: 8, background: saving ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: saving ? "default" : "pointer" }}>
             {saving ? "Saving…" : "💾 Save"}

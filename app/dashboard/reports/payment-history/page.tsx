@@ -63,13 +63,13 @@ export default function PaymentHistoryPage() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.name}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.totalInvoiced)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399", fontWeight: 700 }}>{cur} {fmt(r.totalPaid)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: outstanding ? "#f87171" : "var(--text-muted)", fontWeight: outstanding ? 700 : 400 }}>{outstanding ? `${cur} ${fmt(r.totalOutstanding)}` : "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{cur} {fmt(r.totalPaid)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: outstanding ? "var(--tx-f87171, #f87171)" : "var(--text-muted)", fontWeight: outstanding ? 700 : 400 }}>{outstanding ? `${cur} ${fmt(r.totalOutstanding)}` : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: daysColor }}>{r.avgDaysToPay} days</span>
                   </td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{r.onTimeCount}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.lateCount > 0 ? "#f87171" : "var(--text-muted)" }}>{r.lateCount > 0 ? r.lateCount : "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-34d399, #34d399)" }}>{r.onTimeCount}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.lateCount > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>{r.lateCount > 0 ? r.lateCount : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.lastPaymentDate)}</td>
                 </tr>
               );

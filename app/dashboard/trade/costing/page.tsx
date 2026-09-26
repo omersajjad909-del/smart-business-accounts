@@ -9,9 +9,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 type CostingStatus = "draft" | "reviewed" | "posted";
 
 const STATUS_COLORS: Record<CostingStatus, { bg: string; color: string; border: string }> = {
-  draft: { bg: "rgba(148,163,184,.12)", color: "#cbd5e1", border: "rgba(148,163,184,.28)" },
-  reviewed: { bg: "rgba(59,130,246,.12)", color: "#60a5fa", border: "rgba(59,130,246,.28)" },
-  posted: { bg: "rgba(16,185,129,.12)", color: "#34d399", border: "rgba(16,185,129,.28)" },
+  draft: { bg: "rgba(148,163,184,.12)", color: "var(--tx-cbd5e1, #cbd5e1)", border: "rgba(148,163,184,.28)" },
+  reviewed: { bg: "rgba(59,130,246,.12)", color: "var(--tx-60a5fa, #60a5fa)", border: "rgba(59,130,246,.28)" },
+  posted: { bg: "rgba(16,185,129,.12)", color: "var(--tx-34d399, #34d399)", border: "rgba(16,185,129,.28)" },
 };
 
 const CURRENCIES = ["USD", "EUR", "GBP", "AED", "CNY", "PKR"];
@@ -213,10 +213,10 @@ export default function ImportCostingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 22 }}>
         {[
-          { label: "Costing Records", value: kpis.records, color: "#60a5fa" },
-          { label: "Booked Landed Cost", value: `USD ${kpis.bookedValue.toLocaleString()}`, color: "#34d399" },
-          { label: "Avg Landed / Unit", value: `USD ${kpis.avgLanded.toFixed(2)}`, color: "#fbbf24" },
-          { label: "Pending Review", value: kpis.pending, color: "#c084fc" },
+          { label: "Costing Records", value: kpis.records, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Booked Landed Cost", value: `USD ${kpis.bookedValue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Avg Landed / Unit", value: `USD ${kpis.avgLanded.toFixed(2)}`, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Pending Review", value: kpis.pending, color: "var(--tx-c084fc, #c084fc)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
@@ -252,7 +252,7 @@ export default function ImportCostingPage() {
                   const meta = STATUS_COLORS[row.status as CostingStatus] || STATUS_COLORS.draft;
                   return (
                     <tr key={row.id}>
-                      <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}`, fontWeight: 700, color: "#93c5fd" }}>{row.shipmentRef}</td>
+                      <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}`, fontWeight: 700, color: "var(--tx-93c5fd, #93c5fd)" }}>{row.shipmentRef}</td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>{row.supplier}</td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>{row.currency} {row.goodsValue.toLocaleString()}</td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>{row.currency} {row.freight.toLocaleString()}</td>
@@ -267,7 +267,7 @@ export default function ImportCostingPage() {
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>
                         <div style={{ display: "flex", gap: 8 }}>
                           <button onClick={() => openEdit(row.id)} style={{ background: "transparent", border: `1px solid ${tradeBorder}`, color: "var(--text-primary)", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }}>Edit</button>
-                          <button onClick={() => handleDelete(row.id, row.shipmentRef)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer" }}>Delete</button>
+                          <button onClick={() => handleDelete(row.id, row.shipmentRef)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -308,15 +308,15 @@ export default function ImportCostingPage() {
             <div style={{ marginTop: 18, padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradeBorder}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
                 <div style={{ fontSize: 11, color: tradeMuted, textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Total Landed Cost</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "#34d399" }}>{form.currency} {landedCost.toLocaleString()}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{form.currency} {landedCost.toLocaleString()}</div>
               </div>
               <div>
                 <div style={{ fontSize: 11, color: tradeMuted, textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Landed Cost Per Unit</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "#60a5fa" }}>{num(form.units) > 0 ? `${form.currency} ${landedPerUnit.toFixed(2)}` : "-"}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>{num(form.units) > 0 ? `${form.currency} ${landedPerUnit.toFixed(2)}` : "-"}</div>
               </div>
             </div>
 
-            {error ? <div style={{ marginTop: 14, color: "#f87171", fontSize: 13 }}>{error}</div> : null}
+            {error ? <div style={{ marginTop: 14, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>{error}</div> : null}
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 22 }}>
               <button onClick={() => setShowModal(false)} style={{ background: "rgba(var(--ink),.08)", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 14px", cursor: "pointer" }}>Cancel</button>

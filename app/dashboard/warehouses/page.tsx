@@ -436,7 +436,7 @@ export default function WarehousesPage() {
                     borderRadius: 7,
                     border: "1px solid #06b6d4",
                     background: "transparent",
-                    color: "#06b6d4",
+                    color: "var(--tx-06b6d4, #06b6d4)",
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: "pointer",
@@ -453,7 +453,7 @@ export default function WarehousesPage() {
                     borderRadius: 7,
                     border: `1px solid ${wh.status === "ACTIVE" ? "#6b7280" : "#10b981"}`,
                     background: "transparent",
-                    color: wh.status === "ACTIVE" ? "#9ca3af" : "#10b981",
+                    color: wh.status === "ACTIVE" ? "var(--tx-9ca3af, #9ca3af)" : "var(--tx-10b981, #10b981)",
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: "pointer",
@@ -547,7 +547,7 @@ export default function WarehousesPage() {
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
                       <span style={{ fontWeight: 600 }}>{tx.from}</span>
-                      <span style={{ margin: "0 6px", color: "#06b6d4" }}>→</span>
+                      <span style={{ margin: "0 6px", color: "var(--tx-06b6d4, #06b6d4)" }}>→</span>
                       <span style={{ fontWeight: 600 }}>{tx.to}</span>
                     </div>
                   </div>
@@ -769,7 +769,7 @@ export default function WarehousesPage() {
 
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-                <span style={{ margin: "0 12px", fontSize: 20, color: "#06b6d4" }}>⇄</span>
+                <span style={{ margin: "0 12px", fontSize: 20, color: "var(--tx-06b6d4, #06b6d4)" }}>⇄</span>
                 <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
               </div>
 

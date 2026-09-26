@@ -109,7 +109,7 @@ export default function SubscriptionPlansPage() {
                   <span style={{ padding: "4px 10px", borderRadius: 999, background: `${saasStatusColor(plan.status)}20`, color: saasStatusColor(plan.status), fontSize: 12, fontWeight: 700 }}>{plan.status}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14, alignItems: "center" }}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: "#93c5fd" }}>${plan.price.toLocaleString()}</div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: "var(--tx-93c5fd, #93c5fd)" }}>${plan.price.toLocaleString()}</div>
                   <div style={{ display: "flex", gap: 8 }}>
                     {plan.status !== "active" && <button style={smallButton} onClick={() => update(plan.id, { status: "active" })}>Activate</button>}
                     {plan.status === "active" && <button style={smallButton} onClick={() => update(plan.id, { status: "retired" })}>Retire</button>}

@@ -6,9 +6,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const isMobile = false;
 
-const wholesaleBg = "rgba(255,255,255,.035)";
-const wholesaleBorder = "rgba(255,255,255,.08)";
-const wholesaleMuted = "rgba(255,255,255,.56)";
+const wholesaleBg = "rgba(var(--ink),.035)";
+const wholesaleBorder = "rgba(var(--ink),.08)";
+const wholesaleMuted = "rgba(var(--ink),.56)";
 const wholesaleFont = "'Outfit','Inter',sans-serif";
 
 type WholesaleWarehouse = {
@@ -197,7 +197,7 @@ export default function WholesaleDashboard() {
     <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: wholesaleFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>
             Wholesale / Distribution
           </div>
           <h1 style={{ margin: "0 0 8px", fontSize: 30, fontWeight: 900 }}>Wholesale Command Center</h1>
@@ -245,7 +245,7 @@ export default function WholesaleDashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(245,158,11,.14), rgba(59,130,246,.10))", border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fde68a", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-fde68a, #fde68a)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Operating Flow
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
@@ -267,7 +267,7 @@ export default function WholesaleDashboard() {
         </div>
 
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#93c5fd", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-93c5fd, #93c5fd)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Operations Snapshot
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -290,7 +290,7 @@ export default function WholesaleDashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Warehouse Watchlist
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -306,8 +306,8 @@ export default function WholesaleDashboard() {
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{warehouse.location || "Unassigned"} | {warehouse.itemsCount} SKUs</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#38bdf8" }}>{formatMoney(warehouse.stockValue)}</div>
-                      <div style={{ fontSize: 12, color: utilization >= 80 ? "#f59e0b" : wholesaleMuted }}>{warehouse.capacity ? `${utilization}% utilized` : warehouse.status}</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-38bdf8, #38bdf8)" }}>{formatMoney(warehouse.stockValue)}</div>
+                      <div style={{ fontSize: 12, color: utilization >= 80 ? "var(--tx-f59e0b, #f59e0b)" : wholesaleMuted }}>{warehouse.capacity ? `${utilization}% utilized` : warehouse.status}</div>
                     </div>
                   </div>
                 );
@@ -317,7 +317,7 @@ export default function WholesaleDashboard() {
         </div>
 
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Credit Watch
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -332,7 +332,7 @@ export default function WholesaleDashboard() {
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{formatMoney(row.used)} used of {formatMoney(row.limit)}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: row.status === "EXCEEDED" ? "#f87171" : row.status === "WARNING" ? "#f59e0b" : "#34d399" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: row.status === "EXCEEDED" ? "var(--tx-f87171, #f87171)" : row.status === "WARNING" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-34d399, #34d399)" }}>
                         {row.utilization.toFixed(1)}%
                       </div>
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.status}</div>
@@ -347,7 +347,7 @@ export default function WholesaleDashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Sales Order Desk
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -362,7 +362,7 @@ export default function WholesaleDashboard() {
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.customerName || "Customer not linked"} | {formatDate(row.date)}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#60a5fa" }}>{formatMoney(row.amount)}</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>{formatMoney(row.amount)}</div>
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.status}</div>
                     </div>
                   </div>
@@ -373,7 +373,7 @@ export default function WholesaleDashboard() {
         </div>
 
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#f97316", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-f97316, #f97316)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Stock Movement Desk
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -388,8 +388,8 @@ export default function WholesaleDashboard() {
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{transfer.from} {"->"} {transfer.to}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#fde68a" }}>{transfer.qty}</div>
-                      <div style={{ fontSize: 12, color: transfer.status === "COMPLETED" ? "#34d399" : "#60a5fa" }}>{transfer.status}</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-fde68a, #fde68a)" }}>{transfer.qty}</div>
+                      <div style={{ fontSize: 12, color: transfer.status === "COMPLETED" ? "var(--tx-34d399, #34d399)" : "var(--tx-60a5fa, #60a5fa)" }}>{transfer.status}</div>
                     </div>
                   </div>
                 </div>
@@ -401,7 +401,7 @@ export default function WholesaleDashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Pricing Discipline
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -416,7 +416,7 @@ export default function WholesaleDashboard() {
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.type} | {row.itemCount} items</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#a78bfa" }}>{row.discount ? `${row.discount}%` : "Custom"}</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-a78bfa, #a78bfa)" }}>{row.discount ? `${row.discount}%` : "Custom"}</div>
                       <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.status}</div>
                     </div>
                   </div>
@@ -427,7 +427,7 @@ export default function WholesaleDashboard() {
         </div>
 
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Party Exposure
           </div>
           <div style={{ display: "grid", gap: 10 }}>
@@ -439,7 +439,7 @@ export default function WholesaleDashboard() {
                     <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.city || row.phone || "Customer account"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>{formatMoney(Number(row.receivable || 0))}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{formatMoney(Number(row.receivable || 0))}</div>
                     <div style={{ fontSize: 12, color: wholesaleMuted }}>Receivable</div>
                   </div>
                 </div>
@@ -453,7 +453,7 @@ export default function WholesaleDashboard() {
                     <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.city || row.phone || "Supplier account"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#f87171" }}>{formatMoney(Number(row.payable || 0))}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>{formatMoney(Number(row.payable || 0))}</div>
                     <div style={{ fontSize: 12, color: wholesaleMuted }}>Payable</div>
                   </div>
                 </div>

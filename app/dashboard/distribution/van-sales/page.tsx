@@ -151,10 +151,10 @@ export default function VanSalesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Trips Logged", value: sales.length, color: "#f97316" },
-          { label: "Sales Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399" },
-          { label: "Collections", value: `Rs. ${totalCollections.toLocaleString()}`, color: "#38bdf8" },
-          { label: "Customers Visited", value: totalCustomers, color: "#818cf8" },
+          { label: "Trips Logged", value: sales.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Sales Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Collections", value: `Rs. ${totalCollections.toLocaleString()}`, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Customers Visited", value: totalCustomers, color: "var(--tx-818cf8, #818cf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
@@ -182,8 +182,8 @@ export default function VanSalesPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{sale.van || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{sale.date || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{sale.customers}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {sale.saleAmount.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#38bdf8", fontWeight: 700 }}>Rs. {sale.collectionAmount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {sale.saleAmount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>Rs. {sale.collectionAmount.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <span style={{ display: "inline-block", background: `${STATUS_COLOR[sale.status]}20`, color: STATUS_COLOR[sale.status], borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>
                     {sale.status}
@@ -198,7 +198,7 @@ export default function VanSalesPage() {
                       Mark Settled
                     </button>
                   )}
-                  <button onClick={() => saleRecords.remove(sale.id)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={() => saleRecords.remove(sale.id)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

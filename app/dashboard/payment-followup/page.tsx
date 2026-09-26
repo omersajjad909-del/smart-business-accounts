@@ -17,14 +17,14 @@ interface OverdueInvoice {
 }
 
 const STATUS_PALETTE: Record<string, { bg: string; color: string }> = {
-  PENDING:   { bg: "rgba(239,68,68,0.12)",   color: "#f87171" },
-  CONTACTED: { bg: "rgba(251,191,36,0.12)",  color: "#fbbf24" },
-  PROMISED:  { bg: "rgba(99,102,241,0.12)",  color: "#a5b4fc" },
-  PAID:      { bg: "rgba(34,197,94,0.12)",   color: "#4ade80" },
+  PENDING:   { bg: "rgba(239,68,68,0.12)",   color: "var(--tx-f87171, #f87171)" },
+  CONTACTED: { bg: "rgba(251,191,36,0.12)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  PROMISED:  { bg: "rgba(99,102,241,0.12)",  color: "var(--tx-a5b4fc, #a5b4fc)" },
+  PAID:      { bg: "rgba(34,197,94,0.12)",   color: "var(--tx-4ade80, #4ade80)" },
 };
 
 function Badge({ label }: { label: string }) {
-  const style = STATUS_PALETTE[label] ?? { bg: "rgba(120,120,120,0.15)", color: "#aaa" };
+  const style = STATUS_PALETTE[label] ?? { bg: "rgba(120,120,120,0.15)", color: "var(--tx-aaaaaa, #aaa)" };
   return (
     <span style={{ display: "inline-block", padding: "3px 11px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: style.bg, color: style.color, letterSpacing: 0.3 }}>
       {label}
@@ -123,10 +123,10 @@ export default function PaymentFollowupPage() {
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
-          { label: "Overdue Invoices",  value: loading ? "…" : kpis.total,    color: "#6366f1" },
-          { label: "Not Yet Contacted", value: loading ? "…" : kpis.pending,  color: "#f87171" },
-          { label: "In Progress",       value: loading ? "…" : kpis.inProg,   color: "#fbbf24" },
-          { label: "Total Overdue",     value: loading ? "…" : `Rs. ${kpis.totalAmt.toLocaleString()}`, color: "#f87171" },
+          { label: "Overdue Invoices",  value: loading ? "…" : kpis.total,    color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Not Yet Contacted", value: loading ? "…" : kpis.pending,  color: "var(--tx-f87171, #f87171)" },
+          { label: "In Progress",       value: loading ? "…" : kpis.inProg,   color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Total Overdue",     value: loading ? "…" : `Rs. ${kpis.totalAmt.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>{k.label}</div>
@@ -180,7 +180,7 @@ export default function PaymentFollowupPage() {
                   <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{inv.dueDate}</td>
                   <td style={td}><AgingBadge days={inv.daysOverdue} /></td>
                   <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>
-                    {inv.lastFollowup || <span style={{ color: "#f87171" }}>Never</span>}
+                    {inv.lastFollowup || <span style={{ color: "var(--tx-f87171, #f87171)" }}>Never</span>}
                   </td>
                   <td style={{ ...td, fontSize: 12, color: "var(--text-muted)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {inv.note || <span style={{ opacity: 0.4 }}>—</span>}

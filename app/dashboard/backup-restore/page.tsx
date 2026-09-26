@@ -185,7 +185,7 @@ A safety snapshot is taken first, so this can be rolled back.`)) return;
   });
 
   if (!canAccess) return (
-    <div style={{ padding: 32, color: "#f87171", textAlign: "center" }}>
+    <div style={{ padding: 32, color: "var(--tx-f87171, #f87171)", textAlign: "center" }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
       <div style={{ fontWeight: 700 }}>Access Denied</div>
       <div style={{ fontSize: 13, color: "rgba(var(--ink),0.4)", marginTop: 6 }}>You do not have permission to access Backup & Restore.</div>
@@ -229,16 +229,16 @@ A safety snapshot is taken first, so this can be rolled back.`)) return;
         <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
           <span style={{ fontSize: 22 }}>📂</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "#fbbf24", marginBottom: 3 }}>Restore from Downloaded File</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)", marginBottom: 3 }}>Restore from Downloaded File</div>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", lineHeight: 1.6 }}>
               Have a <code style={{ background: "rgba(var(--ink),.08)", padding: "1px 5px", borderRadius: 4 }}>.json</code> backup file on your computer? Upload it here to restore your data directly.
-              <span style={{ display: "block", marginTop: 4, color: "#34d399" }}>✓ Works across plans — even if you signed up fresh on a new subscription.</span>
+              <span style={{ display: "block", marginTop: 4, color: "var(--tx-34d399, #34d399)" }}>✓ Works across plans — even if you signed up fresh on a new subscription.</span>
             </div>
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderRadius: 9, border: "1px dashed rgba(251,191,36,.4)", background: "rgba(251,191,36,.06)", cursor: "pointer", fontSize: 13, color: uploadFile ? "#fbbf24" : "rgba(var(--ink),.5)", fontWeight: 600 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderRadius: 9, border: "1px dashed rgba(251,191,36,.4)", background: "rgba(251,191,36,.06)", cursor: "pointer", fontSize: 13, color: uploadFile ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.5)", fontWeight: 600 }}>
             <span>📁</span>
             {uploadFile ? uploadFile.name : "Choose backup .json file"}
             <input
@@ -268,7 +268,7 @@ A safety snapshot is taken first, so this can be rolled back.`)) return;
           )}
         </div>
 
-        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12, color: "#f87171" }}>
+        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12, color: "var(--tx-f87171, #f87171)" }}>
           ⚠️ <strong>Warning:</strong> Restoring will permanently replace ALL current data. Make sure to create a fresh backup first before restoring an old file.
         </div>
       </div>
@@ -308,14 +308,14 @@ A safety snapshot is taken first, so this can be rolled back.`)) return;
                     <div style={{ display: "flex", gap: 6 }}>
                       <button
                         onClick={() => downloadBackup(b.id, b.fileName)}
-                        style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "#a5b4fc", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}
+                        style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}
                       >
                         ⬇ Download
                       </button>
                       <button
                         onClick={() => restoreBackup(b.id, b.fileName)}
                         disabled={restoringId === b.id}
-                        style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.08)", color: restoringId === b.id ? "rgba(var(--ink),0.3)" : "#f87171", fontSize: 12, cursor: restoringId === b.id ? "not-allowed" : "pointer", fontFamily: "inherit", fontWeight: 600 }}
+                        style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.08)", color: restoringId === b.id ? "rgba(var(--ink),0.3)" : "var(--tx-f87171, #f87171)", fontSize: 12, cursor: restoringId === b.id ? "not-allowed" : "pointer", fontFamily: "inherit", fontWeight: 600 }}
                       >
                         {restoringId === b.id ? "Restoring…" : "↺ Restore"}
                       </button>

@@ -7,8 +7,8 @@ import { fmtDate } from "@/lib/dateUtils";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 type Session = {
   id: string;
@@ -184,9 +184,9 @@ export default function POSSessionsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Open Sessions", value: openSessions.length, color: "#10b981", sub: openSessions.map(s => s.cashier).join(", ") || "None" },
-          { label: "Today's Revenue", value: `Rs. ${todayRevenue.toLocaleString()}`, color: "#34d399", sub: `${todaySessions.length} sessions today` },
-          { label: "Today's Transactions", value: todayTxns, color: "#818cf8", sub: "All shifts combined" },
+          { label: "Open Sessions", value: openSessions.length, color: "var(--tx-10b981, #10b981)", sub: openSessions.map(s => s.cashier).join(", ") || "None" },
+          { label: "Today's Revenue", value: `Rs. ${todayRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)", sub: `${todaySessions.length} sessions today` },
+          { label: "Today's Transactions", value: todayTxns, color: "var(--tx-818cf8, #818cf8)", sub: "All shifts combined" },
           { label: "Total Sessions", value: sessions.length, color: "rgba(var(--ink),.6)", sub: `${sessions.filter(s => s.status === "CLOSED").length} closed` },
         ].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
@@ -224,7 +224,7 @@ export default function POSSessionsPage() {
               >
                 {/* Session ref */}
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: 13, color: "#818cf8" }}>{session.sessionRef}</div>
+                  <div style={{ fontWeight: 800, fontSize: 13, color: "var(--tx-818cf8, #818cf8)" }}>{session.sessionRef}</div>
                   <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 2 }}>{fmtDate(session.date)}</div>
                 </div>
 
@@ -250,7 +250,7 @@ export default function POSSessionsPage() {
                 {/* Sales */}
                 <div>
                   <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 3 }}>Sales · {session.transactions} txns</div>
-                  <div style={{ fontWeight: 700, color: "#34d399" }}>Rs. {session.totalSales.toLocaleString()}</div>
+                  <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Rs. {session.totalSales.toLocaleString()}</div>
                   <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 2 }}>
                     Cash Rs. {session.cashSales.toLocaleString()} · Card Rs. {session.cardSales.toLocaleString()}
                   </div>
@@ -263,7 +263,7 @@ export default function POSSessionsPage() {
                       <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 3 }}>Reconciliation</div>
                       <div style={{ fontSize: 12 }}>Expected: <strong>Rs. {session.expectedCash.toLocaleString()}</strong></div>
                       <div style={{ fontSize: 12 }}>Actual: <strong>Rs. {session.closingCash.toLocaleString()}</strong></div>
-                      <div style={{ fontSize: 12, fontWeight: 800, marginTop: 3, color: session.discrepancy === 0 && session.closingCash > 0 ? "#34d399" : session.discrepancy > 0 ? "#818cf8" : "#f87171" }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, marginTop: 3, color: session.discrepancy === 0 && session.closingCash > 0 ? "var(--tx-34d399, #34d399)" : session.discrepancy > 0 ? "var(--tx-818cf8, #818cf8)" : "var(--tx-f87171, #f87171)" }}>
                         {session.discrepancy === 0 && session.closingCash > 0 ? "✅ Balanced" : session.discrepancy > 0 ? `▲ Over Rs. ${session.discrepancy.toLocaleString()}` : session.closingCash === 0 ? "⚠️ No closing cash entered" : `▼ Short Rs. ${Math.abs(session.discrepancy).toLocaleString()}`}
                       </div>
                     </>
@@ -277,7 +277,7 @@ export default function POSSessionsPage() {
                   {isOpen && (
                     <button
                       onClick={() => { setClosingId(session.id); setClosingCash(""); }}
-                      style={{ padding: "7px 14px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                      style={{ padding: "7px 14px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
                     >
                       Close
                     </button>
@@ -291,7 +291,7 @@ export default function POSSessionsPage() {
               {/* Close Session Modal (inline) */}
               {isClosing && (
                 <div style={{ borderTop: `1px solid rgba(239,68,68,.2)`, background: "rgba(239,68,68,.05)", padding: isMobile ? "12px 11px" : "20px 24px" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#f87171", marginBottom: 16 }}>🔒 Close Session — {session.sessionRef}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-f87171, #f87171)", marginBottom: 16 }}>🔒 Close Session — {session.sessionRef}</div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
                     <div style={{ background: "rgba(var(--ink),.04)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>Opening Cash</div>
@@ -299,11 +299,11 @@ export default function POSSessionsPage() {
                     </div>
                     <div style={{ background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.15)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>Cash Sales</div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: "#34d399" }}>Rs. {session.cashSales.toLocaleString()}</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: "var(--tx-34d399, #34d399)" }}>Rs. {session.cashSales.toLocaleString()}</div>
                     </div>
                     <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>Expected in Drawer</div>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: "#818cf8" }}>Rs. {session.expectedCash.toLocaleString()}</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: "var(--tx-818cf8, #818cf8)" }}>Rs. {session.expectedCash.toLocaleString()}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 14, alignItems: "flex-end" }}>
@@ -317,7 +317,7 @@ export default function POSSessionsPage() {
                         style={inp}
                       />
                       {closingCash && (
-                        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: Number(closingCash) === session.expectedCash ? "#34d399" : Number(closingCash) > session.expectedCash ? "#818cf8" : "#f87171" }}>
+                        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: Number(closingCash) === session.expectedCash ? "var(--tx-34d399, #34d399)" : Number(closingCash) > session.expectedCash ? "var(--tx-818cf8, #818cf8)" : "var(--tx-f87171, #f87171)" }}>
                           {Number(closingCash) === session.expectedCash
                             ? "✅ Perfectly balanced!"
                             : Number(closingCash) > session.expectedCash
@@ -356,10 +356,10 @@ export default function POSSessionsPage() {
                         const sd = sale.data || {};
                         return (
                           <div key={sale.id} style={{ display: "flex", alignItems: "center", gap: 16, padding: "10px 14px", background: "rgba(var(--ink),.025)", borderRadius: 8 }}>
-                            <div style={{ fontWeight: 700, color: "#818cf8", minWidth: 100, fontSize: 13 }}>{sale.title}</div>
+                            <div style={{ fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", minWidth: 100, fontSize: 13 }}>{sale.title}</div>
                             <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", flex: 1 }}>{String(sd.items || "")}</div>
                             <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", textTransform: "capitalize" }}>{String(sd.payMethod || "cash")}</div>
-                            <div style={{ fontWeight: 700, color: "#34d399", minWidth: 100, textAlign: "right" }}>Rs. {(sale.amount || 0).toLocaleString()}</div>
+                            <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)", minWidth: 100, textAlign: "right" }}>Rs. {(sale.amount || 0).toLocaleString()}</div>
                           </div>
                         );
                       })}

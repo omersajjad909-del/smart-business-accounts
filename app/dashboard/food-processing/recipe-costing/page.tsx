@@ -40,10 +40,10 @@ export default function FoodProcessingRecipeCostingPage() {
         },
       })}
       summarize={(rows) => [
-        { label: "Recipes", value: rows.length, color: "#f97316" },
-        { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "#34d399" },
-        { label: "Live", value: rows.filter((row) => String(row.status) === "live").length, color: "#60a5fa" },
-        { label: "Avg Unit Cost", value: rows.length ? Math.round(rows.reduce((sum, row) => sum + Number(row.unitCost || 0), 0) / rows.length).toLocaleString() : "0", color: "#fbbf24" },
+        { label: "Recipes", value: rows.length, color: "var(--tx-f97316, #f97316)" },
+        { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Live", value: rows.filter((row) => String(row.status) === "live").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "Avg Unit Cost", value: rows.length ? Math.round(rows.reduce((sum, row) => sum + Number(row.unitCost || 0), 0) / rows.length).toLocaleString() : "0", color: "var(--tx-fbbf24, #fbbf24)" },
       ]}
     />
   );

@@ -99,7 +99,7 @@ export default function FirmOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: firmFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>{firmConfig.eyebrow}</div>
+        <div style={{ fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>{firmConfig.eyebrow}</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>{firmConfig.title}</h1>
         <p style={{ margin: 0, fontSize: 14, color: firmMuted, maxWidth: 760 }}>{firmConfig.description}</p>
       </div>
@@ -113,7 +113,7 @@ export default function FirmOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,.14), rgba(56,189,248,.08))", border: `1px solid ${firmBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Firm Workflow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-c7d2fe, #c7d2fe)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Firm Workflow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {firmConfig.workflow.map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
@@ -126,7 +126,7 @@ export default function FirmOverviewPage() {
         </div>
 
         <div style={{ background: firmBg, border: `1px solid ${firmBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/firm/clients", label: "Client Desk", hint: "Portfolio, status, and retainers" },

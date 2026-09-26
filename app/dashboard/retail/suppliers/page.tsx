@@ -58,10 +58,10 @@ export default function RetailSuppliersPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total Suppliers", val: suppliers.length, color: "#818cf8" },
-          { label: "Active", val: suppliers.filter(x => x.status === "active").length, color: "#10b981" },
-          { label: "Total Payable", val: `Rs ${suppliers.reduce((s, x) => s + x.balance, 0).toLocaleString()}`, color: "#ef4444" },
-          { label: "Total Purchases", val: `Rs ${suppliers.reduce((s, x) => s + x.totalPurchases, 0).toLocaleString()}`, color: "#6366f1" },
+          { label: "Total Suppliers", val: suppliers.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active", val: suppliers.filter(x => x.status === "active").length, color: "var(--tx-10b981, #10b981)" },
+          { label: "Total Payable", val: `Rs ${suppliers.reduce((s, x) => s + x.balance, 0).toLocaleString()}`, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Total Purchases", val: `Rs ${suppliers.reduce((s, x) => s + x.totalPurchases, 0).toLocaleString()}`, color: "var(--tx-6366f1, #6366f1)" },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
@@ -94,7 +94,7 @@ export default function RetailSuppliersPage() {
                 </td>
                 <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{sup.phone}</td>
                 <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{sup.city}</td>
-                <td style={{ padding: "11px 14px", fontWeight: 600, color: sup.balance > 0 ? "#ef4444" : "var(--text-muted)" }}>
+                <td style={{ padding: "11px 14px", fontWeight: 600, color: sup.balance > 0 ? "var(--tx-ef4444, #ef4444)" : "var(--text-muted)" }}>
                   {sup.balance > 0 ? `Rs ${sup.balance.toLocaleString()}` : "—"}
                 </td>
                 <td style={{ padding: "11px 14px" }}>Rs {sup.totalPurchases.toLocaleString()}</td>
@@ -104,7 +104,7 @@ export default function RetailSuppliersPage() {
                   </span>
                 </td>
                 <td style={{ padding: "11px 14px" }}>
-                  <Link prefetch={false} href={`/dashboard/reports/ledger?account=${sup.id}`} style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
+                  <Link prefetch={false} href={`/dashboard/reports/ledger?account=${sup.id}`} style={{ background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
                 </td>
               </tr>
             ))}

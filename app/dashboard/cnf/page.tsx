@@ -9,9 +9,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
-const BG     = "rgba(255,255,255,.035)";
-const BORDER = "rgba(255,255,255,.08)";
-const MUTED  = "rgba(255,255,255,.5)";
+const BG     = "rgba(var(--ink),.035)";
+const BORDER = "rgba(var(--ink),.08)";
+const MUTED  = "rgba(var(--ink),.5)";
 const ACCENT = "#f472b6";
 
 type JobStatus = "DRAFT" | "ACTIVE" | "CUSTOMS_PENDING" | "CUSTOMS_CLEARED" | "DELIVERED" | "INVOICED" | "CLOSED";
@@ -19,12 +19,12 @@ type TransportMode = "Sea" | "Air" | "Land";
 
 const STATUS_META: Record<JobStatus, { label: string; color: string; bg: string }> = {
   DRAFT:            { label: "Draft",            color: "#6b7280", bg: "rgba(107,114,128,.15)" },
-  ACTIVE:           { label: "Active",           color: "#38bdf8", bg: "rgba(56,189,248,.15)"  },
-  CUSTOMS_PENDING:  { label: "Customs Pending",  color: "#fbbf24", bg: "rgba(251,191,36,.15)"  },
-  CUSTOMS_CLEARED:  { label: "Customs Cleared",  color: "#34d399", bg: "rgba(52,211,153,.15)"  },
-  DELIVERED:        { label: "Delivered",        color: "#a78bfa", bg: "rgba(167,139,250,.15)" },
-  INVOICED:         { label: "Invoiced",         color: "#f472b6", bg: "rgba(244,114,182,.15)" },
-  CLOSED:           { label: "Closed",           color: "#4ade80", bg: "rgba(74,222,128,.15)"  },
+  ACTIVE:           { label: "Active",           color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.15)"  },
+  CUSTOMS_PENDING:  { label: "Customs Pending",  color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.15)"  },
+  CUSTOMS_CLEARED:  { label: "Customs Cleared",  color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.15)"  },
+  DELIVERED:        { label: "Delivered",        color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.15)" },
+  INVOICED:         { label: "Invoiced",         color: "var(--tx-f472b6, #f472b6)", bg: "rgba(244,114,182,.15)" },
+  CLOSED:           { label: "Closed",           color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.15)"  },
 };
 
 const MODES: TransportMode[] = ["Sea", "Air", "Land"];
@@ -66,7 +66,7 @@ function todayIso() { return new Date().toISOString().slice(0, 10); }
 const inp: React.CSSProperties = {
   width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)",
   border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px",
-  color: "#f1f5f9", fontFamily: FONT, fontSize: 13, outline: "none",
+  color: "var(--tx-f1f5f9, #f1f5f9)", fontFamily: FONT, fontSize: 13, outline: "none",
 };
 const lbl: React.CSSProperties = {
   display: "block", fontSize: 12, fontWeight: 600, color: MUTED, marginBottom: 5,
@@ -284,7 +284,7 @@ export default function CnfPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "#f1f5f9", fontFamily: FONT }}>
+    <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-f1f5f9, #f1f5f9)", fontFamily: FONT }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
@@ -318,10 +318,10 @@ export default function CnfPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
         {[
           { label: "Total Jobs",       value: kpis.total,               color: ACCENT },
-          { label: "Active Jobs",      value: kpis.active,              color: "#38bdf8" },
-          { label: "Customs Pending",  value: kpis.customs,             color: "#fbbf24" },
-          { label: "Unbilled Jobs",    value: kpis.unbilled,            color: "#f87171" },
-          { label: "Total Billed",     value: fmt(kpis.revenue),        color: "#34d399" },
+          { label: "Active Jobs",      value: kpis.active,              color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Customs Pending",  value: kpis.customs,             color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Unbilled Jobs",    value: kpis.unbilled,            color: "var(--tx-f87171, #f87171)" },
+          { label: "Total Billed",     value: fmt(kpis.revenue),        color: "var(--tx-34d399, #34d399)" },
         ].map(card => (
           <div key={card.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".05em" }}>{card.label}</div>
@@ -371,8 +371,8 @@ export default function CnfPage() {
                   <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{j.shipmentRef || j.blAwbNo || "—"}</td>
                   <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, fontSize: 13 }}>{MODE_ICON[j.mode]} {j.mode}</td>
                   <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{j.portOfEntry || "—"}</td>
-                  <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, color: "#34d399", fontWeight: 700 }}>{fmt(j.billed)}</td>
-                  <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, color: j.profit >= 0 ? "#4ade80" : "#f87171", fontWeight: 700 }}>{fmt(j.profit)}</td>
+                  <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{fmt(j.billed)}</td>
+                  <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, color: j.profit >= 0 ? "var(--tx-4ade80, #4ade80)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>{fmt(j.profit)}</td>
                   <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{j.date || "—"}</td>
                   <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}` }}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: sm.bg, color: sm.color }}>{sm.label}</span>
@@ -380,7 +380,7 @@ export default function CnfPage() {
                   <td style={{ padding: "13px 14px", borderBottom: `1px solid ${BORDER}` }}>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       <button onClick={() => openEdit(j)}
-                        style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, border: `1px solid ${BORDER}`, background: "transparent", color: "#a5b4fc", cursor: "pointer" }}>
+                        style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, border: `1px solid ${BORDER}`, background: "transparent", color: "var(--tx-a5b4fc, #a5b4fc)", cursor: "pointer" }}>
                         Edit
                       </button>
                       {next && (
@@ -390,7 +390,7 @@ export default function CnfPage() {
                         </button>
                       )}
                       <button onClick={() => void handleDelete(j.id, j.jobNo)}
-                        style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, border: "1px solid rgba(239,68,68,.3)", background: "transparent", color: "#f87171", cursor: "pointer" }}>
+                        style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, border: "1px solid rgba(239,68,68,.3)", background: "transparent", color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}>
                         Del
                       </button>
                     </div>
@@ -409,7 +409,7 @@ export default function CnfPage() {
             <h2 style={{ margin: "0 0 22px", fontSize: 18, fontWeight: 800 }}>{editId ? "Edit Job File" : "New Job File"}</h2>
 
             {error && (
-              <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#f87171", fontSize: 13 }}>{error}</div>
+              <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>{error}</div>
             )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -467,7 +467,7 @@ export default function CnfPage() {
 
               {/* Expenses */}
               <div style={{ gridColumn: "span 2" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10, marginTop: 4 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10, marginTop: 4 }}>
                   Expenses (Costs You Incur)
                 </div>
               </div>
@@ -487,7 +487,7 @@ export default function CnfPage() {
 
               {/* Revenue */}
               <div style={{ gridColumn: "span 2" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#34d399", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10, marginTop: 4 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-34d399, #34d399)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10, marginTop: 4 }}>
                   Your Service Charge (Revenue)
                 </div>
               </div>
@@ -499,7 +499,7 @@ export default function CnfPage() {
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
                 <div style={{ padding: "9px 14px", borderRadius: 8, background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.25)", fontSize: 13 }}>
                   <span style={{ color: MUTED }}>Total Billed to Client: </span>
-                  <span style={{ fontWeight: 800, color: "#34d399" }}>{fmt(totalBilled)}</span>
+                  <span style={{ fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{fmt(totalBilled)}</span>
                 </div>
               </div>
 
@@ -517,7 +517,7 @@ export default function CnfPage() {
             </div>
 
             {form.status === "INVOICED" && form.clientId && (
-              <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 8, background: "rgba(244,114,182,.08)", border: "1px solid rgba(244,114,182,.25)", fontSize: 12, color: "#f9a8d4" }}>
+              <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 8, background: "rgba(244,114,182,.08)", border: "1px solid rgba(244,114,182,.25)", fontSize: 12, color: "var(--tx-f9a8d4, #f9a8d4)" }}>
                 A Sales Invoice will be auto-created for {form.clientName} when you save.
               </div>
             )}

@@ -32,8 +32,8 @@ function calcTotal(f: FormState): number {
 
 function statusBadge(status: string) {
   const map: Record<string, { bg: string; color: string }> = {
-    PENDING:   { bg: "rgba(251,191,36,.15)", color: "#fbbf24" },
-    ALLOCATED: { bg: "rgba(16,185,129,.15)", color: "#10b981" },
+    PENDING:   { bg: "rgba(251,191,36,.15)", color: "var(--tx-fbbf24, #fbbf24)" },
+    ALLOCATED: { bg: "rgba(16,185,129,.15)", color: "var(--tx-10b981, #10b981)" },
   };
   const s = map[status] ?? map.PENDING;
   return (
@@ -98,9 +98,9 @@ export default function LandedCostPage() {
 
   const kpis = [
     { label: "Total Entries",       value: totalEntries,                              color: ACCENT },
-    { label: "Pending Allocation",  value: pendingCount,                              color: "#fbbf24" },
-    { label: "Allocated",           value: allocatedCount,                            color: "#10b981" },
-    { label: "Total Landed Cost",   value: `$${totalLandedCost.toLocaleString()}`,    color: "#60a5fa" },
+    { label: "Pending Allocation",  value: pendingCount,                              color: "var(--tx-fbbf24, #fbbf24)" },
+    { label: "Allocated",           value: allocatedCount,                            color: "var(--tx-10b981, #10b981)" },
+    { label: "Total Landed Cost",   value: `$${totalLandedCost.toLocaleString()}`,    color: "var(--tx-60a5fa, #60a5fa)" },
   ];
 
   function setField<K extends keyof FormState>(k: K, v: FormState[K]) {
@@ -227,7 +227,7 @@ export default function LandedCostPage() {
                 </tr>
               ) : entries.map((e) => (
                 <tr key={e.id}
-                  onMouseEnter={(ev) => (ev.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                  onMouseEnter={(ev) => (ev.currentTarget.style.background = "rgba(var(--ink),.03)")}
                   onMouseLeave={(ev) => (ev.currentTarget.style.background = "transparent")}
                 >
                   <td style={{ ...cell, fontWeight: 600 }}>{e.ref}</td>
@@ -258,7 +258,7 @@ export default function LandedCostPage() {
                       style={{
                         padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 600,
                         border: "1px solid rgba(239,68,68,.4)", background: "transparent",
-                        color: "#ef4444", cursor: "pointer",
+                        color: "var(--tx-ef4444, #ef4444)", cursor: "pointer",
                       }}
                     >
                       Delete
@@ -289,7 +289,7 @@ export default function LandedCostPage() {
             {error && (
               <div style={{
                 background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)",
-                color: "#f87171", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16,
+                color: "var(--tx-f87171, #f87171)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16,
               }}>{error}</div>
             )}
 

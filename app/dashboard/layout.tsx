@@ -1204,7 +1204,7 @@ export default function DashboardLayout({
   if (!currentUser) {
     return (
       <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"var(--dk-080c1e, #080c1e)"}}>
-        <div style={{color:"#f87171",fontWeight:700,fontSize:18}}>Session expired.</div>
+        <div style={{color:"var(--tx-f87171, #f87171)",fontWeight:700,fontSize:18}}>Session expired.</div>
         <button onClick={logout} style={{marginTop:16,color:"var(--accent)",background:"none",border:"none",cursor:"pointer",textDecoration:"underline",fontSize:14}}>
           Back to Login
         </button>
@@ -1244,7 +1244,7 @@ export default function DashboardLayout({
             <div style={{fontSize:14, color:"rgba(var(--ink),0.6)", lineHeight:1.6, marginBottom:24}}>
               You've been inactive for 25 minutes.<br/>
               For your security, you'll be logged out in{" "}
-              <span style={{color:"#f87171", fontWeight:700}}>
+              <span style={{color:"var(--tx-f87171, #f87171)", fontWeight:700}}>
                 {Math.floor(idleSecondsLeft / 60)}:{String(idleSecondsLeft % 60).padStart(2,"0")}
               </span>
             </div>
@@ -1294,7 +1294,7 @@ export default function DashboardLayout({
             <div style={{fontSize:14, color:"rgba(var(--ink),0.6)", lineHeight:1.6, marginBottom:24}}>
               Your shift is about to end.<br/>
               You will be automatically logged out in{" "}
-              <span style={{color:"#f87171", fontWeight:700}}>
+              <span style={{color:"var(--tx-f87171, #f87171)", fontWeight:700}}>
                 {Math.floor(shiftSecsLeft / 60)}:{String(shiftSecsLeft % 60).padStart(2,"0")}
               </span>
               <br/>
@@ -1319,7 +1319,7 @@ export default function DashboardLayout({
       {/* ═══ UNSAVED CHANGES — asked by the topbar ✕ ═══ */}
       {closeConfirm && (
         <div
-          style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(3,6,20,0.72)",backdropFilter:"blur(3px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}
+          style={{position:"fixed",inset:0,zIndex:100000,background:"rgba(var(--dkr-030614, 3,6,20),0.72)",backdropFilter:"blur(3px)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}
           onClick={() => { if (!closeSaving) setCloseConfirm(false); }}
         >
           <div
@@ -1334,7 +1334,7 @@ export default function DashboardLayout({
             }}
           >
             <div style={{padding:"22px 24px 18px",display:"flex",gap:14,alignItems:"flex-start"}}>
-              <div style={{width:42,height:42,borderRadius:12,flexShrink:0,background:"rgba(251,191,36,0.12)",border:"1px solid rgba(251,191,36,0.3)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fbbf24"}}>
+              <div style={{width:42,height:42,borderRadius:12,flexShrink:0,background:"rgba(251,191,36,0.12)",border:"1px solid rgba(251,191,36,0.3)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--tx-fbbf24, #fbbf24)"}}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                   <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -1363,7 +1363,7 @@ export default function DashboardLayout({
               <button
                 onClick={leaveToDashboard}
                 disabled={closeSaving}
-                style={{minWidth:96,padding:"9px 18px",borderRadius:10,cursor:closeSaving?"not-allowed":"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit",background:"transparent",border:"1px solid rgba(248,113,113,0.35)",color:"#f87171",opacity:closeSaving?0.5:1}}
+                style={{minWidth:96,padding:"9px 18px",borderRadius:10,cursor:closeSaving?"not-allowed":"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit",background:"transparent",border:"1px solid rgba(248,113,113,0.35)",color:"var(--tx-f87171, #f87171)",opacity:closeSaving?0.5:1}}
               >
                 No
               </button>
@@ -2798,7 +2798,7 @@ export default function DashboardLayout({
               background:"transparent",border:"none",cursor:"pointer",
               color:"var(--text-muted)",transition:"background .15s, color .15s",
             }}
-            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="var(--text-primary)";}}
+            onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),0.04)";e.currentTarget.style.color="var(--text-primary)";}}
             onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--text-muted)";}}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -2843,7 +2843,7 @@ export default function DashboardLayout({
             display:"flex", justifyContent:"flex-end",
             overflow:"visible", pointerEvents:"none",
           } : {
-            background: isMobileViewport ? "rgba(10,15,35,0.97)" : "var(--panel-bg)",
+            background: isMobileViewport ? "rgba(var(--dkr-0a0f23, 10,15,35),0.97)" : "var(--panel-bg)",
             borderBottom:"1px solid var(--border)",
             padding:isMobileViewport ? "10px 14px" : "8px 12px",
             minHeight:isMobileViewport ? 52 : 56,
@@ -2890,7 +2890,7 @@ export default function DashboardLayout({
                   title="Close this page"
                   style={{
                     width:36,height:36,borderRadius:10,border:"1px solid rgba(248,113,113,.4)",
-                    background:"var(--panel-bg)",color:"#f87171",cursor:"pointer",
+                    background:"var(--panel-bg)",color:"var(--tx-f87171, #f87171)",cursor:"pointer",
                     display:"flex",alignItems:"center",justifyContent:"center",
                     boxShadow:"0 4px 16px rgba(0,0,0,.2)",transition:"transform .15s, background .15s",
                   }}
@@ -2919,7 +2919,7 @@ export default function DashboardLayout({
                 <div style={{minWidth:0}}>
                   <span style={{fontSize:14,fontWeight:800,color:"var(--ink-solid, white)",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"block"}}>{companyName}</span>
                   {companyDetail?.companyNo && (
-                    <span style={{fontSize:10,fontWeight:700,color:"rgba(56,189,248,0.8)",fontFamily:"monospace",letterSpacing:".04em"}}>ID: {companyDetail.companyNo}</span>
+                    <span style={{fontSize:10,fontWeight:700,color:"rgba(var(--txr-38bdf8, 56,189,248),0.8)",fontFamily:"monospace",letterSpacing:".04em"}}>ID: {companyDetail.companyNo}</span>
                   )}
                 </div>
               </div>
@@ -2941,7 +2941,7 @@ export default function DashboardLayout({
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:"1px solid var(--border)"}}>
                       <div style={{display:"flex",alignItems:"center",gap:8}}>
                         <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Notifications</span>
-                        {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"#f87171"}}>{unreadCount} new</span>}
+                        {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"var(--tx-f87171, #f87171)"}}>{unreadCount} new</span>}
                       </div>
                       {unreadCount > 0 && <button onClick={markAllRead} style={{fontSize:11,color:"var(--accent)",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>}
                     </div>
@@ -2975,7 +2975,7 @@ export default function DashboardLayout({
                 <button
                   onClick={requestClosePage}
                   aria-label="Close this page"
-                  style={{marginLeft:6,width:38,height:38,borderRadius:11,background:"rgba(248,113,113,0.10)",border:"1px solid rgba(248,113,113,0.28)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"#f87171",flexShrink:0}}>
+                  style={{marginLeft:6,width:38,height:38,borderRadius:11,background:"rgba(248,113,113,0.10)",border:"1px solid rgba(248,113,113,0.28)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"var(--tx-f87171, #f87171)",flexShrink:0}}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
                     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
@@ -2997,7 +2997,7 @@ export default function DashboardLayout({
               style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:9,background:"rgba(var(--ink),0.04)",border:"1px solid rgba(var(--ink),0.08)"}}
               className="hidden md:flex"
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),0.4)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <select
                 value={activeBranchId}
                 onChange={e => setActiveBranchId(e.target.value)}
@@ -3037,8 +3037,8 @@ export default function DashboardLayout({
                   if (next && !notifsFetched) fetchNotifs();
                 }}
                 style={{position:"relative",width:36,height:36,borderRadius:10,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.05)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showNotifPanel?"var(--accent)":"var(--text-muted)"}}
-                onMouseEnter={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-                onMouseLeave={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
+                onMouseEnter={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(var(--ink),0.1)";}}
+                onMouseLeave={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(var(--ink),0.05)";}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
                 </svg>
@@ -3056,7 +3056,7 @@ export default function DashboardLayout({
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:"1px solid var(--border)"}}>
                     <div style={{display:"flex",alignItems:"center",gap:8}}>
                       <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Notifications</span>
-                      {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"#f87171"}}>{unreadCount} new</span>}
+                      {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"var(--tx-f87171, #f87171)"}}>{unreadCount} new</span>}
                     </div>
                     {unreadCount > 0 && (
                       <button onClick={markAllRead} style={{fontSize:11,color:"var(--accent)",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>
@@ -3084,7 +3084,7 @@ export default function DashboardLayout({
                           key={n.id}
                           onClick={()=>{ markRead(n.id); if(n.link) { router.push(n.link); setShowNotifPanel(false); } }}
                           style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(var(--accent-rgb),0.04)",transition:"background .12s"}}
-                          onMouseEnter={e=>{ if(!n.isRead||n.link) e.currentTarget.style.background="rgba(255,255,255,0.03)"; }}
+                          onMouseEnter={e=>{ if(!n.isRead||n.link) e.currentTarget.style.background="rgba(var(--ink),0.03)"; }}
                           onMouseLeave={e=>{ e.currentTarget.style.background=n.isRead?"transparent":"rgba(var(--accent-rgb),0.04)"; }}
                         >
                           <div style={{width:8,height:8,borderRadius:"50%",background:col,flexShrink:0,marginTop:5,opacity:n.isRead?0.3:1}}/>
@@ -3117,8 +3117,8 @@ export default function DashboardLayout({
               <button
                 onClick={()=>{ setShowHelpPanel(v=>!v); setShowNotifPanel(false); setShowUserMenu(false); }}
                 style={{width:36,height:36,borderRadius:10,background:showHelpPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.05)",border:showHelpPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showHelpPanel?"var(--accent)":"var(--text-muted)"}}
-                onMouseEnter={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-                onMouseLeave={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
+                onMouseEnter={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(var(--ink),0.1)";}}
+                onMouseLeave={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(var(--ink),0.05)";}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
@@ -3192,7 +3192,7 @@ export default function DashboardLayout({
               <div
                 className="hidden md:flex"
                 style={{display:"flex",alignItems:"center",gap:8,padding:"4px 8px 4px 4px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:showUserMenu?"rgba(var(--accent-rgb),0.1)":"transparent"}}
-                onMouseEnter={e=>{ if(!showUserMenu) e.currentTarget.style.background="rgba(255,255,255,0.06)"; }}
+                onMouseEnter={e=>{ if(!showUserMenu) e.currentTarget.style.background="rgba(var(--ink),0.06)"; }}
                 onMouseLeave={e=>{ if(!showUserMenu) e.currentTarget.style.background="transparent"; }}
                 onClick={()=>{ setShowUserMenu(v=>!v); setShowNotifPanel(false); setShowHelpPanel(false); }}
               >
@@ -3245,7 +3245,7 @@ export default function DashboardLayout({
                           {(currentUser.role||"User").toLowerCase()} · {avatarUploading ? "Uploading..." : "Tap photo to change"}
                         </div>
                         {companyDetail?.companyNo && (
-                          <div style={{fontSize:10,fontWeight:700,color:"rgba(56,189,248,0.85)",marginTop:3,fontFamily:"monospace",letterSpacing:".04em"}}>
+                          <div style={{fontSize:10,fontWeight:700,color:"rgba(var(--txr-38bdf8, 56,189,248),0.85)",marginTop:3,fontFamily:"monospace",letterSpacing:".04em"}}>
                             Company ID: {companyDetail.companyNo}
                           </div>
                         )}
@@ -3264,8 +3264,8 @@ export default function DashboardLayout({
                     ].map(item => (
                       <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
                         style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(var(--ink),0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
-                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="white";}}
-                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.65)";}}>
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),0.06)";e.currentTarget.style.color="white";}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(var(--ink),0.65)";}}>
                         <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
                         {item.label}
                       </a>
@@ -3273,7 +3273,7 @@ export default function DashboardLayout({
 
                     <div style={{borderTop:"1px solid rgba(var(--ink),0.07)",marginTop:4,paddingTop:4}}>
                       <button onClick={logout}
-                        style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
+                        style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"var(--tx-f87171, #f87171)",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
                         onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}
                         onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{flexShrink:0}}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -3297,7 +3297,7 @@ export default function DashboardLayout({
                 display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .15s",
               }}
               onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--accent-rgb),.14)";e.currentTarget.style.borderColor="rgba(var(--accent-rgb),.35)";e.currentTarget.style.color="var(--accent)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.05)";e.currentTarget.style.borderColor="rgba(255,255,255,.08)";e.currentTarget.style.color="var(--text-muted)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(var(--ink),.05)";e.currentTarget.style.borderColor="rgba(var(--ink),.08)";e.currentTarget.style.color="var(--text-muted)";}}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14"/><path d="m18 13-6 6-6-6"/>
@@ -3310,7 +3310,7 @@ export default function DashboardLayout({
                 onClick={requestClosePage}
                 title="Close this page"
                 aria-label="Close this page"
-                style={{width:34,height:34,borderRadius:9,background:"rgba(248,113,113,0.10)",border:"1px solid rgba(248,113,113,0.25)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:"#f87171",flexShrink:0}}
+                style={{width:34,height:34,borderRadius:9,background:"rgba(248,113,113,0.10)",border:"1px solid rgba(248,113,113,0.25)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:"var(--tx-f87171, #f87171)",flexShrink:0}}
                 onMouseEnter={e=>{e.currentTarget.style.background="rgba(248,113,113,0.22)";e.currentTarget.style.borderColor="rgba(248,113,113,0.5)";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="rgba(248,113,113,0.10)";e.currentTarget.style.borderColor="rgba(248,113,113,0.25)";}}
               >
@@ -3348,7 +3348,7 @@ export default function DashboardLayout({
                 <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                   <span style={{fontSize:18}}>🎮</span>
                   <div>
-                    <span style={{fontSize:13,fontWeight:700,color:"#fbbf24"}}>Demo Mode</span>
+                    <span style={{fontSize:13,fontWeight:700,color:"var(--tx-fbbf24, #fbbf24)"}}>Demo Mode</span>
                     <span style={{fontSize:12,color:"rgba(var(--ink),.45)",marginLeft:10}}>
                       You&apos;re viewing a demo account with sample data. Nothing here is real.
                     </span>
@@ -3386,7 +3386,7 @@ export default function DashboardLayout({
                       await fetch("/api/admin/dev-test/clear", { method:"POST" });
                       window.location.reload();
                     }}
-                    style={{ padding:"6px 14px", borderRadius:7, border:"1px solid rgba(248,113,113,.4)", background:"rgba(248,113,113,.1)", color:"#f87171", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
+                    style={{ padding:"6px 14px", borderRadius:7, border:"1px solid rgba(248,113,113,.4)", background:"rgba(248,113,113,.1)", color:"var(--tx-f87171, #f87171)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
                   >
                     🗑 Clear Data
                   </button>
@@ -3409,7 +3409,7 @@ export default function DashboardLayout({
             {subInfo?.status?.toUpperCase() === "READ_ONLY" && (
               <div style={{ margin:"0 0 16px", padding:"12px 16px", borderRadius:12, background:"rgba(249,115,22,.08)", border:"1px solid rgba(249,115,22,.25)", display:"flex", alignItems:"center", gap:10 }}>
                 <span style={{ fontSize:18 }}>🔒</span>
-                <div style={{ fontSize:13, color:"#fb923c", lineHeight:1.6 }}>
+                <div style={{ fontSize:13, color:"var(--tx-fb923c, #fb923c)", lineHeight:1.6 }}>
                   <strong>Read-only mode.</strong> Your access period has ended — you can still view and export
                   everything, but new records cannot be saved. Contact us to renew and full access comes straight back.
                 </div>
@@ -3428,7 +3428,7 @@ export default function DashboardLayout({
       {isMobileViewport && (
         <nav style={{
           position:"fixed", bottom:0, left:0, right:0, zIndex:25,
-          background:"rgba(8,12,30,0.97)", backdropFilter:"blur(24px)",
+          background:"rgba(var(--dkr-080c1e, 8,12,30),0.97)", backdropFilter:"blur(24px)",
           borderTop:"1px solid rgba(var(--ink),0.08)",
           display:"flex", alignItems:"stretch",
           paddingBottom:"env(safe-area-inset-bottom)",
@@ -3540,8 +3540,8 @@ export default function DashboardLayout({
             {/* Status badges */}
             <div style={{ display:"flex",gap:8,marginBottom:20,flexWrap:"wrap" }}>
               {[
-                { label: companyDetail?.plan || "STARTER", color: companyDetail?.plan==="ENTERPRISE"?"#fbbf24":companyDetail?.plan==="PRO"?"#34d399":"var(--accent)" },
-                { label: companyDetail?.subscriptionStatus || "ACTIVE", color: companyDetail?.subscriptionStatus==="ACTIVE"?"#34d399":"#f87171" },
+                { label: companyDetail?.plan || "STARTER", color: companyDetail?.plan==="ENTERPRISE"?"var(--tx-fbbf24, #fbbf24)":companyDetail?.plan==="PRO"?"var(--tx-34d399, #34d399)":"var(--accent)" },
+                { label: companyDetail?.subscriptionStatus || "ACTIVE", color: companyDetail?.subscriptionStatus==="ACTIVE"?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" },
               ].map(b => (
                 <span key={b.label} style={{ padding:"4px 14px",borderRadius:20,background:`${b.color}15`,border:`1px solid ${b.color}30`,color:b.color,fontSize:12,fontWeight:700 }}>{b.label}</span>
               ))}
@@ -3611,7 +3611,7 @@ function NavDirectLink({ href, icon, children, pathname, exact }: {
     return (
       <Link prefetch={false} href={href} title={typeof label === "string" ? label : ""} onClick={onNavigate}
         style={{display:"flex",alignItems:"center",justifyContent:"center",width:44,height:36,borderRadius:9,margin:"1px auto",cursor:"pointer",color:active?"var(--accent)":"var(--sidebar-link-muted)",background:active?"rgba(var(--accent-rgb),0.15)":"transparent",textDecoration:"none",transition:"all .15s"}}
-        onMouseEnter={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.18)":"rgba(255,255,255,0.06)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.18)":"rgba(var(--ink),0.06)";}}
         onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.15)":"transparent";}}
       ><span style={{display:"flex"}}>{icon}</span></Link>
     );
@@ -3620,7 +3620,7 @@ function NavDirectLink({ href, icon, children, pathname, exact }: {
   return (
     <Link prefetch={false} href={href} onClick={onNavigate}
       style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:10,fontSize:13,fontWeight:active?700:500,color:active?"var(--accent)":"var(--sidebar-link)",background:active?"rgba(var(--accent-rgb),0.15)":"transparent",textDecoration:"none",transition:"all .15s",marginBottom:2}}
-      onMouseEnter={e=>{if(!active){e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}}
+      onMouseEnter={e=>{if(!active){e.currentTarget.style.background="rgba(var(--ink),0.06)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}}
       onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--sidebar-link)";}}}
     >
       <span style={{display:"flex",color:active?"var(--accent)":"var(--sidebar-link-muted)",flexShrink:0,transition:"color .15s"}}>{icon}</span>
@@ -3726,7 +3726,7 @@ function NavGroup({ title, icon, open, onToggle, children }: {
           borderRadius:10,cursor:"pointer",userSelect:"none",transition:"all .15s",
           background: open ? "rgba(var(--accent-rgb),0.12)" : "transparent",
         }}
-        onMouseEnter={e => { if (!open) e.currentTarget.style.background="rgba(255,255,255,0.05)";}}
+        onMouseEnter={e => { if (!open) e.currentTarget.style.background="rgba(var(--ink),0.05)";}}
         onMouseLeave={e => { if (!open) e.currentTarget.style.background="transparent";}}
       >
         <span style={{color: open ? "var(--accent)" : "var(--sidebar-link-muted)",display:"flex",flexShrink:0,transition:"color .15s"}}>{icon}</span>
@@ -3855,7 +3855,7 @@ function NavLink({ href, children, pathname }: {
       onMouseEnter={e => {
         if (!active) {
           e.currentTarget.style.color = "var(--sidebar-link-hover)";
-          e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+          e.currentTarget.style.background = "rgba(var(--ink),0.06)";
         }
       }}
       onMouseLeave={e => {

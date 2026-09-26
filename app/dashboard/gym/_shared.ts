@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const gymFont = "'Outfit','Inter',sans-serif";
-export const gymBg = "rgba(255,255,255,.03)";
-export const gymBorder = "rgba(255,255,255,.07)";
-export const gymMuted = "rgba(255,255,255,.58)";
+export const gymBg = "rgba(var(--ink),.03)";
+export const gymBorder = "rgba(var(--ink),.07)";
+export const gymMuted = "rgba(var(--ink),.58)";
 
 export type GymMemberStatus = "Active" | "Expiring" | "Expired";
 export type GymClassStatus = "Open" | "Full" | "Cancelled";

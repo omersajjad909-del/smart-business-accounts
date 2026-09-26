@@ -27,9 +27,9 @@ function getStatus(qty: number, minStock: number): StockStatus {
 }
 
 const STATUS_STYLE: Record<StockStatus, { bg: string; color: string; label: string }> = {
-  OK:  { bg: "rgba(34,197,94,0.12)",  color: "#4ade80",  label: "In Stock"  },
-  LOW: { bg: "rgba(251,191,36,0.12)", color: "#fbbf24",  label: "Low Stock" },
-  OUT: { bg: "rgba(239,68,68,0.12)",  color: "#f87171",  label: "Out of Stock" },
+  OK:  { bg: "rgba(34,197,94,0.12)",  color: "var(--tx-4ade80, #4ade80)",  label: "In Stock"  },
+  LOW: { bg: "rgba(251,191,36,0.12)", color: "var(--tx-fbbf24, #fbbf24)",  label: "Low Stock" },
+  OUT: { bg: "rgba(239,68,68,0.12)",  color: "var(--tx-f87171, #f87171)",  label: "Out of Stock" },
 };
 
 export default function InventoryPage() {
@@ -198,7 +198,7 @@ export default function InventoryPage() {
           <button onClick={downloadTemplate} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", cursor: "pointer", fontFamily: FONT }}>
             ⬇ Template
           </button>
-          <button onClick={() => csvInputRef.current?.click()} disabled={csvImporting} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.5)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "#6366f1", cursor: "pointer", fontFamily: FONT, fontWeight: 600, opacity: csvImporting ? 0.6 : 1 }}>
+          <button onClick={() => csvInputRef.current?.click()} disabled={csvImporting} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.5)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--tx-6366f1, #6366f1)", cursor: "pointer", fontFamily: FONT, fontWeight: 600, opacity: csvImporting ? 0.6 : 1 }}>
             {csvImporting ? "Importing…" : "⬆ Import CSV"}
           </button>
           <input ref={csvInputRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleCsvImport} />
@@ -211,11 +211,11 @@ export default function InventoryPage() {
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Items",    value: kpis.total,    color: "#6366f1" },
-          { label: "In Stock",       value: kpis.inStock,  color: "#4ade80" },
-          { label: "Low Stock",      value: kpis.low,      color: "#fbbf24" },
-          { label: "Out of Stock",   value: kpis.out,      color: "#f87171" },
-          { label: "Stock Value",    value: fmtK(kpis.totalVal), color: "#a5b4fc" },
+          { label: "Total Items",    value: kpis.total,    color: "var(--tx-6366f1, #6366f1)" },
+          { label: "In Stock",       value: kpis.inStock,  color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Low Stock",      value: kpis.low,      color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Out of Stock",   value: kpis.out,      color: "var(--tx-f87171, #f87171)" },
+          { label: "Stock Value",    value: fmtK(kpis.totalVal), color: "var(--tx-a5b4fc, #a5b4fc)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
@@ -229,11 +229,11 @@ export default function InventoryPage() {
         <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", borderRadius: 12, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 18 }}>⚠️</span>
           <div>
-            <span style={{ fontWeight: 700, color: "#fbbf24", fontSize: 13 }}>{kpis.low} item{kpis.low > 1 ? "s" : ""} at or below reorder level</span>
+            <span style={{ fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", fontSize: 13 }}>{kpis.low} item{kpis.low > 1 ? "s" : ""} at or below reorder level</span>
             <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 12 }}>Consider raising purchase orders</span>
           </div>
           <button onClick={() => setFilter("LOW")}
-            style={{ marginLeft: "auto", background: "transparent", border: "1px solid rgba(251,191,36,0.4)", borderRadius: 8, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "#fbbf24", cursor: "pointer", fontFamily: FONT }}>
+            style={{ marginLeft: "auto", background: "transparent", border: "1px solid rgba(251,191,36,0.4)", borderRadius: 8, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "var(--tx-fbbf24, #fbbf24)", cursor: "pointer", fontFamily: FONT }}>
             Show Low Stock
           </button>
         </div>
@@ -243,11 +243,11 @@ export default function InventoryPage() {
         <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 18 }}>🚨</span>
           <div>
-            <span style={{ fontWeight: 700, color: "#f87171", fontSize: 13 }}>{kpis.out} item{kpis.out > 1 ? "s" : ""} out of stock</span>
+            <span style={{ fontWeight: 700, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>{kpis.out} item{kpis.out > 1 ? "s" : ""} out of stock</span>
             <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 12 }}>Immediate reorder needed</span>
           </div>
           <button onClick={() => setFilter("OUT")}
-            style={{ marginLeft: "auto", background: "transparent", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 8, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "#f87171", cursor: "pointer", fontFamily: FONT }}>
+            style={{ marginLeft: "auto", background: "transparent", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 8, padding: "5px 14px", fontSize: 12, fontWeight: 600, color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontFamily: FONT }}>
             Show Out of Stock
           </button>
         </div>
@@ -333,7 +333,7 @@ export default function InventoryPage() {
                     <td style={{ ...td, textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>
                       {s.minStock > 0 ? s.minStock.toLocaleString() : "—"}
                     </td>
-                    <td style={{ ...td, textAlign: "right", fontWeight: 600, color: "#a5b4fc" }}>
+                    <td style={{ ...td, textAlign: "right", fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                       {s.rate > 0 ? fmt(s.value) : "—"}
                     </td>
                     <td style={{ ...td, textAlign: "center" }}>
@@ -350,7 +350,7 @@ export default function InventoryPage() {
                 <td colSpan={6} style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
                   Showing {filtered.length} of {enriched.length} items
                 </td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, color: "#a5b4fc", fontSize: 14 }}>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 14 }}>
                   {fmt(filtered.reduce((s, i) => s + i.value, 0))}
                 </td>
                 <td />

@@ -7,8 +7,8 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const F = "'Outfit','Inter',sans-serif";
-const BG = "rgba(255,255,255,0.03)";
-const BD = "rgba(255,255,255,0.07)";
+const BG = "rgba(var(--ink),0.03)";
+const BD = "rgba(var(--ink),0.07)";
 const inp: React.CSSProperties = {
   fontFamily: F, padding: "9px 12px", background: BG,
   border: `1px solid ${BD}`, borderRadius: 8,
@@ -19,16 +19,16 @@ type PortalStatus = "ACTIVE" | "PENDING" | "SUSPENDED";
 type OrderStatus  = "SENT" | "ACKNOWLEDGED" | "DISPATCHED" | "RECEIVED" | "CANCELLED";
 
 const PORTAL_META: Record<PortalStatus, { label: string; color: string; bg: string }> = {
-  ACTIVE:    { label: "Active",    color: "#10b981", bg: "rgba(16,185,129,.12)" },
-  PENDING:   { label: "Pending",   color: "#f59e0b", bg: "rgba(245,158,11,.12)" },
-  SUSPENDED: { label: "Suspended", color: "#ef4444", bg: "rgba(239,68,68,.12)"  },
+  ACTIVE:    { label: "Active",    color: "var(--tx-10b981, #10b981)", bg: "rgba(16,185,129,.12)" },
+  PENDING:   { label: "Pending",   color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)" },
+  SUSPENDED: { label: "Suspended", color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.12)"  },
 };
 const ORDER_META: Record<OrderStatus, { label: string; color: string }> = {
-  SENT:         { label: "Sent",         color: "#6366f1" },
-  ACKNOWLEDGED: { label: "Acknowledged", color: "#3b82f6" },
-  DISPATCHED:   { label: "Dispatched",   color: "#f59e0b" },
-  RECEIVED:     { label: "Received",     color: "#10b981" },
-  CANCELLED:    { label: "Cancelled",    color: "#ef4444" },
+  SENT:         { label: "Sent",         color: "var(--tx-6366f1, #6366f1)" },
+  ACKNOWLEDGED: { label: "Acknowledged", color: "var(--tx-3b82f6, #3b82f6)" },
+  DISPATCHED:   { label: "Dispatched",   color: "var(--tx-f59e0b, #f59e0b)" },
+  RECEIVED:     { label: "Received",     color: "var(--tx-10b981, #10b981)" },
+  CANCELLED:    { label: "Cancelled",    color: "var(--tx-ef4444, #ef4444)" },
 };
 
 const BLANK_SUP  = { name: "", email: "", phone: "", category: "", creditDays: 30, portalNote: "" };
@@ -159,10 +159,10 @@ export default function SupplierPortalPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Suppliers",  value: supplierList.length, color: "#a78bfa" },
-          { label: "Active Portal",    value: activeCount,         color: "#10b981" },
-          { label: "Pending Orders",   value: pendingOrds,         color: "#f59e0b" },
-          { label: "Total Received",   value: `Rs. ${(totalSpend/1000).toFixed(0)}K`, color: "#38bdf8" },
+          { label: "Total Suppliers",  value: supplierList.length, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active Portal",    value: activeCount,         color: "var(--tx-10b981, #10b981)" },
+          { label: "Pending Orders",   value: pendingOrds,         color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Total Received",   value: `Rs. ${(totalSpend/1000).toFixed(0)}K`, color: "var(--tx-38bdf8, #38bdf8)" },
         ].map(k => (
           <div key={k.label} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: .5 }}>{k.label}</div>
@@ -218,7 +218,7 @@ export default function SupplierPortalPage() {
                           {s.status === "ACTIVE" ? "Suspend" : "Activate"}
                         </button>
                         <button onClick={() => openEditSup(s)} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, borderRadius: 6, border: `1px solid ${BD}`, background: "none", cursor: "pointer", color: "var(--text-muted)" }}>Edit</button>
-                        <button onClick={() => deleteSup(s.id, s.name)} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, borderRadius: 6, border: "none", background: "rgba(239,68,68,.1)", color: "#f87171", cursor: "pointer" }}>Del</button>
+                        <button onClick={() => deleteSup(s.id, s.name)} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, borderRadius: 6, border: "none", background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}>Del</button>
                       </div>
                     </td>
                   </tr>
@@ -250,7 +250,7 @@ export default function SupplierPortalPage() {
                 const canAdvance = o.status !== "RECEIVED" && o.status !== "CANCELLED";
                 return (
                   <tr key={o.id} style={{ borderBottom: `1px solid ${BD}` }}>
-                    <td style={{ padding: "11px 14px", fontWeight: 700, fontSize: 12, color: "#a78bfa" }}>{o.ref}</td>
+                    <td style={{ padding: "11px 14px", fontWeight: 700, fontSize: 12, color: "var(--tx-a78bfa, #a78bfa)" }}>{o.ref}</td>
                     <td style={{ padding: "11px 14px", fontSize: 13 }}>{o.supplierName}</td>
                     <td style={{ padding: "11px 14px", fontSize: 12, color: "var(--text-muted)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.items}</td>
                     <td style={{ padding: "11px 14px", fontSize: 13, fontWeight: 600 }}>Rs. {o.amount.toLocaleString()}</td>
@@ -267,7 +267,7 @@ export default function SupplierPortalPage() {
                           </button>
                         )}
                         {canAdvance && (
-                          <button onClick={() => cancelOrder(o.id)} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, borderRadius: 6, border: "none", background: "rgba(239,68,68,.1)", color: "#f87171", cursor: "pointer" }}>Cancel</button>
+                          <button onClick={() => cancelOrder(o.id)} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, borderRadius: 6, border: "none", background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}>Cancel</button>
                         )}
                       </div>
                     </td>

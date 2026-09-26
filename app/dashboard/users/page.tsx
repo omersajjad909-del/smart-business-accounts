@@ -56,19 +56,19 @@ function defaultShift(): ShiftSetting {
 
 /* ── Role meta ── */
 const ROLE_META: Record<string, { color: string; bg: string; border: string; desc: string }> = {
-  ADMIN:             { color: "#f87171", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.3)",  desc: "Full access to all features, settings, and user management." },
-  MANAGER:           { color: "#34d399", bg: "rgba(52,211,153,.12)",  border: "rgba(52,211,153,.3)",   desc: "Manage operations, approve transactions, and view reports." },
-  ACCOUNTANT:        { color: "#818cf8", bg: "rgba(99,102,241,.12)",  border: "rgba(99,102,241,.3)",   desc: "Access to accounting, invoices, expenses, and financial reports." },
-  HR_MANAGER:        { color: "#fbbf24", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.3)",   desc: "Manage employees, payroll, and HR-related data." },
-  SALES:             { color: "#38bdf8", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.3)",   desc: "Create sales orders, manage customers, and view sales reports." },
-  INVENTORY_MANAGER: { color: "#4ade80", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.3)",   desc: "Manage inventory, stock, items, and purchase orders." },
-  CASHIER:           { color: "#c084fc", bg: "rgba(192,132,252,.12)", border: "rgba(192,132,252,.3)",  desc: "Process payments, receipts, and basic transactions." },
-  AUDITOR:           { color: "#fb923c", bg: "rgba(251,146,60,.12)",  border: "rgba(251,146,60,.3)",   desc: "Read-only access to financial data and audit logs." },
-  SECURITY:          { color: "#94a3b8", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.3)",  desc: "Gate and visitor management access only." },
+  ADMIN:             { color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.3)",  desc: "Full access to all features, settings, and user management." },
+  MANAGER:           { color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)",  border: "rgba(52,211,153,.3)",   desc: "Manage operations, approve transactions, and view reports." },
+  ACCOUNTANT:        { color: "var(--tx-818cf8, #818cf8)", bg: "rgba(99,102,241,.12)",  border: "rgba(99,102,241,.3)",   desc: "Access to accounting, invoices, expenses, and financial reports." },
+  HR_MANAGER:        { color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.3)",   desc: "Manage employees, payroll, and HR-related data." },
+  SALES:             { color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.3)",   desc: "Create sales orders, manage customers, and view sales reports." },
+  INVENTORY_MANAGER: { color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.3)",   desc: "Manage inventory, stock, items, and purchase orders." },
+  CASHIER:           { color: "var(--tx-c084fc, #c084fc)", bg: "rgba(192,132,252,.12)", border: "rgba(192,132,252,.3)",  desc: "Process payments, receipts, and basic transactions." },
+  AUDITOR:           { color: "var(--tx-fb923c, #fb923c)", bg: "rgba(251,146,60,.12)",  border: "rgba(251,146,60,.3)",   desc: "Read-only access to financial data and audit logs." },
+  SECURITY:          { color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.3)",  desc: "Gate and visitor management access only." },
   VIEWER:            { color: "#64748b", bg: "rgba(100,116,139,.12)", border: "rgba(100,116,139,.3)",  desc: "Read-only access to dashboards and basic reports." },
 };
 const ALL_ROLES = Object.keys(ROLE_META);
-function roleMeta(r: string) { return ROLE_META[r] || { color: "#94a3b8", bg: "rgba(148,163,184,.1)", border: "rgba(148,163,184,.2)", desc: "" }; }
+function roleMeta(r: string) { return ROLE_META[r] || { color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.1)", border: "rgba(148,163,184,.2)", desc: "" }; }
 
 const inp: React.CSSProperties = {
   background: "rgba(var(--ink),.04)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9,
@@ -353,7 +353,7 @@ export default function TeamAndPermissionsPage() {
   /* ── access denied ── */
   if (!loading && me?.role !== "ADMIN") return (
     <div style={{ padding: isMobile ? "22px 13px" : "40px 28px", fontFamily: ff }}>
-      <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "#f87171" }}>
+      <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "var(--tx-f87171, #f87171)" }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
         <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Access Denied</div>
         <div style={{ fontSize: 13, color: "#475569" }}>Only admins can manage team members and permissions.</div>
@@ -397,10 +397,10 @@ export default function TeamAndPermissionsPage() {
       {/* ── Stats ── */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Users",  value: users.length, color: "#818cf8" },
-          { label: "Active",        value: activeCount,  color: "#34d399" },
-          { label: "Admins",        value: adminCount,   color: "#f87171" },
-          { label: "Shifts Active", value: shiftOnCount, color: "#f59e0b" },
+          { label: "Total Users",  value: users.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",        value: activeCount,  color: "var(--tx-34d399, #34d399)" },
+          { label: "Admins",        value: adminCount,   color: "var(--tx-f87171, #f87171)" },
+          { label: "Shifts Active", value: shiftOnCount, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map(s => (
           <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: `1px solid ${s.color}20` }}>
             <div style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
@@ -452,7 +452,7 @@ export default function TeamAndPermissionsPage() {
                   const assignedBranches = (branchMap[u.id] || []).map(bid => branches.find(b => b.id === bid)?.name).filter(Boolean);
                   return (
                     <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid rgba(var(--ink),.04)" : "none", transition: "background .12s" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.02)")}
+                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.02)")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                       <td style={{ padding: "13px 16px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -478,8 +478,8 @@ export default function TeamAndPermissionsPage() {
                       </td>
                       <td style={{ padding: "13px 16px" }}>
                         <div style={{ display: "flex", gap: 6 }}>
-                          <button onClick={() => openEdit(u)} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.08)", color: "#818cf8", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
-                          <button onClick={() => deleteUser(u.id)} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "#f87171", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                          <button onClick={() => openEdit(u)} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.08)", color: "var(--tx-818cf8, #818cf8)", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
+                          <button onClick={() => deleteUser(u.id)} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "var(--tx-f87171, #f87171)", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -503,7 +503,7 @@ export default function TeamAndPermissionsPage() {
                   <input style={inp} placeholder="Muhammad Ali" value={invName} onChange={e => setInvName(e.target.value)} />
                 </div>
                 <div>
-                  <label style={lbl}>Email Address <span style={{ color: "#f87171" }}>*</span></label>
+                  <label style={lbl}>Email Address <span style={{ color: "var(--tx-f87171, #f87171)" }}>*</span></label>
                   <input style={inp} type="email" placeholder="user@example.com" value={invEmail} onChange={e => setInvEmail(e.target.value)} required />
                 </div>
               </div>
@@ -575,7 +575,7 @@ export default function TeamAndPermissionsPage() {
                 {invAddEmployee && (
                   <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed rgba(var(--ink),.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
-                      <label style={lbl}>Department <span style={{ color: "#f87171" }}>*</span></label>
+                      <label style={lbl}>Department <span style={{ color: "var(--tx-f87171, #f87171)" }}>*</span></label>
                       <input
                         type="text"
                         list="invite-department-suggestions"
@@ -604,7 +604,7 @@ export default function TeamAndPermissionsPage() {
                       </datalist>
                     </div>
                     <div>
-                      <label style={lbl}>Date of Joining <span style={{ color: "#f87171" }}>*</span></label>
+                      <label style={lbl}>Date of Joining <span style={{ color: "var(--tx-f87171, #f87171)" }}>*</span></label>
                       <input
                         type="date"
                         value={invEmpJoin}
@@ -636,7 +636,7 @@ export default function TeamAndPermissionsPage() {
           <div style={{ marginTop: 12, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.06)", display: "flex", gap: 12, alignItems: "flex-start" }}>
             <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
-              Invited member will receive an email with a link to set their password and join your workspace. You can change their role anytime from the <strong style={{ color: "#818cf8" }}>Team Members</strong> tab.
+              Invited member will receive an email with a link to set their password and join your workspace. You can change their role anytime from the <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>Team Members</strong> tab.
             </div>
           </div>
         </div>
@@ -671,8 +671,8 @@ export default function TeamAndPermissionsPage() {
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <input placeholder="Search…" value={permSearch} onChange={e => setPermSearch(e.target.value)} style={{ ...inp, width: 160, padding: "7px 12px" }} />
-                <button onClick={() => setRolePerms([...allPerms])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", color: "#34d399", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>All</button>
-                <button onClick={() => setRolePerms([])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "#f87171", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>None</button>
+                <button onClick={() => setRolePerms([...allPerms])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", color: "var(--tx-34d399, #34d399)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>All</button>
+                <button onClick={() => setRolePerms([])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "var(--tx-f87171, #f87171)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>None</button>
                 <button onClick={savePermissions} disabled={savingPerms} style={{ padding: "7px 18px", borderRadius: 8, background: savingPerms ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: savingPerms ? "default" : "pointer" }}>
                   {savingPerms ? "Saving…" : "💾 Save"}
                 </button>
@@ -710,7 +710,7 @@ export default function TeamAndPermissionsPage() {
           <div style={{ marginBottom: 20, padding: "13px 17px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", display: "flex", gap: 12, alignItems: "flex-start" }}>
             <span style={{ fontSize: 18, flexShrink: 0 }}>🕐</span>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 3 }}>Shift Access Control</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", marginBottom: 3 }}>Shift Access Control</div>
               <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.6 }}>
                 Set working hours per employee. Login is blocked outside their scheduled shift. Admins can extend overtime instantly without restarting the session.
               </div>
@@ -719,7 +719,7 @@ export default function TeamAndPermissionsPage() {
 
           {nonAdminShiftUsers.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: "#475569", fontSize: 13 }}>
-              No staff users found. Add users from the <strong style={{ color: "#818cf8" }}>Team Members</strong> tab first.
+              No staff users found. Add users from the <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>Team Members</strong> tab first.
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -819,7 +819,7 @@ export default function TeamAndPermissionsPage() {
                                       onChange={e => updateShiftDraft(u.id, { [key]: type === "number" ? Number(e.target.value) : e.target.value })}
                                       style={{ ...inp, padding: "8px 10px" }}
                                     />
-                                    {ampmHint && <div style={{ fontSize: 11, color: "#818cf8", fontWeight: 700, marginTop: 3 }}>= {ampmHint}</div>}
+                                    {ampmHint && <div style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, marginTop: 3 }}>= {ampmHint}</div>}
                                   </div>
                                 );
                               })}
@@ -829,13 +829,13 @@ export default function TeamAndPermissionsPage() {
                             <div style={{ marginTop: 16, background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.22)", borderRadius: 12, padding: "13px 15px" }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                                 <div>
-                                  <div style={{ fontWeight: 700, fontSize: 13, color: "#f59e0b" }}>⏰ Overtime Extension</div>
+                                  <div style={{ fontWeight: 700, fontSize: 13, color: "var(--tx-f59e0b, #f59e0b)" }}>⏰ Overtime Extension</div>
                                   <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>
-                                    Current: <strong style={{ color: ot > 0 ? "#f59e0b" : "#475569" }}>{ot > 0 ? `+${ot} minutes` : "None"}</strong>
+                                    Current: <strong style={{ color: ot > 0 ? "var(--tx-f59e0b, #f59e0b)" : "#475569" }}>{ot > 0 ? `+${ot} minutes` : "None"}</strong>
                                   </div>
                                 </div>
                                 {ot > 0 && (
-                                  <button onClick={() => applyOvertime(u.id, 0)} disabled={shiftOvertiming === u.id} style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(239,68,68,.4)", background: "rgba(239,68,68,.1)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Clear OT</button>
+                                  <button onClick={() => applyOvertime(u.id, 0)} disabled={shiftOvertiming === u.id} style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(239,68,68,.4)", background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Clear OT</button>
                                 )}
                               </div>
                               <div style={{ display: "flex", gap: 7 }}>
@@ -898,11 +898,11 @@ export default function TeamAndPermissionsPage() {
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>Profile Photo</div>
                   <div style={{ display: "flex", gap: 7 }}>
-                    <label htmlFor="member-avatar-input" style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.08)", color: "#818cf8", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                    <label htmlFor="member-avatar-input" style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.08)", color: "var(--tx-818cf8, #818cf8)", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                       {form.avatar ? "Change" : "Upload"}
                     </label>
                     {form.avatar && (
-                      <button type="button" onClick={() => setForm(f => ({ ...f, avatar: null }))} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "#f87171", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      <button type="button" onClick={() => setForm(f => ({ ...f, avatar: null }))} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "var(--tx-f87171, #f87171)", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                         Remove
                       </button>
                     )}

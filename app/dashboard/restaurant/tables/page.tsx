@@ -9,10 +9,10 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 type TableStatus = "available" | "occupied" | "reserved" | "cleaning";
 const STATUS_META: Record<TableStatus, { label: string; color: string; bg: string; emoji: string }> = {
-  available: { label: "Available", color: "#34d399", bg: "rgba(52,211,153,.12)", emoji: "✓" },
-  occupied: { label: "Occupied", color: "#f59e0b", bg: "rgba(245,158,11,.12)", emoji: "🍽️" },
-  reserved: { label: "Reserved", color: "#818cf8", bg: "rgba(129,140,248,.12)", emoji: "📋" },
-  cleaning: { label: "Cleaning", color: "#38bdf8", bg: "rgba(56,189,248,.12)", emoji: "🧹" },
+  available: { label: "Available", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)", emoji: "✓" },
+  occupied: { label: "Occupied", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)", emoji: "🍽️" },
+  reserved: { label: "Reserved", color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.12)", emoji: "📋" },
+  cleaning: { label: "Cleaning", color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)", emoji: "🧹" },
 };
 
 export default function TablesPage() {
@@ -68,7 +68,7 @@ export default function TablesPage() {
           <p style={{ fontSize: 13, color: restaurantMuted, margin: 0 }}>Live floor view with status discipline.</p>
         </div>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399" }}>Revenue: Rs.{revenue.toLocaleString()}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Revenue: Rs.{revenue.toLocaleString()}</div>
           <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#f87171", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Table</button>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function TablesPage() {
           {tables.map((table) => {
             const meta = STATUS_META[table.status];
             const isSelected = selected === table.id;
-            return <div key={table.id} onClick={() => setSelected(isSelected ? null : table.id)} style={{ padding: isMobile ? "12px 10px" : "18px 14px", borderRadius: 14, background: isSelected ? meta.bg : restaurantBg, border: `2px solid ${isSelected ? meta.color : `${meta.color}30`}`, cursor: "pointer", textAlign: "center" }}><div style={{ fontSize: 26, marginBottom: 6 }}>{meta.emoji}</div><div style={{ fontSize: 18, fontWeight: 800 }}>Table {table.number}</div><div style={{ fontSize: 11, color: restaurantMuted, marginTop: 2 }}>Cap: {table.capacity}</div><div style={{ fontSize: 11, fontWeight: 700, color: meta.color, marginTop: 6, padding: "2px 8px", borderRadius: 20, background: `${meta.color}15`, display: "inline-block" }}>{meta.label}</div>{table.order && <div style={{ fontSize: 12, fontWeight: 700, color: "#f59e0b", marginTop: 6 }}>Rs.{table.order.total.toLocaleString()}</div>}</div>;
+            return <div key={table.id} onClick={() => setSelected(isSelected ? null : table.id)} style={{ padding: isMobile ? "12px 10px" : "18px 14px", borderRadius: 14, background: isSelected ? meta.bg : restaurantBg, border: `2px solid ${isSelected ? meta.color : `${meta.color}30`}`, cursor: "pointer", textAlign: "center" }}><div style={{ fontSize: 26, marginBottom: 6 }}>{meta.emoji}</div><div style={{ fontSize: 18, fontWeight: 800 }}>Table {table.number}</div><div style={{ fontSize: 11, color: restaurantMuted, marginTop: 2 }}>Cap: {table.capacity}</div><div style={{ fontSize: 11, fontWeight: 700, color: meta.color, marginTop: 6, padding: "2px 8px", borderRadius: 20, background: `${meta.color}15`, display: "inline-block" }}>{meta.label}</div>{table.order && <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)", marginTop: 6 }}>Rs.{table.order.total.toLocaleString()}</div>}</div>;
           })}
           {!loading && tables.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No tables added yet.</div>}
         </div>

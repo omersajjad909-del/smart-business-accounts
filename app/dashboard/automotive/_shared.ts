@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const autoFont = "'Outfit','Inter',sans-serif";
-export const autoBg = "rgba(255,255,255,.03)";
-export const autoBorder = "rgba(255,255,255,.07)";
-export const autoMuted = "rgba(255,255,255,.56)";
+export const autoBg = "rgba(var(--ink),.03)";
+export const autoBorder = "rgba(var(--ink),.07)";
+export const autoMuted = "rgba(var(--ink),.56)";
 
 export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
   try {

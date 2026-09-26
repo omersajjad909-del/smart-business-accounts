@@ -50,7 +50,7 @@ export default function AgricultureOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: agricultureFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture / Farm</div>
+        <div style={{ fontSize: 12, color: "var(--tx-86efac, #86efac)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture / Farm</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Farm Control Center</h1>
         <p style={{ margin: 0, fontSize: 14, color: agricultureMuted, maxWidth: 760 }}>
           Field planning, crop cycles, livestock records, and harvest sales now roll up through one agriculture control center.
@@ -67,7 +67,7 @@ export default function AgricultureOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(34,197,94,.12), rgba(245,158,11,.1))", border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#dcfce7", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-dcfce7, #dcfce7)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Prepare Field", body: `${data.summary.activeFields} active field blocks are in current rotation.` },
@@ -85,7 +85,7 @@ export default function AgricultureOverviewPage() {
         </div>
 
         <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/agriculture/fields", label: "Manage Fields", hint: "Soil, area, and irrigation control" },
@@ -105,7 +105,7 @@ export default function AgricultureOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Largest Active Fields</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Largest Active Fields</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topFields.length === 0 ? (
               <div style={{ color: agricultureMuted, fontSize: 13 }}>Top land blocks will appear here once fields are added.</div>
@@ -116,7 +116,7 @@ export default function AgricultureOverviewPage() {
                   <div style={{ fontSize: 12, color: agricultureMuted }}>{field.soilType} | {field.irrigationType}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: field.status === "active" ? "#34d399" : "#94a3b8" }}>{field.area.toFixed(1)} acres</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: field.status === "active" ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>{field.area.toFixed(1)} acres</div>
                   <div style={{ fontSize: 12, color: agricultureMuted }}>{field.status}</div>
                 </div>
               </div>
@@ -125,7 +125,7 @@ export default function AgricultureOverviewPage() {
         </div>
 
         <div style={{ background: agricultureBg, border: `1px solid ${agricultureBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Harvest quantity", value: `${data.summary.harvestQuantity.toLocaleString()} total units`, tone: "#60a5fa" },

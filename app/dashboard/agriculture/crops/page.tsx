@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 const STATUS_COLOR: Record<string, string> = { growing: "#34d399", harvested: "#f59e0b", planted: "#818cf8", failed: "#ef4444" };
 
 export default function CropsPage() {
@@ -51,7 +51,7 @@ export default function CropsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Crops", val: crops.length, color: "#34d399" }, { label: "Growing", val: crops.filter(c => c.status === "growing").length, color: "#818cf8" }, { label: "Planted", val: crops.filter(c => c.status === "planted").length, color: "#f59e0b" }, { label: "Harvested", val: crops.filter(c => c.status === "harvested").length, color: "#34d399" }].map(s => (
+        {[{ label: "Total Crops", val: crops.length, color: "var(--tx-34d399, #34d399)" }, { label: "Growing", val: crops.filter(c => c.status === "growing").length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Planted", val: crops.filter(c => c.status === "planted").length, color: "var(--tx-f59e0b, #f59e0b)" }, { label: "Harvested", val: crops.filter(c => c.status === "harvested").length, color: "var(--tx-34d399, #34d399)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>

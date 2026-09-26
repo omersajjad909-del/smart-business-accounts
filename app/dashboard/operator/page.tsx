@@ -108,7 +108,7 @@ function HealthArc({ score }: { score: number }) {
         </defs>
         {/* Track */}
         <circle cx="65" cy="72" r={R} fill="none"
-          stroke="rgba(255,255,255,.07)" strokeWidth="9"
+          stroke="rgba(var(--ink),.07)" strokeWidth="9"
           strokeDasharray={`${arcLen} ${circ - arcLen}`}
           strokeLinecap="round" transform="rotate(135 65 72)"
         />
@@ -474,7 +474,7 @@ export default function BusinessOperatorPage() {
       <div style={{
         position: "relative", overflow: "hidden",
         borderRadius: 24, marginBottom: 18,
-        background: "linear-gradient(135deg, rgba(12,16,44,.98) 0%, rgba(8,10,28,.96) 58%)",
+        background: "linear-gradient(135deg, rgba(var(--dkr-0c102c, 12,16,44),0.98) 0%, rgba(var(--dkr-080a1c, 8,10,28),0.96) 58%)",
         border: `1px solid ${T.border}`,
         boxShadow: "0 24px 64px rgba(0,0,0,.35)",
       }}>
@@ -495,9 +495,9 @@ export default function BusinessOperatorPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 99, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.22)" }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: T.indigo, boxShadow: "0 0 10px rgba(99,102,241,.8)", animation: "live-pulse 2s ease infinite" }} />
-                <span style={{ fontSize: 11, color: "#bfdbfe", textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>Business Operator</span>
+                <span style={{ fontSize: 11, color: "var(--tx-bfdbfe, #bfdbfe)", textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>Business Operator</span>
               </div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 99, background: "rgba(52,211,153,.09)", border: "1px solid rgba(52,211,153,.2)", fontSize: 11, fontWeight: 700, color: "#6ee7b7" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 99, background: "rgba(52,211,153,.09)", border: "1px solid rgba(52,211,153,.2)", fontSize: 11, fontWeight: 700, color: "var(--tx-6ee7b7, #6ee7b7)" }}>
                 <span style={{ width: 5, height: 5, borderRadius: "50%", background: T.emerald, animation: "live-pulse 2s ease infinite .5s" }} />
                 LIVE
               </div>

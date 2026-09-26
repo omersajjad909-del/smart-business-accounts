@@ -243,10 +243,10 @@ export default function JVPage() {
         {/* Title */}
         <div style={{ marginBottom: 20, display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: queryMode ? "#facc15" : PURPLE }}>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: queryMode ? "var(--tx-facc15, #facc15)" : PURPLE }}>
               {queryMode ? "🔍 QUERY MODE — JV" : "Journal Voucher (JV)"}
             </h1>
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: queryMode ? "rgba(250,204,21,.5)" : "var(--text-muted)" }}>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: queryMode ? "rgba(var(--txr-facc15, 250,204,21),.5)" : "var(--text-muted)" }}>
               {queryMode ? "Enter search criteria then press F8 to execute" : "Record double-entry journal entries — debit must equal credit"}
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function JVPage() {
                 <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
                   style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === queryResults.length - 1 ? "rgba(var(--ink),.2)" : "rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx === queryResults.length - 1 ? "default" : "pointer", fontFamily: ff }}>▶</button>
                 <button onClick={exitQueryMode}
-                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
+                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
               </div>
             )}
             {queryIdx < 0 && !queryMode && (
@@ -297,23 +297,23 @@ export default function JVPage() {
         {queryMode && (
           <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
             <div style={{ marginBottom: 20 }}>
-              <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+              <span style={{ fontSize: 12, color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&lt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;=</b> for date range.</span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
               <div>
-                <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>JV # (e.g. JV-5)</label>
+                <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>JV # (e.g. JV-5)</label>
                 <input autoFocus value={queryJvNo} onChange={e => setQueryJvNo(e.target.value)} placeholder="JV-1 or blank for all…"
                   style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                   onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryJvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }} />
               </div>
               <div>
-                <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+                <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
                 <input value={queryDate} onChange={e => setQueryDate(e.target.value)} placeholder=">010125 or 01-01-2025 or blank…"
                   style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                   onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryJvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }} />
               </div>
               <div>
-                <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Account (name)</label>
+                <label style={{ ...lbl, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Account (name)</label>
                 <input value={queryParty} onChange={e => setQueryParty(e.target.value)} placeholder="e.g. Cash, Sales, or blank…"
                   style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                   onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryJvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }} />
@@ -326,8 +326,8 @@ export default function JVPage() {
                 Execute Query
               </button>
               <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
-              <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>
-                Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>010425</b> (exact)
+              <span style={{ fontSize: 11, color: "rgba(var(--txr-facc15, 250,204,21),.4)", marginLeft: 8 }}>
+                Operators: <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>010425</b> (exact)
               </span>
             </div>
           </div>
@@ -384,7 +384,7 @@ export default function JVPage() {
                         </td>
                         <td style={{ padding: "8px 10px", width: 40, textAlign: "center" }}>
                           {entries.length > 2 && (
-                            <button onClick={() => removeEntry(e.id)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
+                            <button onClick={() => removeEntry(e.id)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
                           )}
                         </td>
                       </tr>
@@ -394,9 +394,9 @@ export default function JVPage() {
                     <tr style={{ borderTop: "2px solid var(--border)" }}>
                       <td colSpan={2} style={{ padding: "10px 10px", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textAlign: "right" }}>Total:</td>
                       <td style={{ padding: "10px 10px", textAlign: "right" }}>
-                        <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 700 }}>Dr: {fmt(totalDebit)}</div>
-                        <div style={{ fontSize: 12, color: "#f87171", fontWeight: 700 }}>Cr: {fmt(totalCredit)}</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: balanced ? "#22c55e" : "#f87171", marginTop: 2 }}>
+                        <div style={{ fontSize: 12, color: "var(--tx-22c55e, #22c55e)", fontWeight: 700 }}>Dr: {fmt(totalDebit)}</div>
+                        <div style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", fontWeight: 700 }}>Cr: {fmt(totalCredit)}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: balanced ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f87171, #f87171)", marginTop: 2 }}>
                           {balanced ? "✓ Balanced" : "✗ Not Balanced"}
                         </div>
                       </td>
@@ -415,7 +415,7 @@ export default function JVPage() {
                 <button onClick={() => { resetForm(); setEditing(null); exitQueryMode(); }} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 20px", fontFamily: ff, fontSize: 14, color: "var(--text-muted)", cursor: "pointer" }}>Cancel</button>
               )}
               {editing && (
-                <button onClick={() => deleteVoucher(editing.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 8, padding: "10px 20px", fontFamily: ff, fontSize: 14, color: "#f87171", cursor: "pointer" }}>Delete</button>
+                <button onClick={() => deleteVoucher(editing.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 8, padding: "10px 20px", fontFamily: ff, fontSize: 14, color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}>Delete</button>
               )}
             </div>
           </div>
@@ -467,7 +467,7 @@ export default function JVPage() {
         {!saved && (
           <div style={{ display: "flex", gap: 6, marginTop: 20, flexWrap: "wrap" }}>
             {(queryMode ? [
-              { key: "F8", label: "Execute Query", color: "#facc15" },
+              { key: "F8", label: "Execute Query", color: "var(--tx-facc15, #facc15)" },
               { key: "Esc", label: "Cancel Query", color: undefined },
             ] : queryIdx >= 0 ? [
               { key: "F7", label: "New Query", color: PURPLE },

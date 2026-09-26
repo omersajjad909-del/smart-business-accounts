@@ -40,7 +40,7 @@ export default function MaintenanceOverviewPage() {
     <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: maintenanceFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 12, color: "#34d399", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Maintenance Services</div>
+          <div style={{ fontSize: 12, color: "var(--tx-34d399, #34d399)", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Maintenance Services</div>
           <h1 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 900 }}>AMC contracts, service visits, and field execution desk</h1>
           <p style={{ margin: 0, fontSize: 14, color: maintenanceMuted, maxWidth: 760 }}>
             Contract obligations, preventive schedules, active service jobs, and parts support ko ek operational command center me monitor karein.
@@ -63,11 +63,11 @@ export default function MaintenanceOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Contracts", value: summary.activeContracts, color: "#34d399" },
-          { label: "Due Visits", value: summary.scheduledVisits, color: "#f59e0b" },
-          { label: "Open Jobs", value: summary.openJobs, color: "#60a5fa" },
-          { label: "Low Stock", value: summary.lowStockParts, color: "#f87171" },
-          { label: "Contract Value", value: `Rs. ${summary.contractValue.toLocaleString()}`, color: "#22c55e" },
+          { label: "Contracts", value: summary.activeContracts, color: "var(--tx-34d399, #34d399)" },
+          { label: "Due Visits", value: summary.scheduledVisits, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Open Jobs", value: summary.openJobs, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Low Stock", value: summary.lowStockParts, color: "var(--tx-f87171, #f87171)" },
+          { label: "Contract Value", value: `Rs. ${summary.contractValue.toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: maintenanceMuted, marginBottom: 8 }}>{card.label}</div>
@@ -78,7 +78,7 @@ export default function MaintenanceOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(34,197,94,.14), rgba(16,185,129,.08))", border: `1px solid ${maintenanceBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#bbf7d0", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Service Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-bbf7d0, #bbf7d0)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Service Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "AMC Scope", body: "Client contract, covered assets, and annual visit commitments define service load." },
@@ -97,7 +97,7 @@ export default function MaintenanceOverviewPage() {
 
         <div style={{ display: "grid", gap: 18 }}>
           <div style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 20, padding: 22 }}>
-            <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Renewal Watchlist</div>
+            <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Renewal Watchlist</div>
             <div style={{ display: "grid", gap: 10 }}>
               {contracts.length === 0 ? (
                 <div style={{ color: maintenanceMuted, fontSize: 13 }}>Add AMC contracts to populate the renewal watchlist.</div>
@@ -105,14 +105,14 @@ export default function MaintenanceOverviewPage() {
                 <div key={contract.id} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{contract.contract}</div>
                   <div style={{ fontSize: 12, color: maintenanceMuted }}>{contract.client} - {contract.asset}</div>
-                  <div style={{ fontSize: 12, color: "#bbf7d0", marginTop: 6 }}>{contract.renewalDate || "No renewal date"} - Rs. {contract.value.toLocaleString()}</div>
+                  <div style={{ fontSize: 12, color: "var(--tx-bbf7d0, #bbf7d0)", marginTop: 6 }}>{contract.renewalDate || "No renewal date"} - Rs. {contract.value.toLocaleString()}</div>
                 </div>
               ))}
             </div>
           </div>
 
           <div style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 20, padding: 22 }}>
-            <div style={{ fontSize: 13, color: "#facc15", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Ops Reading</div>
+            <div style={{ fontSize: 13, color: "var(--tx-facc15, #facc15)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Ops Reading</div>
             <div style={{ display: "grid", gap: 12 }}>
               {[
                 { label: "Scheduled visits", value: `${summary.scheduledVisits} upcoming`, tone: "#60a5fa" },

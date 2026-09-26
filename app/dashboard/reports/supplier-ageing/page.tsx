@@ -30,9 +30,9 @@ export default function SupplierAgeingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Total Payable",  value: `${cur} ${fmt(totals.total)}`, color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
-          { label: "Current (0–30)", value: `${cur} ${fmt(totals.current)}`, color: "#34d399", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
-          { label: "Overdue",        value: `${cur} ${fmt(overdue)}`,       color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Total Payable",  value: `${cur} ${fmt(totals.total)}`, color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+          { label: "Current (0–30)", value: `${cur} ${fmt(totals.current)}`, color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
+          { label: "Overdue",        value: `${cur} ${fmt(overdue)}`,       color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -58,22 +58,22 @@ export default function SupplierAgeingPage() {
                 onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                 <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.supplierName}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{r.current > 0 ? `${cur} ${fmt(r.current)}` : "—"}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.days30 > 0 ? "#fbbf24" : "var(--text-muted)" }}>{r.days30 > 0 ? `${cur} ${fmt(r.days30)}` : "—"}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.days60 > 0 ? "#fb923c" : "var(--text-muted)" }}>{r.days60 > 0 ? `${cur} ${fmt(r.days60)}` : "—"}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.days90 > 0 ? "#f87171" : "var(--text-muted)" }}>{r.days90 > 0 ? `${cur} ${fmt(r.days90)}` : "—"}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.over90 > 0 ? "#ef4444" : "var(--text-muted)", fontWeight: r.over90 > 0 ? 700 : 400 }}>{r.over90 > 0 ? `${cur} ${fmt(r.over90)}` : "—"}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-34d399, #34d399)" }}>{r.current > 0 ? `${cur} ${fmt(r.current)}` : "—"}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.days30 > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--text-muted)" }}>{r.days30 > 0 ? `${cur} ${fmt(r.days30)}` : "—"}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.days60 > 0 ? "var(--tx-fb923c, #fb923c)" : "var(--text-muted)" }}>{r.days60 > 0 ? `${cur} ${fmt(r.days60)}` : "—"}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.days90 > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>{r.days90 > 0 ? `${cur} ${fmt(r.days90)}` : "—"}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.over90 > 0 ? "var(--tx-ef4444, #ef4444)" : "var(--text-muted)", fontWeight: r.over90 > 0 ? 700 : 400 }}>{r.over90 > 0 ? `${cur} ${fmt(r.over90)}` : "—"}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 800 }}>{cur} {fmt(r.total)}</td>
               </tr>
             ))}
             {data.length > 0 && (
               <tr style={{ borderTop: "2px solid var(--border)", background: "var(--app-bg)" }}>
                 <td style={{ padding: "11px 14px", fontSize: 12, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase" }}>Total</td>
-                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#34d399" }}>{cur} {fmt(totals.current)}</td>
-                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#fbbf24" }}>{cur} {fmt(totals.d30)}</td>
-                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#fb923c" }}>{cur} {fmt(totals.d60)}</td>
-                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#f87171" }}>{cur} {fmt(totals.d90)}</td>
-                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#ef4444" }}>{cur} {fmt(totals.over90)}</td>
+                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{cur} {fmt(totals.current)}</td>
+                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>{cur} {fmt(totals.d30)}</td>
+                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "var(--tx-fb923c, #fb923c)" }}>{cur} {fmt(totals.d60)}</td>
+                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(totals.d90)}</td>
+                <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "var(--tx-ef4444, #ef4444)" }}>{cur} {fmt(totals.over90)}</td>
                 <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 900 }}>{cur} {fmt(totals.total)}</td>
               </tr>
             )}

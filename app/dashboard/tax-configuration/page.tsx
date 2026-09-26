@@ -232,8 +232,8 @@ export default function TaxConfigurationPage() {
                   </td>
                   <td style={{ padding: "13px 16px" }}>
                     <div style={{ display: "flex", gap: 12 }}>
-                      <button onClick={() => handleEdit(t)} style={{ background: "none", border: "none", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Edit</button>
-                      <button onClick={() => handleDelete(t.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Delete</button>
+                      <button onClick={() => handleEdit(t)} style={{ background: "none", border: "none", color: "var(--tx-818cf8, #818cf8)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Edit</button>
+                      <button onClick={() => handleDelete(t.id)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Delete</button>
                     </div>
                   </td>
                 </tr>

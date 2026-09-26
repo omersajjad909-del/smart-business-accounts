@@ -112,7 +112,7 @@ export default function ClientAcceptInvite() {
       <div style={card}>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>❌</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#f87171", marginBottom: 8 }}>Invalid Invite</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-f87171, #f87171)", marginBottom: 8 }}>Invalid Invite</div>
           <div style={{ fontSize: 13, color: "rgba(var(--ink),0.45)" }}>{inviteError}</div>
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function ClientAcceptInvite() {
         {done ? (
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#34d399", marginBottom: 6 }}>Account created!</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "var(--tx-34d399, #34d399)", marginBottom: 6 }}>Account created!</div>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),0.4)" }}>Redirecting to login…</div>
           </div>
         ) : (
@@ -152,7 +152,7 @@ export default function ClientAcceptInvite() {
               <label style={label}>Your Email</label>
               <input style={readonlyInput} value={inviteEmail} readOnly />
               {inviteRole && (
-                <div style={{ marginTop: 6, fontSize: 11, color: "rgba(99,102,241,0.8)", fontWeight: 600 }}>
+                <div style={{ marginTop: 6, fontSize: 11, color: "rgba(var(--txr-6366f1, 99,102,241),0.8)", fontWeight: 600 }}>
                   Role: {inviteRole}
                 </div>
               )}
@@ -186,7 +186,7 @@ export default function ClientAcceptInvite() {
             </div>
 
             {error && (
-              <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", fontSize: 13, color: "#f87171" }}>
+              <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>
                 {error}
               </div>
             )}

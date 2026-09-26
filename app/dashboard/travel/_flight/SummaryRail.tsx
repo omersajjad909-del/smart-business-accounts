@@ -181,7 +181,7 @@ export function SummaryRail({
                     borderRadius: 10, padding: "9px 12px",
                   }}
                 >
-                  <span style={{ fontSize: 12, fontWeight: 700, color: pricing.profit >= 0 ? "#34d399" : "#f87171" }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: pricing.profit >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                     {pricing.profit >= 0 ? "Your profit" : "Selling below cost"}
                   </span>
                   <Money value={pricing.profit} size={13.5} weight={800} tone={pricing.profit >= 0 ? "#34d399" : "#f87171"} />

@@ -3,9 +3,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const hospitalFont = "'Outfit','Inter',sans-serif";
-export const hospitalBg = "rgba(255,255,255,0.03)";
-export const hospitalBorder = "rgba(255,255,255,0.07)";
-export const hospitalMuted = "rgba(255,255,255,0.45)";
+export const hospitalBg = "rgba(var(--ink),0.03)";
+export const hospitalBorder = "rgba(var(--ink),0.07)";
+export const hospitalMuted = "rgba(var(--ink),0.45)";
 
 export type PatientStatus = "admitted" | "discharged" | "icu" | "opd";
 export type AppointmentStatus = "scheduled" | "confirmed" | "completed" | "cancelled" | "no_show";

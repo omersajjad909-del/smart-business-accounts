@@ -120,7 +120,7 @@ function Problems({ items }: { items: string[] }) {
     <div style={{ border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.1)", borderRadius: 11, padding: "11px 14px" }}>
       <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 5 }}>
         {items.map((item) => (
-          <li key={item} style={{ fontSize: 12.5, color: "#f87171", lineHeight: 1.45 }}>{item}</li>
+          <li key={item} style={{ fontSize: 12.5, color: "var(--tx-f87171, #f87171)", lineHeight: 1.45 }}>{item}</li>
         ))}
       </ul>
     </div>
@@ -364,7 +364,7 @@ export default function BookFlightPage() {
       </div>
 
       {error ? (
-        <div style={{ marginBottom: 14, border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.1)", color: "#f87171", borderRadius: 12, padding: "11px 14px", fontSize: 12.5 }}>
+        <div style={{ marginBottom: 14, border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.1)", color: "var(--tx-f87171, #f87171)", borderRadius: 12, padding: "11px 14px", fontSize: 12.5 }}>
           {error}
         </div>
       ) : null}
@@ -545,7 +545,7 @@ export default function BookFlightPage() {
                           <button
                             type="button"
                             onClick={() => removePassenger(activePax)}
-                            style={{ border: "none", background: "transparent", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                            style={{ border: "none", background: "transparent", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                           >
                             Remove this passenger
                           </button>
@@ -716,7 +716,7 @@ export default function BookFlightPage() {
               </section>
 
               {invoice ? (
-                <div style={{ border: "1px solid rgba(52,211,153,.4)", background: "rgba(52,211,153,.1)", borderRadius: 12, padding: "12px 14px", fontSize: 12.5, color: "#34d399" }}>
+                <div style={{ border: "1px solid rgba(52,211,153,.4)", background: "rgba(52,211,153,.1)", borderRadius: 12, padding: "12px 14px", fontSize: 12.5, color: "var(--tx-34d399, #34d399)" }}>
                   Sales invoice <strong>{invoice.no}</strong> raised against this booking.
                 </div>
               ) : null}

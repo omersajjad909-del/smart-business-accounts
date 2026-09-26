@@ -554,15 +554,15 @@ export default function BarcodePage() {
                     )}
                   </div>
                 )}
-                {scanErr && <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 9, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "#f87171" }}>{scanErr}</div>}
+                {scanErr && <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 9, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "var(--tx-f87171, #f87171)" }}>{scanErr}</div>}
               </div>
 
               {/* Stats */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {[
-                  { label: "Total Items",     val: items.length,                         color: "#818cf8" },
-                  { label: "With Barcode",    val: items.filter(i => i.barcode).length,  color: "#34d399" },
-                  { label: "Without Barcode", val: items.filter(i => !i.barcode).length, color: "#f87171" },
+                  { label: "Total Items",     val: items.length,                         color: "var(--tx-818cf8, #818cf8)" },
+                  { label: "With Barcode",    val: items.filter(i => i.barcode).length,  color: "var(--tx-34d399, #34d399)" },
+                  { label: "Without Barcode", val: items.filter(i => !i.barcode).length, color: "var(--tx-f87171, #f87171)" },
                 ].map(({ label, val, color }) => (
                   <div key={label} style={{ flex: 1, borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid var(--border)", padding: isMobile ? "12px 10px" : "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{label}</span>
@@ -580,7 +580,7 @@ export default function BarcodePage() {
                 {/* Batch print bar */}
                 {selectedIds.size > 0 && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)" }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#818cf8" }}>{selectedIds.size} selected</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{selectedIds.size} selected</span>
                     <button onClick={() => setShowBatchModal(true)} style={{ padding: "5px 12px", borderRadius: 7, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                       🖨 Print Selected
                     </button>
@@ -634,8 +634,8 @@ export default function BarcodePage() {
                         <td style={{ padding: "8px 16px" }}>
                           {item.barcode ? (
                             <div style={{ display: "flex", gap: 5 }}>
-                              <button onClick={() => openPrint(item)} style={{ padding: "5px 10px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>🖨 Print</button>
-                              <button onClick={() => setTestScanItem(item)} style={{ padding: "5px 10px", borderRadius: 7, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)", color: "#34d399", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>📱 Test</button>
+                              <button onClick={() => openPrint(item)} style={{ padding: "5px 10px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>🖨 Print</button>
+                              <button onClick={() => setTestScanItem(item)} style={{ padding: "5px 10px", borderRadius: 7, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)", color: "var(--tx-34d399, #34d399)", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>📱 Test</button>
                             </div>
                           ) : (
                             <div style={{ display: "flex", gap: 6 }}>
@@ -664,7 +664,7 @@ export default function BarcodePage() {
             {/* Left — scanner + form */}
             <div>
               <div style={{ borderRadius: 14, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.25)", padding: 24, marginBottom: 16 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b", marginBottom: 6 }}>💰 Price Update Scanner</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)", marginBottom: 6 }}>💰 Price Update Scanner</div>
                 <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "0 0 18px", lineHeight: 1.6 }}>
                   Scan a barcode → current price appears → enter new price → Save → scan next item. No need to search through lists.
                 </p>
@@ -689,7 +689,7 @@ export default function BarcodePage() {
                       <button type="submit" style={{ padding: "12px 18px", borderRadius: 10, background: "linear-gradient(135deg,#f59e0b,#d97706)", border: "none", color: "#000", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Scan</button>
                       <input ref={puFileRef} type="file" accept="image/*" capture="environment" onChange={handlePuFileCapture} style={{ display: "none" }} />
                     </form>
-                    {puErr && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 12.5 }}>{puErr}</div>}
+                    {puErr && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 12.5 }}>{puErr}</div>}
                   </>
                 )}
 
@@ -705,7 +705,7 @@ export default function BarcodePage() {
                       <div style={{ display: "flex", gap: 20, marginTop: 10 }}>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Current Sale Price</div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: "#f87171" }}>{currency}{puItem.rate ?? puItem.salePrice ?? "—"}</div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>{currency}{puItem.rate ?? puItem.salePrice ?? "—"}</div>
                         </div>
                         <div>
                           <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Current Cost Price</div>
@@ -719,7 +719,7 @@ export default function BarcodePage() {
 
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
                         <div>
-                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#f59e0b", marginBottom: 6 }}>New Sale Price (Rs.) *</label>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)", marginBottom: 6 }}>New Sale Price (Rs.) *</label>
                           <input
                             ref={puPriceRef}
                             type="number" min="0" step="0.01"
@@ -743,9 +743,9 @@ export default function BarcodePage() {
 
                       {puSalePrice && Number(puSalePrice) !== (puItem.rate ?? puItem.salePrice) && (
                         <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 8, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.25)", fontSize: 13 }}>
-                          <span style={{ color: "#f87171" }}>{currency}{puItem.rate ?? puItem.salePrice}</span>
+                          <span style={{ color: "var(--tx-f87171, #f87171)" }}>{currency}{puItem.rate ?? puItem.salePrice}</span>
                           {" → "}
-                          <span style={{ fontWeight: 800, color: "#34d399" }}>{currency}{puSalePrice}</span>
+                          <span style={{ fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{currency}{puSalePrice}</span>
                           {" "}
                           <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
                             ({Number(puSalePrice) > (puItem.rate ?? 0) ? "▲" : "▼"} {Math.abs(Number(puSalePrice) - (puItem.rate ?? 0)).toFixed(0)} Rs.)
@@ -770,7 +770,7 @@ export default function BarcodePage() {
 
               {/* Tip box */}
               <div style={{ borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.8 }}>
-                <strong style={{ color: "#818cf8" }}>Tip:</strong> Connect a USB barcode scanner — scan item, type new price, press Enter, scan next item. <br/>
+                <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>Tip:</strong> Connect a USB barcode scanner — scan item, type new price, press Enter, scan next item. <br/>
                 Update 100 items in under 10 minutes.
               </div>
             </div>
@@ -801,9 +801,9 @@ export default function BarcodePage() {
                         <tr key={i} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                           <td style={{ padding: "10px 14px", color: "var(--text-muted)", fontSize: 11, whiteSpace: "nowrap" }}>{l.ts}</td>
                           <td style={{ padding: "10px 14px", fontWeight: 600 }}>{l.name}</td>
-                          <td style={{ padding: "10px 14px", color: "#f87171" }}>{currency}{l.oldPrice}</td>
-                          <td style={{ padding: "10px 14px", color: "#34d399", fontWeight: 700 }}>{currency}{l.newPrice}</td>
-                          <td style={{ padding: "10px 14px", fontWeight: 700, color: diff >= 0 ? "#818cf8" : "#f87171" }}>
+                          <td style={{ padding: "10px 14px", color: "var(--tx-f87171, #f87171)" }}>{currency}{l.oldPrice}</td>
+                          <td style={{ padding: "10px 14px", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{currency}{l.newPrice}</td>
+                          <td style={{ padding: "10px 14px", fontWeight: 700, color: diff >= 0 ? "var(--tx-818cf8, #818cf8)" : "var(--tx-f87171, #f87171)" }}>
                             {diff >= 0 ? "▲" : "▼"} {Math.abs(diff).toFixed(0)}
                           </td>
                         </tr>
@@ -820,7 +820,7 @@ export default function BarcodePage() {
         {tab === "bulk" && (
           <div>
             <div style={{ borderRadius: 14, background: "rgba(239,68,68,.05)", border: "1px solid rgba(239,68,68,.2)", padding: 24, marginBottom: 20 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#f87171", marginBottom: 6 }}>⚡ Bulk Price Change</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f87171, #f87171)", marginBottom: 6 }}>⚡ Bulk Price Change</div>
               <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "0 0 20px", lineHeight: 1.6 }}>
                 Update prices for an entire category or all items at once — by percentage or fixed amount.
               </p>
@@ -902,9 +902,9 @@ export default function BarcodePage() {
                         <tr key={p.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                           <td style={{ padding: "9px 16px", fontWeight: 600 }}>{p.name}</td>
                           <td style={{ padding: "9px 16px", color: "var(--text-muted)" }}>{items.find(i => i.id === p.id)?.category || "—"}</td>
-                          <td style={{ padding: "9px 16px", color: "#f87171" }}>{currency}{p.old}</td>
-                          <td style={{ padding: "9px 16px", color: "#34d399", fontWeight: 700 }}>{currency}{p.newRate}</td>
-                          <td style={{ padding: "9px 16px", fontWeight: 700, color: diff >= 0 ? "#818cf8" : "#f87171" }}>
+                          <td style={{ padding: "9px 16px", color: "var(--tx-f87171, #f87171)" }}>{currency}{p.old}</td>
+                          <td style={{ padding: "9px 16px", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{currency}{p.newRate}</td>
+                          <td style={{ padding: "9px 16px", fontWeight: 700, color: diff >= 0 ? "var(--tx-818cf8, #818cf8)" : "var(--tx-f87171, #f87171)" }}>
                             {diff >= 0 ? "+" : ""}{diff.toFixed(0)} Rs.
                           </td>
                         </tr>
@@ -995,7 +995,7 @@ export default function BarcodePage() {
 
             {/* Selected items preview */}
             <div style={{ borderRadius: 10, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", padding: "12px 16px", marginBottom: 20, maxHeight: 180, overflowY: "auto" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>
                 {batchSelectedItems.length} items selected
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -1026,7 +1026,7 @@ export default function BarcodePage() {
                 </div>
               </div>
               <div style={{ marginTop: 8, fontSize: 12, color: "var(--text-muted)" }}>
-                Total labels: <strong style={{ color: "#818cf8" }}>{batchSelectedItems.length * batchPrintQty}</strong>
+                Total labels: <strong style={{ color: "var(--tx-818cf8, #818cf8)" }}>{batchSelectedItems.length * batchPrintQty}</strong>
               </div>
             </div>
 
@@ -1064,11 +1064,11 @@ export default function BarcodePage() {
 
           <div style={{ marginTop: 20, textAlign: "center" }}>
             {puCameraErr ? (
-              <div style={{ fontSize: 13, color: "#f87171", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 360 }}>
+              <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 360 }}>
                 {puCameraErr}
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "#34d399" : "rgba(var(--ink),.55)" }}>
+              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.55)" }}>
                 {puCameraStatus === "starting" && "Starting camera…"}
                 {puCameraStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
               </div>

@@ -46,10 +46,10 @@ export default function MaintenanceSchedulePage() {
         },
       })}
       summarize={(rows) => [
-        { label: "Visits", value: rows.length, color: "#34d399" },
-        { label: "Due Today", value: rows.filter((row) => row.status === "due_today").length, color: "#f59e0b" },
-        { label: "Completed", value: rows.filter((row) => row.status === "completed").length, color: "#22c55e" },
-        { label: "Missed", value: rows.filter((row) => row.status === "missed").length, color: "#f87171" },
+        { label: "Visits", value: rows.length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Due Today", value: rows.filter((row) => row.status === "due_today").length, color: "var(--tx-f59e0b, #f59e0b)" },
+        { label: "Completed", value: rows.filter((row) => row.status === "completed").length, color: "var(--tx-22c55e, #22c55e)" },
+        { label: "Missed", value: rows.filter((row) => row.status === "missed").length, color: "var(--tx-f87171, #f87171)" },
       ]}
     />
   );

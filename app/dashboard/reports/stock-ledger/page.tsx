@@ -20,12 +20,12 @@ type Row  = {
 
 function typeBadge(type: string) {
   const map: Record<string, { bg: string; color: string }> = {
-    OPENING:  { bg: "rgba(148,163,184,.14)", color: "#94a3b8" },
-    PURCHASE: { bg: "rgba(16,185,129,.14)",  color: "#34d399" },
-    SALE:     { bg: "rgba(245,158,11,.14)",  color: "#fbbf24" },
-    RETURN:   { bg: "rgba(99,102,241,.14)",  color: "#a5b4fc" },
-    ADJUST:   { bg: "rgba(239,68,68,.14)",   color: "#f87171" },
-    TRANSFER: { bg: "rgba(59,130,246,.14)",  color: "#60a5fa" },
+    OPENING:  { bg: "rgba(148,163,184,.14)", color: "var(--tx-94a3b8, #94a3b8)" },
+    PURCHASE: { bg: "rgba(16,185,129,.14)",  color: "var(--tx-34d399, #34d399)" },
+    SALE:     { bg: "rgba(245,158,11,.14)",  color: "var(--tx-fbbf24, #fbbf24)" },
+    RETURN:   { bg: "rgba(99,102,241,.14)",  color: "var(--tx-a5b4fc, #a5b4fc)" },
+    ADJUST:   { bg: "rgba(239,68,68,.14)",   color: "var(--tx-f87171, #f87171)" },
+    TRANSFER: { bg: "rgba(59,130,246,.14)",  color: "var(--tx-60a5fa, #60a5fa)" },
   };
   const s = map[type?.toUpperCase()] || { bg: "rgba(255,255,255,.08)", color: "rgba(var(--ink),.5)" };
   return (
@@ -107,7 +107,7 @@ export default function StockLedgerPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--dk-080e1b, #080e1b)", color: "#e2e8f0", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--dk-080e1b, #080e1b)", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: ff, padding: isMobile ? "15px 14px" : "28px 32px" }}>
       <style>{`
         .sl-row:hover td { background: rgba(99,102,241,.04) !important; }
         .sl-opening td  { opacity: .6; }
@@ -123,7 +123,7 @@ export default function StockLedgerPage() {
         <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
           <span>Reports</span>
           <span style={{ color: "rgba(var(--ink),.15)" }}>›</span>
-          <span style={{ color: "#a5b4fc" }}>Stock Ledger</span>
+          <span style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>Stock Ledger</span>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div>
@@ -137,7 +137,7 @@ export default function StockLedgerPage() {
           {selectedItem && hasLoaded && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 10, padding: "7px 14px" }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#c7d2fe" }}>{selectedItem.name}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-c7d2fe, #c7d2fe)" }}>{selectedItem.name}</span>
               {selectedItem.description && <span style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>{selectedItem.description}</span>}
             </div>
           )}
@@ -150,7 +150,7 @@ export default function StockLedgerPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: "1 1 260px", minWidth: 220 }}>
           <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.38)", letterSpacing: ".07em", textTransform: "uppercase" }}>Select Item</label>
           <select className="sl-sel" value={itemId} onChange={e => setItemId(e.target.value)}
-            style={{ background: "rgba(var(--ink),.06)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9, padding: "9px 12px", color: itemId ? "#e2e8f0" : "rgba(var(--ink),.35)", fontSize: 13, fontFamily: ff, cursor: "pointer" }}>
+            style={{ background: "rgba(var(--ink),.06)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9, padding: "9px 12px", color: itemId ? "var(--tx-e2e8f0, #e2e8f0)" : "rgba(var(--ink),.35)", fontSize: 13, fontFamily: ff, cursor: "pointer" }}>
             <option value="">— Choose item —</option>
             {items.map(i => (
               <option key={i.id} value={i.id} style={{ background: "var(--dk-1e293b, #1e293b)" }}>
@@ -164,14 +164,14 @@ export default function StockLedgerPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.38)", letterSpacing: ".07em", textTransform: "uppercase" }}>From Date</label>
           <DateInput value={from} onChange={setFrom}
-            style={{ background: "rgba(var(--ink),.06)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9, padding: "9px 12px", color: "#e2e8f0", fontSize: 13, fontFamily: ff, width: 130 }} />
+            style={{ background: "rgba(var(--ink),.06)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9, padding: "9px 12px", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: ff, width: 130 }} />
         </div>
 
         {/* To date */}
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.38)", letterSpacing: ".07em", textTransform: "uppercase" }}>To Date</label>
           <DateInput value={to} onChange={setTo}
-            style={{ background: "rgba(var(--ink),.06)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9, padding: "9px 12px", color: "#e2e8f0", fontSize: 13, fontFamily: ff, width: 130 }} />
+            style={{ background: "rgba(var(--ink),.06)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 9, padding: "9px 12px", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: ff, width: 130 }} />
         </div>
 
         {/* Show button */}
@@ -195,10 +195,10 @@ export default function StockLedgerPage() {
       {hasLoaded && !loading && rows.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 20 }}>
           {[
-            { label: "Total IN",     value: totalIn.toLocaleString(),    color: "#34d399", bg: "rgba(16,185,129,.09)",  border: "rgba(16,185,129,.2)",  icon: "▲" },
-            { label: "Total OUT",    value: totalOut.toLocaleString(),   color: "#f87171", bg: "rgba(239,68,68,.09)",   border: "rgba(239,68,68,.2)",   icon: "▼" },
-            { label: "Net Balance",  value: finalBal.toLocaleString(),   color: "#818cf8", bg: "rgba(99,102,241,.1)",   border: "rgba(99,102,241,.25)", icon: "=" },
-            { label: "Transactions", value: String(nonOpening.length),   color: "#e2e8f0", bg: "rgba(255,255,255,.04)", border: "rgba(var(--ink),.1)",  icon: "#" },
+            { label: "Total IN",     value: totalIn.toLocaleString(),    color: "var(--tx-34d399, #34d399)", bg: "rgba(16,185,129,.09)",  border: "rgba(16,185,129,.2)",  icon: "▲" },
+            { label: "Total OUT",    value: totalOut.toLocaleString(),   color: "var(--tx-f87171, #f87171)", bg: "rgba(239,68,68,.09)",   border: "rgba(239,68,68,.2)",   icon: "▼" },
+            { label: "Net Balance",  value: finalBal.toLocaleString(),   color: "var(--tx-818cf8, #818cf8)", bg: "rgba(99,102,241,.1)",   border: "rgba(99,102,241,.25)", icon: "=" },
+            { label: "Transactions", value: String(nonOpening.length),   color: "var(--tx-e2e8f0, #e2e8f0)", bg: "rgba(255,255,255,.04)", border: "rgba(var(--ink),.1)",  icon: "#" },
           ].map(k => (
             <div key={k.label} style={{ background: k.bg, border: `1px solid ${k.border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <div style={{ fontSize: 9, color: "rgba(var(--ink),.35)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 6, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
@@ -249,7 +249,7 @@ export default function StockLedgerPage() {
               <tr>
                 <td colSpan={rfActive ? 6 + rf.fields.length : 6} style={{ padding: "60px 0", textAlign: "center" }}>
                   {error ? (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, color: "#f87171", maxWidth: 520, margin: "0 auto" }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, color: "var(--tx-f87171, #f87171)", maxWidth: 520, margin: "0 auto" }}>
                       <div style={{ fontSize: 34, opacity: 0.7 }}>🔒</div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>Ledger could not be shown</div>
                       <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", lineHeight: 1.7, fontWeight: 400 }}>{error}</div>
@@ -272,10 +272,10 @@ export default function StockLedgerPage() {
               return (
                 <tr key={i} className={`sl-row${isOpening ? " sl-opening" : ""}`}
                   style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
-                  <td style={{ padding: "11px 16px", fontSize: 12, fontWeight: 600, color: isOpening ? "rgba(var(--ink),.4)" : "#c7d2fe", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap", fontStyle: isOpening ? "italic" : "normal", background: "transparent" }}>
+                  <td style={{ padding: "11px 16px", fontSize: 12, fontWeight: 600, color: isOpening ? "rgba(var(--ink),.4)" : "var(--tx-c7d2fe, #c7d2fe)", borderRight: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap", fontStyle: isOpening ? "italic" : "normal", background: "transparent" }}>
                     {formatDate(r.date)}
                   </td>
-                  <td style={{ padding: "11px 16px", fontSize: 12, color: isOpening ? "rgba(var(--ink),.35)" : "#e2e8f0", borderRight: "1px solid rgba(var(--ink),.04)", fontStyle: isOpening ? "italic" : "normal", background: "transparent" }}>
+                  <td style={{ padding: "11px 16px", fontSize: 12, color: isOpening ? "rgba(var(--ink),.35)" : "var(--tx-e2e8f0, #e2e8f0)", borderRight: "1px solid rgba(var(--ink),.04)", fontStyle: isOpening ? "italic" : "normal", background: "transparent" }}>
                     {r.party}
                   </td>
                   <td style={{ padding: "11px 16px", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent" }}>
@@ -284,18 +284,18 @@ export default function StockLedgerPage() {
                   {rfActive && (() => {
                     const meta = readRateFormulaMeta(rf, r.meta);
                     return rf.fields.map(f => (
-                      <td key={f.key} style={{ padding: "11px 16px", fontSize: 12, textAlign: "center", color: meta[f.key] === "" ? "rgba(var(--ink),.2)" : "#e2e8f0", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent", whiteSpace: "nowrap" }}>
+                      <td key={f.key} style={{ padding: "11px 16px", fontSize: 12, textAlign: "center", color: meta[f.key] === "" ? "rgba(var(--ink),.2)" : "var(--tx-e2e8f0, #e2e8f0)", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent", whiteSpace: "nowrap" }}>
                         {meta[f.key] === "" ? "—" : meta[f.key]}
                       </td>
                     ));
                   })()}
-                  <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.inQty ? "#34d399" : "rgba(var(--ink),.2)", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent" }}>
+                  <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.inQty ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.2)", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent" }}>
                     {r.inQty ? `+${r.inQty.toLocaleString()}` : "—"}
                   </td>
-                  <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.outQty ? "#f87171" : "rgba(var(--ink),.2)", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent" }}>
+                  <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.outQty ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.2)", borderRight: "1px solid rgba(var(--ink),.04)", background: "transparent" }}>
                     {r.outQty ? `−${r.outQty.toLocaleString()}` : "—"}
                   </td>
-                  <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "#e2e8f0", background: "rgba(var(--ink),.025)" }}>
+                  <td style={{ padding: "11px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)", background: "rgba(var(--ink),.025)" }}>
                     {r.balanceQty.toLocaleString()}
                   </td>
                 </tr>
@@ -310,13 +310,13 @@ export default function StockLedgerPage() {
                 <td colSpan={rfActive ? 3 + rf.fields.length : 3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", textAlign: "right" }}>
                   Current Period Totals
                 </td>
-                <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "#34d399", borderLeft: "1px solid rgba(var(--ink),.06)" }}>
+                <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)", borderLeft: "1px solid rgba(var(--ink),.06)" }}>
                   +{totalIn.toLocaleString()}
                 </td>
-                <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "#f87171", borderLeft: "1px solid rgba(var(--ink),.06)" }}>
+                <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 14, fontWeight: 800, color: "var(--tx-f87171, #f87171)", borderLeft: "1px solid rgba(var(--ink),.06)" }}>
                   −{totalOut.toLocaleString()}
                 </td>
-                <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 18, fontWeight: 900, color: "#818cf8", background: "rgba(99,102,241,.12)", borderLeft: "1px solid rgba(99,102,241,.2)" }}>
+                <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 18, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)", background: "rgba(99,102,241,.12)", borderLeft: "1px solid rgba(99,102,241,.2)" }}>
                   {finalBal.toLocaleString()}
                 </td>
               </tr>

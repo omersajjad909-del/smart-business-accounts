@@ -110,10 +110,10 @@ export default function ITProjectsPage() {
       </div>
 
       <div style={S.stats}>
-        <div style={S.stat}><div style={S.statLabel}>Active Projects</div><div style={{ ...S.statVal, color: '#34d399' }}>{active}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>On-Time Delivery</div><div style={{ ...S.statVal, color: '#818cf8' }}>{deliveryPct}%</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Active Projects</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{active}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>On-Time Delivery</div><div style={{ ...S.statVal, color: 'var(--tx-818cf8, #818cf8)' }}>{deliveryPct}%</div></div>
         <div style={S.stat}><div style={S.statLabel}>Total Budget</div><div style={{ ...S.statVal, color: '#7c3aed', fontSize: 22 }}>Rs. {(totalBudget / 100000).toFixed(1)}L</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Overdue Projects</div><div style={{ ...S.statVal, color: '#f87171' }}>{delayed}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Overdue Projects</div><div style={{ ...S.statVal, color: 'var(--tx-f87171, #f87171)' }}>{delayed}</div></div>
       </div>
 
       <div style={S.tabs}>
@@ -151,9 +151,9 @@ export default function ITProjectsPage() {
               </div>
               <div style={S.infoGrid}>
                 <div style={S.infoItem}><div style={S.infoLabel}>Team Size</div><div style={S.infoVal}>👥 {p.teamSize} devs</div></div>
-                <div style={S.infoItem}><div style={S.infoLabel}>Deadline</div><div style={{ ...S.infoVal, color: p.status === 'Delayed' ? '#f87171' : '#fff' }}>{p.deadline}</div></div>
+                <div style={S.infoItem}><div style={S.infoLabel}>Deadline</div><div style={{ ...S.infoVal, color: p.status === 'Delayed' ? 'var(--tx-f87171, #f87171)' : '#fff' }}>{p.deadline}</div></div>
                 <div style={S.infoItem}><div style={S.infoLabel}>Budget</div><div style={S.infoVal}>Rs. {(p.budget / 1000).toFixed(0)}K</div></div>
-                <div style={S.infoItem}><div style={S.infoLabel}>Spent</div><div style={{ ...S.infoVal, color: budgetUsed > 90 ? '#f87171' : '#fbbf24' }}>{budgetUsed}% used</div></div>
+                <div style={S.infoItem}><div style={S.infoLabel}>Spent</div><div style={{ ...S.infoVal, color: budgetUsed > 90 ? 'var(--tx-f87171, #f87171)' : 'var(--tx-fbbf24, #fbbf24)' }}>{budgetUsed}% used</div></div>
               </div>
             </div>
           );

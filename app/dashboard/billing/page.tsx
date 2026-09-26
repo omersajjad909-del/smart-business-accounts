@@ -50,19 +50,19 @@ type PlanPricingMap = {
 /* ─── Plan definitions ───────────────────────────────── */
 const PLANS = [
   {
-    code: "STARTER", name: "Starter", monthlyPrice: 49, icon: "🌱", color: "#818cf8",
+    code: "STARTER", name: "Starter", monthlyPrice: 49, icon: "🌱", color: "var(--tx-818cf8, #818cf8)",
     gradFrom: "#6366f1", gradTo: "#4f46e5",
     features: ["Up to 3 users","Core Accounting","Sales & Purchase Invoices","Bank Reconciliation","Basic Reports","Email Support"],
     notIncluded: ["HR & Payroll","Advanced Reports","Multi-Branch","API Access"],
   },
   {
-    code: "PROFESSIONAL", name: "Professional", monthlyPrice: 99, icon: "🚀", color: "#34d399", popular: true,
+    code: "PROFESSIONAL", name: "Professional", monthlyPrice: 99, icon: "🚀", color: "var(--tx-34d399, #34d399)", popular: true,
     gradFrom: "#10b981", gradTo: "#059669",
     features: ["Up to 10 users","Everything in Starter","CRM & Sales Pipeline","Inventory Management","Multi-Branch Support","Advanced Reports","Backup & Restore","Priority Support"],
     notIncluded: ["HR & Payroll","API Access","Dedicated Account Manager"],
   },
   {
-    code: "ENTERPRISE", name: "Enterprise", monthlyPrice: 249, icon: "💎", color: "#fbbf24",
+    code: "ENTERPRISE", name: "Enterprise", monthlyPrice: 249, icon: "💎", color: "var(--tx-fbbf24, #fbbf24)",
     gradFrom: "#f59e0b", gradTo: "#d97706",
     features: ["Up to 25 users","Everything in Pro","HR & Payroll","API Access & Webhooks","Custom Integrations","Dedicated Account Manager","SLA Support","Custom Modules"],
     notIncluded: [],
@@ -179,12 +179,12 @@ function detectBrand(num: string): string {
 /* ─── Status Badge ───────────────────────────────────── */
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; color: string; label: string }> = {
-    paid:     { bg:"rgba(52,211,153,.12)",  color:"#34d399", label:"Paid" },
-    open:     { bg:"rgba(251,191,36,.12)",  color:"#fbbf24", label:"Open" },
+    paid:     { bg:"rgba(52,211,153,.12)",  color:"var(--tx-34d399, #34d399)", label:"Paid" },
+    open:     { bg:"rgba(251,191,36,.12)",  color:"var(--tx-fbbf24, #fbbf24)", label:"Open" },
     void:     { bg:"rgba(255,255,255,.06)", color:"rgba(var(--ink),.4)", label:"Void" },
-    active:   { bg:"rgba(52,211,153,.12)",  color:"#34d399", label:"Active" },
-    trialing: { bg:"rgba(129,140,248,.12)", color:"#a5b4fc", label:"Trial" },
-    past_due: { bg:"rgba(239,68,68,.12)",   color:"#f87171", label:"Past Due" },
+    active:   { bg:"rgba(52,211,153,.12)",  color:"var(--tx-34d399, #34d399)", label:"Active" },
+    trialing: { bg:"rgba(129,140,248,.12)", color:"var(--tx-a5b4fc, #a5b4fc)", label:"Trial" },
+    past_due: { bg:"rgba(239,68,68,.12)",   color:"var(--tx-f87171, #f87171)", label:"Past Due" },
     canceled: { bg:"rgba(255,255,255,.06)", color:"rgba(var(--ink),.4)", label:"Canceled" },
     inactive: { bg:"rgba(255,255,255,.06)", color:"rgba(var(--ink),.4)", label:"Inactive" },
   };
@@ -339,7 +339,7 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
                   ))}
                 </select>
               </div>
-              <div style={{ padding:"12px 14px", borderRadius:12, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.18)", display:"flex", alignItems:"center", gap:10, fontSize:11, color:"#6ee7b7" }}>
+              <div style={{ padding:"12px 14px", borderRadius:12, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.18)", display:"flex", alignItems:"center", gap:10, fontSize:11, color:"var(--tx-6ee7b7, #6ee7b7)" }}>
                 🔒 256-bit SSL — we never store your full card number
               </div>
               <div style={{ display:"flex", gap:10 }}>
@@ -794,7 +794,7 @@ function BillingPage() {
         <div style={{ marginBottom:24, borderRadius:20, background:"linear-gradient(135deg,rgba(239,68,68,.1),rgba(220,38,38,.06))", border:"1.5px solid rgba(239,68,68,.35)", padding: isMobile ? "13px 13px" : "24px 28px", display:"flex", alignItems:"center", gap:20 }}>
           <div style={{ width:52, height:52, borderRadius:14, background:"rgba(239,68,68,.15)", border:"1px solid rgba(239,68,68,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🔒</div>
           <div>
-            <div style={{ fontSize:17, fontWeight:800, color:"#fca5a5", marginBottom:4 }}>Active subscription required</div>
+            <div style={{ fontSize:17, fontWeight:800, color:"var(--tx-fca5a5, #fca5a5)", marginBottom:4 }}>Active subscription required</div>
             <div style={{ fontSize:13, color:"rgba(var(--ink),.55)", lineHeight:1.6 }}>
               Dashboard access is locked until your subscription is active. Please select a plan and add a payment method below to continue.
             </div>
@@ -889,11 +889,11 @@ function BillingPage() {
       <div className="bill-stats" style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:14, marginBottom:24 }}>
         {[
           { label:"Current Plan",   value: currentPlan.name,                          icon: currentPlan.icon, color: currentPlan.color },
-          { label:"Status",         value: subscription?.status||"—",                 icon: "●",              color: "#34d399", isStatus:true },
-          { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—", icon:"📅", color:"#fbbf24" },
+          { label:"Status",         value: subscription?.status||"—",                 icon: "●",              color: "var(--tx-34d399, #34d399)", isStatus:true },
+          { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—", icon:"📅", color:"var(--tx-fbbf24, #fbbf24)" },
           { label: subscription?.billingCycle === "yearly" ? "Yearly Amount" : "Monthly Amount",
             value: subscription ? `${formatInvoiceAmount(subscription.amount, subscription.currency)}/${subscription.billingCycle === "yearly" ? "yr" : "mo"}` : "—",
-            icon: "💰", color: "#38bdf8" },
+            icon: "💰", color: "var(--tx-38bdf8, #38bdf8)" },
         ].map(s => (
           <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "17px 18px", borderRadius:16, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ width:40, height:40, borderRadius:12, background:`${s.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{s.icon}</div>
@@ -936,7 +936,7 @@ function BillingPage() {
                     {subscription ? formatInvoiceAmount(subscription.amount, subscription.currency) : `$${currentPlan.monthlyPrice}`}
                     <span style={{ fontSize:11 }}>/{subscription?.billingCycle === "yearly" ? "yr" : "mo"}</span>
                   </div>
-                  {isCanceled && <div style={{ marginTop:8, padding:"3px 10px", borderRadius:99, background:"rgba(239,68,68,.12)", border:"1px solid rgba(239,68,68,.22)", fontSize:10, fontWeight:700, color:"#f87171", display:"inline-block" }}>CANCELED</div>}
+                  {isCanceled && <div style={{ marginTop:8, padding:"3px 10px", borderRadius:99, background:"rgba(239,68,68,.12)", border:"1px solid rgba(239,68,68,.22)", fontSize:10, fontWeight:700, color:"var(--tx-f87171, #f87171)", display:"inline-block" }}>CANCELED</div>}
                 </div>
                 {/* Details */}
                 <div style={{ flex:1, display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:18 }}>
@@ -966,7 +966,7 @@ function BillingPage() {
                       <button onClick={() => setActiveTab("plans")} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.09)", color:"rgba(var(--ink),.6)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
                         View all plans
                       </button>
-                      <button onClick={() => setShowCancel(true)} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(239,68,68,.07)", border:"1px solid rgba(239,68,68,.18)", color:"#f87171", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+                      <button onClick={() => setShowCancel(true)} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(239,68,68,.07)", border:"1px solid rgba(239,68,68,.18)", color:"var(--tx-f87171, #f87171)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
                         Cancel Subscription
                       </button>
                     </>
@@ -1000,17 +1000,17 @@ function BillingPage() {
                       <>
                         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
                           <span style={{ fontSize:13, color:"rgba(var(--ink),.6)" }}>{totalUsers} of {effectiveUserLimit} seats used</span>
-                          {extraSeats > 0 && <span style={{ fontSize:11, color:"#a78bfa", fontWeight:600 }}>+{extraSeats} extra</span>}
+                          {extraSeats > 0 && <span style={{ fontSize:11, color:"var(--tx-a78bfa, #a78bfa)", fontWeight:600 }}>+{extraSeats} extra</span>}
                         </div>
                         <div style={{ height:7, borderRadius:4, background:"rgba(var(--ink),.07)", overflow:"hidden" }}>
                           <div style={{ height:"100%", borderRadius:4, width:`${Math.min(100, (totalUsers / effectiveUserLimit) * 100)}%`, background: totalUsers >= effectiveUserLimit ? "linear-gradient(90deg,#f87171,#ef4444)" : "linear-gradient(90deg,#6366f1,#7c3aed)", transition:"width .5s" }}/>
                         </div>
                         {totalUsers >= effectiveUserLimit && (
-                          <div style={{ marginTop:8, fontSize:12, color:"#fbbf24", fontWeight:600 }}>⚠️ Seat limit reached — add more seats to invite users</div>
+                          <div style={{ marginTop:8, fontSize:12, color:"var(--tx-fbbf24, #fbbf24)", fontWeight:600 }}>⚠️ Seat limit reached — add more seats to invite users</div>
                         )}
                       </>
                     ) : (
-                      <div style={{ fontSize:13, color:"rgba(var(--ink),.5)" }}>{totalUsers} users · <span style={{ color:"#34d399", fontWeight:700 }}>Unlimited seats</span></div>
+                      <div style={{ fontSize:13, color:"rgba(var(--ink),.5)" }}>{totalUsers} users · <span style={{ color:"var(--tx-34d399, #34d399)", fontWeight:700 }}>Unlimited seats</span></div>
                     )}
                   </div>
                   {/* Right: pricing + button */}
@@ -1032,7 +1032,7 @@ function BillingPage() {
           <div style={{ ...card }}>
             <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Recent Invoices</div>
-              <button onClick={() => setActiveTab("invoices")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>View all →</button>
+              <button onClick={() => setActiveTab("invoices")} style={{ fontSize:12, fontWeight:600, color:"var(--tx-a5b4fc, #a5b4fc)", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>View all →</button>
             </div>
             {invoices.length === 0 ? (
               <div style={{ padding: isMobile ? "18px 11px" : "32px 24px", textAlign:"center", color:"rgba(var(--ink),.3)" }}>                <div style={{ fontSize:28, marginBottom:8 }}>💳</div>
@@ -1070,7 +1070,7 @@ function BillingPage() {
           <div style={{ ...card }}>
             <div style={{ padding: isMobile ? "12px 11px" : "18px 24px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Payment Methods</div>
-              <button onClick={() => setActiveTab("methods")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Manage →</button>
+              <button onClick={() => setActiveTab("methods")} style={{ fontSize:12, fontWeight:600, color:"var(--tx-a5b4fc, #a5b4fc)", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Manage →</button>
             </div>
             {paymentMethods.length === 0 ? (
               <div style={{ padding: isMobile ? "15px 11px" : "28px 24px", textAlign:"center" }}>                <div style={{ fontSize:26, marginBottom:8 }}>🧾</div>
@@ -1163,17 +1163,17 @@ function BillingPage() {
                     <span style={{ fontSize:12, color:"rgba(var(--ink),.35)" }}>/ mo{billing==="annual"?" · billed annually":""}</span>
                   </div>
                   {seatAddon > 0 && (
-                    <div style={{ fontSize:11, color:"rgba(110,231,183,.95)", marginBottom:8, fontWeight:700 }}>
+                    <div style={{ fontSize:11, color:"rgba(var(--txr-6ee7b7, 110,231,183),.95)", marginBottom:8, fontWeight:700 }}>
                       Includes {extraSeats} extra seats (+{currencySym}{seatAddon.toLocaleString("en-US")}/mo)
                     </div>
                   )}
                   {billing==="annual" && (() => {
                     const src = showPkr ? pkrPricing![pricingKey] : planPricing[pricingKey];
                     const yearlySaving = Math.max(0, Math.round((src.monthly - src.yearly) * 12));
-                    return <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save {currencySym}{yearlySaving.toLocaleString("en-US")}/year</div>;
+                    return <div style={{ fontSize:11, color:"rgba(var(--txr-34d399, 52,211,153),.7)", marginBottom:14, fontWeight:600 }}>Save {currencySym}{yearlySaving.toLocaleString("en-US")}/year</div>;
                   })()}
                   <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:22, marginTop:billing==="annual"?0:14 }}>
-                    {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{f}</div>)}
+                    {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.7)" }}><span style={{ color:"var(--tx-34d399, #34d399)", flexShrink:0 }}>✓</span>{f}</div>)}
                     {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}
                   </div>
                   {/* The current plan is normally a dead end — there is nothing
@@ -1231,8 +1231,8 @@ function BillingPage() {
               ].map(l => (
                 <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer"
                   style={{ padding:"5px 12px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.08)", fontSize:11, fontWeight:600, color:"rgba(var(--ink),.5)", textDecoration:"none", transition:"all .15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,.85)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.2)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,.5)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.08)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "rgba(var(--ink),.85)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.2)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),.5)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.08)"; }}
                 >
                   {l.label}
                 </a>
@@ -1289,7 +1289,7 @@ function BillingPage() {
                   </div>
                   <div style={{ display:"flex", gap:8 }}>
                     {!pm.isDefault && <button onClick={() => setDefaultCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.55)", cursor:"pointer", fontFamily:"inherit" }}>Set Default</button>}
-                    <button onClick={() => removeCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(239,68,68,.22)", background:"rgba(239,68,68,.06)", color:"#f87171", cursor:"pointer", fontFamily:"inherit" }}>Remove</button>
+                    <button onClick={() => removeCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(239,68,68,.22)", background:"rgba(239,68,68,.06)", color:"var(--tx-f87171, #f87171)", cursor:"pointer", fontFamily:"inherit" }}>Remove</button>
                   </div>
                 </div>
               );
@@ -1395,7 +1395,7 @@ function BillingPage() {
                     <div style={{ height:"100%", borderRadius:3, width:`${Math.min(100, (totalUsers / effectiveUserLimit) * 100)}%`, background: totalUsers >= effectiveUserLimit ? "linear-gradient(90deg,#f87171,#ef4444)" : "linear-gradient(90deg,#6366f1,#7c3aed)", transition:"width .3s" }}/>
                   </div>
                 )}
-                {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(167,139,250,.7)", marginTop:8 }}>Includes {extraSeats} extra purchased seat{extraSeats > 1 ? "s" : ""}</div>}
+                {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(var(--txr-a78bfa, 167,139,250),.7)", marginTop:8 }}>Includes {extraSeats} extra purchased seat{extraSeats > 1 ? "s" : ""}</div>}
               </div>
 
               {/* Quantity selector */}
@@ -1423,12 +1423,12 @@ function BillingPage() {
                 {subscription?.billingCycle === "yearly" && (
                   <div style={{ display:"flex", justifyContent:"space-between" }}>
                     <span style={{ fontSize:12, color:"rgba(var(--ink),.4)" }}>Billed yearly</span>
-                    <span style={{ fontSize:12, fontWeight:700, color:"#34d399" }}>${seatTotalCost * 12}/year</span>
+                    <span style={{ fontSize:12, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>${seatTotalCost * 12}/year</span>
                   </div>
                 )}
                 <div style={{ borderTop:"1px solid rgba(var(--ink),.07)", marginTop:10, paddingTop:10, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <span style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>New user limit</span>
-                  <span style={{ fontSize:14, fontWeight:800, color:"#a5b4fc" }}>{effectiveUserLimit !== null ? effectiveUserLimit + seatQty : "∞"} users</span>
+                  <span style={{ fontSize:14, fontWeight:800, color:"var(--tx-a5b4fc, #a5b4fc)" }}>{effectiveUserLimit !== null ? effectiveUserLimit + seatQty : "∞"} users</span>
                 </div>
               </div>
 

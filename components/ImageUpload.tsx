@@ -145,7 +145,7 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
       />
 
       {error && (
-        <div style={{ fontSize: 11, color: "#f87171", padding: "4px 8px", borderRadius: 6, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)" }}>
+        <div style={{ fontSize: 11, color: "var(--tx-f87171, #f87171)", padding: "4px 8px", borderRadius: 6, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)" }}>
           {error}
         </div>
       )}

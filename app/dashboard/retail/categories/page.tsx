@@ -31,7 +31,7 @@ export default function RetailCategoriesPage() {
 
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", color: "#f97316", description: "" });
+  const [form, setForm] = useState({ name: "", color: "var(--tx-f97316, #f97316)", description: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -57,7 +57,7 @@ export default function RetailCategoriesPage() {
 
   function openAdd() {
     setEditId(null);
-    setForm({ name: "", color: "#f97316", description: "" });
+    setForm({ name: "", color: "var(--tx-f97316, #f97316)", description: "" });
     setError("");
     setShowModal(true);
   }
@@ -134,9 +134,9 @@ export default function RetailCategoriesPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Total Categories", val: categories.length, color: "#f97316" },
-          { label: "Products Categorized", val: categorized, color: "#10b981" },
-          { label: "Uncategorized Products", val: totalProducts - categorized, color: "#f59e0b" },
+          { label: "Total Categories", val: categories.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Products Categorized", val: categorized, color: "var(--tx-10b981, #10b981)" },
+          { label: "Uncategorized Products", val: totalProducts - categorized, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map(s => (
           <div key={s.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{s.label}</div>
@@ -197,13 +197,13 @@ export default function RetailCategoriesPage() {
                 <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                   <button
                     onClick={() => openEdit(cat)}
-                    style={{ background: "rgba(99,102,241,.12)", color: "#818cf8", border: "none", borderRadius: 7, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                    style={{ background: "rgba(99,102,241,.12)", color: "var(--tx-818cf8, #818cf8)", border: "none", borderRadius: 7, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => setDeleteId(cat.id)}
-                    style={{ background: "rgba(239,68,68,.1)", color: "#f87171", border: "none", borderRadius: 7, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                    style={{ background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", border: "none", borderRadius: 7, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                   >
                     Del
                   </button>
@@ -224,7 +224,7 @@ export default function RetailCategoriesPage() {
             </div>
 
             {error && (
-              <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12 }}>
+              <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>
                 {error}
               </div>
             )}

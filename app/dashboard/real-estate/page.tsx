@@ -60,10 +60,10 @@ export default function RealEstateOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Properties", value: summary.properties, color: "#818cf8" },
-          { label: "Occupancy", value: `${summary.occupancyRate}%`, color: "#34d399" },
-          { label: "Collected Rent", value: `Rs. ${summary.collectedRent.toLocaleString()}`, color: "#60a5fa" },
-          { label: "Pending Rent", value: `Rs. ${summary.pendingRent.toLocaleString()}`, color: "#f87171" },
+          { label: "Properties", value: summary.properties, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Occupancy", value: `${summary.occupancyRate}%`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Collected Rent", value: `Rs. ${summary.collectedRent.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Pending Rent", value: `Rs. ${summary.pendingRent.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
         ].map((card) => (
           <div key={card.label} style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: realEstateMuted, marginBottom: 8 }}>{card.label}</div>
@@ -77,10 +77,10 @@ export default function RealEstateOverviewPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Portfolio Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Vacant properties", value: summary.vacantProperties, color: "#34d399" },
-              { label: "Rented properties", value: summary.rentedProperties, color: "#818cf8" },
-              { label: "Maintenance units", value: summary.maintenanceProperties, color: "#f59e0b" },
-              { label: "Active tenants", value: summary.activeTenants, color: "#c084fc" },
+              { label: "Vacant properties", value: summary.vacantProperties, color: "var(--tx-34d399, #34d399)" },
+              { label: "Rented properties", value: summary.rentedProperties, color: "var(--tx-818cf8, #818cf8)" },
+              { label: "Maintenance units", value: summary.maintenanceProperties, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Active tenants", value: summary.activeTenants, color: "var(--tx-c084fc, #c084fc)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: realEstateMuted }}>{row.label}</span>
@@ -98,7 +98,7 @@ export default function RealEstateOverviewPage() {
               <div key={lease.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{lease.tenant}</div>
                 <div style={{ fontSize: 12, color: realEstateMuted, marginTop: 4 }}>{lease.property} | {lease.startDate} to {lease.endDate}</div>
-                <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>Rs. {lease.rentAmount.toLocaleString()} / month</div>
+                <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>Rs. {lease.rentAmount.toLocaleString()} / month</div>
               </div>
             ))}
           </div>

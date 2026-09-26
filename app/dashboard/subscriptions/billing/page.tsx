@@ -93,10 +93,10 @@ export default function RecurringBillingPage() {
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 800 }}>{row.invoiceNo}</div>
                     <div style={{ fontSize: 12, color: saasMuted, marginTop: 6 }}>{row.company} | {row.planName}</div>
-                    <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>Due {row.dueDate || "-"}</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>Due {row.dueDate || "-"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#34d399" }}>${row.amount.toLocaleString()}</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: "var(--tx-34d399, #34d399)" }}>${row.amount.toLocaleString()}</div>
                     <span style={{ padding: "4px 10px", borderRadius: 999, background: `${saasStatusColor(row.status)}20`, color: saasStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
                   </div>
                 </div>

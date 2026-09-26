@@ -22,9 +22,9 @@ interface StockMovementRecord extends StockMovementData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TYPE_META: Record<MovementType, { label: string; color: string; bg: string; border: string; prefix: string }> = {
-  STOCK_IN:    { label: "Stock In",    color: "#4ade80", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)",   prefix: "SIN" },
-  STOCK_OUT:   { label: "Stock Out",   color: "#f87171", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)",  prefix: "SOUT" },
-  ADJUSTMENT:  { label: "Adjustment",  color: "#fbbf24", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)",   prefix: "ADJ" },
+  STOCK_IN:    { label: "Stock In",    color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)",   prefix: "SIN" },
+  STOCK_OUT:   { label: "Stock Out",   color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)",  prefix: "SOUT" },
+  ADJUSTMENT:  { label: "Adjustment",  color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",   border: "rgba(251,191,36,.35)",   prefix: "ADJ" },
 };
 
 const REASONS: Record<MovementType, string[]> = {
@@ -136,10 +136,10 @@ export default function StockMovementsPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Units In",    value: kpis.totalIn,      color: "#4ade80" },
-          { label: "Total Units Out",   value: kpis.totalOut,     color: "#f87171" },
-          { label: "Adjustments",       value: kpis.adjustments,  color: "#fbbf24" },
-          { label: "Today's Movements", value: kpis.today,        color: "#60a5fa" },
+          { label: "Total Units In",    value: kpis.totalIn,      color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Total Units Out",   value: kpis.totalOut,     color: "var(--tx-f87171, #f87171)" },
+          { label: "Adjustments",       value: kpis.adjustments,  color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Today's Movements", value: kpis.today,        color: "var(--tx-60a5fa, #60a5fa)" },
         ].map(k => (
           <div key={k.label} style={{ ...s.panel, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{k.label}</div>
@@ -155,7 +155,7 @@ export default function StockMovementsPage() {
             <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
               {editing ? "Edit" : "New"} {TYPE_META[formType].label}
             </h2>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)", true)}>✕ Close</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)", true)}>✕ Close</button>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
@@ -196,7 +196,7 @@ export default function StockMovementsPage() {
 
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={handleSave} disabled={saving} style={s.btn(ACCENT)}>{saving ? "Saving…" : editing ? "Update" : "Save Movement"}</button>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)")}>Cancel</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)")}>Cancel</button>
           </div>
         </div>
       )}
@@ -247,7 +247,7 @@ export default function StockMovementsPage() {
                     <td style={{ ...s.td, color: "var(--text-muted)" }}>{m.reason}</td>
                     <td style={{ ...s.td, color: "var(--text-muted)" }}>{m.reference || "—"}</td>
                     <td style={{ ...s.td, textAlign: "right" as const }}>
-                      <button onClick={() => openEdit(m)} style={{ ...s.btn("rgba(255,255,255,.08)", true), marginRight: 6 }}>Edit</button>
+                      <button onClick={() => openEdit(m)} style={{ ...s.btn("rgba(var(--ink),.08)", true), marginRight: 6 }}>Edit</button>
                       <button onClick={async () => { if (confirm("Delete this movement?")) await remove(m.id); }} style={s.btn("rgba(248,113,113,.15)", true)}>Delete</button>
                     </td>
                   </tr>

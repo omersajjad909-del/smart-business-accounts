@@ -190,22 +190,22 @@ export default function StockReportPage() {
               </div>
             </div>
             <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-              <button onClick={() => setShowModal(true)} style={{ padding:"8px 16px", borderRadius:9, background:"rgba(129,140,248,.1)", border:"1px solid rgba(129,140,248,.25)", color:"#818cf8", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>⚙ Parameters</button>
-              <button onClick={() => exportCSV(filtered, asOn)} style={{ padding:"8px 14px", borderRadius:9, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>↓ CSV</button>
+              <button onClick={() => setShowModal(true)} style={{ padding:"8px 16px", borderRadius:9, background:"rgba(129,140,248,.1)", border:"1px solid rgba(129,140,248,.25)", color:"var(--tx-818cf8, #818cf8)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>⚙ Parameters</button>
+              <button onClick={() => exportCSV(filtered, asOn)} style={{ padding:"8px 14px", borderRadius:9, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>↓ CSV</button>
               <button onClick={() => window.print()} style={{ padding:"8px 14px", borderRadius:9, background:"transparent", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>🖨 Print</button>
-              <button onClick={() => router.back()} style={{ width:34, height:34, borderRadius:8, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:16, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+              <button onClick={() => router.back()} style={{ width:34, height:34, borderRadius:8, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"var(--tx-f87171, #f87171)", fontSize:16, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
             </div>
           </div>
 
           {/* KPI Cards */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:12, marginBottom:24 }}>
             {[
-              { label:"Total Items",        val: rows.length,               color:"#818cf8", icon:"📦" },
-              { label:"In Stock",           val: inStockCount,              color:"#34d399", icon:"✅" },
-              { label:"Out of Stock (Nil)", val: nillCount,                 color:"#f87171", icon:"⚠️"  },
-              { label:"Total Purchased",    val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.purchasedAmt,0))}`, color:"#60a5fa", icon:"📥" },
-              { label:"Total Sold",         val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.soldAmt,0))}`,      color:"#f59e0b", icon:"📤" },
-              { label:"Stock Value",        val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.remainingAmt,0))}`, color:"#34d399", icon:"💰" },
+              { label:"Total Items",        val: rows.length,               color:"var(--tx-818cf8, #818cf8)", icon:"📦" },
+              { label:"In Stock",           val: inStockCount,              color:"var(--tx-34d399, #34d399)", icon:"✅" },
+              { label:"Out of Stock (Nil)", val: nillCount,                 color:"var(--tx-f87171, #f87171)", icon:"⚠️"  },
+              { label:"Total Purchased",    val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.purchasedAmt,0))}`, color:"var(--tx-60a5fa, #60a5fa)", icon:"📥" },
+              { label:"Total Sold",         val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.soldAmt,0))}`,      color:"var(--tx-f59e0b, #f59e0b)", icon:"📤" },
+              { label:"Stock Value",        val: `Rs ${fmtAmt(rows.reduce((s,r)=>s+r.remainingAmt,0))}`, color:"var(--tx-34d399, #34d399)", icon:"💰" },
             ].map(k => (
               <div key={k.label} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius:12, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:12 }}>
                 <span style={{ fontSize:20 }}>{k.icon}</span>
@@ -242,11 +242,11 @@ export default function StockReportPage() {
                   <th style={th("left")}>Item Name</th>
                   <th style={th("center", 70)}>Unit</th>
                   {/* Purchased */}
-                  <th colSpan={2} style={{ padding:"6px 14px 2px", fontSize:9, fontWeight:800, color:"#60a5fa", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:"rgba(96,165,250,.04)" }}>Purchased</th>
+                  <th colSpan={2} style={{ padding:"6px 14px 2px", fontSize:9, fontWeight:800, color:"var(--tx-60a5fa, #60a5fa)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:"rgba(96,165,250,.04)" }}>Purchased</th>
                   {/* Sold */}
-                  <th colSpan={2} style={{ padding:"6px 14px 2px", fontSize:9, fontWeight:800, color:"#f59e0b", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:"rgba(245,158,11,.04)" }}>Sold</th>
+                  <th colSpan={2} style={{ padding:"6px 14px 2px", fontSize:9, fontWeight:800, color:"var(--tx-f59e0b, #f59e0b)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:"rgba(245,158,11,.04)" }}>Sold</th>
                   {/* Remaining */}
-                  <th colSpan={2} style={{ padding:"6px 14px 2px", fontSize:9, fontWeight:800, color:"#34d399", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:"rgba(52,211,153,.04)" }}>Remaining</th>
+                  <th colSpan={2} style={{ padding:"6px 14px 2px", fontSize:9, fontWeight:800, color:"var(--tx-34d399, #34d399)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:"rgba(52,211,153,.04)" }}>Remaining</th>
                 </tr>
                 <tr style={{ borderBottom:"2px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.02)" }}>
                   <th style={th("left", 40)}></th>
@@ -274,7 +274,7 @@ export default function StockReportPage() {
                     <tr key={r.itemId}
                       style={{ borderBottom:"1px solid rgba(var(--ink),.05)", background: i%2===0?"transparent":"rgba(var(--ink),.01)", transition:"background .15s" }}
                       onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.05)")}
-                      onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.01)")}
+                      onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(var(--ink),.01)")}
                     >
                       <td style={{ padding:"10px 14px", fontSize:11, color:"rgba(var(--ink),.25)", fontWeight:600 }}>{i+1}</td>
                       <td style={{ padding:"10px 14px" }}>
@@ -283,11 +283,11 @@ export default function StockReportPage() {
                       </td>
                       <td style={{ padding:"10px 14px", textAlign:"center", fontSize:11, color:"rgba(var(--ink),.4)", fontWeight:600 }}>{r.unit}</td>
                       {/* Purchased */}
-                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, fontWeight:700, color:"#93c5fd", borderLeft:"1px solid rgba(var(--ink),.05)", background:"rgba(96,165,250,.03)" }}>{fmt(r.purchasedQty)}</td>
-                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, color:"#60a5fa", background:"rgba(96,165,250,.03)" }}>Rs {fmtAmt(r.purchasedAmt)}</td>
+                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, fontWeight:700, color:"var(--tx-93c5fd, #93c5fd)", borderLeft:"1px solid rgba(var(--ink),.05)", background:"rgba(96,165,250,.03)" }}>{fmt(r.purchasedQty)}</td>
+                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, color:"var(--tx-60a5fa, #60a5fa)", background:"rgba(96,165,250,.03)" }}>Rs {fmtAmt(r.purchasedAmt)}</td>
                       {/* Sold */}
-                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, fontWeight:700, color:"#fcd34d", borderLeft:"1px solid rgba(var(--ink),.05)", background:"rgba(245,158,11,.03)" }}>{fmt(r.soldQty)}</td>
-                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, color:"#f59e0b", background:"rgba(245,158,11,.03)" }}>Rs {fmtAmt(r.soldAmt)}</td>
+                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, fontWeight:700, color:"var(--tx-fcd34d, #fcd34d)", borderLeft:"1px solid rgba(var(--ink),.05)", background:"rgba(245,158,11,.03)" }}>{fmt(r.soldQty)}</td>
+                      <td style={{ padding:"10px 14px", textAlign:"right", fontSize:12, color:"var(--tx-f59e0b, #f59e0b)", background:"rgba(245,158,11,.03)" }}>Rs {fmtAmt(r.soldAmt)}</td>
                       {/* Remaining */}
                       <td style={{ padding:"10px 14px", textAlign:"right", borderLeft:"1px solid rgba(var(--ink),.05)", background: isNill?"rgba(248,113,113,.04)":"rgba(52,211,153,.04)" }}>
                         <span style={{ display:"inline-block", padding:"3px 10px", borderRadius:20, fontSize:12, fontWeight:800,
@@ -309,12 +309,12 @@ export default function StockReportPage() {
                     <td colSpan={3} style={{ padding:"13px 14px", fontSize:11, fontWeight:800, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em" }}>
                       Grand Total — {filtered.length} item{filtered.length!==1?"s":""}
                     </td>
-                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:14, fontWeight:900, color:"#93c5fd", borderLeft:"1px solid rgba(var(--ink),.08)", background:"rgba(96,165,250,.05)" }}>{fmt(totalPurchasedQty)}</td>
-                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:13, fontWeight:800, color:"#60a5fa", background:"rgba(96,165,250,.05)" }}>Rs {fmtAmt(totalPurchasedAmt)}</td>
-                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:14, fontWeight:900, color:"#fcd34d", borderLeft:"1px solid rgba(var(--ink),.08)", background:"rgba(245,158,11,.05)" }}>{fmt(totalSoldQty)}</td>
-                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:13, fontWeight:800, color:"#f59e0b", background:"rgba(245,158,11,.05)" }}>Rs {fmtAmt(totalSoldAmt)}</td>
-                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:14, fontWeight:900, color:"#34d399", borderLeft:"1px solid rgba(var(--ink),.08)", background:"rgba(52,211,153,.05)" }}>{fmt(totalRemainingQty)}</td>
-                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:13, fontWeight:800, color:"#34d399", background:"rgba(52,211,153,.05)" }}>Rs {fmtAmt(totalRemainingAmt)}</td>
+                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:14, fontWeight:900, color:"var(--tx-93c5fd, #93c5fd)", borderLeft:"1px solid rgba(var(--ink),.08)", background:"rgba(96,165,250,.05)" }}>{fmt(totalPurchasedQty)}</td>
+                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:13, fontWeight:800, color:"var(--tx-60a5fa, #60a5fa)", background:"rgba(96,165,250,.05)" }}>Rs {fmtAmt(totalPurchasedAmt)}</td>
+                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:14, fontWeight:900, color:"var(--tx-fcd34d, #fcd34d)", borderLeft:"1px solid rgba(var(--ink),.08)", background:"rgba(245,158,11,.05)" }}>{fmt(totalSoldQty)}</td>
+                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:13, fontWeight:800, color:"var(--tx-f59e0b, #f59e0b)", background:"rgba(245,158,11,.05)" }}>Rs {fmtAmt(totalSoldAmt)}</td>
+                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:14, fontWeight:900, color:"var(--tx-34d399, #34d399)", borderLeft:"1px solid rgba(var(--ink),.08)", background:"rgba(52,211,153,.05)" }}>{fmt(totalRemainingQty)}</td>
+                    <td style={{ padding:"13px 14px", textAlign:"right", fontSize:13, fontWeight:800, color:"var(--tx-34d399, #34d399)", background:"rgba(52,211,153,.05)" }}>Rs {fmtAmt(totalRemainingAmt)}</td>
                   </tr>
                 </tfoot>
               )}

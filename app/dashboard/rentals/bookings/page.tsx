@@ -49,9 +49,9 @@ export default function RentalsBookingsPage() {
         const value = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
         return [
           { label: "Bookings", value: rows.length, color: rentalsAccent },
-          { label: "Reserved", value: rows.filter((row) => String(row.status) === "reserved").length, color: "#60a5fa" },
-          { label: "On Rent", value: rows.filter((row) => String(row.status) === "out").length, color: "#fbbf24" },
-          { label: "Booking Value", value: value.toLocaleString(), color: "#34d399" },
+          { label: "Reserved", value: rows.filter((row) => String(row.status) === "reserved").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "On Rent", value: rows.filter((row) => String(row.status) === "out").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Booking Value", value: value.toLocaleString(), color: "var(--tx-34d399, #34d399)" },
         ];
       }}
     />

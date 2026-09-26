@@ -42,10 +42,10 @@ export default function UtilityMetersPage() {
       summarize={(rows) => {
         const units = rows.reduce((sum, row) => sum + Number(row.units || 0), 0);
         return [
-          { label: "Readings", value: rows.length, color: "#38bdf8" },
-          { label: "Verified", value: rows.filter((row) => String(row.status) === "verified").length, color: "#34d399" },
-          { label: "Estimated", value: rows.filter((row) => String(row.status) === "estimated").length, color: "#fbbf24" },
-          { label: "Units Logged", value: units.toLocaleString(), color: "#a78bfa" },
+          { label: "Readings", value: rows.length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Verified", value: rows.filter((row) => String(row.status) === "verified").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Estimated", value: rows.filter((row) => String(row.status) === "estimated").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Units Logged", value: units.toLocaleString(), color: "var(--tx-a78bfa, #a78bfa)" },
         ];
       }}
     />

@@ -47,7 +47,7 @@ export default function LawAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: lawFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#fdba74", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Law Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-fdba74, #fdba74)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Law Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Practice mix, fees, aur lawyer load</h1>
         <p style={{ margin: 0, fontSize: 14, color: lawMuted, maxWidth: 760 }}>
           Is board se legal practice ko pata chalta hai ke kis type ke matters zyada hain, fee realization kaisi hai, aur kaun se lawyers sabse zyada billable load carry kar rahe hain.
@@ -63,7 +63,7 @@ export default function LawAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Case Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Case Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {caseMix.length === 0 ? (
               <div style={{ color: lawMuted, fontSize: 13 }}>Case mix show karne ke liye matters add karein.</div>
@@ -85,14 +85,14 @@ export default function LawAnalyticsPage() {
         </div>
 
         <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Lawyer Load</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Lawyer Load</div>
           <div style={{ display: "grid", gap: 10 }}>
             {lawyerLoad.length === 0 ? (
               <div style={{ color: lawMuted, fontSize: 13 }}>Lawyer load show karne ke liye time entries log karein.</div>
             ) : lawyerLoad.map(([lawyer, hours]) => (
               <div key={lawyer} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{lawyer}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{hours}h</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{hours}h</div>
               </div>
             ))}
           </div>

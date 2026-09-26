@@ -50,7 +50,7 @@ function LegRow({ leg, compact }: { leg: FlightOffer["legs"][number]; compact?: 
           {leg.via.length ? <span style={{ flex: 1, height: 1, background: T.border }} /> : null}
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: T.muted, flexShrink: 0 }} />
         </div>
-        <div style={{ fontSize: 10.5, color: leg.via.length || !timed ? T.muted : "#34d399", marginTop: 3, fontWeight: 600 }}>
+        <div style={{ fontSize: 10.5, color: leg.via.length || !timed ? T.muted : "var(--tx-34d399, #34d399)", marginTop: 3, fontWeight: 600 }}>
           {timed ? describeStops(leg) : `Likely ${describeStops(leg).toLowerCase()}`}
         </div>
       </div>
@@ -60,7 +60,7 @@ function LegRow({ leg, compact }: { leg: FlightOffer["legs"][number]; compact?: 
           {timed ? leg.arriveAt : "--:--"}
           {/* A red-eye that lands the next morning is not the same flight as
               one that lands the same evening. */}
-          {leg.arrivesNextDay ? <span style={{ fontSize: 10, color: "#f4c25b", marginLeft: 3 }}>+1</span> : null}
+          {leg.arrivesNextDay ? <span style={{ fontSize: 10, color: "var(--tx-f4c25b, #f4c25b)", marginLeft: 3 }}>+1</span> : null}
         </div>
         <div style={{ fontSize: 11, color: T.muted, fontWeight: 600 }}>{leg.to}</div>
       </div>
@@ -205,11 +205,11 @@ function QuickFare({
       ))}
 
       {ready ? (
-        <div style={{ fontSize: 11.5, color: margin >= 0 ? "#34d399" : "#f87171", textAlign: "right", fontWeight: 700 }}>
+        <div style={{ fontSize: 11.5, color: margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", textAlign: "right", fontWeight: 700 }}>
           Margin {margin.toLocaleString()}
         </div>
       ) : null}
-      {error ? <div style={{ fontSize: 11, color: "#f87171" }}>{error}</div> : null}
+      {error ? <div style={{ fontSize: 11, color: "var(--tx-f87171, #f87171)" }}>{error}</div> : null}
 
       <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
         <button

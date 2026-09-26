@@ -321,7 +321,7 @@ export default function PayrollPage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14 }}>
           <div>
-            <label style={lbl}>Deductions {detectedAdv > 0 && <span style={{ color: "#f87171", marginLeft: 4 }}>(Auto: {fmt(detectedAdv)})</span>}</label>
+            <label style={lbl}>Deductions {detectedAdv > 0 && <span style={{ color: "var(--tx-f87171, #f87171)", marginLeft: 4 }}>(Auto: {fmt(detectedAdv)})</span>}</label>
             <input type="number" style={{ ...inp, borderColor: form.deductions > 0 ? "rgba(248,113,113,0.4)" : undefined }} placeholder="0"
               value={form.deductions} onChange={e => setForm(f => ({ ...f, deductions: +e.target.value || 0 }))} />
           </div>
@@ -386,32 +386,32 @@ export default function PayrollPage() {
               </div>
               <div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Absent deduction</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.absentDeduction > 0 ? "#f87171" : "var(--text-primary)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.absentDeduction > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-primary)" }}>
                   Rs. {fmt(Math.round(attSummary.absentDeduction))}
                 </div>
               </div>
               <div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Half-day deduction</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.halfDayDeduction > 0 ? "#fb923c" : "var(--text-primary)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.halfDayDeduction > 0 ? "var(--tx-fb923c, #fb923c)" : "var(--text-primary)" }}>
                   Rs. {fmt(Math.round(attSummary.halfDayDeduction))}
                 </div>
               </div>
               <div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>OT credit (offset)</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.otCredit > 0 ? "#818cf8" : "var(--text-primary)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.otCredit > 0 ? "var(--tx-818cf8, #818cf8)" : "var(--text-primary)" }}>
                   Rs. {fmt(Math.round(attSummary.otCredit))}
                 </div>
               </div>
               <div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Net deduction</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: attSummary.netDeduction > 0 ? "#f87171" : "#22c55e" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: attSummary.netDeduction > 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-22c55e, #22c55e)" }}>
                   Rs. {fmt(Math.round(attSummary.netDeduction))}
                 </div>
               </div>
               {attSummary.otAllowance > 0 && (
                 <div>
                   <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Extra OT allowance</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#818cf8" }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)" }}>
                     Rs. {fmt(Math.round(attSummary.otAllowance))}
                   </div>
                 </div>
@@ -446,18 +446,18 @@ export default function PayrollPage() {
                 const next = pay - (p.additionalCash || 0);
                 return (
                   <tr key={p.id} style={{ borderBottom: idx < payroll.length - 1 ? "1px solid var(--border)" : "none" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(var(--ink),0.03)"}
                     onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = "transparent"}>
                     <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, color: accent }}>{p.employee.employeeId}</td>
                     <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{p.employee.firstName} {p.employee.lastName}</td>
                     <td style={{ padding: "12px 14px", fontSize: 13, textAlign: "right" }}>{fmt(p.baseSalary)}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: p.deductions > 0 ? "#f87171" : "var(--text-muted)" }}>
+                    <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: p.deductions > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>
                       {p.deductions > 0 ? `-${fmt(p.deductions)}` : "—"}
                     </td>
                     <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)" }}>{p.deductionReason || "—"}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "#e2e8f0" }}>{fmt(pay)}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 13, textAlign: "right", color: "#818cf8" }}>{p.additionalCash > 0 ? fmt(p.additionalCash) : "—"}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", background: "rgba(248,113,113,0.04)", color: next < 0 ? "#f87171" : "#22c55e" }}>
+                    <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-e2e8f0, #e2e8f0)" }}>{fmt(pay)}</td>
+                    <td style={{ padding: "12px 14px", fontSize: 13, textAlign: "right", color: "var(--tx-818cf8, #818cf8)" }}>{p.additionalCash > 0 ? fmt(p.additionalCash) : "—"}</td>
+                    <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", background: "rgba(248,113,113,0.04)", color: next < 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-22c55e, #22c55e)" }}>
                       {next < 0 ? (
                         <span style={{ background: "rgba(248,113,113,0.15)", padding: "3px 8px", borderRadius: 6, fontSize: 11 }}>{fmt(next)}</span>
                       ) : fmt(next)}
@@ -465,8 +465,8 @@ export default function PayrollPage() {
                     <td style={{ padding: "12px 14px" }}>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => handlePrintPayslip(p)} style={{ background: "rgba(var(--ink),0.07)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--text-muted)", cursor: "pointer", fontFamily: ff }}>Slip</button>
-                        <button onClick={() => handleEdit(p)} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#818cf8", cursor: "pointer", fontFamily: ff }}>Edit</button>
-                        <button onClick={() => handleDelete(p.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#f87171", cursor: "pointer", fontFamily: ff }}>Del</button>
+                        <button onClick={() => handleEdit(p)} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)", cursor: "pointer", fontFamily: ff }}>Edit</button>
+                        <button onClick={() => handleDelete(p.id)} style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontFamily: ff }}>Del</button>
                       </div>
                     </td>
                   </tr>
@@ -478,11 +478,11 @@ export default function PayrollPage() {
                 <tr style={{ borderTop: "2px solid var(--border)", background: "rgba(var(--ink),0.03)" }}>
                   <td colSpan={2} style={{ padding: "12px 14px", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Totals</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right" }}>{fmt(totalBasic)}</td>
-                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "#f87171" }}>-{fmt(totalDed)}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-f87171, #f87171)" }}>-{fmt(totalDed)}</td>
                   <td></td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right" }}>{fmt(totalBasic - totalDed)}</td>
-                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "#818cf8" }}>{fmt(totalPaid)}</td>
-                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: totalNeg < 0 ? "#f87171" : "#22c55e" }}>{fmt(totalNeg)}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-818cf8, #818cf8)" }}>{fmt(totalPaid)}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: totalNeg < 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-22c55e, #22c55e)" }}>{fmt(totalNeg)}</td>
                   <td></td>
                 </tr>
               </tfoot>
@@ -501,7 +501,7 @@ export default function PayrollPage() {
         // Rendered straight into <body> so the print stylesheet can display:none
         // every other top-level box instead of merely hiding it.
         return createPortal(
-        <div id="payroll-print-portal" style={{ position: "fixed", inset: 0, background: "rgba(9, 12, 30, 0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: isMobile ? "13px 10px" : "24px 16px" }}>
+        <div id="payroll-print-portal" style={{ position: "fixed", inset: 0, background: "rgba(var(--dkr-090c1e, 9,12,30),0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: isMobile ? "13px 10px" : "24px 16px" }}>
           {/* Toolbar */}
           <div className="print-toolbar" style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -592,7 +592,7 @@ export default function PayrollPage() {
                 <div style={{ textAlign: "right", fontSize: 11, color: "#64748b", lineHeight: 1.7 }}>
                   <div style={{ fontWeight: 700, color: "#0f172a", fontSize: 12 }}>Generated</div>
                   <div>{generatedAt}</div>
-                  <div style={{ marginTop: 4, fontSize: 10, color: "#94a3b8" }}>Ref: PR-{monthYear}</div>
+                  <div style={{ marginTop: 4, fontSize: 10, color: "var(--tx-94a3b8, #94a3b8)" }}>Ref: PR-{monthYear}</div>
                 </div>
               </div>
             </div>
@@ -644,12 +644,12 @@ export default function PayrollPage() {
                         <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", fontWeight: 700, color: "#0f172a" }}>{p.employee.employeeId}</td>
                         <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", fontWeight: 600, color: "#0f172a" }}>{p.employee.firstName} {p.employee.lastName}</td>
                         <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmt(p.baseSalary)}</td>
-                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", color: p.deductions > 0 ? "#0f172a" : "#cbd5e1", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", color: p.deductions > 0 ? "#0f172a" : "var(--tx-cbd5e1, #cbd5e1)", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
                           {p.deductions > 0 ? `-${fmt(p.deductions)}` : "—"}
                         </td>
                         <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", fontSize: 11, color: "#64748b" }}>{p.deductionReason || "—"}</td>
                         <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(pay)}</td>
-                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", color: p.additionalCash > 0 ? "#0f172a" : "#cbd5e1", fontVariantNumeric: "tabular-nums" }}>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", color: p.additionalCash > 0 ? "#0f172a" : "var(--tx-cbd5e1, #cbd5e1)", fontVariantNumeric: "tabular-nums" }}>
                           {p.additionalCash > 0 ? fmt(p.additionalCash) : "—"}
                         </td>
                         <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums", color: "#0f172a" }}>
@@ -694,7 +694,7 @@ export default function PayrollPage() {
               justifyContent: "space-between",
               alignItems: "center",
               fontSize: 10,
-              color: "#94a3b8",
+              color: "var(--tx-94a3b8, #94a3b8)",
             }}>
               <div>
                 Confidential — For internal use only. Any discrepancies to be reported within 7 days.

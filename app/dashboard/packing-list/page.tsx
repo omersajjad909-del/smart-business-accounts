@@ -10,10 +10,10 @@ interface PackItem { marks: string; description: string; hsCode: string; package
 function newItem(): PackItem { return { marks: "", description: "", hsCode: "", packages: 1, pkgType: "Carton", netWeight: 0, grossWeight: 0, cbm: 0 }; }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  DRAFT:     { bg: "rgba(148,163,184,0.12)", color: "#94a3b8" },
-  PREPARED:  { bg: "rgba(14,165,233,0.12)",  color: "#38bdf8" },
-  VERIFIED:  { bg: "rgba(251,191,36,0.12)",  color: "#fbbf24" },
-  SHIPPED:   { bg: "rgba(16,185,129,0.12)",  color: "#34d399" },
+  DRAFT:     { bg: "rgba(148,163,184,0.12)", color: "var(--tx-94a3b8, #94a3b8)" },
+  PREPARED:  { bg: "rgba(14,165,233,0.12)",  color: "var(--tx-38bdf8, #38bdf8)" },
+  VERIFIED:  { bg: "rgba(251,191,36,0.12)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  SHIPPED:   { bg: "rgba(16,185,129,0.12)",  color: "var(--tx-34d399, #34d399)" },
 };
 
 export default function PackingListPage() {
@@ -158,9 +158,9 @@ export default function PackingListPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
         {[
           { label: "Total Lists", value: kpis.total, color: ACCENT },
-          { label: "Draft", value: kpis.draft, color: "#94a3b8" },
-          { label: "Shipped", value: kpis.shipped, color: "#34d399" },
-          { label: "Total Packages", value: kpis.totalPkg.toLocaleString(), color: "#a5b4fc" },
+          { label: "Draft", value: kpis.draft, color: "var(--tx-94a3b8, #94a3b8)" },
+          { label: "Shipped", value: kpis.shipped, color: "var(--tx-34d399, #34d399)" },
+          { label: "Total Packages", value: kpis.totalPkg.toLocaleString(), color: "var(--tx-a5b4fc, #a5b4fc)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
@@ -193,8 +193,8 @@ export default function PackingListPage() {
                 const ss = STATUS_STYLE[r.status] || STATUS_STYLE.DRAFT;
                 const t = r.d.totals || {};
                 return (
-                  <tr key={r.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
-                    <td style={{ ...td, fontWeight: 700, color: "#34d399" }}>{r.title}</td>
+                  <tr key={r.id} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
+                    <td style={{ ...td, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{r.title}</td>
                     <td style={td}>{r.d.exporter || "—"}</td>
                     <td style={td}>{r.d.importer || "—"}</td>
                     <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{r.d.ciNo || "—"}</td>
@@ -205,8 +205,8 @@ export default function PackingListPage() {
                     <td style={td}><span style={{ ...ss, display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{r.status}</span></td>
                     <td style={td}><div style={{ display: "flex", gap: 6 }}>
                       <button onClick={() => openEdit(r)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--text-muted)", cursor: "pointer" }}>Edit</button>
-                      <button onClick={() => printRecord(r)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#34d399", cursor: "pointer" }}>Print</button>
-                      <button onClick={() => remove(r.id)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 15 }}>×</button>
+                      <button onClick={() => printRecord(r)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-34d399, #34d399)", cursor: "pointer" }}>Print</button>
+                      <button onClick={() => remove(r.id)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 15 }}>×</button>
                     </div></td>
                   </tr>
                 );
@@ -273,18 +273,18 @@ export default function PackingListPage() {
                       <td style={{ padding: "5px 6px", width: 80 }}><input type="number" value={it.netWeight} onChange={e => si(i, "netWeight", Number(e.target.value))} min={0} step={0.01} style={{ ...inp(), textAlign: "right" }} /></td>
                       <td style={{ padding: "5px 6px", width: 90 }}><input type="number" value={it.grossWeight} onChange={e => si(i, "grossWeight", Number(e.target.value))} min={0} step={0.01} style={{ ...inp(), textAlign: "right" }} /></td>
                       <td style={{ padding: "5px 6px", width: 80 }}><input type="number" value={it.cbm} onChange={e => si(i, "cbm", Number(e.target.value))} min={0} step={0.001} style={{ ...inp(), textAlign: "right" }} /></td>
-                      <td style={{ padding: "5px 6px", width: 28 }}>{items.length > 1 && <button onClick={() => setItems(ls => ls.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
+                      <td style={{ padding: "5px 6px", width: 28 }}>{items.length > 1 && <button onClick={() => setItems(ls => ls.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
                   <tr style={{ background: "rgba(16,185,129,0.06)", borderTop: "1px solid var(--border)" }}>
                     <td colSpan={3} style={{ padding: "10px 10px", fontSize: 12, fontWeight: 700, color: "var(--text-muted)" }}>TOTALS</td>
-                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 800, color: "#34d399" }}>{totals.packages}</td>
+                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{totals.packages}</td>
                     <td />
-                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 700, color: "#34d399" }}>{totals.netWeight.toFixed(2)}</td>
-                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 700, color: "#34d399" }}>{totals.grossWeight.toFixed(2)}</td>
-                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 700, color: "#34d399" }}>{totals.cbm.toFixed(3)}</td>
+                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{totals.netWeight.toFixed(2)}</td>
+                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{totals.grossWeight.toFixed(2)}</td>
+                    <td style={{ padding: "10px 6px", textAlign: "right", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{totals.cbm.toFixed(3)}</td>
                     <td />
                   </tr>
                 </tfoot>

@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const realEstateFont = "'Outfit','Inter',sans-serif";
-export const realEstateBg = "rgba(255,255,255,0.03)";
-export const realEstateBorder = "rgba(255,255,255,0.07)";
-export const realEstateMuted = "rgba(255,255,255,0.45)";
+export const realEstateBg = "rgba(var(--ink),0.03)";
+export const realEstateBorder = "rgba(var(--ink),0.07)";
+export const realEstateMuted = "rgba(var(--ink),0.45)";
 
 export type PropertyStatus = "vacant" | "rented" | "maintenance" | "for_sale";
 

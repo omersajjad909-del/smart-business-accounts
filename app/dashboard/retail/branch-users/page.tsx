@@ -127,10 +127,10 @@ export default function BranchUsersPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Branches", value: branches.length, color: "#818cf8" },
-          { label: "Team Members", value: users.length, color: "#10b981" },
-          { label: "Assigned Users", value: assignedUsers, color: "#f59e0b" },
-          { label: "Needs Branch Setup", value: unassignedUsers, color: "#ef4444" },
+          { label: "Branches", value: branches.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Team Members", value: users.length, color: "var(--tx-10b981, #10b981)" },
+          { label: "Assigned Users", value: assignedUsers, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Needs Branch Setup", value: unassignedUsers, color: "var(--tx-ef4444, #ef4444)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{card.label}</div>
@@ -194,7 +194,7 @@ export default function BranchUsersPage() {
                       {row.branchNames.length > 0 ? (
                         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           {row.branchNames.map((branchName) => (
-                            <span key={`${row.id}-${branchName}`} style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                            <span key={`${row.id}-${branchName}`} style={{ background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)", padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
                               {branchName}
                             </span>
                           ))}

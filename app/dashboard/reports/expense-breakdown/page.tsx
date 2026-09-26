@@ -77,9 +77,9 @@ export default function ExpenseBreakdownPage() {
       {/* Summary cards */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Total Expenses", value: `${cur} ${fmt(total)}`, color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
-          { label: "Top Item", value: data[0]?.category || "—", color: "#6366f1", bg: "rgba(99,102,241,.07)", border: "rgba(99,102,241,.2)" },
-          { label: "Categories", value: String(data.length), color: "#34d399", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
+          { label: "Total Expenses", value: `${cur} ${fmt(total)}`, color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Top Item", value: data[0]?.category || "—", color: "var(--tx-6366f1, #6366f1)", bg: "rgba(99,102,241,.07)", border: "rgba(99,102,241,.2)" },
+          { label: "Categories", value: String(data.length), color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
         ].map(c => (
           <div key={c.label} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
@@ -96,7 +96,7 @@ export default function ExpenseBreakdownPage() {
             <span style={{ fontSize: 13, fontWeight: 700 }}>
               Breakdown — {groupBy === "costCenter" ? "Cost Centers" : "Categories"}
             </span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#f87171" }}>Total: {cur} {fmt(total)}</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>Total: {cur} {fmt(total)}</span>
           </div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -129,7 +129,7 @@ export default function ExpenseBreakdownPage() {
                   </td>
                   <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 13, fontWeight: 700 }}>{cur} {fmt(r.amount)}</td>
                   <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 13, color: "var(--text-muted)" }}>{r.pct.toFixed(1)}%</td>
-                  <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 12, fontWeight: 700, color: r.change > 0 ? "#f87171" : "#34d399" }}>
+                  <td style={{ padding: "12px 16px", textAlign: "right", fontSize: 12, fontWeight: 700, color: r.change > 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" }}>
                     {r.change >= 0 ? "▲" : "▼"} {Math.abs(r.change).toFixed(1)}%
                   </td>
                 </tr>
@@ -159,7 +159,7 @@ export default function ExpenseBreakdownPage() {
 
           {/* Cost center tip */}
           {groupBy === "costCenter" && (
-            <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 10, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", fontSize: 11, color: "#818cf8", lineHeight: 1.5 }}>
+            <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 10, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", fontSize: 11, color: "var(--tx-818cf8, #818cf8)", lineHeight: 1.5 }}>
               Cost centers are assigned when creating expense vouchers. Set them up in Settings → Cost Centers.
             </div>
           )}

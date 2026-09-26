@@ -55,10 +55,10 @@ export default function RealEstateAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Occupancy and Lease Health</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Active leases", value: data.summary.activeLeases, color: "#818cf8" },
-              { label: "Expired leases", value: data.leases.filter((row) => row.status !== "active").length, color: "#f87171" },
-              { label: "Active tenants", value: data.summary.activeTenants, color: "#34d399" },
-              { label: "Pending rent records", value: data.rents.filter((row) => row.status !== "paid").length, color: "#f59e0b" },
+              { label: "Active leases", value: data.summary.activeLeases, color: "var(--tx-818cf8, #818cf8)" },
+              { label: "Expired leases", value: data.leases.filter((row) => row.status !== "active").length, color: "var(--tx-f87171, #f87171)" },
+              { label: "Active tenants", value: data.summary.activeTenants, color: "var(--tx-34d399, #34d399)" },
+              { label: "Pending rent records", value: data.rents.filter((row) => row.status !== "paid").length, color: "var(--tx-f59e0b, #f59e0b)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: realEstateMuted }}>{row.label}</span>
@@ -74,7 +74,7 @@ export default function RealEstateAnalyticsPage() {
             {Object.entries(propertyMix).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
               <div key={type} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{type}</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd" }}>{count}</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{count}</span>
               </div>
             ))}
             {Object.keys(propertyMix).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No property mix available.</div>}
@@ -88,7 +88,7 @@ export default function RealEstateAnalyticsPage() {
           {Object.entries(rentByProperty).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([property, amount]) => (
             <div key={property} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
               <span style={{ fontSize: 13 }}>{property}</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {amount.toLocaleString()}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {amount.toLocaleString()}</span>
             </div>
           ))}
           {Object.keys(rentByProperty).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No rent data yet.</div>}

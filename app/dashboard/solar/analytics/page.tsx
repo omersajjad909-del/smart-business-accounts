@@ -20,7 +20,7 @@ export default function SolarAnalyticsPage() {
   }, []);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Solar Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>Project load, equipment exposure, AMC backlog, and service continuity.</p>
@@ -29,9 +29,9 @@ export default function SolarAnalyticsPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Projects", value: data.summary.projects, color: solarAccent },
-          { label: "Installing", value: data.summary.liveProjects, color: "#60a5fa" },
-          { label: "Low Stock", value: data.summary.lowStockEquipment, color: "#f97316" },
-          { label: "Pending Visits", value: data.summary.pendingVisits, color: "#34d399" },
+          { label: "Installing", value: data.summary.liveProjects, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Low Stock", value: data.summary.lowStockEquipment, color: "var(--tx-f97316, #f97316)" },
+          { label: "Pending Visits", value: data.summary.pendingVisits, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
@@ -47,7 +47,7 @@ export default function SolarAnalyticsPage() {
             {data.projects.slice(0, 8).map((item) => (
               <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{item.project}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#fde68a" }}>{item.status}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-fde68a, #fde68a)" }}>{item.status}</span>
               </div>
             ))}
           </div>
@@ -59,7 +59,7 @@ export default function SolarAnalyticsPage() {
             {data.amc.slice(0, 8).map((item) => (
               <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{item.contract}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{item.status}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{item.status}</span>
               </div>
             ))}
           </div>

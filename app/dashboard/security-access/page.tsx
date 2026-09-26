@@ -105,12 +105,12 @@ function parseDevice(ua: string | null): string {
 }
 
 const ACTION_STYLES: Record<string, { label: string; color: string }> = {
-  LOGIN:              { label: "Login",           color: "#22c55e" },
-  SSO_LOGIN:          { label: "SSO Login",       color: "#3b82f6" },
-  API_KEY_CREATED:    { label: "API Key Created", color: "#f59e0b" },
-  API_KEY_REVOKED:    { label: "API Key Revoked", color: "#ef4444" },
-  API_KEY_USED:       { label: "API Key Used",    color: "#a78bfa" },
-  SSO_CONFIG_UPDATED: { label: "SSO Updated",     color: "#06b6d4" },
+  LOGIN:              { label: "Login",           color: "var(--tx-22c55e, #22c55e)" },
+  SSO_LOGIN:          { label: "SSO Login",       color: "var(--tx-3b82f6, #3b82f6)" },
+  API_KEY_CREATED:    { label: "API Key Created", color: "var(--tx-f59e0b, #f59e0b)" },
+  API_KEY_REVOKED:    { label: "API Key Revoked", color: "var(--tx-ef4444, #ef4444)" },
+  API_KEY_USED:       { label: "API Key Used",    color: "var(--tx-a78bfa, #a78bfa)" },
+  SSO_CONFIG_UPDATED: { label: "SSO Updated",     color: "var(--tx-06b6d4, #06b6d4)" },
 };
 
 export default function SecurityAccessPage() {

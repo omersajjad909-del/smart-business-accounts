@@ -40,7 +40,7 @@ export default function ExpiryTrackingPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "All Tracked", val: drugs.length, color: "#fb7185", key: "all" }, { label: "Expired", val: expired, color: "#ef4444", key: "expired" }, { label: "Critical (< 30d)", val: critical, color: "#f59e0b", key: "critical" }, { label: "Expiring Soon (< 90d)", val: soon, color: "#818cf8", key: "soon" }].map((s) => (
+        {[{ label: "All Tracked", val: drugs.length, color: "var(--tx-fb7185, #fb7185)", key: "all" }, { label: "Expired", val: expired, color: "var(--tx-ef4444, #ef4444)", key: "expired" }, { label: "Critical (< 30d)", val: critical, color: "var(--tx-f59e0b, #f59e0b)", key: "critical" }, { label: "Expiring Soon (< 90d)", val: soon, color: "var(--tx-818cf8, #818cf8)", key: "soon" }].map((s) => (
           <div key={s.label} onClick={() => setFilter(s.key as "all" | "critical" | "soon" | "expired")} style={{ background: filter === s.key ? `${s.color}15` : pharmacyBg, border: `1px solid ${filter === s.key ? s.color : pharmacyBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px", cursor: "pointer" }}>
             <div style={{ fontSize: 13, color: pharmacyMuted, marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>

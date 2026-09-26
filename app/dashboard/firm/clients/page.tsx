@@ -15,7 +15,7 @@ const S = {
   title:       { fontSize: "1.5rem", fontWeight: 700, margin: 0 },
   btn:         { background: "#6366f1", color: "#fff", border: "none", borderRadius: "8px", padding: "0.55rem 1.25rem", fontFamily: font, fontSize: "0.95rem", fontWeight: 600, cursor: "pointer" },
   btnSm:       { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: "6px", padding: "0.3rem 0.7rem", fontFamily: font, fontSize: "0.8rem", cursor: "pointer", marginRight: "0.4rem" },
-  btnDanger:   { background: "transparent", color: "#f87171", border: "1px solid #f87171", borderRadius: "6px", padding: "0.3rem 0.7rem", fontFamily: font, fontSize: "0.8rem", cursor: "pointer" },
+  btnDanger:   { background: "transparent", color: "var(--tx-f87171, #f87171)", border: "1px solid #f87171", borderRadius: "6px", padding: "0.3rem 0.7rem", fontFamily: font, fontSize: "0.8rem", cursor: "pointer" },
   kpiGrid:     { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(185px,1fr))", gap: "1rem", marginBottom: "1.5rem" },
   kpi:         { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: "12px", padding: "1.2rem 1.4rem" },
   kpiLabel:    { fontSize: "0.78rem", color: "var(--text-muted)", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.4rem" },
@@ -128,15 +128,15 @@ export default function FirmClientsPage() {
         </div>
         <div style={S.kpi}>
           <div style={S.kpiLabel}>Active</div>
-          <div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.active}</div>
+          <div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.active}</div>
         </div>
         <div style={S.kpi}>
           <div style={S.kpiLabel}>Prospects</div>
-          <div style={{ ...S.kpiVal, color: "#f59e0b" }}>{kpis.prospect}</div>
+          <div style={{ ...S.kpiVal, color: "var(--tx-f59e0b, #f59e0b)" }}>{kpis.prospect}</div>
         </div>
         <div style={S.kpi}>
           <div style={S.kpiLabel}>Total Retainer Value</div>
-          <div style={{ ...S.kpiVal, color: "#818cf8" }}>${kpis.retainer.toLocaleString()}</div>
+          <div style={{ ...S.kpiVal, color: "var(--tx-818cf8, #818cf8)" }}>${kpis.retainer.toLocaleString()}</div>
         </div>
       </div>
 

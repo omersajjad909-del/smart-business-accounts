@@ -93,10 +93,10 @@ export default function ConstructionBillingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
         {[
-          { label: "Draft Bills", value: billings.filter((row) => row.status === "draft").length, color: "#f59e0b" },
-          { label: "Approved", value: billings.filter((row) => row.status === "approved").length, color: "#818cf8" },
-          { label: "Paid Value", value: `Rs. ${billings.filter((row) => row.status === "paid").reduce((sum, row) => sum + row.certifiedValue, 0).toLocaleString()}`, color: "#34d399" },
-          { label: "Pending Value", value: `Rs. ${billings.filter((row) => row.status !== "paid").reduce((sum, row) => sum + row.certifiedValue, 0).toLocaleString()}`, color: "#f87171" },
+          { label: "Draft Bills", value: billings.filter((row) => row.status === "draft").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Approved", value: billings.filter((row) => row.status === "approved").length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Paid Value", value: `Rs. ${billings.filter((row) => row.status === "paid").reduce((sum, row) => sum + row.certifiedValue, 0).toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Pending Value", value: `Rs. ${billings.filter((row) => row.status !== "paid").reduce((sum, row) => sum + row.certifiedValue, 0).toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
         ].map((card) => (
           <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: constructionMuted, marginBottom: 8 }}>{card.label}</div>
@@ -119,8 +119,8 @@ export default function ConstructionBillingPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.invoiceNo}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.client}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.site}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#60a5fa" }}>{row.progress}%</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399" }}>Rs. {row.certifiedValue.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-60a5fa, #60a5fa)" }}>{row.progress}%</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)" }}>Rs. {row.certifiedValue.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.date}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
@@ -166,10 +166,10 @@ export default function ConstructionBillingPage() {
                 <input type="date" value={form.date} onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))} style={{ width: "100%", padding: "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: "none", background: "#f97316", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 18px", borderRadius: 8, border: `1px solid ${constructionBorder}`, background: "transparent", color: "#cbd5e1", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 18px", borderRadius: 8, border: `1px solid ${constructionBorder}`, background: "transparent", color: "var(--tx-cbd5e1, #cbd5e1)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -12,21 +12,21 @@ import { useResponsive } from "@/hooks/useResponsive";
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
-const PANEL  = "rgba(255,255,255,0.03)";
-const BORDER = "rgba(255,255,255,0.08)";
+const PANEL  = "rgba(var(--ink),0.03)";
+const BORDER = "rgba(var(--ink),0.08)";
 const TEXT   = "#f1f5f9";
-const MUTED  = "rgba(255,255,255,0.45)";
+const MUTED  = "rgba(var(--ink),0.45)";
 const INPUT  = { background:"rgba(var(--ink),0.05)", border:`1px solid ${BORDER}`, borderRadius:8, padding:"9px 12px", color:TEXT, fontFamily:FONT, fontSize:13, width:"100%", outline:"none" };
 const SELECT: React.CSSProperties = { ...INPUT, paddingRight:34, appearance:"none", WebkitAppearance:"none", MozAppearance:"none", colorScheme:"dark", cursor:"pointer" };
 const SELECT_ARROW: React.CSSProperties = { position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", pointerEvents:"none", fontSize:10, color:MUTED };
 
 // ── Category options ──────────────────────────────────────────────────────────
 const CATEGORIES = [
-  { value:"TRADING",      label:"Trading Goods",    color:"#818cf8" },
-  { value:"RAW_MATERIAL", label:"Raw Material",     color:"#34d399" },
-  { value:"PACKAGING",    label:"Packing Material", color:"#38bdf8" },
-  { value:"FINISHED",     label:"Finished Goods",   color:"#f59e0b" },
-  { value:"SERVICE",      label:"Service",          color:"#a78bfa" },
+  { value:"TRADING",      label:"Trading Goods",    color:"var(--tx-818cf8, #818cf8)" },
+  { value:"RAW_MATERIAL", label:"Raw Material",     color:"var(--tx-34d399, #34d399)" },
+  { value:"PACKAGING",    label:"Packing Material", color:"var(--tx-38bdf8, #38bdf8)" },
+  { value:"FINISHED",     label:"Finished Goods",   color:"var(--tx-f59e0b, #f59e0b)" },
+  { value:"SERVICE",      label:"Service",          color:"var(--tx-a78bfa, #a78bfa)" },
 ];
 
 // ── Category pill ─────────────────────────────────────────────────────────────
@@ -305,15 +305,15 @@ export default function ItemsNewPage() {
             <input style={INPUT} type="number" placeholder="0" value={rate} onChange={e=>setRate(e.target.value)} />
           </div>
           <div>
-            <div style={{ fontSize:11, color:"#34d399", marginBottom:5 }}>Purchase Rate (Rs.) <span style={{fontSize:10,opacity:.6}}>cost price</span></div>
+            <div style={{ fontSize:11, color:"var(--tx-34d399, #34d399)", marginBottom:5 }}>Purchase Rate (Rs.) <span style={{fontSize:10,opacity:.6}}>cost price</span></div>
             <input style={{...INPUT, borderColor:"rgba(52,211,153,0.2)"}} type="number" placeholder="0" value={purchaseRate} onChange={e=>setPurchaseRate(e.target.value)} />
           </div>
           <div>
-            <div style={{ fontSize:11, color:"#f59e0b", marginBottom:5 }}>Tax / GST % <span style={{fontSize:10,opacity:.6}}></span></div>
+            <div style={{ fontSize:11, color:"var(--tx-f59e0b, #f59e0b)", marginBottom:5 }}>Tax / GST % <span style={{fontSize:10,opacity:.6}}></span></div>
             <input style={{...INPUT, borderColor:"rgba(245,158,11,0.2)"}} type="number" placeholder="0" value={taxRate} onChange={e=>setTaxRate(e.target.value)} />
           </div>
           <div>
-            <div style={{ fontSize:11, color:"#f87171", marginBottom:5 }}>Min Stock Alert</div>
+            <div style={{ fontSize:11, color:"var(--tx-f87171, #f87171)", marginBottom:5 }}>Min Stock Alert</div>
             <input style={{...INPUT, borderColor:"rgba(248,113,113,0.2)"}} type="number" placeholder="0" value={minStock} onChange={e=>setMinStock(e.target.value)} />
           </div>
         </div>
@@ -442,7 +442,7 @@ export default function ItemsNewPage() {
                   style={{ borderBottom:`1px solid ${BORDER}`,
                     background: idx % 2 === 0 ? "transparent" : "rgba(var(--ink),.01)" }}
                   onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,0.04)")}
-                  onMouseLeave={e=>(e.currentTarget.style.background=idx%2===0?"transparent":"rgba(255,255,255,.01)")}>
+                  onMouseLeave={e=>(e.currentTarget.style.background=idx%2===0?"transparent":"rgba(var(--ink),.01)")}>
                   <td style={{ padding:"6px 8px 6px 14px", width:44 }}>
                     {item.imageUrl
                       ? <img src={item.imageUrl} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, border:`1px solid ${BORDER}`, display:"block" }} />
@@ -456,22 +456,22 @@ export default function ItemsNewPage() {
                   <td style={{ padding:"10px 14px", textAlign:"right", fontWeight:700 }}>
                     {item.rate ? item.rate.toLocaleString() : <span style={{color:MUTED}}>—</span>}
                   </td>
-                  <td style={{ padding:"10px 14px", textAlign:"right", color:"#34d399" }}>
+                  <td style={{ padding:"10px 14px", textAlign:"right", color:"var(--tx-34d399, #34d399)" }}>
                     {item.purchaseRate ? item.purchaseRate.toLocaleString() : <span style={{color:MUTED}}>—</span>}
                   </td>
                   <td style={{ padding:"10px 14px", textAlign:"right" }}>
                     {mgn !== null ? (
-                      <span style={{ fontSize:11, fontWeight:700, color: Number(mgn) > 15 ? "#34d399" : Number(mgn) > 5 ? "#f59e0b" : "#f87171" }}>
+                      <span style={{ fontSize:11, fontWeight:700, color: Number(mgn) > 15 ? "var(--tx-34d399, #34d399)" : Number(mgn) > 5 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-f87171, #f87171)" }}>
                         {mgn}%
                       </span>
                     ) : <span style={{color:MUTED}}>—</span>}
                   </td>
-                  <td style={{ padding:"10px 14px", textAlign:"right", color:"#f59e0b" }}>
+                  <td style={{ padding:"10px 14px", textAlign:"right", color:"var(--tx-f59e0b, #f59e0b)" }}>
                     {item.taxRate ? `${item.taxRate}%` : <span style={{color:MUTED}}>—</span>}
                   </td>
                   <td style={{ padding:"10px 14px", textAlign:"right" }}>
                     {item.minStock > 0
-                      ? <span style={{ color:"#f87171", fontWeight:700 }}>{item.minStock}</span>
+                      ? <span style={{ color:"var(--tx-f87171, #f87171)", fontWeight:700 }}>{item.minStock}</span>
                       : <span style={{color:MUTED}}>—</span>}
                   </td>
                   <td style={{ padding:"10px 14px", fontFamily:"monospace", fontSize:11, color:MUTED }}>
@@ -480,13 +480,13 @@ export default function ItemsNewPage() {
                   <td style={{ padding:"10px 14px", whiteSpace:"nowrap" }}>
                     <button onClick={()=>handleEdit(item)}
                       style={{ padding:"4px 12px", borderRadius:6, border:`1px solid rgba(99,102,241,0.4)`,
-                        background:"rgba(99,102,241,0.1)", color:"#818cf8", fontFamily:FONT,
+                        background:"rgba(99,102,241,0.1)", color:"var(--tx-818cf8, #818cf8)", fontFamily:FONT,
                         fontSize:11, fontWeight:700, cursor:"pointer", marginRight:6 }}>
                       Edit
                     </button>
                     <button onClick={()=>handleDelete(item.id)}
                       style={{ padding:"4px 12px", borderRadius:6, border:`1px solid rgba(248,113,113,0.4)`,
-                        background:"rgba(248,113,113,0.08)", color:"#f87171", fontFamily:FONT,
+                        background:"rgba(248,113,113,0.08)", color:"var(--tx-f87171, #f87171)", fontFamily:FONT,
                         fontSize:11, fontWeight:700, cursor:"pointer" }}>
                       Del
                     </button>

@@ -51,11 +51,11 @@ export default function RentalBookingsPage() {
         const out = rows.filter((row) => String(row.status) === "out").length;
         const returned = rows.filter((row) => String(row.status) === "returned").length;
         return [
-          { label: "Bookings", value: rows.length, color: "#22c55e" },
-          { label: "Reserved", value: reserved, color: "#60a5fa" },
-          { label: "On Rent", value: out, color: "#fbbf24" },
-          { label: "Returned", value: returned, color: "#94a3b8" },
-          { label: "Booking Value", value: value.toLocaleString(), color: "#34d399" },
+          { label: "Bookings", value: rows.length, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Reserved", value: reserved, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "On Rent", value: out, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Returned", value: returned, color: "var(--tx-94a3b8, #94a3b8)" },
+          { label: "Booking Value", value: value.toLocaleString(), color: "var(--tx-34d399, #34d399)" },
         ];
       }}
     />

@@ -59,7 +59,7 @@ export default function TaxSummaryPage() {
       {/* ── MODAL ── */}
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-          <div style={{ width:"100%", maxWidth:460, background:"rgba(10,13,32,.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
+          <div style={{ width:"100%", maxWidth:460, background:"rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
             <button onClick={() => data.length > 0 ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#f59e0b,#d97706)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>🧾</div>
@@ -93,7 +93,7 @@ export default function TaxSummaryPage() {
               ⟵ Change Dates
             </button>
             {data.length > 0 && (
-              <button onClick={() => exportToCSV(data, "tax-summary")} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+              <button onClick={() => exportToCSV(data, "tax-summary")} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
                 ↓ Export CSV
               </button>
             )}
@@ -107,9 +107,9 @@ export default function TaxSummaryPage() {
               {data.length > 0 && (
                 <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:12, marginBottom:20 }}>
                   {[
-                    { label:"Total Tax Collected", val:totalTax, color:"#fbbf24", bg:"rgba(251,191,36,.08)", border:"rgba(251,191,36,.2)" },
-                    { label:"Total Invoice Amount", val:totalAmt, color:"#818cf8", bg:"rgba(129,140,248,.08)", border:"rgba(129,140,248,.2)" },
-                    { label:"Tax Types", val:data.length, color:"#34d399", bg:"rgba(52,211,153,.08)", border:"rgba(52,211,153,.2)", isCount:true },
+                    { label:"Total Tax Collected", val:totalTax, color:"var(--tx-fbbf24, #fbbf24)", bg:"rgba(251,191,36,.08)", border:"rgba(251,191,36,.2)" },
+                    { label:"Total Invoice Amount", val:totalAmt, color:"var(--tx-818cf8, #818cf8)", bg:"rgba(129,140,248,.08)", border:"rgba(129,140,248,.2)" },
+                    { label:"Tax Types", val:data.length, color:"var(--tx-34d399, #34d399)", bg:"rgba(52,211,153,.08)", border:"rgba(52,211,153,.2)", isCount:true },
                   ].map(k => (
                     <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
                       <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
@@ -126,7 +126,7 @@ export default function TaxSummaryPage() {
                     <div style={{ fontSize:16, fontWeight:800, color:"var(--ink-solid, white)" }}>{companyInfo?.name || "Tax Summary Report"}</div>
                     <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", marginTop:3 }}>Period: {from} — {to}</div>
                   </div>
-                  <div style={{ fontSize:13, color:"#fbbf24", fontWeight:700 }}>🧾 Tax Summary</div>
+                  <div style={{ fontSize:13, color:"var(--tx-fbbf24, #fbbf24)", fontWeight:700 }}>🧾 Tax Summary</div>
                 </div>
 
                 <div style={{ overflowX:"auto" }}>
@@ -138,7 +138,7 @@ export default function TaxSummaryPage() {
                         <th style={{ ...th, textAlign:"right" }}>Rate %</th>
                         <th style={{ ...th, textAlign:"right" }}>Invoices</th>
                         <th style={{ ...th, textAlign:"right" }}>Subtotal</th>
-                        <th style={{ ...th, textAlign:"right", color:"rgba(251,191,36,.6)" }}>Tax Amount</th>
+                        <th style={{ ...th, textAlign:"right", color:"rgba(var(--txr-fbbf24, 251,191,36),.6)" }}>Tax Amount</th>
                         <th style={{ ...th, textAlign:"right" }}>Total</th>
                       </tr>
                     </thead>
@@ -148,13 +148,13 @@ export default function TaxSummaryPage() {
                       ) : data.map((d, i) => (
                         <tr key={i} style={{ background:i%2===0?"transparent":"rgba(var(--ink),.012)", borderBottom:"1px solid rgba(var(--ink),.04)" }}
                           onMouseEnter={e => (e.currentTarget.style.background="rgba(245,158,11,.05)")}
-                          onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.012)")}>
-                          <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color:"#fbbf24" }}>{d.taxType}</td>
+                          onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(var(--ink),.012)")}>
+                          <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)" }}>{d.taxType}</td>
                           <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(var(--ink),.5)", fontFamily:"monospace" }}>{d.taxCode}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.7)" }}>{d.taxRate}%</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.6)" }}>{d.invoiceCount}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.6)", fontFamily:"monospace" }}>{fmtN(d.totalSubtotal)}</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color:"#fbbf24", fontFamily:"monospace" }}>{fmtN(d.totalTaxAmount)}</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)", fontFamily:"monospace" }}>{fmtN(d.totalTaxAmount)}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.7)", fontFamily:"monospace" }}>{fmtN(d.totalAmount)}</td>
                         </tr>
                       ))}
@@ -164,7 +164,7 @@ export default function TaxSummaryPage() {
                         <tr style={{ background:"rgba(245,158,11,.08)", borderTop:"2px solid rgba(245,158,11,.25)" }}>
                           <td colSpan={4} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),.5)" }}>Grand Total</td>
                           <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),.7)", fontFamily:"monospace" }}>{fmtN(data.reduce((s,d)=>s+d.totalSubtotal,0))}</td>
-                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:900, fontSize:14, color:"#fbbf24", fontFamily:"monospace" }}>{fmtN(totalTax)}</td>
+                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:900, fontSize:14, color:"var(--tx-fbbf24, #fbbf24)", fontFamily:"monospace" }}>{fmtN(totalTax)}</td>
                           <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),.7)", fontFamily:"monospace" }}>{fmtN(totalAmt)}</td>
                         </tr>
                       </tfoot>

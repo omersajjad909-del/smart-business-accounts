@@ -189,7 +189,7 @@ export default function EInvoicePage() {
 
       {!fbrConfigured && (
         <div style={{ ...section(), background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)" }}>
             ⚠️ FBR integration is not connected yet. Add your seller NTN and gateway token to start filing invoices digitally.
           </div>
           <button onClick={() => setShowSettings(true)} style={{ background: "#fbbf24", color: "#111", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
@@ -227,7 +227,7 @@ export default function EInvoicePage() {
               <input value={settings.sellerAddress} onChange={e => setSettings(p => ({ ...p, sellerAddress: e.target.value }))} style={inp()} />
             </Field>
           </div>
-          <p style={{ fontSize: 12, color: "#fbbf24", margin: "4px 0 10px", lineHeight: 1.6 }}>
+          <p style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", margin: "4px 0 10px", lineHeight: 1.6 }}>
             These four are <b>overrides</b>. Leave them blank and the filing uses your Company
             Profile — the same NTN, name, address and province the invoice prints. Fill one in only
             when FBR has you registered differently from what the invoice shows.
@@ -289,7 +289,7 @@ export default function EInvoicePage() {
                   <td style={{ padding: "12px 16px", color: "rgba(var(--ink),.6)", fontFamily: "monospace", fontSize: 12 }}>{inv.fbrInvoiceNo || "—"}</td>
                   <td style={{ padding: "12px 16px", textAlign: "right", whiteSpace: "nowrap" }}>
                     {inv.fbrStatus === "FILED" ? (
-                      <button onClick={() => setQrFor(inv)} style={{ background: "rgba(52,211,153,.12)", color: "#34d399", border: "none", borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View QR</button>
+                      <button onClick={() => setQrFor(inv)} style={{ background: "rgba(52,211,153,.12)", color: "var(--tx-34d399, #34d399)", border: "none", borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View QR</button>
                     ) : canManage ? (
                       <button
                         onClick={() => {
@@ -325,7 +325,7 @@ export default function EInvoicePage() {
             </Field>
             {fileSaleType === SALE_TYPE_ZERO_RATED && (
               <>
-                <p style={{ margin: "-8px 0 12px", fontSize: 11.5, color: "#fbbf24", lineHeight: 1.6 }}>
+                <p style={{ margin: "-8px 0 12px", fontSize: 11.5, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.6 }}>
                   Sales tax is filed as 0% on every line, and buyer registration as Unregistered. Every line item needs an HS code set — filing fails otherwise.
                 </p>
                 <Field label="SRO / Schedule No. (optional)">

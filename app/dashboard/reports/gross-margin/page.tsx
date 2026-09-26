@@ -88,7 +88,7 @@ export default function GrossMarginPage() {
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📈</div>No margin data found for this period
               </td></tr>
             ) : sorted.map((r, i) => {
-              const signal = r.marginPct >= 30 ? { label: "High Margin ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" } : r.marginPct >= 15 ? { label: "Healthy", color: "#818cf8", bg: "rgba(129,140,248,.1)" } : r.marginPct >= 5 ? { label: "Low Margin ⚠️", color: "#fbbf24", bg: "rgba(251,191,36,.1)" } : { label: "Loss Maker 🔴", color: "#f87171", bg: "rgba(248,113,113,.1)" };
+              const signal = r.marginPct >= 30 ? { label: "High Margin ⭐", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" } : r.marginPct >= 15 ? { label: "Healthy", color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" } : r.marginPct >= 5 ? { label: "Low Margin ⚠️", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" } : { label: "Loss Maker 🔴", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" };
               return (
                 <tr key={i} style={{ borderBottom: i < sorted.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
@@ -96,8 +96,8 @@ export default function GrossMarginPage() {
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)", fontWeight: 700 }}>{i + 1}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.name}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.revenue)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#f87171" }}>{cur} {fmt(r.cogs)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.grossProfit >= 0 ? "#34d399" : "#f87171" }}>{cur} {fmt(r.grossProfit)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.cogs)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.grossProfit >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.grossProfit)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 15, fontWeight: 900, color: signal.color }}>{r.marginPct.toFixed(1)}%</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: signal.bg, color: signal.color }}>{signal.label}</span>

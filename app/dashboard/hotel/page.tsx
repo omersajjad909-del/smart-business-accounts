@@ -62,7 +62,7 @@ export default function HotelOverviewPage() {
             { label: "Analytics", href: "/dashboard/hotel/analytics" },
           ].map(item => (
             <Link key={item.href} prefetch={false} href={item.href}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>
+              style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "var(--tx-fdba74, #fdba74)", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>
               {item.label}
             </Link>
           ))}
@@ -72,10 +72,10 @@ export default function HotelOverviewPage() {
       {/* Row 1: Main Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
         {[
-          { label: "Today's Check-Ins",   value: summary.todayCheckIns,      icon: "🚪", color: "#34d399" },
-          { label: "Today's Check-Outs",  value: summary.todayCheckOuts,     icon: "🔑", color: "#60a5fa" },
-          { label: "Expected Arrivals",   value: summary.expectedArrivals,   icon: "🧳", color: "#f59e0b" },
-          { label: "Open Complaints",     value: summary.openComplaints,     icon: "⚠️", color: "#f87171" },
+          { label: "Today's Check-Ins",   value: summary.todayCheckIns,      icon: "🚪", color: "var(--tx-34d399, #34d399)" },
+          { label: "Today's Check-Outs",  value: summary.todayCheckOuts,     icon: "🔑", color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Expected Arrivals",   value: summary.expectedArrivals,   icon: "🧳", color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Open Complaints",     value: summary.openComplaints,     icon: "⚠️", color: "var(--tx-f87171, #f87171)" },
         ].map(c => (
           <div key={c.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
@@ -90,10 +90,10 @@ export default function HotelOverviewPage() {
       {/* Row 2: Secondary Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 12 }}>
         {[
-          { label: "Occupancy",            value: `${summary.occupancyRate}%\n${summary.occupiedRooms}/${summary.rooms} rooms`, icon: "📊", color: "#a78bfa" },
-          { label: "Revenue Today",        value: `Rs. ${revenueToday.toLocaleString()}`,   icon: "💰", color: "#34d399" },
-          { label: "Checked-In Guests",    value: summary.checkedInGuests,    icon: "🛏️", color: "#60a5fa" },
-          { label: "Pending Reservations", value: summary.pendingReservations, icon: "📋", color: "#f59e0b" },
+          { label: "Occupancy",            value: `${summary.occupancyRate}%\n${summary.occupiedRooms}/${summary.rooms} rooms`, icon: "📊", color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Revenue Today",        value: `Rs. ${revenueToday.toLocaleString()}`,   icon: "💰", color: "var(--tx-34d399, #34d399)" },
+          { label: "Checked-In Guests",    value: summary.checkedInGuests,    icon: "🛏️", color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Pending Reservations", value: summary.pendingReservations, icon: "📋", color: "var(--tx-f59e0b, #f59e0b)" },
         ].map(c => (
           <div key={c.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
@@ -108,9 +108,9 @@ export default function HotelOverviewPage() {
       {/* Row 3: Laundry Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Laundry Pending",     value: summary.laundryPending,    sub: "Awaiting pickup/processing", icon: "🧺", color: "#f59e0b" },
-          { label: "In Progress",         value: summary.laundryInProgress, sub: "Washing / Ironing",          icon: "🫧", color: "#60a5fa" },
-          { label: "Ready to Deliver",    value: summary.laundryReady,      sub: "Cleaned & folded",           icon: "✅", color: "#34d399" },
+          { label: "Laundry Pending",     value: summary.laundryPending,    sub: "Awaiting pickup/processing", icon: "🧺", color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "In Progress",         value: summary.laundryInProgress, sub: "Washing / Ironing",          icon: "🫧", color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Ready to Deliver",    value: summary.laundryReady,      sub: "Cleaned & folded",           icon: "✅", color: "var(--tx-34d399, #34d399)" },
         ].map(c => (
           <div key={c.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
@@ -138,7 +138,7 @@ export default function HotelOverviewPage() {
         </div>
         {rooms.length === 0 ? (
           <div style={{ textAlign: "center", padding: "32px 0", color: hotelMuted, fontSize: 13 }}>
-            No rooms added yet. <Link prefetch={false} href="/dashboard/hotel/rooms" style={{ color: "#f97316", textDecoration: "none" }}>Add rooms →</Link>
+            No rooms added yet. <Link prefetch={false} href="/dashboard/hotel/rooms" style={{ color: "var(--tx-f97316, #f97316)", textDecoration: "none" }}>Add rooms →</Link>
           </div>
         ) : (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -165,7 +165,7 @@ export default function HotelOverviewPage() {
               <div key={r.id} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{r.guest}</div>
                 <div style={{ fontSize: 11, color: hotelMuted, marginTop: 2 }}>Room {r.room} · {r.checkIn} → {r.checkOut}</div>
-                <div style={{ fontSize: 11, color: "#93c5fd", marginTop: 4 }}>{r.status.replace(/_/g, " ")}</div>
+                <div style={{ fontSize: 11, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 4 }}>{r.status.replace(/_/g, " ")}</div>
               </div>
             ))}
             {reservations.filter(r => r.status !== "checked_out").length === 0 && (
@@ -178,11 +178,11 @@ export default function HotelOverviewPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 14, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 16, display: "grid", gap: 8 }}>
             {[
-              { label: "Available rooms",        value: rooms.filter(r => r.status === "available").length,  color: "#34d399" },
-              { label: "Cleaning tasks active",  value: summary.pendingHousekeeping,                         color: "#f59e0b" },
-              { label: "Room service preparing", value: serviceOrders.filter(r => r.status === "preparing").length, color: "#60a5fa" },
-              { label: "Maintenance rooms",      value: summary.maintenanceRooms,                            color: "#f87171" },
-              { label: "Laundry in queue",       value: summary.laundryPending + summary.laundryInProgress,  color: "#a78bfa" },
+              { label: "Available rooms",        value: rooms.filter(r => r.status === "available").length,  color: "var(--tx-34d399, #34d399)" },
+              { label: "Cleaning tasks active",  value: summary.pendingHousekeeping,                         color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Room service preparing", value: serviceOrders.filter(r => r.status === "preparing").length, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Maintenance rooms",      value: summary.maintenanceRooms,                            color: "var(--tx-f87171, #f87171)" },
+              { label: "Laundry in queue",       value: summary.laundryPending + summary.laundryInProgress,  color: "var(--tx-a78bfa, #a78bfa)" },
             ].map(row => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "9px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 12, color: hotelMuted }}>{row.label}</span>

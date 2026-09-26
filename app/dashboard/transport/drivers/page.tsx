@@ -68,9 +68,9 @@ export default function DriversPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Drivers", value: stats.total, color: "#2563eb" },
-          { label: "Available", value: stats.available, color: "#22c55e" },
-          { label: "On Duty", value: stats.onDuty, color: "#3b82f6" },
-          { label: "License Expiring Soon", value: stats.expiringSoon, color: "#ef4444" },
+          { label: "Available", value: stats.available, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "On Duty", value: stats.onDuty, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "License Expiring Soon", value: stats.expiringSoon, color: "var(--tx-ef4444, #ef4444)" },
         ].map((s) => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 32, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -106,7 +106,7 @@ export default function DriversPage() {
                 <div style={{ color: transportMuted }}>Trips Done</div>
                 <div>{d.tripsCompleted.toLocaleString()}</div>
                 <div style={{ color: transportMuted }}>Rating</div>
-                <div style={{ color: "#f59e0b" }}>{stars(d.rating)} {d.rating}</div>
+                <div style={{ color: "var(--tx-f59e0b, #f59e0b)" }}>{stars(d.rating)} {d.rating}</div>
                 <div style={{ color: transportMuted }}>Salary</div>
                 <div>Rs. {d.salary.toLocaleString()}</div>
                 <div style={{ color: transportMuted }}>CNIC</div>
@@ -114,10 +114,10 @@ export default function DriversPage() {
               </div>
 
               <div style={{ background: expired ? "rgba(239,68,68,.1)" : expiringSoon ? "rgba(245,158,11,.1)" : "rgba(var(--ink),.04)", border: `1px solid ${expired ? "#ef444440" : expiringSoon ? "#f59e0b40" : transportBorder}`, borderRadius: 8, padding: "8px 12px", fontSize: 13 }}>
-                <span style={{ color: expired ? "#ef4444" : expiringSoon ? "#f59e0b" : transportMuted }}>
+                <span style={{ color: expired ? "var(--tx-ef4444, #ef4444)" : expiringSoon ? "var(--tx-f59e0b, #f59e0b)" : transportMuted }}>
                   License: {d.licenseNo}
                 </span>
-                <span style={{ float: "right", color: expired ? "#ef4444" : expiringSoon ? "#f59e0b" : transportMuted }}>
+                <span style={{ float: "right", color: expired ? "var(--tx-ef4444, #ef4444)" : expiringSoon ? "var(--tx-f59e0b, #f59e0b)" : transportMuted }}>
                   {expired ? `Expired ${Math.abs(days)}d ago` : expiringSoon ? `Expires in ${days}d` : `Expires ${d.licenseExpiry}`}
                 </span>
               </div>
@@ -138,10 +138,10 @@ export default function DriversPage() {
                 </div>
               ))}
             </div>
-            {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
               <button onClick={addDriver} style={{ ...btn("#2563eb"), flex: 1 }}>Add Driver</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(255,255,255,.07)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(var(--ink),.07)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>

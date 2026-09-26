@@ -290,10 +290,10 @@ export default function DeliveryPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Orders", value: deliveries.length, color: "#f97316" },
-          { label: "Pending", value: deliveries.filter((delivery) => delivery.status === "pending").length, color: "#f59e0b" },
-          { label: "Dispatched", value: deliveries.filter((delivery) => delivery.status === "dispatched").length, color: "#3b82f6" },
-          { label: "Delivered", value: deliveries.filter((delivery) => delivery.status === "delivered").length, color: "#34d399" },
+          { label: "Total Orders", value: deliveries.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Pending", value: deliveries.filter((delivery) => delivery.status === "pending").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Dispatched", value: deliveries.filter((delivery) => delivery.status === "dispatched").length, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Delivered", value: deliveries.filter((delivery) => delivery.status === "delivered").length, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
@@ -342,11 +342,11 @@ export default function DeliveryPage() {
                     </button>
                   )}
                   {(delivery.status === "pending" || delivery.status === "dispatched") && (
-                    <button onClick={() => void moveDeliveryStatus(delivery, "failed")} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                    <button onClick={() => void moveDeliveryStatus(delivery, "failed")} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                       Fail
                     </button>
                   )}
-                  <button onClick={() => void removeDelivery(delivery)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={() => void removeDelivery(delivery)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

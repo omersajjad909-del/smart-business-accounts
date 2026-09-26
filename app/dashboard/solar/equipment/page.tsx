@@ -47,10 +47,10 @@ export default function SolarEquipmentPage() {
         const lowStock = rows.filter((row) => Number(row.quantity || 0) <= Number(row.reorderLevel || 0)).length;
         const allocated = rows.filter((row) => String(row.status) === "allocated").length;
         return [
-          { label: "Items", value: rows.length, color: "#fbbf24" },
-          { label: "Units on Hand", value: quantity.toLocaleString(), color: "#60a5fa" },
-          { label: "Allocated", value: allocated, color: "#34d399" },
-          { label: "Low Stock", value: lowStock, color: "#f87171" },
+          { label: "Items", value: rows.length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Units on Hand", value: quantity.toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Allocated", value: allocated, color: "var(--tx-34d399, #34d399)" },
+          { label: "Low Stock", value: lowStock, color: "var(--tx-f87171, #f87171)" },
         ];
       }}
     />

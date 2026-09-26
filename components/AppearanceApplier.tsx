@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTheme } from "next-themes";
 import { BRAND_PRESETS, type BrandKey } from "@/lib/brandPalette";
 import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig";
 
@@ -25,30 +26,20 @@ type CompanyResponse = {
  * in place, so this can never break the dashboard.
  */
 export default function AppearanceApplier() {
+  const { setTheme } = useTheme();
+
   useEffect(() => {
     let cancelled = false;
     const root = document.documentElement;
 
-    // Auto/dark handling — respected until user selects light or dark.
-    //
-    // `null` until a saved preference actually arrives. It used to start at
-    // "auto", so before the fetch resolved an OS theme change could pull the
-    // page to light even for someone who had never chosen anything — and dark
-    // is the default. Only an explicit "auto" follows the system now.
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    let currentThemeMode: "light" | "dark" | "auto" | null = null;
+    // The theme itself belongs to next-themes (the header toggle and the
+    // Appearance page both go through it); this only carries a saved choice
+    // across devices. "auto" is what the API returns for someone who never
+    // chose, and it means "leave the default" — dark — not "follow the OS".
     const applyThemeMode = (mode: "light" | "dark" | "auto") => {
-      currentThemeMode = mode;
-      if (!ALLOW_LIGHT_THEME) { root.classList.add("dark"); return; }
-      if (mode === "dark") root.classList.add("dark");
-      else if (mode === "light") root.classList.remove("dark");
-      else root.classList.toggle("dark", media.matches);
-    };
-    const onSystemThemeChange = () => {
       if (!ALLOW_LIGHT_THEME) return;
-      if (currentThemeMode === "auto") root.classList.toggle("dark", media.matches);
+      if (mode === "light" || mode === "dark") setTheme(mode);
     };
-    media.addEventListener?.("change", onSystemThemeChange);
 
     (async () => {
       try {
@@ -80,9 +71,8 @@ export default function AppearanceApplier() {
 
     return () => {
       cancelled = true;
-      media.removeEventListener?.("change", onSystemThemeChange);
     };
-  }, []);
+  }, [setTheme]);
 
   return null;
 }

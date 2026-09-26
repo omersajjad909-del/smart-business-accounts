@@ -84,10 +84,10 @@ export default function TradeAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Shipment Value", value: `USD ${data.summary.shipmentValue.toLocaleString()}`, color: "#38bdf8" },
-          { label: "LC / TT Value", value: `USD ${data.summary.lcValue.toLocaleString()}`, color: "#a78bfa" },
-          { label: "Landed Cost", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "#f59e0b" },
-          { label: "Rebate Value", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "#22c55e" },
+          { label: "Shipment Value", value: `USD ${data.summary.shipmentValue.toLocaleString()}`, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "LC / TT Value", value: `USD ${data.summary.lcValue.toLocaleString()}`, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Landed Cost", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Rebate Value", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
@@ -103,7 +103,7 @@ export default function TradeAnalyticsPage() {
             {routeRows.map((row) => (
               <div key={row.route} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.route}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#7dd3fc" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-7dd3fc, #7dd3fc)" }}>{row.count}</span>
               </div>
             ))}
           </div>
@@ -115,7 +115,7 @@ export default function TradeAnalyticsPage() {
             {statusRows.map((row) => (
               <div key={row.status} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.status}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{row.count}</span>
               </div>
             ))}
           </div>
@@ -127,7 +127,7 @@ export default function TradeAnalyticsPage() {
             {lcCurrencyRows.map((row) => (
               <div key={row.currency} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "var(--panel-bg)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{row.currency}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#a78bfa" }}>{row.amount.toLocaleString()}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-a78bfa, #a78bfa)" }}>{row.amount.toLocaleString()}</span>
               </div>
             ))}
           </div>

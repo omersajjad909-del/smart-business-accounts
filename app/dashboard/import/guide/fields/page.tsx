@@ -59,7 +59,7 @@ function Pill({ children, tone }: { children: React.ReactNode; tone?: "required"
     <span style={{
       padding: "3px 9px", borderRadius: 7, fontSize: 11, fontFamily: MONO,
       background: "rgba(var(--ink),.05)", border: "1px solid var(--border)",
-      color: tone === "required" ? "#f59e0b" : "var(--text-muted)",
+      color: tone === "required" ? "var(--tx-f59e0b, #f59e0b)" : "var(--text-muted)",
       display: "inline-block",
     }}>{children}</span>
   );
@@ -270,7 +270,7 @@ export default function ColumnReferencePage() {
         <code style={{ fontFamily: MONO }}>AMOUNT_DUE_REMAINING</code>. Columns nobody recognises are
         ignored, so an export with sixty columns is no harder to import than one with six.
         <br />
-        <span style={{ color: "#f59e0b", fontWeight: 700 }}>*</span> marks a column a row is refused
+        <span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>*</span> marks a column a row is refused
         without.
       </div>
 
@@ -293,7 +293,7 @@ export default function ColumnReferencePage() {
         {matches && (
           <div style={{ marginTop: 13 }}>
             {matches.length === 0 ? (
-              <div style={{ fontSize: 12.5, color: "#f59e0b", lineHeight: 1.7 }}>
+              <div style={{ fontSize: 12.5, color: "var(--tx-f59e0b, #f59e0b)", lineHeight: 1.7 }}>
                 No column is read under that heading. Rename it in your file to the plain word from
                 the tables below — that is a thirty-second fix, and the import will then find it.
               </div>
@@ -301,7 +301,7 @@ export default function ColumnReferencePage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {matches.map((m) => (
                   <div key={m.field} style={{ fontSize: 12.5, lineHeight: 1.7 }}>
-                    <span style={{ color: "#22c55e", fontWeight: 800 }}>✓</span>{" "}
+                    <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 800 }}>✓</span>{" "}
                     Read as <Pill>{m.field}</Pill>
                     <span style={{ color: "var(--text-muted)" }}>
                       {" "}— {FIELD_NOTES[m.field] ?? "read into the row as given."}

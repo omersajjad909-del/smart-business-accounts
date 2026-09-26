@@ -100,7 +100,7 @@ export default function DealsPage() {
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.customer}</div>
                     <div style={{ fontSize: 12, color: autoMuted, marginTop: 6 }}>{row.financier} | ${row.amount.toLocaleString()}</div>
-                    <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{row.vehicleLabel}</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 8 }}>{row.vehicleLabel}</div>
                   </div>
                   <span style={{ padding: "4px 10px", borderRadius: 999, background: `${autoStatusColor(row.status)}20`, color: autoStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
                 </div>

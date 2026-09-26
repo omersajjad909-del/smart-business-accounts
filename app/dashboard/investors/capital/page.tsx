@@ -147,7 +147,7 @@ export default function InvestorCapitalPage() {
                 <tr key={e.id}>
                   <td style={tdStyle}>{fmtDate(e.date)}</td>
                   <td style={tdStyle}>{e.note}</td>
-                  <td style={{ ...tdStyle, color: e.kind === "withdraw" ? "#fbbf24" : "#2dd4bf", fontWeight: 700 }}>
+                  <td style={{ ...tdStyle, color: e.kind === "withdraw" ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-2dd4bf, #2dd4bf)", fontWeight: 700 }}>
                     {e.kind === "withdraw" ? "Withdrawn" : "Placed"}
                   </td>
                   <td style={numTd}>{(e.kind === "withdraw" ? "-" : "") + fmtMoney(e.amount)}</td>

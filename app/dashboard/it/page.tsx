@@ -49,7 +49,7 @@ export default function ITOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: itFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>IT Company</div>
+        <div style={{ fontSize: 12, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>IT Company</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Delivery, contracts, and support command center</h1>
         <p style={{ margin: 0, fontSize: 14, color: itMuted, maxWidth: 760 }}>
           Projects, sprint execution, client contracts, aur support workload ko ek hi delivery board se monitor karein.
@@ -65,7 +65,7 @@ export default function ITOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(124,58,237,.14), rgba(59,130,246,.08))", border: `1px solid ${itBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#c4b5fd", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Delivery Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-c4b5fd, #c4b5fd)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Delivery Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Project Intake", body: "Client scope, stack, budget, and target timeline define karein." },
@@ -83,7 +83,7 @@ export default function ITOverviewPage() {
         </div>
 
         <div style={{ background: itBg, border: `1px solid ${itBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/it/projects", label: "Projects Desk", hint: "Delivery pipeline and budget visibility" },
@@ -103,7 +103,7 @@ export default function ITOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: itBg, border: `1px solid ${itBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Project Portfolio</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Project Portfolio</div>
           <div style={{ display: "grid", gap: 10 }}>
             {projects.length === 0 ? (
               <div style={{ color: itMuted, fontSize: 13 }}>Projects add karne ke baad yahan portfolio summary show hogi.</div>
@@ -113,14 +113,14 @@ export default function ITOverviewPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{project.name}</div>
                   <div style={{ fontSize: 12, color: itMuted }}>{project.client} | {project.progress}% progress</div>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "Active" ? "#34d399" : "#94a3b8" }}>{project.status}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "Active" ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>{project.status}</div>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ background: itBg, border: `1px solid ${itBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#f59e0b", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Active sprints", value: `${summary.activeSprints} running`, tone: "#8b5cf6" },

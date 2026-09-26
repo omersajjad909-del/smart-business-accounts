@@ -107,7 +107,7 @@ export default function SubscribersPage() {
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.company}</div>
                     <div style={{ fontSize: 12, color: saasMuted, marginTop: 6 }}>{row.contact} | {row.email}</div>
-                    <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>{row.planName} | Renewal {row.renewalDate || "-"}</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>{row.planName} | Renewal {row.renewalDate || "-"}</div>
                   </div>
                   <span style={{ padding: isMobile ? "8px 8px" : "4px 10px", borderRadius: 999, background: `${saasStatusColor(row.status)}20`, color: saasStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
                 </div>

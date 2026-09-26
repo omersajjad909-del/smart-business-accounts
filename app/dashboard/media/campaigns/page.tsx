@@ -45,10 +45,10 @@ export default function MediaCampaignsPage() {
       summarize={(rows) => {
         const budget = rows.reduce((sum, row) => sum + Number(row.budget || 0), 0);
         return [
-          { label: "Campaigns", value: rows.length, color: "#a78bfa" },
-          { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#60a5fa" },
-          { label: "Completed", value: rows.filter((row) => String(row.status) === "completed").length, color: "#34d399" },
-          { label: "Budget", value: budget.toLocaleString(), color: "#fbbf24" },
+          { label: "Campaigns", value: rows.length, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Completed", value: rows.filter((row) => String(row.status) === "completed").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Budget", value: budget.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

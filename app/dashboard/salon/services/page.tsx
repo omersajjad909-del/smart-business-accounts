@@ -91,12 +91,12 @@ export default function ServicesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Services</div><div style={{ fontSize: 28, fontWeight: 800 }}>{services.length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Services</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{active}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Most Popular</div><div style={{ fontSize: 18, fontWeight: 800, color: "#ec4899" }}>{popular}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Price</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>Rs. {avgPrice.toLocaleString()}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Active Services</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{active}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Most Popular</div><div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-ec4899, #ec4899)" }}>{popular}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Avg Price</div><div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>Rs. {avgPrice.toLocaleString()}</div></div>
       </div>
 
-      {error && <div style={{ marginBottom: 14, fontSize: 12, color: "#fda4af" }}>{error}</div>}
+      {error && <div style={{ marginBottom: 14, fontSize: 12, color: "var(--tx-fda4af, #fda4af)" }}>{error}</div>}
 
       <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
         {CATEGORY_TABS.map((category) => (
@@ -122,7 +122,7 @@ export default function ServicesPage() {
               <tr key={service.id}>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <div style={{ fontWeight: 700 }}>{service.name}</div>
-                  {service.name === popular && <span style={{ fontSize: 11, color: "#fbbf24" }}>Most booked</span>}
+                  {service.name === popular && <span style={{ fontSize: 11, color: "var(--tx-fbbf24, #fbbf24)" }}>Most booked</span>}
                 </td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>{service.category}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", fontSize: 14, borderBottom: "1px solid rgba(var(--ink),.04)" }}>{service.duration} min</td>

@@ -71,7 +71,7 @@ export default function BalanceSheetPage() {
       {/* ── MODAL ── */}
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-          <div style={{ width:"100%", maxWidth:420, background:"rgba(10,13,32,.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
+          <div style={{ width:"100%", maxWidth:420, background:"rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
             <button onClick={() => data ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#3b82f6,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>🏛️</div>
@@ -101,14 +101,14 @@ export default function BalanceSheetPage() {
             </button>
             <div style={{ display:"flex", gap:8 }}>
               <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
-              <button onClick={sendEmail} disabled={sendingEmail||!data} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:(sendingEmail||!data)?0.5:1 }}>
+              <button onClick={sendEmail} disabled={sendingEmail||!data} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:(sendingEmail||!data)?0.5:1 }}>
                 {sendingEmail ? "Sending…" : "✉ Email"}
               </button>
             </div>
           </div>
 
           {error && (
-            <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"#f87171", fontSize:13 }}>{error}</div>
+            <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"var(--tx-f87171, #f87171)", fontSize:13 }}>{error}</div>
           )}
 
           {loading && (
@@ -126,7 +126,7 @@ export default function BalanceSheetPage() {
                   </div>
                   <div style={{ textAlign:"right" }}>
                     <div style={{ fontSize:10, color:"rgba(var(--ink),.3)", fontWeight:700, textTransform:"uppercase", letterSpacing:".08em", marginBottom:4 }}>As of Date</div>
-                    <div style={{ fontSize:16, fontWeight:800, color:"#60a5fa" }}>{date}</div>
+                    <div style={{ fontSize:16, fontWeight:800, color:"var(--tx-60a5fa, #60a5fa)" }}>{date}</div>
                   </div>
                 </div>
               </div>
@@ -137,7 +137,7 @@ export default function BalanceSheetPage() {
                 <div style={sectionCard("#3b82f6")}>
                   <div style={{ background:"rgba(59,130,246,.12)", padding:"12px 16px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ width:8, height:8, borderRadius:"50%", background:"#60a5fa", display:"inline-block" }}/>
-                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"#60a5fa" }}>Assets & Receivables</span>
+                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"var(--tx-60a5fa, #60a5fa)" }}>Assets & Receivables</span>
                   </div>
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead><tr>
@@ -150,13 +150,13 @@ export default function BalanceSheetPage() {
                       ) : data.assets.map((a: any, i: number) => (
                         <tr key={i} style={{ borderBottom:"1px solid rgba(var(--ink),.04)" }}>
                           <td style={td}>{a.name}</td>
-                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"#93c5fd", fontWeight:600 }}>{fmtN(a.amount)}</td>
+                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"var(--tx-93c5fd, #93c5fd)", fontWeight:600 }}>{fmtN(a.amount)}</td>
                         </tr>
                       ))}
                     </tbody>
                     <tfoot><tr style={{ background:"rgba(59,130,246,.1)", borderTop:"2px solid rgba(59,130,246,.25)" }}>
-                      <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#60a5fa" }}>Total Assets</td>
-                      <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:900, fontSize:15, color:"#60a5fa", fontFamily:"monospace" }}>{fmtN(data.totalAssets || 0)}</td>
+                      <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"var(--tx-60a5fa, #60a5fa)" }}>Total Assets</td>
+                      <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:900, fontSize:15, color:"var(--tx-60a5fa, #60a5fa)", fontFamily:"monospace" }}>{fmtN(data.totalAssets || 0)}</td>
                     </tr></tfoot>
                   </table>
                 </div>
@@ -165,7 +165,7 @@ export default function BalanceSheetPage() {
                 <div style={sectionCard("#ef4444")}>
                   <div style={{ background:"rgba(239,68,68,.12)", padding:"12px 16px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ width:8, height:8, borderRadius:"50%", background:"#f87171", display:"inline-block" }}/>
-                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"#f87171" }}>Liabilities & Equity</span>
+                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"var(--tx-f87171, #f87171)" }}>Liabilities & Equity</span>
                   </div>
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead><tr>
@@ -176,13 +176,13 @@ export default function BalanceSheetPage() {
                       {data.liabilities?.map((l: any, i: number) => (
                         <tr key={`l-${i}`} style={{ borderBottom:"1px solid rgba(var(--ink),.04)" }}>
                           <td style={td}>{l.name}</td>
-                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"#fca5a5", fontWeight:600 }}>{fmtN(l.amount)}</td>
+                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"var(--tx-fca5a5, #fca5a5)", fontWeight:600 }}>{fmtN(l.amount)}</td>
                         </tr>
                       ))}
                       {data.equity?.map((e: any, i: number) => (
                         <tr key={`e-${i}`} style={{ borderBottom:"1px solid rgba(var(--ink),.04)", background:"rgba(52,211,153,.03)" }}>
-                          <td style={{ ...td, color:"#6ee7b7" }}>{e.name}</td>
-                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"#6ee7b7", fontWeight:600 }}>{fmtN(e.amount)}</td>
+                          <td style={{ ...td, color:"var(--tx-6ee7b7, #6ee7b7)" }}>{e.name}</td>
+                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"var(--tx-6ee7b7, #6ee7b7)", fontWeight:600 }}>{fmtN(e.amount)}</td>
                         </tr>
                       ))}
                       {data.netProfit !== undefined && (() => {
@@ -199,8 +199,8 @@ export default function BalanceSheetPage() {
                       })()}
                     </tbody>
                     <tfoot><tr style={{ background:"rgba(239,68,68,.1)", borderTop:"2px solid rgba(239,68,68,.25)" }}>
-                      <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#f87171" }}>Total Liabilities & Equity</td>
-                      <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:900, fontSize:15, color:"#f87171", fontFamily:"monospace" }}>{fmtN(totalL)}</td>
+                      <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"var(--tx-f87171, #f87171)" }}>Total Liabilities & Equity</td>
+                      <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:900, fontSize:15, color:"var(--tx-f87171, #f87171)", fontFamily:"monospace" }}>{fmtN(totalL)}</td>
                     </tr></tfoot>
                   </table>
                 </div>

@@ -12,9 +12,9 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 interface Row { customerName: string; creditLimit: number; outstanding: number; utilizationPct: number; avgDaysToPay: number; overdueAmount: number; riskRating: string; }
 
 const RISK: Record<string, Badge> = {
-  low:    { label: "Low Risk ✓",  color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  medium: { label: "Medium Risk", color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  high:   { label: "High Risk ⚠", color: "#f87171", bg: "rgba(248,113,113,.1)" },
+  low:    { label: "Low Risk ✓",  color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
+  medium: { label: "Medium Risk", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" },
+  high:   { label: "High Risk ⚠", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function CreditAnalysisPage() {
@@ -51,9 +51,9 @@ export default function CreditAnalysisPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Total Exposure",   value: `${cur} ${fmt(totalExposure)}`,  color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
-          { label: "High Risk Customers", value: `${highRiskCount} customers`, color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
-          { label: "Total Customers",  value: `${data.length} tracked`,        color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
+          { label: "Total Exposure",   value: `${cur} ${fmt(totalExposure)}`,  color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+          { label: "High Risk Customers", value: `${highRiskCount} customers`, color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Total Customers",  value: `${data.length} tracked`,        color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -95,7 +95,7 @@ export default function CreditAnalysisPage() {
                     ) : <span style={{ fontSize: 12, color: "var(--text-muted)" }}>No limit</span>}
                   </td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.avgDaysToPay} days</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.overdueAmount > 0 ? "#f87171" : "var(--text-muted)", fontWeight: r.overdueAmount > 0 ? 700 : 400 }}>{r.overdueAmount > 0 ? `${cur} ${fmt(r.overdueAmount)}` : "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.overdueAmount > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)", fontWeight: r.overdueAmount > 0 ? 700 : 400 }}>{r.overdueAmount > 0 ? `${cur} ${fmt(r.overdueAmount)}` : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: risk.bg, color: risk.color }}>{risk.label}</span>
                   </td>

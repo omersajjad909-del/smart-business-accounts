@@ -51,7 +51,7 @@ export default function ServicesDashboard() {
   ];
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: serviceFont, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: serviceFont, color: "var(--tx-e2e8f0, #e2e8f0)" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)", margin: 0 }}>Service Command Center</h1>
         <p style={{ color: serviceMuted, fontSize: 14, marginTop: 6 }}>
@@ -61,10 +61,10 @@ export default function ServicesDashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Catalog Services", value: summary.catalog, color: "#34d399" },
-          { label: "Active Projects", value: summary.activeProjects, color: "#38bdf8" },
-          { label: "Open Deliveries", value: summary.deliveries - summary.completedProjects, color: "#f59e0b" },
-          { label: "Billable Value", value: `Rs. ${summary.billableValue.toLocaleString()}`, color: "#f97316" },
+          { label: "Catalog Services", value: summary.catalog, color: "var(--tx-34d399, #34d399)" },
+          { label: "Active Projects", value: summary.activeProjects, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Open Deliveries", value: summary.deliveries - summary.completedProjects, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Billable Value", value: `Rs. ${summary.billableValue.toLocaleString()}`, color: "var(--tx-f97316, #f97316)" },
         ].map((card) => (
           <div key={card.label} style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -77,7 +77,7 @@ export default function ServicesDashboard() {
         <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.5)", marginBottom: 12, letterSpacing: ".06em" }}>QUICK ACTIONS</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           {quickLinks.map((link) => (
-            <Link prefetch={false} key={link.href} href={link.href} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", color: "#c7d2fe", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+            <Link prefetch={false} key={link.href} href={link.href} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", color: "var(--tx-c7d2fe, #c7d2fe)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
               {link.label}
             </Link>
           ))}
@@ -103,15 +103,15 @@ export default function ServicesDashboard() {
         <div style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Enterprise Summary</div>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: "rgba(var(--ink),.55)" }}>
-            Overdue Deliveries: <span style={{ color: summary.overdueDeliveries ? "#f87171" : "#22c55e" }}>{summary.overdueDeliveries}</span>
+            Overdue Deliveries: <span style={{ color: summary.overdueDeliveries ? "var(--tx-f87171, #f87171)" : "var(--tx-22c55e, #22c55e)" }}>{summary.overdueDeliveries}</span>
             <br />
-            Waiting Review: <span style={{ color: summary.reviewDeliveries ? "#f59e0b" : "#22c55e" }}>{summary.reviewDeliveries}</span>
+            Waiting Review: <span style={{ color: summary.reviewDeliveries ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" }}>{summary.reviewDeliveries}</span>
             <br />
-            Draft Timesheets: <span style={{ color: summary.draftTimesheets ? "#f59e0b" : "#22c55e" }}>{summary.draftTimesheets}</span>
+            Draft Timesheets: <span style={{ color: summary.draftTimesheets ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" }}>{summary.draftTimesheets}</span>
             <br />
-            Active Projects: <span style={{ color: "#38bdf8" }}>{summary.activeProjects}</span>
+            Active Projects: <span style={{ color: "var(--tx-38bdf8, #38bdf8)" }}>{summary.activeProjects}</span>
             <br />
-            Active Clients: <span style={{ color: "#34d399" }}>{summary.activeClients}</span>
+            Active Clients: <span style={{ color: "var(--tx-34d399, #34d399)" }}>{summary.activeClients}</span>
           </div>
         </div>
       </div>

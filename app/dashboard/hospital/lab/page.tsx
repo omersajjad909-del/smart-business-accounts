@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 20, fontFamily: ff };
 
 const statusColors: Record<string, string> = { requested: "#f59e0b", sample_collected: "#a78bfa", processing: "#3b82f6", completed: "#22c55e" };
@@ -109,10 +109,10 @@ export default function LabPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Today's Tests", value: today, color: "#a78bfa" },
-          { label: "Processing", value: processing, color: "#3b82f6" },
-          { label: "Completed", value: completed, color: "#22c55e" },
-          { label: "Urgent Pending", value: urgent, color: "#ef4444" },
+          { label: "Today's Tests", value: today, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Processing", value: processing, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Completed", value: completed, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Urgent Pending", value: urgent, color: "var(--tx-ef4444, #ef4444)" },
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -143,7 +143,7 @@ export default function LabPage() {
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                  <span style={{ color: "#a78bfa", fontWeight: 700 }}>{t.labNo}</span>
+                  <span style={{ color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700 }}>{t.labNo}</span>
                   <span style={{ fontWeight: 600, fontSize: 15 }}>{t.patient}</span>
                   {t.urgent && <span style={{ background: "rgba(239,68,68,0.2)", color: "#ef4444", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>URGENT</span>}
                   <span style={{ background: `${statusColors[t.status]}22`, color: statusColors[t.status], padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>{statusLabels[t.status]}</span>
@@ -151,7 +151,7 @@ export default function LabPage() {
                 <div style={{ fontSize: 13, color: "rgba(var(--ink),0.5)", marginBottom: 8 }}>{t.doctor} &nbsp;·&nbsp; Requested: {t.requestDate}</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {t.tests.map((test, i) => (
-                    <span key={i} style={{ background: "rgba(167,139,250,0.1)", color: "#a78bfa", padding: "3px 10px", borderRadius: 6, fontSize: 12 }}>{test}</span>
+                    <span key={i} style={{ background: "rgba(167,139,250,0.1)", color: "var(--tx-a78bfa, #a78bfa)", padding: "3px 10px", borderRadius: 6, fontSize: 12 }}>{test}</span>
                   ))}
                 </div>
               </div>
@@ -170,7 +170,7 @@ export default function LabPage() {
             </div>
             {expandedId === t.id && t.results && (
               <div style={{ marginTop: 14, padding: 14, background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: 8 }}>
-                <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 600, marginBottom: 4 }}>Results:</div>
+                <div style={{ fontSize: 12, color: "var(--tx-22c55e, #22c55e)", fontWeight: 600, marginBottom: 4 }}>Results:</div>
                 <div style={{ fontSize: 13, color: "rgba(var(--ink),0.8)" }}>{t.results}</div>
               </div>
             )}
@@ -227,7 +227,7 @@ export default function LabPage() {
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
               {([["Patient Name", "patient"], ["Doctor", "doctor"], ["Request Date", "requestDate"]] as [string, string][]).map(([label, key]) => (
                 <div key={key}>
                   <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>{label}</label>
@@ -237,7 +237,7 @@ export default function LabPage() {
               ))}
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <input type="checkbox" checked={form.urgent} onChange={e => setForm(f => ({ ...f, urgent: e.target.checked }))} id="urgent" />
-                <label htmlFor="urgent" style={{ fontSize: 14, color: "#ef4444", fontWeight: 600, cursor: "pointer" }}>Mark as Urgent</label>
+                <label htmlFor="urgent" style={{ fontSize: 14, color: "var(--tx-ef4444, #ef4444)", fontWeight: 600, cursor: "pointer" }}>Mark as Urgent</label>
               </div>
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Add Test</label>
@@ -248,7 +248,7 @@ export default function LabPage() {
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
                   {form.tests.map((t, i) => (
-                    <span key={i} style={{ background: "rgba(167,139,250,0.1)", color: "#a78bfa", padding: "4px 10px", borderRadius: 6, fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span key={i} style={{ background: "rgba(167,139,250,0.1)", color: "var(--tx-a78bfa, #a78bfa)", padding: "4px 10px", borderRadius: 6, fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>
                       {t}
                       <span onClick={() => setForm(f => ({ ...f, tests: f.tests.filter((_, idx) => idx !== i) }))} style={{ cursor: "pointer", color: "rgba(var(--ink),0.4)", fontSize: 14 }}>✕</span>
                     </span>

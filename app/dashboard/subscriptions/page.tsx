@@ -113,7 +113,7 @@ export default function SubscriptionsOverviewPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: saasFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 12, color: "#60a5fa", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>
             {isMembershipWebsite ? "Membership Website" : isSubscriptionBox ? "Subscription Box" : "SaaS Company"}
           </div>
           <h1 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 900 }}>{title}</h1>
@@ -132,11 +132,11 @@ export default function SubscriptionsOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Plans", value: summary.plans, color: "#60a5fa" },
-          { label: "Active Subscribers", value: summary.activeSubscribers, color: "#34d399" },
-          { label: "Trials", value: summary.trialSubscribers, color: "#f59e0b" },
-          { label: "MRR", value: formatMoney(Math.round(summary.mrr)), color: "#c084fc" },
-          { label: "ARR", value: formatMoney(Math.round(summary.arr)), color: "#22c55e" },
+          { label: "Plans", value: summary.plans, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Active Subscribers", value: summary.activeSubscribers, color: "var(--tx-34d399, #34d399)" },
+          { label: "Trials", value: summary.trialSubscribers, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "MRR", value: formatMoney(Math.round(summary.mrr)), color: "var(--tx-c084fc, #c084fc)" },
+          { label: "ARR", value: formatMoney(Math.round(summary.arr)), color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: saasMuted, marginBottom: 8 }}>{card.label}</div>
@@ -147,7 +147,7 @@ export default function SubscriptionsOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(59,130,246,.14), rgba(14,165,233,.08))", border: `1px solid ${saasBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#bfdbfe", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-bfdbfe, #bfdbfe)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
             {isMembershipWebsite ? "Membership Flow" : isSubscriptionBox ? "Fulfillment Flow" : "SaaS Flow"}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
@@ -166,10 +166,10 @@ export default function SubscriptionsOverviewPage() {
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 12 }}>Revenue Snapshot</div>
             <div style={{ display: "grid", gap: 10 }}>
               {[
-                { label: "Collected this cycle", value: formatMoney(summary.collectedThisCycle), color: "#34d399" },
-                { label: "Past due subscribers", value: summary.pastDueSubscribers, color: "#f97316" },
-                { label: "Cancelled subscribers", value: summary.cancelledSubscribers, color: "#f87171" },
-                { label: "Draft or retired plans", value: plans.filter((item) => item.status !== "active").length, color: "#fbbf24" },
+                { label: "Collected this cycle", value: formatMoney(summary.collectedThisCycle), color: "var(--tx-34d399, #34d399)" },
+                { label: "Past due subscribers", value: summary.pastDueSubscribers, color: "var(--tx-f97316, #f97316)" },
+                { label: "Cancelled subscribers", value: summary.cancelledSubscribers, color: "var(--tx-f87171, #f87171)" },
+                { label: "Draft or retired plans", value: plans.filter((item) => item.status !== "active").length, color: "var(--tx-fbbf24, #fbbf24)" },
               ].map((row) => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", borderRadius: 12, padding: "10px 12px" }}>
                   <span style={{ fontSize: 13, color: saasMuted }}>{row.label}</span>

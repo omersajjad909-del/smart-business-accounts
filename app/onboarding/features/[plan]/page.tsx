@@ -18,27 +18,27 @@ const PLAN_META: Record<string, {
 }> = {
   starter: {
     name: "Starter", icon: "🌱", tagline: "Perfect for growing businesses",
-    color: "#818cf8", glow: "rgba(129,140,248,.35)", dim: "rgba(129,140,248,.1)", border: "rgba(129,140,248,.3)",
+    color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.35)", dim: "rgba(129,140,248,.1)", border: "rgba(129,140,248,.3)",
     gradientFrom: "#6366f1", gradientTo: "#4f46e5",
   },
   pro: {
     name: "Professional", icon: "🚀", tagline: "For established teams that need more",
-    color: "#34d399", glow: "rgba(52,211,153,.35)", dim: "rgba(52,211,153,.1)", border: "rgba(52,211,153,.3)",
+    color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)", dim: "rgba(52,211,153,.1)", border: "rgba(52,211,153,.3)",
     gradientFrom: "#10b981", gradientTo: "#059669",
   },
   professional: {
     name: "Professional", icon: "🚀", tagline: "For established teams that need more",
-    color: "#34d399", glow: "rgba(52,211,153,.35)", dim: "rgba(52,211,153,.1)", border: "rgba(52,211,153,.3)",
+    color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)", dim: "rgba(52,211,153,.1)", border: "rgba(52,211,153,.3)",
     gradientFrom: "#10b981", gradientTo: "#059669",
   },
   enterprise: {
     name: "Enterprise", icon: "💎", tagline: "Tailored for complex organizations",
-    color: "#fbbf24", glow: "rgba(251,191,36,.35)", dim: "rgba(251,191,36,.1)", border: "rgba(251,191,36,.3)",
+    color: "var(--tx-fbbf24, #fbbf24)", glow: "rgba(251,191,36,.35)", dim: "rgba(251,191,36,.1)", border: "rgba(251,191,36,.3)",
     gradientFrom: "#f59e0b", gradientTo: "#d97706",
   },
   custom: {
     name: "Custom Plan", icon: "⚡", tagline: "Built exactly for your needs",
-    color: "#38bdf8", glow: "rgba(56,189,248,.35)", dim: "rgba(56,189,248,.1)", border: "rgba(56,189,248,.3)",
+    color: "var(--tx-38bdf8, #38bdf8)", glow: "rgba(56,189,248,.35)", dim: "rgba(56,189,248,.1)", border: "rgba(56,189,248,.3)",
     gradientFrom: "#0ea5e9", gradientTo: "#0284c7",
   },
 };
@@ -70,7 +70,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
       </div>
       <span style={{
         fontSize:9, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase",
-        color: active ? "#a5b4fc" : done ? "#6ee7b7" : "rgba(var(--ink),.22)",
+        color: active ? "var(--tx-a5b4fc, #a5b4fc)" : done ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),.22)",
       }}>
         {label}
       </span>
@@ -301,7 +301,7 @@ export default function OnboardingPlanFeatures() {
       {/* Header */}
       <header className="fu" style={{
         borderBottom:"1px solid rgba(var(--ink),.06)",
-        background:"rgba(8,12,30,.85)", backdropFilter:"blur(20px)",
+        background:"rgba(var(--dkr-080c1e, 8,12,30),0.85)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:50,
       }}>
         <div style={{ maxWidth:1100, margin:"0 auto", padding:"14px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -334,8 +334,8 @@ export default function OnboardingPlanFeatures() {
             border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)",
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
-            onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(255,255,255,.25)"; }}
-            onMouseLeave={e=>{ e.currentTarget.style.color="rgba(255,255,255,.55)"; e.currentTarget.style.borderColor="rgba(255,255,255,.1)"; }}
+            onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),.55)"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
           >
             ← Back
           </button>
@@ -347,7 +347,7 @@ export default function OnboardingPlanFeatures() {
 
         {/* Step label */}
         <div className="fu d1" style={{ marginBottom:32 }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:22, background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)", fontSize:10.5, fontWeight:700, color:"#a5b4fc", letterSpacing:".09em", textTransform:"uppercase", marginBottom:16 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:22, background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)", fontSize:10.5, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".09em", textTransform:"uppercase", marginBottom:16 }}>
             <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
             Step 3 of 3 — Plan Confirmation
           </div>
@@ -482,8 +482,8 @@ export default function OnboardingPlanFeatures() {
                 color:"rgba(var(--ink),.55)", fontSize:14, fontWeight:600,
                 cursor:"pointer", fontFamily:"inherit", transition:"all .2s",
               }}
-                onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(255,255,255,.25)"; }}
-                onMouseLeave={e=>{ e.currentTarget.style.color="rgba(255,255,255,.55)"; e.currentTarget.style.borderColor="rgba(255,255,255,.1)"; }}
+                onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),.55)"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
               >
                 Skip for now — View Dashboard
               </button>

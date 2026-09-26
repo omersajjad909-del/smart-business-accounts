@@ -23,7 +23,7 @@ function getHeaders(): Record<string, string> {
 }
 
 function Section({ title, accent, section, expanded, onToggle }: { title:string; accent:string; section:CashFlowSection; expanded:boolean; onToggle:()=>void }) {
-  const border = "rgba(255,255,255,.06)";
+  const border = "rgba(var(--ink),.06)";
   return (
     <div style={{ background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.08)", borderRadius:12, overflow:"hidden", marginBottom:12 }}>
       <div onClick={onToggle} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding: isMobile ? "12px 10px" : "14px 20px", cursor:"pointer", borderBottom: expanded ? `1px solid ${border}` : "none" }}>
@@ -33,9 +33,9 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
           <span style={{ fontSize:12, color:"rgba(var(--ink),.3)" }}>({section.items.length} transactions)</span>
         </div>
         <div style={{ display:"flex", gap:24, alignItems:"center" }}>
-          <span style={{ fontSize:12, color:"#4ade80" }}>In: {fmt(section.inflow)}</span>
-          <span style={{ fontSize:12, color:"#f87171" }}>Out: {fmt(section.outflow)}</span>
-          <span style={{ fontWeight:800, fontSize:14, color: section.net>=0?"#4ade80":"#f87171" }}>Net: {section.net>=0?"":" −"}{fmt(section.net)}</span>
+          <span style={{ fontSize:12, color:"var(--tx-4ade80, #4ade80)" }}>In: {fmt(section.inflow)}</span>
+          <span style={{ fontSize:12, color:"var(--tx-f87171, #f87171)" }}>Out: {fmt(section.outflow)}</span>
+          <span style={{ fontWeight:800, fontSize:14, color: section.net>=0?"var(--tx-4ade80, #4ade80)":"var(--tx-f87171, #f87171)" }}>Net: {section.net>=0?"":" −"}{fmt(section.net)}</span>
           <span style={{ color:"rgba(var(--ink),.35)", fontSize:12 }}>{expanded ? "▲" : "▼"}</span>
         </div>
       </div>
@@ -57,7 +57,7 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
                 <td style={{ padding:"9px 14px" }}>
                   <span style={{ fontSize:11, fontWeight:600, padding:"2px 8px", borderRadius:4, background:item.type==="INFLOW"?"rgba(34,197,94,.12)":"rgba(239,68,68,.12)", color:item.type==="INFLOW"?"#4ade80":"#f87171" }}>{item.type}</span>
                 </td>
-                <td style={{ padding:"9px 14px", textAlign:"right", fontWeight:600, fontSize:13, color:item.type==="INFLOW"?"#86efac":"#fca5a5" }}>{fmt(item.amount)}</td>
+                <td style={{ padding:"9px 14px", textAlign:"right", fontWeight:600, fontSize:13, color:item.type==="INFLOW"?"var(--tx-86efac, #86efac)":"var(--tx-fca5a5, #fca5a5)" }}>{fmt(item.amount)}</td>
               </tr>
             ))}
           </tbody>
@@ -113,7 +113,7 @@ export default function CashFlowPage() {
       {/* ── MODAL ── */}
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-          <div style={{ width:"100%", maxWidth:460, background:"rgba(10,13,32,.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
+          <div style={{ width:"100%", maxWidth:460, background:"rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
             <button onClick={() => data ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>💧</div>
@@ -147,12 +147,12 @@ export default function CashFlowPage() {
               ⟵ Change Dates
             </button>
             <div style={{ display:"flex", gap:8 }}>
-              {data && <button onClick={() => exportCSV(data)} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>↓ Export CSV</button>}
+              {data && <button onClick={() => exportCSV(data)} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>↓ Export CSV</button>}
               <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
             </div>
           </div>
 
-          {error && <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"#f87171", fontSize:13 }}>{error}</div>}
+          {error && <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"var(--tx-f87171, #f87171)", fontSize:13 }}>{error}</div>}
           {loading && <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(var(--ink),.25)", fontSize:14 }}>Loading report…</div>}
 
           {data && !loading && (
@@ -164,7 +164,7 @@ export default function CashFlowPage() {
               {/* Net banner */}
               <div style={{ background:data.netCashFlow>=0?"rgba(34,197,94,.08)":"rgba(239,68,68,.08)", border:`1px solid ${data.netCashFlow>=0?"rgba(34,197,94,.25)":"rgba(239,68,68,.25)"}`, borderRadius:12, padding: isMobile ? "12px 11px" : "16px 24px", marginBottom:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                 <span style={{ fontSize:14, fontWeight:600, color:"rgba(var(--ink),.8)" }}>Net Increase / (Decrease) in Cash</span>
-                <span style={{ fontSize:28, fontWeight:800, color:data.netCashFlow>=0?"#4ade80":"#f87171" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</span>
+                <span style={{ fontSize:28, fontWeight:800, color:data.netCashFlow>=0?"var(--tx-4ade80, #4ade80)":"var(--tx-f87171, #f87171)" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</span>
               </div>
 
               <Section title="Operating Activities" accent="#6366f1" section={data.operating} expanded={expanded.operating} onToggle={() => setExpanded(p=>({...p,operating:!p.operating}))}/>
@@ -187,12 +187,12 @@ export default function CashFlowPage() {
                         <td style={{ padding:"12px 20px", fontSize:13, color:"rgba(var(--ink),.7)" }}>
                           <span style={{ width:8, height:8, borderRadius:"50%", background:row.accent, display:"inline-block", marginRight:10, verticalAlign:"middle" }}/>{row.label}
                         </td>
-                        <td style={{ padding:"12px 20px", textAlign:"right", fontWeight:700, fontSize:14, color:row.value>=0?"#4ade80":"#f87171" }}>{row.value>=0?"":" −"}{fmt(row.value)}</td>
+                        <td style={{ padding:"12px 20px", textAlign:"right", fontWeight:700, fontSize:14, color:row.value>=0?"var(--tx-4ade80, #4ade80)":"var(--tx-f87171, #f87171)" }}>{row.value>=0?"":" −"}{fmt(row.value)}</td>
                       </tr>
                     ))}
                     <tr style={{ background:data.netCashFlow>=0?"rgba(34,197,94,.06)":"rgba(239,68,68,.06)" }}>
                       <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:14, fontWeight:800, color:"var(--ink-solid, white)" }}>Net Cash Flow</td>
-                      <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", textAlign:"right", fontWeight:900, fontSize:18, color:data.netCashFlow>=0?"#4ade80":"#f87171" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</td>
+                      <td style={{ padding: isMobile ? "12px 10px" : "14px 20px", textAlign:"right", fontWeight:900, fontSize:18, color:data.netCashFlow>=0?"var(--tx-4ade80, #4ade80)":"var(--tx-f87171, #f87171)" }}>{data.netCashFlow>=0?"":" −"}{fmt(data.netCashFlow)}</td>
                     </tr>
                   </tbody>
                 </table>

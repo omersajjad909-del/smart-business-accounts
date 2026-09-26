@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const STATUS_COLOR: Record<string, string> = { checked_in: "#34d399", checked_out: "#6b7280", reserved: "#818cf8" };
 
 export default function FrontDeskPage() {
@@ -66,7 +66,7 @@ export default function FrontDeskPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Reservations", val: reservations.length, color: "#f97316" }, { label: "Checked In", val: checkedIn, color: "#34d399" }, { label: "Reserved", val: reservations.filter(r => r.status === "reserved").length, color: "#818cf8" }].map(s => (
+        {[{ label: "Total Reservations", val: reservations.length, color: "var(--tx-f97316, #f97316)" }, { label: "Checked In", val: checkedIn, color: "var(--tx-34d399, #34d399)" }, { label: "Reserved", val: reservations.filter(r => r.status === "reserved").length, color: "var(--tx-818cf8, #818cf8)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -134,7 +134,7 @@ export default function FrontDeskPage() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-              {error && <div style={{ color: "#fda4af", fontSize: 12, flex: 1 }}>{error}</div>}
+              {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Create Reservation</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>

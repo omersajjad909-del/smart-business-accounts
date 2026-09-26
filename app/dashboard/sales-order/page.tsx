@@ -389,7 +389,7 @@ export default function SalesOrderPage() {
                     transition: "background 0.1s",
                   }}
                   onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)")
+                    ((e.currentTarget as HTMLTableRowElement).style.background = "rgba(var(--ink),0.03)")
                   }
                   onMouseLeave={(e) =>
                     ((e.currentTarget as HTMLTableRowElement).style.background = "transparent")
@@ -469,7 +469,7 @@ export default function SalesOrderPage() {
                             onClick={() => createInvoiceFromSO(order)}
                             style={{
                               ...btnGhost,
-                              color: "#34d399",
+                              color: "var(--tx-34d399, #34d399)",
                               borderColor: "#34d39955",
                               padding: "4px 10px",
                               fontSize: 12,
@@ -484,7 +484,7 @@ export default function SalesOrderPage() {
                           onClick={() => createInvoiceFromSO(order)}
                           style={{
                             ...btnGhost,
-                            color: "#34d399",
+                            color: "var(--tx-34d399, #34d399)",
                             borderColor: "#34d39955",
                             padding: "4px 10px",
                             fontSize: 12,
@@ -500,7 +500,7 @@ export default function SalesOrderPage() {
                           background: "transparent",
                           border: "none",
                           cursor: "pointer",
-                          color: "#f87171",
+                          color: "var(--tx-f87171, #f87171)",
                           fontSize: 16,
                           lineHeight: 1,
                           padding: "2px 6px",
@@ -615,7 +615,7 @@ export default function SalesOrderPage() {
                     <div key={idx} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(var(--ink),0.02)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {idx + 1}</span>
-                        <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+                        <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "var(--tx-f87171, #f87171)", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
                       </div>
                       <select style={{ ...inputStyle, marginBottom: 8 }} value={item.itemId || item.name}
                         onChange={(e) => {
@@ -671,7 +671,7 @@ export default function SalesOrderPage() {
                       <input type="number" min={1} style={{ ...inputStyle, textAlign: "right" }} value={item.qty} onChange={(e) => updateItem(idx, "qty", e.target.value)} />
                       <input type="number" min={0} step="0.01" style={{ ...inputStyle, textAlign: "right" }} value={item.unitPrice} onChange={(e) => updateItem(idx, "unitPrice", e.target.value)} />
                       <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", textAlign: "right", padding: "0 4px" }}>{fmt(item.qty * item.unitPrice)}</span>
-                      <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+                      <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "var(--tx-f87171, #f87171)", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
                     </div></div>
                   ))}
                 </>
@@ -711,7 +711,7 @@ export default function SalesOrderPage() {
 
             {/* Error */}
             {formError && (
-              <p style={{ color: "#f87171", fontSize: 13, marginBottom: 12, margin: "0 0 12px" }}>{formError}</p>
+              <p style={{ color: "var(--tx-f87171, #f87171)", fontSize: 13, marginBottom: 12, margin: "0 0 12px" }}>{formError}</p>
             )}
 
             {/* Actions */}

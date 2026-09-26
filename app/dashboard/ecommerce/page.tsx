@@ -53,7 +53,7 @@ export default function EcommerceOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ecommerceFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>E-Commerce / Online Store</div>
+        <div style={{ fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>E-Commerce / Online Store</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Command Center</h1>
         <p style={{ margin: 0, fontSize: 14, color: ecommerceMuted, maxWidth: 720 }}>
           Catalog, orders, returns, and shipping are now unified through one dedicated ecommerce control center.
@@ -70,7 +70,7 @@ export default function EcommerceOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,.14), rgba(20,184,166,.12))", border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-c7d2fe, #c7d2fe)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Catalog Ready", body: `${data.summary.activeProducts} active listings are currently available.` },
@@ -88,7 +88,7 @@ export default function EcommerceOverviewPage() {
         </div>
 
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/ecommerce/products", label: "Manage Catalog", hint: "Products, SKU, stock, platforms" },
@@ -108,7 +108,7 @@ export default function EcommerceOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Selling Products</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Selling Products</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topProducts.length === 0 ? (
               <div style={{ color: ecommerceMuted, fontSize: 13 }}>No products have been added yet.</div>
@@ -119,7 +119,7 @@ export default function EcommerceOverviewPage() {
                   <div style={{ fontSize: 12, color: ecommerceMuted }}>{product.sku || "No SKU"} | {product.platform}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>{product.sales} sold</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{product.sales} sold</div>
                   <div style={{ fontSize: 12, color: ecommerceMuted }}>Rs. {product.price.toLocaleString()}</div>
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default function EcommerceOverviewPage() {
         </div>
 
         <div style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operations Snapshot</div>
+          <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operations Snapshot</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Catalog Health", value: `${data.summary.activeProducts}/${data.summary.products || 0} active products`, tone: "#c7d2fe" },

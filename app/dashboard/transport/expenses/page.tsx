@@ -184,9 +184,9 @@ export default function TransportExpensesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 22 }}>
         {[
-          { label: "Total Logged", value: `Rs. ${total.toLocaleString()}`, color: "#f87171" },
-          { label: "Approved", value: `Rs. ${approved.toLocaleString()}`, color: "#f59e0b" },
-          { label: "Posted", value: `Rs. ${posted.toLocaleString()}`, color: "#22c55e" },
+          { label: "Total Logged", value: `Rs. ${total.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
+          { label: "Approved", value: `Rs. ${approved.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Posted", value: `Rs. ${posted.toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
         ].map((item) => (
           <div key={item.label} style={card}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{item.label}</div>
@@ -217,7 +217,7 @@ export default function TransportExpensesPage() {
                 {row.notes && <div style={{ marginTop: 10, fontSize: 12, color: transportMuted }}>{row.notes}</div>}
               </div>
               <div style={{ minWidth: 190, display: "grid", gap: 8 }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#fca5a5" }}>Rs. {row.amount.toLocaleString()}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Rs. {row.amount.toLocaleString()}</div>
                 <button onClick={() => editRow(row.id)} style={{ background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#c7d2fe", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Edit</button>
                 {row.status === "logged" && <button onClick={() => void moveStatus(row.id, "approved")} style={{ background: "rgba(245,158,11,.16)", border: "1px solid rgba(245,158,11,.25)", color: "#fcd34d", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Approve</button>}
                 {row.status === "approved" && <button onClick={() => void moveStatus(row.id, "posted")} style={{ background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.25)", color: "#86efac", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Post</button>}

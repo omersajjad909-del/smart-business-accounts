@@ -147,10 +147,10 @@ export default function SalesHistoryPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Bills", value: filtered.length, color: "#818cf8", icon: "🧾" },
-          { label: "Total Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399", icon: "💰" },
-          { label: "Total Tax", value: `Rs. ${totalTax.toLocaleString()}`, color: "#fbbf24", icon: "📊" },
-          { label: "Total Discount", value: `Rs. ${totalDiscount.toLocaleString()}`, color: "#f87171", icon: "🏷️" },
+          { label: "Bills", value: filtered.length, color: "var(--tx-818cf8, #818cf8)", icon: "🧾" },
+          { label: "Total Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)", icon: "💰" },
+          { label: "Total Tax", value: `Rs. ${totalTax.toLocaleString()}`, color: "var(--tx-fbbf24, #fbbf24)", icon: "📊" },
+          { label: "Total Discount", value: `Rs. ${totalDiscount.toLocaleString()}`, color: "var(--tx-f87171, #f87171)", icon: "🏷️" },
         ].map(s => (
           <div key={s.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 22px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 8 }}>{s.icon} {s.label}</div>
@@ -183,7 +183,7 @@ export default function SalesHistoryPage() {
         </select>
         {(search || dateFrom || dateTo || payFilter !== "all") && (
           <button onClick={() => { setSearch(""); setDateFrom(""); setDateTo(""); setPayFilter("all"); }}
-            style={{ padding: "9px 14px", borderRadius: 8, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, cursor: "pointer", fontWeight: 600 }}>
+            style={{ padding: "9px 14px", borderRadius: 8, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "var(--tx-f87171, #f87171)", fontSize: 12, cursor: "pointer", fontWeight: 600 }}>
             ✕ Clear
           </button>
         )}
@@ -217,7 +217,7 @@ export default function SalesHistoryPage() {
               >
                 {/* Receipt # */}
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "#818cf8" }}>{sale.receiptNo}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)" }}>{sale.receiptNo}</div>
                   <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 2 }}>{itemCount} item{itemCount !== 1 ? "s" : ""}</div>
                 </div>
 
@@ -248,8 +248,8 @@ export default function SalesHistoryPage() {
 
                 {/* Total */}
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#34d399" }}>Rs. {sale.total.toLocaleString()}</div>
-                  {sale.discount > 0 && <div style={{ fontSize: 10, color: "#f87171", marginTop: 1 }}>−Rs. {sale.discount.toLocaleString()} disc</div>}
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {sale.total.toLocaleString()}</div>
+                  {sale.discount > 0 && <div style={{ fontSize: 10, color: "var(--tx-f87171, #f87171)", marginTop: 1 }}>−Rs. {sale.discount.toLocaleString()} disc</div>}
                 </div>
 
                 {/* Actions */}
@@ -262,7 +262,7 @@ export default function SalesHistoryPage() {
                   <button
                     title="Delete Bill"
                     onClick={() => deleteSale(sale.id, sale.receiptNo)}
-                    style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                   >🗑</button>
                   <div style={{ width: 24, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(var(--ink),.2)", fontSize: 11 }}>
                     {isOpen ? "▲" : "▼"}
@@ -281,7 +281,7 @@ export default function SalesHistoryPage() {
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                         {sale.items.map((item, idx) => (
                           <div key={idx} style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#818cf8" }}>
+                            <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>
                               {item.qty}
                             </div>
                             <div style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{item.name}</div>
@@ -305,19 +305,19 @@ export default function SalesHistoryPage() {
                       </div>
                       {sale.discount > 0 && (
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                          <span style={{ color: "#f87171" }}>Discount</span>
-                          <span style={{ color: "#f87171" }}>− Rs. {sale.discount.toLocaleString()}</span>
+                          <span style={{ color: "var(--tx-f87171, #f87171)" }}>Discount</span>
+                          <span style={{ color: "var(--tx-f87171, #f87171)" }}>− Rs. {sale.discount.toLocaleString()}</span>
                         </div>
                       )}
                       {sale.taxAmt > 0 && (
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                          <span style={{ color: "#fbbf24" }}>Tax ({sale.taxRate}%)</span>
-                          <span style={{ color: "#fbbf24" }}>+ Rs. {sale.taxAmt.toLocaleString()}</span>
+                          <span style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>Tax ({sale.taxRate}%)</span>
+                          <span style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>+ Rs. {sale.taxAmt.toLocaleString()}</span>
                         </div>
                       )}
                       <div style={{ borderTop: "1px solid rgba(var(--ink),.08)", paddingTop: 10, marginTop: 2, display: "flex", justifyContent: "space-between", fontSize: 17, fontWeight: 800 }}>
                         <span>Total</span>
-                        <span style={{ color: "#34d399" }}>Rs. {sale.total.toLocaleString()}</span>
+                        <span style={{ color: "var(--tx-34d399, #34d399)" }}>Rs. {sale.total.toLocaleString()}</span>
                       </div>
                       <div style={{ marginTop: 8, padding: "10px 14px", borderRadius: 10, background: `${payBg}`, border: `1px solid ${payColor}25` }}>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>

@@ -3,9 +3,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const hotelFont = "'Outfit','Inter',sans-serif";
-export const hotelBg = "rgba(255,255,255,0.03)";
-export const hotelBorder = "rgba(255,255,255,0.07)";
-export const hotelMuted = "rgba(255,255,255,0.45)";
+export const hotelBg = "rgba(var(--ink),0.03)";
+export const hotelBorder = "rgba(var(--ink),0.07)";
+export const hotelMuted = "rgba(var(--ink),0.45)";
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);

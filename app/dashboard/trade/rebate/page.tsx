@@ -11,11 +11,11 @@ import { useResponsive } from "@/hooks/useResponsive";
 type RebateStatus = "filed" | "under_review" | "approved" | "received" | "rejected";
 
 const STATUS_COLORS: Record<RebateStatus, { bg: string; color: string; border: string }> = {
-  filed: { bg: "rgba(59,130,246,.12)", color: "#60a5fa", border: "rgba(59,130,246,.28)" },
-  under_review: { bg: "rgba(245,158,11,.12)", color: "#fbbf24", border: "rgba(245,158,11,.28)" },
-  approved: { bg: "rgba(16,185,129,.12)", color: "#34d399", border: "rgba(16,185,129,.28)" },
-  received: { bg: "rgba(99,102,241,.12)", color: "#818cf8", border: "rgba(99,102,241,.28)" },
-  rejected: { bg: "rgba(239,68,68,.12)", color: "#f87171", border: "rgba(239,68,68,.28)" },
+  filed: { bg: "rgba(59,130,246,.12)", color: "var(--tx-60a5fa, #60a5fa)", border: "rgba(59,130,246,.28)" },
+  under_review: { bg: "rgba(245,158,11,.12)", color: "var(--tx-fbbf24, #fbbf24)", border: "rgba(245,158,11,.28)" },
+  approved: { bg: "rgba(16,185,129,.12)", color: "var(--tx-34d399, #34d399)", border: "rgba(16,185,129,.28)" },
+  received: { bg: "rgba(99,102,241,.12)", color: "var(--tx-818cf8, #818cf8)", border: "rgba(99,102,241,.28)" },
+  rejected: { bg: "rgba(239,68,68,.12)", color: "var(--tx-f87171, #f87171)", border: "rgba(239,68,68,.28)" },
 };
 
 const STATUS_OPTIONS: RebateStatus[] = ["filed", "under_review", "approved", "received", "rejected"];
@@ -213,10 +213,10 @@ export default function TradeRebatePage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 22 }}>
         {[
-          { label: "Claims", value: totals.total, color: "#60a5fa" },
-          { label: "Open Claims", value: totals.open, color: "#fbbf24" },
-          { label: "Claimed Value", value: `USD ${totals.claimed.toLocaleString()}`, color: "#34d399" },
-          { label: "Approved / Received", value: `USD ${totals.approved.toLocaleString()}`, color: "#818cf8" },
+          { label: "Claims", value: totals.total, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Open Claims", value: totals.open, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Claimed Value", value: `USD ${totals.claimed.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Approved / Received", value: `USD ${totals.approved.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)" },
         ].map((card) => (
           <div key={card.label} style={cardStyle}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
@@ -250,7 +250,7 @@ export default function TradeRebatePage() {
                   const meta = STATUS_COLORS[row.status as RebateStatus] || STATUS_COLORS.filed;
                   return (
                     <tr key={row.id}>
-                      <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}`, fontWeight: 700, color: "#93c5fd" }}>{row.claimNo}</td>
+                      <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}`, fontWeight: 700, color: "var(--tx-93c5fd, #93c5fd)" }}>{row.claimNo}</td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>{row.scheme}</td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}`, color: tradeMuted }}>{row.invoiceRef || "-"}</td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}`, color: tradeMuted }}>{row.shipmentRef || "-"}</td>
@@ -264,7 +264,7 @@ export default function TradeRebatePage() {
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>
                         <div style={{ display: "flex", gap: 8 }}>
                           <button onClick={() => openEdit(row.id)} style={{ background: "transparent", border: `1px solid ${tradeBorder}`, color: "var(--text-primary)", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }}>Edit</button>
-                          <button onClick={() => handleDelete(row.id, row.claimNo)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer" }}>Delete</button>
+                          <button onClick={() => handleDelete(row.id, row.claimNo)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -298,7 +298,7 @@ export default function TradeRebatePage() {
               <div style={{ gridColumn: "span 2" }}><label style={labelStyle}>Notes</label><input value={form.notes} onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))} style={inputStyle} /></div>
             </div>
 
-            {error ? <div style={{ marginTop: 14, color: "#f87171", fontSize: 13 }}>{error}</div> : null}
+            {error ? <div style={{ marginTop: 14, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>{error}</div> : null}
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 22 }}>
               <button onClick={() => setShowModal(false)} style={{ background: "rgba(var(--ink),.08)", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 14px", cursor: "pointer" }}>Cancel</button>

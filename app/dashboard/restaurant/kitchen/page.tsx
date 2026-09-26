@@ -44,7 +44,7 @@ function KitchenKanbanCol({
           <div key={order.id} style={{ background: "rgba(var(--ink),.04)", border: `1px solid ${PRIORITY_COLOR[order.priority]}30`, borderLeft: `3px solid ${PRIORITY_COLOR[order.priority]}`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>Table {order.table}</div>
-              <div style={{ fontSize: 11, color: order.elapsed > 15 ? "#ef4444" : restaurantMuted }}>⏱ {order.elapsed}m</div>
+              <div style={{ fontSize: 11, color: order.elapsed > 15 ? "var(--tx-ef4444, #ef4444)" : restaurantMuted }}>⏱ {order.elapsed}m</div>
             </div>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginBottom: 10 }}>{order.items.join(", ")}</div>
             {order.notes && <div style={{ fontSize: 11, color: restaurantMuted, marginBottom: 10 }}>Note: {order.notes}</div>}

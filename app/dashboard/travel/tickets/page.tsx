@@ -232,10 +232,10 @@ export default function TravelTicketsPage() {
         const totalCost = rows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
         return [
           { label: "Tickets", value: rows.length, color: travelAccent },
-          { label: "Quoted", value: rows.filter((row) => String(row.status) === "quoted").length, color: "#fbbf24" },
-          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "#34d399" },
-          { label: "Invoice Ready", value: rows.filter((row) => !String(row.invoiceNo || "")).length, color: "#f97316" },
-          { label: "Margin", value: (totalValue - totalCost).toLocaleString(), color: "#60a5fa" },
+          { label: "Quoted", value: rows.filter((row) => String(row.status) === "quoted").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Invoice Ready", value: rows.filter((row) => !String(row.invoiceNo || "")).length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Margin", value: (totalValue - totalCost).toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ];
       }}
     />

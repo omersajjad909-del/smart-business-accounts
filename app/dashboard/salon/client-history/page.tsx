@@ -55,9 +55,9 @@ export default function SalonClientHistoryPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Clients</div><div style={{ fontSize: 28, fontWeight: 800 }}>{clients.length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Repeat Clients</div><div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{clients.filter((client) => client.visits.length > 1).length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>High Value</div><div style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>{clients.filter((client) => client.totalSpend >= 10000).length}</div></div>
-        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Visits</div><div style={{ fontSize: 24, fontWeight: 800, color: "#a78bfa" }}>{appointments.length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Repeat Clients</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{clients.filter((client) => client.visits.length > 1).length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>High Value</div><div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>{clients.filter((client) => client.totalSpend >= 10000).length}</div></div>
+        <div style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: salonMuted, marginBottom: 6 }}>Total Visits</div><div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-a78bfa, #a78bfa)" }}>{appointments.length}</div></div>
       </div>
 
       <div style={{ marginBottom: 18 }}>
@@ -80,7 +80,7 @@ export default function SalonClientHistoryPage() {
                 <div style={{ fontSize: 13, color: salonMuted }}>{client.phone} • Favorite: {client.favoriteService}</div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#34d399" }}>Rs. {client.totalSpend.toLocaleString()}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {client.totalSpend.toLocaleString()}</div>
                 <div style={{ fontSize: 12, color: salonMuted }}>{client.visits.length} total visits</div>
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function SalonClientHistoryPage() {
                     <div style={{ fontSize: 12, color: salonMuted }}>{visit.date} • {visit.time} • {visit.stylist}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399" }}>Rs. {visit.price.toLocaleString()}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Rs. {visit.price.toLocaleString()}</div>
                     <div style={{ fontSize: 12, color: salonStatusColor(visit.status) }}>{salonStatusLabel(visit.status)}</div>
                   </div>
                 </div>

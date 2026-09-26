@@ -6,16 +6,16 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 const typeColor: Record<string,string> = { individual:"#6366f1", corporate:"#3b82f6", government:"#22c55e", foreign:"#f59e0b" };
 const freqLabel: Record<string,string> = { one_time:"One-Time", monthly:"Monthly", annual:"Annual" };
 
 const getTier = (total: number) => {
-  if(total >= 5000000) return { label:"Platinum", color:"#e5e7eb" };
-  if(total >= 1000000) return { label:"Gold", color:"#f59e0b" };
-  if(total >= 300000) return { label:"Silver", color:"#94a3b8" };
+  if(total >= 5000000) return { label:"Platinum", color:"var(--tx-e5e7eb, #e5e7eb)" };
+  if(total >= 1000000) return { label:"Gold", color:"var(--tx-f59e0b, #f59e0b)" };
+  if(total >= 300000) return { label:"Silver", color:"var(--tx-94a3b8, #94a3b8)" };
   return { label:"Bronze", color:"#b45309" };
 };
 
@@ -75,10 +75,10 @@ export default function DonorsPage() {
 
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
-          { label:"Total Donors", value:donors.length, color:"#6366f1" },
-          { label:"Active Donors", value:donors.filter(d=>d.status==="active").length, color:"#22c55e" },
-          { label:"This Month (Rs.)", value:`${(thisMonthDonations/1000).toFixed(0)}K`, color:"#3b82f6" },
-          { label:"Top Donor", value:topDonor ? topDonor.name.split(" ")[0] : "—", color:"#f59e0b" },
+          { label:"Total Donors", value:donors.length, color:"var(--tx-6366f1, #6366f1)" },
+          { label:"Active Donors", value:donors.filter(d=>d.status==="active").length, color:"var(--tx-22c55e, #22c55e)" },
+          { label:"This Month (Rs.)", value:`${(thisMonthDonations/1000).toFixed(0)}K`, color:"var(--tx-3b82f6, #3b82f6)" },
+          { label:"Top Donor", value:topDonor ? topDonor.name.split(" ")[0] : "—", color:"var(--tx-f59e0b, #f59e0b)" },
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:24, fontWeight:700, color:s.color }}>{s.value}</div>
@@ -89,7 +89,7 @@ export default function DonorsPage() {
 
       <div style={{ display:"flex", gap:8, marginBottom:20 }}>
         {["all","individual","corporate","government","foreign"].map(t=>(
-          <button key={t} onClick={()=>setFilterType(t)} style={{ ...btn(filterType===t?"#6366f1":"rgba(255,255,255,.07)"), padding:"8px 16px", textTransform:"capitalize" }}>{t==="all"?"All":t}</button>
+          <button key={t} onClick={()=>setFilterType(t)} style={{ ...btn(filterType===t?"#6366f1":"rgba(var(--ink),.07)"), padding:"8px 16px", textTransform:"capitalize" }}>{t==="all"?"All":t}</button>
         ))}
       </div>
 
@@ -115,13 +115,13 @@ export default function DonorsPage() {
                 <div style={{ fontSize:12, color:"rgba(var(--ink),.4)", marginTop:2 }}>📂 {d.category} · {freqLabel[d.frequency] || d.frequency}</div>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:16, fontWeight:700, color:"#22c55e" }}>Rs. {d.totalDonated.toLocaleString()}</div>
+                <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-22c55e, #22c55e)" }}>Rs. {d.totalDonated.toLocaleString()}</div>
                 <div style={{ fontSize:12, color:"rgba(var(--ink),.4)" }}>Total donated</div>
-                <div style={{ fontSize:13, color:"#60a5fa", marginTop:2 }}>Last: Rs. {d.lastDonation.toLocaleString()}</div>
+                <div style={{ fontSize:13, color:"var(--tx-60a5fa, #60a5fa)", marginTop:2 }}>Last: Rs. {d.lastDonation.toLocaleString()}</div>
               </div>
               <div style={{ display:"flex", gap:6, flexShrink:0 }}>
-                <button style={{ ...btn("rgba(255,255,255,.07)"), padding:"7px 14px", fontSize:12 }}>History</button>
-                <button style={{ ...btn("rgba(99,102,241,.2)"), padding:"7px 14px", fontSize:12, color:"#818cf8" }}>Receipt</button>
+                <button style={{ ...btn("rgba(var(--ink),.07)"), padding:"7px 14px", fontSize:12 }}>History</button>
+                <button style={{ ...btn("rgba(99,102,241,.2)"), padding:"7px 14px", fontSize:12, color:"var(--tx-818cf8, #818cf8)" }}>Receipt</button>
               </div>
             </div>
           );

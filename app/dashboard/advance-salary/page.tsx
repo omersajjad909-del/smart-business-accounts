@@ -74,7 +74,7 @@ export default function AdvanceSalaryPage() {
   const totalCleared = advances.filter(a => a.status === "CLEARED").length;
 
   const selectedEmployee = employees.find(e => e.id === form.employeeId);
-  const optionStyle: React.CSSProperties = { background: "var(--dk-0f172a, #0f172a)", color: "#f8fafc" };
+  const optionStyle: React.CSSProperties = { background: "var(--dk-0f172a, #0f172a)", color: "var(--tx-f8fafc, #f8fafc)" };
 
   async function handleSave() {
     if (!form.employeeId || !form.amount) { setMsg("Please select an employee and enter amount"); return; }
@@ -184,7 +184,7 @@ export default function AdvanceSalaryPage() {
     mbox:   { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, width: 420, maxWidth: "90vw" },
     label:  { fontSize: 12, color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: 6 },
     input:  { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, outline: "none", boxSizing: "border-box" as const },
-    select: { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--dk-0f172a, #0f172a)", color: "#f8fafc", fontSize: 13, outline: "none", boxSizing: "border-box" as const, colorScheme: "dark" as const, cursor: "pointer" },
+    select: { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--dk-0f172a, #0f172a)", color: "var(--tx-f8fafc, #f8fafc)", fontSize: 13, outline: "none", boxSizing: "border-box" as const, colorScheme: "dark" as const, cursor: "pointer" },
   };
 
   return (
@@ -207,12 +207,12 @@ export default function AdvanceSalaryPage() {
         </div>
         <div style={s.card}>
           <div style={s.clabel}>Outstanding Balance</div>
-          <div style={{ ...s.cval, color: "#fbbf24" }}>Rs. {totalActive.toLocaleString()}</div>
+          <div style={{ ...s.cval, color: "var(--tx-fbbf24, #fbbf24)" }}>Rs. {totalActive.toLocaleString()}</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Pending recovery</div>
         </div>
         <div style={s.card}>
           <div style={s.clabel}>Cleared Advances</div>
-          <div style={{ ...s.cval, color: "#34d399" }}>{totalCleared}</div>
+          <div style={{ ...s.cval, color: "var(--tx-34d399, #34d399)" }}>{totalCleared}</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Fully recovered</div>
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function AdvanceSalaryPage() {
                       </div>
                       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{pct}%</div>
                     </td>
-                    <td style={{ ...s.td, color: balance > 0 ? "#fbbf24" : "#34d399", fontWeight: 700 }}>
+                    <td style={{ ...s.td, color: balance > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)", fontWeight: 700 }}>
                       Rs. {balance.toLocaleString()}
                     </td>
                     <td style={s.td}>
@@ -268,8 +268,8 @@ export default function AdvanceSalaryPage() {
                       </span>
                     </td>
                     <td style={s.td}>
-                      <button type="button" style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#818cf8", cursor: "pointer", marginRight: 8 }} onClick={() => openEdit(a)}>Edit</button>
-                      <button type="button" style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#f87171", cursor: "pointer" }} onClick={() => handleDelete(a.id, a.employeeName)}>Delete</button>
+                      <button type="button" style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)", cursor: "pointer", marginRight: 8 }} onClick={() => openEdit(a)}>Edit</button>
+                      <button type="button" style={{ background: "transparent", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-f87171, #f87171)", cursor: "pointer" }} onClick={() => handleDelete(a.id, a.employeeName)}>Delete</button>
                     </td>
                   </tr>
                 );

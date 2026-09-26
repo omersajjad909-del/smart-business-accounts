@@ -87,7 +87,7 @@ export default function PlanGate({ feature, requiredPlan, children }: Props) {
           {info.label} — Upgrade Required
         </h2>
         <p style={{ fontSize: 14, color: "rgba(var(--ink),.45)", maxWidth: 380, lineHeight: 1.7, margin: "0 0 28px" }}>
-          This feature is available on the <strong style={{ color: "#a5b4fc" }}>{info.plan}</strong> plan and above.
+          This feature is available on the <strong style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>{info.plan}</strong> plan and above.
           Upgrade your subscription to unlock {info.label}.
         </p>
         <div style={{ display: "flex", gap: 12 }}>

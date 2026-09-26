@@ -39,7 +39,7 @@ export default function NgoOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ngoFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>NGO / Non-Profit</div>
+        <div style={{ fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>NGO / Non-Profit</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Mission Control Desk</h1>
         <p style={{ margin: 0, fontSize: 14, color: ngoMuted, maxWidth: 760 }}>
           Fundraising, grants, beneficiaries, aur fund accounting ko ek hi command center se manage karein taa ke impact aur compliance dono clear rahen.
@@ -56,7 +56,7 @@ export default function NgoOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,.14), rgba(59,130,246,.1))", border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Mission Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-c7d2fe, #c7d2fe)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Mission Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Capture Donors", body: "Donor profile, frequency, aur fundraising relationships maintain karein." },
@@ -74,7 +74,7 @@ export default function NgoOverviewPage() {
         </div>
 
         <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/ngo/donors", label: "Open Donor Desk", hint: "Fundraising relationships and donor tiers" },
@@ -94,7 +94,7 @@ export default function NgoOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Donors</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Donors</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topDonors.length === 0 ? (
               <div style={{ color: ngoMuted, fontSize: 13 }}>Donor base build hone ke baad yahan top contributors show honge.</div>
@@ -104,14 +104,14 @@ export default function NgoOverviewPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{donor.name}</div>
                   <div style={{ fontSize: 12, color: ngoMuted }}>{donor.type} · {donor.frequency}</div>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {donor.totalDonated.toLocaleString()}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {donor.totalDonated.toLocaleString()}</div>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Monthly aid commitment", value: `Rs. ${summary.monthlyAid.toLocaleString()}`, tone: "#60a5fa" },

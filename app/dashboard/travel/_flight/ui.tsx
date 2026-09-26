@@ -113,7 +113,7 @@ export function Field({
         }}
       >
         {label}
-        {required ? <span style={{ color: "#f87171", marginLeft: 3 }}>*</span> : null}
+        {required ? <span style={{ color: "var(--tx-f87171, #f87171)", marginLeft: 3 }}>*</span> : null}
       </span>
       {children}
       {/* Reserves no space when absent, and cannot stretch the field beside it
@@ -1031,7 +1031,7 @@ export function FareNotice({ note }: { note?: string }) {
         {/* Leads with what the operator has to act on. "Not a live airline
             feed" read as a fault that wanted fixing; the thing that actually
             matters is that a fare here is not yet a fare you can quote. */}
-        <strong style={{ color: "#f4c25b" }}>Confirm fares before quoting.</strong>{" "}
+        <strong style={{ color: "var(--tx-f4c25b, #f4c25b)" }}>Confirm fares before quoting.</strong>{" "}
         {note || FARE_NOTICE}
       </div>
     </div>

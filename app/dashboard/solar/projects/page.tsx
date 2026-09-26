@@ -51,10 +51,10 @@ export default function SolarProjectsPage() {
         const liveSites = rows.filter((row) => String(row.status) === "installing").length;
         const commissioned = rows.filter((row) => String(row.status) === "commissioned").length;
         return [
-          { label: "Projects", value: rows.length, color: "#fbbf24" },
-          { label: "Installing", value: liveSites, color: "#60a5fa" },
-          { label: "Commissioned", value: commissioned, color: "#34d399" },
-          { label: "Pipeline Budget", value: totalBudget.toLocaleString(), color: "#f59e0b" },
+          { label: "Projects", value: rows.length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Installing", value: liveSites, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Commissioned", value: commissioned, color: "var(--tx-34d399, #34d399)" },
+          { label: "Pipeline Budget", value: totalBudget.toLocaleString(), color: "var(--tx-f59e0b, #f59e0b)" },
         ];
       }}
     />

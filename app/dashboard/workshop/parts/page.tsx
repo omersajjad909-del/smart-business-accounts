@@ -46,9 +46,9 @@ export default function WorkshopPartsPage() {
         const cost = rows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
         return [
           { label: "Parts Lines", value: rows.length, color: workshopAccent },
-          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "#34d399" },
-          { label: "Ordered", value: rows.filter((row) => String(row.status) === "ordered").length, color: "#60a5fa" },
-          { label: "Parts Cost", value: cost.toLocaleString(), color: "#fbbf24" },
+          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Ordered", value: rows.filter((row) => String(row.status) === "ordered").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Parts Cost", value: cost.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

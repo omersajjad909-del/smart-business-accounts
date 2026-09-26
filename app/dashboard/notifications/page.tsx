@@ -185,9 +185,9 @@ export default function NotificationsPage() {
       {/* Channel status chips */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "24px", flexWrap: "wrap" }}>
         {([
-          { key: "whatsapp" as Channel, label: "WhatsApp", icon: "💬", color: "#25D366" },
-          { key: "sms"      as Channel, label: "SMS",       icon: "📱", color: "#6366f1" },
-          { key: "email"    as Channel, label: "Email",     icon: "📧", color: "#0891b2" },
+          { key: "whatsapp" as Channel, label: "WhatsApp", icon: "💬", color: "var(--tx-25d366, #25D366)" },
+          { key: "sms"      as Channel, label: "SMS",       icon: "📱", color: "var(--tx-6366f1, #6366f1)" },
+          { key: "email"    as Channel, label: "Email",     icon: "📧", color: "var(--tx-0891b2, #0891b2)" },
         ]).map(ch => (
           <div key={ch.key} style={{
             display: "flex", alignItems: "center", gap: "8px",
@@ -217,7 +217,7 @@ export default function NotificationsPage() {
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             padding: "10px 16px", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600,
             background: "transparent", borderBottom: tab === t.id ? "2px solid #6366f1" : "2px solid transparent",
-            color: tab === t.id ? "#6366f1" : "var(--text-muted)",
+            color: tab === t.id ? "var(--tx-6366f1, #6366f1)" : "var(--text-muted)",
             marginBottom: "-1px", display: "flex", alignItems: "center", gap: "6px",
             transition: "color .15s",
           }}>
@@ -265,7 +265,7 @@ export default function NotificationsPage() {
               background: "rgba(37,211,102,0.06)", border: "1px solid rgba(37,211,102,0.2)",
               fontSize: "12px", color: "var(--text-muted)", lineHeight: "1.7",
             }}>
-              <strong style={{ color: "#25D366" }}>How to get credentials:</strong><br/>
+              <strong style={{ color: "var(--tx-25d366, #25D366)" }}>How to get credentials:</strong><br/>
               1. Go to <strong>developers.facebook.com</strong> → My Apps → Create App → Business<br/>
               2. Add <strong>WhatsApp</strong> product → Go to WhatsApp Setup<br/>
               3. Copy <strong>Temporary Access Token</strong> and <strong>Phone Number ID</strong> from the setup page
@@ -273,7 +273,7 @@ export default function NotificationsPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
               <div style={{ gridColumn: "1 / -1" }}>
-                <label style={labelStyle}>Meta Access Token <span style={{ color: "#ef4444" }}>*</span></label>
+                <label style={labelStyle}>Meta Access Token <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
                 <input
                   style={inputStyle} type="password"
                   value={wa.token} onChange={e => setWa(w => ({ ...w, token: e.target.value }))}
@@ -281,7 +281,7 @@ export default function NotificationsPage() {
                 />
               </div>
               <div>
-                <label style={labelStyle}>Phone Number ID <span style={{ color: "#ef4444" }}>*</span></label>
+                <label style={labelStyle}>Phone Number ID <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
                 <input
                   style={inputStyle}
                   value={wa.phoneId} onChange={e => setWa(w => ({ ...w, phoneId: e.target.value }))}
@@ -387,7 +387,7 @@ export default function NotificationsPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
               <div>
-                <label style={labelStyle}>SMTP Host <span style={{ color: "#ef4444" }}>*</span></label>
+                <label style={labelStyle}>SMTP Host <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
                 <input style={inputStyle} value={email.host} onChange={e => setEmail(f => ({ ...f, host: e.target.value }))} placeholder="smtp.gmail.com" />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
@@ -403,11 +403,11 @@ export default function NotificationsPage() {
                 </div>
               </div>
               <div>
-                <label style={labelStyle}>SMTP Username (Email) <span style={{ color: "#ef4444" }}>*</span></label>
+                <label style={labelStyle}>SMTP Username (Email) <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
                 <input style={inputStyle} value={email.user} onChange={e => setEmail(f => ({ ...f, user: e.target.value }))} placeholder="you@gmail.com" />
               </div>
               <div>
-                <label style={labelStyle}>SMTP Password / App Password <span style={{ color: "#ef4444" }}>*</span></label>
+                <label style={labelStyle}>SMTP Password / App Password <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
                 <input style={inputStyle} type="password" value={email.pass} onChange={e => setEmail(f => ({ ...f, pass: e.target.value }))} placeholder="Gmail: use App Password, not account password" />
               </div>
               <div>
@@ -425,7 +425,7 @@ export default function NotificationsPage() {
               <div style={{
                 padding: "10px 14px", borderRadius: "8px", marginBottom: "16px",
                 background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)",
-                fontSize: "12px", color: "#fbbf24",
+                fontSize: "12px", color: "var(--tx-fbbf24, #fbbf24)",
               }}>
                 💡 <strong>Gmail tip:</strong> Use an <strong>App Password</strong> (not your Gmail password). Go to Google Account → Security → 2-Step Verification → App Passwords.
               </div>
@@ -474,7 +474,7 @@ export default function NotificationsPage() {
                 background: status.sms ? "#6366f1" : "#f87171",
                 boxShadow: `0 0 6px ${status.sms ? "rgba(99,102,241,0.5)" : "rgba(248,113,113,0.5)"}`,
               }}/>
-              <span style={{ fontSize: "14px", fontWeight: 700, color: status.sms ? "#6366f1" : "#f87171" }}>
+              <span style={{ fontSize: "14px", fontWeight: 700, color: status.sms ? "var(--tx-6366f1, #6366f1)" : "var(--tx-f87171, #f87171)" }}>
                 {status.sms ? "SMS Configured" : "SMS Not Configured"}
               </span>
             </div>

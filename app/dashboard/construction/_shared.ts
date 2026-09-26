@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const constructionFont = "'Outfit','Inter',sans-serif";
-export const constructionBg = "rgba(255,255,255,0.03)";
-export const constructionBorder = "rgba(255,255,255,0.07)";
-export const constructionMuted = "rgba(255,255,255,0.45)";
+export const constructionBg = "rgba(var(--ink),0.03)";
+export const constructionBorder = "rgba(var(--ink),0.07)";
+export const constructionMuted = "rgba(var(--ink),0.45)";
 
 export type ConstructionProjectStatus = "planning" | "active" | "on_hold" | "completed";
 export type ConstructionSiteStatus = "active" | "inactive" | "maintenance";

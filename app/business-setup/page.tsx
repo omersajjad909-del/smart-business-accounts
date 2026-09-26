@@ -5,48 +5,48 @@ import { BUSINESS_TYPES, BUSINESS_PHASE_CONFIG, BUSINESS_CATEGORIES, type Busine
 import { getCurrentUser } from "@/lib/auth";
 
 const BADGE_MAP: Record<string, { labels: string[]; color: string; bg: string }> = {
-  manufacturing:  { labels: ["BOM", "Production", "Work Orders"], color: "#fbbf24", bg: "rgba(245,158,11,.15)" },
-  restaurant:     { labels: ["Tables", "Kitchen", "Menu"], color: "#fca5a5", bg: "rgba(248,113,113,.15)" },
-  real_estate:    { labels: ["Properties", "Rent", "Leases"], color: "#a5b4fc", bg: "rgba(129,140,248,.15)" },
-  construction:   { labels: ["Projects", "Sites", "Subcontractors"], color: "#fdba74", bg: "rgba(251,146,60,.15)" },
-  distribution:   { labels: ["Routes", "Van Sales", "Delivery"], color: "#c4b5fd", bg: "rgba(139,92,246,.15)" },
-  retail:         { labels: ["POS", "Loyalty", "Catalog"], color: "#f9a8d4", bg: "rgba(236,72,153,.15)" },
-  hospital:       { labels: ["Patients", "Appointments", "Lab"], color: "#6ee7b7", bg: "rgba(52,211,153,.15)" },
-  clinic:         { labels: ["Patients", "Prescriptions"], color: "#6ee7b7", bg: "rgba(52,211,153,.15)" },
-  hotel:          { labels: ["Rooms", "Housekeeping", "Front Desk"], color: "#7dd3fc", bg: "rgba(56,189,248,.15)" },
-  school:         { labels: ["Students", "Fees", "Exams"], color: "#fde68a", bg: "rgba(245,158,11,.15)" },
-  pharmacy:       { labels: ["Drugs", "Expiry", "Prescriptions"], color: "#86efac", bg: "rgba(34,197,94,.15)" },
-  salon:          { labels: ["Appointments", "Stylists", "Services"], color: "#f9a8d4", bg: "rgba(244,114,182,.15)" },
-  gym:            { labels: ["Memberships", "Trainers", "Classes"], color: "#67e8f9", bg: "rgba(6,182,212,.15)" },
-  transport:      { labels: ["Fleet", "Trips", "Drivers"], color: "#fca5a5", bg: "rgba(239,68,68,.15)" },
-  agriculture:    { labels: ["Crops", "Livestock", "Harvest"], color: "#86efac", bg: "rgba(34,197,94,.15)" },
-  ngo:            { labels: ["Donors", "Grants", "Beneficiaries"], color: "#c4b5fd", bg: "rgba(139,92,246,.15)" },
-  ecommerce:      { labels: ["Listings", "Orders", "Returns"], color: "#7dd3fc", bg: "rgba(56,189,248,.15)" },
-  it_company:          { labels: ["Projects", "Sprints", "Support"], color: "#a5b4fc", bg: "rgba(99,102,241,.15)" },
-  law_firm:            { labels: ["Cases", "Billing", "Time"], color: "#fde68a", bg: "rgba(234,179,8,.15)" },
-  food_processing:     { labels: ["BOM", "Production", "HACCP"], color: "#fca5a5", bg: "rgba(248,113,113,.15)" },
-  car_showroom:        { labels: ["Vehicle Stock", "Test Drive", "Finance"], color: "#7dd3fc", bg: "rgba(14,165,233,.15)" },
-  car_workshop:        { labels: ["Job Cards", "Parts", "Labour"], color: "#94a3b8", bg: "rgba(100,116,139,.15)" },
-  spare_parts:         { labels: ["Parts Stock", "Barcode", "Reorder"], color: "#cbd5e1", bg: "rgba(120,113,108,.15)" },
-  car_rental:          { labels: ["Fleet", "Bookings", "AMC"], color: "#c4b5fd", bg: "rgba(124,58,237,.15)" },
-  advertising_agency:  { labels: ["Campaigns", "Media Buy", "Billing"], color: "#fda4af", bg: "rgba(244,63,94,.15)" },
-  digital_marketing:   { labels: ["Retainers", "Campaigns", "ROI"], color: "#67e8f9", bg: "rgba(6,182,212,.15)" },
-  printing_press:      { labels: ["Print Jobs", "Paper Stock", "Delivery"], color: "#93c5fd", bg: "rgba(30,64,175,.15)" },
-  saas_company:        { labels: ["MRR", "Subscribers", "Churn"], color: "#a5b4fc", bg: "rgba(99,102,241,.15)" },
-  isp:                 { labels: ["Connections", "Billing", "Support"], color: "#7dd3fc", bg: "rgba(2,132,199,.15)" },
-  accounting_firm:     { labels: ["Clients", "Tax Filing", "Billing"], color: "#6ee7b7", bg: "rgba(5,150,105,.15)" },
-  consultancy_firm:    { labels: ["Projects", "Retainers", "Reports"], color: "#fde68a", bg: "rgba(217,119,6,.15)" },
-  mobile_repair:       { labels: ["Job Cards", "Parts", "Warranty"], color: "#c4b5fd", bg: "rgba(124,58,237,.15)" },
-  equipment_maintenance:{ labels: ["AMC", "Service Jobs", "Parts"], color: "#94a3b8", bg: "rgba(71,85,105,.15)" },
-  solar_company:       { labels: ["Projects", "kWp", "AMC"], color: "#fde68a", bg: "rgba(245,158,11,.15)" },
-  import_company:      { labels: ["Shipments", "Customs", "LC"], color: "#67e8f9", bg: "rgba(8,145,178,.15)" },
-  export_company:      { labels: ["Shipments", "LC/TT", "FOB"], color: "#6ee7b7", bg: "rgba(13,148,136,.15)" },
-  clearing_forwarding: { labels: ["Files", "Customs", "Delivery"], color: "#fbbf24", bg: "rgba(120,53,15,.15)" },
-  event_planner:       { labels: ["Events", "Vendors", "Budget"], color: "#e879f9", bg: "rgba(192,38,211,.15)" },
-  wedding_planner:     { labels: ["Bookings", "Vendors", "Decor"], color: "#fda4af", bg: "rgba(225,29,72,.15)" },
-  travel:              { labels: ["Tickets", "Visas", "Quotations"], color: "#7dd3fc", bg: "rgba(56,189,248,.15)" },
-  equipment_rental:    { labels: ["Rentals", "Utilization", "Maintenance"], color: "#fdba74", bg: "rgba(234,88,12,.15)" },
-  franchise_brand:     { labels: ["Outlets", "Royalty", "Brand"], color: "#c4b5fd", bg: "rgba(124,58,237,.15)" },
+  manufacturing:  { labels: ["BOM", "Production", "Work Orders"], color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(245,158,11,.15)" },
+  restaurant:     { labels: ["Tables", "Kitchen", "Menu"], color: "var(--tx-fca5a5, #fca5a5)", bg: "rgba(248,113,113,.15)" },
+  real_estate:    { labels: ["Properties", "Rent", "Leases"], color: "var(--tx-a5b4fc, #a5b4fc)", bg: "rgba(129,140,248,.15)" },
+  construction:   { labels: ["Projects", "Sites", "Subcontractors"], color: "var(--tx-fdba74, #fdba74)", bg: "rgba(251,146,60,.15)" },
+  distribution:   { labels: ["Routes", "Van Sales", "Delivery"], color: "var(--tx-c4b5fd, #c4b5fd)", bg: "rgba(139,92,246,.15)" },
+  retail:         { labels: ["POS", "Loyalty", "Catalog"], color: "var(--tx-f9a8d4, #f9a8d4)", bg: "rgba(236,72,153,.15)" },
+  hospital:       { labels: ["Patients", "Appointments", "Lab"], color: "var(--tx-6ee7b7, #6ee7b7)", bg: "rgba(52,211,153,.15)" },
+  clinic:         { labels: ["Patients", "Prescriptions"], color: "var(--tx-6ee7b7, #6ee7b7)", bg: "rgba(52,211,153,.15)" },
+  hotel:          { labels: ["Rooms", "Housekeeping", "Front Desk"], color: "var(--tx-7dd3fc, #7dd3fc)", bg: "rgba(56,189,248,.15)" },
+  school:         { labels: ["Students", "Fees", "Exams"], color: "var(--tx-fde68a, #fde68a)", bg: "rgba(245,158,11,.15)" },
+  pharmacy:       { labels: ["Drugs", "Expiry", "Prescriptions"], color: "var(--tx-86efac, #86efac)", bg: "rgba(34,197,94,.15)" },
+  salon:          { labels: ["Appointments", "Stylists", "Services"], color: "var(--tx-f9a8d4, #f9a8d4)", bg: "rgba(244,114,182,.15)" },
+  gym:            { labels: ["Memberships", "Trainers", "Classes"], color: "var(--tx-67e8f9, #67e8f9)", bg: "rgba(6,182,212,.15)" },
+  transport:      { labels: ["Fleet", "Trips", "Drivers"], color: "var(--tx-fca5a5, #fca5a5)", bg: "rgba(239,68,68,.15)" },
+  agriculture:    { labels: ["Crops", "Livestock", "Harvest"], color: "var(--tx-86efac, #86efac)", bg: "rgba(34,197,94,.15)" },
+  ngo:            { labels: ["Donors", "Grants", "Beneficiaries"], color: "var(--tx-c4b5fd, #c4b5fd)", bg: "rgba(139,92,246,.15)" },
+  ecommerce:      { labels: ["Listings", "Orders", "Returns"], color: "var(--tx-7dd3fc, #7dd3fc)", bg: "rgba(56,189,248,.15)" },
+  it_company:          { labels: ["Projects", "Sprints", "Support"], color: "var(--tx-a5b4fc, #a5b4fc)", bg: "rgba(99,102,241,.15)" },
+  law_firm:            { labels: ["Cases", "Billing", "Time"], color: "var(--tx-fde68a, #fde68a)", bg: "rgba(234,179,8,.15)" },
+  food_processing:     { labels: ["BOM", "Production", "HACCP"], color: "var(--tx-fca5a5, #fca5a5)", bg: "rgba(248,113,113,.15)" },
+  car_showroom:        { labels: ["Vehicle Stock", "Test Drive", "Finance"], color: "var(--tx-7dd3fc, #7dd3fc)", bg: "rgba(14,165,233,.15)" },
+  car_workshop:        { labels: ["Job Cards", "Parts", "Labour"], color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(100,116,139,.15)" },
+  spare_parts:         { labels: ["Parts Stock", "Barcode", "Reorder"], color: "var(--tx-cbd5e1, #cbd5e1)", bg: "rgba(120,113,108,.15)" },
+  car_rental:          { labels: ["Fleet", "Bookings", "AMC"], color: "var(--tx-c4b5fd, #c4b5fd)", bg: "rgba(124,58,237,.15)" },
+  advertising_agency:  { labels: ["Campaigns", "Media Buy", "Billing"], color: "var(--tx-fda4af, #fda4af)", bg: "rgba(244,63,94,.15)" },
+  digital_marketing:   { labels: ["Retainers", "Campaigns", "ROI"], color: "var(--tx-67e8f9, #67e8f9)", bg: "rgba(6,182,212,.15)" },
+  printing_press:      { labels: ["Print Jobs", "Paper Stock", "Delivery"], color: "var(--tx-93c5fd, #93c5fd)", bg: "rgba(30,64,175,.15)" },
+  saas_company:        { labels: ["MRR", "Subscribers", "Churn"], color: "var(--tx-a5b4fc, #a5b4fc)", bg: "rgba(99,102,241,.15)" },
+  isp:                 { labels: ["Connections", "Billing", "Support"], color: "var(--tx-7dd3fc, #7dd3fc)", bg: "rgba(2,132,199,.15)" },
+  accounting_firm:     { labels: ["Clients", "Tax Filing", "Billing"], color: "var(--tx-6ee7b7, #6ee7b7)", bg: "rgba(5,150,105,.15)" },
+  consultancy_firm:    { labels: ["Projects", "Retainers", "Reports"], color: "var(--tx-fde68a, #fde68a)", bg: "rgba(217,119,6,.15)" },
+  mobile_repair:       { labels: ["Job Cards", "Parts", "Warranty"], color: "var(--tx-c4b5fd, #c4b5fd)", bg: "rgba(124,58,237,.15)" },
+  equipment_maintenance:{ labels: ["AMC", "Service Jobs", "Parts"], color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(71,85,105,.15)" },
+  solar_company:       { labels: ["Projects", "kWp", "AMC"], color: "var(--tx-fde68a, #fde68a)", bg: "rgba(245,158,11,.15)" },
+  import_company:      { labels: ["Shipments", "Customs", "LC"], color: "var(--tx-67e8f9, #67e8f9)", bg: "rgba(8,145,178,.15)" },
+  export_company:      { labels: ["Shipments", "LC/TT", "FOB"], color: "var(--tx-6ee7b7, #6ee7b7)", bg: "rgba(13,148,136,.15)" },
+  clearing_forwarding: { labels: ["Files", "Customs", "Delivery"], color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(120,53,15,.15)" },
+  event_planner:       { labels: ["Events", "Vendors", "Budget"], color: "var(--tx-e879f9, #e879f9)", bg: "rgba(192,38,211,.15)" },
+  wedding_planner:     { labels: ["Bookings", "Vendors", "Decor"], color: "var(--tx-fda4af, #fda4af)", bg: "rgba(225,29,72,.15)" },
+  travel:              { labels: ["Tickets", "Visas", "Quotations"], color: "var(--tx-7dd3fc, #7dd3fc)", bg: "rgba(56,189,248,.15)" },
+  equipment_rental:    { labels: ["Rentals", "Utilization", "Maintenance"], color: "var(--tx-fdba74, #fdba74)", bg: "rgba(234,88,12,.15)" },
+  franchise_brand:     { labels: ["Outlets", "Royalty", "Brand"], color: "var(--tx-c4b5fd, #c4b5fd)", bg: "rgba(124,58,237,.15)" },
 };
 
 // Notify Me modal state
@@ -252,7 +252,7 @@ export default function BusinessSetupPage() {
                   />
                 </div>
                 {notify.error && (
-                  <div style={{ fontSize: 12, color: "#f87171", marginBottom: 12 }}>{notify.error}</div>
+                  <div style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", marginBottom: 12 }}>{notify.error}</div>
                 )}
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
@@ -298,7 +298,7 @@ export default function BusinessSetupPage() {
           {allAuditedLive && (
             <div style={{ maxWidth: 760, margin: "0 auto 24px", padding: "14px 18px", borderRadius: 14, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "#34d399", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>All Business Types Live</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "var(--tx-34d399, #34d399)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>All Business Types Live</div>
                 <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)" }}>
                   All audited businesses are now available for setup and launch-prep.
                 </div>
@@ -343,7 +343,7 @@ export default function BusinessSetupPage() {
           {liveFiltered.length > 0 && (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", textTransform: "uppercase", letterSpacing: ".08em" }}>{allAuditedLive ? "Launch-Ready Business Types" : "🟢 Available Now"}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)", textTransform: "uppercase", letterSpacing: ".08em" }}>{allAuditedLive ? "Launch-Ready Business Types" : "🟢 Available Now"}</span>
                 <span style={{ fontSize: 11, color: "rgba(var(--ink),.2)" }}>{liveFiltered.length} business types</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12, marginBottom: 32 }}>
@@ -387,7 +387,7 @@ export default function BusinessSetupPage() {
           {comingSoonFiltered.length > 0 && (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, marginTop: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", textTransform: "uppercase", letterSpacing: ".08em" }}>⏳ Coming Soon</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", textTransform: "uppercase", letterSpacing: ".08em" }}>⏳ Coming Soon</span>
                 <span style={{ fontSize: 11, color: "rgba(var(--ink),.2)" }}>{comingSoonFiltered.length} more types launching soon</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12 }}>
@@ -424,7 +424,7 @@ export default function BusinessSetupPage() {
                         })}
                         style={{
                           width: "100%", padding: "7px 0", borderRadius: 8, border: "1px solid rgba(251,191,36,.25)",
-                          background: "rgba(251,191,36,.06)", color: "#fbbf24", fontSize: 11, fontWeight: 700,
+                          background: "rgba(251,191,36,.06)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 11, fontWeight: 700,
                           cursor: "pointer", fontFamily: "inherit", letterSpacing: ".02em",
                         }}
                       >

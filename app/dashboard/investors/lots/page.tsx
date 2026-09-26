@@ -456,7 +456,7 @@ export default function InvestorLotsPage() {
                     <td style={numTd}>
                       {fmtQty(r.lot.qty)}
                       {r.lot.qty > 0 && (
-                        <div style={{ fontSize: 11.5, color: r.remaining < 0 ? "#f87171" : MUTED, fontWeight: 600, marginTop: 2 }}>
+                        <div style={{ fontSize: 11.5, color: r.remaining < 0 ? "var(--tx-f87171, #f87171)" : MUTED, fontWeight: 600, marginTop: 2 }}>
                           {r.remaining > 0
                             ? fmtQty(r.remaining) + " left"
                             : r.remaining === 0
@@ -474,15 +474,15 @@ export default function InvestorLotsPage() {
                           r.lineCount === 0
                             ? MUTED
                             : r.recoveryPct > 100
-                              ? "#f87171"
+                              ? "var(--tx-f87171, #f87171)"
                               : r.recoveryPct === 100
                                 ? undefined
-                                : "#fbbf24",
+                                : "var(--tx-fbbf24, #fbbf24)",
                       }}
                     >
                       {r.lineCount > 0 ? fmtQty(r.recoveryPct) + "%" : "not yet"}
                     </td>
-                    <td style={{ ...numTd, fontWeight: 700, color: r.share > 0 ? "#2dd4bf" : undefined }}>{fmtMoney(r.share)}</td>
+                    <td style={{ ...numTd, fontWeight: 700, color: r.share > 0 ? "var(--tx-2dd4bf, #2dd4bf)" : undefined }}>{fmtMoney(r.share)}</td>
                     <td style={numTd}>{r.producedQty > 0 ? fmtMoney(r.sharePerUnit) : "-"}</td>
                     <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
                       <Btn small tone="ghost" onClick={() => startEdit(r.lot)}>

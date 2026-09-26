@@ -98,14 +98,14 @@ export default function BudgetVsActualPage() {
       {/* Summary Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Budgeted",  value: `${cur} ${fmt(summary.totalBudget)}`,  color: "#818cf8", bg: "rgba(129,140,248,.07)",  border: "rgba(129,140,248,.2)" },
-          { label: "Total Actual",    value: `${cur} ${fmt(summary.totalActual)}`,  color: "#34d399", bg: "rgba(52,211,153,.07)",   border: "rgba(52,211,153,.2)" },
+          { label: "Total Budgeted",  value: `${cur} ${fmt(summary.totalBudget)}`,  color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)",  border: "rgba(129,140,248,.2)" },
+          { label: "Total Actual",    value: `${cur} ${fmt(summary.totalActual)}`,  color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",   border: "rgba(52,211,153,.2)" },
           { label: "Variance",        value: `${summary.variance >= 0 ? "+" : ""}${cur} ${fmt(Math.abs(summary.variance))}`,
-            color: summary.variance > 0 ? "#f87171" : "#34d399",
+            color: summary.variance > 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)",
             bg:    summary.variance > 0 ? "rgba(248,113,113,.07)" : "rgba(52,211,153,.07)",
             border:summary.variance > 0 ? "rgba(248,113,113,.2)"  : "rgba(52,211,153,.2)" },
-          { label: "Over Budget",     value: String(overCount),  color: "#f87171", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
-          { label: "Under Budget",    value: String(underCount), color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
+          { label: "Over Budget",     value: String(overCount),  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)", border: "rgba(248,113,113,.2)" },
+          { label: "Under Budget",    value: String(underCount), color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
@@ -117,11 +117,11 @@ export default function BudgetVsActualPage() {
       {/* Active cost center banner */}
       {costCenterId && costCenters.length > 0 && (
         <div style={{ marginBottom: 16, padding: "9px 16px", borderRadius: 10, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12 }}>
-          <span style={{ color: "#818cf8", fontWeight: 600 }}>
+          <span style={{ color: "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>
             Filtered by cost center: {costCenters.find(c => c.id === costCenterId)?.name}
           </span>
           <button onClick={() => setCostCenterId("")}
-            style={{ fontSize: 11, color: "#818cf8", background: "none", border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600 }}>
+            style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)", background: "none", border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600 }}>
             Clear filter ✕
           </button>
         </div>

@@ -46,10 +46,10 @@ export default function DeliveryPerformancePage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "On-Time Rate",     value: `${overallOnTime.toFixed(1)}%`, color: overallOnTime >= 90 ? "#34d399" : overallOnTime >= 70 ? "#fbbf24" : "#f87171" },
-          { label: "Total Deliveries", value: fmt(totals.deliveries),          color: "#818cf8" },
-          { label: "Late",             value: fmt(totals.late),                color: "#fbbf24" },
-          { label: "Failed",           value: fmt(totals.failed),              color: "#f87171" },
+          { label: "On-Time Rate",     value: `${overallOnTime.toFixed(1)}%`, color: overallOnTime >= 90 ? "var(--tx-34d399, #34d399)" : overallOnTime >= 70 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-f87171, #f87171)" },
+          { label: "Total Deliveries", value: fmt(totals.deliveries),          color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Late",             value: fmt(totals.late),                color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Failed",           value: fmt(totals.failed),              color: "var(--tx-f87171, #f87171)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px", background: "var(--panel-bg)", border: "1px solid var(--border)" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>
@@ -78,9 +78,9 @@ export default function DeliveryPerformancePage() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>🚚 {r.driverOrRoute}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.totalDeliveries}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{r.onTimeCount}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.lateCount > 0 ? "#fbbf24" : "var(--text-muted)" }}>{r.lateCount || "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.failedCount > 0 ? "#f87171" : "var(--text-muted)" }}>{r.failedCount || "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-34d399, #34d399)" }}>{r.onTimeCount}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.lateCount > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--text-muted)" }}>{r.lateCount || "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: r.failedCount > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>{r.failedCount || "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
                       <span style={{ fontSize: 13, fontWeight: 800, color: rateColor }}>{r.onTimeRatePct.toFixed(1)}%</span>

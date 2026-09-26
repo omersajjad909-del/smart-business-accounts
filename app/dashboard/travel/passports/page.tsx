@@ -7,8 +7,8 @@ import { readBooking } from "@/lib/umrahBooking";
 import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
 
 const ff = "'Outfit','Inter',sans-serif";
-const panelBg = "rgba(255,255,255,.03)";
-const panelBorder = "rgba(255,255,255,.07)";
+const panelBg = "rgba(var(--ink),.03)";
+const panelBorder = "rgba(var(--ink),.07)";
 const inputBg = "rgba(15,23,42,.72)";
 const ACCENT = "#38bdf8";
 
@@ -22,9 +22,9 @@ function getPassportStatus(expiryDate: string): { label: string; color: string }
   const expiry = new Date(expiryDate);
   const now = new Date();
   const daysLeft = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (daysLeft < 0) return { label: "expired", color: "#f87171" };
-  if (daysLeft <= 180) return { label: "expiring_soon", color: "#fbbf24" };
-  return { label: "valid", color: "#34d399" };
+  if (daysLeft < 0) return { label: "expired", color: "var(--tx-f87171, #f87171)" };
+  if (daysLeft <= 180) return { label: "expiring_soon", color: "var(--tx-fbbf24, #fbbf24)" };
+  return { label: "valid", color: "var(--tx-34d399, #34d399)" };
 }
 
 export default function PassportDatabasePage() {
@@ -122,7 +122,7 @@ export default function PassportDatabasePage() {
   const inp: React.CSSProperties = { width: "100%", background: inputBg, border: `1px solid ${panelBorder}`, borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, boxSizing: "border-box", fontFamily: ff };
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--tx-e2e8f0, #e2e8f0)" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
@@ -136,9 +136,9 @@ export default function PassportDatabasePage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Total Passports", value: passports.length, color: ACCENT },
-          { label: "Valid", value: totalValid, color: "#34d399" },
-          { label: "Expiring Soon", value: totalExpiring, color: "#fbbf24" },
-          { label: "Expired", value: totalExpired, color: "#f87171" },
+          { label: "Valid", value: totalValid, color: "var(--tx-34d399, #34d399)" },
+          { label: "Expiring Soon", value: totalExpiring, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Expired", value: totalExpired, color: "var(--tx-f87171, #f87171)" },
         ].map(s => (
           <div key={s.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.label}</div>
@@ -188,7 +188,7 @@ export default function PassportDatabasePage() {
                     <td style={{ padding: "13px 14px" }}>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => openEdit(p)} style={{ background: "rgba(99,102,241,.15)", color: "#818cf8", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Edit</button>
-                        <button onClick={() => setDeleteId(p.id)} style={{ background: "rgba(239,68,68,.1)", color: "#f87171", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Delete</button>
+                        <button onClick={() => setDeleteId(p.id)} style={{ background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", border: "none", borderRadius: 6, padding: "5px 10px", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -212,7 +212,7 @@ export default function PassportDatabasePage() {
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--ink-solid, #fff)" }}>{editId ? "✏️ Edit Passport" : "🛂 Add Passport"}</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
-            {formError && <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[
                 { label: "Passenger Name *", key: "passengerName", span: 2 },

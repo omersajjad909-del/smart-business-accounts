@@ -48,12 +48,12 @@ const BUSINESS_TYPE_LABELS_FALLBACK: Record<string, string> = {
 };
 
 const PLAN_META: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
-  STARTER:           { color: "#818cf8", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.25)", icon: "🌱", label: "Starter" },
-  PROFESSIONAL:      { color: "#a78bfa", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
-  PRO:               { color: "#a78bfa", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
-  ENTERPRISE:        { color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
-  CUSTOM:            { color: "#fbbf24", bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.25)", icon: "⭐", label: "Custom" },
-  "ADDON-AUTOMATION":{ color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
+  STARTER:           { color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.25)", icon: "🌱", label: "Starter" },
+  PROFESSIONAL:      { color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
+  PRO:               { color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
+  ENTERPRISE:        { color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
+  CUSTOM:            { color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.25)", icon: "⭐", label: "Custom" },
+  "ADDON-AUTOMATION":{ color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
 };
 
 const CURRENCIES = [...SUPPORTED_CURRENCIES];
@@ -307,7 +307,7 @@ export default function CompanyProfilePage() {
               borderRadius: "9px",
               background: "rgba(99,102,241,0.1)",
               border: "1px solid rgba(99,102,241,0.3)",
-              color: "#818cf8",
+              color: "var(--tx-818cf8, #818cf8)",
               fontWeight: 600,
               fontSize: "13px",
               cursor: "pointer",
@@ -442,7 +442,7 @@ export default function CompanyProfilePage() {
             </div>
             <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", lineHeight: 1.6 }}>
               The uploaded photo will appear on the company card and sync to the admin&apos;s navbar &amp; sidebar preview. To change your personal photo separately, visit{" "}
-              <Link href="/dashboard/account-settings" style={{ color: "#a5b4fc", fontWeight: 700, textDecoration: "none" }}>
+              <Link href="/dashboard/account-settings" style={{ color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 700, textDecoration: "none" }}>
                 Account Settings
               </Link>.
             </div>
@@ -553,10 +553,10 @@ export default function CompanyProfilePage() {
       {/* ── QUICK STATS ROW ── */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: "12px", marginBottom: "16px" }}>
         {[
-          { label: "Team Members", value: userCount, icon: "👥", color: "#6366f1" },
-          { label: "Branches", value: branches.length, sub: `${activeBranches} active`, icon: "🏢", color: "#0891b2" },
-          { label: "Accounts", value: accountCount, icon: "📊", color: "#0d9488" },
-          { label: "Plan Limit", value: maxUsers === null ? "∞" : maxUsers, sub: "max users", icon: "🔢", color: "#d97706" },
+          { label: "Team Members", value: userCount, icon: "👥", color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Branches", value: branches.length, sub: `${activeBranches} active`, icon: "🏢", color: "var(--tx-0891b2, #0891b2)" },
+          { label: "Accounts", value: accountCount, icon: "📊", color: "var(--tx-0d9488, #0d9488)" },
+          { label: "Plan Limit", value: maxUsers === null ? "∞" : maxUsers, sub: "max users", icon: "🔢", color: "var(--tx-d97706, #d97706)" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -599,7 +599,7 @@ export default function CompanyProfilePage() {
                 {maxUsers === null ? "Unlimited users" : `Up to ${maxUsers} users`}
               </div>
               {!!company.extraSeats && company.extraSeats > 0 && (
-                <div style={{ fontSize: "11px", color: "#34d399", marginTop: "2px" }}>
+                <div style={{ fontSize: "11px", color: "var(--tx-34d399, #34d399)", marginTop: "2px" }}>
                   Includes +{company.extraSeats} extra seats add-on
                 </div>
               )}
@@ -626,7 +626,7 @@ export default function CompanyProfilePage() {
                 <span>
                   {userCount} / {maxUsers} users
                 </span>
-                <span style={{ color: userCount >= maxUsers ? "#f87171" : "var(--text-muted)" }}>
+                <span style={{ color: userCount >= maxUsers ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>
                   {userCount >= maxUsers ? "Limit reached" : `${maxUsers - userCount} slots left`}
                 </span>
               </div>
@@ -688,7 +688,7 @@ export default function CompanyProfilePage() {
           <div
             style={{
               ...sectionLabel,
-              color: statusActive ? "#34d399" : "#f87171",
+              color: statusActive ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)",
             } as React.CSSProperties}
           >
             <span>💳</span> Subscription
@@ -709,7 +709,7 @@ export default function CompanyProfilePage() {
               style={{
                 fontSize: "20px",
                 fontWeight: 800,
-                color: statusActive ? "#34d399" : "#f87171",
+                color: statusActive ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)",
               }}
             >
               {(company.subscriptionStatus || "ACTIVE").toUpperCase()}
@@ -724,12 +724,12 @@ export default function CompanyProfilePage() {
                 background: "rgba(248,113,113,0.08)",
                 border: "1px solid rgba(248,113,113,0.2)",
                 fontSize: "12px",
-                color: "#f87171",
+                color: "var(--tx-f87171, #f87171)",
                 marginBottom: "12px",
               }}
             >
               ⚠️ Subscription inactive.{" "}
-              <Link prefetch={false} href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
+              <Link prefetch={false} href="/dashboard/billing" style={{ color: "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                 Renew now →
               </Link>
             </div>
@@ -779,7 +779,7 @@ export default function CompanyProfilePage() {
           {isAdmin && (
             <Link prefetch={false}
               href="/dashboard/branches"
-              style={{ fontSize: "12px", color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
+              style={{ fontSize: "12px", color: "var(--tx-6366f1, #6366f1)", fontWeight: 600, textDecoration: "none" }}
             >
               Manage Branches →
             </Link>
@@ -801,7 +801,7 @@ export default function CompanyProfilePage() {
             {isAdmin && (
               <>
                 {" "}
-                <Link prefetch={false} href="/dashboard/branches" style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}>
+                <Link prefetch={false} href="/dashboard/branches" style={{ color: "var(--tx-6366f1, #6366f1)", fontWeight: 600, textDecoration: "none" }}>
                   Add your first branch →
                 </Link>
               </>
@@ -831,7 +831,7 @@ export default function CompanyProfilePage() {
                       padding: "2px 7px",
                       borderRadius: "4px",
                       background: "rgba(99,102,241,0.1)",
-                      color: "#818cf8",
+                      color: "var(--tx-818cf8, #818cf8)",
                       border: "1px solid rgba(99,102,241,0.2)",
                     }}
                   >
@@ -873,7 +873,7 @@ export default function CompanyProfilePage() {
           {isAdmin && (
             <Link prefetch={false}
               href="/dashboard/users"
-              style={{ fontSize: "12px", color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
+              style={{ fontSize: "12px", color: "var(--tx-6366f1, #6366f1)", fontWeight: 600, textDecoration: "none" }}
             >
               Manage Users →
             </Link>
@@ -896,7 +896,7 @@ export default function CompanyProfilePage() {
               flexShrink: 0,
             }}
           >
-            <div style={{ fontSize: "22px", fontWeight: 800, color: "#6366f1", lineHeight: 1 }}>{userCount}</div>
+            <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--tx-6366f1, #6366f1)", lineHeight: 1 }}>{userCount}</div>
             <div style={{ fontSize: "9px", color: "var(--text-muted)", fontWeight: 600, marginTop: "2px" }}>
               USERS
             </div>
@@ -917,7 +917,7 @@ export default function CompanyProfilePage() {
                   <span>
                     {userCount} of {maxUsers} seats used
                   </span>
-                  <span style={{ color: userCount >= maxUsers ? "#f87171" : "var(--text-muted)" }}>
+                  <span style={{ color: userCount >= maxUsers ? "var(--tx-f87171, #f87171)" : "var(--text-muted)" }}>
                     {userCount >= maxUsers ? "Limit reached" : `${maxUsers - userCount} available`}
                   </span>
                 </div>
@@ -936,9 +936,9 @@ export default function CompanyProfilePage() {
                   />
                 </div>
                 {userCount >= maxUsers && (
-                  <div style={{ marginTop: "10px", fontSize: "12px", color: "#f87171" }}>
+                  <div style={{ marginTop: "10px", fontSize: "12px", color: "var(--tx-f87171, #f87171)" }}>
                     User limit reached.{" "}
-                    <Link prefetch={false} href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
+                    <Link prefetch={false} href="/dashboard/billing" style={{ color: "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                       Upgrade your plan →
                     </Link>
                   </div>
@@ -971,7 +971,7 @@ export default function CompanyProfilePage() {
                     borderRadius: "20px",
                     background: "rgba(251,191,36,0.1)",
                     border: "1px solid rgba(251,191,36,0.25)",
-                    color: "#fbbf24",
+                    color: "var(--tx-fbbf24, #fbbf24)",
                     fontSize: "12px",
                     fontWeight: 600,
                   }}
@@ -991,10 +991,10 @@ export default function CompanyProfilePage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px" }}>
             {[
-              { href: "/dashboard/users", label: "Manage Users", icon: "👥", color: "#6366f1" },
-              { href: "/dashboard/branches", label: "Manage Branches", icon: "🏢", color: "#0891b2" },
-              { href: "/dashboard/billing", label: "Billing & Plan", icon: "💳", color: "#0d9488" },
-              { href: "/dashboard/team", label: "Invite Member", icon: "✉️", color: "#d97706" },
+              { href: "/dashboard/users", label: "Manage Users", icon: "👥", color: "var(--tx-6366f1, #6366f1)" },
+              { href: "/dashboard/branches", label: "Manage Branches", icon: "🏢", color: "var(--tx-0891b2, #0891b2)" },
+              { href: "/dashboard/billing", label: "Billing & Plan", icon: "💳", color: "var(--tx-0d9488, #0d9488)" },
+              { href: "/dashboard/team", label: "Invite Member", icon: "✉️", color: "var(--tx-d97706, #d97706)" },
               { href: "/dashboard/users/roles", label: "Roles & Access", icon: "🔐", color: "#7c3aed" },
               { href: "/dashboard/users/logs", label: "Activity Logs", icon: "📋", color: "#64748b" },
             ].map((link) => (

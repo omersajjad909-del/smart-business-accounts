@@ -70,9 +70,9 @@ export default function FleetPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Fleet", value: stats.total, color: "#2563eb" },
-          { label: "Available", value: stats.available, color: "#22c55e" },
-          { label: "On Trip", value: stats.on_trip, color: "#3b82f6" },
-          { label: "In Maintenance", value: stats.maintenance, color: "#f59e0b" },
+          { label: "Available", value: stats.available, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "On Trip", value: stats.on_trip, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "In Maintenance", value: stats.maintenance, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((s) => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 32, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -83,7 +83,7 @@ export default function FleetPage() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {["all", "available", "on_trip", "maintenance", "inactive"].map((s) => (
-          <button key={s} onClick={() => setFilterStatus(s)} style={{ ...btn(filterStatus === s ? "#2563eb" : "rgba(255,255,255,.07)"), padding: "8px 16px", textTransform: "capitalize" }}>{s === "all" ? "All" : statusLabel[s]}</button>
+          <button key={s} onClick={() => setFilterStatus(s)} style={{ ...btn(filterStatus === s ? "#2563eb" : "rgba(var(--ink),.07)"), padding: "8px 16px", textTransform: "capitalize" }}>{s === "all" ? "All" : statusLabel[s]}</button>
         ))}
       </div>
 
@@ -116,7 +116,7 @@ export default function FleetPage() {
                 <div>Capacity: {v.capacity || "-"}</div>
                 <div>Fuel: {v.fuelType}</div>
                 <div>Mileage: {v.mileage.toLocaleString()} km</div>
-                <div style={{ color: overdue ? "#ef4444" : dueSoon ? "#f59e0b" : transportMuted }}>Next: {v.nextService || "-"}</div>
+                <div style={{ color: overdue ? "var(--tx-ef4444, #ef4444)" : dueSoon ? "var(--tx-f59e0b, #f59e0b)" : transportMuted }}>Next: {v.nextService || "-"}</div>
                 <div>Last: {v.lastService || "-"}</div>
               </div>
             </div>
@@ -142,10 +142,10 @@ export default function FleetPage() {
                 </select>
               </div>
             </div>
-            {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
               <button onClick={addVehicle} style={{ ...btn("#2563eb"), flex: 1 }}>Add Vehicle</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(255,255,255,.07)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(var(--ink),.07)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>

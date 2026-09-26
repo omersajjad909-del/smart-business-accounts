@@ -130,7 +130,7 @@ function RejectModal({
           {po.poNo} — {po.supplierName}
         </p>
         <label style={{ display: "block", marginBottom: 8, color: "var(--text-muted)", fontSize: 13 }}>
-          Rejection Reason <span style={{ color: "#f87171" }}>*</span>
+          Rejection Reason <span style={{ color: "var(--tx-f87171, #f87171)" }}>*</span>
         </label>
         <textarea
           rows={4}
@@ -237,7 +237,7 @@ function NewPOModal({
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
           <div>
-            <label style={labelStyle}>Supplier Name <span style={{ color: "#f87171" }}>*</span></label>
+            <label style={labelStyle}>Supplier Name <span style={{ color: "var(--tx-f87171, #f87171)" }}>*</span></label>
             <input
               value={supplierName}
               onChange={(e) => setSupplierName(e.target.value)}
@@ -314,7 +314,7 @@ function NewPOModal({
                       {items.length > 1 && (
                         <button
                           onClick={() => removeItem(idx)}
-                          style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, lineHeight: 1 }}
+                          style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16, lineHeight: 1 }}
                         >
                           ×
                         </button>

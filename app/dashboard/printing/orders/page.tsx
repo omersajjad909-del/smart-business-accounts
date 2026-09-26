@@ -50,10 +50,10 @@ export default function PrintOrdersPage() {
         const active = rows.filter((row) => ["queued", "proofing", "printing"].includes(String(row.status))).length;
         const completed = rows.filter((row) => String(row.status) === "completed").length;
         return [
-          { label: "Jobs", value: rows.length, color: "#60a5fa" },
-          { label: "Active Queue", value: active, color: "#fbbf24" },
-          { label: "Completed", value: completed, color: "#34d399" },
-          { label: "Order Value", value: value.toLocaleString(), color: "#a78bfa" },
+          { label: "Jobs", value: rows.length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Active Queue", value: active, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Completed", value: completed, color: "var(--tx-34d399, #34d399)" },
+          { label: "Order Value", value: value.toLocaleString(), color: "var(--tx-a78bfa, #a78bfa)" },
         ];
       }}
     />

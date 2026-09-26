@@ -44,9 +44,9 @@ export default function RentalsItemsPage() {
       })}
       summarize={(rows) => [
         { label: "Items", value: rows.length, color: rentalsAccent },
-        { label: "Available", value: rows.filter((row) => String(row.status) === "available").length, color: "#34d399" },
-        { label: "Reserved", value: rows.filter((row) => String(row.status) === "reserved").length, color: "#fbbf24" },
-        { label: "Maintenance", value: rows.filter((row) => String(row.status) === "maintenance").length, color: "#f97316" },
+        { label: "Available", value: rows.filter((row) => String(row.status) === "available").length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Reserved", value: rows.filter((row) => String(row.status) === "reserved").length, color: "var(--tx-fbbf24, #fbbf24)" },
+        { label: "Maintenance", value: rows.filter((row) => String(row.status) === "maintenance").length, color: "var(--tx-f97316, #f97316)" },
       ]}
     />
   );

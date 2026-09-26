@@ -340,7 +340,7 @@ export default function InvestorProductionPage() {
                           placeholder="0"
                         />
                       ) : (
-                        <div style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: p.rate > 0 ? undefined : "#fbbf24", fontSize: 13 }}>
+                        <div style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: p.rate > 0 ? undefined : "var(--tx-fbbf24, #fbbf24)", fontSize: 13 }}>
                           {p.rate > 0 ? fmtMoney(p.rate) : row.gradeId ? "no rate" : "-"}
                         </div>
                       )}
@@ -369,7 +369,7 @@ export default function InvestorProductionPage() {
           </table>
         </TableWrap>
         {lotOverflow.length > 0 && (
-          <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "#fbbf24", lineHeight: 1.55 }}>
+          <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.55 }}>
             {lotOverflow.map((o) =>
               o.left > 0
                 ? o.lotNo + " has " + fmtQty(o.left) + " " + (party?.unit || "kg") + " left, this draft adds " + fmtQty(o.adding) + "."
@@ -413,7 +413,7 @@ export default function InvestorProductionPage() {
                   <td style={numTd}>{fmtQty(l.qty)}</td>
                   <td style={numTd}>{byPercentage ? fmtMoney(l.baseProfit) : fmtMoney(l.rate)}</td>
                   <td style={{ ...numTd, fontWeight: 700 }}>{fmtMoney(l.amount)}</td>
-                  <td style={{ ...tdStyle, color: l.settlementId ? MUTED : "#2dd4bf", fontWeight: 700 }}>
+                  <td style={{ ...tdStyle, color: l.settlementId ? MUTED : "var(--tx-2dd4bf, #2dd4bf)", fontWeight: 700 }}>
                     {l.settlementId ? "settled" : "open"}
                   </td>
                   <td style={{ ...tdStyle, textAlign: "right" }}>

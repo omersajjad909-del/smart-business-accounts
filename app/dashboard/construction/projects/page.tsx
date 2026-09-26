@@ -135,10 +135,10 @@ export default function ConstructionProjectsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Projects", val: projects.length, color: "#f97316" },
-          { label: "Active", val: active, color: "#f59e0b" },
-          { label: "Total Budget", val: `Rs. ${totalBudget.toLocaleString()}`, color: "#818cf8" },
-          { label: "Spent to Date", val: `Rs. ${totalSpent.toLocaleString()}`, color: "#ef4444" },
+          { label: "Total Projects", val: projects.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Active", val: active, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Total Budget", val: `Rs. ${totalBudget.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Spent to Date", val: `Rs. ${totalSpent.toLocaleString()}`, color: "var(--tx-ef4444, #ef4444)" },
         ].map((s) => (
           <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div>
@@ -166,9 +166,9 @@ export default function ConstructionProjectsPage() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 24, marginBottom: 10, flexWrap: "wrap" }}>
-              <div style={{ fontSize: 13 }}>Budget: <span style={{ color: "#818cf8", fontWeight: 600 }}>Rs. {project.budget.toLocaleString()}</span></div>
-              <div style={{ fontSize: 13 }}>Spent: <span style={{ color: "#ef4444", fontWeight: 600 }}>Rs. {project.spent.toLocaleString()}</span></div>
-              <div style={{ fontSize: 13 }}>Site: <span style={{ color: "#fdba74", fontWeight: 600 }}>{project.site || "Unassigned"}</span></div>
+              <div style={{ fontSize: 13 }}>Budget: <span style={{ color: "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>Rs. {project.budget.toLocaleString()}</span></div>
+              <div style={{ fontSize: 13 }}>Spent: <span style={{ color: "var(--tx-ef4444, #ef4444)", fontWeight: 600 }}>Rs. {project.spent.toLocaleString()}</span></div>
+              <div style={{ fontSize: 13 }}>Site: <span style={{ color: "var(--tx-fdba74, #fdba74)", fontWeight: 600 }}>{project.site || "Unassigned"}</span></div>
             </div>
             <div style={{ background: "rgba(var(--ink),.08)", borderRadius: 4, height: 6 }}>
               <div style={{ width: `${project.progress}%`, height: "100%", borderRadius: 4, background: STATUS_COLOR[project.status] }} />
@@ -210,7 +210,7 @@ export default function ConstructionProjectsPage() {
                 <input type="number" value={form.budget} onChange={(e) => setForm((f) => ({ ...f, budget: Number(e.target.value) }))} style={{ width: "100%", background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Create Project</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>

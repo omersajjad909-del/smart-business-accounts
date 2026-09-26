@@ -39,7 +39,7 @@ export default function MediaAnalyticsPage() {
   }, [campaigns, clients, plans]);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Media Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>

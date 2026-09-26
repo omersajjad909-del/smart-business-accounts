@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 export default function StockReceiptsPage() {
   const { isMobile } = useResponsive();
@@ -69,10 +69,10 @@ export default function StockReceiptsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Receipts", value: receipts.length, color: "#34d399" },
-          { label: "Total Units Received", value: totalReceived.toLocaleString(), color: "#6366f1" },
-          { label: "Total Purchase Cost", value: `Rs. ${totalCost.toLocaleString()}`, color: "#f59e0b" },
-          { label: "Unique Suppliers", value: uniqueSuppliers, color: "#a78bfa" },
+          { label: "Total Receipts", value: receipts.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Total Units Received", value: totalReceived.toLocaleString(), color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Total Purchase Cost", value: `Rs. ${totalCost.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Unique Suppliers", value: uniqueSuppliers, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 22px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{s.label}</div>
@@ -118,11 +118,11 @@ export default function StockReceiptsPage() {
                 <td style={{ padding: "12px 16px", fontWeight: 600 }}>{r.productName}</td>
                 <td style={{ padding: "12px 16px", fontSize: 11, color: "rgba(var(--ink),.4)" }}>{r.sku || "—"}</td>
                 <td style={{ padding: "12px 16px", fontSize: 13 }}>{r.supplierName}</td>
-                <td style={{ padding: "12px 16px", fontWeight: 700, color: "#34d399" }}>+{r.qtyReceived}</td>
+                <td style={{ padding: "12px 16px", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>+{r.qtyReceived}</td>
                 <td style={{ padding: "12px 16px", fontSize: 13 }}>Rs. {r.costPrice.toLocaleString()}</td>
-                <td style={{ padding: "12px 16px", fontWeight: 700, color: "#f59e0b" }}>Rs. {r.totalCost.toLocaleString()}</td>
+                <td style={{ padding: "12px 16px", fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)" }}>Rs. {r.totalCost.toLocaleString()}</td>
                 <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.55)" }}>
-                  {r.stockBefore} → <span style={{ color: "#34d399", fontWeight: 700 }}>{r.stockAfter}</span>
+                  {r.stockBefore} → <span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{r.stockAfter}</span>
                 </td>
                 <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.4)" }}>{r.notes || "—"}</td>
               </tr>

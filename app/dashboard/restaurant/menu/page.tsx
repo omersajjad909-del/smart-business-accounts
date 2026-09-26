@@ -60,10 +60,10 @@ export default function MenuPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Items", val: items.length, color: "#f87171" },
-          { label: "Available", val: items.filter((item) => item.available).length, color: "#34d399" },
-          { label: "Avg Margin", val: `${avgMargin}%`, color: "#f59e0b" },
-          { label: "Categories", val: CATEGORIES.length - 1, color: "#818cf8" },
+          { label: "Total Items", val: items.length, color: "var(--tx-f87171, #f87171)" },
+          { label: "Available", val: items.filter((item) => item.available).length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Avg Margin", val: `${avgMargin}%`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Categories", val: CATEGORIES.length - 1, color: "var(--tx-818cf8, #818cf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
@@ -93,7 +93,7 @@ export default function MenuPage() {
             <div style={{ fontSize: 12, color: restaurantMuted, marginBottom: 12 }}>{item.description || "No description"}</div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <div style={{ fontWeight: 700, color: "#34d399", fontSize: 16 }}>Rs. {item.price.toLocaleString()}</div>
+                <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)", fontSize: 16 }}>Rs. {item.price.toLocaleString()}</div>
                 <div style={{ fontSize: 11, color: restaurantMuted }}>Cost Rs. {item.cost.toLocaleString()}</div>
               </div>
               <button onClick={() => update(item.id, { status: item.available ? "inactive" : "active" })} style={{ padding: "5px 10px", background: item.available ? "rgba(34,197,94,.1)" : "rgba(239,68,68,.1)", border: `1px solid ${item.available ? "rgba(34,197,94,.3)" : "rgba(239,68,68,.3)"}`, color: item.available ? "#22c55e" : "#ef4444", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}>

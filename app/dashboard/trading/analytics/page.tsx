@@ -71,14 +71,14 @@ export default function TradingAnalyticsPage() {
   const lowStockItems = stock.filter((entry) => Number(entry.stockQty || 0) <= 5).length;
 
   const cards = [
-    { label: "Sales Realized", value: formatMoney(totalSales), color: "#38bdf8" },
-    { label: "Purchases Booked", value: formatMoney(totalPurchases), color: "#34d399" },
-    { label: "Average Sale Ticket", value: formatMoney(averageSale), color: "#f59e0b" },
-    { label: "Average Purchase Ticket", value: formatMoney(averagePurchase), color: "#a78bfa" },
-    { label: "Stock Value", value: formatMoney(stockValue), color: "#f97316" },
-    { label: "Pending PO Value", value: formatMoney(pendingPoValue), color: "#f87171" },
-    { label: "Pending Challans", value: pendingChallans, color: "#f59e0b" },
-    { label: "Low Stock Items", value: lowStockItems, color: "#ef4444" },
+    { label: "Sales Realized", value: formatMoney(totalSales), color: "var(--tx-38bdf8, #38bdf8)" },
+    { label: "Purchases Booked", value: formatMoney(totalPurchases), color: "var(--tx-34d399, #34d399)" },
+    { label: "Average Sale Ticket", value: formatMoney(averageSale), color: "var(--tx-f59e0b, #f59e0b)" },
+    { label: "Average Purchase Ticket", value: formatMoney(averagePurchase), color: "var(--tx-a78bfa, #a78bfa)" },
+    { label: "Stock Value", value: formatMoney(stockValue), color: "var(--tx-f97316, #f97316)" },
+    { label: "Pending PO Value", value: formatMoney(pendingPoValue), color: "var(--tx-f87171, #f87171)" },
+    { label: "Pending Challans", value: pendingChallans, color: "var(--tx-f59e0b, #f59e0b)" },
+    { label: "Low Stock Items", value: lowStockItems, color: "var(--tx-ef4444, #ef4444)" },
   ];
 
   return (
@@ -104,11 +104,11 @@ export default function TradingAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>Commercial KPIs</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Sales Invoices", value: salesInvoices.length, color: "#38bdf8" },
-              { label: "Purchase Invoices", value: purchaseInvoices.length, color: "#34d399" },
-              { label: "Delivery Conversion", value: `${deliveredRate.toFixed(1)}%`, color: "#f59e0b" },
-              { label: "Active Customers", value: activeCustomers, color: "#a78bfa" },
-              { label: "Tracked Stock Items", value: stock.length, color: "#f97316" },
+              { label: "Sales Invoices", value: salesInvoices.length, color: "var(--tx-38bdf8, #38bdf8)" },
+              { label: "Purchase Invoices", value: purchaseInvoices.length, color: "var(--tx-34d399, #34d399)" },
+              { label: "Delivery Conversion", value: `${deliveredRate.toFixed(1)}%`, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Active Customers", value: activeCustomers, color: "var(--tx-a78bfa, #a78bfa)" },
+              { label: "Tracked Stock Items", value: stock.length, color: "var(--tx-f97316, #f97316)" },
             ].map((metric) => (
               <div key={metric.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                 <span style={{ color: tradingMuted, fontSize: 13 }}>{metric.label}</span>
@@ -132,8 +132,8 @@ export default function TradingAnalyticsPage() {
               {stock.slice(0, 8).map((entry) => (
                 <tr key={entry.itemId}>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{entry.itemName}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: Number(entry.stockQty || 0) <= 5 ? "#f59e0b" : "#38bdf8", fontWeight: 700 }}>{entry.stockQty}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(entry.stockValue)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: Number(entry.stockQty || 0) <= 5 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>{entry.stockQty}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{formatMoney(entry.stockValue)}</td>
                 </tr>
               ))}
               {stock.length === 0 && (

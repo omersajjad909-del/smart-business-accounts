@@ -113,9 +113,9 @@ export default function AuditFindingsPage() {
 
       <div style={S.kpiGrid}>
         <div style={S.kpi}><div style={S.kpiLabel}>Total Findings</div><div style={S.kpiVal}>{kpis.total}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Open</div><div style={{ ...S.kpiVal, color: "#f87171" }}>{kpis.open}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>High Severity</div><div style={{ ...S.kpiVal, color: "#ef4444" }}>{kpis.high}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Cleared</div><div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.cleared}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Open</div><div style={{ ...S.kpiVal, color: "var(--tx-f87171, #f87171)" }}>{kpis.open}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>High Severity</div><div style={{ ...S.kpiVal, color: "var(--tx-ef4444, #ef4444)" }}>{kpis.high}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Cleared</div><div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.cleared}</div></div>
       </div>
 
       <div style={S.panel}>

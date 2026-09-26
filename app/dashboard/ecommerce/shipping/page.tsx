@@ -147,10 +147,10 @@ export default function ShippingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Open Dispatch", value: processingCount, color: "#60a5fa" },
-          { label: "In Transit", value: inTransitCount, color: "#f59e0b" },
-          { label: "Delivered", value: deliveredCount, color: "#34d399" },
-          { label: "Success Rate", value: `${deliveryRate}%`, color: "#a78bfa" },
+          { label: "Open Dispatch", value: processingCount, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "In Transit", value: inTransitCount, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Delivered", value: deliveredCount, color: "var(--tx-34d399, #34d399)" },
+          { label: "Success Rate", value: `${deliveryRate}%`, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -182,7 +182,7 @@ export default function ShippingPage() {
       </div>
 
       {error && (
-        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "#fca5a5", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
+        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -213,7 +213,7 @@ export default function ShippingPage() {
                     <div style={{ fontSize: 11, color: ecommerceMuted }}>{shipment.weight} kg</div>
                   </td>
                   <td style={tdStyle}>{shipment.city}</td>
-                  <td style={{ ...tdStyle, color: "#34d399", fontWeight: 800 }}>Rs. {shipment.charges.toLocaleString()}</td>
+                  <td style={{ ...tdStyle, color: "var(--tx-34d399, #34d399)", fontWeight: 800 }}>Rs. {shipment.charges.toLocaleString()}</td>
                   <td style={tdStyle}>{shipment.expected}</td>
                   <td style={tdStyle}>
                     <span style={{ display: "inline-block", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, color: ecommerceStatusColor(shipment.status), background: `${ecommerceStatusColor(shipment.status)}20` }}>
@@ -228,7 +228,7 @@ export default function ShippingPage() {
                         </button>
                       )}
                       {!["delivered", "failed"].includes(shipment.status) && (
-                        <button onClick={() => moveShipment(shipment.id, "failed")} style={{ ...actionButton, color: "#f87171", borderColor: "rgba(248,113,113,.35)" }}>
+                        <button onClick={() => moveShipment(shipment.id, "failed")} style={{ ...actionButton, color: "var(--tx-f87171, #f87171)", borderColor: "rgba(248,113,113,.35)" }}>
                           failed
                         </button>
                       )}

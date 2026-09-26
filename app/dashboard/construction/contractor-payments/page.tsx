@@ -95,7 +95,7 @@ export default function ConstructionContractorPaymentsPage() {
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.project}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.site}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.reference || "—"}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399" }}>Rs. {row.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)" }}>Rs. {row.amount.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.date}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
@@ -136,10 +136,10 @@ export default function ConstructionContractorPaymentsPage() {
                 <input value={form.reference} onChange={(e) => setForm((prev) => ({ ...prev, reference: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
               </div>
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: "none", background: "#f97316", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: isMobile ? "8px 9px" : "11px 18px", borderRadius: 8, border: `1px solid ${constructionBorder}`, background: "transparent", color: "#cbd5e1", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: isMobile ? "8px 9px" : "11px 18px", borderRadius: 8, border: `1px solid ${constructionBorder}`, background: "transparent", color: "var(--tx-cbd5e1, #cbd5e1)", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

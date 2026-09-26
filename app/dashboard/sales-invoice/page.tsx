@@ -1085,10 +1085,10 @@ function SalesInvoiceContent() {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 24, gap: 10, flexWrap: "wrap" }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: siQueryMode ? "#facc15" : undefined }}>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: siQueryMode ? "var(--tx-facc15, #facc15)" : undefined }}>
               {siQueryMode ? "🔍 QUERY MODE — Sales Invoice" : "Sales Invoice"}
             </h1>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: siQueryMode ? "rgba(250,204,21,.5)" : "var(--text-muted)" }}>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: siQueryMode ? "rgba(var(--txr-facc15, 250,204,21),.5)" : "var(--text-muted)" }}>
               {siQueryMode ? "Enter search criteria then press F8 to execute" : "Create and manage sales invoices"}
             </p>
           </div>
@@ -1098,7 +1098,7 @@ function SalesInvoiceContent() {
                 <button onClick={() => siNavTo(siQueryIdx - 1)} disabled={siQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: siQueryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: siQueryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
                 <span style={{ fontSize: 12, color: accent, fontWeight: 700, minWidth: 100, textAlign: "center" }}>{siQueryResults[siQueryIdx]?.invoiceNo} · {siQueryIdx+1}/{siQueryResults.length}</span>
                 <button onClick={() => siNavTo(siQueryIdx + 1)} disabled={siQueryIdx === siQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: siQueryIdx===siQueryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: siQueryIdx===siQueryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
-                <button onClick={siExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕</button>
+                <button onClick={siExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕</button>
               </div>
             )}
             {/* Which face the preview is showing. Only a view — the invoice
@@ -1106,7 +1106,7 @@ function SalesInvoiceContent() {
             {preview && previewMode === "DELIVERY" && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(59,130,246,.08)", border: "1px solid rgba(59,130,246,.3)", borderRadius: 8, padding: "6px 12px", fontSize: 12 }}>
                 <span style={{ color: "var(--text-muted)" }}>Showing delivery challan — no rates</span>
-                <button onClick={() => setPreviewMode("INVOICE")} style={{ background: "none", border: "none", color: "#3b82f6", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer", padding: 0 }}>
+                <button onClick={() => setPreviewMode("INVOICE")} style={{ background: "none", border: "none", color: "var(--tx-3b82f6, #3b82f6)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer", padding: 0 }}>
                   Show invoice
                 </button>
               </div>
@@ -1165,23 +1165,23 @@ function SalesInvoiceContent() {
         {siQueryMode && (
           <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
             <div style={{ marginBottom: 18 }}>
-              <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+              <span style={{ fontSize: 12, color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&lt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;=</b> for date range.</span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
               <div>
-                <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Invoice # (e.g. INV-5)</label>
+                <label style={{ ...labelStyle, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Invoice # (e.g. INV-5)</label>
                 <input autoFocus value={siQueryInvNo} onChange={e => setSiQueryInvNo(e.target.value)} placeholder="INV-1 or blank…"
                   style={{ ...inputStyle, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                   onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty); } if (e.key === "Escape") siExitQuery(); }} />
               </div>
               <div>
-                <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+                <label style={{ ...labelStyle, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
                 <input value={siQueryDate} onChange={e => setSiQueryDate(e.target.value)} placeholder=">010125 or blank…"
                   style={{ ...inputStyle, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                   onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty); } if (e.key === "Escape") siExitQuery(); }} />
               </div>
               <div>
-                <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Customer (name)</label>
+                <label style={{ ...labelStyle, color: "rgba(var(--txr-facc15, 250,204,21),.6)" }}>Customer (name)</label>
                 <input value={siQueryParty} onChange={e => setSiQueryParty(e.target.value)} placeholder="e.g. Ali, or blank…"
                   style={{ ...inputStyle, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                   onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty); } if (e.key === "Escape") siExitQuery(); }} />
@@ -1193,7 +1193,7 @@ function SalesInvoiceContent() {
                 <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>Execute Query
               </button>
               <button onClick={siExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "transparent", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
-              <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before)</span>
+              <span style={{ fontSize: 11, color: "rgba(var(--txr-facc15, 250,204,21),.4)", marginLeft: 8 }}>Operators: <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&lt;010425</b> (before)</span>
             </div>
           </div>
         )}
@@ -1215,7 +1215,7 @@ function SalesInvoiceContent() {
                   <tr><td colSpan={5} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>No invoices found</td></tr>
                 ) : invoices.map((inv, idx) => (
                   <tr key={inv.id} style={{ borderBottom: idx < invoices.length - 1 ? "1px solid var(--border)" : "none" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(var(--ink),0.03)"}
                     onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = "transparent"}>
                     <td style={{ padding: "12px 16px", fontWeight: 700, color: accent, fontSize: 14 }}>{inv.invoiceNo}</td>
                     <td style={{ padding: "12px 16px", fontSize: 14, color: "var(--text-muted)" }}>{fmtDate(inv.date)}</td>
@@ -1224,7 +1224,7 @@ function SalesInvoiceContent() {
                     <td style={{ padding: "12px 16px" }}>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                         <button style={{ ...btnGhost, padding: "5px 12px", fontSize: 12 }} onClick={() => startEdit(inv)}>Edit</button>
-                        <button style={{ ...btnGhost, padding: "5px 12px", fontSize: 12, color: "#f87171", borderColor: "#f8717144" }} onClick={() => deleteInvoice(inv.id)}>Delete</button>
+                        <button style={{ ...btnGhost, padding: "5px 12px", fontSize: 12, color: "var(--tx-f87171, #f87171)", borderColor: "#f8717144" }} onClick={() => deleteInvoice(inv.id)}>Delete</button>
                       </div>
                     </td>
                   </tr>

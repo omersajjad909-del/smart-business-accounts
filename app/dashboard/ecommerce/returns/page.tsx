@@ -128,10 +128,10 @@ export default function ReturnsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Total Cases", value: returns.length, color: "#818cf8" },
-          { label: "Pending Approval", value: pendingCount, color: "#f59e0b" },
-          { label: "Approved", value: approvedCount, color: "#60a5fa" },
-          { label: "Refunded Value", value: `Rs. ${refundedTotal.toLocaleString()}`, color: "#14b8a6" },
+          { label: "Total Cases", value: returns.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Pending Approval", value: pendingCount, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Approved", value: approvedCount, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Refunded Value", value: `Rs. ${refundedTotal.toLocaleString()}`, color: "var(--tx-14b8a6, #14b8a6)" },
         ].map((card) => (
           <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -163,7 +163,7 @@ export default function ReturnsPage() {
       </div>
 
       {error && (
-        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "#fca5a5", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
+        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -194,7 +194,7 @@ export default function ReturnsPage() {
                     <div style={{ fontSize: 11, color: ecommerceMuted }}>Qty: {record.qty}</div>
                   </td>
                   <td style={tdStyle}>{record.reason}</td>
-                  <td style={{ ...tdStyle, color: "#fbbf24", fontWeight: 800 }}>Rs. {record.amount.toLocaleString()}</td>
+                  <td style={{ ...tdStyle, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800 }}>Rs. {record.amount.toLocaleString()}</td>
                   <td style={tdStyle}>
                     <span style={{ display: "inline-block", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, color: ecommerceStatusColor(record.status), background: `${ecommerceStatusColor(record.status)}20` }}>
                       {record.status}
@@ -204,12 +204,12 @@ export default function ReturnsPage() {
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       {record.status === "pending" && (
                         <>
-                          <button onClick={() => moveReturn(record.id, "approved")} style={{ ...actionButton, color: "#38bdf8", borderColor: "rgba(56,189,248,.35)" }}>approve</button>
-                          <button onClick={() => moveReturn(record.id, "rejected")} style={{ ...actionButton, color: "#f87171", borderColor: "rgba(248,113,113,.35)" }}>reject</button>
+                          <button onClick={() => moveReturn(record.id, "approved")} style={{ ...actionButton, color: "var(--tx-38bdf8, #38bdf8)", borderColor: "rgba(56,189,248,.35)" }}>approve</button>
+                          <button onClick={() => moveReturn(record.id, "rejected")} style={{ ...actionButton, color: "var(--tx-f87171, #f87171)", borderColor: "rgba(248,113,113,.35)" }}>reject</button>
                         </>
                       )}
                       {record.status === "approved" && (
-                        <button onClick={() => moveReturn(record.id, "refunded")} style={{ ...actionButton, color: "#14b8a6", borderColor: "rgba(20,184,166,.35)" }}>mark refunded</button>
+                        <button onClick={() => moveReturn(record.id, "refunded")} style={{ ...actionButton, color: "var(--tx-14b8a6, #14b8a6)", borderColor: "rgba(20,184,166,.35)" }}>mark refunded</button>
                       )}
                     </div>
                   </td>

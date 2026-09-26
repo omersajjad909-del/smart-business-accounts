@@ -144,7 +144,7 @@ export default function InvestorOverviewPage() {
                           fontWeight: 700,
                           letterSpacing: ".06em",
                           textTransform: "uppercase",
-                          color: "#fbbf24",
+                          color: "var(--tx-fbbf24, #fbbf24)",
                           border: "1px solid #fbbf2455",
                           borderRadius: 5,
                           padding: "2px 6px",

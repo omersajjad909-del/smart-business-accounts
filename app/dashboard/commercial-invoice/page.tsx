@@ -15,12 +15,12 @@ function newLine(): LineItem { return { hsCode: "", description: "", qty: 1, uni
 function lineTotal(l: LineItem) { return l.qty * l.unitPrice; }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  DRAFT:     { bg: "rgba(148,163,184,0.12)", color: "#94a3b8" },
-  ISSUED:    { bg: "rgba(14,165,233,0.12)",  color: "#38bdf8" },
-  SENT:      { bg: "rgba(251,191,36,0.12)",  color: "#fbbf24" },
-  ACCEPTED:  { bg: "rgba(16,185,129,0.12)",  color: "#34d399" },
-  PAID:      { bg: "rgba(99,102,241,0.12)",  color: "#a5b4fc" },
-  CANCELLED: { bg: "rgba(239,68,68,0.12)",   color: "#f87171" },
+  DRAFT:     { bg: "rgba(148,163,184,0.12)", color: "var(--tx-94a3b8, #94a3b8)" },
+  ISSUED:    { bg: "rgba(14,165,233,0.12)",  color: "var(--tx-38bdf8, #38bdf8)" },
+  SENT:      { bg: "rgba(251,191,36,0.12)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  ACCEPTED:  { bg: "rgba(16,185,129,0.12)",  color: "var(--tx-34d399, #34d399)" },
+  PAID:      { bg: "rgba(99,102,241,0.12)",  color: "var(--tx-a5b4fc, #a5b4fc)" },
+  CANCELLED: { bg: "rgba(239,68,68,0.12)",   color: "var(--tx-f87171, #f87171)" },
 };
 
 export default function CommercialInvoicePage() {
@@ -180,9 +180,9 @@ export default function CommercialInvoicePage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
         {[
           { label: "Total Invoices", value: kpis.total,    color: ACCENT },
-          { label: "Issued / Sent",  value: kpis.issued,   color: "#38bdf8" },
-          { label: "Paid",           value: kpis.paid,     color: "#34d399" },
-          { label: "Total Value",    value: `$${(kpis.totalVal/1000).toFixed(1)}k`, color: "#a5b4fc" },
+          { label: "Issued / Sent",  value: kpis.issued,   color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Paid",           value: kpis.paid,     color: "var(--tx-34d399, #34d399)" },
+          { label: "Total Value",    value: `$${(kpis.totalVal/1000).toFixed(1)}k`, color: "var(--tx-a5b4fc, #a5b4fc)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
@@ -220,14 +220,14 @@ export default function CommercialInvoicePage() {
               {filtered.map((r, i) => {
                 const ss = STATUS_STYLE[r.status] || STATUS_STYLE.DRAFT;
                 return (
-                  <tr key={r.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
-                    <td style={{ ...td, fontWeight: 700, color: "#a5b4fc" }}>{r.title}</td>
+                  <tr key={r.id} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
+                    <td style={{ ...td, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{r.title}</td>
                     <td style={td}>{r.d.importer || "—"}</td>
                     <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>
                       {r.d.portOfLoading || "—"} → {r.d.portOfDischarge || "—"}
                     </td>
                     <td style={td}>
-                      <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>
+                      <span style={{ background: "rgba(99,102,241,0.12)", color: "var(--tx-818cf8, #818cf8)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>
                         {r.d.incoterm || "—"}
                       </span>
                     </td>
@@ -244,8 +244,8 @@ export default function CommercialInvoicePage() {
                     <td style={td}>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => openEdit(r)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--text-muted)", cursor: "pointer" }}>Edit</button>
-                        <button onClick={() => printRecord(r)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "#38bdf8", cursor: "pointer" }}>Print</button>
-                        <button onClick={() => remove(r.id)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 15, padding: "0 4px" }}>×</button>
+                        <button onClick={() => printRecord(r)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: 12, color: "var(--tx-38bdf8, #38bdf8)", cursor: "pointer" }}>Print</button>
+                        <button onClick={() => remove(r.id)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 15, padding: "0 4px" }}>×</button>
                       </div>
                     </td>
                   </tr>
@@ -287,13 +287,13 @@ export default function CommercialInvoicePage() {
             {/* Section: Parties */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
               <div style={{ background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 12, padding: "16px" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 12 }}>Exporter (Seller)</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 12 }}>Exporter (Seller)</div>
                 <div style={{ marginBottom: 10 }}><label style={lbl}>Company Name</label><input value={form.exporter} onChange={e => sf("exporter", e.target.value)} style={inp()} placeholder="Your company name" /></div>
                 <div style={{ marginBottom: 10 }}><label style={lbl}>Address</label><textarea value={form.exporterAddress} onChange={e => sf("exporterAddress", e.target.value)} rows={2} style={{ ...inp(), resize: "none" }} /></div>
                 <div><label style={lbl}>Country</label><input value={form.exporterCountry} onChange={e => sf("exporterCountry", e.target.value)} style={inp()} /></div>
               </div>
               <div style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: 12, padding: "16px" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#34d399", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 12 }}>Importer (Buyer)</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 12 }}>Importer (Buyer)</div>
                 <div style={{ marginBottom: 10 }}><label style={lbl}>Company Name</label><input value={form.importer} onChange={e => sf("importer", e.target.value)} style={inp()} placeholder="Buyer company name" /></div>
                 <div style={{ marginBottom: 10 }}><label style={lbl}>Address</label><textarea value={form.importerAddress} onChange={e => sf("importerAddress", e.target.value)} rows={2} style={{ ...inp(), resize: "none" }} /></div>
                 <div><label style={lbl}>Country</label><input value={form.importerCountry} onChange={e => sf("importerCountry", e.target.value)} style={inp()} /></div>
@@ -342,11 +342,11 @@ export default function CommercialInvoicePage() {
                       <td style={{ padding: "6px 8px", width: 80 }}><input type="number" value={l.qty} onChange={e => sl(i, "qty", Number(e.target.value))} min={0} style={{ ...inp(), textAlign: "right" }} /></td>
                       <td style={{ padding: "6px 8px", width: 80 }}><input value={l.unit} onChange={e => sl(i, "unit", e.target.value)} placeholder="pcs" style={inp()} /></td>
                       <td style={{ padding: "6px 8px", width: 110 }}><input type="number" value={l.unitPrice} onChange={e => sl(i, "unitPrice", Number(e.target.value))} min={0} step={0.01} style={{ ...inp(), textAlign: "right" }} /></td>
-                      <td style={{ padding: "6px 12px", width: 100, fontSize: 13, fontWeight: 700, color: "#a5b4fc", textAlign: "right" }}>
+                      <td style={{ padding: "6px 12px", width: 100, fontSize: 13, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", textAlign: "right" }}>
                         {lineTotal(l).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                       </td>
                       <td style={{ padding: "6px 8px", width: 32 }}>
-                        {lines.length > 1 && <button onClick={() => setLines(ls => ls.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16 }}>×</button>}
+                        {lines.length > 1 && <button onClick={() => setLines(ls => ls.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16 }}>×</button>}
                       </td>
                     </tr>
                   ))}
@@ -380,7 +380,7 @@ export default function CommercialInvoicePage() {
                     <span>{fmt(row.value)}</span>
                   </div>
                 ))}
-                <div style={{ borderTop: "1px solid rgba(99,102,241,0.2)", paddingTop: 10, display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 16, color: "#a5b4fc" }}>
+                <div style={{ borderTop: "1px solid rgba(99,102,241,0.2)", paddingTop: 10, display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                   <span>Grand Total ({form.incoterm})</span>
                   <span>{fmt(grandTotal)}</span>
                 </div>

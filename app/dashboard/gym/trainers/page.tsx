@@ -25,7 +25,7 @@ const S = {
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 8 },
   stars: (r: number) => Array.from({ length: 5 }, (_, i) => i < r ? '⭐' : '☆').join(''),
-  certBadge: { background: 'rgba(56,189,248,.12)', color: '#38bdf8', borderRadius: 6, padding: '2px 8px', fontSize: 11, marginRight: 4, marginBottom: 4, display: 'inline-block' },
+  certBadge: { background: 'rgba(56,189,248,.12)', color: 'var(--tx-38bdf8, #38bdf8)', borderRadius: 6, padding: '2px 8px', fontSize: 11, marginRight: 4, marginBottom: 4, display: 'inline-block' },
   actRow: { display: 'flex', gap: 8, marginTop: 16 },
   actBtn: { flex: 1, background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', color: 'var(--ink-solid, #fff)', borderRadius: 8, padding: '8px', fontSize: 13, cursor: 'pointer' },
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
@@ -98,9 +98,9 @@ export default function TrainersPage() {
 
       <div style={S.stats}>
         <div style={S.stat}><div style={S.statLabel}>Total Trainers</div><div style={S.statVal}>{trainers.length}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Active Today</div><div style={{ ...S.statVal, color: '#34d399' }}>{active}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Total Clients</div><div style={{ ...S.statVal, color: '#38bdf8' }}>{totalClients}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Avg Rating</div><div style={{ ...S.statVal, color: '#fbbf24' }}>⭐ {avgRating}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Active Today</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{active}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Total Clients</div><div style={{ ...S.statVal, color: 'var(--tx-38bdf8, #38bdf8)' }}>{totalClients}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Avg Rating</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)' }}>⭐ {avgRating}</div></div>
       </div>
 
       {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
@@ -122,7 +122,7 @@ export default function TrainersPage() {
             </div>
             <div style={{ fontSize: 18, marginBottom: 12, letterSpacing: 2 }}>{S.stars(t.rating)}</div>
             <div style={S.infoRow}><span>👥 Active Clients</span><span style={{ color: 'var(--ink-solid, #fff)', fontWeight: 600 }}>{t.activeClients}</span></div>
-            <div style={S.infoRow}><span>💰 Monthly Salary</span><span style={{ color: '#34d399', fontWeight: 600 }}>Rs. {t.salary.toLocaleString()}</span></div>
+            <div style={S.infoRow}><span>💰 Monthly Salary</span><span style={{ color: 'var(--tx-34d399, #34d399)', fontWeight: 600 }}>Rs. {t.salary.toLocaleString()}</span></div>
             <div style={S.infoRow}><span>🪪 {t.trainerId}</span></div>
             <div style={S.actRow}>
               <button style={S.actBtn}>View Schedule</button>

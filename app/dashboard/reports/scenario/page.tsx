@@ -74,14 +74,14 @@ export default function ScenarioPage() {
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 18 }}>🎛️ Adjust Your Scenario</div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 24 }}>
               {[
-                { label: "Revenue Change", val: revenueChg, set: setRevenueChg, color: "#818cf8" },
-                { label: "COGS Change",    val: cogsChg,    set: setCogsChg,    color: "#f87171" },
-                { label: "Expense Change", val: expenseChg, set: setExpenseChg, color: "#fbbf24" },
+                { label: "Revenue Change", val: revenueChg, set: setRevenueChg, color: "var(--tx-818cf8, #818cf8)" },
+                { label: "COGS Change",    val: cogsChg,    set: setCogsChg,    color: "var(--tx-f87171, #f87171)" },
+                { label: "Expense Change", val: expenseChg, set: setExpenseChg, color: "var(--tx-fbbf24, #fbbf24)" },
               ].map(({ label, val, set, color }) => (
                 <div key={label}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                     <span style={lblStyle}>{label}</span>
-                    <span style={{ fontSize: 14, fontWeight: 900, color: val === 0 ? "var(--text-muted)" : val > 0 ? color : "#34d399" }}>{val > 0 ? "+" : ""}{val}%</span>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: val === 0 ? "var(--text-muted)" : val > 0 ? color : "var(--tx-34d399, #34d399)" }}>{val > 0 ? "+" : ""}{val}%</span>
                   </div>
                   <input type="range" min={-50} max={50} step={1} value={val} onChange={e => set(Number(e.target.value))} style={{ ...sliderStyle, accentColor: color }} />
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
@@ -127,12 +127,12 @@ export default function ScenarioPage() {
                     <tr key={i} style={{ borderBottom: i < scenarios.length - 1 ? "1px solid var(--border)" : "none", background: isCustom ? "rgba(99,102,241,.04)" : "transparent" }}
                       onMouseEnter={e => (e.currentTarget.style.background = isCustom ? "rgba(99,102,241,.08)" : "var(--app-bg)")}
                       onMouseLeave={e => (e.currentTarget.style.background = isCustom ? "rgba(99,102,241,.04)" : "transparent")}>
-                      <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: isCustom ? 800 : 600, color: isCustom ? "#6366f1" : "var(--text-primary)" }}>
+                      <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: isCustom ? 800 : 600, color: isCustom ? "var(--tx-6366f1, #6366f1)" : "var(--text-primary)" }}>
                         {isBase ? "📊 " : isCustom ? "🎛️ " : i === 2 ? "📈 " : "📉 "}{s.label}
                       </td>
                       <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(s.revenue)}</td>
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#f87171" }}>{cur} {fmt(s.cogs)}</td>
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#fbbf24" }}>{cur} {fmt(s.expenses)}</td>
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(s.cogs)}</td>
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)" }}>{cur} {fmt(s.expenses)}</td>
                       <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 800, color: profitColor }}>{s.netProfit >= 0 ? "" : "-"}{cur} {fmt(Math.abs(s.netProfit))}</td>
                       <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 14, fontWeight: 900, color: profitColor }}>{s.marginPct.toFixed(1)}%</td>
                     </tr>

@@ -13,9 +13,9 @@ interface Row { customerName: string; revenue: number; cogs: number; grossProfit
 // "Low Value" (three bands, with spaces). The map used to hold four made-up
 // keys — star/good/average/low — none of which the API has ever sent.
 const SEG: Record<string, Badge> = {
-  high_value: { label: "Star Customer ⭐", color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  mid_value:  { label: "Mid Value",        color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  low_value:  { label: "Low Value",        color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
+  high_value: { label: "Star Customer ⭐", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
+  mid_value:  { label: "Mid Value",        color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" },
+  low_value:  { label: "Low Value",        color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" },
 };
 
 export default function CustomerProfitabilityPage() {
@@ -63,8 +63,8 @@ export default function CustomerProfitabilityPage() {
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)", fontWeight: 700 }}>{i + 1}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.customerName}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.revenue)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#f87171" }}>{cur} {fmt(r.cogs)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#34d399" }}>{cur} {fmt(r.grossProfit)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.cogs)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{cur} {fmt(r.grossProfit)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 14, fontWeight: 900, color: s.color }}>{r.marginPct.toFixed(1)}%</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.invoiceCount}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.avgOrderValue)}</td>

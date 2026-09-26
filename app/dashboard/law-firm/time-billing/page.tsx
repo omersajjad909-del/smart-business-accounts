@@ -111,9 +111,9 @@ export default function TimeBillingPage() {
 
       <div style={S.stats}>
         <div style={S.stat}><div style={S.statLabel}>Total Hours (Month)</div><div style={S.statVal}>{totalHours}h</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Billable Hours</div><div style={{ ...S.statVal, color: '#34d399' }}>{billableHours}h</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Billed Hours</div><div style={{ ...S.statVal, color: '#818cf8' }}>{billedHours}h</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Unbilled Amount</div><div style={{ ...S.statVal, color: '#fbbf24', fontSize: 22 }}>Rs. {unbilledAmount.toLocaleString()}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Billable Hours</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{billableHours}h</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Billed Hours</div><div style={{ ...S.statVal, color: 'var(--tx-818cf8, #818cf8)' }}>{billedHours}h</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Unbilled Amount</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)', fontSize: 22 }}>Rs. {unbilledAmount.toLocaleString()}</div></div>
       </div>
 
       <div style={S.filters}>
@@ -148,7 +148,7 @@ export default function TimeBillingPage() {
                 <td style={S.td}>{e.billable ? `Rs. ${e.amount.toLocaleString()}` : '—'}</td>
                 <td style={S.td}><span style={S.badge(e.billable ? '#34d399' : '#6b7280')}>{e.billable ? 'Yes' : 'No'}</span></td>
                 <td style={S.td}><span style={S.badge(e.billed ? '#818cf8' : e.billable ? '#fbbf24' : '#6b7280')}>{e.billed ? 'Billed' : e.billable ? 'Pending' : '—'}</span></td>
-                <td style={S.td}>{e.billable && !e.billed && <button style={{ ...S.actBtn, color: '#818cf8' }} onClick={() => markBilled(e.id)}>Mark Billed</button>}</td>
+                <td style={S.td}>{e.billable && !e.billed && <button style={{ ...S.actBtn, color: 'var(--tx-818cf8, #818cf8)' }} onClick={() => markBilled(e.id)}>Mark Billed</button>}</td>
               </tr>
             ))}
           </tbody>

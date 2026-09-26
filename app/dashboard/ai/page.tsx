@@ -460,9 +460,9 @@ function healthScore(ctx: FinCtx): number {
   return Math.max(20, Math.min(100, Math.round(score)));
 }
 function riskLevel(score: number): { label: string; color: string } {
-  if (score >= 75) return { label: "Low", color: "#10b981" };
-  if (score >= 55) return { label: "Medium", color: "#f59e0b" };
-  return { label: "High", color: "#ef4444" };
+  if (score >= 75) return { label: "Low", color: "var(--tx-10b981, #10b981)" };
+  if (score >= 55) return { label: "Medium", color: "var(--tx-f59e0b, #f59e0b)" };
+  return { label: "High", color: "var(--tx-ef4444, #ef4444)" };
 }
 function categoryHealthScores(ctx: FinCtx) {
   const revenue = Math.max(20, Math.min(100, Math.round(
@@ -507,21 +507,21 @@ function categoryHealthScores(ctx: FinCtx) {
     + (expRatio < 0.5 ? 20 : expRatio < 0.7 ? 10 : expRatio < 0.9 ? 0 : expRatio < 1 ? -10 : -20)
   )));
   return [
-    { label: "Revenue", score: revenue, icon: "📈", color: revenue >= 75 ? "#10b981" : revenue >= 55 ? "#f59e0b" : "#ef4444" },
-    { label: "Profitability", score: profitability, icon: "💼", color: profitability >= 75 ? "#10b981" : profitability >= 55 ? "#f59e0b" : "#ef4444" },
-    { label: "Cash Flow", score: cashflow, icon: "💧", color: cashflow >= 75 ? "#10b981" : cashflow >= 55 ? "#f59e0b" : "#ef4444" },
-    { label: "Customers", score: customers, icon: "👥", color: customers >= 75 ? "#10b981" : customers >= 55 ? "#f59e0b" : "#ef4444" },
-    { label: "Inventory", score: inventory, icon: "📦", color: inventory >= 75 ? "#10b981" : inventory >= 55 ? "#f59e0b" : "#ef4444" },
-    { label: "Collections", score: collections, icon: "🧾", color: collections >= 75 ? "#10b981" : collections >= 55 ? "#f59e0b" : "#ef4444" },
-    { label: "Efficiency", score: efficiency, icon: "⚙️", color: efficiency >= 75 ? "#10b981" : efficiency >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Revenue", score: revenue, icon: "📈", color: revenue >= 75 ? "var(--tx-10b981, #10b981)" : revenue >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
+    { label: "Profitability", score: profitability, icon: "💼", color: profitability >= 75 ? "var(--tx-10b981, #10b981)" : profitability >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
+    { label: "Cash Flow", score: cashflow, icon: "💧", color: cashflow >= 75 ? "var(--tx-10b981, #10b981)" : cashflow >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
+    { label: "Customers", score: customers, icon: "👥", color: customers >= 75 ? "var(--tx-10b981, #10b981)" : customers >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
+    { label: "Inventory", score: inventory, icon: "📦", color: inventory >= 75 ? "var(--tx-10b981, #10b981)" : inventory >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
+    { label: "Collections", score: collections, icon: "🧾", color: collections >= 75 ? "var(--tx-10b981, #10b981)" : collections >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
+    { label: "Efficiency", score: efficiency, icon: "⚙️", color: efficiency >= 75 ? "var(--tx-10b981, #10b981)" : efficiency >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
   ];
 }
 
 function severityTone(severity: InsightCard["severity"] | AnomalyAlert["severity"]) {
-  if (severity === "critical") return { color: "#ef4444", bg: "rgba(239,68,68,.1)", border: "rgba(239,68,68,.25)" };
-  if (severity === "warning") return { color: "#f59e0b", bg: "rgba(245,158,11,.1)", border: "rgba(245,158,11,.25)" };
-  if (severity === "positive") return { color: "#10b981", bg: "rgba(16,185,129,.1)", border: "rgba(16,185,129,.25)" };
-  return { color: "#6366f1", bg: "rgba(99,102,241,.1)", border: "rgba(99,102,241,.25)" };
+  if (severity === "critical") return { color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.1)", border: "rgba(239,68,68,.25)" };
+  if (severity === "warning") return { color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.1)", border: "rgba(245,158,11,.25)" };
+  if (severity === "positive") return { color: "var(--tx-10b981, #10b981)", bg: "rgba(16,185,129,.1)", border: "rgba(16,185,129,.25)" };
+  return { color: "var(--tx-6366f1, #6366f1)", bg: "rgba(99,102,241,.1)", border: "rgba(99,102,241,.25)" };
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -537,7 +537,7 @@ function Spinner({ size = 20 }: { size?: number }) {
 function Panel({ children, style, id, className }: { children: React.ReactNode; style?: React.CSSProperties; id?: string; className?: string }) {
   return (
     <div id={id} className={className} style={{
-      background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
+      background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)",
       borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", ...style,
     }}>
       {children}
@@ -547,9 +547,9 @@ function Panel({ children, style, id, className }: { children: React.ReactNode; 
 
 function SeverityBadge({ severity }: { severity: AnomalyAlert["severity"] }) {
   const cfg = {
-    critical: { bg: "rgba(239,68,68,.15)", border: "rgba(239,68,68,.3)", color: "#fca5a5", label: "Critical" },
-    warning: { bg: "rgba(245,158,11,.12)", border: "rgba(245,158,11,.3)", color: "#fcd34d", label: "Warning" },
-    info: { bg: "rgba(99,102,241,.12)", border: "rgba(99,102,241,.3)", color: "#a5b4fc", label: "Info" },
+    critical: { bg: "rgba(239,68,68,.15)", border: "rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", label: "Critical" },
+    warning: { bg: "rgba(245,158,11,.12)", border: "rgba(245,158,11,.3)", color: "var(--tx-fcd34d, #fcd34d)", label: "Warning" },
+    info: { bg: "rgba(99,102,241,.12)", border: "rgba(99,102,241,.3)", color: "var(--tx-a5b4fc, #a5b4fc)", label: "Info" },
   }[severity];
   return (
     <span style={{
@@ -573,13 +573,13 @@ function HealthRing({ score }: { score: number }) {
   const color = score >= 75 ? "#10b981" : score >= 55 ? "#f59e0b" : "#ef4444";
   return (
     <svg width={110} height={110} viewBox="0 0 110 110">
-      <circle cx={55} cy={55} r={r} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth={9} />
+      <circle cx={55} cy={55} r={r} fill="none" stroke="rgba(var(--ink),.06)" strokeWidth={9} />
       <circle cx={55} cy={55} r={r} fill="none" stroke={color} strokeWidth={9}
         strokeDasharray={`${dash} ${circ - dash}`}
         strokeLinecap="round" transform="rotate(-90 55 55)"
         style={{ transition: "stroke-dasharray 1s ease" }} />
       <text x={55} y={52} textAnchor="middle" fill="white" fontSize={22} fontWeight={800}>{score}</text>
-      <text x={55} y={67} textAnchor="middle" fill="rgba(255,255,255,.4)" fontSize={11}>/100</text>
+      <text x={55} y={67} textAnchor="middle" fill="rgba(var(--ink),.4)" fontSize={11}>/100</text>
     </svg>
   );
 }
@@ -1290,7 +1290,7 @@ export default function AICommandCenter() {
       <>
         {parts.map((p, i) => {
           const b = p.match(/^\*\*([^*]+)\*\*$/) || p.match(/^__([^_]+)__$/);
-          if (b) return <strong key={i} style={{ color: "white", fontWeight: 700 }}>{b[1]}</strong>;
+          if (b) return <strong key={i} style={{ color: "var(--ink-solid, white)", fontWeight: 700 }}>{b[1]}</strong>;
           // Strip any unclosed ** from non-bold segments
           const clean = p.replace(/\*\*/g, "").replace(/__/g, "");
           return clean ? <span key={i}>{clean}</span> : null;
@@ -1348,9 +1348,9 @@ export default function AICommandCenter() {
             )}
             <tbody>
               {bodyRows.map((cols, ri) => (
-                <tr key={ri} style={{ background: ri % 2 === 0 ? "rgba(255,255,255,.03)" : "transparent" }}>
+                <tr key={ri} style={{ background: ri % 2 === 0 ? "rgba(var(--ink),.03)" : "transparent" }}>
                   {cols.map((c, ci) => (
-                    <td key={ci} style={{ padding: "5px 10px", color: "rgba(255,255,255,.85)", borderBottom: "1px solid rgba(255,255,255,.06)", fontSize: 12.5 }}>
+                    <td key={ci} style={{ padding: "5px 10px", color: "rgba(var(--ink),.85)", borderBottom: "1px solid rgba(var(--ink),.06)", fontSize: 12.5 }}>
                       {renderInline(c)}
                     </td>
                   ))}
@@ -1381,17 +1381,17 @@ export default function AICommandCenter() {
       if (!line) { elements.push(<div key={idx} style={{ height: 6 }} />); idx++; continue; }
       if (/^\*{1,3}$/.test(line)) { idx++; continue; }
 
-      const h4m = line.match(/^#{4}\s*(.*)/);  if (h4m) { elements.push(<div key={idx} style={{ fontSize: 13, fontWeight: 700, color: "#e0e7ff", margin: "10px 0 2px", letterSpacing: ".01em" }}>{renderInline(h4m[1])}</div>); idx++; continue; }
-      const h3m = line.match(/^#{3}\s*(.*)/);  if (h3m) { elements.push(<div key={idx} style={{ fontSize: 13.5, fontWeight: 700, color: "#c7d2fe", margin: "12px 0 4px", borderLeft: "3px solid #6366f1", paddingLeft: 8 }}>{renderInline(h3m[1])}</div>); idx++; continue; }
-      const h2m = line.match(/^#{2}\s*(.*)/);  if (h2m) { elements.push(<div key={idx} style={{ fontSize: 15, fontWeight: 700, color: "#a5b4fc", margin: "14px 0 6px" }}>{renderInline(h2m[1])}</div>); idx++; continue; }
-      const h1m = line.match(/^#{1}\s+(.*)/);  if (h1m) { elements.push(<div key={idx} style={{ fontSize: 17, fontWeight: 800, color: "white", margin: "16px 0 8px", borderBottom: "1px solid rgba(255,255,255,.12)", paddingBottom: 6 }}>{renderInline(h1m[1])}</div>); idx++; continue; }
+      const h4m = line.match(/^#{4}\s*(.*)/);  if (h4m) { elements.push(<div key={idx} style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-e0e7ff, #e0e7ff)", margin: "10px 0 2px", letterSpacing: ".01em" }}>{renderInline(h4m[1])}</div>); idx++; continue; }
+      const h3m = line.match(/^#{3}\s*(.*)/);  if (h3m) { elements.push(<div key={idx} style={{ fontSize: 13.5, fontWeight: 700, color: "var(--tx-c7d2fe, #c7d2fe)", margin: "12px 0 4px", borderLeft: "3px solid #6366f1", paddingLeft: 8 }}>{renderInline(h3m[1])}</div>); idx++; continue; }
+      const h2m = line.match(/^#{2}\s*(.*)/);  if (h2m) { elements.push(<div key={idx} style={{ fontSize: 15, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", margin: "14px 0 6px" }}>{renderInline(h2m[1])}</div>); idx++; continue; }
+      const h1m = line.match(/^#{1}\s+(.*)/);  if (h1m) { elements.push(<div key={idx} style={{ fontSize: 17, fontWeight: 800, color: "var(--ink-solid, white)", margin: "16px 0 8px", borderBottom: "1px solid rgba(var(--ink),.12)", paddingBottom: 6 }}>{renderInline(h1m[1])}</div>); idx++; continue; }
 
       const numm = line.match(/^(\d+)\.\s+(.*)/);
       if (numm) {
         elements.push(
           <div key={idx} style={{ display: "flex", gap: 10, padding: "3px 0", alignItems: "flex-start" }}>
             <span style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(99,102,241,.35)", color: "#c7d2fe", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{numm[1]}</span>
-            <span dir="auto" style={{ color: "rgba(255,255,255,.9)", fontSize: 13.5, lineHeight: 1.75 }}>{renderInline(numm[2])}</span>
+            <span dir="auto" style={{ color: "rgba(var(--ink),.9)", fontSize: 13.5, lineHeight: 1.75 }}>{renderInline(numm[2])}</span>
           </div>
         );
         idx++; continue;
@@ -1400,19 +1400,19 @@ export default function AICommandCenter() {
       if (line.startsWith("• ") || line.startsWith("- ") || line.startsWith("* ")) {
         elements.push(
           <div key={idx} style={{ display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start", paddingLeft: 4 }}>
-            <span style={{ color: "#818cf8", fontSize: 14, flexShrink: 0, marginTop: 1 }}>•</span>
-            <span dir="auto" style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }}>{renderInline(line.slice(2))}</span>
+            <span style={{ color: "var(--tx-818cf8, #818cf8)", fontSize: 14, flexShrink: 0, marginTop: 1 }}>•</span>
+            <span dir="auto" style={{ color: "rgba(var(--ink),.88)", fontSize: 13.5, lineHeight: 1.75 }}>{renderInline(line.slice(2))}</span>
           </div>
         );
         idx++; continue;
       }
 
       if (line.startsWith(boldMarker) && line.endsWith(boldMarker) && line.length > 4) {
-        elements.push(<div key={idx} style={{ fontWeight: 700, color: "white", fontSize: 14, margin: "6px 0 2px" }}>{renderInline(line)}</div>);
+        elements.push(<div key={idx} style={{ fontWeight: 700, color: "var(--ink-solid, white)", fontSize: 14, margin: "6px 0 2px" }}>{renderInline(line)}</div>);
         idx++; continue;
       }
 
-      elements.push(<div key={idx} dir="auto" style={{ color: "rgba(255,255,255,.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>{renderInline(line)}</div>);
+      elements.push(<div key={idx} dir="auto" style={{ color: "rgba(var(--ink),.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>{renderInline(line)}</div>);
       idx++;
     }
 
@@ -1473,12 +1473,12 @@ export default function AICommandCenter() {
   const enabledTabSet = new Set(TABS.map(t => t.id));
 
   const TAB_GROUPS = [
-    { id: "core",      label: "Core",       icon: "⚡", color: "#6366f1", tabs: ["overview", "chat", "insights", "alerts"] as Tab[] },
-    { id: "reports",   label: "Reports",    icon: "📊", color: "#10b981", tabs: ["forecast", "tax", "report", "ratios", "budget"] as Tab[] },
-    { id: "ops",       label: "Operations", icon: "⚙️", color: "#f59e0b", tabs: ["recommendations", "reminders", "invoice-gen", "scan", "reconciliation"] as Tab[] },
-    { id: "growth",    label: "Growth",     icon: "🌐", color: "#8b5cf6", tabs: ["market", "advisor"] as Tab[] },
-    { id: "inventory", label: "Inventory",  icon: "📦", color: "#0ea5e9", tabs: ["inv-forecast", "cashflow-opt", "supplier-intel"] as Tab[] },
-    { id: "analytics", label: "Analytics",  icon: "🔬", color: "#ec4899", tabs: ["churn", "customer-profit", "gl-suggest", "expense-cat", "duplicate"] as Tab[] },
+    { id: "core",      label: "Core",       icon: "⚡", color: "var(--tx-6366f1, #6366f1)", tabs: ["overview", "chat", "insights", "alerts"] as Tab[] },
+    { id: "reports",   label: "Reports",    icon: "📊", color: "var(--tx-10b981, #10b981)", tabs: ["forecast", "tax", "report", "ratios", "budget"] as Tab[] },
+    { id: "ops",       label: "Operations", icon: "⚙️", color: "var(--tx-f59e0b, #f59e0b)", tabs: ["recommendations", "reminders", "invoice-gen", "scan", "reconciliation"] as Tab[] },
+    { id: "growth",    label: "Growth",     icon: "🌐", color: "var(--tx-8b5cf6, #8b5cf6)", tabs: ["market", "advisor"] as Tab[] },
+    { id: "inventory", label: "Inventory",  icon: "📦", color: "var(--tx-0ea5e9, #0ea5e9)", tabs: ["inv-forecast", "cashflow-opt", "supplier-intel"] as Tab[] },
+    { id: "analytics", label: "Analytics",  icon: "🔬", color: "var(--tx-ec4899, #ec4899)", tabs: ["churn", "customer-profit", "gl-suggest", "expense-cat", "duplicate"] as Tab[] },
   ]
     .map(g => ({ ...g, tabs: g.tabs.filter(t => enabledTabSet.has(t)) }))
     .filter(g => g.tabs.length > 0);
@@ -1491,10 +1491,10 @@ export default function AICommandCenter() {
   // half-broken instead of locked.
   if (TABS.length === 0) {
     return (
-      <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, minHeight: "60vh", textAlign: "center", padding: "0 24px" }}>
+      <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, minHeight: "60vh", textAlign: "center", padding: "0 24px" }}>
         <div style={{ width: 52, height: 52, borderRadius: 15, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 20px rgba(99,102,241,.4)" }}><AiIcon size={26} /></div>
         <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-.3px" }}>AI tools are not enabled</div>
-        <div style={{ fontSize: 13.5, color: "rgba(255,255,255,.45)", maxWidth: 420, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 13.5, color: "rgba(var(--ink),.45)", maxWidth: 420, lineHeight: 1.6 }}>
           No AI Intelligence tool is assigned to your plan for this business type.
           Ask your administrator to enable them in Plans → Pages &amp; Modules.
         </div>
@@ -1509,7 +1509,7 @@ export default function AICommandCenter() {
     // one viewport height and clipping it left every tab's lower half
     // unreachable — nothing below the fold could be scrolled to. Mobile grows
     // with its content and lets the page do the scrolling.
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: isMobile ? "auto" : "calc(100vh - 56px)", minHeight: isMobile ? "calc(100vh - 160px)" : undefined, overflow: isMobile ? "visible" : "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", display: "flex", flexDirection: "column", height: isMobile ? "auto" : "calc(100vh - 56px)", minHeight: isMobile ? "calc(100vh - 160px)" : undefined, overflow: isMobile ? "visible" : "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
@@ -1531,14 +1531,14 @@ export default function AICommandCenter() {
       `}</style>
 
       {/* ══ TOP HEADER ═══════════════════════════════════════════════════════ */}
-      <div style={{ padding: isMobile ? "8px 14px" : "10px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "rgba(255,255,255,.018)" }}>
+      <div style={{ padding: isMobile ? "8px 14px" : "10px 24px", borderBottom: "1px solid rgba(var(--ink),.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "rgba(var(--ink),.018)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(99,102,241,.45)", flexShrink: 0 }}><AiIcon size={18} /></div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-.2px", lineHeight: 1.2 }}>FinovaOS AI</div>
-            <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 1 }}>{ctx?.company.name || "Loading..."}</div>
+            <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginTop: 1 }}>{ctx?.company.name || "Loading..."}</div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: "#6ee7b7", background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.18)", borderRadius: 999, padding: "4px 10px", marginLeft: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: "var(--tx-6ee7b7, #6ee7b7)", background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.18)", borderRadius: 999, padding: "4px 10px", marginLeft: 4 }}>
             <span style={{ position: "relative", width: 7, height: 7, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", width: "100%", height: "100%", borderRadius: "50%", background: "#10b981", animation: "aiPing 1.6s ease infinite" }} />
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
@@ -1548,13 +1548,13 @@ export default function AICommandCenter() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {ctx && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 999, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)" }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: `conic-gradient(${risk.color} ${score}%, rgba(255,255,255,.08) 0%)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#0b0d1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900, color: risk.color }}>{score}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 999, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)" }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: `conic-gradient(${risk.color} ${score}%, rgba(var(--ink),.08) 0%)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 18, height: 18, borderRadius: "50%", background: "var(--dk-0b0d1a, #0b0d1a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900, color: risk.color }}>{score}</div>
               </div>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: risk.color, lineHeight: 1.2 }}>{risk.label} Risk</div>
-                <div style={{ fontSize: 9.5, color: "rgba(255,255,255,.3)" }}>{score}/100 health</div>
+                <div style={{ fontSize: 9.5, color: "rgba(var(--ink),.3)" }}>{score}/100 health</div>
               </div>
             </div>
           )}
@@ -1566,7 +1566,7 @@ export default function AICommandCenter() {
       </div>
 
       {/* ══ ROW 1: GROUPS ════════════════════════════════════════════════════ */}
-      <div className="ai-tabs-bar" style={{ padding: isMobile ? "0 8px" : "0 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", gap: isMobile ? 1 : 2, overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.015)" }}>
+      <div className="ai-tabs-bar" style={{ padding: isMobile ? "0 8px" : "0 16px", borderBottom: "1px solid rgba(var(--ink),.06)", display: "flex", gap: isMobile ? 1 : 2, overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(var(--ink),.015)" }}>
         {TAB_GROUPS.map(g => {
           const isActive = activeGroup?.id === g.id;
           const hasBadge = g.id === "core" && alerts.length > 0;
@@ -1577,7 +1577,7 @@ export default function AICommandCenter() {
               padding: "9px 14px", border: "none",
               borderBottom: isActive ? `2px solid ${g.color}` : "2px solid transparent",
               background: isActive ? `${g.color}12` : "none",
-              color: isActive ? "white" : "rgba(255,255,255,.42)",
+              color: isActive ? "white" : "rgba(var(--ink),.42)",
               fontSize: 12, fontWeight: isActive ? 700 : 500,
               cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
               transition: "all .15s", display: "flex", alignItems: "center", gap: 5,
@@ -1592,13 +1592,13 @@ export default function AICommandCenter() {
       </div>
 
       {/* ══ ROW 2: TABS IN ACTIVE GROUP ══════════════════════════════════════ */}
-      <div className="ai-tabs-bar" style={{ padding: "0 16px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.008)", minHeight: 36 }}>
+      <div className="ai-tabs-bar" style={{ padding: "0 16px", borderBottom: "1px solid rgba(var(--ink),.07)", display: "flex", overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(var(--ink),.008)", minHeight: 36 }}>
         {tabsInGroup.map(t => (
           <button key={t.id} className="ai-tab-btn" onClick={() => handleTab(t.id)} style={{
             padding: "7px 11px", border: "none",
             borderBottom: tab === t.id ? `2px solid ${activeGroup?.color ?? "#6366f1"}` : "2px solid transparent",
             background: "none",
-            color: tab === t.id ? "white" : "rgba(255,255,255,.38)",
+            color: tab === t.id ? "white" : "rgba(var(--ink),.38)",
             fontSize: 11.5, fontWeight: tab === t.id ? 700 : 400,
             cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
             transition: "all .15s", display: "flex", alignItems: "center", gap: 4,
@@ -1620,7 +1620,7 @@ export default function AICommandCenter() {
         {tab === "overview" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {!overviewLoaded ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div style={{ fontSize: 14 }}>AI is analyzing your financial data…</div>
               </div>
@@ -1632,45 +1632,45 @@ export default function AICommandCenter() {
                   <div className="kpi-card" style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     <HealthRing score={score} />
                     <div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>Financial Health</div>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: score >= 75 ? "#10b981" : score >= 55 ? "#f59e0b" : "#ef4444" }}>{score}/100</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Risk: <span style={{ color: risk.color, fontWeight: 700 }}>{risk.label}</span></div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>Financial Health</div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: score >= 75 ? "var(--tx-10b981, #10b981)" : score >= 55 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" }}>{score}/100</div>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>Risk: <span style={{ color: risk.color, fontWeight: 700 }}>{risk.label}</span></div>
                     </div>
                   </div>
 
                   {/* Revenue */}
                   <div className="kpi-card">
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Revenue This Month</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Revenue This Month</div>
                     <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{fmt(ctx?.revenue.thisMonth || 0, currency)}</div>
-                    <div style={{ fontSize: 12, color: (ctx?.revenue.change || 0) >= 0 ? "#10b981" : "#ef4444", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+                    <div style={{ fontSize: 12, color: (ctx?.revenue.change || 0) >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
                       {(ctx?.revenue.change || 0) >= 0 ? "▲" : "▼"} {pct(ctx?.revenue.change || 0)} vs last month
                     </div>
                   </div>
 
                   {/* Expenses */}
                   <div className="kpi-card">
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Expenses This Month</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Expenses This Month</div>
                     <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{fmt(ctx?.expenses.thisMonth || 0, currency)}</div>
-                    <div style={{ fontSize: 12, color: (ctx?.expenses.change || 0) <= 0 ? "#10b981" : "#f59e0b", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+                    <div style={{ fontSize: 12, color: (ctx?.expenses.change || 0) <= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-f59e0b, #f59e0b)", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
                       {(ctx?.expenses.change || 0) >= 0 ? "▲" : "▼"} {pct(ctx?.expenses.change || 0)} vs last month
                     </div>
                   </div>
 
                   {/* Profit */}
                   <div className="kpi-card">
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Net Profit</div>
-                    <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4, color: (ctx?.profit.thisMonth || 0) >= 0 ? "white" : "#ef4444" }}>{fmt(ctx?.profit.thisMonth || 0, currency)}</div>
-                    <div style={{ fontSize: 12, color: (ctx?.profit.change || 0) >= 0 ? "#10b981" : "#ef4444", fontWeight: 600 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Net Profit</div>
+                    <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4, color: (ctx?.profit.thisMonth || 0) >= 0 ? "white" : "var(--tx-ef4444, #ef4444)" }}>{fmt(ctx?.profit.thisMonth || 0, currency)}</div>
+                    <div style={{ fontSize: 12, color: (ctx?.profit.change || 0) >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)", fontWeight: 600 }}>
                       {(ctx?.profit.change || 0) >= 0 ? "▲" : "▼"} {pct(ctx?.profit.change || 0)} vs last month
                     </div>
                   </div>
 
                   {/* Receivables */}
                   <div className="kpi-card">
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Outstanding Receivables</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Outstanding Receivables</div>
                     <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{fmt(ctx?.receivables.total || 0, currency)}</div>
                     {(ctx?.receivables.overdue || 0) > 0 && (
-                      <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 600 }}>
+                      <div style={{ fontSize: 12, color: "var(--tx-ef4444, #ef4444)", fontWeight: 600 }}>
                         ⚠ {fmt(ctx?.receivables.overdue || 0, currency)} overdue
                       </div>
                     )}
@@ -1678,11 +1678,11 @@ export default function AICommandCenter() {
 
                   {/* Stock Value */}
                   <div className="kpi-card">
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Stock Value (Inventory)</div>
-                    <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4, color: (ctx?.inventory.stockValue || 0) > 0 ? "#34d399" : "rgba(255,255,255,.6)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Stock Value (Inventory)</div>
+                    <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4, color: (ctx?.inventory.stockValue || 0) > 0 ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.6)" }}>
                       {fmt(ctx?.inventory.stockValue || 0, currency)}
                     </div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>
                       {ctx?.inventory.totalItems || 0} items · {ctx?.inventory.lowStockItems || 0} low stock
                     </div>
                   </div>
@@ -1691,20 +1691,20 @@ export default function AICommandCenter() {
                 {/* Category Health Scores */}
                 {ctx && (
                   <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Business Health by Category</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Business Health by Category</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(7,minmax(0,1fr))", gap: 10 }}>
                       {categoryHealthScores(ctx).map(cat => (
-                        <div key={cat.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+                        <div key={cat.label} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
                           <div style={{ fontSize: 16, marginBottom: 6 }}>{cat.icon}</div>
                           <div style={{
                             width: 40, height: 40, borderRadius: "50%",
-                            background: `conic-gradient(${cat.color} ${cat.score}%, rgba(255,255,255,.06) 0%)`,
+                            background: `conic-gradient(${cat.color} ${cat.score}%, rgba(var(--ink),.06) 0%)`,
                             display: "flex", alignItems: "center", justifyContent: "center",
                             margin: "0 auto 8px",
                           }}>
-                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#0b0d1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900, color: cat.color }}>{cat.score}</div>
+                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--dk-0b0d1a, #0b0d1a)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900, color: cat.color }}>{cat.score}</div>
                           </div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.45)", lineHeight: 1.3 }}>{cat.label}</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.45)", lineHeight: 1.3 }}>{cat.label}</div>
                         </div>
                       ))}
                     </div>
@@ -1715,10 +1715,10 @@ export default function AICommandCenter() {
                 <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16, marginBottom: 20 }}>
                   <Panel>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 6 }}><AiIcon size={14} color="rgba(255,255,255,.6)" /> AI Insights Box</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)", display: "flex", alignItems: "center", gap: 6 }}><AiIcon size={14} color="rgba(var(--ink),.6)" /> AI Insights Box</div>
                       <button
                         onClick={() => handleTab("insights")}
-                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         Open Insights
                       </button>
@@ -1735,8 +1735,8 @@ export default function AICommandCenter() {
                               <span style={{ fontSize: 16 }}>{card.icon}</span>
                               <span style={{ fontSize: 11, fontWeight: 700, color: tone.color, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</span>
                             </div>
-                            <div style={{ fontSize: 18, fontWeight: 900, color: "white", marginBottom: 5 }}>{card.value}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.65)", lineHeight: 1.55 }}>{card.note}</div>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: "var(--ink-solid, white)", marginBottom: 5 }}>{card.value}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.65)", lineHeight: 1.55 }}>{card.note}</div>
                           </div>
                         );
                       })}
@@ -1745,8 +1745,8 @@ export default function AICommandCenter() {
                       {(insights || "").split("\n").filter(Boolean).slice(0, 4).map((line, index) => {
                         const clean = cleanMarkdownText(line);
                         return (
-                          <div key={index} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(255,255,255,.72)", fontSize: 12.5, lineHeight: 1.6 }}>
-                            <span style={{ color: "#6366f1", flexShrink: 0 }}>•</span>
+                          <div key={index} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(var(--ink),.72)", fontSize: 12.5, lineHeight: 1.6 }}>
+                            <span style={{ color: "var(--tx-6366f1, #6366f1)", flexShrink: 0 }}>•</span>
                             <span>{clean}</span>
                           </div>
                         );
@@ -1756,10 +1756,10 @@ export default function AICommandCenter() {
 
                   <Panel>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>📈 Cashflow Forecast</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)" }}>📈 Cashflow Forecast</div>
                       <button
                         onClick={() => handleTab("forecast")}
-                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         Open Forecast
                       </button>
@@ -1772,25 +1772,25 @@ export default function AICommandCenter() {
                             { label: "60 Days", value: forecast.projections.closingCash60d },
                             { label: "90 Days", value: forecast.projections.closingCash90d },
                           ].map((point) => (
-                            <div key={point.label} style={{ padding: "14px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}>
-                              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{point.label}</div>
-                              <div style={{ fontSize: 16, fontWeight: 900, color: point.value >= 0 ? "#10b981" : "#ef4444" }}>{fmt(point.value, currency)}</div>
+                            <div key={point.label} style={{ padding: "14px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)" }}>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{point.label}</div>
+                              <div style={{ fontSize: 16, fontWeight: 900, color: point.value >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" }}>{fmt(point.value, currency)}</div>
                             </div>
                           ))}
                         </div>
                         <ResponsiveContainer width="100%" height={180}>
                           <BarChart data={forecast.chartData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.05)" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--ink),.05)" />
                             <XAxis dataKey="period" tick={{ fill: "rgba(255,255,255,.4)", fontSize: 11 }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fill: "rgba(255,255,255,.4)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${Math.round(v / 1000)}K` : String(v)} />
-                            <Tooltip contentStyle={{ background: "#1a1d3a", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, color: "white", fontSize: 12 }} formatter={(v: unknown) => [fmt(Number(v), currency)]} />
-                            <Legend wrapperStyle={{ color: "rgba(255,255,255,.5)", fontSize: 12 }} />
+                            <Tooltip contentStyle={{ background: "var(--dk-1a1d3a, #1a1d3a)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, color: "var(--ink-solid, white)", fontSize: 12 }} formatter={(v: unknown) => [fmt(Number(v), currency)]} />
+                            <Legend wrapperStyle={{ color: "rgba(var(--ink),.5)", fontSize: 12 }} />
                             <Bar dataKey="closingCash" name="Closing Cash" fill="#6366f1" radius={[8, 8, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </>
                     ) : (
-                      <div style={{ minHeight: 180, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.35)" }}>
+                      <div style={{ minHeight: 180, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(var(--ink),.35)" }}>
                         <Spinner size={24} />
                       </div>
                     )}
@@ -1800,7 +1800,7 @@ export default function AICommandCenter() {
                 {/* Alerts strip */}
                 {alerts.length > 0 && (
                   <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 10 }}>Active Alerts</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 10 }}>Active Alerts</div>
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                       {alerts.slice(0, 3).map((a, i) => (
                         <div key={i} onClick={() => handleTab("alerts")} style={{
@@ -1814,7 +1814,7 @@ export default function AICommandCenter() {
                         </div>
                       ))}
                       {alerts.length > 3 && (
-                        <div onClick={() => handleTab("alerts")} style={{ display: "flex", alignItems: "center", padding: "8px 14px", borderRadius: 10, cursor: "pointer", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+                        <div onClick={() => handleTab("alerts")} style={{ display: "flex", alignItems: "center", padding: "8px 14px", borderRadius: 10, cursor: "pointer", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12, color: "rgba(var(--ink),.5)" }}>
                           +{alerts.length - 3} more
                         </div>
                       )}
@@ -1825,31 +1825,31 @@ export default function AICommandCenter() {
                 {/* 2-col: Top Customers + Top Expenses */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(255,255,255,.6)" }}>🏆 Top Customers (This Year)</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(var(--ink),.6)" }}>🏆 Top Customers (This Year)</div>
                     {(ctx?.topCustomers || []).length === 0 ? (
-                      <div style={{ color: "rgba(255,255,255,.25)", fontSize: 13 }}>No customer data yet</div>
+                      <div style={{ color: "rgba(var(--ink),.25)", fontSize: 13 }}>No customer data yet</div>
                     ) : ctx?.topCustomers.map((c, i) => (
                       <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={{ width: 26, height: 26, borderRadius: "50%", background: `hsl(${i * 60 + 220},70%,55%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800 }}>{i + 1}</div>
                           <span style={{ fontSize: 13, fontWeight: 600 }}>{c.name}</span>
                         </div>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#a5b4fc" }}>{fmt(c.amount, currency)}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{fmt(c.amount, currency)}</span>
                       </div>
                     ))}
                   </Panel>
 
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(255,255,255,.6)" }}>💸 Top Expenses (This Month)</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(var(--ink),.6)" }}>💸 Top Expenses (This Month)</div>
                     {(ctx?.topExpenses || []).length === 0 ? (
-                      <div style={{ color: "rgba(255,255,255,.25)", fontSize: 13 }}>No expense data this month</div>
+                      <div style={{ color: "rgba(var(--ink),.25)", fontSize: 13 }}>No expense data this month</div>
                     ) : ctx?.topExpenses.map((e, i) => (
                       <div key={i} style={{ marginBottom: 10 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                           <span style={{ fontSize: 12, fontWeight: 600 }}>{e.category}</span>
                           <span style={{ fontSize: 12, fontWeight: 700 }}>{fmt(e.amount, currency)}</span>
                         </div>
-                        <div style={{ height: 4, background: "rgba(255,255,255,.08)", borderRadius: 4 }}>
+                        <div style={{ height: 4, background: "rgba(var(--ink),.08)", borderRadius: 4 }}>
                           <div style={{ height: "100%", borderRadius: 4, background: `hsl(${i * 30 + 240},70%,60%)`, width: `${Math.round((e.amount / (ctx?.topExpenses[0]?.amount || 1)) * 100)}%`, transition: "width 1s ease" }} />
                         </div>
                       </div>
@@ -1860,32 +1860,32 @@ export default function AICommandCenter() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                   <Panel>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>🎯 AI Recommendations</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)" }}>🎯 AI Recommendations</div>
                       <button
                         onClick={() => handleTab("recommendations")}
-                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         View All
                       </button>
                     </div>
                     <div style={{ display: "grid", gap: 10 }}>
                       {recommendations.slice(0, 3).map((rec, index) => (
-                        <div key={index} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}>
+                        <div key={index} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                             <span>{rec.icon}</span>
                             <span style={{ fontSize: 13, fontWeight: 800 }}>{rec.title}</span>
                           </div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.62)", lineHeight: 1.55 }}>{rec.action}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--ink),.62)", lineHeight: 1.55 }}>{rec.action}</div>
                         </div>
                       ))}
                       {!recommendations.length && (
-                        <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Generating recommendations from your live business data...</div>
+                        <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Generating recommendations from your live business data...</div>
                       )}
                     </div>
                   </Panel>
 
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>📄 Monthly AI Report</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)", marginBottom: 14 }}>📄 Monthly AI Report</div>
                     <div style={{ display: "grid", gap: 10, marginBottom: 16 }}>
                       {[
                         "Revenue summary and month-on-month movement",
@@ -1893,8 +1893,8 @@ export default function AICommandCenter() {
                         "Profit and cashflow position",
                         "Top customers, risks, and recommendations",
                       ].map((item) => (
-                        <div key={item} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(255,255,255,.72)", fontSize: 12.5 }}>
-                          <span style={{ color: "#10b981" }}>✓</span>
+                        <div key={item} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(var(--ink),.72)", fontSize: 12.5 }}>
+                          <span style={{ color: "var(--tx-10b981, #10b981)" }}>✓</span>
                           <span>{item}</span>
                         </div>
                       ))}
@@ -1921,10 +1921,10 @@ export default function AICommandCenter() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                   <Panel>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>🔔 Invoice Reminders</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)" }}>🔔 Invoice Reminders</div>
                       <button
                         onClick={() => handleTab("reminders")}
-                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         Open Reminders
                       </button>
@@ -1932,50 +1932,50 @@ export default function AICommandCenter() {
                     {invoiceReminders ? (
                       <div style={{ display: "grid", gap: 8 }}>
                         {invoiceReminders.summary.slice(0, 3).map((line) => (
-                          <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.6 }}>{line}</div>
+                          <div key={line} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)", lineHeight: 1.6 }}>{line}</div>
                         ))}
                         {invoiceReminders.reminders[0] && (
-                          <div style={{ fontSize: 12, color: "#fca5a5" }}>
+                          <div style={{ fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>
                             Next follow-up: {invoiceReminders.reminders[0].customer} · {invoiceReminders.reminders[0].invoiceRef}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading reminder suggestions...</div>
+                      <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Loading reminder suggestions...</div>
                     )}
                   </Panel>
 
                   <Panel>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>🧾 Tax Estimate</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)" }}>🧾 Tax Estimate</div>
                       <button
                         onClick={() => handleTab("tax")}
-                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         Open Tax
                       </button>
                     </div>
                     {taxEstimate ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        <div style={{ fontSize: 18, fontWeight: 900, color: taxEstimate.metrics.netTaxPayable >= 0 ? "#f59e0b" : "#10b981" }}>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: taxEstimate.metrics.netTaxPayable >= 0 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-10b981, #10b981)" }}>
                           {fmt(taxEstimate.metrics.netTaxPayable, currency)}
                         </div>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.6 }}>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)", lineHeight: 1.6 }}>
                           {taxEstimate.month} estimated tax position based on taxed invoices and current tax configurations.
                         </div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+                        <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>
                           Output: {fmt(taxEstimate.metrics.outputTax, currency)} · Input: {fmt(taxEstimate.metrics.inputTax, currency)}
                         </div>
                       </div>
                     ) : (
-                      <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading tax estimate...</div>
+                      <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Loading tax estimate...</div>
                     )}
                   </Panel>
                 </div>
 
                 {/* Quick questions */}
                 <Panel>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>💬 Ask AI a Question</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>💬 Ask AI a Question</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {QUICK_QUESTIONS.map(q => (
                       <button key={q} className="q-pill" onClick={() => { handleTab("chat"); setTimeout(() => sendChat(q), 100); }}>{q}</button>
@@ -1995,7 +1995,7 @@ export default function AICommandCenter() {
           <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", height: isMobile ? "auto" : "100%", animation: "fadeUp .35s ease both" }}>
 
             {/* ── Left: Conversation ── */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, borderRight: isMobile ? "none" : "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, borderRight: isMobile ? "none" : "1px solid rgba(var(--ink),.06)" }}>
 
             {/* ── Messages area ── */}
             <div style={{ flex: 1, overflowY: isMobile ? "visible" : "auto", minHeight: isMobile ? 260 : 0, display: "flex", flexDirection: "column" }}>
@@ -2013,8 +2013,8 @@ export default function AICommandCenter() {
                     </div>
                   </div>
 
-                  <div style={{ fontSize: isMobile ? 20 : 28, fontWeight: 900, color: "white", marginBottom: isMobile ? 6 : 8, letterSpacing: "-.5px" }}>FinovaOS AI</div>
-                  <div style={{ fontSize: isMobile ? 12.5 : 14, color: "rgba(255,255,255,.42)", marginBottom: isMobile ? 18 : 32, maxWidth: 400, lineHeight: 1.6 }}>
+                  <div style={{ fontSize: isMobile ? 20 : 28, fontWeight: 900, color: "var(--ink-solid, white)", marginBottom: isMobile ? 6 : 8, letterSpacing: "-.5px" }}>FinovaOS AI</div>
+                  <div style={{ fontSize: isMobile ? 12.5 : 14, color: "rgba(var(--ink),.42)", marginBottom: isMobile ? 18 : 32, maxWidth: 400, lineHeight: 1.6 }}>
                     Your financial intelligence assistant — connected to your live business data.<br />
                   </div>
 
@@ -2035,23 +2035,23 @@ export default function AICommandCenter() {
                         onClick={() => sendChat(s.q)}
                         style={{
                           display: "flex", alignItems: "center", gap: 13, padding: isMobile ? "12px 10px" : "14px 16px",
-                          borderRadius: 16, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
-                          color: "white", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                          borderRadius: 16, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)",
+                          color: "var(--ink-solid, white)", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
                           transition: "all .18s",
                         }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,.14)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,.35)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,.04)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,.08)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(var(--ink),.04)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(var(--ink),.08)"; }}
                       >
                         <span style={{ fontSize: 24, flexShrink: 0 }}>{s.icon}</span>
                         <div>
-                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.9)", marginBottom: 2 }}>{s.title}</div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.4 }}>{s.q}</div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(var(--ink),.9)", marginBottom: 2 }}>{s.title}</div>
+                          <div style={{ fontSize: 11, color: "rgba(var(--ink),.38)", lineHeight: 1.4 }}>{s.q}</div>
                         </div>
                       </button>
                     ))}
                   </div>
 
-                  <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 999, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", color: "#6ee7b7", fontSize: 11, fontWeight: 700 }}>
+                  <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 999, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", color: "var(--tx-6ee7b7, #6ee7b7)", fontSize: 11, fontWeight: 700 }}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
                     {aiProviderLabel} · Connected to live data
                   </div>
@@ -2085,8 +2085,8 @@ export default function AICommandCenter() {
                         maxWidth: "76%",
                         padding: m.role === "assistant" ? "14px 18px 12px" : "11px 16px",
                         borderRadius: m.role === "user" ? "20px 4px 20px 20px" : "4px 20px 20px 20px",
-                        background: m.role === "user" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.065)",
-                        border: m.role === "assistant" ? "1px solid rgba(255,255,255,.1)" : "none",
+                        background: m.role === "user" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.065)",
+                        border: m.role === "assistant" ? "1px solid rgba(var(--ink),.1)" : "none",
                         boxShadow: m.role === "user" ? "0 8px 28px rgba(79,70,229,.35)" : "0 2px 12px rgba(0,0,0,.15)",
                         fontSize: 14, lineHeight: 1.8, color: "white",
                       }}>
@@ -2102,7 +2102,7 @@ export default function AICommandCenter() {
                   {chatLoading && messages[messages.length - 1]?.content === "" && (
                     <div style={{ display: "flex", gap: 12, padding: "8px 20px", alignItems: "flex-start" }}>
                       <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 4px 16px rgba(79,70,229,.4)" }}><AiIcon size={17} /></div>
-                      <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: "4px 20px 20px 20px", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.09)", display: "flex", gap: 5, alignItems: "center" }}>
+                      <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: "4px 20px 20px 20px", background: "rgba(var(--ink),.07)", border: "1px solid rgba(var(--ink),.09)", display: "flex", gap: 5, alignItems: "center" }}>
                         {[0,1,2].map(j => <div key={j} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(99,102,241,.8)", animation: `pulse 1.1s ease ${j * .18}s infinite` }} />)}
                       </div>
                     </div>
@@ -2114,7 +2114,7 @@ export default function AICommandCenter() {
             </div>
 
             {/* ── Input composer ── */}
-            <div className="chat-composer" style={{ padding: "10px 16px 16px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+            <div className="chat-composer" style={{ padding: "10px 16px 16px", borderTop: "1px solid rgba(var(--ink),.06)" }}>
               {/* Quick pills (shown after first message) */}
               {messages.filter(m => m.role === "user").length > 0 && (
                 <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
@@ -2122,7 +2122,7 @@ export default function AICommandCenter() {
                     <button key={q} onClick={() => sendChat(q)} style={{
                       padding: "5px 12px", borderRadius: 999, fontSize: 11.5, fontWeight: 600,
                       background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)",
-                      color: "rgba(255,255,255,.75)", cursor: "pointer", fontFamily: "inherit", transition: "all .15s",
+                      color: "rgba(var(--ink),.75)", cursor: "pointer", fontFamily: "inherit", transition: "all .15s",
                     }}
                     onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,.25)"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,.12)"; }}
@@ -2130,14 +2130,14 @@ export default function AICommandCenter() {
                   ))}
                 </div>
               )}
-              <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, padding: "12px 12px 12px 20px" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 16, padding: "12px 12px 12px 20px" }}>
                 <input
                   ref={chatInputRef}
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
                   placeholder="Ask anything about your business..."
-                  style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 14, fontFamily: "inherit", outline: "none", padding: "2px 0" }}
+                  style={{ flex: 1, background: "none", border: "none", color: "var(--ink-solid, white)", fontSize: 14, fontFamily: "inherit", outline: "none", padding: "2px 0" }}
                 />
                 <button
                   onClick={() => sendChat()}
@@ -2145,7 +2145,7 @@ export default function AICommandCenter() {
                   style={{
                     width: 42, height: 42, borderRadius: 13, border: "none", flexShrink: 0,
                     cursor: chatInput.trim() && !chatLoading ? "pointer" : "not-allowed",
-                    background: chatInput.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)",
+                    background: chatInput.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.07)",
                     display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s",
                     boxShadow: chatInput.trim() && !chatLoading ? "0 8px 24px rgba(79,70,229,.4)" : "none",
                   }}
@@ -2156,19 +2156,19 @@ export default function AICommandCenter() {
                   }
                 </button>
               </div>
-              <div style={{ textAlign: "center", fontSize: 10.5, color: "rgba(255,255,255,.2)", marginTop: 8 }}>
-                Powered by <b style={{ color: "rgba(255,255,255,.35)" }}>FinovaOS AI</b> · Responses based on your real business data
+              <div style={{ textAlign: "center", fontSize: 10.5, color: "rgba(var(--ink),.2)", marginTop: 8 }}>
+                Powered by <b style={{ color: "rgba(var(--ink),.35)" }}>FinovaOS AI</b> · Responses based on your real business data
               </div>
             </div>
             </div>{/* end left conversation */}
 
             {/* ── Right: Context Panel ── */}
-            <div style={{ width: isMobile ? "100%" : 272, background: "rgba(255,255,255,.018)", borderTop: isMobile ? "1px solid rgba(255,255,255,.06)" : "none", overflowY: isMobile ? "visible" : "auto", padding: isMobile ? "12px 10px 20px" : "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: isMobile ? 14 : 18 }}>
+            <div style={{ width: isMobile ? "100%" : 272, background: "rgba(var(--ink),.018)", borderTop: isMobile ? "1px solid rgba(var(--ink),.06)" : "none", overflowY: isMobile ? "visible" : "auto", padding: isMobile ? "12px 10px 20px" : "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: isMobile ? 14 : 18 }}>
 
               {/* Health Ring */}
               <div style={{ textAlign: "center", padding: "16px 0 4px" }}>
                 <HealthRing score={score} />
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>Financial Health</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 4 }}>Financial Health</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: risk.color, marginTop: 2 }}>{risk.label} Risk</div>
               </div>
 
@@ -2179,13 +2179,13 @@ export default function AICommandCenter() {
                   same information in roughly a quarter of the height. */}
               {ctx && (
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 7 }}>Live Snapshot</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 7 }}>Live Snapshot</div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(4,minmax(0,1fr))" : "1fr", gap: isMobile ? 6 : 7 }}>
                     {[
-                      { label: "Revenue", value: fmt(ctx.revenue.thisMonth, currency), color: "#10b981" },
-                      { label: "Profit",  value: fmt(ctx.profit.thisMonth, currency),  color: ctx.profit.thisMonth >= 0 ? "#10b981" : "#ef4444" },
-                      { label: "Overdue", value: fmt(ctx.receivables.overdue, currency), color: "#f59e0b" },
-                      { label: "Stock",   value: fmt(ctx.inventory.stockValue, currency), color: "#34d399" },
+                      { label: "Revenue", value: fmt(ctx.revenue.thisMonth, currency), color: "var(--tx-10b981, #10b981)" },
+                      { label: "Profit",  value: fmt(ctx.profit.thisMonth, currency),  color: ctx.profit.thisMonth >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" },
+                      { label: "Overdue", value: fmt(ctx.receivables.overdue, currency), color: "var(--tx-f59e0b, #f59e0b)" },
+                      { label: "Stock",   value: fmt(ctx.inventory.stockValue, currency), color: "var(--tx-34d399, #34d399)" },
                     ].map(kpi => (
                       <div key={kpi.label} style={{
                         display: "flex",
@@ -2194,9 +2194,9 @@ export default function AICommandCenter() {
                         alignItems: isMobile ? "flex-start" : "center",
                         gap: isMobile ? 2 : 0,
                         padding: isMobile ? "7px 8px" : "8px 11px",
-                        borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", minWidth: 0,
+                        borderRadius: 10, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.06)", minWidth: 0,
                       }}>
-                        <span style={{ fontSize: isMobile ? 9.5 : 11, color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{kpi.label}</span>
+                        <span style={{ fontSize: isMobile ? 9.5 : 11, color: "rgba(var(--ink),.4)", whiteSpace: "nowrap" }}>{kpi.label}</span>
                         <span style={{ fontSize: isMobile ? 11 : 12, fontWeight: 700, color: kpi.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{kpi.value}</span>
                       </div>
                     ))}
@@ -2207,11 +2207,11 @@ export default function AICommandCenter() {
               {/* Active alerts */}
               {alerts.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Active Alerts</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Active Alerts</div>
                   {alerts.slice(0, 3).map((a, i) => (
                     <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "7px 10px", borderRadius: 9, marginBottom: 5, background: a.severity === "critical" ? "rgba(239,68,68,.08)" : a.severity === "warning" ? "rgba(245,158,11,.08)" : "rgba(99,102,241,.08)", border: `1px solid ${a.severity === "critical" ? "rgba(239,68,68,.22)" : a.severity === "warning" ? "rgba(245,158,11,.22)" : "rgba(99,102,241,.22)"}` }}>
                       <span style={{ fontSize: 13, flexShrink: 0 }}>{a.severity === "critical" ? "🚨" : a.severity === "warning" ? "⚠️" : "ℹ️"}</span>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.72)", lineHeight: 1.45 }}>{a.title}</span>
+                      <span style={{ fontSize: 11, color: "rgba(var(--ink),.72)", lineHeight: 1.45 }}>{a.title}</span>
                     </div>
                   ))}
                 </div>
@@ -2219,7 +2219,7 @@ export default function AICommandCenter() {
 
               {/* Quick questions */}
               <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Quick Questions</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Quick Questions</div>
                 {[
                   "Show my profit this month",
                   "Which items are low on stock?",
@@ -2241,7 +2241,7 @@ export default function AICommandCenter() {
         {tab === "insights" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {loadingInsights ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div>AI is analyzing your financial patterns…</div>
               </div>
@@ -2252,10 +2252,10 @@ export default function AICommandCenter() {
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}><AiIcon size={18} /></div>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: 15 }}>AI Financial Insights</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Generated now based on your live data</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>Generated now based on your live data</div>
                     </div>
                     <button onClick={() => { setInsights(""); setLoadingInsights(true); fetch("/api/ai/insights", { headers: getHeaders() }).then(r => r.json()).then(d => { setInsights(d.insights || ""); setInsightCards(d.insightCards || []); setLoadingInsights(false); }); loadDeepAnalysis(); }}
-                      style={{ marginLeft: "auto", padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                      style={{ marginLeft: "auto", padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
                       ↻ Refresh
                     </button>
                   </div>
@@ -2268,8 +2268,8 @@ export default function AICommandCenter() {
                             <span>{card.icon}</span>
                             <span style={{ fontSize: 11, fontWeight: 700, color: tone.color, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</span>
                           </div>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: "white", marginBottom: 4 }}>{card.value}</div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.65)", lineHeight: 1.55 }}>{card.note}</div>
+                          <div style={{ fontSize: 18, fontWeight: 900, color: "var(--ink-solid, white)", marginBottom: 4 }}>{card.value}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--ink),.65)", lineHeight: 1.55 }}>{card.note}</div>
                         </div>
                       );
                     })}
@@ -2279,47 +2279,47 @@ export default function AICommandCenter() {
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>📈 Revenue Analyzer</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>📈 Revenue Analyzer</div>
                     {revenueAnalyzer ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        {revenueAnalyzer.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{cleanMarkdownText(line)}</div>)}
-                        {revenueAnalyzer.topCustomer && <div style={{ fontSize: 12, color: "#a5b4fc" }}>Top customer: {revenueAnalyzer.topCustomer.name}</div>}
-                        {revenueAnalyzer.topProduct && <div style={{ fontSize: 12, color: "#6ee7b7" }}>Top product: {revenueAnalyzer.topProduct.name}</div>}
-                        {revenueAnalyzer.bestMonth && <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Best month: {revenueAnalyzer.bestMonth.month}</div>}
+                        {revenueAnalyzer.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>{cleanMarkdownText(line)}</div>)}
+                        {revenueAnalyzer.topCustomer && <div style={{ fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)" }}>Top customer: {revenueAnalyzer.topCustomer.name}</div>}
+                        {revenueAnalyzer.topProduct && <div style={{ fontSize: 12, color: "var(--tx-6ee7b7, #6ee7b7)" }}>Top product: {revenueAnalyzer.topProduct.name}</div>}
+                        {revenueAnalyzer.bestMonth && <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>Best month: {revenueAnalyzer.bestMonth.month}</div>}
                       </div>
-                    ) : <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading revenue insights...</div>}
+                    ) : <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Loading revenue insights...</div>}
                   </Panel>
 
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>💼 Profitability Analyzer</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>💼 Profitability Analyzer</div>
                     {profitability ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        <div style={{ fontSize: 24, fontWeight: 900, color: profitability.marginPct >= 0 ? "#10b981" : "#ef4444" }}>{profitability.marginPct}% margin</div>
-                        {profitability.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{cleanMarkdownText(line)}</div>)}
+                        <div style={{ fontSize: 24, fontWeight: 900, color: profitability.marginPct >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" }}>{profitability.marginPct}% margin</div>
+                        {profitability.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>{cleanMarkdownText(line)}</div>)}
                       </div>
-                    ) : <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading profitability...</div>}
+                    ) : <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Loading profitability...</div>}
                   </Panel>
 
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>📦 Inventory Intelligence</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>📦 Inventory Intelligence</div>
                     {inventoryIntel ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        {inventoryIntel.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>{cleanMarkdownText(line)}</div>)}
-                        <div style={{ fontSize: 12, color: "#fcd34d" }}>Reorder now: {inventoryIntel.reorderItems.join(", ") || "No urgent items"}</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Dead stock: {inventoryIntel.deadStockItems.join(", ") || "None"}</div>
+                        {inventoryIntel.summary.map((line) => <div key={line} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>{cleanMarkdownText(line)}</div>)}
+                        <div style={{ fontSize: 12, color: "var(--tx-fcd34d, #fcd34d)" }}>Reorder now: {inventoryIntel.reorderItems.join(", ") || "No urgent items"}</div>
+                        <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>Dead stock: {inventoryIntel.deadStockItems.join(", ") || "None"}</div>
                       </div>
-                    ) : <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading inventory intelligence...</div>}
+                    ) : <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Loading inventory intelligence...</div>}
                   </Panel>
 
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>🚨 Risk & Late Payment Detection</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>🚨 Risk & Late Payment Detection</div>
                     {riskAnalyzer && latePayments ? (
                       <div style={{ display: "grid", gap: 8 }}>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Business risk score: <span style={{ color: riskAnalyzer.scoreLabel === "Low" ? "#10b981" : riskAnalyzer.scoreLabel === "Medium" ? "#f59e0b" : "#ef4444", fontWeight: 800 }}>{riskAnalyzer.healthScore}/100</span></div>
-                        {riskAnalyzer.items.slice(0, 2).map((item) => <div key={item.title} style={{ fontSize: 12, color: "rgba(255,255,255,.6)" }}>{item.title}: {item.note}</div>)}
-                        {latePayments.customers[0] && <div style={{ fontSize: 12, color: "#fca5a5" }}>Late payment risk: {latePayments.customers[0].name}</div>}
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Business risk score: <span style={{ color: riskAnalyzer.scoreLabel === "Low" ? "var(--tx-10b981, #10b981)" : riskAnalyzer.scoreLabel === "Medium" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)", fontWeight: 800 }}>{riskAnalyzer.healthScore}/100</span></div>
+                        {riskAnalyzer.items.slice(0, 2).map((item) => <div key={item.title} style={{ fontSize: 12, color: "rgba(var(--ink),.6)" }}>{item.title}: {item.note}</div>)}
+                        {latePayments.customers[0] && <div style={{ fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>Late payment risk: {latePayments.customers[0].name}</div>}
                       </div>
-                    ) : <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading risk signals...</div>}
+                    ) : <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Loading risk signals...</div>}
                   </Panel>
                 </div>
               </div>
@@ -2331,14 +2331,14 @@ export default function AICommandCenter() {
         {tab === "alerts" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {loadingAlerts ? (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 200, gap: 12, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 200, gap: 12, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={24} /><span>Scanning for anomalies…</span>
               </div>
             ) : alerts.length === 0 ? (
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
                 <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>All Clear!</div>
-                <div style={{ color: "rgba(255,255,255,.4)", fontSize: 14 }}>No anomalies or risks detected in your financial data.</div>
+                <div style={{ color: "rgba(var(--ink),.4)", fontSize: 14 }}>No anomalies or risks detected in your financial data.</div>
               </Panel>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -2356,10 +2356,10 @@ export default function AICommandCenter() {
                           <span style={{ fontWeight: 800, fontSize: 14 }}>{alert.title}</span>
                           <SeverityBadge severity={alert.severity} />
                         </div>
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.6, marginBottom: 10 }}>{renderMarkdown(alert.description)}</div>
+                        <div style={{ fontSize: 13, color: "rgba(var(--ink),.65)", lineHeight: 1.6, marginBottom: 10 }}>{renderMarkdown(alert.description)}</div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                          <span style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 600 }}>Action: {renderMarkdown(alert.action)}</span>
+                          <span style={{ fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 600 }}>Action: {renderMarkdown(alert.action)}</span>
                         </div>
                         {alert.link && (
                           <a href={alert.link} style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10, fontSize: 12, color: "#818cf8", fontWeight: 600, textDecoration: "none", background: "rgba(99,102,241,.15)", padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)" }}>
@@ -2379,7 +2379,7 @@ export default function AICommandCenter() {
         {tab === "forecast" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {loadingForecast ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div>AI is building your cash flow forecast…</div>
               </div>
@@ -2387,15 +2387,15 @@ export default function AICommandCenter() {
               <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
                   {[
-                    { label: "Closing Cash (30d)", value: Number(forecast.projections.closingCash30d || 0), color: Number(forecast.projections.closingCash30d || 0) >= 0 ? "#10b981" : "#ef4444" },
-                    { label: "Closing Cash (60d)", value: Number(forecast.projections.closingCash60d || 0), color: Number(forecast.projections.closingCash60d || 0) >= 0 ? "#10b981" : "#ef4444" },
-                    { label: "Closing Cash (90d)", value: Number(forecast.projections.closingCash90d || 0), color: Number(forecast.projections.closingCash90d || 0) >= 0 ? "#10b981" : "#ef4444" },
-                    { label: "Cash Buffer Needed", value: Number(forecast.projections.recommendedBuffer || 0), color: "#fbbf24" },
-                    { label: "Receivables Due", value: Number(forecast.projections.receivablesDue || 0), color: "#6366f1" },
-                    { label: "Payables Due", value: Number(forecast.projections.payablesDue || 0), color: "#ec4899" },
+                    { label: "Closing Cash (30d)", value: Number(forecast.projections.closingCash30d || 0), color: Number(forecast.projections.closingCash30d || 0) >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" },
+                    { label: "Closing Cash (60d)", value: Number(forecast.projections.closingCash60d || 0), color: Number(forecast.projections.closingCash60d || 0) >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" },
+                    { label: "Closing Cash (90d)", value: Number(forecast.projections.closingCash90d || 0), color: Number(forecast.projections.closingCash90d || 0) >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" },
+                    { label: "Cash Buffer Needed", value: Number(forecast.projections.recommendedBuffer || 0), color: "var(--tx-fbbf24, #fbbf24)" },
+                    { label: "Receivables Due", value: Number(forecast.projections.receivablesDue || 0), color: "var(--tx-6366f1, #6366f1)" },
+                    { label: "Payables Due", value: Number(forecast.projections.payablesDue || 0), color: "var(--tx-ec4899, #ec4899)" },
                   ].map((p, i) => (
                     <div key={i} className="kpi-card">
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>{p.label}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>{p.label}</div>
                       <div style={{ fontSize: 20, fontWeight: 900, color: p.color }}>{fmt(p.value, currency)}</div>
                     </div>
                   ))}
@@ -2411,9 +2411,9 @@ export default function AICommandCenter() {
                     <span style={{ fontSize: 20 }}>{forecast.projections.cashRisk === "high" ? "🚨" : forecast.projections.cashRisk === "medium" ? "⚠️" : "✅"}</span>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>
-                        Cash Risk: <span style={{ color: forecast.projections.cashRisk === "high" ? "#fca5a5" : forecast.projections.cashRisk === "medium" ? "#fcd34d" : "#6ee7b7", textTransform: "capitalize" }}>{String(forecast.projections.cashRisk).toUpperCase()}</span>
+                        Cash Risk: <span style={{ color: forecast.projections.cashRisk === "high" ? "var(--tx-fca5a5, #fca5a5)" : forecast.projections.cashRisk === "medium" ? "var(--tx-fcd34d, #fcd34d)" : "var(--tx-6ee7b7, #6ee7b7)", textTransform: "capitalize" }}>{String(forecast.projections.cashRisk).toUpperCase()}</span>
                       </div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>
                         {forecast.projections.daysUntilCashLow ? `Cash may tighten in around ${forecast.projections.daysUntilCashLow} days if current trend continues.` : "Current forecast does not signal an immediate cash crunch."}
                       </div>
                     </div>
@@ -2422,7 +2422,7 @@ export default function AICommandCenter() {
 
                 {forecast.chartData.length > 0 && (
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "rgba(255,255,255,.6)" }}>📊 Cashflow Forecast Chart (30 / 60 / 90 Days)</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "rgba(var(--ink),.6)" }}>📊 Cashflow Forecast Chart (30 / 60 / 90 Days)</div>
                     <ResponsiveContainer width="100%" height={260}>
                       <BarChart data={forecast.chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                         <defs>
@@ -2431,11 +2431,11 @@ export default function AICommandCenter() {
                             <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.55} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.05)" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--ink),.05)" />
                         <XAxis dataKey="period" tick={{ fill: "rgba(255,255,255,.4)", fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fill: "rgba(255,255,255,.4)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : String(v)} />
-                        <Tooltip contentStyle={{ background: "#1a1d3a", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, color: "white", fontSize: 12 }} formatter={(v: unknown) => [fmt(Number(v), currency)]} />
-                        <Legend wrapperStyle={{ color: "rgba(255,255,255,.5)", fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: "var(--dk-1a1d3a, #1a1d3a)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, color: "var(--ink-solid, white)", fontSize: 12 }} formatter={(v: unknown) => [fmt(Number(v), currency)]} />
+                        <Legend wrapperStyle={{ color: "rgba(var(--ink),.5)", fontSize: 12 }} />
                         <Bar dataKey="revenue" name="Revenue" fill="#10b981" radius={[6, 6, 0, 0]} />
                         <Bar dataKey="expenses" name="Expenses" fill="#f59e0b" radius={[6, 6, 0, 0]} />
                         <Bar dataKey="closingCash" name="Closing Cash" fill="url(#gClosingCash)" radius={[6, 6, 0, 0]} />
@@ -2446,33 +2446,33 @@ export default function AICommandCenter() {
 
                 {/* AI forecast text */}
                 <Panel>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 6 }}><AiIcon size={14} color="rgba(255,255,255,.6)" /> AI Cash Flow Analysis</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(var(--ink),.6)", display: "flex", alignItems: "center", gap: 6 }}><AiIcon size={14} color="rgba(var(--ink),.6)" /> AI Cash Flow Analysis</div>
                   <div style={{ lineHeight: 1.8 }}>{renderMarkdown(forecast.text)}</div>
                 </Panel>
 
                 {/* Predictive Signals — Confidence Intervals */}
                 {forecast.predictiveSignals && forecast.predictiveSignals.length > 0 && (
                   <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "rgba(255,255,255,.6)" }}>📊 Predictive Intelligence — Confidence Intervals</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "rgba(var(--ink),.6)" }}>📊 Predictive Intelligence — Confidence Intervals</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
                       {forecast.predictiveSignals.map((sig, i) => {
                         const riskColor = sig.risk === "high" ? "#ef4444" : sig.risk === "medium" ? "#f59e0b" : "#10b981";
                         const confColor = sig.confidence >= 75 ? "#10b981" : sig.confidence >= 55 ? "#f59e0b" : "#f87171";
                         return (
-                          <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
+                          <div key={i} style={{ background: "rgba(var(--ink),.03)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", border: "1px solid rgba(var(--ink),.06)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                              <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{sig.label}</div>
+                              <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>{sig.label}</div>
                               <div style={{ display: "flex", gap: 6 }}>
                                 <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: `${confColor}18`, border: `1px solid ${confColor}30`, color: confColor }}>{sig.confidence}% conf</span>
                                 <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: `${riskColor}15`, border: `1px solid ${riskColor}30`, color: riskColor, textTransform: "capitalize" }}>{sig.risk}</span>
                               </div>
                             </div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: "white", marginBottom: 6 }}>{fmt(sig.forecast, currency)}</div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink-solid, white)", marginBottom: 6 }}>{fmt(sig.forecast, currency)}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                              <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Range:</span>
-                              <span style={{ fontSize: 11.5, fontWeight: 700, color: "#6366f1" }}>{fmt(sig.lowerBound, currency)} – {fmt(sig.upperBound, currency)}</span>
+                              <span style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>Range:</span>
+                              <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--tx-6366f1, #6366f1)" }}>{fmt(sig.lowerBound, currency)} – {fmt(sig.upperBound, currency)}</span>
                             </div>
-                            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", lineHeight: 1.6 }}>{sig.explanation}</div>
+                            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", lineHeight: 1.6 }}>{sig.explanation}</div>
                           </div>
                         );
                       })}
@@ -2488,7 +2488,7 @@ export default function AICommandCenter() {
         {tab === "recommendations" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {loadingRecs ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div>AI is crafting recommendations based on your data…</div>
               </div>
@@ -2496,7 +2496,7 @@ export default function AICommandCenter() {
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>🎯</div>
                 <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>No Recommendations Yet</div>
-                <div style={{ color: "rgba(255,255,255,.4)", fontSize: 14, marginBottom: 24 }}>Add some financial data and AI will generate personalized recommendations.</div>
+                <div style={{ color: "rgba(var(--ink),.4)", fontSize: 14, marginBottom: 24 }}>Add some financial data and AI will generate personalized recommendations.</div>
                 <button onClick={loadRecommendations} style={{ padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                   Generate Recommendations
                 </button>
@@ -2506,9 +2506,9 @@ export default function AICommandCenter() {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                   <div>
                     <div style={{ fontWeight: 800, fontSize: 16 }}>🎯 AI Recommendations</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>Personalized actions based on your financial data</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 2 }}>Personalized actions based on your financial data</div>
                   </div>
-                  <button onClick={() => { setRecommendations([]); loadRecommendations(); }} style={{ padding: "7px 14px", borderRadius: 9, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                  <button onClick={() => { setRecommendations([]); loadRecommendations(); }} style={{ padding: "7px 14px", borderRadius: 9, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
                     ↻ Refresh
                   </button>
                 </div>
@@ -2534,22 +2534,22 @@ export default function AICommandCenter() {
                         </div>
 
                         {/* Description */}
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.65 }}>{renderMarkdown(rec.description)}</div>
+                        <div style={{ fontSize: 13, color: "rgba(var(--ink),.65)", lineHeight: 1.65 }}>{renderMarkdown(rec.description)}</div>
 
                         {/* Impact */}
                         {rec.impact && (
-                          <div style={{ display: "flex", alignItems: "flex-start", gap: 7, padding: "9px 12px", background: "rgba(255,255,255,.04)", borderRadius: 9, border: "1px solid rgba(255,255,255,.06)" }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 7, padding: "9px 12px", background: "rgba(var(--ink),.04)", borderRadius: 9, border: "1px solid rgba(var(--ink),.06)" }}>
                             <span style={{ fontSize: 14, flexShrink: 0 }}>✨</span>
                             <div>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 2 }}>Expected Impact</div>
-                              <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{renderMarkdown(rec.impact)}</div>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 2 }}>Expected Impact</div>
+                              <div style={{ fontSize: 12, color: "rgba(var(--ink),.7)" }}>{renderMarkdown(rec.impact)}</div>
                             </div>
                           </div>
                         )}
 
                         {/* Action + Link */}
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 2 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#a5b4fc", fontWeight: 600 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 600 }}>
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
                             {renderMarkdown(rec.action)}
                           </div>
@@ -2568,7 +2568,7 @@ export default function AICommandCenter() {
                 <div style={{ marginTop: 20, padding: isMobile ? "12px 10px" : "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 3 }}>Want a deeper explanation?</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Ask AI to explain any recommendation in detail or suggest more ideas.</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>Ask AI to explain any recommendation in detail or suggest more ideas.</div>
                   </div>
                   <button onClick={() => handleTab("chat")} style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", flexShrink: 0, boxShadow: "0 4px 14px rgba(99,102,241,.35)" }}>
                     💬 Ask AI
@@ -2583,7 +2583,7 @@ export default function AICommandCenter() {
         {tab === "reminders" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {loadingReminders ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 260, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 260, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div>AI is prioritizing invoice follow-ups...</div>
               </div>
@@ -2593,20 +2593,20 @@ export default function AICommandCenter() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>Invoice Reminder Center</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI prioritized follow-up queue from overdue invoices and customer payment behavior.</div>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI prioritized follow-up queue from overdue invoices and customer payment behavior.</div>
                     </div>
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", fontSize: 12, color: "#fca5a5" }}>
+                      <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>
                         Overdue: {fmt(invoiceReminders.totals.overdueReceivables, currency)}
                       </div>
-                      <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", fontSize: 12, color: "#c7d2fe" }}>
+                      <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", fontSize: 12, color: "var(--tx-c7d2fe, #c7d2fe)" }}>
                         Invoices: {invoiceReminders.totals.overdueCount}
                       </div>
                     </div>
                   </div>
                   <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
                     {invoiceReminders.summary.map((line) => (
-                      <div key={line} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.6 }}>{cleanMarkdownText(line)}</div>
+                      <div key={line} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)", lineHeight: 1.6 }}>{cleanMarkdownText(line)}</div>
                     ))}
                   </div>
                 </Panel>
@@ -2615,16 +2615,16 @@ export default function AICommandCenter() {
                   <Panel style={{ textAlign: "center", padding: "50px 24px" }}>
                     <div style={{ fontSize: 44, marginBottom: 14 }}>✅</div>
                     <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>No urgent reminders right now</div>
-                    <div style={{ color: "rgba(255,255,255,.4)", fontSize: 14 }}>Current invoice aging does not require a follow-up push.</div>
+                    <div style={{ color: "rgba(var(--ink),.4)", fontSize: 14 }}>Current invoice aging does not require a follow-up push.</div>
                   </Panel>
                 ) : (
                   <div style={{ display: "grid", gap: 14 }}>
                     {invoiceReminders.reminders.map((reminder) => {
                       const tone =
-                        reminder.priority === "urgent" ? { bg: "rgba(239,68,68,.08)", border: "rgba(239,68,68,.25)", color: "#fca5a5" } :
-                        reminder.priority === "high" ? { bg: "rgba(245,158,11,.08)", border: "rgba(245,158,11,.25)", color: "#fcd34d" } :
-                        reminder.priority === "medium" ? { bg: "rgba(99,102,241,.08)", border: "rgba(99,102,241,.25)", color: "#c7d2fe" } :
-                        { bg: "rgba(16,185,129,.08)", border: "rgba(16,185,129,.25)", color: "#86efac" };
+                        reminder.priority === "urgent" ? { bg: "rgba(239,68,68,.08)", border: "rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)" } :
+                        reminder.priority === "high" ? { bg: "rgba(245,158,11,.08)", border: "rgba(245,158,11,.25)", color: "var(--tx-fcd34d, #fcd34d)" } :
+                        reminder.priority === "medium" ? { bg: "rgba(99,102,241,.08)", border: "rgba(99,102,241,.25)", color: "var(--tx-c7d2fe, #c7d2fe)" } :
+                        { bg: "rgba(16,185,129,.08)", border: "rgba(16,185,129,.25)", color: "var(--tx-86efac, #86efac)" };
 
                       return (
                         <Panel key={reminder.invoiceRef} style={{ background: tone.bg, border: `1px solid ${tone.border}` }}>
@@ -2635,16 +2635,16 @@ export default function AICommandCenter() {
                                 <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 9px", borderRadius: 999, background: `${tone.color}18`, border: `1px solid ${tone.border}`, color: tone.color, textTransform: "uppercase", letterSpacing: ".06em" }}>
                                   {reminder.priority}
                                 </span>
-                                <span style={{ fontSize: 11, color: "rgba(255,255,255,.45)" }}>{reminder.invoiceRef}</span>
+                                <span style={{ fontSize: 11, color: "rgba(var(--ink),.45)" }}>{reminder.invoiceRef}</span>
                               </div>
                               <div style={{ display: "grid", gap: 7 }}>
-                                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Amount: <span style={{ fontWeight: 700, color: "white" }}>{fmt(reminder.amount, currency)}</span> · Age: {reminder.daysAgo} day(s)</div>
-                                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.6 }}>{reminder.reason}</div>
-                                <div style={{ fontSize: 12.5, color: "#a5b4fc", lineHeight: 1.6 }}>Next step: {reminder.suggestedAction}</div>
+                                <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Amount: <span style={{ fontWeight: 700, color: "var(--ink-solid, white)" }}>{fmt(reminder.amount, currency)}</span> · Age: {reminder.daysAgo} day(s)</div>
+                                <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)", lineHeight: 1.6 }}>{reminder.reason}</div>
+                                <div style={{ fontSize: 12.5, color: "var(--tx-a5b4fc, #a5b4fc)", lineHeight: 1.6 }}>Next step: {reminder.suggestedAction}</div>
                               </div>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 180 }}>
-                              <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>Suggested channel: <span style={{ color: "white", fontWeight: 700 }}>{reminder.channel}</span></div>
+                              <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>Suggested channel: <span style={{ color: "var(--ink-solid, white)", fontWeight: 700 }}>{reminder.channel}</span></div>
                               <button
                                 onClick={() => sendInvoiceReminder(reminder)}
                                 disabled={sendingReminderRef === reminder.invoiceRef}
@@ -2679,7 +2679,7 @@ export default function AICommandCenter() {
         {tab === "tax" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
             {loadingTaxEstimate ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 260, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 260, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div>AI is estimating your tax position...</div>
               </div>
@@ -2697,11 +2697,11 @@ export default function AICommandCenter() {
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                           <span style={{ fontSize: 28 }}>{tr.flagEmoji}</span>
                           <div>
-                            <div style={{ fontWeight: 800, fontSize: 16, color: "#10b981" }}>{tr.reportTitle}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{tr.lawReference} · {taxEstimate.month}</div>
+                            <div style={{ fontWeight: 800, fontSize: 16, color: "var(--tx-10b981, #10b981)" }}>{tr.reportTitle}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{tr.lawReference} · {taxEstimate.month}</div>
                           </div>
                         </div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "right" }}>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", textAlign: "right" }}>
                           <div style={{ fontWeight: 700 }}>{tr.country}</div>
                           <div>{tr.currency}</div>
                         </div>
@@ -2710,54 +2710,54 @@ export default function AICommandCenter() {
                       {/* Sales Tax + Income Tax two-column */}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                         {/* Sales Tax */}
-                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+                        <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
                             {tr.salesTax.taxName} · {(tr.salesTax.standardRate * 100).toFixed(0)}% Standard Rate
                           </div>
                           <div style={{ display: "grid", gap: 10 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Output Tax (Sales)</span>
-                              <span style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b" }}>{fmtC(tr.salesTax.outputTax)}</span>
+                              <span style={{ fontSize: 13, color: "rgba(var(--ink),.6)" }}>Output Tax (Sales)</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)" }}>{fmtC(tr.salesTax.outputTax)}</span>
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Input Tax (Purchases)</span>
-                              <span style={{ fontSize: 14, fontWeight: 700, color: "#10b981" }}>{fmtC(tr.salesTax.inputTax)}</span>
+                              <span style={{ fontSize: 13, color: "rgba(var(--ink),.6)" }}>Input Tax (Purchases)</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-10b981, #10b981)" }}>{fmtC(tr.salesTax.inputTax)}</span>
                             </div>
-                            <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
+                            <div style={{ height: 1, background: "rgba(var(--ink),.08)", margin: "4px 0" }} />
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>
                                 {tr.salesTax.isRefundable ? "Refundable" : "Net Payable"}
                               </span>
-                              <span style={{ fontSize: 16, fontWeight: 900, color: tr.salesTax.isRefundable ? "#10b981" : "#f59e0b" }}>
+                              <span style={{ fontSize: 16, fontWeight: 900, color: tr.salesTax.isRefundable ? "var(--tx-10b981, #10b981)" : "var(--tx-f59e0b, #f59e0b)" }}>
                                 {fmtC(tr.salesTax.netPayable)}
                               </span>
                             </div>
-                            <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                            <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>
                               Due: {tr.salesTax.filingDeadline}
                             </div>
                           </div>
                         </div>
 
                         {/* Income / Corporate Tax */}
-                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+                        <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
                             {tr.incomeTax.taxName}
                           </div>
                           <div style={{ display: "grid", gap: 10 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Annual Net Profit (Est.)</span>
-                              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{fmtC(tr.incomeTax.annualNetProfitEstimate)}</span>
+                              <span style={{ fontSize: 13, color: "rgba(var(--ink),.6)" }}>Annual Net Profit (Est.)</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>{fmtC(tr.incomeTax.annualNetProfitEstimate)}</span>
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Effective Rate</span>
-                              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{tr.incomeTax.effectiveRate}%</span>
+                              <span style={{ fontSize: 13, color: "rgba(var(--ink),.6)" }}>Effective Rate</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>{tr.incomeTax.effectiveRate}%</span>
                             </div>
-                            <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
+                            <div style={{ height: 1, background: "rgba(var(--ink),.08)", margin: "4px 0" }} />
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>Estimated Tax</span>
-                              <span style={{ fontSize: 16, fontWeight: 900, color: "#f59e0b" }}>{fmtC(tr.incomeTax.estimatedTax)}</span>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>Estimated Tax</span>
+                              <span style={{ fontSize: 16, fontWeight: 900, color: "var(--tx-f59e0b, #f59e0b)" }}>{fmtC(tr.incomeTax.estimatedTax)}</span>
                             </div>
-                            <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                            <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>
                               Due: {tr.incomeTax.filingDeadline}
                             </div>
                           </div>
@@ -2766,22 +2766,22 @@ export default function AICommandCenter() {
 
                       {/* Slab Breakdown */}
                       {tr.incomeTax.slabBreakdown.length > 0 && (
-                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Tax Slab Breakdown</div>
+                        <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)", marginBottom: 14 }}>Tax Slab Breakdown</div>
                           <table style={{ width: "100%", borderCollapse: "collapse" }}>
                             <thead>
                               <tr>
-                                <th style={{ textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Slab</th>
-                                <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Taxable Amount</th>
-                                <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Tax</th>
+                                <th style={{ textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Slab</th>
+                                <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Taxable Amount</th>
+                                <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Tax</th>
                               </tr>
                             </thead>
                             <tbody>
                               {tr.incomeTax.slabBreakdown.map((row, i) => (
-                                <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
-                                  <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", padding: "8px 0" }}>{row.slab}</td>
-                                  <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", textAlign: "right", padding: "8px 0" }}>{fmtC(row.taxableAmount)}</td>
-                                  <td style={{ fontSize: 12.5, color: "#f59e0b", textAlign: "right", padding: "8px 0", fontWeight: 700 }}>{fmtC(row.tax)}</td>
+                                <tr key={i} style={{ borderTop: "1px solid rgba(var(--ink),.06)" }}>
+                                  <td style={{ fontSize: 12.5, color: "rgba(var(--ink),.7)", padding: "8px 0" }}>{row.slab}</td>
+                                  <td style={{ fontSize: 12.5, color: "rgba(var(--ink),.7)", textAlign: "right", padding: "8px 0" }}>{fmtC(row.taxableAmount)}</td>
+                                  <td style={{ fontSize: 12.5, color: "var(--tx-f59e0b, #f59e0b)", textAlign: "right", padding: "8px 0", fontWeight: 700 }}>{fmtC(row.tax)}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -2791,16 +2791,16 @@ export default function AICommandCenter() {
 
                       {/* WHT Section */}
                       {tr.wht.applicable && (
-                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Withholding Tax on Purchases</div>
+                        <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)", marginBottom: 14 }}>Withholding Tax on Purchases</div>
                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                             <div>
-                              <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>Registered Supplier</div>
-                              <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981" }}>{fmtC(tr.wht.registered)}</div>
+                              <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 4 }}>Registered Supplier</div>
+                              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-10b981, #10b981)" }}>{fmtC(tr.wht.registered)}</div>
                             </div>
                             <div>
-                              <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>Unregistered Supplier</div>
-                              <div style={{ fontSize: 16, fontWeight: 800, color: "#f59e0b" }}>{fmtC(tr.wht.unregistered)}</div>
+                              <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginBottom: 4 }}>Unregistered Supplier</div>
+                              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{fmtC(tr.wht.unregistered)}</div>
                             </div>
                           </div>
                         </div>
@@ -2808,13 +2808,13 @@ export default function AICommandCenter() {
 
                       {/* Notes */}
                       {tr.notes.length > 0 && (
-                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 12 }}>Key Notes &amp; Deadlines</div>
+                        <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.6)", marginBottom: 12 }}>Key Notes &amp; Deadlines</div>
                           <div style={{ display: "grid", gap: 8 }}>
                             {tr.notes.map((note, i) => (
                               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                                <span style={{ color: "#10b981", fontSize: 14, lineHeight: "20px", flexShrink: 0 }}>•</span>
-                                <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.65)", lineHeight: 1.6 }}>{note}</span>
+                                <span style={{ color: "var(--tx-10b981, #10b981)", fontSize: 14, lineHeight: "20px", flexShrink: 0 }}>•</span>
+                                <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.65)", lineHeight: 1.6 }}>{note}</span>
                               </div>
                             ))}
                           </div>
@@ -2822,16 +2822,16 @@ export default function AICommandCenter() {
                       )}
 
                       {/* AI Summary */}
-                      <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                      <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 20 }}>
                         <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 6 }}>AI Summary</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · {tr.lawReference}</div>
+                        <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 14 }}>{taxEstimate.month} · {tr.lawReference}</div>
                         <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
                       </div>
 
                       {/* Disclaimer */}
                       <div style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 12, padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start" }}>
                         <span style={{ fontSize: 16, marginTop: 1 }}>⚠️</span>
-                        <div style={{ fontSize: 12, color: "#f59e0b", lineHeight: 1.6 }}>
+                        <div style={{ fontSize: 12, color: "var(--tx-f59e0b, #f59e0b)", lineHeight: 1.6 }}>
                           This is an estimate based on current data and {tr.lawReference}. Actual tax liability may differ. Consult a qualified tax professional before filing.
                         </div>
                       </div>
@@ -2843,43 +2843,43 @@ export default function AICommandCenter() {
                 <div style={{ display: "grid", gap: 16 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
                     <Panel>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Output Tax</div>
-                      <div style={{ fontSize: 20, fontWeight: 900, color: "#f59e0b" }}>{fmt(taxEstimate.metrics.outputTax, currency)}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Output Tax</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: "var(--tx-f59e0b, #f59e0b)" }}>{fmt(taxEstimate.metrics.outputTax, currency)}</div>
                     </Panel>
                     <Panel>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Input Tax</div>
-                      <div style={{ fontSize: 20, fontWeight: 900, color: "#10b981" }}>{fmt(taxEstimate.metrics.inputTax, currency)}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Input Tax</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: "var(--tx-10b981, #10b981)" }}>{fmt(taxEstimate.metrics.inputTax, currency)}</div>
                     </Panel>
                     <Panel>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Net Tax Position</div>
-                      <div style={{ fontSize: 20, fontWeight: 900, color: taxEstimate.metrics.netTaxPayable >= 0 ? "#f59e0b" : "#10b981" }}>{fmt(taxEstimate.metrics.netTaxPayable, currency)}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Net Tax Position</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: taxEstimate.metrics.netTaxPayable >= 0 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-10b981, #10b981)" }}>{fmt(taxEstimate.metrics.netTaxPayable, currency)}</div>
                     </Panel>
                   </div>
 
                   <Panel>
                     <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 6 }}>AI Tax Estimate</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · estimate based on taxed sales, taxed purchases, and configured tax profiles.</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 14 }}>{taxEstimate.month} · estimate based on taxed sales, taxed purchases, and configured tax profiles.</div>
                     <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
                   </Panel>
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <Panel>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>Coverage</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>Coverage</div>
                       <div style={{ display: "grid", gap: 8 }}>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Tax configurations: {taxEstimate.metrics.taxConfigsCount}</div>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Taxed sales invoices: {taxEstimate.metrics.taxedSalesInvoices}</div>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Taxed purchase invoices: {taxEstimate.metrics.taxedPurchaseInvoices}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Tax configurations: {taxEstimate.metrics.taxConfigsCount}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Taxed sales invoices: {taxEstimate.metrics.taxedSalesInvoices}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Taxed purchase invoices: {taxEstimate.metrics.taxedPurchaseInvoices}</div>
                       </div>
                     </Panel>
                     <Panel>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>Tax Profiles</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(var(--ink),.6)" }}>Tax Profiles</div>
                       <div style={{ display: "grid", gap: 8 }}>
                         {taxEstimate.taxCoverage.length ? taxEstimate.taxCoverage.map((tax) => (
-                          <div key={`${tax.taxCode}-${tax.taxType}`} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>
+                          <div key={`${tax.taxCode}-${tax.taxType}`} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>
                             {tax.taxType} · {tax.taxCode} · {tax.taxRate}%
                           </div>
                         )) : (
-                          <div style={{ color: "rgba(255,255,255,.4)", fontSize: 13 }}>No tax configuration found.</div>
+                          <div style={{ color: "rgba(var(--ink),.4)", fontSize: 13 }}>No tax configuration found.</div>
                         )}
                       </div>
                     </Panel>
@@ -2898,9 +2898,9 @@ export default function AICommandCenter() {
               {(["weekly", "monthly", "quarterly"] as const).map(p => (
                 <button key={p} onClick={() => { setReportPeriod(p); setReport(null); }} style={{
                   padding: "7px 18px", borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                  border: reportPeriod === p ? "1px solid rgba(99,102,241,.5)" : "1px solid rgba(255,255,255,.1)",
-                  background: reportPeriod === p ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
-                  color: reportPeriod === p ? "#c7d2fe" : "rgba(255,255,255,.5)",
+                  border: reportPeriod === p ? "1px solid rgba(99,102,241,.5)" : "1px solid rgba(var(--ink),.1)",
+                  background: reportPeriod === p ? "rgba(99,102,241,.18)" : "rgba(var(--ink),.04)",
+                  color: reportPeriod === p ? "#c7d2fe" : "rgba(var(--ink),.5)",
                 }}>
                   {{ weekly: "Weekly", monthly: "Monthly", quarterly: "Quarterly" }[p]}
                 </button>
@@ -2908,11 +2908,11 @@ export default function AICommandCenter() {
             </div>
 
             {loadingReport ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div style={{ textAlign: "center" }}>
                   <div style={{ marginBottom: 4 }}>AI is generating your {reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} Financial Report…</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>This may take 15–30 seconds</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.25)" }}>This may take 15–30 seconds</div>
                 </div>
               </div>
             ) : report ? (
@@ -2922,11 +2922,11 @@ export default function AICommandCenter() {
                     <div style={{ fontSize: 24 }}>📄</div>
                       <div>
                         <div style={{ fontWeight: 800, fontSize: 16 }}>{reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} Financial Report</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Generated by FinovaOS AI · {new Date(report.generatedAt || Date.now()).toLocaleDateString("en-US", { dateStyle: "long" })}</div>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>Generated by FinovaOS AI · {new Date(report.generatedAt || Date.now()).toLocaleDateString("en-US", { dateStyle: "long" })}</div>
                       </div>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={() => { setReport(null); loadReport(); }} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                    <button onClick={() => { setReport(null); loadReport(); }} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
                       ↻ Regenerate
                     </button>
                     <button onClick={() => {
@@ -2946,13 +2946,13 @@ export default function AICommandCenter() {
                 <div id="ai-report-content" style={{ display: "grid", gap: 16 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
                     {[
-                      { label: "Revenue", value: fmt(report.summary.revenue, currency), color: "#10b981" },
-                      { label: "Expenses", value: fmt(report.summary.expenses, currency), color: "#f59e0b" },
-                      { label: "Profit", value: fmt(report.summary.profit, currency), color: report.summary.profit >= 0 ? "#10b981" : "#ef4444" },
-                      { label: "Cash Risk", value: report.highlights?.cashRisk || "n/a", color: report.highlights?.cashRisk === "high" ? "#ef4444" : report.highlights?.cashRisk === "medium" ? "#f59e0b" : "#a5b4fc" },
+                      { label: "Revenue", value: fmt(report.summary.revenue, currency), color: "var(--tx-10b981, #10b981)" },
+                      { label: "Expenses", value: fmt(report.summary.expenses, currency), color: "var(--tx-f59e0b, #f59e0b)" },
+                      { label: "Profit", value: fmt(report.summary.profit, currency), color: report.summary.profit >= 0 ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" },
+                      { label: "Cash Risk", value: report.highlights?.cashRisk || "n/a", color: report.highlights?.cashRisk === "high" ? "var(--tx-ef4444, #ef4444)" : report.highlights?.cashRisk === "medium" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-a5b4fc, #a5b4fc)" },
                     ].map((item) => (
                       <Panel key={item.label} style={{ padding: isMobile ? "12px 10px" : "16px 18px" }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>{item.label}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>{item.label}</div>
                         <div style={{ fontSize: 20, fontWeight: 900, color: item.color }}>{item.value}</div>
                       </Panel>
                     ))}
@@ -2960,29 +2960,29 @@ export default function AICommandCenter() {
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <Panel>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "rgba(255,255,255,.6)" }}>CEO Highlights</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "rgba(var(--ink),.6)" }}>CEO Highlights</div>
                       <div style={{ display: "grid", gap: 8 }}>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Top customer: {report.highlights?.topCustomer?.name || "n/a"}</div>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Top expense: {report.highlights?.topExpense?.category || "n/a"}</div>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Low stock items: {report.highlights?.lowStockCount ?? 0}</div>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Overdue receivables: {fmt(report.highlights?.overdueReceivables || 0, currency)}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Top customer: {report.highlights?.topCustomer?.name || "n/a"}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Top expense: {report.highlights?.topExpense?.category || "n/a"}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Low stock items: {report.highlights?.lowStockCount ?? 0}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>Overdue receivables: {fmt(report.highlights?.overdueReceivables || 0, currency)}</div>
                       </div>
                     </Panel>
                     <Panel>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "rgba(255,255,255,.6)" }}>Risk Snapshot</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "rgba(var(--ink),.6)" }}>Risk Snapshot</div>
                       {report.riskSnapshot ? (
                         <div style={{ display: "grid", gap: 8 }}>
-                          <div style={{ fontSize: 22, fontWeight: 900, color: report.riskSnapshot.label === "Low" ? "#10b981" : report.riskSnapshot.label === "Medium" ? "#f59e0b" : "#ef4444" }}>
+                          <div style={{ fontSize: 22, fontWeight: 900, color: report.riskSnapshot.label === "Low" ? "var(--tx-10b981, #10b981)" : report.riskSnapshot.label === "Medium" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" }}>
                             {report.riskSnapshot.score}/100
                           </div>
                           {report.riskSnapshot.items.slice(0, 3).map((item) => (
-                            <div key={item.title} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>
+                            <div key={item.title} style={{ fontSize: 12.5, color: "rgba(var(--ink),.72)" }}>
                               {item.title}: {item.note}
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div style={{ color: "rgba(255,255,255,.4)", fontSize: 13 }}>Risk snapshot unavailable.</div>
+                        <div style={{ color: "rgba(var(--ink),.4)", fontSize: 13 }}>Risk snapshot unavailable.</div>
                       )}
                     </Panel>
                   </div>
@@ -2996,7 +2996,7 @@ export default function AICommandCenter() {
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 56, marginBottom: 20 }}>📊</div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Generate {reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} AI Report</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
+                <div style={{ fontSize: 14, color: "rgba(var(--ink),.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
                   AI will analyze all your financial data and generate a comprehensive {reportPeriod} report including revenue, expenses, profit, cash flow, risks, and recommendations.
                 </div>
                 <button onClick={() => loadReport(reportPeriod)} style={{
@@ -3018,14 +3018,14 @@ export default function AICommandCenter() {
             {loadingMarket ? (
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <Spinner size={36} />
-                <div style={{ color: "rgba(255,255,255,.4)", marginTop: 16 }}>Building market intelligence…</div>
-                <div style={{ color: "rgba(255,255,255,.25)", marginTop: 8, fontSize: 12 }}>This may take up to 20 seconds</div>
+                <div style={{ color: "rgba(var(--ink),.4)", marginTop: 16 }}>Building market intelligence…</div>
+                <div style={{ color: "rgba(var(--ink),.25)", marginTop: 8, fontSize: 12 }}>This may take up to 20 seconds</div>
               </Panel>
             ) : marketError ? (
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 36, marginBottom: 16 }}>⚠️</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 8 }}>Failed to Load</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>{marketError}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 8 }}>Failed to Load</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)", marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>{marketError}</div>
                 <button onClick={loadMarketIntel} style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                   Try Again
                 </button>
@@ -3040,30 +3040,30 @@ export default function AICommandCenter() {
                       <div style={{ fontSize: 22, fontWeight: 800 }}>Market Intelligence</div>
                       {marketIntel.aiEnhanced
                         ? <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(99,102,241,.2)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,.3)" }}>GPT Enhanced</span>
-                        : <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.35)", border: "1px solid rgba(255,255,255,.1)" }}>Rule-based</span>
+                        : <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),.35)", border: "1px solid rgba(var(--ink),.1)" }}>Rule-based</span>
                       }
                     </div>
-                    <div style={{ fontSize: 14, color: "rgba(255,255,255,.55)", marginBottom: 10 }}>{marketIntel.businessLabel} industry analysis</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.7 }}>{renderMarkdown(marketIntel.summary)}</div>
+                    <div style={{ fontSize: 14, color: "rgba(var(--ink),.55)", marginBottom: 10 }}>{marketIntel.businessLabel} industry analysis</div>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.7 }}>{renderMarkdown(marketIntel.summary)}</div>
                   </div>
                 </Panel>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 20 }}>
                   {/* Suggested New Products */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>🆕 Suggested Products to Add</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>🆕 Suggested Products to Add</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {marketIntel.suggestedNewProducts.slice(0, 6).map((p, i) => (
                         <div key={i} style={{ borderLeft: `3px solid ${p.potentialRevenue === "high" ? "#10b981" : p.potentialRevenue === "medium" ? "#f59e0b" : "#6366f1"}`, paddingLeft: 12 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "white" }}>{p.name}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>{p.name}</span>
                             <span style={{
                               fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 20,
                               background: p.potentialRevenue === "high" ? "rgba(16,185,129,.15)" : p.potentialRevenue === "medium" ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)",
                               color: p.potentialRevenue === "high" ? "#6ee7b7" : p.potentialRevenue === "medium" ? "#fcd34d" : "#a5b4fc",
                             }}>{p.potentialRevenue.toUpperCase()}</span>
                           </div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>{p.reason}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>{p.reason}</div>
                         </div>
                       ))}
                     </div>
@@ -3071,12 +3071,12 @@ export default function AICommandCenter() {
 
                   {/* Industry Trends */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>📊 Industry Trends</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>📊 Industry Trends</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {marketIntel.trendsThisIndustry.map((trend, i) => (
                         <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                          <span style={{ color: "#6366f1", fontSize: 16, flexShrink: 0 }}>→</span>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.6 }}>{trend}</span>
+                          <span style={{ color: "var(--tx-6366f1, #6366f1)", fontSize: 16, flexShrink: 0 }}>→</span>
+                          <span style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.6 }}>{trend}</span>
                         </div>
                       ))}
                     </div>
@@ -3084,13 +3084,13 @@ export default function AICommandCenter() {
 
                   {/* Seasonal Opportunities */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>📅 Seasonal Opportunities (Next 3 Months)</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>📅 Seasonal Opportunities (Next 3 Months)</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       {marketIntel.seasonalOpportunities.map((s, i) => (
                         <div key={i}>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#6366f1", marginBottom: 6 }}>{s.month}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-6366f1, #6366f1)", marginBottom: 6 }}>{s.month}</div>
                           {s.opportunities.map((opp, j) => (
-                            <div key={j} style={{ fontSize: 12, color: "rgba(255,255,255,.6)", paddingLeft: 12, lineHeight: 1.7 }}>• {opp}</div>
+                            <div key={j} style={{ fontSize: 12, color: "rgba(var(--ink),.6)", paddingLeft: 12, lineHeight: 1.7 }}>• {opp}</div>
                           ))}
                         </div>
                       ))}
@@ -3099,12 +3099,12 @@ export default function AICommandCenter() {
 
                   {/* Revenue Diversification */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>💡 Revenue Diversification</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>💡 Revenue Diversification</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {marketIntel.revenueDiversification.map((item, i) => (
                         <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                          <span style={{ color: "#10b981", fontSize: 14, flexShrink: 0 }}>✓</span>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.6 }}>{item}</span>
+                          <span style={{ color: "var(--tx-10b981, #10b981)", fontSize: 14, flexShrink: 0 }}>✓</span>
+                          <span style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.6 }}>{item}</span>
                         </div>
                       ))}
                     </div>
@@ -3112,12 +3112,12 @@ export default function AICommandCenter() {
 
                   {/* Competitive Edge */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>🏆 Competitive Edge Actions</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>🏆 Competitive Edge Actions</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {marketIntel.competitorEdge.map((item, i) => (
                         <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                          <span style={{ color: "#f59e0b", fontSize: 14, flexShrink: 0 }}>★</span>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.6 }}>{item}</span>
+                          <span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontSize: 14, flexShrink: 0 }}>★</span>
+                          <span style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.6 }}>{item}</span>
                         </div>
                       ))}
                     </div>
@@ -3128,7 +3128,7 @@ export default function AICommandCenter() {
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 56, marginBottom: 20 }}>🌐</div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Market Intelligence</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
+                <div style={{ fontSize: 14, color: "rgba(var(--ink),.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
                   Discover what products to add, industry trends, seasonal opportunities, and competitive strategies for your business type.
                 </div>
                 <button onClick={loadMarketIntel} style={{
@@ -3147,7 +3147,7 @@ export default function AICommandCenter() {
             {loadingAdvisor ? (
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <Spinner size={36} />
-                <div style={{ color: "rgba(255,255,255,.4)", marginTop: 16 }}>Building your business advisor…</div>
+                <div style={{ color: "rgba(var(--ink),.4)", marginTop: 16 }}>Building your business advisor…</div>
               </Panel>
             ) : businessAdvisor ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -3156,18 +3156,18 @@ export default function AICommandCenter() {
                   <HealthRing score={businessAdvisor.score?.overall ?? 0} />
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Business Advisor</div>
-                    <div style={{ fontSize: 14, color: "rgba(255,255,255,.55)", marginBottom: 6 }}>
-                      Health Score: <span style={{ color: businessAdvisor.score?.label === "Low Risk" ? "#10b981" : businessAdvisor.score?.label === "Medium Risk" ? "#f59e0b" : "#ef4444", fontWeight: 700 }}>{businessAdvisor.score?.label || "Unavailable"}</span>
+                    <div style={{ fontSize: 14, color: "rgba(var(--ink),.55)", marginBottom: 6 }}>
+                      Health Score: <span style={{ color: businessAdvisor.score?.label === "Low Risk" ? "var(--tx-10b981, #10b981)" : businessAdvisor.score?.label === "Medium Risk" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)", fontWeight: 700 }}>{businessAdvisor.score?.label || "Unavailable"}</span>
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.7 }}>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.7 }}>
                       Personalized growth plan based on your financial data and industry profile.
                     </div>
                   </div>
                   {(businessAdvisor.quickWins?.length || 0) > 0 && (
                     <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", minWidth: 200 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7", marginBottom: 8 }}>⚡ QUICK WINS</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-6ee7b7, #6ee7b7)", marginBottom: 8 }}>⚡ QUICK WINS</div>
                       {businessAdvisor.quickWins.slice(0, 3).map((win, i) => (
-                        <div key={i} style={{ fontSize: 12, color: "rgba(255,255,255,.7)", lineHeight: 1.6, paddingLeft: 8 }}>• {win}</div>
+                        <div key={i} style={{ fontSize: 12, color: "rgba(var(--ink),.7)", lineHeight: 1.6, paddingLeft: 8 }}>• {win}</div>
                       ))}
                     </div>
                   )}
@@ -3176,24 +3176,24 @@ export default function AICommandCenter() {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", gap: 20 }}>
                   {/* Growth Plan */}
                   <Panel style={{ gridColumn: "1 / -1" }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>🚀 Growth Plan</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>🚀 Growth Plan</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                       {businessAdvisor.growthPlan.map((item, i) => {
                         const priorityColor = item.priority === "urgent" ? "#ef4444" : item.priority === "high" ? "#f59e0b" : item.priority === "medium" ? "#6366f1" : "#10b981";
                         return (
                           <div key={i} style={{ borderLeft: `3px solid ${priorityColor}`, paddingLeft: 16 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                              <span style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{item.title}</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)" }}>{item.title}</span>
                               <span style={{
                                 fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase",
                                 background: `${priorityColor}22`, color: priorityColor,
                               }}>{item.priority}</span>
                             </div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>Impact: {renderMarkdown(item.impact)}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8 }}>Impact: {renderMarkdown(item.impact)}</div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                               {item.steps.map((step, j) => (
-                                <div key={j} style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", display: "flex", gap: 8 }}>
-                                  <span style={{ color: "#6366f1", flexShrink: 0 }}>{j + 1}.</span>{step}
+                                <div key={j} style={{ fontSize: 12.5, color: "rgba(var(--ink),.7)", display: "flex", gap: 8 }}>
+                                  <span style={{ color: "var(--tx-6366f1, #6366f1)", flexShrink: 0 }}>{j + 1}.</span>{step}
                                 </div>
                               ))}
                             </div>
@@ -3205,13 +3205,13 @@ export default function AICommandCenter() {
 
                   {/* Cross-sell / Upsell */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>🔗 Cross-sell & Upsell</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>🔗 Cross-sell & Upsell</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       {businessAdvisor.crossSellUpsell.map((item, i) => (
-                        <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 10, padding: "10px 14px" }}>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 4 }}>When customer buys: <span style={{ color: "#c7d2fe" }}>{item.trigger}</span></div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "white", marginBottom: 4 }}>→ Suggest: {item.suggest}</div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>{item.reason}</div>
+                        <div key={i} style={{ background: "rgba(var(--ink),.03)", borderRadius: 10, padding: "10px 14px" }}>
+                          <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 4 }}>When customer buys: <span style={{ color: "var(--tx-c7d2fe, #c7d2fe)" }}>{item.trigger}</span></div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-solid, white)", marginBottom: 4 }}>→ Suggest: {item.suggest}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>{item.reason}</div>
                         </div>
                       ))}
                     </div>
@@ -3219,12 +3219,12 @@ export default function AICommandCenter() {
 
                   {/* Market Gaps */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>🎯 Market Gaps to Capture</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>🎯 Market Gaps to Capture</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {businessAdvisor.marketGaps.map((gap, i) => (
                         <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                          <span style={{ color: "#10b981", fontSize: 14, flexShrink: 0 }}>◆</span>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.6 }}>{gap}</span>
+                          <span style={{ color: "var(--tx-10b981, #10b981)", fontSize: 14, flexShrink: 0 }}>◆</span>
+                          <span style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.6 }}>{gap}</span>
                         </div>
                       ))}
                     </div>
@@ -3232,7 +3232,7 @@ export default function AICommandCenter() {
 
                   {/* Risk Warnings */}
                   <Panel>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#a5b4fc" }}>⚠️ Risk Warnings</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--tx-a5b4fc, #a5b4fc)" }}>⚠️ Risk Warnings</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       {businessAdvisor.riskWarnings.map((risk, i) => {
                         const tone = severityTone(risk.severity);
@@ -3242,8 +3242,8 @@ export default function AICommandCenter() {
                               <span style={{ fontSize: 13, fontWeight: 700, color: tone.color }}>{risk.title}</span>
                               <SeverityBadge severity={risk.severity} />
                             </div>
-                            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.65)", marginBottom: 6 }}>{renderMarkdown(risk.description)}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Mitigation: {renderMarkdown(risk.mitigation)}</div>
+                            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.65)", marginBottom: 6 }}>{renderMarkdown(risk.description)}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>Mitigation: {renderMarkdown(risk.mitigation)}</div>
                           </div>
                         );
                       })}
@@ -3255,7 +3255,7 @@ export default function AICommandCenter() {
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 56, marginBottom: 20 }}>🧭</div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>AI Business Advisor</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
+                <div style={{ fontSize: 14, color: "rgba(var(--ink),.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
                   Get a personalized growth plan, cross-sell opportunities, market gap analysis, and risk warnings — all based on your real business data.
                 </div>
                 <button onClick={loadBusinessAdvisor} style={{
@@ -3275,7 +3275,7 @@ export default function AICommandCenter() {
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 56, marginBottom: 20 }}>🔗</div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Smart Reconciliation AI</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px", lineHeight: 1.7 }}>
+                <div style={{ fontSize: 14, color: "rgba(var(--ink),.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px", lineHeight: 1.7 }}>
                   AI scans your bank transactions and automatically matches them to invoices, payments, and expenses — with a confidence score for each match.
                 </div>
                 <button onClick={loadReconciliation} style={{
@@ -3285,7 +3285,7 @@ export default function AICommandCenter() {
                 }}>Run Reconciliation AI</button>
               </Panel>
             ) : loadingReconciliation ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(var(--ink),.4)" }}>
                 <Spinner size={32} />
                 <div style={{ fontSize: 14 }}>AI is matching transactions…</div>
               </div>
@@ -3294,14 +3294,14 @@ export default function AICommandCenter() {
                 {/* KPI strip */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12 }}>
                   {[
-                    { label: "Total Entries", value: reconciliation.summary.total, color: "#a5b4fc" },
-                    { label: "Auto-Matched", value: reconciliation.summary.autoMatched, color: "#10b981" },
-                    { label: "Manual Match", value: reconciliation.summary.manuallyMatched, color: "#60a5fa" },
-                    { label: "Pending Review", value: reconciliation.summary.pending, color: "#f59e0b" },
-                    { label: "Unmatched", value: reconciliation.summary.unmatched, color: "#ef4444" },
+                    { label: "Total Entries", value: reconciliation.summary.total, color: "var(--tx-a5b4fc, #a5b4fc)" },
+                    { label: "Auto-Matched", value: reconciliation.summary.autoMatched, color: "var(--tx-10b981, #10b981)" },
+                    { label: "Manual Match", value: reconciliation.summary.manuallyMatched, color: "var(--tx-60a5fa, #60a5fa)" },
+                    { label: "Pending Review", value: reconciliation.summary.pending, color: "var(--tx-f59e0b, #f59e0b)" },
+                    { label: "Unmatched", value: reconciliation.summary.unmatched, color: "var(--tx-ef4444, #ef4444)" },
                   ].map(k => (
-                    <div key={k.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginBottom: 8, fontWeight: 600 }}>{k.label}</div>
+                    <div key={k.label} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.38)", marginBottom: 8, fontWeight: 600 }}>{k.label}</div>
                       <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
                     </div>
                   ))}
@@ -3309,12 +3309,12 @@ export default function AICommandCenter() {
 
                 {/* Empty state when no bank transactions exist */}
                 {reconciliation.summary.total === 0 && (
-                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "22px 13px" : "40px 28px", textAlign: "center" }}>
+                  <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: isMobile ? "22px 13px" : "40px 28px", textAlign: "center" }}>
                     <div style={{ fontSize: 44, marginBottom: 16 }}>🏦</div>
                     <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 10 }}>No Bank Transactions Found</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 24px" }}>
-                      Reconciliation matches your <strong style={{ color: "rgba(255,255,255,.75)" }}>bank statement entries</strong> with your invoices, payments, and expenses.
-                      To use this feature, first record bank transactions via <strong style={{ color: "rgba(255,255,255,.75)" }}>Banking &amp; Payments → Bank Transactions</strong>.
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 24px" }}>
+                      Reconciliation matches your <strong style={{ color: "rgba(var(--ink),.75)" }}>bank statement entries</strong> with your invoices, payments, and expenses.
+                      To use this feature, first record bank transactions via <strong style={{ color: "rgba(var(--ink),.75)" }}>Banking &amp; Payments → Bank Transactions</strong>.
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12, maxWidth: 560, margin: "0 auto" }}>
                       {[
@@ -3322,10 +3322,10 @@ export default function AICommandCenter() {
                         { icon: "✏️", label: "Enter Transactions Manually", desc: "Add bank entries one by one" },
                         { icon: "🔄", label: "Auto-sync Bank Feed", desc: "Connect your bank for live sync" },
                       ].map(s => (
-                        <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left" }}>
+                        <div key={s.label} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left" }}>
                           <div style={{ fontSize: 22, marginBottom: 8 }}>{s.icon}</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.8)", marginBottom: 4 }}>{s.label}</div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", lineHeight: 1.5 }}>{s.desc}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.8)", marginBottom: 4 }}>{s.label}</div>
+                          <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", lineHeight: 1.5 }}>{s.desc}</div>
                         </div>
                       ))}
                     </div>
@@ -3337,9 +3337,9 @@ export default function AICommandCenter() {
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {(["all", "pending", "auto_matched", "unmatched"] as const).map(f => (
                     <button key={f} onClick={() => setReconciliationFilter(f)} style={{
-                      padding: "7px 16px", borderRadius: 999, border: reconciliationFilter === f ? "1px solid rgba(99,102,241,.5)" : "1px solid rgba(255,255,255,.1)",
-                      background: reconciliationFilter === f ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
-                      color: reconciliationFilter === f ? "#c7d2fe" : "rgba(255,255,255,.55)",
+                      padding: "7px 16px", borderRadius: 999, border: reconciliationFilter === f ? "1px solid rgba(99,102,241,.5)" : "1px solid rgba(var(--ink),.1)",
+                      background: reconciliationFilter === f ? "rgba(99,102,241,.18)" : "rgba(var(--ink),.04)",
+                      color: reconciliationFilter === f ? "#c7d2fe" : "rgba(var(--ink),.55)",
                       fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                     }}>
                       {{ all: "All", pending: "Pending Review", auto_matched: "Auto-Matched", unmatched: "Unmatched" }[f]}
@@ -3354,15 +3354,15 @@ export default function AICommandCenter() {
                     .filter(item => reconciliationFilter === "all" || item.status === reconciliationFilter)
                     .map(item => {
                       const statusCfg = {
-                        pending: { label: "Pending", color: "#f59e0b", bg: "rgba(245,158,11,.12)", border: "rgba(245,158,11,.3)" },
-                        auto_matched: { label: "Auto-Matched", color: "#10b981", bg: "rgba(16,185,129,.1)", border: "rgba(16,185,129,.25)" },
-                        manually_matched: { label: "Manual Match", color: "#60a5fa", bg: "rgba(96,165,250,.1)", border: "rgba(96,165,250,.25)" },
-                        unmatched: { label: "Unmatched", color: "#ef4444", bg: "rgba(239,68,68,.1)", border: "rgba(239,68,68,.25)" },
+                        pending: { label: "Pending", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)", border: "rgba(245,158,11,.3)" },
+                        auto_matched: { label: "Auto-Matched", color: "var(--tx-10b981, #10b981)", bg: "rgba(16,185,129,.1)", border: "rgba(16,185,129,.25)" },
+                        manually_matched: { label: "Manual Match", color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.1)", border: "rgba(96,165,250,.25)" },
+                        unmatched: { label: "Unmatched", color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.1)", border: "rgba(239,68,68,.25)" },
                       }[item.status];
                       return (
-                        <div key={item.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+                        <div key={item.id} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden" }}>
                           {/* Transaction header */}
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 18px", gap: 16, flexWrap: "wrap", borderBottom: item.matches.length > 0 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "14px 18px", gap: 16, flexWrap: "wrap", borderBottom: item.matches.length > 0 ? "1px solid rgba(var(--ink),.05)" : "none" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
                               <div style={{
                                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -3373,8 +3373,8 @@ export default function AICommandCenter() {
                                 {item.direction === "credit" ? "↓" : "↑"}
                               </div>
                               <div>
-                                <div style={{ fontSize: 13.5, fontWeight: 700, color: "white" }}>{item.description}</div>
-                                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{item.ledgerRef} · {item.date}</div>
+                                <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-solid, white)" }}>{item.description}</div>
+                                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{item.ledgerRef} · {item.date}</div>
                               </div>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -3384,7 +3384,7 @@ export default function AICommandCenter() {
                                 </span>
                               )}
                               <div style={{ textAlign: "right" }}>
-                                <div style={{ fontSize: 16, fontWeight: 800, color: item.direction === "credit" ? "#10b981" : "#f87171" }}>
+                                <div style={{ fontSize: 16, fontWeight: 800, color: item.direction === "credit" ? "var(--tx-10b981, #10b981)" : "var(--tx-f87171, #f87171)" }}>
                                   {item.direction === "credit" ? "+" : "−"}{item.amount.toLocaleString()}
                                 </div>
                               </div>
@@ -3397,7 +3397,7 @@ export default function AICommandCenter() {
                           {/* Match candidates */}
                           {item.matches.length > 0 && (
                             <div style={{ padding: "12px 18px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
-                              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 4 }}>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 4 }}>
                                 {item.matches.length} Match Candidate{item.matches.length !== 1 ? "s" : ""}
                               </div>
                               {item.matches.map(match => {
@@ -3407,19 +3407,19 @@ export default function AICommandCenter() {
                                 return (
                                   <div key={match.id} style={{
                                     display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10,
-                                    background: isSelected ? "rgba(99,102,241,.12)" : "rgba(255,255,255,.025)",
-                                    border: `1px solid ${isSelected ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.06)"}`,
+                                    background: isSelected ? "rgba(99,102,241,.12)" : "rgba(var(--ink),.025)",
+                                    border: `1px solid ${isSelected ? "rgba(99,102,241,.35)" : "rgba(var(--ink),.06)"}`,
                                     flexWrap: "wrap",
                                   }}>
                                     <span style={{ fontSize: 16 }}>{typeIcon}</span>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{match.ref} · {match.party}</div>
-                                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginTop: 2 }}>{match.type.toUpperCase()} · {match.date}</div>
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(var(--ink),.85)" }}>{match.ref} · {match.party}</div>
+                                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.38)", marginTop: 2 }}>{match.type.toUpperCase()} · {match.date}</div>
                                     </div>
-                                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", marginRight: 4 }}>{match.amount.toLocaleString()}</div>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.7)", marginRight: 4 }}>{match.amount.toLocaleString()}</div>
                                     <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 8, background: `${confColor}18`, border: `1px solid ${confColor}35` }}>
                                       <span style={{ fontSize: 11, fontWeight: 800, color: confColor }}>{match.confidence}%</span>
-                                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>conf</span>
+                                      <span style={{ fontSize: 10, color: "rgba(var(--ink),.3)" }}>conf</span>
                                     </div>
                                     {item.status === "pending" && (
                                       <button onClick={() => {
@@ -3436,7 +3436,7 @@ export default function AICommandCenter() {
                                       </button>
                                     )}
                                     {isSelected && (
-                                      <span style={{ fontSize: 18, color: "#10b981" }}>✓</span>
+                                      <span style={{ fontSize: 18, color: "var(--tx-10b981, #10b981)" }}>✓</span>
                                     )}
                                   </div>
                                 );
@@ -3444,7 +3444,7 @@ export default function AICommandCenter() {
                             </div>
                           )}
                           {item.matches.length === 0 && item.status === "unmatched" && (
-                            <div style={{ padding: "10px 18px 12px", fontSize: 12.5, color: "rgba(255,255,255,.3)", fontStyle: "italic" }}>
+                            <div style={{ padding: "10px 18px 12px", fontSize: 12.5, color: "rgba(var(--ink),.3)", fontStyle: "italic" }}>
                               No matching records found. Manual journal entry may be required.
                             </div>
                           )}
@@ -3460,12 +3460,12 @@ export default function AICommandCenter() {
           {/* ── SCAN RECEIPT TAB ─────────────────────────────────────────── */}
         {tab === "scan" && (
           <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px" }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📷</div>
                 <div>
                   <div style={{ fontSize: 17, fontWeight: 800 }}>Receipt / Invoice Scanner</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Upload any receipt or invoice — AI extracts vendor, amount, tax, and category automatically</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 2 }}>Upload any receipt or invoice — AI extracts vendor, amount, tax, and category automatically</div>
                 </div>
               </div>
 
@@ -3486,9 +3486,9 @@ export default function AICommandCenter() {
                   }
                 }}
                 style={{
-                  border: `2px dashed ${scanFile ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.12)"}`,
+                  border: `2px dashed ${scanFile ? "rgba(99,102,241,.5)" : "rgba(var(--ink),.12)"}`,
                   borderRadius: 14, padding: isMobile ? "18px 10px" : "32px 20px", textAlign: "center", cursor: "pointer",
-                  background: scanFile ? "rgba(99,102,241,.06)" : "rgba(255,255,255,.02)",
+                  background: scanFile ? "rgba(99,102,241,.06)" : "rgba(var(--ink),.02)",
                   transition: "all .2s", marginBottom: 16,
                 }}
               >
@@ -3497,8 +3497,8 @@ export default function AICommandCenter() {
                 ) : (
                   <>
                     <div style={{ fontSize: 36, marginBottom: 10 }}>📄</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>Click or drag &amp; drop</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>JPG, PNG, WEBP — receipts, invoices, bills</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),.7)" }}>Click or drag &amp; drop</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 4 }}>JPG, PNG, WEBP — receipts, invoices, bills</div>
                   </>
                 )}
               </div>
@@ -3520,8 +3520,8 @@ export default function AICommandCenter() {
                   disabled={!scanFile || scanLoading}
                   style={{
                     flex: 1, padding: "12px 0", borderRadius: 11, border: "none", cursor: scanFile && !scanLoading ? "pointer" : "not-allowed",
-                    background: scanFile && !scanLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)",
-                    color: scanFile && !scanLoading ? "white" : "rgba(255,255,255,.3)",
+                    background: scanFile && !scanLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.07)",
+                    color: scanFile && !scanLoading ? "white" : "rgba(var(--ink),.3)",
                     fontSize: 14, fontWeight: 700, fontFamily: "inherit",
                     boxShadow: scanFile && !scanLoading ? "0 4px 16px rgba(99,102,241,.35)" : "none",
                     transition: "all .2s",
@@ -3531,14 +3531,14 @@ export default function AICommandCenter() {
                 </button>
                 {scanFile && (
                   <button onClick={() => { setScanFile(null); setScanPreview(null); setScanResult(null); setScanError(null); if (scanFileRef.current) scanFileRef.current.value = ""; }}
-                    style={{ padding: "12px 18px", borderRadius: 11, border: "1px solid rgba(255,255,255,.12)", background: "none", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                    style={{ padding: "12px 18px", borderRadius: 11, border: "1px solid rgba(var(--ink),.12)", background: "none", color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
                     Clear
                   </button>
                 )}
               </div>
 
               {scanError && (
-                <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", fontSize: 13 }}>
+                <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>
                   ⚠️ {scanError}
                 </div>
               )}
@@ -3546,11 +3546,11 @@ export default function AICommandCenter() {
 
             {/* Results */}
             {scanResult && (
-              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px" }}>
+              <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>Extracted Data</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 999, background: scanResult.confidence >= 80 ? "rgba(16,185,129,.1)" : "rgba(245,158,11,.1)", border: `1px solid ${scanResult.confidence >= 80 ? "rgba(16,185,129,.3)" : "rgba(245,158,11,.3)"}` }}>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: scanResult.confidence >= 80 ? "#10b981" : "#f59e0b" }}>{scanResult.confidence}% confidence</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: scanResult.confidence >= 80 ? "var(--tx-10b981, #10b981)" : "var(--tx-f59e0b, #f59e0b)" }}>{scanResult.confidence}% confidence</span>
                   </div>
                 </div>
 
@@ -3563,9 +3563,9 @@ export default function AICommandCenter() {
                     { label: "Currency", value: scanResult.currency },
                     { label: "Tax Rate", value: scanResult.taxRate != null ? `${scanResult.taxRate}%` : null },
                   ].map(({ label, value }) => (
-                    <div key={label} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{label}</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: value ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.25)" }}>{value || "—"}</div>
+                    <div key={label} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: value ? "rgba(var(--ink),.85)" : "rgba(var(--ink),.25)" }}>{value || "—"}</div>
                     </div>
                   ))}
                 </div>
@@ -3573,37 +3573,37 @@ export default function AICommandCenter() {
                 {/* Totals */}
                 <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                    <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Subtotal</span>
+                    <span style={{ fontSize: 13, color: "rgba(var(--ink),.5)" }}>Subtotal</span>
                     <span style={{ fontSize: 13, fontWeight: 700 }}>{scanResult.currency} {scanResult.subtotal?.toLocaleString() ?? "—"}</span>
                   </div>
                   {scanResult.taxAmount != null && (
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Tax {scanResult.taxRate ? `(${scanResult.taxRate}%)` : ""}</span>
+                      <span style={{ fontSize: 13, color: "rgba(var(--ink),.5)" }}>Tax {scanResult.taxRate ? `(${scanResult.taxRate}%)` : ""}</span>
                       <span style={{ fontSize: 13, fontWeight: 700 }}>{scanResult.currency} {scanResult.taxAmount.toLocaleString()}</span>
                     </div>
                   )}
-                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.08)" }}>
-                    <span style={{ fontSize: 15, fontWeight: 800, color: "#c7d2fe" }}>Total</span>
-                    <span style={{ fontSize: 17, fontWeight: 900, color: "#818cf8" }}>{scanResult.currency} {scanResult.total.toLocaleString()}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(var(--ink),.08)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-c7d2fe, #c7d2fe)" }}>Total</span>
+                    <span style={{ fontSize: 17, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)" }}>{scanResult.currency} {scanResult.total.toLocaleString()}</span>
                   </div>
                 </div>
 
                 {/* Line items */}
                 {scanResult.items.length > 0 && (
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
                     {scanResult.items.map((item, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,.05)", gap: 12 }}>
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", flex: 1 }}>{item.description}</span>
-                        {item.qty && <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>×{item.qty}</span>}
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", whiteSpace: "nowrap" }}>{scanResult.currency} {item.amount.toLocaleString()}</span>
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: "1px solid rgba(var(--ink),.05)", gap: 12 }}>
+                        <span style={{ fontSize: 13, color: "rgba(var(--ink),.75)", flex: 1 }}>{item.description}</span>
+                        {item.qty && <span style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>×{item.qty}</span>}
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.7)", whiteSpace: "nowrap" }}>{scanResult.currency} {item.amount.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
                 {scanResult.notes && (
-                  <div style={{ marginTop: 14, fontSize: 12.5, color: "rgba(255,255,255,.4)", fontStyle: "italic" }}>📝 {scanResult.notes}</div>
+                  <div style={{ marginTop: 14, fontSize: 12.5, color: "rgba(var(--ink),.4)", fontStyle: "italic" }}>📝 {scanResult.notes}</div>
                 )}
 
                 <a
@@ -3626,12 +3626,12 @@ export default function AICommandCenter() {
         {/* ── QUICK INVOICE GEN TAB ─────────────────────────────────────── */}
         {tab === "invoice-gen" && (
           <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px" }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✍️</div>
                 <div>
                   <div style={{ fontSize: 17, fontWeight: 800 }}>Quick Invoice Generator</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Type naturally — AI generates a complete invoice draft instantly</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 2 }}>Type naturally — AI generates a complete invoice draft instantly</div>
                 </div>
               </div>
 
@@ -3646,7 +3646,7 @@ export default function AICommandCenter() {
                   <button key={ex} onClick={() => setInvoiceGenPrompt(ex)} style={{
                     padding: "7px 13px", borderRadius: 999, fontSize: 11.5, fontWeight: 600,
                     background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)",
-                    color: "rgba(255,255,255,.65)", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+                    color: "rgba(var(--ink),.65)", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
                   }}>
                     {ex}
                   </button>
@@ -3661,12 +3661,12 @@ export default function AICommandCenter() {
                   placeholder='e.g. "Invoice to Sunrise Trading for Rs. 1,20,000 + GST — consulting services"'
                   rows={3}
                   style={{
-                    width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)",
-                    borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", color: "white", fontSize: 14,
+                    width: "100%", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.12)",
+                    borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", color: "var(--ink-solid, white)", fontSize: 14,
                     fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box",
                   }}
                 />
-                <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.25)", marginTop: 5 }}>Ctrl+Enter to generate</div>
+                <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.25)", marginTop: 5 }}>Ctrl+Enter to generate</div>
               </div>
 
               <button
@@ -3675,8 +3675,8 @@ export default function AICommandCenter() {
                 style={{
                   width: "100%", marginTop: 12, padding: "13px 0", borderRadius: 11, border: "none",
                   cursor: invoiceGenPrompt.trim() && !invoiceGenLoading ? "pointer" : "not-allowed",
-                  background: invoiceGenPrompt.trim() && !invoiceGenLoading ? "linear-gradient(135deg,#10b981,#059669)" : "rgba(255,255,255,.07)",
-                  color: invoiceGenPrompt.trim() && !invoiceGenLoading ? "white" : "rgba(255,255,255,.3)",
+                  background: invoiceGenPrompt.trim() && !invoiceGenLoading ? "linear-gradient(135deg,#10b981,#059669)" : "rgba(var(--ink),.07)",
+                  color: invoiceGenPrompt.trim() && !invoiceGenLoading ? "white" : "rgba(var(--ink),.3)",
                   fontSize: 14, fontWeight: 700, fontFamily: "inherit",
                   boxShadow: invoiceGenPrompt.trim() && !invoiceGenLoading ? "0 4px 16px rgba(16,185,129,.3)" : "none",
                   transition: "all .2s",
@@ -3686,7 +3686,7 @@ export default function AICommandCenter() {
               </button>
 
               {invoiceGenError && (
-                <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", fontSize: 13 }}>
+                <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>
                   ⚠️ {invoiceGenError}
                 </div>
               )}
@@ -3694,11 +3694,11 @@ export default function AICommandCenter() {
 
             {/* Draft preview */}
             {invoiceDraft && (
-              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px" }}>
+              <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
                   <div style={{ fontSize: 15, fontWeight: 800 }}>Invoice Draft</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 999, background: invoiceDraft.confidence >= 80 ? "rgba(16,185,129,.1)" : "rgba(245,158,11,.1)", border: `1px solid ${invoiceDraft.confidence >= 80 ? "rgba(16,185,129,.3)" : "rgba(245,158,11,.3)"}` }}>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: invoiceDraft.confidence >= 80 ? "#10b981" : "#f59e0b" }}>{invoiceDraft.confidence}% confidence</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: invoiceDraft.confidence >= 80 ? "var(--tx-10b981, #10b981)" : "var(--tx-f59e0b, #f59e0b)" }}>{invoiceDraft.confidence}% confidence</span>
                   </div>
                 </div>
 
@@ -3709,27 +3709,27 @@ export default function AICommandCenter() {
                     { label: "Date", value: invoiceDraft.date },
                     { label: "Due Date", value: invoiceDraft.dueDate },
                   ].map(({ label, value }) => (
-                    <div key={label} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{label}</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{value}</div>
+                    <div key={label} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),.85)" }}>{value}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Line items */}
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
-                  <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,.07)" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 60px 90px 80px 90px", gap: 0, padding: "8px 14px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
+                  <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid rgba(var(--ink),.07)" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 60px 90px 80px 90px", gap: 0, padding: "8px 14px", background: "rgba(var(--ink),.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase" }}>
                       <span>Description</span><span style={{ textAlign: "center" }}>Qty</span><span style={{ textAlign: "right" }}>Unit Price</span><span style={{ textAlign: "center" }}>Tax</span><span style={{ textAlign: "right" }}>Amount</span>
                     </div>
                     {invoiceDraft.items.map((item, i) => (
-                      <div key={i} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 60px 90px 80px 90px", gap: 0, padding: "11px 14px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 13 }}>
-                        <span style={{ color: "rgba(255,255,255,.8)" }}>{item.description}</span>
-                        <span style={{ textAlign: "center", color: "rgba(255,255,255,.5)" }}>{item.qty}</span>
-                        <span style={{ textAlign: "right", color: "rgba(255,255,255,.6)" }}>{item.unitPrice.toLocaleString()}</span>
-                        <span style={{ textAlign: "center", color: "rgba(255,255,255,.4)" }}>{item.taxRate > 0 ? `${item.taxRate}%` : "—"}</span>
-                        <span style={{ textAlign: "right", fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{item.amount.toLocaleString()}</span>
+                      <div key={i} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 60px 90px 80px 90px", gap: 0, padding: "11px 14px", borderTop: "1px solid rgba(var(--ink),.05)", fontSize: 13 }}>
+                        <span style={{ color: "rgba(var(--ink),.8)" }}>{item.description}</span>
+                        <span style={{ textAlign: "center", color: "rgba(var(--ink),.5)" }}>{item.qty}</span>
+                        <span style={{ textAlign: "right", color: "rgba(var(--ink),.6)" }}>{item.unitPrice.toLocaleString()}</span>
+                        <span style={{ textAlign: "center", color: "rgba(var(--ink),.4)" }}>{item.taxRate > 0 ? `${item.taxRate}%` : "—"}</span>
+                        <span style={{ textAlign: "right", fontWeight: 700, color: "rgba(var(--ink),.85)" }}>{item.amount.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
@@ -3738,27 +3738,27 @@ export default function AICommandCenter() {
                 {/* Totals */}
                 <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.18)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                    <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Subtotal</span>
+                    <span style={{ fontSize: 13, color: "rgba(var(--ink),.5)" }}>Subtotal</span>
                     <span style={{ fontSize: 13, fontWeight: 700 }}>PKR {invoiceDraft.subtotal.toLocaleString()}</span>
                   </div>
                   {invoiceDraft.taxTotal > 0 && (
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Tax / GST</span>
+                      <span style={{ fontSize: 13, color: "rgba(var(--ink),.5)" }}>Tax / GST</span>
                       <span style={{ fontSize: 13, fontWeight: 700 }}>PKR {invoiceDraft.taxTotal.toLocaleString()}</span>
                     </div>
                   )}
-                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.08)" }}>
-                    <span style={{ fontSize: 15, fontWeight: 800, color: "#6ee7b7" }}>Total</span>
-                    <span style={{ fontSize: 17, fontWeight: 900, color: "#10b981" }}>PKR {invoiceDraft.total.toLocaleString()}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(var(--ink),.08)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-6ee7b7, #6ee7b7)" }}>Total</span>
+                    <span style={{ fontSize: 17, fontWeight: 900, color: "var(--tx-10b981, #10b981)" }}>PKR {invoiceDraft.total.toLocaleString()}</span>
                   </div>
                 </div>
 
                 {invoiceDraft.notes && (
-                  <div style={{ marginTop: 12, fontSize: 12.5, color: "rgba(255,255,255,.4)", fontStyle: "italic" }}>📝 {invoiceDraft.notes}</div>
+                  <div style={{ marginTop: 12, fontSize: 12.5, color: "rgba(var(--ink),.4)", fontStyle: "italic" }}>📝 {invoiceDraft.notes}</div>
                 )}
 
                 {!invoiceDraft.customerId && (
-                  <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.22)", fontSize: 12.5, color: "#fbbf24" }}>
+                  <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.22)", fontSize: 12.5, color: "var(--tx-fbbf24, #fbbf24)" }}>
                     ⚠️ Customer "{invoiceDraft.customerName}" not found in your records — you'll need to select or create them when saving the invoice.
                   </div>
                 )}
@@ -3789,54 +3789,54 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📦</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Inventory Demand Forecast</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI predicts next-month demand per product using 6-month sales history and trend analysis</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI predicts next-month demand per product using 6-month sales history and trend analysis</div>
               </div>
-              <button onClick={loadInvForecast} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", color: "#fbbf24", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+              <button onClick={loadInvForecast} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
-            {invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing sales patterns...</div>}
-            {invForecastError && !invForecastLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {invForecastError} <button onClick={() => { setInvForecast(null); loadInvForecast(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
+            {invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.4)", fontSize: 14 }}>⏳ Analyzing sales patterns...</div>}
+            {invForecastError && !invForecastLoading && <div style={{ textAlign: "center", padding: 40, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>⚠️ {invForecastError} <button onClick={() => { setInvForecast(null); loadInvForecast(); }} style={{ marginLeft: 10, color: "var(--tx-a5b4fc, #a5b4fc)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {invForecast && !invForecastLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
                   {[
-                    { label: "Critical", value: invForecast.summary.criticalCount, color: "#ef4444", bg: "rgba(239,68,68,.08)", desc: "< 15 days stock" },
-                    { label: "Warning", value: invForecast.summary.warningCount, color: "#f59e0b", bg: "rgba(245,158,11,.08)", desc: "< 30 days stock" },
-                    { label: "Total Tracked", value: invForecast.summary.totalItems, color: "#818cf8", bg: "rgba(99,102,241,.08)", desc: "products analyzed" },
-                    { label: "Reorder Value", value: invForecast.summary.reorderValueFormatted, color: "#10b981", bg: "rgba(16,185,129,.08)", desc: "estimated cost" },
+                    { label: "Critical", value: invForecast.summary.criticalCount, color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.08)", desc: "< 15 days stock" },
+                    { label: "Warning", value: invForecast.summary.warningCount, color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.08)", desc: "< 30 days stock" },
+                    { label: "Total Tracked", value: invForecast.summary.totalItems, color: "var(--tx-818cf8, #818cf8)", bg: "rgba(99,102,241,.08)", desc: "products analyzed" },
+                    { label: "Reorder Value", value: invForecast.summary.reorderValueFormatted, color: "var(--tx-10b981, #10b981)", bg: "rgba(16,185,129,.08)", desc: "estimated cost" },
                   ].map(card => (
                     <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
                       <div style={{ fontSize: 22, fontWeight: 900, color: card.color }}>{card.value}</div>
-                      <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{card.desc}</div>
+                      <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginTop: 3 }}>{card.desc}</div>
                     </div>
                   ))}
                 </div>
-                {invForecast.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(invForecast.narrative)}</div>}
-                <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 80px 90px 90px 90px 90px", padding: "10px 16px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", gap: 8 }}>
+                {invForecast.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(var(--ink),.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(invForecast.narrative)}</div>}
+                <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 80px 90px 90px 90px 90px", padding: "10px 16px", background: "rgba(var(--ink),.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", gap: 8 }}>
                     <span>Product</span><span style={{ textAlign: "center" }}>Stock</span><span style={{ textAlign: "center" }}>Avg/Mo</span><span style={{ textAlign: "center" }}>Forecast</span><span style={{ textAlign: "center" }}>Days Left</span><span style={{ textAlign: "center" }}>Reorder</span>
                   </div>
                   {invForecast.forecasts.map((item, i) => {
                     const urgencyColor = item.urgency === "critical" ? "#ef4444" : item.urgency === "warning" ? "#f59e0b" : "#10b981";
                     const trendIcon = item.trend === "growing" ? "↑" : item.trend === "declining" ? "↓" : "→";
                     return (
-                      <div key={item.itemId} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 80px 90px 90px 90px 90px", padding: "12px 16px", borderTop: "1px solid rgba(255,255,255,.04)", gap: 8, alignItems: "center" }}>
+                      <div key={item.itemId} style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 80px 90px 90px 90px 90px", padding: "12px 16px", borderTop: "1px solid rgba(var(--ink),.04)", gap: 8, alignItems: "center" }}>
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.85)" }}>{item.name}</div>
-                          <div style={{ fontSize: 10.5, color: item.trend === "growing" ? "#10b981" : item.trend === "declining" ? "#ef4444" : "rgba(255,255,255,.35)", marginTop: 2 }}>{trendIcon} {item.trend}</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(var(--ink),.85)" }}>{item.name}</div>
+                          <div style={{ fontSize: 10.5, color: item.trend === "growing" ? "var(--tx-10b981, #10b981)" : item.trend === "declining" ? "var(--tx-ef4444, #ef4444)" : "rgba(var(--ink),.35)", marginTop: 2 }}>{trendIcon} {item.trend}</div>
                         </div>
-                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{item.currentStock}</span>
-                        <span style={{ textAlign: "center", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{item.avgMonthlySales}</span>
-                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "#818cf8" }}>{item.nextMonthForecast}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.7)" }}>{item.currentStock}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{item.avgMonthlySales}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{item.nextMonthForecast}</span>
                         <span style={{ textAlign: "center", fontSize: 13, fontWeight: 800, color: urgencyColor }}>{item.daysOfStock === 999 ? "∞" : `${item.daysOfStock}d`}</span>
-                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: item.suggestedReorder > 0 ? "#f59e0b" : "rgba(255,255,255,.25)" }}>{item.suggestedReorder > 0 ? item.suggestedReorder : "—"}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: item.suggestedReorder > 0 ? "var(--tx-f59e0b, #f59e0b)" : "rgba(var(--ink),.25)" }}>{item.suggestedReorder > 0 ? item.suggestedReorder : "—"}</span>
                       </div>
                     );
                   })}
                 </div>
               </>
             )}
-            {!invForecast && !invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No inventory sales data yet.</div>}
+            {!invForecast && !invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.3)" }}>No inventory sales data yet.</div>}
           </div>
         )}
 
@@ -3847,12 +3847,12 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>💵</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Cash Flow Optimizer</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI schedules optimal payment timing — collect faster, pay smarter, maximize liquidity</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI schedules optimal payment timing — collect faster, pay smarter, maximize liquidity</div>
               </div>
-              <button onClick={loadCashflowOpt} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.3)", color: "#6ee7b7", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+              <button onClick={loadCashflowOpt} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.3)", color: "var(--tx-6ee7b7, #6ee7b7)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
-            {cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing cash position...</div>}
-            {cashflowOptError && !cashflowOptLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {cashflowOptError} <button onClick={() => { setCashflowOpt(null); loadCashflowOpt(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
+            {cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.4)", fontSize: 14 }}>⏳ Analyzing cash position...</div>}
+            {cashflowOptError && !cashflowOptLoading && <div style={{ textAlign: "center", padding: 40, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>⚠️ {cashflowOptError} <button onClick={() => { setCashflowOpt(null); loadCashflowOpt(); }} style={{ marginLeft: 10, color: "var(--tx-a5b4fc, #a5b4fc)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {cashflowOpt && !cashflowOptLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
@@ -3863,26 +3863,26 @@ export default function AICommandCenter() {
                     const positive = card.value >= 0;
                     return (
                       <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "20px 22px", borderRadius: 14, background: positive ? "rgba(16,185,129,.07)" : "rgba(239,68,68,.07)", border: `1px solid ${positive ? "rgba(16,185,129,.25)" : "rgba(239,68,68,.25)"}` }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{card.label}</div>
-                        <div style={{ fontSize: 24, fontWeight: 900, color: positive ? "#10b981" : "#ef4444" }}>{positive ? "+" : ""}{card.currency} {Math.abs(card.value).toLocaleString()}</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{positive ? "Positive cash position" : "Cash gap — action needed"}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{card.label}</div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: positive ? "var(--tx-10b981, #10b981)" : "var(--tx-ef4444, #ef4444)" }}>{positive ? "+" : ""}{card.currency} {Math.abs(card.value).toLocaleString()}</div>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 4 }}>{positive ? "Positive cash position" : "Cash gap — action needed"}</div>
                       </div>
                     );
                   })}
                 </div>
-                {cashflowOpt.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(cashflowOpt.narrative)}</div>}
+                {cashflowOpt.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(var(--ink),.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(cashflowOpt.narrative)}</div>}
                 {cashflowOpt.tips.length > 0 && (
-                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 20 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>💡 Optimization Actions</div>
+                  <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", marginBottom: 20 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>💡 Optimization Actions</div>
                     {cashflowOpt.tips.map((tip, i) => {
                       const impactColor = tip.impact === "critical" ? "#ef4444" : tip.impact === "high" ? "#f59e0b" : "#818cf8";
                       return (
-                        <div key={i} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", marginBottom: 8, display: "flex", gap: 14, alignItems: "flex-start" }}>
+                        <div key={i} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", marginBottom: 8, display: "flex", gap: 14, alignItems: "flex-start" }}>
                           <div style={{ width: 8, height: 8, borderRadius: "50%", background: impactColor, flexShrink: 0, marginTop: 4 }} />
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)", marginBottom: 3 }}>{tip.title}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 4 }}>{tip.action}</div>
-                            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#10b981" }}>{tip.potentialSaving}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.85)", marginBottom: 3 }}>{tip.title}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 4 }}>{tip.action}</div>
+                            <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--tx-10b981, #10b981)" }}>{tip.potentialSaving}</div>
                           </div>
                         </div>
                       );
@@ -3890,19 +3890,19 @@ export default function AICommandCenter() {
                   </div>
                 )}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  {[{ title: "💰 Expected Inflows", items: cashflowOpt.inflows, color: "#10b981" }, { title: "💸 Expected Outflows", items: cashflowOpt.outflows, color: "#f87171" }].map(section => (
-                    <div key={section.title} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
-                      <div style={{ padding: "12px 16px", background: "rgba(255,255,255,.03)", fontSize: 12, fontWeight: 700, color: section.color, borderBottom: "1px solid rgba(255,255,255,.05)" }}>{section.title}</div>
+                  {[{ title: "💰 Expected Inflows", items: cashflowOpt.inflows, color: "var(--tx-10b981, #10b981)" }, { title: "💸 Expected Outflows", items: cashflowOpt.outflows, color: "var(--tx-f87171, #f87171)" }].map(section => (
+                    <div key={section.title} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden" }}>
+                      <div style={{ padding: "12px 16px", background: "rgba(var(--ink),.03)", fontSize: 12, fontWeight: 700, color: section.color, borderBottom: "1px solid rgba(var(--ink),.05)" }}>{section.title}</div>
                       {(section.items as CashflowEntry[]).slice(0, 6).map((item, i) => {
                         const prColor = item.priority === "urgent" ? "#ef4444" : item.priority === "high" ? "#f59e0b" : "#818cf8";
                         return (
-                          <div key={i} style={{ padding: "10px 16px", borderTop: i > 0 ? "1px solid rgba(255,255,255,.04)" : "none" }}>
+                          <div key={i} style={{ padding: "10px 16px", borderTop: i > 0 ? "1px solid rgba(var(--ink),.04)" : "none" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                              <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,.8)", flex: 1, marginRight: 8 }}>{item.label}</span>
+                              <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(var(--ink),.8)", flex: 1, marginRight: 8 }}>{item.label}</span>
                               <span style={{ fontSize: 13, fontWeight: 800, color: section.color, whiteSpace: "nowrap" }}>{cashflowOpt.projection.currency} {item.amount.toLocaleString()}</span>
                             </div>
-                            <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{item.dueDate} · <span style={{ color: prColor }}>{item.priority}</span></div>
-                            {"earlyPayDiscount" in item && item.earlyPayDiscount && <div style={{ fontSize: 10.5, color: "#fbbf24", marginTop: 3 }}>💡 {item.earlyPayDiscount}</div>}
+                            <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>{item.dueDate} · <span style={{ color: prColor }}>{item.priority}</span></div>
+                            {"earlyPayDiscount" in item && item.earlyPayDiscount && <div style={{ fontSize: 10.5, color: "var(--tx-fbbf24, #fbbf24)", marginTop: 3 }}>💡 {item.earlyPayDiscount}</div>}
                           </div>
                         );
                       })}
@@ -3911,7 +3911,7 @@ export default function AICommandCenter() {
                 </div>
               </>
             )}
-            {!cashflowOpt && !cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No outstanding invoices to analyze.</div>}
+            {!cashflowOpt && !cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.3)" }}>No outstanding invoices to analyze.</div>}
           </div>
         )}
 
@@ -3922,50 +3922,50 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#8b5cf6,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>👥</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Customer Churn Prediction</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI identifies which customers are likely to leave based on purchase frequency and revenue trends</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI identifies which customers are likely to leave based on purchase frequency and revenue trends</div>
               </div>
-              <button onClick={loadChurn} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(139,92,246,.12)", border: "1px solid rgba(139,92,246,.3)", color: "#c4b5fd", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+              <button onClick={loadChurn} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(139,92,246,.12)", border: "1px solid rgba(139,92,246,.3)", color: "var(--tx-c4b5fd, #c4b5fd)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
-            {churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing customer behavior...</div>}
-            {churnError && !churnLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {churnError} <button onClick={() => { setChurnResult(null); loadChurn(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
+            {churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.4)", fontSize: 14 }}>⏳ Analyzing customer behavior...</div>}
+            {churnError && !churnLoading && <div style={{ textAlign: "center", padding: 40, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>⚠️ {churnError} <button onClick={() => { setChurnResult(null); loadChurn(); }} style={{ marginLeft: 10, color: "var(--tx-a5b4fc, #a5b4fc)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {churnResult && !churnLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
                   {[
-                    { label: "Critical Risk", value: churnResult.summary.criticalCount, color: "#ef4444", bg: "rgba(239,68,68,.08)" },
-                    { label: "High Risk", value: churnResult.summary.highCount, color: "#f59e0b", bg: "rgba(245,158,11,.08)" },
-                    { label: "Total Customers", value: churnResult.summary.totalCustomers, color: "#818cf8", bg: "rgba(99,102,241,.08)" },
-                    { label: "Revenue at Risk", value: `${churnResult.summary.currency} ${Math.round(churnResult.summary.atRiskRevenue / 1000)}K`, color: "#ef4444", bg: "rgba(239,68,68,.08)" },
+                    { label: "Critical Risk", value: churnResult.summary.criticalCount, color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.08)" },
+                    { label: "High Risk", value: churnResult.summary.highCount, color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.08)" },
+                    { label: "Total Customers", value: churnResult.summary.totalCustomers, color: "var(--tx-818cf8, #818cf8)", bg: "rgba(99,102,241,.08)" },
+                    { label: "Revenue at Risk", value: `${churnResult.summary.currency} ${Math.round(churnResult.summary.atRiskRevenue / 1000)}K`, color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.08)" },
                   ].map(card => (
                     <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
                       <div style={{ fontSize: 22, fontWeight: 900, color: card.color }}>{card.value}</div>
                     </div>
                   ))}
                 </div>
-                {churnResult.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(churnResult.narrative)}</div>}
+                {churnResult.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(var(--ink),.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(churnResult.narrative)}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {churnResult.customers.map(customer => {
                     const riskColor = customer.churnRisk === "critical" ? "#ef4444" : customer.churnRisk === "high" ? "#f59e0b" : customer.churnRisk === "medium" ? "#818cf8" : "#10b981";
                     const trendIcon = customer.revenueTrend === "growing" ? "↑" : customer.revenueTrend === "gone_silent" ? "⚠" : customer.revenueTrend === "declining" ? "↓" : "→";
                     return (
-                      <div key={customer.customerId} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${customer.churnRisk === "critical" ? "rgba(239,68,68,.25)" : "rgba(255,255,255,.07)"}`, display: "flex", gap: 16, alignItems: "flex-start" }}>
+                      <div key={customer.customerId} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: `1px solid ${customer.churnRisk === "critical" ? "rgba(239,68,68,.25)" : "rgba(var(--ink),.07)"}`, display: "flex", gap: 16, alignItems: "flex-start" }}>
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: `${riskColor}15`, border: `2px solid ${riskColor}40`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <div style={{ fontSize: 16, fontWeight: 900, color: riskColor }}>{customer.churnScore}</div>
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                            <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{customer.name}</span>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(var(--ink),.9)" }}>{customer.name}</span>
                             <span style={{ fontSize: 10.5, fontWeight: 800, color: riskColor, background: `${riskColor}15`, padding: "2px 8px", borderRadius: 999, border: `1px solid ${riskColor}30` }}>{customer.churnRisk.toUpperCase()}</span>
-                            <span style={{ fontSize: 11, color: customer.revenueTrend === "growing" ? "#10b981" : customer.revenueTrend === "declining" || customer.revenueTrend === "gone_silent" ? "#ef4444" : "rgba(255,255,255,.35)" }}>{trendIcon} {customer.revenueTrend}</span>
+                            <span style={{ fontSize: 11, color: customer.revenueTrend === "growing" ? "var(--tx-10b981, #10b981)" : customer.revenueTrend === "declining" || customer.revenueTrend === "gone_silent" ? "var(--tx-ef4444, #ef4444)" : "rgba(var(--ink),.35)" }}>{trendIcon} {customer.revenueTrend}</span>
                           </div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{customer.reason}</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: "#c4b5fd" }}>→ {customer.suggestedAction}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{customer.reason}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-c4b5fd, #c4b5fd)" }}>→ {customer.suggestedAction}</div>
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.7)" }}>{churnResult.summary.currency} {Math.round(customer.totalRevenue / 1000)}K</div>
-                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{customer.invoiceCount} orders</div>
-                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)" }}>Last: {customer.daysSinceLastOrder}d ago</div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: "rgba(var(--ink),.7)" }}>{churnResult.summary.currency} {Math.round(customer.totalRevenue / 1000)}K</div>
+                          <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginTop: 2 }}>{customer.invoiceCount} orders</div>
+                          <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)" }}>Last: {customer.daysSinceLastOrder}d ago</div>
                         </div>
                       </div>
                     );
@@ -3973,7 +3973,7 @@ export default function AICommandCenter() {
                 </div>
               </>
             )}
-            {!churnResult && !churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No customer sales history yet.</div>}
+            {!churnResult && !churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.3)" }}>No customer sales history yet.</div>}
           </div>
         )}
 
@@ -3984,48 +3984,48 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#0ea5e9,#0284c7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🤝</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Supplier Negotiation Intelligence</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI identifies which suppliers to negotiate with and estimates savings from volume/loyalty discounts</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI identifies which suppliers to negotiate with and estimates savings from volume/loyalty discounts</div>
               </div>
-              <button onClick={loadSupplierIntel} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(14,165,233,.12)", border: "1px solid rgba(14,165,233,.3)", color: "#7dd3fc", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+              <button onClick={loadSupplierIntel} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(14,165,233,.12)", border: "1px solid rgba(14,165,233,.3)", color: "var(--tx-7dd3fc, #7dd3fc)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
-            {supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing purchase history...</div>}
-            {supplierIntelError && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {supplierIntelError} <button onClick={() => { setSupplierIntel(null); loadSupplierIntel(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
+            {supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.4)", fontSize: 14 }}>⏳ Analyzing purchase history...</div>}
+            {supplierIntelError && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 40, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>⚠️ {supplierIntelError} <button onClick={() => { setSupplierIntel(null); loadSupplierIntel(); }} style={{ marginLeft: 10, color: "var(--tx-a5b4fc, #a5b4fc)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {supplierIntel && !supplierIntelLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
                   {[
-                    { label: "High Opportunity", value: supplierIntel.summary.highOpportunityCount, color: "#10b981", desc: "suppliers to negotiate now" },
-                    { label: "Total Suppliers", value: supplierIntel.summary.totalSuppliers, color: "#818cf8", desc: "with 2+ orders" },
-                    { label: "Potential Savings", value: `${supplierIntel.summary.currency} ${Math.round(supplierIntel.summary.totalPotentialSaving / 1000)}K/yr`, color: "#f59e0b", desc: "if discounts secured" },
+                    { label: "High Opportunity", value: supplierIntel.summary.highOpportunityCount, color: "var(--tx-10b981, #10b981)", desc: "suppliers to negotiate now" },
+                    { label: "Total Suppliers", value: supplierIntel.summary.totalSuppliers, color: "var(--tx-818cf8, #818cf8)", desc: "with 2+ orders" },
+                    { label: "Potential Savings", value: `${supplierIntel.summary.currency} ${Math.round(supplierIntel.summary.totalPotentialSaving / 1000)}K/yr`, color: "var(--tx-f59e0b, #f59e0b)", desc: "if discounts secured" },
                   ].map(card => (
                     <div key={card.label} style={{ padding: isMobile ? "12px 10px" : "18px 20px", borderRadius: 14, background: `${card.color}0d`, border: `1px solid ${card.color}22` }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
                       <div style={{ fontSize: 24, fontWeight: 900, color: card.color }}>{card.value}</div>
-                      <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{card.desc}</div>
+                      <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginTop: 3 }}>{card.desc}</div>
                     </div>
                   ))}
                 </div>
-                {supplierIntel.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(supplierIntel.narrative)}</div>}
+                {supplierIntel.narrative && <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(var(--ink),.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(supplierIntel.narrative)}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {supplierIntel.suppliers.map(supplier => {
                     const opColor = supplier.negotiationOpportunity === "high" ? "#10b981" : supplier.negotiationOpportunity === "medium" ? "#f59e0b" : "#818cf8";
                     const trendIcon = supplier.spendTrend === "increasing" ? "↑" : supplier.spendTrend === "decreasing" ? "↓" : "→";
-                    const trendColor = supplier.spendTrend === "increasing" ? "#ef4444" : supplier.spendTrend === "decreasing" ? "#10b981" : "rgba(255,255,255,.4)";
+                    const trendColor = supplier.spendTrend === "increasing" ? "#ef4444" : supplier.spendTrend === "decreasing" ? "#10b981" : "rgba(var(--ink),.4)";
                     return (
-                      <div key={supplier.supplierId} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${supplier.negotiationOpportunity === "high" ? "rgba(16,185,129,.25)" : "rgba(255,255,255,.07)"}` }}>
+                      <div key={supplier.supplierId} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: `1px solid ${supplier.negotiationOpportunity === "high" ? "rgba(16,185,129,.25)" : "rgba(var(--ink),.07)"}` }}>
                         <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                           <div style={{ flex: 1 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
-                              <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{supplier.name}</span>
+                              <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(var(--ink),.9)" }}>{supplier.name}</span>
                               <span style={{ fontSize: 10.5, fontWeight: 800, color: opColor, background: `${opColor}15`, padding: "2px 8px", borderRadius: 999 }}>{supplier.negotiationOpportunity.toUpperCase()} OPPORTUNITY</span>
-                              {supplier.concentrationRisk && <span style={{ fontSize: 10.5, color: "#f59e0b", background: "rgba(245,158,11,.1)", padding: "2px 8px", borderRadius: 999 }}>⚠ Concentration Risk</span>}
+                              {supplier.concentrationRisk && <span style={{ fontSize: 10.5, color: "var(--tx-f59e0b, #f59e0b)", background: "rgba(245,158,11,.1)", padding: "2px 8px", borderRadius: 999 }}>⚠ Concentration Risk</span>}
                             </div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{supplier.negotiationReason}</div>
-                            <div style={{ fontSize: 12.5, fontWeight: 700, color: "#7dd3fc" }}>💡 {supplier.suggestedDiscount}</div>
+                            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{supplier.negotiationReason}</div>
+                            <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--tx-7dd3fc, #7dd3fc)" }}>💡 {supplier.suggestedDiscount}</div>
                             {supplier.topItems.length > 0 && (
                               <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
                                 {supplier.topItems.slice(0, 3).map((item, i) => (
-                                  <div key={i} style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 11, color: "rgba(255,255,255,.55)" }}>
+                                  <div key={i} style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", fontSize: 11, color: "rgba(var(--ink),.55)" }}>
                                     {item.description} · avg {supplierIntel.summary.currency} {item.avgRate.toLocaleString()}{item.priceVariance > 5 ? ` · ${item.priceVariance}% price variance` : ""}
                                   </div>
                                 ))}
@@ -4033,9 +4033,9 @@ export default function AICommandCenter() {
                             )}
                           </div>
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
-                            <div style={{ fontSize: 15, fontWeight: 900, color: "rgba(255,255,255,.85)" }}>{supplierIntel.summary.currency} {Math.round(supplier.totalSpend / 1000)}K/yr</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: "rgba(var(--ink),.85)" }}>{supplierIntel.summary.currency} {Math.round(supplier.totalSpend / 1000)}K/yr</div>
                             <div style={{ fontSize: 11, color: trendColor, marginTop: 3 }}>{trendIcon} {Math.abs(supplier.spendTrendPct)}% spend {supplier.spendTrend}</div>
-                            <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{supplier.invoiceCount} orders · last {supplier.lastOrderDaysAgo}d ago</div>
+                            <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginTop: 2 }}>{supplier.invoiceCount} orders · last {supplier.lastOrderDaysAgo}d ago</div>
                           </div>
                         </div>
                       </div>
@@ -4044,7 +4044,7 @@ export default function AICommandCenter() {
                 </div>
               </>
             )}
-            {!supplierIntel && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No purchase history with multiple orders yet.</div>}
+            {!supplierIntel && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(var(--ink),.3)" }}>No purchase history with multiple orders yet.</div>}
           </div>
         )}
 
@@ -4055,69 +4055,69 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🏷️</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>GL Auto-Code</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Type a description and AI instantly suggests the correct GL account — no manual lookup needed</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>Type a description and AI instantly suggests the correct GL account — no manual lookup needed</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
                 <div style={{ flex: 2 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Description / Narration</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Description / Narration</label>
                   <input value={glDesc} onChange={e => setGlDesc(e.target.value)} onKeyDown={e => e.key === "Enter" && handleGLSuggest()}
                     placeholder='e.g. "electricity bill", "office rent", "petrol for delivery van"'
-                    style={{ width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 10, padding: "12px 14px", color: "white", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                    style={{ width: "100%", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 10, padding: "12px 14px", color: "var(--ink-solid, white)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Vendor (optional)</label>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Vendor (optional)</label>
                   <input value={glVendor} onChange={e => setGlVendor(e.target.value)} onKeyDown={e => e.key === "Enter" && handleGLSuggest()}
                     placeholder='e.g. "K-Electric", "PTCL"'
-                    style={{ width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 10, padding: "12px 14px", color: "white", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                    style={{ width: "100%", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 10, padding: "12px 14px", color: "var(--ink-solid, white)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
                 </div>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 14 }}>
                 {["electricity bill", "office rent", "salary payment", "petrol for van", "lawyer fees", "Google Ads payment", "printer cartridge", "bank charges", "airline ticket"].map(ex => (
-                  <button key={ex} onClick={() => { setGlDesc(ex); setTimeout(handleGLSuggest, 0); }} style={{ padding: "6px 12px", borderRadius: 999, fontSize: 11.5, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", color: "rgba(255,255,255,.6)", cursor: "pointer", fontFamily: "inherit" }}>{ex}</button>
+                  <button key={ex} onClick={() => { setGlDesc(ex); setTimeout(handleGLSuggest, 0); }} style={{ padding: "6px 12px", borderRadius: 999, fontSize: 11.5, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", color: "rgba(var(--ink),.6)", cursor: "pointer", fontFamily: "inherit" }}>{ex}</button>
                 ))}
               </div>
               <button onClick={handleGLSuggest} disabled={!glDesc.trim() || glLoading}
-                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: glDesc.trim() && !glLoading ? "pointer" : "not-allowed", background: glDesc.trim() && !glLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)", color: glDesc.trim() && !glLoading ? "white" : "rgba(255,255,255,.3)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: glDesc.trim() && !glLoading ? "pointer" : "not-allowed", background: glDesc.trim() && !glLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.07)", color: glDesc.trim() && !glLoading ? "white" : "rgba(var(--ink),.3)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
                 {glLoading ? "🔍 Matching..." : "🏷️ Suggest GL Account"}
               </button>
             </div>
             {glResult && (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {glResult.suggestions.length === 0 && glResult.fallbackAccounts.length === 0 && (
-                  <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,.4)", fontSize: 13 }}>No matching GL accounts found. Try a different description.</div>
+                  <div style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),.4)", fontSize: 13 }}>No matching GL accounts found. Try a different description.</div>
                 )}
                 {glResult.suggestions.map((s, i) => (
-                  <div key={i} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: i === 0 ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.03)", border: `1px solid ${i === 0 ? "rgba(99,102,241,.3)" : "rgba(255,255,255,.07)"}` }}>
+                  <div key={i} style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: i === 0 ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.03)", border: `1px solid ${i === 0 ? "rgba(99,102,241,.3)" : "rgba(var(--ink),.07)"}` }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                       {i === 0 && <span style={{ fontSize: 11, fontWeight: 800, color: "#818cf8", background: "rgba(99,102,241,.15)", padding: "3px 10px", borderRadius: 999 }}>BEST MATCH</span>}
-                      <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{s.category}</span>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginLeft: "auto" }}>matched "{s.matchedKeyword}"</span>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: s.confidence >= 90 ? "#10b981" : "#f59e0b" }}>{s.confidence}%</span>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(var(--ink),.9)" }}>{s.category}</span>
+                      <span style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginLeft: "auto" }}>matched "{s.matchedKeyword}"</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: s.confidence >= 90 ? "var(--tx-10b981, #10b981)" : "var(--tx-f59e0b, #f59e0b)" }}>{s.confidence}%</span>
                     </div>
                     {s.matchedAccounts.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                         {s.matchedAccounts.map(acc => (
-                          <div key={acc.id} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", display: "flex", gap: 8, alignItems: "center" }}>
-                            {acc.code && <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", fontFamily: "monospace" }}>{acc.code}</span>}
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{acc.name}</span>
-                            {acc.type && <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", background: "rgba(255,255,255,.05)", padding: "1px 6px", borderRadius: 4 }}>{acc.type}</span>}
+                          <div key={acc.id} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", display: "flex", gap: 8, alignItems: "center" }}>
+                            {acc.code && <span style={{ fontSize: 11, color: "rgba(var(--ink),.35)", fontFamily: "monospace" }}>{acc.code}</span>}
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.8)" }}>{acc.name}</span>
+                            {acc.type && <span style={{ fontSize: 10, color: "rgba(var(--ink),.3)", background: "rgba(var(--ink),.05)", padding: "1px 6px", borderRadius: 4 }}>{acc.type}</span>}
                           </div>
                         ))}
                       </div>
                     )}
-                    {s.matchedAccounts.length === 0 && <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", fontStyle: "italic" }}>Category identified but no matching accounts in your chart of accounts yet.</div>}
+                    {s.matchedAccounts.length === 0 && <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", fontStyle: "italic" }}>Category identified but no matching accounts in your chart of accounts yet.</div>}
                   </div>
                 ))}
                 {glResult.fallbackAccounts.length > 0 && glResult.suggestions.length === 0 && (
-                  <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", marginBottom: 10 }}>Possible Matches (by name search)</div>
+                  <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.4)", marginBottom: 10 }}>Possible Matches (by name search)</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                       {glResult.fallbackAccounts.map(acc => (
-                        <div key={acc.id} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)" }}>
-                          {acc.code && <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", fontFamily: "monospace", marginRight: 6 }}>{acc.code}</span>}
-                          <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.8)" }}>{acc.name}</span>
+                        <div key={acc.id} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)" }}>
+                          {acc.code && <span style={{ fontSize: 11, color: "rgba(var(--ink),.35)", fontFamily: "monospace", marginRight: 6 }}>{acc.code}</span>}
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(var(--ink),.8)" }}>{acc.name}</span>
                         </div>
                       ))}
                     </div>
@@ -4135,36 +4135,36 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📂</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Expense Categorization</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI groups your expenses into categories and highlights where to cut costs</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI groups your expenses into categories and highlights where to cut costs</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
-                  { label: "This Month Expenses", value: ctx ? `${ctx.company.currency} ${Number(ctx.expenses.thisMonth).toLocaleString()}` : "—", color: "#ef4444" },
-                  { label: "Top Expense", value: ctx?.topExpenses?.[0]?.category || "—", color: "#f59e0b" },
-                  { label: "Expense Categories", value: ctx?.topExpenses?.length ? `${ctx.topExpenses.length} detected` : "—", color: "#a78bfa" },
+                  { label: "This Month Expenses", value: ctx ? `${ctx.company.currency} ${Number(ctx.expenses.thisMonth).toLocaleString()}` : "—", color: "var(--tx-ef4444, #ef4444)" },
+                  { label: "Top Expense", value: ctx?.topExpenses?.[0]?.category || "—", color: "var(--tx-f59e0b, #f59e0b)" },
+                  { label: "Expense Categories", value: ctx?.topExpenses?.length ? `${ctx.topExpenses.length} detected` : "—", color: "var(--tx-a78bfa, #a78bfa)" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                  <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
                 ))}
               </div>
               <button onClick={handleExpenseCat} disabled={expenseCatLoading}
-                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: expenseCatLoading ? "not-allowed" : "pointer", background: expenseCatLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#f59e0b,#d97706)", color: expenseCatLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: expenseCatLoading ? "not-allowed" : "pointer", background: expenseCatLoading ? "rgba(var(--ink),.07)" : "linear-gradient(135deg,#f59e0b,#d97706)", color: expenseCatLoading ? "rgba(var(--ink),.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
                 {expenseCatLoading ? "🔄 Analyzing expenses..." : "📂 Run Expense Categorization"}
               </button>
             </div>
             {expenseCatLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(var(--ink),.03)", borderRadius: 14, border: "1px solid rgba(var(--ink),.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(245,158,11,.3)", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
-                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is analyzing your expense patterns...</span>
+                <span style={{ color: "rgba(var(--ink),.5)", fontSize: 13 }}>AI is analyzing your expense patterns...</span>
               </div>
             )}
             {expenseCat && !expenseCatLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Categorization Report</div>
+              <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Categorization Report</div>
                 {renderMarkdown(expenseCat)}
               </div>
             )}
@@ -4178,36 +4178,36 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📊</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Budget & Variance Analysis</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI suggests realistic budget targets and shows where you&apos;re over or under plan</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI suggests realistic budget targets and shows where you&apos;re over or under plan</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
-                  { label: "Revenue This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "#10b981" },
-                  { label: "Revenue Last Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.lastMonth).toLocaleString()}` : "—", color: "#34d399" },
-                  { label: "Net Profit This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "#a78bfa" },
+                  { label: "Revenue This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "var(--tx-10b981, #10b981)" },
+                  { label: "Revenue Last Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.lastMonth).toLocaleString()}` : "—", color: "var(--tx-34d399, #34d399)" },
+                  { label: "Net Profit This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "var(--tx-a78bfa, #a78bfa)" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                  <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
                 ))}
               </div>
               <button onClick={handleBudgetAnalysis} disabled={budgetLoading}
-                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: budgetLoading ? "not-allowed" : "pointer", background: budgetLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#10b981,#059669)", color: budgetLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: budgetLoading ? "not-allowed" : "pointer", background: budgetLoading ? "rgba(var(--ink),.07)" : "linear-gradient(135deg,#10b981,#059669)", color: budgetLoading ? "rgba(var(--ink),.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
                 {budgetLoading ? "🔄 Building budget plan..." : "📊 Generate Budget & Variance Report"}
               </button>
             </div>
             {budgetLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(var(--ink),.03)", borderRadius: 14, border: "1px solid rgba(var(--ink),.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(16,185,129,.3)", borderTopColor: "#10b981", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
-                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is building your budget roadmap...</span>
+                <span style={{ color: "rgba(var(--ink),.5)", fontSize: 13 }}>AI is building your budget roadmap...</span>
               </div>
             )}
             {budgetAnalysis && !budgetLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Budget Plan & Variance</div>
+              <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Budget Plan & Variance</div>
                 {renderMarkdown(budgetAnalysis)}
               </div>
             )}
@@ -4221,36 +4221,36 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#ef4444,#b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🔍</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Duplicate & Anomaly Detection</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI scans for duplicate invoices, suspicious patterns, and internal control gaps</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI scans for duplicate invoices, suspicious patterns, and internal control gaps</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
-                  { label: "Recent Invoices Scanned", value: ctx?.recentInvoices?.length ? `${ctx.recentInvoices.length} invoices` : "—", color: "#ef4444" },
-                  { label: "Top Customer", value: ctx?.topCustomers?.[0]?.name || "—", color: "#f59e0b" },
-                  { label: "Overdue Count", value: ctx?.receivables?.overdueCount != null ? `${ctx.receivables.overdueCount} overdue` : "—", color: "#f87171" },
+                  { label: "Recent Invoices Scanned", value: ctx?.recentInvoices?.length ? `${ctx.recentInvoices.length} invoices` : "—", color: "var(--tx-ef4444, #ef4444)" },
+                  { label: "Top Customer", value: ctx?.topCustomers?.[0]?.name || "—", color: "var(--tx-f59e0b, #f59e0b)" },
+                  { label: "Overdue Count", value: ctx?.receivables?.overdueCount != null ? `${ctx.receivables.overdueCount} overdue` : "—", color: "var(--tx-f87171, #f87171)" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                  <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
                 ))}
               </div>
               <button onClick={handleDuplicateDetection} disabled={duplicateLoading}
-                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: duplicateLoading ? "not-allowed" : "pointer", background: duplicateLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#ef4444,#b91c1c)", color: duplicateLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: duplicateLoading ? "not-allowed" : "pointer", background: duplicateLoading ? "rgba(var(--ink),.07)" : "linear-gradient(135deg,#ef4444,#b91c1c)", color: duplicateLoading ? "rgba(var(--ink),.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
                 {duplicateLoading ? "🔄 Scanning for anomalies..." : "🔍 Scan for Duplicates & Anomalies"}
               </button>
             </div>
             {duplicateLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(var(--ink),.03)", borderRadius: 14, border: "1px solid rgba(var(--ink),.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(239,68,68,.3)", borderTopColor: "#ef4444", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
-                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is reviewing your transaction history...</span>
+                <span style={{ color: "rgba(var(--ink),.5)", fontSize: 13 }}>AI is reviewing your transaction history...</span>
               </div>
             )}
             {duplicateResult && !duplicateLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Audit & Anomaly Report</div>
+              <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Audit & Anomaly Report</div>
                 {renderMarkdown(duplicateResult)}
               </div>
             )}
@@ -4264,36 +4264,36 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#38bdf8,#0284c7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>👤</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Customer Profitability</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI ranks customers by revenue, payment behaviour, and estimated CLV</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>AI ranks customers by revenue, payment behaviour, and estimated CLV</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
-                  { label: "Total Customers", value: ctx?.topCustomers?.length ? `${ctx.topCustomers.length} tracked` : "—", color: "#38bdf8" },
-                  { label: "Top Customer Revenue", value: ctx?.topCustomers?.[0] ? `${ctx.company?.currency} ${Number(ctx.topCustomers[0].amount).toLocaleString()}` : "—", color: "#34d399" },
-                  { label: "Total Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "#f59e0b" },
+                  { label: "Total Customers", value: ctx?.topCustomers?.length ? `${ctx.topCustomers.length} tracked` : "—", color: "var(--tx-38bdf8, #38bdf8)" },
+                  { label: "Top Customer Revenue", value: ctx?.topCustomers?.[0] ? `${ctx.company?.currency} ${Number(ctx.topCustomers[0].amount).toLocaleString()}` : "—", color: "var(--tx-34d399, #34d399)" },
+                  { label: "Total Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "var(--tx-f59e0b, #f59e0b)" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                  <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
                 ))}
               </div>
               <button onClick={handleCustomerProfit} disabled={customerProfitLoading}
-                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: customerProfitLoading ? "not-allowed" : "pointer", background: customerProfitLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#38bdf8,#0284c7)", color: customerProfitLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: customerProfitLoading ? "not-allowed" : "pointer", background: customerProfitLoading ? "rgba(var(--ink),.07)" : "linear-gradient(135deg,#38bdf8,#0284c7)", color: customerProfitLoading ? "rgba(var(--ink),.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
                 {customerProfitLoading ? "🔄 Ranking customers..." : "👤 Analyze Customer Profitability"}
               </button>
             </div>
             {customerProfitLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(var(--ink),.03)", borderRadius: 14, border: "1px solid rgba(var(--ink),.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(56,189,248,.3)", borderTopColor: "#38bdf8", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
-                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is analysing customer value and CLV...</span>
+                <span style={{ color: "rgba(var(--ink),.5)", fontSize: 13 }}>AI is analysing customer value and CLV...</span>
               </div>
             )}
             {customerProfit && !customerProfitLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Customer Profitability Report</div>
+              <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Customer Profitability Report</div>
                 {renderMarkdown(customerProfit)}
               </div>
             )}
@@ -4307,37 +4307,37 @@ export default function AICommandCenter() {
               <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#a78bfa,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>⚖️</div>
               <div>
                 <div style={{ fontSize: 17, fontWeight: 800 }}>Financial Ratio Analysis</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Full profitability, liquidity, efficiency, and leverage ratios with benchmarks</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>Full profitability, liquidity, efficiency, and leverage ratios with benchmarks</div>
               </div>
             </div>
-            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
+            <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 18, padding: isMobile ? "13px 12px" : "24px 26px", marginBottom: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10, marginBottom: 18 }}>
                 {[
-                  { label: "Revenue", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "#10b981" },
-                  { label: "Profit", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "#a78bfa" },
-                  { label: "Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "#f59e0b" },
-                  { label: "Cash Position", value: ctx ? `${ctx.company.currency} ${Number(ctx.cashPosition).toLocaleString()}` : "—", color: "#38bdf8" },
+                  { label: "Revenue", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "var(--tx-10b981, #10b981)" },
+                  { label: "Profit", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "var(--tx-a78bfa, #a78bfa)" },
+                  { label: "Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "var(--tx-f59e0b, #f59e0b)" },
+                  { label: "Cash Position", value: ctx ? `${ctx.company.currency} ${Number(ctx.cashPosition).toLocaleString()}` : "—", color: "var(--tx-38bdf8, #38bdf8)" },
                 ].map(card => (
-                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                  <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6 }}>{card.label}</div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: card.color }}>{card.value}</div>
                   </div>
                 ))}
               </div>
               <button onClick={handleRatioAnalysis} disabled={ratiosLoading}
-                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: ratiosLoading ? "not-allowed" : "pointer", background: ratiosLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#a78bfa,#7c3aed)", color: ratiosLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: ratiosLoading ? "not-allowed" : "pointer", background: ratiosLoading ? "rgba(var(--ink),.07)" : "linear-gradient(135deg,#a78bfa,#7c3aed)", color: ratiosLoading ? "rgba(var(--ink),.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
                 {ratiosLoading ? "🔄 Calculating ratios..." : "⚖️ Run Full Ratio Analysis"}
               </button>
             </div>
             {ratiosLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: isMobile ? "12px 11px" : "20px 24px", background: "rgba(var(--ink),.03)", borderRadius: 14, border: "1px solid rgba(var(--ink),.07)" }}>
                 <div style={{ width: 20, height: 20, border: "2px solid rgba(167,139,250,.3)", borderTopColor: "#a78bfa", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
-                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is computing your financial ratios...</span>
+                <span style={{ color: "rgba(var(--ink),.5)", fontSize: 13 }}>AI is computing your financial ratios...</span>
               </div>
             )}
             {ratiosResult && !ratiosLoading && (
-              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Financial Ratios Report</div>
+              <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Financial Ratios Report</div>
                 {renderMarkdown(ratiosResult)}
               </div>
             )}

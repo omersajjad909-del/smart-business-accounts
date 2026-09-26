@@ -6,9 +6,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#38bdf8";
-const BG = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.08)";
-const MUTED = "rgba(255,255,255,.45)";
+const BG = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.08)";
+const MUTED = "rgba(var(--ink),.45)";
 
 const inp: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
@@ -33,7 +33,7 @@ function daysUntil(dateStr: string) {
 function ExpiryBadge({ days }: { days: number }) {
   if (days < 0) return <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(239,68,68,.15)", color: "#ef4444", fontSize: 11, fontWeight: 700 }}>Expired</span>;
   if (days <= 30) return <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700 }}>Expiring in {days}d</span>;
-  return <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(52,211,153,.1)", color: "#34d399", fontSize: 11, fontWeight: 700 }}>OK</span>;
+  return <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(52,211,153,.1)", color: "var(--tx-34d399, #34d399)", fontSize: 11, fontWeight: 700 }}>OK</span>;
 }
 
 export default function BatchTrackingPage() {
@@ -118,9 +118,9 @@ export default function BatchTrackingPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Batches",      value: batches.length,  color: ACCENT },
-          { label: "Expiring ≤ 30 days", value: expiring,         color: "#fbbf24" },
-          { label: "Expired",            value: expired,          color: "#ef4444" },
-          { label: "Serials Sold",       value: sold,             color: "#a78bfa" },
+          { label: "Expiring ≤ 30 days", value: expiring,         color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Expired",            value: expired,          color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Serials Sold",       value: sold,             color: "var(--tx-a78bfa, #a78bfa)" },
         ].map(k => (
           <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{k.label}</div>
@@ -160,7 +160,7 @@ export default function BatchTrackingPage() {
                     <td style={td}>{b.qty.toLocaleString()}</td>
                     <td style={td}><ExpiryBadge days={days} /></td>
                     <td style={td}>
-                      <button onClick={() => batchHook.remove(b.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Remove</button>
+                      <button onClick={() => batchHook.remove(b.id)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Remove</button>
                     </td>
                   </tr>
                 );
@@ -195,9 +195,9 @@ export default function BatchTrackingPage() {
                   <td style={{ ...td, color: MUTED }}>{s.saleDate || "—"}</td>
                   <td style={td}>
                     {s.status !== "sold" && (
-                      <button onClick={() => serialHook.update(s.id, { status: "sold" })} style={{ background: "none", border: "none", color: "#a78bfa", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>Mark Sold</button>
+                      <button onClick={() => serialHook.update(s.id, { status: "sold" })} style={{ background: "none", border: "none", color: "var(--tx-a78bfa, #a78bfa)", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>Mark Sold</button>
                     )}
-                    <button onClick={() => serialHook.remove(s.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Remove</button>
+                    <button onClick={() => serialHook.remove(s.id)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Remove</button>
                   </td>
                 </tr>
               ))}

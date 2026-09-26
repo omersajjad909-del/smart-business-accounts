@@ -40,10 +40,10 @@ export default function EventVendorsPage() {
         },
       })}
       summarize={(rows) => [
-        { label: "Vendors", value: rows.length, color: "#fb7185" },
-        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
-        { label: "Standby", value: rows.filter((row) => String(row.status) === "standby").length, color: "#fbbf24" },
-        { label: "Blocked", value: rows.filter((row) => String(row.status) === "blocked").length, color: "#f87171" },
+        { label: "Vendors", value: rows.length, color: "var(--tx-fb7185, #fb7185)" },
+        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Standby", value: rows.filter((row) => String(row.status) === "standby").length, color: "var(--tx-fbbf24, #fbbf24)" },
+        { label: "Blocked", value: rows.filter((row) => String(row.status) === "blocked").length, color: "var(--tx-f87171, #f87171)" },
       ]}
     />
   );

@@ -24,7 +24,7 @@ import { useMemo, useState } from "react";
 import { quoteRefund } from "@/lib/travelRefundMath";
 
 const ff = "'Outfit','Inter',sans-serif";
-const border = "rgba(255,255,255,0.09)";
+const border = "rgba(var(--ink),0.09)";
 const panel = "#161b27";
 
 export type RefundTarget = {
@@ -181,12 +181,12 @@ export function RefundDialog({
         </div>
 
         {quote.errors.length > 0 && (
-          <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12, lineHeight: 1.6, marginBottom: 14 }}>
+          <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12, lineHeight: 1.6, marginBottom: 14 }}>
             {quote.errors.join(" ")}
           </div>
         )}
         {error && (
-          <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12, lineHeight: 1.6, marginBottom: 14 }}>
+          <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12, lineHeight: 1.6, marginBottom: 14 }}>
             {error}
           </div>
         )}

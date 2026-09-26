@@ -88,7 +88,7 @@ export default function SubcontractorsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Subcontractors", val: subs.length, color: "#f97316" }, { label: "Active", val: subs.filter((s) => s.status === "active").length, color: "#34d399" }, { label: "Total Contracts", val: `Rs. ${totalContracts.toLocaleString()}`, color: "#818cf8" }, { label: "Total Paid", val: `Rs. ${totalPaid.toLocaleString()}`, color: "#f59e0b" }].map((s) => (
+        {[{ label: "Total Subcontractors", val: subs.length, color: "var(--tx-f97316, #f97316)" }, { label: "Active", val: subs.filter((s) => s.status === "active").length, color: "var(--tx-34d399, #34d399)" }, { label: "Total Contracts", val: `Rs. ${totalContracts.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)" }, { label: "Total Paid", val: `Rs. ${totalPaid.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" }].map((s) => (
           <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 16, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -107,10 +107,10 @@ export default function SubcontractorsPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{sub.trade}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{sub.phone}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{sub.project}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "#fdba74" }}>{sub.site || "—"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "var(--tx-fdba74, #fdba74)" }}>{sub.site || "—"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {sub.contractValue.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399" }}>Rs. {sub.paid.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f59e0b" }}>Rs. {(sub.contractValue - sub.paid).toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)" }}>Rs. {sub.paid.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-f59e0b, #f59e0b)" }}>Rs. {(sub.contractValue - sub.paid).toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <span style={{ display: "inline-block", background: sub.status === "active" ? "rgba(52,211,153,.15)" : "rgba(107,114,128,.15)", color: sub.status === "active" ? "#34d399" : "#d1d5db", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{sub.status}</span>
                 </td>
@@ -143,7 +143,7 @@ export default function SubcontractorsPage() {
                 </div>
               ))}
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>

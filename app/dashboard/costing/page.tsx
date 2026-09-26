@@ -44,8 +44,8 @@ import {
 import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 
-const CARD = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.09)";
+const CARD = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.09)";
 const FONT = "'Outfit','DM Sans',system-ui,sans-serif";
 const MONO = "ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace";
 
@@ -507,7 +507,7 @@ function CostingInner() {
           <h1 style={{ fontSize: 23, fontWeight: 800, margin: "0 0 4px" }}>Costing</h1>
           <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.42)", margin: 0 }}>
             Work out what a job costs using your own{" "}
-            <Link href="/dashboard/costing/formulas" style={{ color: "#818cf8" }}>formulas</Link>.
+            <Link href="/dashboard/costing/formulas" style={{ color: "var(--tx-818cf8, #818cf8)" }}>formulas</Link>.
           </p>
         </div>
         <Link className="cxHeaderAction" href="/dashboard/costing/formulas" style={{ ...btn(), textDecoration: "none" }}>Manage formulas</Link>
@@ -592,7 +592,7 @@ function CostingInner() {
           {/* ── Right: the answer, its working, and what to do with it ── */}
           <div className="cxSide">
             {run && !run.ok && (
-              <div style={{ padding: "12px 15px", borderRadius: 11, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.28)", color: "#f87171", fontSize: 13 }}>
+              <div style={{ padding: "12px 15px", borderRadius: 11, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.28)", color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>
                 {run.error}
               </div>
             )}
@@ -606,7 +606,7 @@ function CostingInner() {
                 border: "1px solid rgba(52,211,153,.26)",
               }}>
                 <div style={{ padding: "24px 22px 20px" }}>
-                  <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(52,211,153,.8)", marginBottom: 8 }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--txr-34d399, 52,211,153),.8)", marginBottom: 8 }}>
                     {primary.label || primary.key}
                   </div>
                   {/* The number that gets quoted, so it carries the profit —
@@ -672,7 +672,7 @@ function CostingInner() {
                           how much money it is until it is spelled out. */}
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 3 }}>Profit on the rate</div>
-                        <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 800, color: "#34d399", fontVariantNumeric: "tabular-nums" }}>
+                        <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 800, color: "var(--tx-34d399, #34d399)", fontVariantNumeric: "tabular-nums" }}>
                           + {fmt(profitAmount)}
                           <span style={{ fontSize: 12, color: "rgba(var(--ink),.32)", marginLeft: 6, fontWeight: 600 }}>{primary.unit}</span>
                         </div>
@@ -719,7 +719,7 @@ function CostingInner() {
                       <div style={{
                         fontFamily: MONO, fontSize: 13, fontWeight: 700, textAlign: "right", whiteSpace: "nowrap",
                         fontVariantNumeric: "tabular-nums",
-                        color: s.error ? "#f87171" : "rgba(var(--ink),.85)",
+                        color: s.error ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.85)",
                       }}>
                         {s.error ? "error" : fmt(s.value)}
                         <span style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginLeft: 4 }}>{s.unit}</span>
@@ -782,12 +782,12 @@ function CostingInner() {
                             {jobWorkPlan && (
                               <>
                                 needs {jobWorkPlan.needed} · issue {jobWorkPlan.toIssue} whole ·{" "}
-                                <span style={{ color: "#5eead4" }}>{jobWorkPlan.leftover} left over, not waste</span>
+                                <span style={{ color: "var(--tx-5eead4, #5eead4)" }}>{jobWorkPlan.leftover} left over, not waste</span>
                               </>
                             )}
                           </div>
                         ) : (
-                          <div style={{ fontSize: 11.5, color: "#fbbf24", marginTop: 9, lineHeight: 1.6, maxWidth: 480 }}>
+                          <div style={{ fontSize: 11.5, color: "var(--tx-fbbf24, #fbbf24)", marginTop: 9, lineHeight: 1.6, maxWidth: 480 }}>
                             This formula has no output marked{" "}
                             <span style={{ fontFamily: MONO }}>Units per batch</span> — the one value
                             that says how many pieces come off one roll. Set that role on the right
@@ -918,7 +918,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
                           textAlign: "right", fontVariantNumeric: "tabular-nums",
                           fontWeight: ri === 2 ? 800 : 600, padding: "1px 0",
                         }}>
-                          {v}<span style={{ fontSize: 8, color: "#777", marginLeft: 3 }}>{main.unit ?? ""}</span>
+                          {v}<span style={{ fontSize: 8, color: "var(--tx-777777, #777)", marginLeft: 3 }}>{main.unit ?? ""}</span>
                         </td>
                       </tr>
                     ))}
@@ -946,7 +946,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
                       <span style={{ fontSize: 9, color: "#555" }}>{o.label || o.key}</span>
                       <span style={{ fontFamily: MONO, fontSize: 10.5, fontWeight: 700, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
                         {fmt(run.values[o.key])}
-                        <span style={{ fontSize: 8, color: "#777", marginLeft: 2 }}>{o.unit ?? ""}</span>
+                        <span style={{ fontSize: 8, color: "var(--tx-777777, #777)", marginLeft: 2 }}>{o.unit ?? ""}</span>
                       </span>
                     </div>
                   ))}
@@ -1035,7 +1035,7 @@ function PrintSheet({ kind, formula, title, run, outputs, primaryKey, saleRate, 
                   <div style={{ fontSize: 9.5, color: "#666" }}>{s.label}</div>
                   <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
                     {optionText(s.key, s.value)}
-                    <span style={{ fontSize: 9.5, color: "#777", marginLeft: 3 }}>{s.unit ?? ""}</span>
+                    <span style={{ fontSize: 9.5, color: "var(--tx-777777, #777)", marginLeft: 3 }}>{s.unit ?? ""}</span>
                   </div>
                 </div>
               ))}

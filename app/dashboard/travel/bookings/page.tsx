@@ -31,8 +31,8 @@ import { voucherFromBooking } from "@/lib/umrahVoucherBuild";
 import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.08)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.08)";
 const accent = "#38bdf8";
 
 const input: React.CSSProperties = {
@@ -246,7 +246,7 @@ export default function BookingsPage() {
         </h1>
         <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
           {money.pax} pilgrim{money.pax === 1 ? "" : "s"} · {money.total.toLocaleString()} total ·{" "}
-          <strong style={{ color: money.balance > 0 ? "#fbbf24" : "#34d399" }}>
+          <strong style={{ color: money.balance > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>
             {money.balance > 0 ? `${money.balance.toLocaleString()} owing` : "paid in full"}
           </strong>
         </p>
@@ -414,7 +414,7 @@ export default function BookingsPage() {
                         onChange={(e) => patchInstalment(inst.id, { receiptNo: e.target.value })}
                         style={input} />
                     </div>
-                    <div style={{ fontSize: 11.5, fontWeight: 700, paddingBottom: 10, textAlign: "right", color: inst.paidDate ? "#34d399" : late ? "#fbbf24" : "rgba(var(--ink),.35)" }}>
+                    <div style={{ fontSize: 11.5, fontWeight: 700, paddingBottom: 10, textAlign: "right", color: inst.paidDate ? "var(--tx-34d399, #34d399)" : late ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.35)" }}>
                       {inst.paidDate ? "paid" : late ? "overdue" : "due"}
                     </div>
                     <button tabIndex={-1} title="Remove instalment"
@@ -438,18 +438,18 @@ export default function BookingsPage() {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "rgba(var(--ink),.45)" }}>
             <span>Paid ({money.percentPaid}%)</span>
-            <span style={{ fontFamily: "ui-monospace, monospace", color: "#34d399" }}>{money.paid.toLocaleString()}</span>
+            <span style={{ fontFamily: "ui-monospace, monospace", color: "var(--tx-34d399, #34d399)" }}>{money.paid.toLocaleString()}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, marginTop: 6, paddingTop: 6, borderTop: `1px solid ${border}` }}>
             <span>Balance</span>
-            <span style={{ fontFamily: "ui-monospace, monospace", color: money.balance > 0 ? "#fbbf24" : "#34d399" }}>
+            <span style={{ fontFamily: "ui-monospace, monospace", color: money.balance > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>
               {money.balance.toLocaleString()}
             </span>
           </div>
           {/* Money that belongs to the booking with no date against it. Not the
               same as a balance: a dated balance gets chased, this does not. */}
           {Math.abs(money.unscheduled) > 0.01 && (
-            <div style={{ marginTop: 8, fontSize: 11.5, color: "#fbbf24" }}>
+            <div style={{ marginTop: 8, fontSize: 11.5, color: "var(--tx-fbbf24, #fbbf24)" }}>
               {money.unscheduled > 0
                 ? `${money.unscheduled.toLocaleString()} is not on any instalment — nothing is watching for it.`
                 : `Instalments come to ${Math.abs(money.unscheduled).toLocaleString()} more than the booking is worth.`}
@@ -458,12 +458,12 @@ export default function BookingsPage() {
         </div>
 
         {problems.length > 0 && (
-          <div style={{ marginTop: 16, padding: "12px 15px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "#fbbf24", fontSize: 12.5, lineHeight: 1.8 }}>
+          <div style={{ marginTop: 16, padding: "12px 15px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 12.5, lineHeight: 1.8 }}>
             {problems.map((p) => <div key={p}>{p}</div>)}
           </div>
         )}
         {error && (
-          <div style={{ marginTop: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5 }}>{error}</div>
+          <div style={{ marginTop: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12.5 }}>{error}</div>
         )}
 
         <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
@@ -495,7 +495,7 @@ export default function BookingsPage() {
                    and their room sharing, the hotels said once, and what has
                    actually been received against it. */
                 <a href={`/dashboard/travel/print?kind=package&id=${encodeURIComponent(editing.id)}`}
-                  style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(34,197,94,.12)", border: "1px solid rgba(34,197,94,.35)", color: "#34d399", fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
+                  style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(34,197,94,.12)", border: "1px solid rgba(34,197,94,.35)", color: "var(--tx-34d399, #34d399)", fontSize: 12.5, fontWeight: 700, textDecoration: "none" }}>
                   Invoice {b.invoiceNo} →
                 </a>
               ) : (
@@ -516,14 +516,14 @@ export default function BookingsPage() {
                 onClick={makeVoucher}
                 disabled={busyAction !== "" || !chosenDeparture}
                 title={chosenDeparture ? "Builds a voucher draft from this booking and its departure" : "Pick a departure first"}
-                style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(167,139,250,.12)", border: "1px solid rgba(167,139,250,.35)", color: "#c4b5fd", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: chosenDeparture ? "pointer" : "not-allowed" }}>
+                style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(167,139,250,.12)", border: "1px solid rgba(167,139,250,.35)", color: "var(--tx-c4b5fd, #c4b5fd)", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: chosenDeparture ? "pointer" : "not-allowed" }}>
                 {busyAction === "voucher" ? "Building…" : "Make voucher"}
               </button>
 
               <button
                 onClick={() => setCancelling({ charge: "", refund: String(money.paid), reason: "" })}
                 disabled={busyAction !== ""}
-                style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "9px 16px", borderRadius: 9, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                 Cancel booking
               </button>
 
@@ -667,7 +667,7 @@ export default function BookingsPage() {
                 </div>
               </div>
               <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: row.money.balance > 0 ? "#fbbf24" : "#34d399" }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: row.money.balance > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>
                   {row.money.balance > 0 ? row.money.balance.toLocaleString() : "clear"}
                 </div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>
@@ -681,7 +681,7 @@ export default function BookingsPage() {
                 <div style={{ width: `${row.money.percentPaid}%`, height: "100%", background: row.money.overdue > 0 ? "#ef4444" : row.money.balance > 0 ? "#fbbf24" : "#22c55e" }} />
               </div>
               {row.money.overdue > 0 && (
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#fca5a5" }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-fca5a5, #fca5a5)" }}>
                   {row.money.overdue.toLocaleString()} overdue
                 </span>
               )}

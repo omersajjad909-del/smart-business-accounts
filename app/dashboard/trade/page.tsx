@@ -88,10 +88,10 @@ export default function TradeOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[ 
-          { label: "Shipments", value: data.summary.shipmentCount, color: "#38bdf8" },
-          { label: "Active LC / TT", value: data.summary.activeLcCount, color: "#a78bfa" },
-          { label: "Customs Open", value: data.summary.openCustomsCount, color: "#f59e0b" },
-          { label: "Rebate Claims", value: data.summary.rebateCount, color: "#22c55e" },
+          { label: "Shipments", value: data.summary.shipmentCount, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Active LC / TT", value: data.summary.activeLcCount, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Customs Open", value: data.summary.openCustomsCount, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Rebate Claims", value: data.summary.rebateCount, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
@@ -108,7 +108,7 @@ export default function TradeOverviewPage() {
               <div key={row.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.ref}</div>
                 <div style={{ fontSize: 12, color: tradeMuted, marginTop: 4 }}>{row.type} | {row.originPort} to {row.destinationPort}</div>
-                <div style={{ fontSize: 12, color: "#7dd3fc", marginTop: 6 }}>{row.blAwbNo || "No BL/AWB"} | {row.incoterm}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-7dd3fc, #7dd3fc)", marginTop: 6 }}>{row.blAwbNo || "No BL/AWB"} | {row.incoterm}</div>
               </div>
             ))}
           </div>
@@ -118,10 +118,10 @@ export default function TradeOverviewPage() {
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Financial Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Open customs payable", value: `USD ${data.summary.openCustomsPayable.toLocaleString()}`, color: "#f59e0b" },
-              { label: "Import costing booked", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "#60a5fa" },
-              { label: "Export rebate claimed", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "#34d399" },
-              { label: "Shipment freight", value: `USD ${data.summary.shipmentFreight.toLocaleString()}`, color: "#f87171" },
+              { label: "Open customs payable", value: `USD ${data.summary.openCustomsPayable.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Import costing booked", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Export rebate claimed", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+              { label: "Shipment freight", value: `USD ${data.summary.shipmentFreight.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: tradeMuted }}>{row.label}</span>

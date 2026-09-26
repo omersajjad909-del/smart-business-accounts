@@ -6,8 +6,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 const isMobile = false;
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const card: React.CSSProperties = { background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px", fontFamily: ff };
 
 export default function RentPage() {
@@ -62,7 +62,7 @@ export default function RentPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Records", val: payments.length, color: "#818cf8" }, { label: "Collected", val: `Rs. ${collected.toLocaleString()}`, color: "#34d399" }, { label: "Pending", val: `Rs. ${pending.toLocaleString()}`, color: "#f87171" }, { label: "Overdue", val: payments.filter(p => p.status === "overdue").length, color: "#f59e0b" }].map(s => (
+        {[{ label: "Total Records", val: payments.length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Collected", val: `Rs. ${collected.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }, { label: "Pending", val: `Rs. ${pending.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" }, { label: "Overdue", val: payments.filter(p => p.status === "overdue").length, color: "var(--tx-f59e0b, #f59e0b)" }].map(s => (
           <div key={s.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -80,7 +80,7 @@ export default function RentPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600 }}>{p.tenant}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{p.property}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{p.month}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 600 }}>Rs. {p.amount.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>Rs. {p.amount.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: "rgba(var(--ink),.5)" }}>{p.dueDate}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <span style={{ display: "inline-block", background: p.status === "paid" ? "#34d39920" : p.status === "overdue" ? "#ef444420" : "#f59e0b20", color: p.status === "paid" ? "#34d399" : p.status === "overdue" ? "#ef4444" : "#f59e0b", borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>{p.status}</span>
@@ -99,7 +99,7 @@ export default function RentPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 480, fontFamily: ff }}>
             <h2 style={{ margin: "0 0 24px", fontSize: 20, fontWeight: 700 }}>Add Rent Record</h2>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Tenant Name", "tenant", "text"], ["Property", "property", "text"], ["Month (e.g. March 2026)", "month", "text"], ["Due Date", "dueDate", "date"]].map(([label, key, type]) => (
                 <div key={key}>

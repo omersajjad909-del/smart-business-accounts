@@ -164,10 +164,10 @@ export default function TransportMaintenancePage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 22 }}>
         {[
-          { label: "Scheduled", value: scheduled, color: "#60a5fa" },
-          { label: "In Progress", value: inProgress, color: "#f59e0b" },
-          { label: "Completed", value: completed, color: "#22c55e" },
-          { label: "Cost Booked", value: `Rs. ${costBooked.toLocaleString()}`, color: "#fca5a5" },
+          { label: "Scheduled", value: scheduled, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "In Progress", value: inProgress, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Completed", value: completed, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Cost Booked", value: `Rs. ${costBooked.toLocaleString()}`, color: "var(--tx-fca5a5, #fca5a5)" },
         ].map((item) => (
           <div key={item.label} style={card}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{item.label}</div>
@@ -202,7 +202,7 @@ export default function TransportMaintenancePage() {
                 <button onClick={() => editRow(row.id)} style={{ background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#c7d2fe", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Edit</button>
                 {row.status === "scheduled" && <button onClick={() => void moveStatus(row.id, "in_progress")} style={{ background: "rgba(245,158,11,.16)", border: "1px solid rgba(245,158,11,.25)", color: "#fcd34d", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Start Work</button>}
                 {row.status === "in_progress" && <button onClick={() => void moveStatus(row.id, "completed")} style={{ background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.25)", color: "#86efac", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Mark Completed</button>}
-                {(row.status === "scheduled" || row.status === "in_progress") && <button onClick={() => void moveStatus(row.id, "cancelled")} style={{ background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Cancel</button>}
+                {(row.status === "scheduled" || row.status === "in_progress") && <button onClick={() => void moveStatus(row.id, "cancelled")} style={{ background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Cancel</button>}
                 <button onClick={() => void removeJob(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),.68)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
               </div>
             </div>

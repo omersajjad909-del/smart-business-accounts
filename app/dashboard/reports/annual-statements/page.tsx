@@ -132,7 +132,7 @@ export default function AnnualStatementsPage() {
 
       {/* Error */}
       {error && (
-        <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 10, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", marginBottom: 20, fontSize: 14 }}>
+        <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 10, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--tx-f87171, #f87171)", marginBottom: 20, fontSize: 14 }}>
           {error}
         </div>
       )}
@@ -154,8 +154,8 @@ export default function AnnualStatementsPage() {
                 Balance Sheet — {year}
               </div>
               {[
-                { label: "Total Assets",      val: data.balanceSheet?.assets,       color: "#34d399" },
-                { label: "Total Liabilities", val: data.balanceSheet?.liabilities,  color: "#f87171" },
+                { label: "Total Assets",      val: data.balanceSheet?.assets,       color: "var(--tx-34d399, #34d399)" },
+                { label: "Total Liabilities", val: data.balanceSheet?.liabilities,  color: "var(--tx-f87171, #f87171)" },
                 { label: "Equity",            val: data.balanceSheet?.equity,        color: ACCENT     },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--border)", fontSize: 14 }}>
@@ -175,8 +175,8 @@ export default function AnnualStatementsPage() {
                 Profit & Loss — {year}
               </div>
               {[
-                { label: "Total Income",   val: data.profitLoss?.income,    color: "#34d399" },
-                { label: "Total Expenses", val: data.profitLoss?.expenses,  color: "#f87171" },
+                { label: "Total Income",   val: data.profitLoss?.income,    color: "var(--tx-34d399, #34d399)" },
+                { label: "Total Expenses", val: data.profitLoss?.expenses,  color: "var(--tx-f87171, #f87171)" },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--border)", fontSize: 14 }}>
                   <span style={{ color: "var(--text-muted)" }}>{label}</span>
@@ -254,7 +254,7 @@ export default function AnnualStatementsPage() {
                         <td style={{ padding: "11px 16px", textAlign: "right", color: "var(--text-muted)" }}>
                           {fmt(acc.openingBalance ?? 0)}
                         </td>
-                        <td style={{ padding: "11px 16px", textAlign: "right", color: (acc.transactions ?? 0) >= 0 ? "#34d399" : "#f87171" }}>
+                        <td style={{ padding: "11px 16px", textAlign: "right", color: (acc.transactions ?? 0) >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                           {fmt(acc.transactions ?? 0)}
                         </td>
                         <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: colorVal(acc.closingBalance ?? 0) }}>

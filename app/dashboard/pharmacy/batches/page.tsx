@@ -102,7 +102,7 @@ export default function PharmacyBatchesPage() {
                 </div>
               ))}
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fca5a5", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: "none", background: "#fb7185", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save Batch</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 18px", borderRadius: 8, border: `1px solid ${pharmacyBorder}`, background: "transparent", color: "var(--ink-solid, #fff)", cursor: "pointer" }}>Cancel</button>

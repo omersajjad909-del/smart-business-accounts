@@ -6,8 +6,8 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 // ── Style constants ────────────────────────────────────────────────────────────
 const FF = "'Outfit','Inter',sans-serif";
-const BG = "rgba(255,255,255,0.03)";
-const BD = "rgba(255,255,255,0.07)";
+const BG = "rgba(var(--ink),0.03)";
+const BD = "rgba(var(--ink),0.07)";
 const MODAL_BG = "#12161f";
 
 const inp: React.CSSProperties = {
@@ -274,11 +274,11 @@ export default function LCPage() {
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 26 }}>
         {[
-          { label: "Total LCs",       value: totalLCs,                    color: "#a78bfa" },
-          { label: "Active LCs",      value: activeLCs,                   color: "#3b82f6" },
-          { label: "TT Transfers",    value: ttCount,                     color: "#38bdf8" },
-          { label: "Total LC Value",  value: `$${fmt(totalValue)}`,       color: "#22c55e" },
-          { label: "Expiring ≤30d",   value: expiringSoon,                color: expiringSoon > 0 ? "#ef4444" : "#6b7280" },
+          { label: "Total LCs",       value: totalLCs,                    color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active LCs",      value: activeLCs,                   color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "TT Transfers",    value: ttCount,                     color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Total LC Value",  value: `$${fmt(totalValue)}`,       color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Expiring ≤30d",   value: expiringSoon,                color: expiringSoon > 0 ? "var(--tx-ef4444, #ef4444)" : "#6b7280" },
         ].map(k => (
           <div key={k.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 26, fontWeight: 800, color: k.color, letterSpacing: "-0.5px" }}>{k.value}</div>
@@ -341,7 +341,7 @@ export default function LCPage() {
                         <tr key={item.id}
                           onClick={() => setDetail(item.id === detail ? null : item.id)}
                           style={{ borderBottom: `1px solid ${BD}`, cursor: "pointer", background: detail === item.id ? "rgba(99,102,241,0.07)" : "transparent", transition: "background 0.12s" }}>
-                          <td style={{ padding: "12px 14px", color: "#a78bfa", fontWeight: 700, whiteSpace: "nowrap" }}>{item.refNo}</td>
+                          <td style={{ padding: "12px 14px", color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700, whiteSpace: "nowrap" }}>{item.refNo}</td>
                           <td style={{ padding: "12px 14px" }}>
                             <span style={{ background: item.type === "LC" ? "rgba(167,139,250,0.15)" : "rgba(56,189,248,0.15)", color: item.type === "LC" ? "#a78bfa" : "#38bdf8", padding: "2px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{item.type}</span>
                           </td>
@@ -356,7 +356,7 @@ export default function LCPage() {
                           <td style={{ padding: "12px 14px", fontWeight: 700, whiteSpace: "nowrap" }}>{fmt(item.amount)}</td>
                           <td style={{ padding: "12px 14px", color: "rgba(var(--ink),0.5)", fontSize: 12 }}>{item.currency}</td>
                           <td style={{ padding: "12px 14px", color: "rgba(var(--ink),0.5)", whiteSpace: "nowrap", fontSize: 12 }}>{item.issueDate}</td>
-                          <td style={{ padding: "12px 14px", whiteSpace: "nowrap", fontSize: 12, color: expRed ? "#ef4444" : "rgba(var(--ink),0.5)", fontWeight: expRed ? 700 : 400 }}>
+                          <td style={{ padding: "12px 14px", whiteSpace: "nowrap", fontSize: 12, color: expRed ? "var(--tx-ef4444, #ef4444)" : "rgba(var(--ink),0.5)", fontWeight: expRed ? 700 : 400 }}>
                             {item.expiryDate || "—"}
                             {expRed && <span style={{ marginLeft: 4, fontSize: 10 }}>({expDays}d)</span>}
                           </td>
@@ -369,9 +369,9 @@ export default function LCPage() {
                           <td style={{ padding: "12px 14px" }}>
                             <div style={{ display: "flex", gap: 6 }}>
                               <button onClick={e => { e.stopPropagation(); openEdit(item); }}
-                                style={{ padding: "4px 10px", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 6, color: "#a5b4fc", fontSize: 11, cursor: "pointer", fontFamily: FF, fontWeight: 600 }}>Edit</button>
+                                style={{ padding: "4px 10px", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 6, color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, cursor: "pointer", fontFamily: FF, fontWeight: 600 }}>Edit</button>
                               <button onClick={e => { e.stopPropagation(); void handleRemove(item.id, item.refNo); }}
-                                style={{ padding: "4px 8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, color: "#ef4444", fontSize: 11, cursor: "pointer", fontFamily: FF }}>✕</button>
+                                style={{ padding: "4px 8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6, color: "var(--tx-ef4444, #ef4444)", fontSize: 11, cursor: "pointer", fontFamily: FF }}>✕</button>
                             </div>
                           </td>
                         </tr>
@@ -440,9 +440,9 @@ export default function LCPage() {
 
             <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
               <button onClick={() => openEdit(selectedItem)}
-                style={{ flex: 1, padding: "9px 0", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "#a5b4fc", borderRadius: 8, cursor: "pointer", fontFamily: FF, fontSize: 13, fontWeight: 700 }}>Edit</button>
+                style={{ flex: 1, padding: "9px 0", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "var(--tx-a5b4fc, #a5b4fc)", borderRadius: 8, cursor: "pointer", fontFamily: FF, fontSize: 13, fontWeight: 700 }}>Edit</button>
               <button onClick={() => void handleRemove(selectedItem.id, selectedItem.refNo)}
-                style={{ padding: "9px 16px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#ef4444", borderRadius: 8, cursor: "pointer", fontFamily: FF, fontSize: 13 }}>Delete</button>
+                style={{ padding: "9px 16px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "var(--tx-ef4444, #ef4444)", borderRadius: 8, cursor: "pointer", fontFamily: FF, fontSize: 13 }}>Delete</button>
             </div>
           </div>
         )}
@@ -461,7 +461,7 @@ export default function LCPage() {
             </div>
 
             {formErr && (
-              <div style={{ marginBottom: 16, padding: "10px 12px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formErr}</div>
+              <div style={{ marginBottom: 16, padding: "10px 12px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formErr}</div>
             )}
 
             {/* Type + Direction toggle */}

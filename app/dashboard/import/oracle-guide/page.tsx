@@ -166,7 +166,7 @@ function Section({ n, title, children }: { n: string; title: string; children: R
     <div style={{ ...card, padding: "20px 22px", marginBottom: 12 }}>
       <div style={{ display: "flex", gap: 12, alignItems: "baseline", marginBottom: 12 }}>
         <span style={{
-          fontSize: 12, fontWeight: 800, color: "#818cf8",
+          fontSize: 12, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)",
           fontFamily: MONO, flexShrink: 0,
         }}>{n}</span>
         <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{title}</h2>
@@ -262,7 +262,7 @@ export default function OracleGuidePage() {
         Use the first day of a financial year — in Pakistan, <b>1 July</b>. A mid-year cutover works
         but forces you to reconcile a part-year in two systems, and every report for that year has to
         be stitched together by hand. Set the same date in{" "}
-        <Link href="/dashboard/financial-year" style={{ color: "#818cf8" }}>Financial Year</Link>{" "}
+        <Link href="/dashboard/financial-year" style={{ color: "var(--tx-818cf8, #818cf8)" }}>Financial Year</Link>{" "}
         so the reports agree with the balances.
       </Section>
 
@@ -308,7 +308,7 @@ export default function OracleGuidePage() {
       {/* ── The eight files ── */}
       <div style={{ ...card, padding: "20px 22px", marginBottom: 12 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "baseline", marginBottom: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#818cf8", fontFamily: MONO }}>04</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)", fontFamily: MONO }}>04</span>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>The eight files, in order</h2>
         </div>
         <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>
@@ -355,7 +355,7 @@ export default function OracleGuidePage() {
                       position: "absolute", top: 9, right: 9, zIndex: 1,
                       padding: "5px 11px", borderRadius: 7, fontSize: 11, cursor: "pointer",
                       border: "1px solid var(--border)", background: "var(--panel-bg)",
-                      color: copied === q.step ? "#22c55e" : "var(--text-muted)", fontFamily: FONT,
+                      color: copied === q.step ? "var(--tx-22c55e, #22c55e)" : "var(--text-muted)", fontFamily: FONT,
                     }}
                   >{copied === q.step ? "Copied" : "Copy"}</button>
                   <pre style={{
@@ -385,9 +385,9 @@ export default function OracleGuidePage() {
             { r: "Receivables Ageing", href: "/dashboard/reports/ageing", m: "Party by party against Oracle's ageing. Bucket totals should line up too." },
           ].map((item) => (
             <div key={item.r} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-              <span style={{ color: "#22c55e", fontWeight: 800, fontSize: 13 }}>✓</span>
+              <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 800, fontSize: 13 }}>✓</span>
               <div style={{ fontSize: 12.5, lineHeight: 1.65 }}>
-                <Link href={item.href} style={{ color: "#818cf8", fontWeight: 700 }}>{item.r}</Link>
+                <Link href={item.href} style={{ color: "var(--tx-818cf8, #818cf8)", fontWeight: 700 }}>{item.r}</Link>
                 {" — "}{item.m}
               </div>
             </div>
@@ -398,7 +398,7 @@ export default function OracleGuidePage() {
       {/* ── Traps ── */}
       <div style={{ ...card, borderColor: "rgba(245,158,11,.3)", padding: "20px 22px", marginBottom: 12 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "baseline", marginBottom: 12 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#f59e0b", fontFamily: MONO }}>07</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)", fontFamily: MONO }}>07</span>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Five things that go wrong</h2>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
@@ -425,7 +425,7 @@ export default function OracleGuidePage() {
             },
           ].map((item) => (
             <div key={item.t} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-              <span style={{ color: "#f59e0b", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>!</span>
+              <span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>!</span>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 3 }}>{item.t}</div>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>{item.d}</div>

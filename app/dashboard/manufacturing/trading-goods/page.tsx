@@ -6,8 +6,8 @@ import { formatRate, mapBomRecord, loadManufacturingItems, type ManufacturingIte
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", background: bg, border: `1px solid ${border}`,
@@ -92,10 +92,10 @@ export default function TradingGoodsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Trading Goods", value: items.length, color: "#818cf8" },
-          { label: "Low Stock", value: lowCount, color: lowCount ? "#ef4444" : "#22c55e" },
-          { label: "Stock Value", value: `Rs. ${Math.round(totalValue).toLocaleString()}`, color: "#22c55e" },
-          { label: "Linked BOMs", value: boms.length, color: "#38bdf8" },
+          { label: "Trading Goods", value: items.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Low Stock", value: lowCount, color: lowCount ? "var(--tx-ef4444, #ef4444)" : "var(--tx-22c55e, #22c55e)" },
+          { label: "Stock Value", value: `Rs. ${Math.round(totalValue).toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Linked BOMs", value: boms.length, color: "var(--tx-38bdf8, #38bdf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
@@ -122,13 +122,13 @@ export default function TradingGoodsPage() {
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.32)" }}>{item.code}</div>
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{item.unit}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: item.isLow ? "#fca5a5" : "#e2e8f0" }}>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: item.isLow ? "var(--tx-fca5a5, #fca5a5)" : "var(--tx-e2e8f0, #e2e8f0)" }}>
                     {item.currentStock}
                     {item.isLow && <span style={{ marginLeft: 6, fontSize: 10, padding: "2px 6px", borderRadius: 5, background: "rgba(239,68,68,.15)", color: "#fca5a5" }}>LOW</span>}
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),.5)" }}>{usedByBom.get(item.id) || 0}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),.62)" }}>Rs. {formatRate(item.unitCost)}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: "var(--tx-22c55e, #22c55e)" }}>Rs. {Math.round(item.stockValue).toLocaleString()}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),.5)" }}>Rs. {Math.round(item.rate).toLocaleString()}</td>
                 </tr>
               ))}

@@ -54,23 +54,23 @@ interface AffiliateProfile {
 }
 
 const TIER_CONFIG: Record<string, { color: string; icon: string; bg: string }> = {
-  STARTER: { color: "#818cf8", icon: "🌱", bg: "rgba(129,140,248,.12)" },
-  GROWTH:  { color: "#34d399", icon: "🚀", bg: "rgba(52,211,153,.12)" },
-  PRO:     { color: "#fbbf24", icon: "⭐", bg: "rgba(251,191,36,.12)" },
-  ELITE:   { color: "#c4b5fd", icon: "💎", bg: "rgba(196,181,253,.12)" },
+  STARTER: { color: "var(--tx-818cf8, #818cf8)", icon: "🌱", bg: "rgba(129,140,248,.12)" },
+  GROWTH:  { color: "var(--tx-34d399, #34d399)", icon: "🚀", bg: "rgba(52,211,153,.12)" },
+  PRO:     { color: "var(--tx-fbbf24, #fbbf24)", icon: "⭐", bg: "rgba(251,191,36,.12)" },
+  ELITE:   { color: "var(--tx-c4b5fd, #c4b5fd)", icon: "💎", bg: "rgba(196,181,253,.12)" },
 };
 
 const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }> = {
-  PENDING:    { label: "Under Review", color: "#fbbf24", bg: "rgba(251,191,36,.15)" },
-  APPROVED:   { label: "Active",       color: "#34d399", bg: "rgba(52,211,153,.12)" },
-  REJECTED:   { label: "Rejected",     color: "#f87171", bg: "rgba(248,113,113,.12)" },
-  SUSPENDED:  { label: "Suspended",    color: "#94a3b8", bg: "rgba(148,163,184,.12)" },
+  PENDING:    { label: "Under Review", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.15)" },
+  APPROVED:   { label: "Active",       color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)" },
+  REJECTED:   { label: "Rejected",     color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)" },
+  SUSPENDED:  { label: "Suspended",    color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)" },
 };
 
 const CONVERSION_STATUS: Record<string, { label: string; color: string }> = {
-  PENDING:   { label: "Pending",   color: "#fbbf24" },
-  CONFIRMED: { label: "Confirmed", color: "#34d399" },
-  PAID:      { label: "Paid",      color: "#818cf8" },
+  PENDING:   { label: "Pending",   color: "var(--tx-fbbf24, #fbbf24)" },
+  CONFIRMED: { label: "Confirmed", color: "var(--tx-34d399, #34d399)" },
+  PAID:      { label: "Paid",      color: "var(--tx-818cf8, #818cf8)" },
 };
 
 const PAYOUT_METHODS = [
@@ -97,7 +97,7 @@ function StatCard({ label, value, sub, color, icon }: { label: string; value: st
     <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: isMobile ? "12px 11px" : "20px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ fontSize: 22 }}>{icon}</span>
-        <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", fontWeight: 500 }}>{label}</span>
       </div>
       <div style={{ fontSize: 28, fontWeight: 700, color }}>{value}</div>
       {sub && <div style={{ fontSize: 12, color: "#64748b" }}>{sub}</div>}
@@ -175,7 +175,7 @@ export default function AffiliateDashboardPage() {
     minHeight: "100vh",
     background: "linear-gradient(135deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0d1035, #0d1035) 60%,var(--dk-080c1e, #080c1e) 100%)",
     fontFamily: "'Outfit','Inter',sans-serif",
-    color: "#e2e8f0",
+    color: "var(--tx-e2e8f0, #e2e8f0)",
     padding: isMobile ? "16px" : "32px",
   };
 
@@ -186,11 +186,11 @@ export default function AffiliateDashboardPage() {
     <div style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ textAlign: "center", maxWidth: 520 }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>🤝</div>
-        <div style={{ display: "inline-block", padding: "5px 14px", borderRadius: 100, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em", marginBottom: 18 }}>
+        <div style={{ display: "inline-block", padding: "5px 14px", borderRadius: 100, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em", marginBottom: 18 }}>
           COMING SOON
         </div>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 10 }}>Our affiliate program isn&apos;t open yet</h2>
-        <p style={{ color: "#94a3b8", lineHeight: 1.7 }}>
+        <p style={{ color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>
           We&apos;re finishing tracking, commission tiers and monthly payouts first, so that
           everyone who sends us a customer is paid accurately from the first referral.
           There is nothing to sign up for today.
@@ -203,7 +203,7 @@ export default function AffiliateDashboardPage() {
     <div style={{ ...s, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 40 }}>🤝</div>
-        <div style={{ marginTop: 12, color: "#818cf8" }}>Loading affiliate data…</div>
+        <div style={{ marginTop: 12, color: "var(--tx-818cf8, #818cf8)" }}>Loading affiliate data…</div>
       </div>
     </div>
   );
@@ -213,7 +213,7 @@ export default function AffiliateDashboardPage() {
       <div style={{ textAlign: "center", maxWidth: 480 }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>🤝</div>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>You are not an affiliate yet</h2>
-        <p style={{ color: "#94a3b8", marginBottom: 24 }}>Join the FinovaOS affiliate program and earn 20–35% recurring commission on every referral.</p>
+        <p style={{ color: "var(--tx-94a3b8, #94a3b8)", marginBottom: 24 }}>Join the FinovaOS affiliate program and earn 20–35% recurring commission on every referral.</p>
         <a href="/affiliate" style={{ display: "inline-block", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "12px 28px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>
           Apply Now →
         </a>
@@ -253,8 +253,8 @@ export default function AffiliateDashboardPage() {
       {/* Referral Link Bar */}
       {affiliate.status === "APPROVED" && (
         <div style={{ background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 28, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 14, color: "#94a3b8", flexShrink: 0 }}>Your referral link:</span>
-          <code style={{ flex: 1, color: "#818cf8", fontSize: 13, background: "rgba(99,102,241,.1)", padding: "4px 10px", borderRadius: 6, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", flexShrink: 0 }}>Your referral link:</span>
+          <code style={{ flex: 1, color: "var(--tx-818cf8, #818cf8)", fontSize: 13, background: "rgba(99,102,241,.1)", padding: "4px 10px", borderRadius: 6, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {affiliate.referralLink}
           </code>
           <button onClick={copyLink} style={{ background: copied ? "rgba(52,211,153,.15)" : "rgba(99,102,241,.2)", border: `1px solid ${copied ? "#34d399" : "#6366f1"}44`, color: copied ? "#34d399" : "#818cf8", padding: "6px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
@@ -265,7 +265,7 @@ export default function AffiliateDashboardPage() {
 
       {/* Pending banner */}
       {affiliate.status === "PENDING" && (
-        <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 28, color: "#fbbf24", fontSize: 14 }}>
+        <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 28, color: "var(--tx-fbbf24, #fbbf24)", fontSize: 14 }}>
           ⏳ Your application is under review. We approve within 1-2 business days. You will receive an email when approved.
         </div>
       )}
@@ -274,7 +274,7 @@ export default function AffiliateDashboardPage() {
       <div style={{ display: "flex", gap: 4, borderBottom: "1px solid rgba(var(--ink),.08)", marginBottom: 28, overflowX: "auto" }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            style={{ padding: "10px 18px", background: "none", border: "none", color: tab === t.key ? "#818cf8" : "#64748b", borderBottom: tab === t.key ? "2px solid #818cf8" : "2px solid transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, whiteSpace: "nowrap", transition: "color .2s" }}>
+            style={{ padding: "10px 18px", background: "none", border: "none", color: tab === t.key ? "var(--tx-818cf8, #818cf8)" : "#64748b", borderBottom: tab === t.key ? "2px solid #818cf8" : "2px solid transparent", cursor: "pointer", fontSize: 14, fontWeight: 600, whiteSpace: "nowrap", transition: "color .2s" }}>
             {t.icon} {t.label}
           </button>
         ))}
@@ -297,16 +297,16 @@ export default function AffiliateDashboardPage() {
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Commission Tier</h3>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12 }}>
               {[
-                { tier: "STARTER", refs: "1–5",    rate: "20%", icon: "🌱", color: "#818cf8" },
-                { tier: "GROWTH",  refs: "6–20",   rate: "25%", icon: "🚀", color: "#34d399" },
-                { tier: "PRO",     refs: "21–50",  rate: "30%", icon: "⭐", color: "#fbbf24" },
-                { tier: "ELITE",   refs: "50+",    rate: "35%", icon: "💎", color: "#c4b5fd" },
+                { tier: "STARTER", refs: "1–5",    rate: "20%", icon: "🌱", color: "var(--tx-818cf8, #818cf8)" },
+                { tier: "GROWTH",  refs: "6–20",   rate: "25%", icon: "🚀", color: "var(--tx-34d399, #34d399)" },
+                { tier: "PRO",     refs: "21–50",  rate: "30%", icon: "⭐", color: "var(--tx-fbbf24, #fbbf24)" },
+                { tier: "ELITE",   refs: "50+",    rate: "35%", icon: "💎", color: "var(--tx-c4b5fd, #c4b5fd)" },
               ].map(t => {
                 const active = affiliate.tier === t.tier;
                 return (
                   <div key={t.tier} style={{ background: active ? `rgba(${t.color === "#818cf8" ? "129,140,248" : t.color === "#34d399" ? "52,211,153" : t.color === "#fbbf24" ? "251,191,36" : "196,181,253"},.12)` : "rgba(var(--ink),.02)", border: `1px solid ${active ? t.color + "44" : "rgba(var(--ink),.06)"}`, borderRadius: 10, padding: "14px 12px", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 4 }}>{t.icon}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: active ? t.color : "#94a3b8" }}>{t.tier}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: active ? t.color : "var(--tx-94a3b8, #94a3b8)" }}>{t.tier}</div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: active ? t.color : "#64748b", marginTop: 4 }}>{t.rate}</div>
                     <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{t.refs} referrals</div>
                     {active && <div style={{ fontSize: 10, color: t.color, marginTop: 6, fontWeight: 600 }}>● CURRENT</div>}
@@ -321,7 +321,7 @@ export default function AffiliateDashboardPage() {
             <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Recent Conversions</h3>
-                <button onClick={() => setTab("conversions")} style={{ background: "none", border: "none", color: "#818cf8", cursor: "pointer", fontSize: 13 }}>View all →</button>
+                <button onClick={() => setTab("conversions")} style={{ background: "none", border: "none", color: "var(--tx-818cf8, #818cf8)", cursor: "pointer", fontSize: 13 }}>View all →</button>
               </div>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -335,12 +335,12 @@ export default function AffiliateDashboardPage() {
                 </thead>
                 <tbody>
                   {affiliate.conversions.slice(0, 5).map(c => {
-                    const st = CONVERSION_STATUS[c.status] || { label: c.status, color: "#94a3b8" };
+                    const st = CONVERSION_STATUS[c.status] || { label: c.status, color: "var(--tx-94a3b8, #94a3b8)" };
                     return (
                       <tr key={c.id} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                         <td style={{ padding: "10px 12px", fontSize: 14 }}>{c.customerName || c.customerEmail}</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8" }}>{c.plan || "—"}</td>
-                        <td style={{ padding: "10px 12px", fontSize: 14, color: "#34d399", fontWeight: 600 }}>${c.commissionAmt.toFixed(2)}</td>
+                        <td style={{ padding: "10px 12px", fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)" }}>{c.plan || "—"}</td>
+                        <td style={{ padding: "10px 12px", fontSize: 14, color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>${c.commissionAmt.toFixed(2)}</td>
                         <td style={{ padding: "10px 12px" }}>
                           <span style={{ color: st.color, fontSize: 12, fontWeight: 600 }}>{st.label}</span>
                         </td>
@@ -387,14 +387,14 @@ export default function AffiliateDashboardPage() {
               </thead>
               <tbody>
                 {affiliate.conversions.map(c => {
-                  const st = CONVERSION_STATUS[c.status] || { label: c.status, color: "#94a3b8" };
+                  const st = CONVERSION_STATUS[c.status] || { label: c.status, color: "var(--tx-94a3b8, #94a3b8)" };
                   return (
                     <tr key={c.id} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                       <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 500 }}>{c.customerName || "—"}</td>
-                      <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8" }}>{c.customerEmail}</td>
-                      <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8" }}>{c.plan || "—"}</td>
+                      <td style={{ padding: "10px 12px", fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)" }}>{c.customerEmail}</td>
+                      <td style={{ padding: "10px 12px", fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)" }}>{c.plan || "—"}</td>
                       <td style={{ padding: "10px 12px", fontSize: 13 }}>{c.planAmount ? `$${c.planAmount}` : "—"}</td>
-                      <td style={{ padding: "10px 12px", fontSize: 14, color: "#34d399", fontWeight: 700 }}>${c.commissionAmt.toFixed(2)}</td>
+                      <td style={{ padding: "10px 12px", fontSize: 14, color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>${c.commissionAmt.toFixed(2)}</td>
                       <td style={{ padding: "10px 12px" }}>
                         <span style={{ background: `${st.color}18`, border: `1px solid ${st.color}44`, color: st.color, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>{st.label}</span>
                       </td>
@@ -440,11 +440,11 @@ export default function AffiliateDashboardPage() {
                   {affiliate.payouts.map(p => (
                     <tr key={p.id} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                       <td style={{ padding: "10px 12px", fontSize: 14 }}>{p.month}</td>
-                      <td style={{ padding: "10px 12px", fontSize: 14, color: "#34d399", fontWeight: 700 }}>${p.amount.toFixed(2)}</td>
-                      <td style={{ padding: "10px 12px", fontSize: 13, color: "#94a3b8", textTransform: "capitalize" }}>{p.method}</td>
+                      <td style={{ padding: "10px 12px", fontSize: 14, color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>${p.amount.toFixed(2)}</td>
+                      <td style={{ padding: "10px 12px", fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", textTransform: "capitalize" }}>{p.method}</td>
                       <td style={{ padding: "10px 12px", fontSize: 12, color: "#64748b" }}>{p.reference || "—"}</td>
                       <td style={{ padding: "10px 12px" }}>
-                        <span style={{ color: p.status === "PAID" ? "#34d399" : p.status === "PROCESSING" ? "#fbbf24" : "#94a3b8", fontSize: 12, fontWeight: 600 }}>{p.status}</span>
+                        <span style={{ color: p.status === "PAID" ? "var(--tx-34d399, #34d399)" : p.status === "PROCESSING" ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 600 }}>{p.status}</span>
                       </td>
                       <td style={{ padding: "10px 12px", fontSize: 12, color: "#64748b" }}>{p.paidAt ? new Date(p.paidAt).toLocaleDateString("en-GB") : "—"}</td>
                     </tr>
@@ -459,7 +459,7 @@ export default function AffiliateDashboardPage() {
       {/* ── MARKETING ASSETS ── */}
       {tab === "assets" && (
         <div>
-          <div style={{ marginBottom: 20, color: "#94a3b8", fontSize: 14 }}>
+          <div style={{ marginBottom: 20, color: "var(--tx-94a3b8, #94a3b8)", fontSize: 14 }}>
             Ready-made content to promote FinovaOS. Copy, customise, and share.
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
@@ -477,8 +477,8 @@ export default function AffiliateDashboardPage() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 24, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 12, padding: 16, color: "#94a3b8", fontSize: 13 }}>
-            💡 <strong style={{ color: "#34d399" }}>Pro tip:</strong> WhatsApp messages convert best in Pakistan. Send personalised pitches to business owners you know personally.
+          <div style={{ marginTop: 24, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 12, padding: 16, color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13 }}>
+            💡 <strong style={{ color: "var(--tx-34d399, #34d399)" }}>Pro tip:</strong> WhatsApp messages convert best in Pakistan. Send personalised pitches to business owners you know personally.
           </div>
         </div>
       )}
@@ -507,7 +507,7 @@ export default function AffiliateDashboardPage() {
           <div style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 24 }}>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Payout Settings</h3>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Preferred Payout Method</label>
+              <label style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", display: "block", marginBottom: 8 }}>Preferred Payout Method</label>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 8 }}>
                 {PAYOUT_METHODS.map(m => (
                   <button key={m.value} onClick={() => setPayoutMethod(m.value)}
@@ -519,13 +519,13 @@ export default function AffiliateDashboardPage() {
               </div>
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Account / Wallet Details</label>
+              <label style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", display: "block", marginBottom: 8 }}>Account / Wallet Details</label>
               <textarea
                 value={payoutDetails}
                 onChange={e => setPayoutDetails(e.target.value)}
                 placeholder={payoutMethod === "bank" ? "Bank name, account #, IBAN…" : payoutMethod === "jazzcash" || payoutMethod === "easypaisa" ? "Mobile number…" : payoutMethod === "paypal" ? "PayPal email…" : payoutMethod === "crypto" ? "USDT TRC20 / ERC20 wallet address…" : "Payout details…"}
                 rows={3}
-                style={{ width: "100%", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, color: "#e2e8f0", padding: "10px 14px", fontSize: 13, resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
+                style={{ width: "100%", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, color: "var(--tx-e2e8f0, #e2e8f0)", padding: "10px 14px", fontSize: 13, resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
               />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -533,7 +533,7 @@ export default function AffiliateDashboardPage() {
                 style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", border: "none", padding: "10px 24px", borderRadius: 10, cursor: saving ? "wait" : "pointer", fontWeight: 600, fontSize: 14 }}>
                 {saving ? "Saving…" : "Save Settings"}
               </button>
-              {saveMsg && <span style={{ color: "#34d399", fontSize: 13 }}>✓ {saveMsg}</span>}
+              {saveMsg && <span style={{ color: "var(--tx-34d399, #34d399)", fontSize: 13 }}>✓ {saveMsg}</span>}
             </div>
           </div>
         </div>

@@ -173,10 +173,10 @@ export default function ContraPage() {
       {/* Title */}
       <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
         <div>
-          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:queryMode?"#facc15":TEAL }}>
+          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:queryMode?"var(--tx-facc15, #facc15)":TEAL }}>
             {queryMode ? "🔍 QUERY MODE — Contra" : "Contra Entry"}
           </h1>
-          <p style={{ margin:"4px 0 0", fontSize:12, color:queryMode?"rgba(250,204,21,.5)":"var(--text-muted)" }}>
+          <p style={{ margin:"4px 0 0", fontSize:12, color:queryMode?"rgba(var(--txr-facc15, 250,204,21),.5)":"var(--text-muted)" }}>
             {queryMode ? "Enter search criteria then press F8 to execute" : "Transfer between cash / bank accounts"}
           </p>
         </div>
@@ -186,7 +186,7 @@ export default function ContraPage() {
               <button onClick={()=>navTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding:"4px 10px", borderRadius:6, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:queryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize:13, cursor:queryIdx===0?"default":"pointer", fontFamily:ff }}>◀</button>
               <span style={{ fontSize:12, color:TEAL, fontWeight:700, minWidth:80, textAlign:"center" }}>{queryResults[queryIdx]?.contraNumber} · {queryIdx+1}/{queryResults.length}</span>
               <button onClick={()=>navTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding:"4px 10px", borderRadius:6, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:queryIdx===queryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize:13, cursor:queryIdx===queryResults.length-1?"default":"pointer", fontFamily:ff }}>▶</button>
-              <button onClick={exitQueryMode} style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
+              <button onClick={exitQueryMode} style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"var(--tx-f87171, #f87171)", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
             </div>
           )}
           {queryIdx<0 && !queryMode && (
@@ -216,23 +216,23 @@ export default function ContraPage() {
       {queryMode && (
         <div style={{ background:"rgba(250,204,21,.04)", border:"2px solid rgba(250,204,21,.3)", borderRadius:16, padding:28, marginBottom:28 }}>
           <div style={{ marginBottom:20 }}>
-            <span style={{ fontSize:12, color:"rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color:"#facc15" }}>&gt;</b>, <b style={{ color:"#facc15" }}>&lt;</b>, <b style={{ color:"#facc15" }}>&gt;=</b> for date range.</span>
+            <span style={{ fontSize:12, color:"rgba(var(--txr-facc15, 250,204,21),.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color:"var(--tx-facc15, #facc15)" }}>&gt;</b>, <b style={{ color:"var(--tx-facc15, #facc15)" }}>&lt;</b>, <b style={{ color:"var(--tx-facc15, #facc15)" }}>&gt;=</b> for date range.</span>
           </div>
           <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap:16, marginBottom:24 }}>
             <div>
-              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Contra # (e.g. CTR-5)</label>
+              <label style={{ ...lbl, color:"rgba(var(--txr-facc15, 250,204,21),.6)" }}>Contra # (e.g. CTR-5)</label>
               <input autoFocus value={queryCNo} onChange={e=>setQueryCNo(e.target.value)} placeholder="CTR-1 or blank…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)" }}
                 onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();executeQuery(queryCNo,queryDate,queryAcct);} if(e.key==="Escape")exitQueryMode(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+              <label style={{ ...lbl, color:"rgba(var(--txr-facc15, 250,204,21),.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
               <input value={queryDate} onChange={e=>setQueryDate(e.target.value)} placeholder=">010125 or blank…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)" }}
                 onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();executeQuery(queryCNo,queryDate,queryAcct);} if(e.key==="Escape")exitQueryMode(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Account (name)</label>
+              <label style={{ ...lbl, color:"rgba(var(--txr-facc15, 250,204,21),.6)" }}>Account (name)</label>
               <input value={queryAcct} onChange={e=>setQueryAcct(e.target.value)} placeholder="e.g. Cash, HBL, or blank…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)" }}
                 onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();executeQuery(queryCNo,queryDate,queryAcct);} if(e.key==="Escape")exitQueryMode(); }} />
@@ -244,8 +244,8 @@ export default function ContraPage() {
               <span style={{ background:"rgba(0,0,0,.2)", borderRadius:4, padding:"1px 7px", fontSize:11 }}>F8</span>Execute Query
             </button>
             <button onClick={exitQueryMode} style={{ padding:"10px 20px", borderRadius:9, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.5)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel (Esc)</button>
-            <span style={{ fontSize:11, color:"rgba(250,204,21,.4)", marginLeft:8 }}>
-              Operators: <b style={{ color:"rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color:"rgba(250,204,21,.7)" }}>&lt;010425</b> (before)
+            <span style={{ fontSize:11, color:"rgba(var(--txr-facc15, 250,204,21),.4)", marginLeft:8 }}>
+              Operators: <b style={{ color:"rgba(var(--txr-facc15, 250,204,21),.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color:"rgba(var(--txr-facc15, 250,204,21),.7)" }}>&lt;010425</b> (before)
             </span>
           </div>
         </div>
@@ -290,7 +290,7 @@ export default function ContraPage() {
             {editingId && (
               <>
                 <button type="button" onClick={resetForm} style={{ background:"transparent", border:"1px solid var(--border)", borderRadius:8, padding:"10px 20px", fontFamily:ff, fontSize:14, color:"var(--text-muted)", cursor:"pointer" }}>Cancel</button>
-                <button type="button" onClick={()=>handleDelete(editingId)} style={{ background:"transparent", border:"1px solid rgba(248,113,113,.3)", borderRadius:8, padding:"10px 20px", fontFamily:ff, fontSize:14, color:"#f87171", cursor:"pointer" }}>Delete</button>
+                <button type="button" onClick={()=>handleDelete(editingId)} style={{ background:"transparent", border:"1px solid rgba(248,113,113,.3)", borderRadius:8, padding:"10px 20px", fontFamily:ff, fontSize:14, color:"var(--tx-f87171, #f87171)", cursor:"pointer" }}>Delete</button>
               </>
             )}
           </div>
@@ -300,7 +300,7 @@ export default function ContraPage() {
       {/* Shortcuts Bar */}
       <div style={{ display:"flex", gap:6, marginBottom:16, flexWrap:"wrap" }}>
         {(queryMode ? [
-          { key:"F8", label:"Execute Query", color:"#facc15" },
+          { key:"F8", label:"Execute Query", color:"var(--tx-facc15, #facc15)" },
           { key:"Esc", label:"Cancel Query", color:undefined },
         ] : queryIdx>=0 ? [
           { key:"F7", label:"New Query", color:TEAL },

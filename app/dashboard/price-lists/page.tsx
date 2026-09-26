@@ -8,12 +8,12 @@ import { useResponsive } from "@/hooks/useResponsive";
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
 const ACCENT = "#10b981";
-const PANEL  = "rgba(255,255,255,0.03)";
-const BORDER = "rgba(255,255,255,0.08)";
+const PANEL  = "rgba(var(--ink),0.03)";
+const BORDER = "rgba(var(--ink),0.08)";
 const TEXT   = "#f1f5f9";
-const MUTED  = "rgba(255,255,255,0.45)";
+const MUTED  = "rgba(var(--ink),0.45)";
 const INPUT: React.CSSProperties = {
-  background: "rgba(255,255,255,0.05)", border: `1px solid ${BORDER}`,
+  background: "rgba(var(--ink),0.05)", border: `1px solid ${BORDER}`,
   borderRadius: 8, padding: "9px 12px", color: TEXT,
   fontFamily: FONT, fontSize: 13, width: "100%",
   outline: "none", boxSizing: "border-box",
@@ -320,8 +320,8 @@ export default function PriceListsPage() {
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:12, marginBottom:28 }}>
         {[
           { label:"Total Lists",   value:totalLists,  color:ACCENT },
-          { label:"Active",        value:activeLists, color:"#34d399" },
-          { label:"Items Covered", value:itemsCovered,color:"#60a5fa" },
+          { label:"Active",        value:activeLists, color:"var(--tx-34d399, #34d399)" },
+          { label:"Items Covered", value:itemsCovered,color:"var(--tx-60a5fa, #60a5fa)" },
         ].map(k => (
           <div key={k.label} style={{ background:PANEL, border:`1px solid ${BORDER}`,
             borderRadius:12, padding: isMobile ? "12px 10px" : "18px 22px" }}>
@@ -350,9 +350,9 @@ export default function PriceListsPage() {
             ) : lists.map((l, idx) => (
               <tr key={l.id}
                 style={{ borderBottom:`1px solid ${BORDER}`,
-                  background:idx%2===0?"transparent":"rgba(255,255,255,.01)" }}
+                  background:idx%2===0?"transparent":"rgba(var(--ink),.01)" }}
                 onMouseEnter={e => e.currentTarget.style.background="rgba(99,102,241,0.04)"}
-                onMouseLeave={e => e.currentTarget.style.background=idx%2===0?"transparent":"rgba(255,255,255,.01)"}>
+                onMouseLeave={e => e.currentTarget.style.background=idx%2===0?"transparent":"rgba(var(--ink),.01)"}>
                 <td style={{ padding:"11px 16px", fontWeight:700 }}>{l.name}
                   {l.notes ? <div style={{ fontSize:11, color:MUTED, fontWeight:400, marginTop:2 }}>{l.notes}</div> : null}
                 </td>
@@ -361,7 +361,7 @@ export default function PriceListsPage() {
                   {l.discount > 0 ? `${l.discount}%` : <span style={{color:MUTED}}>—</span>}
                 </td>
                 <td style={{ padding:"11px 16px" }}>
-                  <span style={{ fontWeight:700, color: l.items.length > 0 ? "#60a5fa" : MUTED }}>
+                  <span style={{ fontWeight:700, color: l.items.length > 0 ? "var(--tx-60a5fa, #60a5fa)" : MUTED }}>
                     {l.items.length}
                   </span>
                   {l.items.length > 0 && <span style={{ fontSize:11, color:MUTED, marginLeft:4 }}>items</span>}
@@ -372,20 +372,20 @@ export default function PriceListsPage() {
                     <button onClick={() => setEditList(l)}
                       style={{ padding:"4px 12px", borderRadius:6, fontSize:11, fontWeight:700,
                         border:`1px solid rgba(99,102,241,0.4)`, background:"rgba(99,102,241,0.1)",
-                        color:"#818cf8", cursor:"pointer", fontFamily:FONT }}>
+                        color:"var(--tx-818cf8, #818cf8)", cursor:"pointer", fontFamily:FONT }}>
                       Manage Items
                     </button>
                     <button onClick={() => toggleStatus(l)}
                       style={{ padding:"4px 12px", borderRadius:6, fontSize:11, fontWeight:700,
                         border:`1px solid ${l.status==="ACTIVE"?"rgba(107,114,128,.4)":"rgba(16,185,129,.4)"}`,
                         background:"transparent",
-                        color:l.status==="ACTIVE"?"#9ca3af":ACCENT, cursor:"pointer", fontFamily:FONT }}>
+                        color:l.status==="ACTIVE"?"var(--tx-9ca3af, #9ca3af)":ACCENT, cursor:"pointer", fontFamily:FONT }}>
                       {l.status === "ACTIVE" ? "Deactivate" : "Activate"}
                     </button>
                     <button onClick={() => handleDelete(l.id)}
                       style={{ padding:"4px 10px", borderRadius:6, fontSize:11, fontWeight:700,
                         border:"1px solid rgba(239,68,68,.4)", background:"transparent",
-                        color:"#ef4444", cursor:"pointer", fontFamily:FONT }}>
+                        color:"var(--tx-ef4444, #ef4444)", cursor:"pointer", fontFamily:FONT }}>
                       Del
                     </button>
                   </div>
@@ -401,7 +401,7 @@ export default function PriceListsPage() {
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.65)",
           display:"flex", alignItems:"center", justifyContent:"center", zIndex:50, padding:16 }}
           onClick={e => { if (e.target===e.currentTarget) setShowCreate(false); }}>
-          <div style={{ background:"#0e1120", border:`1px solid ${BORDER}`, borderRadius:16,
+          <div style={{ background:"var(--dk-0e1120, #0e1120)", border:`1px solid ${BORDER}`, borderRadius:16,
             padding:"28px 28px 24px", width:"100%", maxWidth:460, fontFamily:FONT }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
               <h2 style={{ margin:0, fontSize:18, fontWeight:800 }}>New Price List</h2>
@@ -452,7 +452,7 @@ export default function PriceListsPage() {
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.7)",
           display:"flex", alignItems:"center", justifyContent:"center", zIndex:50, padding:16 }}
           onClick={e => { if (e.target===e.currentTarget) setEditList(null); }}>
-          <div style={{ background:"#0e1120", border:`1px solid ${BORDER}`, borderRadius:16,
+          <div style={{ background:"var(--dk-0e1120, #0e1120)", border:`1px solid ${BORDER}`, borderRadius:16,
             padding:"28px", width:"100%", maxWidth:700, maxHeight:"88vh",
             overflowY:"auto", fontFamily:FONT }}>
 
@@ -532,8 +532,8 @@ export default function PriceListsPage() {
                     return (
                       <tr key={item.itemId}
                         style={{ borderBottom:`1px solid ${BORDER}`,
-                          background:idx%2===0?"transparent":"rgba(255,255,255,.01)" }}>
-                        <td style={{ padding:"9px 12px", fontFamily:"monospace", fontSize:12, color:"#818cf8" }}>
+                          background:idx%2===0?"transparent":"rgba(var(--ink),.01)" }}>
+                        <td style={{ padding:"9px 12px", fontFamily:"monospace", fontSize:12, color:"var(--tx-818cf8, #818cf8)" }}>
                           {item.itemCode}
                         </td>
                         <td style={{ padding:"9px 12px", fontWeight:600 }}>{item.itemName}</td>
@@ -556,7 +556,7 @@ export default function PriceListsPage() {
                         <td style={{ padding:"9px 12px" }}>
                           {diff !== null && (
                             <span style={{ fontSize:11, fontWeight:700,
-                              color: Number(diff) < 0 ? "#f87171" : Number(diff) > 0 ? "#34d399" : MUTED }}>
+                              color: Number(diff) < 0 ? "var(--tx-f87171, #f87171)" : Number(diff) > 0 ? "var(--tx-34d399, #34d399)" : MUTED }}>
                               {Number(diff) > 0 ? "+" : ""}{diff}%
                             </span>
                           )}
@@ -565,7 +565,7 @@ export default function PriceListsPage() {
                           <button onClick={() => handleRemoveItem(item.itemId)}
                             style={{ padding:"3px 10px", borderRadius:6, fontSize:11, fontWeight:700,
                               border:"1px solid rgba(239,68,68,.4)", background:"transparent",
-                              color:"#ef4444", cursor:"pointer", fontFamily:FONT }}>
+                              color:"var(--tx-ef4444, #ef4444)", cursor:"pointer", fontFamily:FONT }}>
                             Remove
                           </button>
                         </td>

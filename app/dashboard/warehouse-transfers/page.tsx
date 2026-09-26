@@ -26,10 +26,10 @@ interface WarehouseTransferRecord extends WarehouseTransferData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_META: Record<TransferStatus, { label: string; color: string; bg: string; border: string }> = {
-  DRAFT:      { label: "Draft",      color: "#94a3b8", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" },
-  IN_TRANSIT: { label: "In Transit", color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  COMPLETED:  { label: "Completed",  color: "#4ade80", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
-  CANCELLED:  { label: "Cancelled",  color: "#f87171", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.35)" },
+  DRAFT:      { label: "Draft",      color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" },
+  IN_TRANSIT: { label: "In Transit", color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  COMPLETED:  { label: "Completed",  color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
+  CANCELLED:  { label: "Cancelled",  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.35)" },
 };
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -165,10 +165,10 @@ export default function WarehouseTransfersPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Transfers",  value: kpis.total,      color: "#a78bfa" },
-          { label: "In Transit",       value: kpis.inTransit,  color: "#60a5fa" },
-          { label: "Completed",        value: kpis.completed,  color: "#4ade80" },
-          { label: "Total Line Items", value: kpis.totalItems, color: "#fbbf24" },
+          { label: "Total Transfers",  value: kpis.total,      color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "In Transit",       value: kpis.inTransit,  color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Completed",        value: kpis.completed,  color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Total Line Items", value: kpis.totalItems, color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(k => (
           <div key={k.label} style={{ ...s.panel, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{k.label}</div>
@@ -182,7 +182,7 @@ export default function WarehouseTransfersPage() {
         <div style={{ ...s.panel, padding: 24, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{editing ? "Edit" : "New"} Warehouse Transfer</h2>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)", true)}>✕ Close</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)", true)}>✕ Close</button>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
@@ -229,7 +229,7 @@ export default function WarehouseTransfersPage() {
                       <td style={s.td}><input type="number" min="0" value={item.qty} onChange={e => setItem(i, "qty", Number(e.target.value))} style={s.inp} /></td>
                       <td style={s.td}><input value={item.unit} onChange={e => setItem(i, "unit", e.target.value)} style={s.inp} placeholder="PCS" /></td>
                       <td style={s.td}><input value={item.notes} onChange={e => setItem(i, "notes", e.target.value)} style={s.inp} placeholder="Optional" /></td>
-                      <td style={s.td}>{form.items.length > 1 && <button onClick={() => removeItem(i)} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: "0 4px" }}>×</button>}</td>
+                      <td style={s.td}>{form.items.length > 1 && <button onClick={() => removeItem(i)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16, padding: "0 4px" }}>×</button>}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -244,7 +244,7 @@ export default function WarehouseTransfersPage() {
 
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={handleSave} disabled={saving} style={s.btn(ACCENT)}>{saving ? "Saving…" : editing ? "Update Transfer" : "Create Transfer"}</button>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)")}>Cancel</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)")}>Cancel</button>
           </div>
         </div>
       )}
@@ -293,7 +293,7 @@ export default function WarehouseTransfersPage() {
                     <td style={{ ...s.td, color: "var(--text-muted)" }}>{t.reason || "—"}</td>
                     <td style={s.td}><span style={s.badge(meta)}>{meta.label}</span></td>
                     <td style={{ ...s.td, textAlign: "right" as const }}>
-                      <button onClick={() => openEdit(t)} style={{ ...s.btn("rgba(255,255,255,.08)", true), marginRight: 6 }}>Edit</button>
+                      <button onClick={() => openEdit(t)} style={{ ...s.btn("rgba(var(--ink),.08)", true), marginRight: 6 }}>Edit</button>
                       <button onClick={async () => { if (confirm("Delete this transfer?")) await remove(t.id); }} style={s.btn("rgba(248,113,113,.15)", true)}>Delete</button>
                     </td>
                   </tr>

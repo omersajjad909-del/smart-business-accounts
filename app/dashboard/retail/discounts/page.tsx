@@ -73,10 +73,10 @@ export default function DiscountsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Active Discounts", val: discounts.filter(d => d.status === "ACTIVE").length, color: "#10b981" },
-          { label: "Scheduled", val: discounts.filter(d => d.status === "SCHEDULED").length, color: "#f59e0b" },
-          { label: "Total Uses (Active)", val: discounts.filter(d => d.status === "ACTIVE").reduce((s, d) => s + d.usedCount, 0), color: "#818cf8" },
-          { label: "Total Discounts", val: discounts.length, color: "#6366f1" },
+          { label: "Active Discounts", val: discounts.filter(d => d.status === "ACTIVE").length, color: "var(--tx-10b981, #10b981)" },
+          { label: "Scheduled", val: discounts.filter(d => d.status === "SCHEDULED").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Total Uses (Active)", val: discounts.filter(d => d.status === "ACTIVE").reduce((s, d) => s + d.usedCount, 0), color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Total Discounts", val: discounts.length, color: "var(--tx-6366f1, #6366f1)" },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
@@ -104,10 +104,10 @@ export default function DiscountsPage() {
                 <tr key={d.id} style={{ borderTop: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(99,102,241,.02)", opacity: d.status === "EXPIRED" ? 0.55 : 1 }}>
                   <td style={{ padding: "11px 14px", fontWeight: 600 }}>{d.name}</td>
                   <td style={{ padding: "11px 14px" }}>
-                    <code style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", padding: "2px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>{d.code}</code>
+                    <code style={{ background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)", padding: "2px 8px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>{d.code}</code>
                   </td>
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{TYPE_LABELS[d.type]}</td>
-                  <td style={{ padding: "11px 14px", fontWeight: 700, color: "#10b981" }}>
+                  <td style={{ padding: "11px 14px", fontWeight: 700, color: "var(--tx-10b981, #10b981)" }}>
                     {d.type === "BUY_X_GET_Y" ? "Free Item" : d.type === "PERCENTAGE" ? `${d.value}%` : `Rs ${d.value}`}
                   </td>
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{d.minPurchase > 0 ? `Rs ${d.minPurchase}` : "—"}</td>
@@ -123,7 +123,7 @@ export default function DiscountsPage() {
                   </td>
                   <td style={{ padding: "11px 14px" }}>
                     {d.status !== "EXPIRED" && (
-                      <button onClick={() => setStatus(d.id, "EXPIRED")} style={{ background: "rgba(239,68,68,.08)", color: "#ef4444", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Stop</button>
+                      <button onClick={() => setStatus(d.id, "EXPIRED")} style={{ background: "rgba(239,68,68,.08)", color: "var(--tx-ef4444, #ef4444)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Stop</button>
                     )}
                   </td>
                 </tr>
@@ -149,7 +149,7 @@ export default function DiscountsPage() {
                 <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Promo Code *</label>
                 <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
                   <input value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} placeholder="EID30" style={{ ...inp }} />
-                  <button onClick={() => setForm(p => ({ ...p, code: generateCode() }))} style={{ flexShrink: 0, background: "rgba(99,102,241,.1)", color: "#818cf8", border: "none", borderRadius: 8, padding: "0 12px", fontSize: 12, cursor: "pointer" }}>Generate</button>
+                  <button onClick={() => setForm(p => ({ ...p, code: generateCode() }))} style={{ flexShrink: 0, background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)", border: "none", borderRadius: 8, padding: "0 12px", fontSize: 12, cursor: "pointer" }}>Generate</button>
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

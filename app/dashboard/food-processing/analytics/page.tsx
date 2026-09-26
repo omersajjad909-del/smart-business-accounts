@@ -31,7 +31,7 @@ export default function FoodProcessingAnalyticsPage() {
   }, [recipes]);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Food Processing Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>
@@ -46,15 +46,15 @@ export default function FoodProcessingAnalyticsPage() {
         </div>
         <div style={cardStyle}>
           <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Live Recipes</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{stats.live}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{stats.live}</div>
         </div>
         <div style={cardStyle}>
           <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Avg Unit Cost</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#fbbf24" }}>{stats.avgCost.toLocaleString()}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>{stats.avgCost.toLocaleString()}</div>
         </div>
         <div style={cardStyle}>
           <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Total Yield</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#60a5fa" }}>{stats.totalYield.toLocaleString()}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>{stats.totalYield.toLocaleString()}</div>
         </div>
       </div>
 

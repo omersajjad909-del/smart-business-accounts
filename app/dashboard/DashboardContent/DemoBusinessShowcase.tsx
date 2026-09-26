@@ -85,7 +85,7 @@ export default function DemoBusinessShowcase({
         }}
       >
         <div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24" }}>Live Demo Experience</div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>Live Demo Experience</div>
           <div style={{ fontSize: 12, color: "rgba(var(--ink),0.55)", marginTop: 4 }}>
             This preview is tailored for {businessMeta.label}. Explore the business flow here, then open the owner dashboard for a live operational view.
           </div>
@@ -113,7 +113,7 @@ export default function DemoBusinessShowcase({
           marginBottom: 18,
           padding: "28px",
           borderRadius: 22,
-          background: "radial-gradient(circle at top left, rgba(99,102,241,0.18), rgba(8,10,24,0.94) 55%)",
+          background: "radial-gradient(circle at top left, rgba(99,102,241,0.18), rgba(var(--dkr-080a18, 8,10,24),0.94) 55%)",
           border: "1px solid rgba(var(--ink),0.08)",
           display: "grid",
           gridTemplateColumns: "minmax(0, 1.4fr) minmax(280px, 0.9fr)",
@@ -185,11 +185,11 @@ export default function DemoBusinessShowcase({
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
               <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Demo plan</span>
-              <span style={{ color: "#a5b4fc", fontSize: 12, fontWeight: 800 }}>{companyInfo?.plan || "Professional"}</span>
+              <span style={{ color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 12, fontWeight: 800 }}>{companyInfo?.plan || "Professional"}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
               <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Status</span>
-              <span style={{ color: "#34d399", fontSize: 12, fontWeight: 800 }}>{companyInfo?.subscriptionStatus || "ACTIVE"}</span>
+              <span style={{ color: "var(--tx-34d399, #34d399)", fontSize: 12, fontWeight: 800 }}>{companyInfo?.subscriptionStatus || "ACTIVE"}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
               <span style={{ color: "rgba(var(--ink),0.5)", fontSize: 12 }}>Modules previewed</span>

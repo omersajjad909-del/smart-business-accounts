@@ -118,10 +118,10 @@ export default function FeeCollectionPage() {
 
       <div style={S.statsGrid}>
         {[
-          { label: "Collected", value: fmt(collected), sub: `${fees.filter(f => f.status === "paid").length} records`, color: "#22c55e" },
-          { label: "Pending", value: fmt(pending), sub: `${fees.filter(f => f.status === "pending").length} records`, color: "#f59e0b" },
-          { label: "Overdue", value: fmt(overdue), sub: `${fees.filter(f => f.status === "overdue").length} records`, color: "#ef4444" },
-          { label: "Collection Rate", value: rate + "%", sub: "This period", color: "#6366f1" },
+          { label: "Collected", value: fmt(collected), sub: `${fees.filter(f => f.status === "paid").length} records`, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Pending", value: fmt(pending), sub: `${fees.filter(f => f.status === "pending").length} records`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Overdue", value: fmt(overdue), sub: `${fees.filter(f => f.status === "overdue").length} records`, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Collection Rate", value: rate + "%", sub: "This period", color: "var(--tx-6366f1, #6366f1)" },
         ].map(s => (
           <div key={s.label} style={S.statCard}>
             <div style={S.statLabel}>{s.label}</div>
@@ -209,7 +209,7 @@ export default function FeeCollectionPage() {
                 <option value="Easypaisa">Easypaisa</option><option value="JazzCash">JazzCash</option>
               </select>
             </div>
-            {error && <div style={{ color: "#fda4af", fontSize: "12px", marginTop: "4px" }}>{error}</div>}
+            {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: "12px", marginTop: "4px" }}>{error}</div>}
             <div style={S.modalBtns}>
               <button style={S.cancelBtn} onClick={() => { setShowModal(false); setError(""); }}>Cancel</button>
               <button style={S.btn} onClick={handleCreate}>Add Record</button>

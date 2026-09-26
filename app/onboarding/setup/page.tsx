@@ -192,7 +192,7 @@ function SetupPageInner() {
                   boxShadow: isActive ? "0 0 16px rgba(99,102,241,.4)" : "none",
                   transform: isActive ? "scale(1.1)" : "scale(1)",
                 }}>
-                  {isDone ? <span style={{color:"#34d399",fontWeight:700,fontSize:13}}>✓</span> : s.icon}
+                  {isDone ? <span style={{color:"var(--tx-34d399, #34d399)",fontWeight:700,fontSize:13}}>✓</span> : s.icon}
                 </div>
               </div>
             );
@@ -204,7 +204,7 @@ function SetupPageInner() {
           display:"inline-flex",alignItems:"center",gap:8,
           padding:"7px 16px",borderRadius:100,
           background:"rgba(99,102,241,.1)",border:"1px solid rgba(99,102,241,.2)",
-          fontSize:12,fontWeight:600,color:"#a5b4fc",
+          fontSize:12,fontWeight:600,color:"var(--tx-a5b4fc, #a5b4fc)",
         }}>
           {done ? (
             <>

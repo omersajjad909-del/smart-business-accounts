@@ -45,10 +45,10 @@ export default function EventBookingsPage() {
       summarize={(rows) => {
         const totalValue = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
         return [
-          { label: "Bookings", value: rows.length, color: "#fb7185" },
-          { label: "Confirmed", value: rows.filter((row) => String(row.status) === "confirmed").length, color: "#34d399" },
-          { label: "Tentative", value: rows.filter((row) => String(row.status) === "tentative").length, color: "#fbbf24" },
-          { label: "Pipeline Value", value: totalValue.toLocaleString(), color: "#60a5fa" },
+          { label: "Bookings", value: rows.length, color: "var(--tx-fb7185, #fb7185)" },
+          { label: "Confirmed", value: rows.filter((row) => String(row.status) === "confirmed").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Tentative", value: rows.filter((row) => String(row.status) === "tentative").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Pipeline Value", value: totalValue.toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ];
       }}
     />

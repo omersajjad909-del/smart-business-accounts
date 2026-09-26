@@ -6,8 +6,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { hotelFont, hotelMuted } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 const inp: React.CSSProperties = {
   width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
   borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14, boxSizing: "border-box",
@@ -17,10 +17,10 @@ const STATUS_FLOW = ["pickup_pending", "washing", "ironing", "ready", "delivered
 type LaundryStatus = typeof STATUS_FLOW[number];
 
 const STATUS_CONFIG: Record<LaundryStatus, { label: string; color: string; bg: string }> = {
-  pickup_pending: { label: "Pickup Pending", color: "#f59e0b", bg: "rgba(245,158,11,.12)" },
-  washing:        { label: "Washing",         color: "#60a5fa", bg: "rgba(96,165,250,.12)" },
-  ironing:        { label: "Ironing",          color: "#a78bfa", bg: "rgba(167,139,250,.12)" },
-  ready:          { label: "Ready",            color: "#34d399", bg: "rgba(52,211,153,.12)" },
+  pickup_pending: { label: "Pickup Pending", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)" },
+  washing:        { label: "Washing",         color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)" },
+  ironing:        { label: "Ironing",          color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)" },
+  ready:          { label: "Ready",            color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)" },
   delivered:      { label: "Delivered",        color: "#6b7280", bg: "rgba(107,114,128,.12)" },
 };
 
@@ -127,10 +127,10 @@ export default function LaundryPage() {
                 <tr key={item.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={{ padding: "12px 16px", fontWeight: 600 }}>{item.guest}</td>
                   <td style={{ padding: "12px 16px" }}>
-                    <span style={{ background: "rgba(99,102,241,.12)", color: "#a5b4fc", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Room {item.room}</span>
+                    <span style={{ background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>Room {item.room}</span>
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 12, color: hotelMuted, maxWidth: 180 }}>{item.items || "—"}</td>
-                  <td style={{ padding: "12px 16px", color: "#34d399", fontWeight: 600 }}>{item.amount ? `Rs. ${item.amount.toLocaleString()}` : "—"}</td>
+                  <td style={{ padding: "12px 16px", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>{item.amount ? `Rs. ${item.amount.toLocaleString()}` : "—"}</td>
                   <td style={{ padding: "12px 16px" }}>
                     <span style={{ background: sc.bg, color: sc.color, borderRadius: 6, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{sc.label}</span>
                   </td>
@@ -139,16 +139,16 @@ export default function LaundryPage() {
                     <div style={{ display: "flex", gap: 6 }}>
                       {!isLast && (
                         <button onClick={() => advance(item.id, item.status)}
-                          style={{ padding: "4px 10px", background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}>
+                          style={{ padding: "4px 10px", background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.3)", color: "var(--tx-34d399, #34d399)", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}>
                           → Next
                         </button>
                       )}
                       <button onClick={() => openEdit(item)}
-                        style={{ padding: "4px 10px", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", color: "#818cf8", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                        style={{ padding: "4px 10px", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", color: "var(--tx-818cf8, #818cf8)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                         Edit
                       </button>
                       <button onClick={() => remove(item.id)}
-                        style={{ padding: "4px 10px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                        style={{ padding: "4px 10px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                         ✕
                       </button>
                     </div>

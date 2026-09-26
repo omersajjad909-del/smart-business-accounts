@@ -46,10 +46,10 @@ export default function COGSPage() {
       {/* Summary */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total COGS",     value: `${cur} ${fmt(totals.cost)}`,   color: "#f87171", bg: "rgba(248,113,113,.07)",  border: "rgba(248,113,113,.2)" },
-          { label: "Total Revenue",  value: `${cur} ${fmt(totals.rev)}`,    color: "#34d399", bg: "rgba(52,211,153,.07)",   border: "rgba(52,211,153,.2)" },
-          { label: "Gross Profit",   value: `${cur} ${fmt(totals.profit)}`, color: "#818cf8", bg: "rgba(129,140,248,.07)",  border: "rgba(129,140,248,.2)" },
-          { label: "Gross Margin",   value: totals.rev > 0 ? ((totals.profit / totals.rev) * 100).toFixed(1) + "%" : "—", color: "#fbbf24", bg: "rgba(251,191,36,.07)", border: "rgba(251,191,36,.2)" },
+          { label: "Total COGS",     value: `${cur} ${fmt(totals.cost)}`,   color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.07)",  border: "rgba(248,113,113,.2)" },
+          { label: "Total Revenue",  value: `${cur} ${fmt(totals.rev)}`,    color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",   border: "rgba(52,211,153,.2)" },
+          { label: "Gross Profit",   value: `${cur} ${fmt(totals.profit)}`, color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)",  border: "rgba(129,140,248,.2)" },
+          { label: "Gross Margin",   value: totals.rev > 0 ? ((totals.profit / totals.rev) * 100).toFixed(1) + "%" : "—", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.07)", border: "rgba(251,191,36,.2)" },
         ].map((c, i) => (
           <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -82,9 +82,9 @@ export default function COGSPage() {
                 <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)" }}>{r.category || "—"}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.qtySold.toLocaleString()}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.costPerUnit)}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "#f87171" }}>{cur} {fmt(r.totalCost)}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.totalCost)}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.revenue)}</td>
-                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.grossProfit >= 0 ? "#34d399" : "#f87171" }}>{cur} {fmt(r.grossProfit)}</td>
+                <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.grossProfit >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{cur} {fmt(r.grossProfit)}</td>
                 <td style={{ padding: "12px 14px", textAlign: "right" }}>
                   <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 800, background: r.grossMarginPct >= 20 ? "rgba(52,211,153,.12)" : r.grossMarginPct >= 10 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)", color: r.grossMarginPct >= 20 ? "#34d399" : r.grossMarginPct >= 10 ? "#fbbf24" : "#f87171" }}>
                     {r.grossMarginPct.toFixed(1)}%

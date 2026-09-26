@@ -280,7 +280,7 @@ function AIInsightPanel({
           href="/dashboard/ai"
           style={{
             fontSize: 11,
-            color: "#818cf8",
+            color: "var(--tx-818cf8, #818cf8)",
             textDecoration: "none",
             fontWeight: 600,
           }}
@@ -310,11 +310,11 @@ function AIInsightPanel({
           filter: "blur(18px)",
         }} />
         {/* Sparkles */}
-        <span style={{ position:"absolute", top:14, left:"22%", fontSize:13, color:"#c4b5fd", animation:"ai-twinkle 2.2s ease infinite" }}>✦</span>
-        <span style={{ position:"absolute", top:22, right:"20%", fontSize:9,  color:"#a78bfa", animation:"ai-twinkle 1.9s ease .4s infinite" }}>✦</span>
-        <span style={{ position:"absolute", top:8,  right:"35%", fontSize:11, color:"#818cf8", animation:"ai-twinkle 2.6s ease .2s infinite" }}>✦</span>
-        <span style={{ position:"absolute", top:46, left:"15%", fontSize:8,  color:"#c4b5fd", animation:"ai-twinkle 2s ease .7s infinite" }}>✦</span>
-        <span style={{ position:"absolute", top:50, right:"12%", fontSize:12, color:"#a78bfa", animation:"ai-twinkle 2.4s ease .1s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:14, left:"22%", fontSize:13, color:"var(--tx-c4b5fd, #c4b5fd)", animation:"ai-twinkle 2.2s ease infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:22, right:"20%", fontSize:9,  color:"var(--tx-a78bfa, #a78bfa)", animation:"ai-twinkle 1.9s ease .4s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:8,  right:"35%", fontSize:11, color:"var(--tx-818cf8, #818cf8)", animation:"ai-twinkle 2.6s ease .2s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:46, left:"15%", fontSize:8,  color:"var(--tx-c4b5fd, #c4b5fd)", animation:"ai-twinkle 2s ease .7s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:50, right:"12%", fontSize:12, color:"var(--tx-a78bfa, #a78bfa)", animation:"ai-twinkle 2.4s ease .1s infinite" }}>✦</span>
         {/* Brain emoji with float */}
         <div style={{
           fontSize: 72,
@@ -793,7 +793,7 @@ export default function DashboardContent() {
         style={{
           padding: 40,
           textAlign: "center",
-          color: "#f87171",
+          color: "var(--tx-f87171, #f87171)",
           fontWeight: 700,
         }}
       >
@@ -1004,7 +1004,7 @@ export default function DashboardContent() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span>💳</span>
-            <div style={{ fontWeight: 700, color: "#a5b4fc", fontSize: 13 }}>
+            <div style={{ fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 13 }}>
               Payment Required —{" "}
               <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
                 Complete payment to unlock all features
@@ -1087,7 +1087,7 @@ export default function DashboardContent() {
                   animation: "db-spin .7s linear infinite",
                 }}
               />
-              <span style={{ fontSize: 11, color: "#818cf8", fontWeight: 600 }}>
+              <span style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>
                 Loading…
               </span>
             </div>
@@ -1442,7 +1442,7 @@ export default function DashboardContent() {
                 style={{
                   fontSize: 12,
                   fontWeight: 700,
-                  color: "#a5b4fc",
+                  color: "var(--tx-a5b4fc, #a5b4fc)",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -1600,7 +1600,7 @@ export default function DashboardContent() {
                 style={{
                   fontSize: 12,
                   fontWeight: 700,
-                  color: heroDeltaGood ? "#86efac" : "#fca5a5",
+                  color: heroDeltaGood ? "var(--tx-86efac, #86efac)" : "var(--tx-fca5a5, #fca5a5)",
                   marginTop: 6,
                   display: "flex",
                   alignItems: "center",
@@ -1798,7 +1798,7 @@ export default function DashboardContent() {
             href="/dashboard/reports"
             style={{
               fontSize: 12,
-              color: "#818cf8",
+              color: "var(--tx-818cf8, #818cf8)",
               textDecoration: "none",
               fontWeight: 600,
             }}
@@ -2147,7 +2147,7 @@ export default function DashboardContent() {
             href="/dashboard/invoices"
             style={{
               fontSize: 12,
-              color: "#818cf8",
+              color: "var(--tx-818cf8, #818cf8)",
               textDecoration: "none",
               fontWeight: 600,
             }}
@@ -2272,7 +2272,7 @@ export default function DashboardContent() {
                       {tx.date} ·{" "}
                       <span
                         style={{
-                          color: isInv ? "#10b981" : "#f87171",
+                          color: isInv ? "var(--tx-10b981, #10b981)" : "var(--tx-f87171, #f87171)",
                           fontWeight: 600,
                         }}
                       >
@@ -2286,7 +2286,7 @@ export default function DashboardContent() {
                       style={{
                         fontSize: 14,
                         fontWeight: 800,
-                        color: isInv ? "#10b981" : "#f87171",
+                        color: isInv ? "var(--tx-10b981, #10b981)" : "var(--tx-f87171, #f87171)",
                       }}
                     >
                       {isInv ? "+" : `-`}
@@ -2543,7 +2543,7 @@ export default function DashboardContent() {
               href="/dashboard/invoices"
               style={{
                 fontSize: 12,
-                color: "#818cf8",
+                color: "var(--tx-818cf8, #818cf8)",
                 textDecoration: "none",
                 fontWeight: 600,
               }}
@@ -2650,7 +2650,7 @@ export default function DashboardContent() {
                     style={{
                       fontSize: 12,
                       fontWeight: 700,
-                      color: isInv ? "#10b981" : "#f87171",
+                      color: isInv ? "var(--tx-10b981, #10b981)" : "var(--tx-f87171, #f87171)",
                     }}
                   >
                     {isInv ? "+" : "-"}
@@ -2663,7 +2663,7 @@ export default function DashboardContent() {
                       fontSize: 10,
                       fontWeight: 700,
                       background: "rgba(16,185,129,.12)",
-                      color: "#10b981",
+                      color: "var(--tx-10b981, #10b981)",
                       display: "inline-block",
                     }}
                   >
@@ -2875,7 +2875,7 @@ export default function DashboardContent() {
                 height="15"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="rgba(255,255,255,.25)"
+                stroke="rgba(var(--ink),.25)"
                 strokeWidth="2"
               >
                 <circle cx="12" cy="12" r="3" />
@@ -2968,7 +2968,7 @@ export default function DashboardContent() {
                 href="/dashboard/sales-invoice"
                 style={{
                   fontSize: 11,
-                  color: "#818cf8",
+                  color: "var(--tx-818cf8, #818cf8)",
                   fontWeight: 600,
                   textDecoration: "none",
                 }}
@@ -3066,7 +3066,7 @@ export default function DashboardContent() {
                         <div
                           style={{
                             fontSize: 10,
-                            color: "#f87171",
+                            color: "var(--tx-f87171, #f87171)",
                             fontWeight: 600,
                             marginTop: 1,
                           }}
@@ -3079,7 +3079,7 @@ export default function DashboardContent() {
                           style={{
                             fontSize: 11,
                             fontWeight: 800,
-                            color: "#f87171",
+                            color: "var(--tx-f87171, #f87171)",
                           }}
                         >
                           {cur} {fmt(r.amount)}
@@ -3088,7 +3088,7 @@ export default function DashboardContent() {
                           style={{
                             fontSize: 9,
                             fontWeight: 700,
-                            color: "rgba(248,113,113,.6)",
+                            color: "rgba(var(--txr-f87171, 248,113,113),.6)",
                             textTransform: "uppercase",
                             letterSpacing: ".04em",
                           }}
@@ -3161,7 +3161,7 @@ export default function DashboardContent() {
                         <div
                           style={{
                             fontSize: 10,
-                            color: "#f59e0b",
+                            color: "var(--tx-f59e0b, #f59e0b)",
                             fontWeight: 600,
                             marginTop: 1,
                           }}
@@ -3174,7 +3174,7 @@ export default function DashboardContent() {
                           style={{
                             fontSize: 11,
                             fontWeight: 800,
-                            color: "#f59e0b",
+                            color: "var(--tx-f59e0b, #f59e0b)",
                           }}
                         >
                           {cur} {fmt(r.amount)}
@@ -3183,7 +3183,7 @@ export default function DashboardContent() {
                           style={{
                             fontSize: 9,
                             fontWeight: 700,
-                            color: "rgba(245,158,11,.6)",
+                            color: "rgba(var(--txr-f59e0b, 245,158,11),.6)",
                             textTransform: "uppercase",
                             letterSpacing: ".04em",
                           }}
@@ -3234,7 +3234,7 @@ export default function DashboardContent() {
               href="/dashboard/bank-reconciliation"
               style={{
                 fontSize: 12,
-                color: "#818cf8",
+                color: "var(--tx-818cf8, #818cf8)",
                 textDecoration: "none",
                 fontWeight: 600,
               }}
@@ -3278,7 +3278,7 @@ export default function DashboardContent() {
                   style={{
                     fontSize: 16,
                     fontWeight: 900,
-                    color: "#818cf8",
+                    color: "var(--tx-818cf8, #818cf8)",
                     letterSpacing: "-.5px",
                   }}
                 >
@@ -3317,7 +3317,7 @@ export default function DashboardContent() {
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: "rgba(99,102,241,.7)",
+              color: "rgba(var(--txr-6366f1, 99,102,241),.7)",
               textTransform: "uppercase",
               letterSpacing: ".08em",
               marginBottom: 7,
@@ -3363,7 +3363,7 @@ export default function DashboardContent() {
                   borderRadius: 9,
                   background: "rgba(99,102,241,.12)",
                   border: "1px solid rgba(99,102,241,.28)",
-                  color: "#a5b4fc",
+                  color: "var(--tx-a5b4fc, #a5b4fc)",
                   fontSize: 12,
                   fontWeight: 600,
                   textDecoration: "none",

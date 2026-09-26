@@ -6,8 +6,8 @@ import { mapServiceCatalogRecord, mapServiceProjectRecord } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 export default function ServiceProjectsPage() {
   const { isMobile } = useResponsive();
@@ -72,7 +72,7 @@ export default function ServiceProjectsPage() {
                 <div style={{ fontSize: 16, fontWeight: 800 }}>{project.name}</div>
                 <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>{project.projectCode} • {project.client} • Manager {project.manager || "N/A"}</div>
               </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "completed" ? "#22c55e" : "#38bdf8" }}>{project.status.toUpperCase()}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "completed" ? "var(--tx-22c55e, #22c55e)" : "var(--tx-38bdf8, #38bdf8)" }}>{project.status.toUpperCase()}</div>
             </div>
             <div style={{ marginTop: 10, fontSize: 13, color: "rgba(var(--ink),.55)" }}>Budget Rs. {project.budget.toLocaleString()} • Due {project.dueDate}</div>
           </div>

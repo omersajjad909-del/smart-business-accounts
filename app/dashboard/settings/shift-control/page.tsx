@@ -362,7 +362,7 @@ export default function ShiftControlPage() {
                                   }}
                                 />
                                 {ampmHint && (
-                                  <div style={{ fontSize: 11, color: "#818cf8", fontWeight: 700, marginTop: 4 }}>
+                                  <div style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, marginTop: 4 }}>
                                     = {ampmHint}
                                   </div>
                                 )}
@@ -378,9 +378,9 @@ export default function ShiftControlPage() {
                         }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                             <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: "#f59e0b" }}>⏰ Overtime Extension</div>
+                              <div style={{ fontWeight: 700, fontSize: 13, color: "var(--tx-f59e0b, #f59e0b)" }}>⏰ Overtime Extension</div>
                               <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
-                                Current: <strong style={{ color: ot > 0 ? "#f59e0b" : "var(--text-secondary)" }}>
+                                Current: <strong style={{ color: ot > 0 ? "var(--tx-f59e0b, #f59e0b)" : "var(--text-secondary)" }}>
                                   {ot > 0 ? `+${ot} minutes` : "None"}
                                 </strong>
                               </div>
@@ -391,7 +391,7 @@ export default function ShiftControlPage() {
                                 disabled={overtiming === u.id}
                                 style={{
                                   padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.4)",
-                                  background: "rgba(239,68,68,0.1)", color: "#f87171",
+                                  background: "rgba(239,68,68,0.1)", color: "var(--tx-f87171, #f87171)",
                                   fontSize: 12, fontWeight: 700, cursor: "pointer",
                                 }}
                               >Clear OT</button>

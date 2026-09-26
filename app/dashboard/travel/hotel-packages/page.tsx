@@ -109,11 +109,11 @@ export default function HotelPackagesPage() {
         const totalSale = rows.reduce((s, r) => s + Number(r.amount || 0), 0);
         const totalCost = rows.reduce((s, r) => s + Number(r.cost || 0), 0);
         return [
-          { label: "Bookings", value: rows.length, color: "#a78bfa" },
-          { label: "Confirmed", value: rows.filter(r => String(r.status) === "confirmed").length, color: "#34d399" },
+          { label: "Bookings", value: rows.length, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Confirmed", value: rows.filter(r => String(r.status) === "confirmed").length, color: "var(--tx-34d399, #34d399)" },
           { label: "Checked In", value: rows.filter(r => String(r.status) === "checked_in").length, color: travelAccent },
-          { label: "Invoice Pending", value: rows.filter(r => !String(r.invoiceNo || "")).length, color: "#f97316" },
-          { label: "Margin", value: (totalSale - totalCost).toLocaleString(), color: "#60a5fa" },
+          { label: "Invoice Pending", value: rows.filter(r => !String(r.invoiceNo || "")).length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Margin", value: (totalSale - totalCost).toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ];
       }}
     />

@@ -6,9 +6,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#f97316";
-const BG = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.08)";
-const MUTED = "rgba(255,255,255,.45)";
+const BG = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.08)";
+const MUTED = "rgba(var(--ink),.45)";
 
 const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
@@ -123,9 +123,9 @@ export default function PromotionsPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total Promotions", value: promos.length,   color: ACCENT },
-          { label: "Active Now",       value: activeCount,      color: "#34d399" },
-          { label: "Scheduled",        value: scheduledCount,   color: "#38bdf8" },
-          { label: "Expired",          value: expiredCount,     color: "#94a3b8" },
+          { label: "Active Now",       value: activeCount,      color: "var(--tx-34d399, #34d399)" },
+          { label: "Scheduled",        value: scheduledCount,   color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Expired",          value: expiredCount,     color: "var(--tx-94a3b8, #94a3b8)" },
         ].map(k => (
           <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{k.label}</div>
@@ -174,12 +174,12 @@ export default function PromotionsPage() {
                 </td>
                 <td style={td}>
                   {p.status === "active" && (
-                    <button onClick={() => update(p.id, { status: "paused" })} style={{ background: "none", border: "none", color: "#fbbf24", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>Pause</button>
+                    <button onClick={() => update(p.id, { status: "paused" })} style={{ background: "none", border: "none", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>Pause</button>
                   )}
                   {p.status === "paused" && (
-                    <button onClick={() => update(p.id, { status: "active" })} style={{ background: "none", border: "none", color: "#34d399", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>Resume</button>
+                    <button onClick={() => update(p.id, { status: "active" })} style={{ background: "none", border: "none", color: "var(--tx-34d399, #34d399)", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>Resume</button>
                   )}
-                  <button onClick={() => remove(p.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                  <button onClick={() => remove(p.id)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Delete</button>
                 </td>
               </tr>
             ))}

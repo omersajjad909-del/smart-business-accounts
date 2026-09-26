@@ -40,10 +40,10 @@ export default function UtilityConnectionsPage() {
         },
       })}
       summarize={(rows) => [
-        { label: "Accounts", value: rows.length, color: "#38bdf8" },
-        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
-        { label: "Pending", value: rows.filter((row) => String(row.status) === "pending").length, color: "#fbbf24" },
-        { label: "Suspended", value: rows.filter((row) => String(row.status) === "suspended").length, color: "#f87171" },
+        { label: "Accounts", value: rows.length, color: "var(--tx-38bdf8, #38bdf8)" },
+        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Pending", value: rows.filter((row) => String(row.status) === "pending").length, color: "var(--tx-fbbf24, #fbbf24)" },
+        { label: "Suspended", value: rows.filter((row) => String(row.status) === "suspended").length, color: "var(--tx-f87171, #f87171)" },
       ]}
     />
   );

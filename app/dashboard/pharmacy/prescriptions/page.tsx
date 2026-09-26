@@ -47,7 +47,7 @@ export default function PharmacyPrescriptionsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total", val: prescriptions.length, color: "#fb7185" }, { label: "Pending", val: prescriptions.filter((p) => p.status === "pending").length, color: "#f59e0b" }, { label: "Dispensed", val: prescriptions.filter((p) => p.status === "dispensed").length, color: "#34d399" }].map((s) => (
+        {[{ label: "Total", val: prescriptions.length, color: "var(--tx-fb7185, #fb7185)" }, { label: "Pending", val: prescriptions.filter((p) => p.status === "pending").length, color: "var(--tx-f59e0b, #f59e0b)" }, { label: "Dispensed", val: prescriptions.filter((p) => p.status === "dispensed").length, color: "var(--tx-34d399, #34d399)" }].map((s) => (
           <div key={s.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: pharmacyMuted, marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>
@@ -89,7 +89,7 @@ export default function PharmacyPrescriptionsPage() {
                 </div>
               ))}
             </div>
-            {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#fb7185", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>

@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const schoolFont = "'Outfit','Inter',sans-serif";
-export const schoolBg = "rgba(255,255,255,0.03)";
-export const schoolBorder = "rgba(255,255,255,0.07)";
-export const schoolMuted = "rgba(255,255,255,0.45)";
+export const schoolBg = "rgba(var(--ink),0.03)";
+export const schoolBorder = "rgba(var(--ink),0.07)";
+export const schoolMuted = "rgba(var(--ink),0.45)";
 
 export type SchoolStudent = ReturnType<typeof mapStudentRecords>[number];
 export type SchoolFee = ReturnType<typeof mapFeeRecords>[number];

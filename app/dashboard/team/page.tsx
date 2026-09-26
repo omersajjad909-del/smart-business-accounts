@@ -4,11 +4,11 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const ROLES = [
   { value: "ADMIN", label: "Admin", color: "#7c3aed" },
-  { value: "MANAGER", label: "Manager", color: "#0891b2" },
-  { value: "ACCOUNTANT", label: "Accountant", color: "#0d9488" },
-  { value: "HR_MANAGER", label: "HR Manager", color: "#d97706" },
+  { value: "MANAGER", label: "Manager", color: "var(--tx-0891b2, #0891b2)" },
+  { value: "ACCOUNTANT", label: "Accountant", color: "var(--tx-0d9488, #0d9488)" },
+  { value: "HR_MANAGER", label: "HR Manager", color: "var(--tx-d97706, #d97706)" },
   { value: "SALES", label: "Sales Executive", color: "#2563eb" },
-  { value: "INVENTORY_MANAGER", label: "Inventory Manager", color: "#16a34a" },
+  { value: "INVENTORY_MANAGER", label: "Inventory Manager", color: "var(--tx-16a34a, #16a34a)" },
   { value: "CASHIER", label: "Cashier", color: "#9333ea" },
   { value: "AUDITOR", label: "Auditor", color: "#dc2626" },
   { value: "SECURITY", label: "Security / Gate", color: "#64748b" },
@@ -119,7 +119,7 @@ export default function TeamPage() {
                   letterSpacing: "0.05em",
                 }}
               >
-                Email Address <span style={{ color: "#ef4444" }}>*</span>
+                Email Address <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span>
               </label>
               <input
                 type="email"
@@ -313,7 +313,7 @@ export default function TeamPage() {
         <div style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: "1.6" }}>
           The invited member will receive an email with a link to set their password and join your workspace.
           Roles define what the member can see and do. You can change roles anytime from the{" "}
-          <span style={{ color: "#6366f1", fontWeight: 500 }}>Users Management</span> page.
+          <span style={{ color: "var(--tx-6366f1, #6366f1)", fontWeight: 500 }}>Users Management</span> page.
         </div>
       </div>
     </div>

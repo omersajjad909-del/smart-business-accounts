@@ -6,8 +6,8 @@ import { mapFinishedGoodsRecord, mapProductionOrderRecord } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 export default function FinishedGoodsPage() {
   const { isMobile } = useResponsive();
@@ -62,10 +62,10 @@ export default function FinishedGoodsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Batches", value: goods.length, color: "#22c55e" },
-          { label: "Total Quantity", value: goods.reduce((sum, item) => sum + item.quantity, 0), color: "#38bdf8" },
-          { label: "Warehouses", value: new Set(goods.map((item) => item.warehouse)).size, color: "#f59e0b" },
-          { label: "Linked Orders", value: goods.filter((item) => item.productionOrderId).length, color: "#a78bfa" },
+          { label: "Batches", value: goods.length, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Total Quantity", value: goods.reduce((sum, item) => sum + item.quantity, 0), color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Warehouses", value: new Set(goods.map((item) => item.warehouse)).size, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Linked Orders", value: goods.filter((item) => item.productionOrderId).length, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>

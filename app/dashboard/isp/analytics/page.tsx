@@ -45,7 +45,7 @@ export default function IspAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ispFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#93c5fd", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>ISP Analytics</div>
         <h1 style={{ margin: "0 0 8px", fontSize: 28, fontWeight: 900 }}>Portfolio, billing, and support pressure</h1>
         <p style={{ margin: 0, fontSize: 14, color: ispMuted, maxWidth: 760 }}>
           Package spread, collection status, and support backlog ko ek analytics board me dekhein.
@@ -54,10 +54,10 @@ export default function IspAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Packages", value: data.summary.packages, color: "#60a5fa" },
-          { label: "Active Base", value: data.summary.activeConnections, color: "#34d399" },
-          { label: "Open Support", value: data.summary.openTickets, color: "#c084fc" },
-          { label: "Paid Revenue", value: `Rs. ${data.summary.paidRevenue.toLocaleString()}`, color: "#22c55e" },
+          { label: "Packages", value: data.summary.packages, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Active Base", value: data.summary.activeConnections, color: "var(--tx-34d399, #34d399)" },
+          { label: "Open Support", value: data.summary.openTickets, color: "var(--tx-c084fc, #c084fc)" },
+          { label: "Paid Revenue", value: `Rs. ${data.summary.paidRevenue.toLocaleString()}`, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 12, color: ispMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -68,12 +68,12 @@ export default function IspAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Package Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Package Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {Object.entries(packageMix).sort((a, b) => b[1] - a[1]).map(([speed, count]) => (
               <div key={speed} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13 }}>{speed}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{count}</span>
               </div>
             ))}
             {Object.keys(packageMix).length === 0 && <div style={{ color: ispMuted, fontSize: 13 }}>No package analytics yet.</div>}
@@ -81,17 +81,17 @@ export default function IspAnalyticsPage() {
         </div>
 
         <div style={{ background: ispBg, border: `1px solid ${ispBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Billing & Support</div>
+          <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Billing & Support</div>
           <div style={{ display: "grid", gap: 12 }}>
             {billingByStatus.map((row) => (
               <div key={row.status} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                 <span style={{ fontSize: 13, color: ispMuted }}>{row.status}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: row.status === "paid" ? "#34d399" : row.status === "overdue" ? "#f87171" : "#c084fc" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: row.status === "paid" ? "var(--tx-34d399, #34d399)" : row.status === "overdue" ? "var(--tx-f87171, #f87171)" : "var(--tx-c084fc, #c084fc)" }}>{row.count}</span>
               </div>
             ))}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px" }}>
               <span style={{ fontSize: 13, color: ispMuted }}>Resolved tickets</span>
-              <span style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{data.tickets.filter((item) => item.status === "resolved" || item.status === "closed").length}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{data.tickets.filter((item) => item.status === "resolved" || item.status === "closed").length}</span>
             </div>
           </div>
         </div>

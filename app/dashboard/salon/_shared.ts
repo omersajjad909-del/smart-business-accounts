@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const salonFont = "'Outfit','Inter',sans-serif";
-export const salonBg = "rgba(255,255,255,.03)";
-export const salonBorder = "rgba(255,255,255,.07)";
-export const salonMuted = "rgba(255,255,255,.55)";
+export const salonBg = "rgba(var(--ink),.03)";
+export const salonBorder = "rgba(var(--ink),.07)";
+export const salonMuted = "rgba(var(--ink),.55)";
 
 export const stylistSpecialties = ["Hair Styling", "Coloring", "Makeup", "Nails", "Skincare", "Threading", "Spa"];
 export const salonServiceCategories = ["Hair", "Skin", "Nails", "Threading", "Makeup", "Spa"];

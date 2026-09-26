@@ -27,7 +27,7 @@ import {
 } from "@/lib/travelPassengers";
 
 const ff = "'Outfit','Inter',sans-serif";
-const border = "rgba(255,255,255,0.09)";
+const border = "rgba(var(--ink),0.09)";
 
 const cell: React.CSSProperties = {
   width: "100%", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`,
@@ -171,7 +171,7 @@ export function PassengerDialog({
             <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)" }}>
               {describeParty(totals)} · {totals.seats} seat{totals.seats === 1 ? "" : "s"}
             </span>
-            <span style={{ fontSize: 18, fontWeight: 800, color: "#38bdf8", fontFamily: "ui-monospace, monospace" }}>
+            <span style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-38bdf8, #38bdf8)", fontFamily: "ui-monospace, monospace" }}>
               {totals.sale.toLocaleString()}
             </span>
           </div>
@@ -179,7 +179,7 @@ export function PassengerDialog({
             <span>Fare {totals.fare.toLocaleString()} + tax {totals.tax.toLocaleString()}</span>
             <span>
               Cost {totals.cost.toLocaleString()} ·{" "}
-              <strong style={{ color: totals.margin >= 0 ? "#34d399" : "#fca5a5" }}>
+              <strong style={{ color: totals.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)" }}>
                 margin {totals.margin.toLocaleString()}
               </strong>
             </span>
@@ -187,12 +187,12 @@ export function PassengerDialog({
         </div>
 
         {problems.length > 0 && (
-          <div style={{ marginTop: 12, padding: "10px 13px", borderRadius: 10, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "#fbbf24", fontSize: 12, lineHeight: 1.7 }}>
+          <div style={{ marginTop: 12, padding: "10px 13px", borderRadius: 10, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 12, lineHeight: 1.7 }}>
             {problems.map((p) => <div key={p}>{p}</div>)}
           </div>
         )}
         {error && (
-          <div style={{ marginTop: 12, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12 }}>
+          <div style={{ marginTop: 12, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>
             {error}
           </div>
         )}

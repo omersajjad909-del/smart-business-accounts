@@ -62,8 +62,8 @@ function PLRow({ label, amount, variant = "normal", indent = false, dimZero = fa
 
   const styles: Record<RowVariant, React.CSSProperties> = {
     normal:   { fontSize: 13, color: "rgba(var(--ink),.65)", fontWeight: 400 },
-    deduct:   { fontSize: 13, color: "#f87171",               fontWeight: 500 },
-    subtotal: { fontSize: 13, color: "#e2e8f0",               fontWeight: 700, borderTop: "1px solid rgba(var(--ink),.08)", paddingTop: 8, marginTop: 4 },
+    deduct:   { fontSize: 13, color: "var(--tx-f87171, #f87171)",               fontWeight: 500 },
+    subtotal: { fontSize: 13, color: "var(--tx-e2e8f0, #e2e8f0)",               fontWeight: 700, borderTop: "1px solid rgba(var(--ink),.08)", paddingTop: 8, marginTop: 4 },
     total:    { fontSize: 15, color: "var(--ink-solid, #fff)",                   fontWeight: 900 },
   };
   const s = styles[variant];
@@ -71,7 +71,7 @@ function PLRow({ label, amount, variant = "normal", indent = false, dimZero = fa
     ? (amount >= 0 ? "#34d399" : "#f87171")
     : variant === "deduct"
       ? "#f87171"
-      : "rgba(255,255,255,.7)";
+      : "rgba(var(--ink),.7)";
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", ...(variant === "subtotal" || variant === "total" ? { borderTop: "1px solid rgba(var(--ink),.08)", marginTop: 6, paddingTop: 8 } : {}) }}>
@@ -165,7 +165,7 @@ export default function ProfitLossPage() {
       {/* ── DATE PICKER MODAL ── */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,.82)", backdropFilter: "blur(14px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ width: "100%", maxWidth: 460, background: "rgba(10,13,32,.97)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 22, padding: "40px 40px 36px", boxShadow: "0 40px 100px rgba(0,0,0,.8)", position: "relative" }}>
+          <div style={{ width: "100%", maxWidth: 460, background: "rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 22, padding: "40px 40px 36px", boxShadow: "0 40px 100px rgba(0,0,0,.8)", position: "relative" }}>
             <button onClick={() => report ? setShowModal(false) : router.back()} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "rgba(var(--ink),.35)", fontSize: 20, cursor: "pointer", padding: 4, borderRadius: 6 }}>✕</button>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
               <div style={{ width: 46, height: 46, borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📊</div>
@@ -197,10 +197,10 @@ export default function ProfitLossPage() {
           {/* Top bar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginBottom: 4 }}>Reports › <span style={{ color: "#a5b4fc" }}>Profit & Loss</span></div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginBottom: 4 }}>Reports › <span style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>Profit & Loss</span></div>
               <h1 style={{ fontSize: 24, fontWeight: 900, color: "var(--ink-solid, #fff)", margin: 0, letterSpacing: "-.02em" }}>Profit & Loss Statement</h1>
               <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 4 }}>
-                Period: <strong style={{ color: "#e2e8f0" }}>{from}</strong> → <strong style={{ color: "#e2e8f0" }}>{to}</strong>
+                Period: <strong style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>{from}</strong> → <strong style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>{to}</strong>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -210,14 +210,14 @@ export default function ProfitLossPage() {
               <button onClick={() => window.print()} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.5)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
                 🖨 Print
               </button>
-              <button onClick={sendEmail} disabled={sendingEmail || !report} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.06)", color: "#34d399", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff, opacity: (sendingEmail || !report) ? 0.5 : 1 }}>
+              <button onClick={sendEmail} disabled={sendingEmail || !report} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.06)", color: "var(--tx-34d399, #34d399)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff, opacity: (sendingEmail || !report) ? 0.5 : 1 }}>
                 {sendingEmail ? "Sending…" : "✉ Email"}
               </button>
             </div>
           </div>
 
           {error && (
-            <div style={{ background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, color: "#f87171", fontSize: 13 }}>{error}</div>
+            <div style={{ background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>{error}</div>
           )}
 
           {loading && (
@@ -238,11 +238,11 @@ export default function ProfitLossPage() {
                 {/* ── KPI CARDS ── */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 12, marginBottom: 24 }}>
                   {[
-                    { label: "Net Sales",      val: r.netSales,        color: "#60a5fa", icon: "💰" },
-                    { label: "COGS",           val: r.cogs,            color: "#fb923c", icon: "📦" },
-                    { label: "Gross Profit",   val: r.grossProfit,     color: isGP   ? "#34d399" : "#f87171", icon: isGP   ? "📈" : "📉", pct: r.grossMarginPct },
-                    { label: "Operating Profit (EBIT)", val: r.operatingProfit, color: isEBIT ? "#a78bfa" : "#f87171", icon: "⚙️", pct: r.operatingMarginPct },
-                    { label: isProfit ? "Net Profit" : "Net Loss", val: r.netProfit, color: isProfit ? "#34d399" : "#f87171", icon: isProfit ? "✅" : "⚠️", pct: r.netMarginPct },
+                    { label: "Net Sales",      val: r.netSales,        color: "var(--tx-60a5fa, #60a5fa)", icon: "💰" },
+                    { label: "COGS",           val: r.cogs,            color: "var(--tx-fb923c, #fb923c)", icon: "📦" },
+                    { label: "Gross Profit",   val: r.grossProfit,     color: isGP   ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", icon: isGP   ? "📈" : "📉", pct: r.grossMarginPct },
+                    { label: "Operating Profit (EBIT)", val: r.operatingProfit, color: isEBIT ? "var(--tx-a78bfa, #a78bfa)" : "var(--tx-f87171, #f87171)", icon: "⚙️", pct: r.operatingMarginPct },
+                    { label: isProfit ? "Net Profit" : "Net Loss", val: r.netProfit, color: isProfit ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", icon: isProfit ? "✅" : "⚠️", pct: r.netMarginPct },
                   ].map(k => (
                     <div key={k.label} style={{ background: `${k.color}0e`, border: `1px solid ${k.color}28`, borderRadius: 13, padding: isMobile ? "12px 10px" : "14px 16px" }}>
                       <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(var(--ink),.32)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
@@ -252,7 +252,7 @@ export default function ProfitLossPage() {
                         {k.val < 0 ? "(" : ""}{fmt(Math.abs(k.val))}{k.val < 0 ? ")" : ""}
                       </div>
                       {k.pct !== undefined && (
-                        <div style={{ fontSize: 11, fontWeight: 700, color: k.pct >= 0 ? "#34d399" : "#f87171", marginTop: 4 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: k.pct >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", marginTop: 4 }}>
                           Margin: {k.pct >= 0 ? "+" : ""}{k.pct.toFixed(1)}%
                         </div>
                       )}
@@ -303,14 +303,14 @@ export default function ProfitLossPage() {
                   <Section title="Other Income & Finance Costs" color="#fbbf24" icon="🏦">
                     {r.otherIncome.length > 0 && (
                       <>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#34d399", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 4 }}>Other Income</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-34d399, #34d399)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 4 }}>Other Income</div>
                         {r.otherIncome.map((e, i) => <PLRow key={i} label={`+ ${e.name}`} amount={e.amount} indent />)}
                         {r.otherIncome.length > 1 && <PLRow label="Total Other Income" amount={r.totalOtherIncome} variant="subtotal" />}
                       </>
                     )}
                     {r.financeExpenses.length > 0 && (
                       <>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#f87171", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 4, marginTop: 10 }}>Finance Costs</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-f87171, #f87171)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 4, marginTop: 10 }}>Finance Costs</div>
                         {r.financeExpenses.map((e, i) => <PLRow key={i} label={`— ${e.name}`} amount={e.amount} variant="deduct" indent />)}
                         {r.financeExpenses.length > 1 && <PLRow label="Total Finance Costs" amount={r.totalFinanceExpenses} variant="subtotal" />}
                       </>
@@ -354,7 +354,7 @@ export default function ProfitLossPage() {
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 28, fontWeight: 900, color: isProfit ? "#34d399" : "#f87171", fontFamily: "'Courier New',monospace", letterSpacing: "-.01em" }}>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: isProfit ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontFamily: "'Courier New',monospace", letterSpacing: "-.01em" }}>
                         {r.netProfit < 0 ? "(" : ""}{fmt(Math.abs(r.netProfit))}{r.netProfit < 0 ? ")" : ""}
                       </div>
                     </div>

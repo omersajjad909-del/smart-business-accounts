@@ -344,7 +344,7 @@ export default function SalesReturnPage() {
                         {rows.map((r, i) => (
                           <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 14px", marginBottom: 10 }}>
                             <div style={{ fontWeight: 700, color: TEXT, marginBottom: 6 }}>{r.name}</div>
-                            <div style={{ fontSize: 11, color: MUTED, marginBottom: 8 }}>Max returnable: <strong style={{ color: "#60a5fa" }}>{r.maxQty}</strong></div>
+                            <div style={{ fontSize: 11, color: MUTED, marginBottom: 8 }}>Max returnable: <strong style={{ color: "var(--tx-60a5fa, #60a5fa)" }}>{r.maxQty}</strong></div>
                             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 8 }}>
                               <div><Label>Return Qty</Label><input type="number" step="any" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ textAlign: "right", borderColor: "rgba(248,113,113,0.4)" })} /></div>
                               <div><Label>Rate</Label><div style={{ ...inp(), background: "transparent" }}>{fmt(r.rate)}</div></div>
@@ -375,7 +375,7 @@ export default function SalesReturnPage() {
                                 <tr key={i} style={{ borderTop: `1px solid ${BORDER}` }}>
                                   <td style={{ padding: "8px", fontWeight: 600, fontSize: 13, minWidth: 120 }}>{r.name}</td>
                                   {rfActive && <RateFormulaReadonlyCells settings={rf} meta={r.meta} />}
-                                  <td style={{ padding: "8px", textAlign: "left", fontWeight: 700, color: "#60a5fa", fontSize: 13 }}>{r.maxQty}</td>
+                                  <td style={{ padding: "8px", textAlign: "left", fontWeight: 700, color: "var(--tx-60a5fa, #60a5fa)", fontSize: 13 }}>{r.maxQty}</td>
                                   <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 90 }}><input type="number" step="any" min={0} max={r.maxQty} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13, borderColor: "rgba(248,113,113,0.4)" })} /></td>
                                   <td style={{ padding: "8px", textAlign: "right", fontSize: 13, color: MUTED, width: 80 }}>{fmt(r.rate)}</td>
                                   <td style={{ padding: isMobile ? "8px 8px" : "6px 8px", width: 72 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: isMobile ? "8px 8px" : "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
@@ -433,7 +433,7 @@ export default function SalesReturnPage() {
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: MUTED }}>Subtotal</span><span>{cur} {fmt(subtotal)}</span></div>
-                    {perItemDiscAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,#f87171)" }}><span>Item Discounts</span><span>— {cur} {fmt(perItemDiscAmt)}</span></div>}
+                    {perItemDiscAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,var(--tx-f87171, #f87171))" }}><span>Item Discounts</span><span>— {cur} {fmt(perItemDiscAmt)}</span></div>}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                       <span style={{ color: MUTED }}>Overall Discount</span>
                       <div style={{ display: "flex", gap: 5 }}>
@@ -441,8 +441,8 @@ export default function SalesReturnPage() {
                         <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 80, padding: isMobile ? "8px 8px" : "3px 7px", fontSize: 12, textAlign: "right" }) }} />
                       </div>
                     </div>
-                    {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,#f87171)" }}><span>Discount Amount</span><span>— {cur} {fmt(discountAmt)}</span></div>}
-                    {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#60a5fa" }}><span>Item Tax</span><span>+ {cur} {fmt(perItemTaxAmt)}</span></div>}
+                    {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,var(--tx-f87171, #f87171))" }}><span>Discount Amount</span><span>— {cur} {fmt(discountAmt)}</span></div>}
+                    {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-60a5fa, #60a5fa)" }}><span>Item Tax</span><span>+ {cur} {fmt(perItemTaxAmt)}</span></div>}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                       <span style={{ color: MUTED }}>Freight</span>
                       <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" style={{ ...inp({ width: 100, padding: isMobile ? "8px 8px" : "3px 7px", fontSize: 12, textAlign: "right" }) }} />

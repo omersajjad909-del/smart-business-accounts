@@ -41,9 +41,9 @@ export default function RepairTechniciansPage() {
       })}
       summarize={(rows) => [
         { label: "Technicians", value: rows.length, color: repairAccent },
-        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
-        { label: "Busy", value: rows.filter((row) => String(row.status) === "busy").length, color: "#60a5fa" },
-        { label: "Off", value: rows.filter((row) => String(row.status) === "off").length, color: "#94a3b8" },
+        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Busy", value: rows.filter((row) => String(row.status) === "busy").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "Off", value: rows.filter((row) => String(row.status) === "off").length, color: "var(--tx-94a3b8, #94a3b8)" },
       ]}
     />
   );

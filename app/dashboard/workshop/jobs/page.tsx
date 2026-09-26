@@ -44,9 +44,9 @@ export default function WorkshopJobsPage() {
       })}
       summarize={(rows) => [
         { label: "Jobs", value: rows.length, color: workshopAccent },
-        { label: "Open", value: rows.filter((row) => String(row.status) === "open").length, color: "#fbbf24" },
-        { label: "In Progress", value: rows.filter((row) => String(row.status) === "in_progress").length, color: "#60a5fa" },
-        { label: "Ready", value: rows.filter((row) => String(row.status) === "ready").length, color: "#34d399" },
+        { label: "Open", value: rows.filter((row) => String(row.status) === "open").length, color: "var(--tx-fbbf24, #fbbf24)" },
+        { label: "In Progress", value: rows.filter((row) => String(row.status) === "in_progress").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "Ready", value: rows.filter((row) => String(row.status) === "ready").length, color: "var(--tx-34d399, #34d399)" },
       ]}
     />
   );

@@ -8,8 +8,8 @@ import { mapProductionOrderRecord, mapWorkOrderRecord } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const statusColor: Record<string, string> = { open: "#f59e0b", in_progress: "#38bdf8", completed: "#22c55e", on_hold: "#6b7280" };
 
 export default function WorkOrdersPage() {
@@ -117,10 +117,10 @@ export default function WorkOrdersPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Total Work Orders", value: workOrders.length, color: "#f97316" },
-          { label: "Open", value: workOrders.filter((item) => item.status === "open").length, color: "#f59e0b" },
-          { label: "In Progress", value: workOrders.filter((item) => item.status === "in_progress").length, color: "#38bdf8" },
-          { label: "Completed", value: workOrders.filter((item) => item.status === "completed").length, color: "#22c55e" },
+          { label: "Total Work Orders", value: workOrders.length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Open", value: workOrders.filter((item) => item.status === "open").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "In Progress", value: workOrders.filter((item) => item.status === "in_progress").length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Completed", value: workOrders.filter((item) => item.status === "completed").length, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
@@ -150,7 +150,7 @@ export default function WorkOrdersPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.operator}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.estimatedHours}h</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
-                  <span style={{ color: order.priority === "high" ? "#ef4444" : order.priority === "medium" ? "#f59e0b" : "#22c55e", fontWeight: 700, fontSize: 12 }}>
+                  <span style={{ color: order.priority === "high" ? "var(--tx-ef4444, #ef4444)" : order.priority === "medium" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)", fontWeight: 700, fontSize: 12 }}>
                     {order.priority}
                   </span>
                 </td>

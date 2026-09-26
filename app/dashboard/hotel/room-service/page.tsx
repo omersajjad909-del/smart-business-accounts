@@ -4,8 +4,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const STATUS_COLOR: Record<string, string> = { pending: "#f59e0b", preparing: "#3b82f6", delivered: "#34d399", cancelled: "#6b7280" };
 
 export default function RoomServicePage() {
@@ -56,7 +56,7 @@ export default function RoomServicePage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Orders", val: orders.length, color: "#f97316" }, { label: "Pending", val: orders.filter(o => o.status === "pending").length, color: "#f59e0b" }, { label: "Preparing", val: orders.filter(o => o.status === "preparing").length, color: "#3b82f6" }, { label: "Revenue", val: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399" }].map(s => (
+        {[{ label: "Total Orders", val: orders.length, color: "var(--tx-f97316, #f97316)" }, { label: "Pending", val: orders.filter(o => o.status === "pending").length, color: "var(--tx-f59e0b, #f59e0b)" }, { label: "Preparing", val: orders.filter(o => o.status === "preparing").length, color: "var(--tx-3b82f6, #3b82f6)" }, { label: "Revenue", val: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -74,7 +74,7 @@ export default function RoomServicePage() {
               <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", marginBottom: 2 }}>{o.items}</div>
               {o.notes && <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>{o.notes}</div>}
             </div>
-            <div style={{ fontWeight: 700, color: "#34d399", minWidth: 80, textAlign: "right" }}>Rs. {o.amount.toLocaleString()}</div>
+            <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)", minWidth: 80, textAlign: "right" }}>Rs. {o.amount.toLocaleString()}</div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <span style={{ display: "inline-block", background: `${STATUS_COLOR[o.status]}20`, color: STATUS_COLOR[o.status], borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{o.status}</span>
               {o.status === "pending" && <button onClick={() => update(o.id, { status: "preparing" })} style={{ padding: "5px 10px", background: "rgba(59,130,246,.15)", border: "1px solid rgba(59,130,246,.3)", color: "#3b82f6", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Prepare</button>}
@@ -100,7 +100,7 @@ export default function RoomServicePage() {
               <input type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
             </div>
             <div style={{ display: "flex", gap: 12 }}>
-              {error && <div style={{ color: "#fda4af", fontSize: 12, flex: 1 }}>{error}</div>}
+              {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Create Order</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>

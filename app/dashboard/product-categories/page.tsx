@@ -21,11 +21,11 @@ interface ProductCategoryRecord extends ProductCategoryData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TYPE_META: Record<CategoryType, { label: string; color: string; bg: string; border: string }> = {
-  PRODUCT:        { label: "Product",        color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  SERVICE:        { label: "Service",        color: "#a78bfa", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
-  RAW_MATERIAL:   { label: "Raw Material",   color: "#fbbf24", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
-  FINISHED_GOODS: { label: "Finished Goods", color: "#4ade80", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
-  SPARE_PARTS:    { label: "Spare Parts",    color: "#fb923c", bg: "rgba(251,146,60,.12)",  border: "rgba(251,146,60,.35)"  },
+  PRODUCT:        { label: "Product",        color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  SERVICE:        { label: "Service",        color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)", border: "rgba(167,139,250,.35)" },
+  RAW_MATERIAL:   { label: "Raw Material",   color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
+  FINISHED_GOODS: { label: "Finished Goods", color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
+  SPARE_PARTS:    { label: "Spare Parts",    color: "var(--tx-fb923c, #fb923c)", bg: "rgba(251,146,60,.12)",  border: "rgba(251,146,60,.35)"  },
 };
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -115,10 +115,10 @@ export default function ProductCategoriesPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Categories", value: kpis.total,   color: "#a78bfa" },
-          { label: "Active",           value: kpis.active,  color: "#4ade80" },
-          { label: "Products",         value: kpis.product, color: "#60a5fa" },
-          { label: "Services",         value: kpis.service, color: "#fb923c" },
+          { label: "Total Categories", value: kpis.total,   color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active",           value: kpis.active,  color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Products",         value: kpis.product, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Services",         value: kpis.service, color: "var(--tx-fb923c, #fb923c)" },
         ].map(k => (
           <div key={k.label} style={{ ...s.panel, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{k.label}</div>
@@ -132,7 +132,7 @@ export default function ProductCategoriesPage() {
         <div style={{ ...s.panel, padding: 24, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{editing ? "Edit" : "New"} Category</h2>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)", true)}>✕ Close</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)", true)}>✕ Close</button>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
@@ -160,7 +160,7 @@ export default function ProductCategoriesPage() {
 
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={handleSave} disabled={saving} style={s.btn(ACCENT)}>{saving ? "Saving…" : editing ? "Update" : "Create Category"}</button>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)")}>Cancel</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)")}>Cancel</button>
           </div>
         </div>
       )}
@@ -205,10 +205,10 @@ export default function ProductCategoriesPage() {
                     <td style={{ ...s.td, color: "var(--text-muted)" }}>{c.parentCategory || "—"}</td>
                     <td style={{ ...s.td, color: "var(--text-muted)", maxWidth: 220 }}>{c.description || "—"}</td>
                     <td style={s.td}>
-                      <span style={{ ...s.badge(c.status === "ACTIVE" ? { color: "#4ade80", bg: "rgba(74,222,128,.12)", border: "rgba(74,222,128,.35)" } : { color: "#94a3b8", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" }) }}>{c.status}</span>
+                      <span style={{ ...s.badge(c.status === "ACTIVE" ? { color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)", border: "rgba(74,222,128,.35)" } : { color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" }) }}>{c.status}</span>
                     </td>
                     <td style={{ ...s.td, textAlign: "right" as const }}>
-                      <button onClick={() => openEdit(c)} style={{ ...s.btn("rgba(255,255,255,.08)", true), marginRight: 6 }}>Edit</button>
+                      <button onClick={() => openEdit(c)} style={{ ...s.btn("rgba(var(--ink),.08)", true), marginRight: 6 }}>Edit</button>
                       <button onClick={async () => { if (confirm("Delete this category?")) await remove(c.id); }} style={s.btn("rgba(248,113,113,.15)", true)}>Delete</button>
                     </td>
                   </tr>

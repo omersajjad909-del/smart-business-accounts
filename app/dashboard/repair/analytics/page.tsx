@@ -27,7 +27,7 @@ export default function RepairAnalyticsPage() {
   }, [data.jobs]);
 
   return (
-    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+    <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Repair Analytics</h1>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>Job ageing, technician productivity, parts cost pressure, and warranty-return visibility.</p>
@@ -35,9 +35,9 @@ export default function RepairAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Active Jobs", value: data.summary.activeJobs, color: "#60a5fa" },
-          { label: "Ready Jobs", value: data.summary.readyJobs, color: "#34d399" },
-          { label: "Parts Cost", value: data.summary.partsCost.toLocaleString(), color: "#f59e0b" },
+          { label: "Active Jobs", value: data.summary.activeJobs, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Ready Jobs", value: data.summary.readyJobs, color: "var(--tx-34d399, #34d399)" },
+          { label: "Parts Cost", value: data.summary.partsCost.toLocaleString(), color: "var(--tx-f59e0b, #f59e0b)" },
           { label: "Warranty Exposure", value: data.summary.warrantyExposure.toLocaleString(), color: repairAccent },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
@@ -54,7 +54,7 @@ export default function RepairAnalyticsPage() {
             {jobMix.map(([status, count]) => (
               <div key={status} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{status}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#bae6fd" }}>{count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-bae6fd, #bae6fd)" }}>{count}</span>
               </div>
             ))}
           </div>
@@ -66,7 +66,7 @@ export default function RepairAnalyticsPage() {
             {data.technicians.slice(0, 6).map((item) => (
               <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{item.technician}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#60a5fa" }}>{item.status}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>{item.status}</span>
               </div>
             ))}
           </div>

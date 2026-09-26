@@ -606,10 +606,10 @@ export default function POSPage() {
   }, [cart, discount, taxRate, itemNote, customerName, heldSales]);
 
   const PAY_METHODS = [
-    { id: "cash",          label: "💵 Cash",          color: "#10b981" },
-    { id: "card",          label: "💳 Card",           color: "#6366f1" },
-    { id: "bank_transfer", label: "🏦 Bank Transfer",  color: "#3b82f6" },
-    { id: "cheque",        label: "📄 Cheque",         color: "#f59e0b" },
+    { id: "cash",          label: "💵 Cash",          color: "var(--tx-10b981, #10b981)" },
+    { id: "card",          label: "💳 Card",           color: "var(--tx-6366f1, #6366f1)" },
+    { id: "bank_transfer", label: "🏦 Bank Transfer",  color: "var(--tx-3b82f6, #3b82f6)" },
+    { id: "cheque",        label: "📄 Cheque",         color: "var(--tx-f59e0b, #f59e0b)" },
   ] as const;
   const QUICK_AMTS = [500, 1000, 2000, 5000];
   const dateStr = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
@@ -698,15 +698,15 @@ export default function POSPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)", borderRadius: 8, padding: "4px 11px" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
             <span style={{ fontSize: 11, color: "rgba(var(--ink),.4)", fontWeight: 600 }}>Invoice</span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#818cf8", fontFamily: "'Courier New',monospace" }}>{nextReceiptNo}</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)", fontFamily: "'Courier New',monospace" }}>{nextReceiptNo}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#c7d0e8" }}>{dateStr}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-c7d0e8, #c7d0e8)" }}>{dateStr}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 7, padding: "3px 10px" }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", letterSpacing: ".02em" }}>{clockStr}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)", letterSpacing: ".02em" }}>{clockStr}</span>
           </div>
         </div>
 
@@ -717,13 +717,13 @@ export default function POSPage() {
             <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(52,211,153,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#34d399", fontWeight: 800, flexShrink: 0 }}>
               {cashierName.charAt(0).toUpperCase()}
             </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>{cashierName}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{cashierName}</span>
           </div>
           {/* Active session dot */}
           {activeSession && (
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 7px #10b981" }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399" }}>LIVE</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>LIVE</span>
             </div>
           )}
           {/* Stats toggle */}
@@ -747,11 +747,11 @@ export default function POSPage() {
       {showStats && (
         <div style={{ display: "flex", background: "var(--dk-0c1829, #0c1829)", borderBottom: "1px solid rgba(var(--ink),.05)", flexShrink: 0 }}>
           {[
-            { label: "TODAY SALES",    value: `Rs. ${todayTotal.toLocaleString()}`,  color: "#34d399", icon: "📈", href: null },
-            { label: "TRANSACTIONS",   value: String(todaySales.length),              color: "#e2e8f0", icon: "🧾", href: "/dashboard/retail/sales-history" },
-            { label: "CASH",           value: `Rs. ${cashTotal.toLocaleString()}`,    color: "#10b981", icon: "💵", href: null },
-            { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`,    color: "#818cf8", icon: "💳", href: null },
-            { label: "NEXT RECEIPT",   value: nextReceiptNo,                           color: "#f59e0b", icon: "#",  href: null },
+            { label: "TODAY SALES",    value: `Rs. ${todayTotal.toLocaleString()}`,  color: "var(--tx-34d399, #34d399)", icon: "📈", href: null },
+            { label: "TRANSACTIONS",   value: String(todaySales.length),              color: "var(--tx-e2e8f0, #e2e8f0)", icon: "🧾", href: "/dashboard/retail/sales-history" },
+            { label: "CASH",           value: `Rs. ${cashTotal.toLocaleString()}`,    color: "var(--tx-10b981, #10b981)", icon: "💵", href: null },
+            { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`,    color: "var(--tx-818cf8, #818cf8)", icon: "💳", href: null },
+            { label: "NEXT RECEIPT",   value: nextReceiptNo,                           color: "var(--tx-f59e0b, #f59e0b)", icon: "#",  href: null },
           ].map((s, si) => (
             <div key={s.label} className="pos-stat-tile"
               onClick={() => s.href && (window.location.href = s.href)}
@@ -772,9 +772,9 @@ export default function POSPage() {
         <div style={{ background: "rgba(245,158,11,.07)", borderBottom: "1px solid rgba(245,158,11,.18)", padding: "7px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(245,158,11,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>⚠</div>
-            <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 600 }}>No active cashier session — sales won't be linked to a shift.</span>
+            <span style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 600 }}>No active cashier session — sales won't be linked to a shift.</span>
           </div>
-          <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "#f59e0b", fontWeight: 700, textDecoration: "none", background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 7, padding: "4px 12px" }}>Open Session →</a>
+          <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700, textDecoration: "none", background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 7, padding: "4px 12px" }}>Open Session →</a>
         </div>
       )}
 
@@ -792,7 +792,7 @@ export default function POSPage() {
             {/* Row 1: Search input + camera + search button */}
             <div style={{ display: "flex", gap: 8, marginBottom: 9 }}>
               <div style={{ position: "relative", flex: 1 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5"
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2.5"
                   style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
@@ -848,7 +848,7 @@ export default function POSPage() {
                     <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 4px", borderRadius: 3,
                       color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "#818cf8",
                       background: isGreen ? "rgba(52,211,153,.15)" : isAmber ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)" }}>{key}</span>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "rgba(var(--ink),.45)" }}>{label}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: isGreen ? "var(--tx-34d399, #34d399)" : isAmber ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.45)" }}>{label}</span>
                   </button>
                 );
               })}
@@ -895,7 +895,7 @@ export default function POSPage() {
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 200, gap: 8, color: "rgba(var(--ink),.25)" }}>
                 <div style={{ fontSize: 40, opacity: 0.4 }}>📦</div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>No products yet</div>
-                <a href="/dashboard/retail/catalog" style={{ fontSize: 12, color: "#6366f1", fontWeight: 700, textDecoration: "none" }}>Add products →</a>
+                <a href="/dashboard/retail/catalog" style={{ fontSize: 12, color: "var(--tx-6366f1, #6366f1)", fontWeight: 700, textDecoration: "none" }}>Add products →</a>
               </div>
             )}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: 10 }}>
@@ -913,19 +913,19 @@ export default function POSPage() {
                     {p.imageUrl ? (
                       <img src={p.imageUrl} alt={p.name} style={{ width: "100%", height: 72, objectFit: "cover", borderRadius: 8, marginBottom: 8, display: "block" }} />
                     ) : (
-                      <div style={{ width: "100%", height: 60, borderRadius: 8, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 20, color: "rgba(99,102,241,.4)" }}>
+                      <div style={{ width: "100%", height: 60, borderRadius: 8, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 20, color: "rgba(var(--txr-6366f1, 99,102,241),.4)" }}>
                         📦
                       </div>
                     )}
                     {/* Category */}
                     <div style={{ fontSize: 8, color: "rgba(var(--ink),.28)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4, fontWeight: 600 }}>{p.category}</div>
                     {/* Name */}
-                    <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.35, marginBottom: 3, color: "#dde6f5", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{p.name}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.35, marginBottom: 3, color: "var(--tx-dde6f5, #dde6f5)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{p.name}</div>
                     {/* SKU */}
                     {p.sku && <div style={{ fontSize: 9, color: "rgba(var(--ink),.2)", marginBottom: 6, fontFamily: "'Courier New',monospace" }}>{p.sku}</div>}
                     {/* Price + add button row */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-                      <span style={{ fontSize: 17, fontWeight: 800, color: "#818cf8", letterSpacing: "-.01em" }}>Rs. {p.price.toLocaleString()}</span>
+                      <span style={{ fontSize: 17, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)", letterSpacing: "-.01em" }}>Rs. {p.price.toLocaleString()}</span>
                       {!outOfStock && (
                         <button className="add-btn" onClick={e => { e.stopPropagation(); addToCart(p); }}
                           style={{ width: 26, height: 26, borderRadius: 7, background: "#6366f1", border: "none", color: "#fff", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, flexShrink: 0, transition: "background .12s" }}>+</button>
@@ -933,7 +933,7 @@ export default function POSPage() {
                     </div>
                     {/* Stock count */}
                     {stockQty !== null && (
-                      <div style={{ fontSize: 10, fontWeight: 600, marginTop: 4, color: outOfStock ? "#f87171" : lowStock ? "#f59e0b" : "#34d399" }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, marginTop: 4, color: outOfStock ? "var(--tx-f87171, #f87171)" : lowStock ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-34d399, #34d399)" }}>
                         {outOfStock ? "Out of stock" : `Stock: ${stockQty}`}
                       </div>
                     )}
@@ -959,18 +959,18 @@ export default function POSPage() {
             {/* Row 1: title + actions */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.5)" strokeWidth="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, #fff)" }}>Cart</span>
                 <span style={{ background: cart.length > 0 ? "rgba(99,102,241,.2)" : "rgba(var(--ink),.07)", border: `1px solid ${cart.length > 0 ? "rgba(99,102,241,.35)" : "rgba(var(--ink),.1)"}`, color: cart.length > 0 ? "#a5b4fc" : "rgba(var(--ink),.3)", fontSize: 10, fontWeight: 800, borderRadius: 20, padding: "1px 8px", minWidth: 20, textAlign: "center" }}>{cart.length}</span>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 {receipt && (
-                  <button onClick={printReceipt} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, display: "flex", alignItems: "center", gap: 4 }}>
+                  <button onClick={printReceipt} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, display: "flex", alignItems: "center", gap: 4 }}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                     Receipt
                   </button>
                 )}
-                <button onClick={clearCart} style={{ padding: "5px 11px", borderRadius: 7, border: "1px solid rgba(239,68,68,.22)", background: "rgba(239,68,68,.07)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear</button>
+                <button onClick={clearCart} style={{ padding: "5px 11px", borderRadius: 7, border: "1px solid rgba(239,68,68,.22)", background: "rgba(239,68,68,.07)", color: "var(--tx-f87171, #f87171)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear</button>
                 <button onClick={() => setShowHeld(v => !v)} style={{ position: "relative", padding: "5px 11px", borderRadius: 7, border: `1px solid ${showHeld ? "rgba(99,102,241,.45)" : "rgba(99,102,241,.25)"}`, background: showHeld ? "rgba(99,102,241,.2)" : "rgba(99,102,241,.08)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
                   Hold
                   {heldSales.length > 0 && <span style={{ position: "absolute", top: -6, right: -6, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
@@ -984,11 +984,11 @@ export default function POSPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.25)", borderRadius: 9 }}>
                   <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(245,158,11,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🎁</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", lineHeight: 1.2 }}>{loyaltyCustomer.name}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.2 }}>{loyaltyCustomer.name}</div>
                     <div style={{ fontSize: 10, color: "rgba(var(--ink),.38)", marginTop: 1 }}>
                       <span style={{ fontFamily: "'Courier New',monospace" }}>{loyaltyCustomer.cardNo}</span>
-                      {" · "}<span style={{ color: "#f59e0b", fontWeight: 700 }}>{loyaltyCustomer.points} pts</span>
-                      {pointsToEarn > 0 && <span style={{ color: "#34d399", marginLeft: 5 }}>+{pointsToEarn} pts</span>}
+                      {" · "}<span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{loyaltyCustomer.points} pts</span>
+                      {pointsToEarn > 0 && <span style={{ color: "var(--tx-34d399, #34d399)", marginLeft: 5 }}>+{pointsToEarn} pts</span>}
                     </div>
                   </div>
                   {loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints && (
@@ -999,7 +999,7 @@ export default function POSPage() {
                         placeholder="0"
                         style={{ width: 48, textAlign: "center", background: "rgba(var(--ink),.07)", border: "1px solid rgba(245,158,11,.35)", borderRadius: 5, padding: "2px 5px", color: "var(--ink-solid, #fff)", fontSize: 11, fontFamily: ff, outline: "none" }} />
                       <span style={{ fontSize: 10, color: "rgba(var(--ink),.22)" }}>pts</span>
-                      {safeRedeemPts > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>−Rs.{loyaltyDiscount}</span>}
+                      {safeRedeemPts > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>−Rs.{loyaltyDiscount}</span>}
                     </div>
                   )}
                   <button onClick={() => { setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0); }}
@@ -1020,11 +1020,11 @@ export default function POSPage() {
                           style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", cursor: "pointer", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                           <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(245,158,11,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#f59e0b", fontWeight: 800, flexShrink: 0 }}>{r.title.charAt(0).toUpperCase()}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{r.title}</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{r.title}</div>
                             <div style={{ fontSize: 10, color: "rgba(var(--ink),.38)" }}>{String(r.data?.cardNo || "")} · {String(r.data?.phone || "")}</div>
                           </div>
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b" }}>{r.amount || 0}</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{r.amount || 0}</div>
                             <div style={{ fontSize: 9, color: "rgba(var(--ink),.28)" }}>pts</div>
                           </div>
                         </div>
@@ -1034,7 +1034,7 @@ export default function POSPage() {
                   {showLoyaltySearch && loyaltyQ.length >= 2 && lcResults.length === 0 && (
                     <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--dk-141e33, #141e33)", border: "1px solid rgba(var(--ink),.09)", borderRadius: 9, zIndex: 60, marginTop: 4, padding: "12px 14px", textAlign: "center", color: "rgba(var(--ink),.32)", fontSize: 12 }}>
                       No customers found ·{" "}
-                      <a href="/dashboard/retail/loyalty" style={{ color: "#f59e0b", textDecoration: "none", fontWeight: 700 }}>Register →</a>
+                      <a href="/dashboard/retail/loyalty" style={{ color: "var(--tx-f59e0b, #f59e0b)", textDecoration: "none", fontWeight: 700 }}>Register →</a>
                     </div>
                   )}
                 </div>
@@ -1065,7 +1065,7 @@ export default function POSPage() {
                 <div style={{ overflowX: "auto" }}><div key={item.id} style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, alignItems: "center", padding: "7px 4px", marginBottom: 2, borderBottom: "1px solid rgba(var(--ink),.04)", minWidth: 560 }}>
                   <div style={{ fontSize: 10, color: "rgba(var(--ink),.22)", textAlign: "center" }}>{idx + 1}</div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#dde6f5" }}>{item.name}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--tx-dde6f5, #dde6f5)" }}>{item.name}</div>
                     {item.sku && <div style={{ fontSize: 9, color: "rgba(var(--ink),.24)", marginTop: 1, fontFamily: "'Courier New',monospace" }}>{item.sku}</div>}
                   </div>
                   <div style={{ fontSize: 10, color: "rgba(var(--ink),.45)", textAlign: "right" }}>Rs.{item.price.toLocaleString()}</div>
@@ -1084,9 +1084,9 @@ export default function POSPage() {
                     <input type="number" min={0} value={item.itemDiscount || ""}
                       onChange={e => setItemDisc(item.id, e.target.value)}
                       placeholder="0"
-                      style={{ width: "100%", textAlign: "right", fontSize: 10, color: item.itemDiscount ? "#fbbf24" : "rgba(var(--ink),.25)", background: "transparent", border: `1px solid ${item.itemDiscount ? "rgba(245,158,11,.28)" : "rgba(var(--ink),.07)"}`, borderRadius: 4, padding: "3px 4px", outline: "none", fontFamily: ff, boxSizing: "border-box" as const }} />
+                      style={{ width: "100%", textAlign: "right", fontSize: 10, color: item.itemDiscount ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.25)", background: "transparent", border: `1px solid ${item.itemDiscount ? "rgba(245,158,11,.28)" : "rgba(var(--ink),.07)"}`, borderRadius: 4, padding: "3px 4px", outline: "none", fontFamily: ff, boxSizing: "border-box" as const }} />
                   </div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", textAlign: "right" }}>Rs.{lineTotal.toLocaleString()}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", textAlign: "right" }}>Rs.{lineTotal.toLocaleString()}</div>
                   <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.18)", fontSize: 13, cursor: "pointer", padding: 0, textAlign: "center", lineHeight: 1 }}>✕</button>
                 </div></div>
               );
@@ -1122,22 +1122,22 @@ export default function POSPage() {
                   style={{ width: 48, textAlign: "right", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.09)", borderRadius: 6, padding: "4px 6px", color: "var(--ink-solid, #fff)", fontSize: 10, fontFamily: ff, outline: "none" }} />
               </div>
               {discountCodeMsg && (
-                <div style={{ fontSize: 10, marginBottom: 4, color: discountCodeMsg.ok ? "#34d399" : "#f87171" }}>{discountCodeMsg.text}</div>
+                <div style={{ fontSize: 10, marginBottom: 4, color: discountCodeMsg.ok ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{discountCodeMsg.text}</div>
               )}
 
               {/* Disc + Tax values */}
               {(discAmt > 0 || taxAmt > 0 || Math.abs(rounding) > 0.001) && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    {discAmt > 0 && <span style={{ fontSize: 10, color: "#f87171", fontWeight: 600 }}>−Rs. {discAmt.toLocaleString()} disc</span>}
+                    {discAmt > 0 && <span style={{ fontSize: 10, color: "var(--tx-f87171, #f87171)", fontWeight: 600 }}>−Rs. {discAmt.toLocaleString()} disc</span>}
                     <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                       <input value={taxRate} onChange={e => setTaxRate(e.target.value)} placeholder="0" type="number" min="0" max="100"
-                        style={{ width: 30, textAlign: "center", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.09)", borderRadius: 4, padding: "2px 4px", color: "#fbbf24", fontSize: 10, fontFamily: ff, outline: "none" }} />
+                        style={{ width: 30, textAlign: "center", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.09)", borderRadius: 4, padding: "2px 4px", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 10, fontFamily: ff, outline: "none" }} />
                       <span style={{ fontSize: 10, color: "rgba(var(--ink),.28)" }}>% tax</span>
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    {taxAmt > 0 && <span style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>+Rs. {taxAmt.toLocaleString()}</span>}
+                    {taxAmt > 0 && <span style={{ fontSize: 10, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 600 }}>+Rs. {taxAmt.toLocaleString()}</span>}
                     {Math.abs(rounding) > 0.001 && <span style={{ fontSize: 10, color: "rgba(var(--ink),.28)", marginLeft: 6 }}>rnd {rounding.toFixed(2)}</span>}
                   </div>
                 </div>
@@ -1145,7 +1145,7 @@ export default function POSPage() {
 
               {/* Loyalty discount */}
               {loyaltyDiscount > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#34d399", fontWeight: 700, marginBottom: 5, padding: "4px 8px", background: "rgba(52,211,153,.06)", borderRadius: 6, border: "1px solid rgba(52,211,153,.13)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--tx-34d399, #34d399)", fontWeight: 700, marginBottom: 5, padding: "4px 8px", background: "rgba(52,211,153,.06)", borderRadius: 6, border: "1px solid rgba(52,211,153,.13)" }}>
                   <span>🎁 Loyalty ({safeRedeemPts} pts)</span>
                   <span>−Rs. {loyaltyDiscount.toLocaleString()}</span>
                 </div>
@@ -1157,7 +1157,7 @@ export default function POSPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: 8, color: "rgba(var(--ink),.32)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 3 }}>Grand Total</div>
-                  <div style={{ fontSize: 27, fontWeight: 900, color: cart.length > 0 ? "#818cf8" : "rgba(var(--ink),.18)", letterSpacing: "-.025em", lineHeight: 1 }}>
+                  <div style={{ fontSize: 27, fontWeight: 900, color: cart.length > 0 ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),.18)", letterSpacing: "-.025em", lineHeight: 1 }}>
                     Rs.&nbsp;{finalTotal.toLocaleString()}
                   </div>
                 </div>
@@ -1190,7 +1190,7 @@ export default function POSPage() {
                 placeholder="Amount received…" type="number" min="0"
                 style={{ width: "100%", textAlign: "left", background: "rgba(var(--ink),.06)", border: `2px solid ${tenderedAmt >= finalTotal && finalTotal > 0 ? "rgba(52,211,153,.55)" : "rgba(var(--ink),.1)"}`, borderRadius: 10, padding: "9px 14px", color: "var(--ink-solid, #fff)", fontSize: 17, fontFamily: ff, outline: "none", fontWeight: 700, boxSizing: "border-box" as const, transition: "border-color .15s" }} />
               {tenderedAmt >= finalTotal && finalTotal > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#34d399", fontWeight: 700, padding: "6px 12px", background: "rgba(52,211,153,.07)", borderRadius: 7, border: "1px solid rgba(52,211,153,.16)", marginTop: 5 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "var(--tx-34d399, #34d399)", fontWeight: 700, padding: "6px 12px", background: "rgba(52,211,153,.07)", borderRadius: 7, border: "1px solid rgba(52,211,153,.16)", marginTop: 5 }}>
                   <span>Change Due</span>
                   <span>Rs. {change.toLocaleString()}</span>
                 </div>
@@ -1204,7 +1204,7 @@ export default function POSPage() {
                     </button>
                   ))}
                   <button className="quick-amt" onClick={() => setTendered(String(finalTotal))}
-                    style={{ flex: 1, padding: "4px 0", borderRadius: 5, border: "1px solid rgba(52,211,153,.22)", background: "rgba(52,211,153,.06)", color: "#34d399", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Exact</button>
+                    style={{ flex: 1, padding: "4px 0", borderRadius: 5, border: "1px solid rgba(52,211,153,.22)", background: "rgba(52,211,153,.06)", color: "var(--tx-34d399, #34d399)", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Exact</button>
                 </div>
               )}
               {payMethod !== "cash" && (
@@ -1216,7 +1216,7 @@ export default function POSPage() {
 
             {/* Checkout error */}
             {checkoutError && (
-              <div style={{ padding: "6px 10px", borderRadius: 7, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.18)", color: "#fca5a5", fontSize: 11, marginBottom: 8, display: "flex", alignItems: "flex-start", gap: 6 }}>
+              <div style={{ padding: "6px 10px", borderRadius: 7, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.18)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 11, marginBottom: 8, display: "flex", alignItems: "flex-start", gap: 6 }}>
                 <span style={{ flexShrink: 0 }}>⚠</span>{checkoutError}
               </div>
             )}
@@ -1282,7 +1282,7 @@ export default function POSPage() {
 
         {/* F8 last receipt */}
         <button onClick={() => { if (receipt) printReceipt(); else showFKeyMsg("F8", "No receipt yet — complete a sale first", "amber"); }}
-          style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "none", borderRight: "1px solid rgba(var(--ink),.05)", color: flashKey === "F8" ? "#fbbf24" : "rgba(var(--ink),.32)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>
+          style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "none", borderRight: "1px solid rgba(var(--ink),.05)", color: flashKey === "F8" ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.32)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>
           <span style={{ fontSize: 8, fontWeight: 800, color: flashKey === "F8" ? "#fbbf24" : "#6366f1", background: flashKey === "F8" ? "rgba(245,158,11,.14)" : "rgba(99,102,241,.14)", padding: "1px 4px", borderRadius: 3 }}>F8</span>
           Receipt
         </button>
@@ -1292,7 +1292,7 @@ export default function POSPage() {
           {activeSession ? (
             <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.16)", borderRadius: 20, padding: "3px 11px" }}>
               <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399" }}>{activeSession.title || "Session Active"}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{activeSession.title || "Session Active"}</span>
             </div>
           ) : (
             <span style={{ fontSize: 10, color: "rgba(var(--ink),.18)", fontWeight: 600 }}>No active session</span>
@@ -1301,7 +1301,7 @@ export default function POSPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 10, color: "rgba(var(--ink),.28)" }}>{cart.length} items · {totalQty} qty</span>
               <span style={{ width: 1, height: 12, background: "rgba(var(--ink),.1)" }} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8" }}>Rs. {finalTotal.toLocaleString()}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>Rs. {finalTotal.toLocaleString()}</span>
             </div>
           )}
         </div>
@@ -1342,9 +1342,9 @@ export default function POSPage() {
                 <div key={h.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 10px", marginBottom: 6, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 10 }}>
                   <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12, fontWeight: 800, color: "#818cf8" }}>{i + 1}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>
                       Hold #{i + 1} — {h.cart.length} item{h.cart.length !== 1 ? "s" : ""}
-                      {h.customer && <span style={{ marginLeft: 6, fontSize: 10, color: "#34d399" }}>· {h.customer}</span>}
+                      {h.customer && <span style={{ marginLeft: 6, fontSize: 10, color: "var(--tx-34d399, #34d399)" }}>· {h.customer}</span>}
                     </div>
                     <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 2 }}>
                       {h.cart.map(c => c.name).join(", ").slice(0, 55)}{h.cart.map(c => c.name).join(", ").length > 55 ? "…" : ""}
@@ -1352,12 +1352,12 @@ export default function POSPage() {
                     <div style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginTop: 1 }}>Saved at {h.savedAt}</div>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#818cf8" }}>Rs. {h.total.toLocaleString()}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)" }}>Rs. {h.total.toLocaleString()}</div>
                     <div style={{ display: "flex", gap: 5, marginTop: 5 }}>
                       <button onClick={() => recallHeld(h.id)}
                         style={{ padding: "4px 12px", borderRadius: 6, background: "#6366f1", border: "none", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Recall</button>
                       <button onClick={() => deleteHeld(h.id)}
-                        style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>✕</button>
+                        style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>✕</button>
                     </div>
                   </div>
                 </div>
@@ -1389,7 +1389,7 @@ export default function POSPage() {
             </div>
             <div style={{ padding: "12px 16px" }}>
               <div style={{ position: "relative", marginBottom: 12 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5"
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2.5"
                   style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
@@ -1407,7 +1407,7 @@ export default function POSPage() {
                     p.sku.toLowerCase().includes(priceCheckQ.toLowerCase()) ||
                     (p.barcode || "").toLowerCase().includes(priceCheckQ.toLowerCase())
                   );
-                  if (res.length === 0) return <div style={{ textAlign: "center", padding: "24px 0", color: "#f87171", fontSize: 13 }}>No product found for "{priceCheckQ}"</div>;
+                  if (res.length === 0) return <div style={{ textAlign: "center", padding: "24px 0", color: "var(--tx-f87171, #f87171)", fontSize: 13 }}>No product found for "{priceCheckQ}"</div>;
                   return res.map(p => {
                     const stockQty = p.itemNewId ? (stockMap[p.itemNewId] ?? 0) : (p.catalogStock !== null ? p.catalogStock : null);
                     const outOfStock = stockQty !== null && stockQty <= 0;
@@ -1416,12 +1416,12 @@ export default function POSPage() {
                         onClick={() => { if (!outOfStock) { addToCart(p); setShowPriceCheck(false); showFKeyMsg("F4", `✓ ${p.name} added`, "green"); } }}>
                         <div style={{ width: 40, height: 40, borderRadius: 8, background: "rgba(99,102,241,.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 18 }}>📦</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>{p.name}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{p.name}</div>
                           {p.sku && <div style={{ fontSize: 10, color: "rgba(var(--ink),.3)" }}>SKU: {p.sku} · {p.category}</div>}
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div style={{ fontSize: 18, fontWeight: 800, color: "#818cf8" }}>Rs. {p.price.toLocaleString()}</div>
-                          <div style={{ fontSize: 10, marginTop: 2, fontWeight: 600, color: outOfStock ? "#f87171" : stockQty !== null && stockQty <= 5 ? "#f59e0b" : "#34d399" }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)" }}>Rs. {p.price.toLocaleString()}</div>
+                          <div style={{ fontSize: 10, marginTop: 2, fontWeight: 600, color: outOfStock ? "var(--tx-f87171, #f87171)" : stockQty !== null && stockQty <= 5 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-34d399, #34d399)" }}>
                             {stockQty !== null ? (outOfStock ? "Out of stock" : `${stockQty} in stock`) : "Stock N/A"}
                           </div>
                         </div>
@@ -1448,7 +1448,7 @@ export default function POSPage() {
           <div style={{ background: "var(--dk-111827, #111827)", borderRadius: 18, border: "1px solid rgba(var(--ink),.08)", padding: 20, width: "min(96vw,560px)", maxHeight: "90vh", overflow: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 17, color: "#34d399" }}>✅ Sale Completed</div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: "var(--tx-34d399, #34d399)" }}>✅ Sale Completed</div>
                 <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginTop: 2 }}>Receipt #{receipt.receiptNo}</div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -1504,7 +1504,7 @@ export default function POSPage() {
           {/* Status / Error */}
           <div style={{ marginTop: 20, textAlign: "center" }}>
             {scannerError ? (
-              <div style={{ fontSize: 13, color: "#f87171", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 340 }}>
+              <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 340 }}>
                 {scannerError}
                 <div style={{ marginTop: 10 }}>
                   <button onClick={() => { if (fileInputRef.current) fileInputRef.current.value = ""; fileInputRef.current?.click(); }}
@@ -1514,7 +1514,7 @@ export default function POSPage() {
                 </div>
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: scannerStatus === "scanning" ? "#34d399" : "rgba(var(--ink),.45)" }}>
+              <div style={{ fontSize: 13, color: scannerStatus === "scanning" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.45)" }}>
                 {scannerStatus === "starting" && "Starting camera…"}
                 {scannerStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
               </div>

@@ -19,12 +19,12 @@ export default function DistributionAnalyticsPage() {
   }, []);
 
   const cards = [
-    { label: "Routes", value: data.summary.routes, color: "#f97316" },
-    { label: "Deliveries", value: data.summary.deliveries, color: "#38bdf8" },
-    { label: "Van Revenue", value: `Rs. ${data.summary.vanRevenue.toLocaleString()}`, color: "#34d399" },
-    { label: "Collections", value: `Rs. ${data.summary.collections.toLocaleString()}`, color: "#a78bfa" },
-    { label: "Failed Deliveries", value: data.summary.failed, color: "#ef4444" },
-    { label: "Recovery Rate", value: `${data.summary.recoveryRate}%`, color: "#f59e0b" },
+    { label: "Routes", value: data.summary.routes, color: "var(--tx-f97316, #f97316)" },
+    { label: "Deliveries", value: data.summary.deliveries, color: "var(--tx-38bdf8, #38bdf8)" },
+    { label: "Van Revenue", value: `Rs. ${data.summary.vanRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+    { label: "Collections", value: `Rs. ${data.summary.collections.toLocaleString()}`, color: "var(--tx-a78bfa, #a78bfa)" },
+    { label: "Failed Deliveries", value: data.summary.failed, color: "var(--tx-ef4444, #ef4444)" },
+    { label: "Recovery Rate", value: `${data.summary.recoveryRate}%`, color: "var(--tx-f59e0b, #f59e0b)" },
   ];
 
   return (
@@ -62,14 +62,14 @@ export default function DistributionAnalyticsPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{metric.route}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{metric.area || "-"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{metric.driver || "-"}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#38bdf8", fontWeight: 700 }}>{metric.deliveries}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{metric.delivered}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#ef4444", fontWeight: 700 }}>{metric.failed}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f59e0b", fontWeight: 700 }}>{metric.loadedQty}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#a78bfa", fontWeight: 700 }}>{metric.soldQty}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: metric.recoveryRate >= 80 ? "#22c55e" : "#f59e0b", fontWeight: 700 }}>{metric.recoveryRate}%</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {metric.revenue.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#38bdf8", fontWeight: 700 }}>Rs. {metric.collected.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>{metric.deliveries}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{metric.delivered}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-ef4444, #ef4444)", fontWeight: 700 }}>{metric.failed}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{metric.loadedQty}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700 }}>{metric.soldQty}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: metric.recoveryRate >= 80 ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{metric.recoveryRate}%</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {metric.revenue.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>Rs. {metric.collected.toLocaleString()}</td>
               </tr>
             ))}
             {data.routeMetrics.length === 0 && (

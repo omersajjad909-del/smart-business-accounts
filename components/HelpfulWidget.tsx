@@ -37,7 +37,7 @@ export default function HelpfulWidget() {
             type="button"
             onClick={() => setAnswer("yes")}
             aria-label="Yes, this article was helpful"
-            style={{ ...base, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.25)", color:"#34d399" }}
+            style={{ ...base, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.25)", color:"var(--tx-34d399, #34d399)" }}
           >
             👍 Yes
           </button>
@@ -45,13 +45,13 @@ export default function HelpfulWidget() {
             type="button"
             onClick={() => setAnswer("no")}
             aria-label="No, this article was not helpful"
-            style={{ ...base, background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.2)", color:"#f87171" }}
+            style={{ ...base, background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.2)", color:"var(--tx-f87171, #f87171)" }}
           >
             👎 No
           </button>
         </div>
       ) : (
-        <span style={{ fontSize:13, fontWeight:600, color: answer === "yes" ? "#34d399" : "#f87171" }}>
+        <span style={{ fontSize:13, fontWeight:600, color: answer === "yes" ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
           {answer === "yes" ? "👍 Glad it helped" : "👎 We'll improve this article"}
         </span>
       )}

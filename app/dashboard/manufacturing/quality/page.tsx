@@ -6,8 +6,8 @@ import { mapFinishedGoodsRecord, mapQualityCheckRecord } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 export default function ManufacturingQualityPage() {
   const { isMobile } = useResponsive();
@@ -64,10 +64,10 @@ export default function ManufacturingQualityPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Checks", value: checks.length, color: "#a855f7" },
-          { label: "Passed", value: checks.filter((item) => item.result === "passed").length, color: "#22c55e" },
-          { label: "Rejected", value: checks.filter((item) => item.result === "rejected").length, color: "#ef4444" },
-          { label: "Finished Goods Tracked", value: finishedGoods.length, color: "#38bdf8" },
+          { label: "Checks", value: checks.length, color: "var(--tx-a855f7, #a855f7)" },
+          { label: "Passed", value: checks.filter((item) => item.result === "passed").length, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Rejected", value: checks.filter((item) => item.result === "rejected").length, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Finished Goods Tracked", value: finishedGoods.length, color: "var(--tx-38bdf8, #38bdf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>

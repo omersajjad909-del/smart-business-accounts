@@ -115,7 +115,7 @@ export default function MembershipContentTiersPage() {
                     <div>
                       <div style={{ fontSize: 16, fontWeight: 800 }}>{tier.title}</div>
                       <div style={{ fontSize: 12, color: saasMuted, marginTop: 6 }}>{String(tier.data?.planName || "-")}</div>
-                      <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{modules.join(" • ") || "No modules listed"}</div>
+                      <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 8 }}>{modules.join(" • ") || "No modules listed"}</div>
                     </div>
                     <span style={{ padding: isMobile ? "8px 8px" : "4px 10px", borderRadius: 999, background: `${saasStatusColor(tier.status)}20`, color: saasStatusColor(tier.status), fontSize: 12, fontWeight: 700 }}>{tier.status}</span>
                   </div>

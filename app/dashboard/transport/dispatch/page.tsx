@@ -206,10 +206,10 @@ export default function TransportDispatchPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Total Dispatches", value: summary.total, color: "#60a5fa" },
-          { label: "Active", value: summary.active, color: "#38bdf8" },
-          { label: "Arrived", value: summary.arrived, color: "#22c55e" },
-          { label: "Closed", value: summary.closed, color: "#a78bfa" },
+          { label: "Total Dispatches", value: summary.total, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Active", value: summary.active, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Arrived", value: summary.arrived, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Closed", value: summary.closed, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((item) => (
           <div key={item.label} style={card}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{item.label}</div>
@@ -260,7 +260,7 @@ export default function TransportDispatchPage() {
                 {row.status === "planned" && <button onClick={() => void moveStatus(row.id, "dispatched")} style={{ background: "rgba(56,189,248,.16)", border: "1px solid rgba(56,189,248,.28)", color: "#7dd3fc", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Mark Dispatched</button>}
                 {row.status === "dispatched" && <button onClick={() => void moveStatus(row.id, "arrived")} style={{ background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.28)", color: "#86efac", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Mark Arrived</button>}
                 {row.status === "arrived" && <button onClick={() => void moveStatus(row.id, "closed")} style={{ background: "rgba(167,139,250,.16)", border: "1px solid rgba(167,139,250,.28)", color: "#ddd6fe", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Close Dispatch</button>}
-                {(row.status === "planned" || row.status === "dispatched") && <button onClick={() => void moveStatus(row.id, "cancelled")} style={{ background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Cancel</button>}
+                {(row.status === "planned" || row.status === "dispatched") && <button onClick={() => void moveStatus(row.id, "cancelled")} style={{ background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Cancel</button>}
                 <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),.68)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
               </div>
             </div>

@@ -111,9 +111,9 @@ export default function SprintsPage() {
       </div>
 
       <div style={S.stats}>
-        <div style={S.stat}><div style={S.statLabel}>Active Sprints</div><div style={{ ...S.statVal, color: '#34d399' }}>{activeSprints}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Active Sprints</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{activeSprints}</div></div>
         <div style={S.stat}><div style={S.statLabel}>Total Stories</div><div style={S.statVal}>{totalStories}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Completed Stories</div><div style={{ ...S.statVal, color: '#818cf8' }}>{totalCompleted}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Completed Stories</div><div style={{ ...S.statVal, color: 'var(--tx-818cf8, #818cf8)' }}>{totalCompleted}</div></div>
         <div style={S.stat}><div style={S.statLabel}>Avg Velocity</div><div style={{ ...S.statVal, color: '#7c3aed' }}>{avgVelocity} pts</div></div>
       </div>
 
@@ -136,7 +136,7 @@ export default function SprintsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <span style={S.badge(STATUS_COLOR[s.status])}>{s.status}</span>
-                  {s.status === 'Active' && s.end && <span style={{ fontSize: 13, color: days < 0 ? '#f87171' : days <= 2 ? '#fbbf24' : 'rgba(var(--ink),.5)' }}>{days < 0 ? `${Math.abs(days)}d overdue` : `${days}d left`}</span>}
+                  {s.status === 'Active' && s.end && <span style={{ fontSize: 13, color: days < 0 ? 'var(--tx-f87171, #f87171)' : days <= 2 ? 'var(--tx-fbbf24, #fbbf24)' : 'rgba(var(--ink),.5)' }}>{days < 0 ? `${Math.abs(days)}d overdue` : `${days}d left`}</span>}
                 </div>
               </div>
               <div style={{ fontSize: 13, color: 'rgba(var(--ink),.4)', marginBottom: 16 }}>{s.start} → {s.end}</div>

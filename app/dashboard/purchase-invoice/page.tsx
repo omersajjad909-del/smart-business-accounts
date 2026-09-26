@@ -1050,7 +1050,7 @@ const [searchTerm, setSearchTerm] = useState("");
             <span style={{ color: BORDER }}>/</span>
             <span style={{ color: ACCENT, fontWeight: 600 }}>Purchase Invoice</span>
           </div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: -0.5, color: piQueryMode ? "#facc15" : TEXT, display: "flex", alignItems: "center", gap: 10 }}>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: -0.5, color: piQueryMode ? "var(--tx-facc15, #facc15)" : TEXT, display: "flex", alignItems: "center", gap: 10 }}>
             {piQueryMode ? "🔍 Query Mode" : (
               <>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/></svg>
@@ -1066,7 +1066,7 @@ const [searchTerm, setSearchTerm] = useState("");
               <button onClick={() => piNavTo(piQueryIdx - 1)} disabled={piQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: piQueryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: piQueryIdx===0?"default":"pointer", fontFamily: FONT }}>◀</button>
               <span style={{ fontSize: 12, color: ACCENT, fontWeight: 700, minWidth: 110, textAlign: "center" }}>{piQueryResults[piQueryIdx]?.invoiceNo} · {piQueryIdx+1}/{piQueryResults.length}</span>
               <button onClick={() => piNavTo(piQueryIdx + 1)} disabled={piQueryIdx === piQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: piQueryIdx===piQueryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: piQueryIdx===piQueryResults.length-1?"default":"pointer", fontFamily: FONT }}>▶</button>
-              <button onClick={piExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: FONT }}>✕ Exit</button>
+              <button onClick={piExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: FONT }}>✕ Exit</button>
             </div>
           )}
           <button onClick={piQueryMode ? piExitQuery : piEnterQuery}
@@ -1115,23 +1115,23 @@ const [searchTerm, setSearchTerm] = useState("");
       {piQueryMode && (
         <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 14, padding: isMobile ? "12px 13px" : "22px 28px", marginBottom: 24, marginInline: 28 }}>
           <div style={{ marginBottom: 14 }}>
-            <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+            <span style={{ fontSize: 12, color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&lt;</b>, <b style={{ color: "var(--tx-facc15, #facc15)" }}>&gt;=</b> for date range.</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap: 16, marginBottom: 20 }}>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Invoice #</div>
+              <div style={{ fontSize: 10, color: "rgba(var(--txr-facc15, 250,204,21),.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Invoice #</div>
               <input autoFocus value={piQueryInvNo} onChange={e => setPiQueryInvNo(e.target.value)} placeholder="PI-1 or blank…"
                 style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
             </div>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Date (e.g. &gt;010425)</div>
+              <div style={{ fontSize: 10, color: "rgba(var(--txr-facc15, 250,204,21),.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Date (e.g. &gt;010425)</div>
               <input value={piQueryDate} onChange={e => setPiQueryDate(e.target.value)} placeholder=">010125 or blank…"
                 style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
             </div>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Supplier</div>
+              <div style={{ fontSize: 10, color: "rgba(var(--txr-facc15, 250,204,21),.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Supplier</div>
               <input value={piQueryParty} onChange={e => setPiQueryParty(e.target.value)} placeholder="e.g. ABC Suppliers…"
                 style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
@@ -1179,7 +1179,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     </td>
                     <td style={{ padding: "12px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
                       <button onClick={() => startEdit(inv)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.07)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 6 }}>Edit</button>
-                      <button onClick={() => deleteInvoice(inv.id)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                      <button onClick={() => deleteInvoice(inv.id)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "var(--tx-f87171, #f87171)", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -1503,7 +1503,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                         at all — the form always keeps one row,
                                         but that is the form's business, not
                                         something to refuse the operator with. */}
-                                    <button tabIndex={-1} onClick={() => setRows(rows.length > 1 ? rows.filter((_, idx) => idx !== i) : [emptyRow()])} title="Remove line" style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: 0.6, lineHeight: 1 }}>×</button>
+                                    <button tabIndex={-1} onClick={() => setRows(rows.length > 1 ? rows.filter((_, idx) => idx !== i) : [emptyRow()])} title="Remove line" style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16, padding: 2, opacity: 0.6, lineHeight: 1 }}>×</button>
                                   </td>
                                 </tr>
                               );
@@ -1612,7 +1612,7 @@ const [searchTerm, setSearchTerm] = useState("");
                         <span style={{ fontWeight: 600 }}>{cur} {subtotal.toLocaleString()}</span>
                       </div>
                       {perItemDiscountAmt > 0 && (
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#f87171" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-f87171, #f87171)" }}>
                           <span>Item Discounts</span><span>− {cur} {perItemDiscountAmt.toLocaleString()}</span>
                         </div>
                       )}
@@ -1623,9 +1623,9 @@ const [searchTerm, setSearchTerm] = useState("");
                           <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 74, padding: "3px 6px", fontSize: 12, textAlign: "right" }) }} />
                         </div>
                       </div>
-                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#f87171" }}><span>Discount Amt</span><span>− {cur} {discountAmt.toLocaleString()}</span></div>}
-                      {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#60a5fa" }}><span>Item Tax</span><span>+ {cur} {perItemTaxAmt.toLocaleString()}</span></div>}
-                      {selectedTax && globalTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#60a5fa" }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>+ {cur} {globalTaxAmt.toLocaleString()}</span></div>}
+                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-f87171, #f87171)" }}><span>Discount Amt</span><span>− {cur} {discountAmt.toLocaleString()}</span></div>}
+                      {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-60a5fa, #60a5fa)" }}><span>Item Tax</span><span>+ {cur} {perItemTaxAmt.toLocaleString()}</span></div>}
+                      {selectedTax && globalTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--tx-60a5fa, #60a5fa)" }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>+ {cur} {globalTaxAmt.toLocaleString()}</span></div>}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                         <span style={{ color: MUTED }}>Freight</span>
                         <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 90, padding: "3px 6px", fontSize: 12, textAlign: "right" }) }} />
@@ -1633,7 +1633,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
                       {/* Grand Total */}
                       <div style={{ margin: "4px 0", padding: "10px 12px", borderRadius: 9, background: "linear-gradient(135deg,rgba(37,99,235,.12),rgba(99,102,241,.08))", border: "1px solid rgba(99,102,241,.18)" }}>
-                        <div style={{ fontSize: 10, color: "#818cf8", fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: 0.6, marginBottom: 3 }}>Grand Total</div>
+                        <div style={{ fontSize: 10, color: "var(--tx-818cf8, #818cf8)", fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: 0.6, marginBottom: 3 }}>Grand Total</div>
                         <div style={{ fontSize: 22, fontWeight: 900, color: ACCENT, letterSpacing: -0.5 }}>{cur} {netTotal.toLocaleString()}</div>
                       </div>
 
@@ -1659,7 +1659,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       {/* Payable Amount */}
                       <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1.5px solid ${BORDER}`, paddingTop: 10, fontSize: 14, fontWeight: 800 }}>
                         <span>Payable Amount</span>
-                        <span style={{ color: payableAmount > 0 ? "#f87171" : "#34d399" }}>{cur} {payableAmount.toLocaleString()}</span>
+                        <span style={{ color: payableAmount > 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" }}>{cur} {payableAmount.toLocaleString()}</span>
                       </div>
                     </div>
 

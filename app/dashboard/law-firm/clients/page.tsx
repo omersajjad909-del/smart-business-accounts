@@ -93,9 +93,9 @@ export default function ClientsPage() {
 
       <div style={S.stats}>
         <div style={S.stat}><div style={S.statLabel}>Total Clients</div><div style={S.statVal}>{clients.length}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Active</div><div style={{ ...S.statVal, color: '#34d399' }}>{active}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>New This Month</div><div style={{ ...S.statVal, color: '#818cf8' }}>{thisMonth}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Outstanding Dues</div><div style={{ ...S.statVal, color: '#f87171', fontSize: 22 }}>Rs. {totalOutstanding.toLocaleString()}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Active</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{active}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>New This Month</div><div style={{ ...S.statVal, color: 'var(--tx-818cf8, #818cf8)' }}>{thisMonth}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Outstanding Dues</div><div style={{ ...S.statVal, color: 'var(--tx-f87171, #f87171)', fontSize: 22 }}>Rs. {totalOutstanding.toLocaleString()}</div></div>
       </div>
 
       {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
@@ -117,9 +117,9 @@ export default function ClientsPage() {
                 <td style={S.td}><span style={S.badge(c.type === 'Company' ? '#818cf8' : '#38bdf8')}>{c.type}</span></td>
                 <td style={S.td}><div>{c.phone}</div><div style={{ fontSize: 12, color: 'rgba(var(--ink),.4)' }}>{c.email}</div></td>
                 <td style={S.td}>{c.city}</td>
-                <td style={S.td}><span style={{ color: '#38bdf8', fontWeight: 600 }}>{c.activeCases}</span> <span style={{ color: 'rgba(var(--ink),.4)' }}>/ {c.totalCases}</span></td>
+                <td style={S.td}><span style={{ color: 'var(--tx-38bdf8, #38bdf8)', fontWeight: 600 }}>{c.activeCases}</span> <span style={{ color: 'rgba(var(--ink),.4)' }}>/ {c.totalCases}</span></td>
                 <td style={S.td}>Rs. {c.totalBilled.toLocaleString()}</td>
-                <td style={S.td}><span style={{ color: c.outstanding > 0 ? '#f87171' : '#34d399', fontWeight: 600 }}>{c.outstanding > 0 ? `Rs. ${c.outstanding.toLocaleString()}` : '✓ Clear'}</span></td>
+                <td style={S.td}><span style={{ color: c.outstanding > 0 ? 'var(--tx-f87171, #f87171)' : 'var(--tx-34d399, #34d399)', fontWeight: 600 }}>{c.outstanding > 0 ? `Rs. ${c.outstanding.toLocaleString()}` : '✓ Clear'}</span></td>
                 <td style={S.td}><span style={S.badge(c.status === 'Active' ? '#34d399' : '#6b7280')}>{c.status}</span></td>
               </tr>
             ))}

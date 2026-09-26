@@ -265,12 +265,12 @@ export default function SalesReportPage() {
             </div>
             <div style={{ display:"flex", gap:8 }}>
               <button onClick={() => setShowModal(true)}
-                style={{ padding:"8px 16px", borderRadius:9, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>
+                style={{ padding:"8px 16px", borderRadius:9, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff }}>
                 ⚙ Parameters
               </button>
               {rows.length > 0 && (
                 <button onClick={() => exportToCSV(rows, "sales-report")}
-                  style={{ padding:"8px 14px", borderRadius:9, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", gap:6 }}>
+                  style={{ padding:"8px 14px", borderRadius:9, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", gap:6 }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Export CSV
                 </button>
@@ -280,7 +280,7 @@ export default function SalesReportPage() {
                 🖨 Print
               </button>
               <button onClick={() => router.back()}
-                style={{ width:34, height:34, borderRadius:8, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:16, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                style={{ width:34, height:34, borderRadius:8, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"var(--tx-f87171, #f87171)", fontSize:16, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", justifyContent:"center" }}>
                 ✕
               </button>
             </div>
@@ -289,10 +289,10 @@ export default function SalesReportPage() {
           {/* KPI Cards */}
           <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:12, marginBottom:24 }}>
             {[
-              { label:"Total Invoices",  val: uniqueInvoices,            color:"#818cf8", icon:"🧾" },
-              { label:"Customers",       val: uniqueCustomers,           color:"#38bdf8", icon:"👥" },
-              { label:"Total Qty",       val: fmt(totalQty),             color:"#fbbf24", icon:"📦" },
-              { label:"Total Amount",    val: `Rs ${fmt(totalAmount)}`,  color:"#34d399", icon:"💰" },
+              { label:"Total Invoices",  val: uniqueInvoices,            color:"var(--tx-818cf8, #818cf8)", icon:"🧾" },
+              { label:"Customers",       val: uniqueCustomers,           color:"var(--tx-38bdf8, #38bdf8)", icon:"👥" },
+              { label:"Total Qty",       val: fmt(totalQty),             color:"var(--tx-fbbf24, #fbbf24)", icon:"📦" },
+              { label:"Total Amount",    val: `Rs ${fmt(totalAmount)}`,  color:"var(--tx-34d399, #34d399)", icon:"💰" },
             ].map(k => (
               <div key={k.label} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius:12, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:12 }}>
                 <span style={{ fontSize:20 }}>{k.icon}</span>
@@ -327,17 +327,17 @@ export default function SalesReportPage() {
                   <tr key={i}
                     style={{ borderBottom:"1px solid rgba(var(--ink),.05)", background:i%2===0?"transparent":"rgba(var(--ink),.01)", transition:"background .15s" }}
                     onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.05)")}
-                    onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.01)")}
+                    onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(var(--ink),.01)")}
                   >
                     <td style={{ padding:"10px 12px", fontSize:11, color:"rgba(var(--ink),.25)", fontWeight:600 }}>{i+1}</td>
                     <td style={{ padding:"10px 12px", fontSize:12, color:"rgba(var(--ink),.5)" }}>{r.date}</td>
-                    <td style={{ padding:"10px 12px", fontSize:12, fontWeight:700, color:"#818cf8" }}>#{r.invoiceNo}</td>
+                    <td style={{ padding:"10px 12px", fontSize:12, fontWeight:700, color:"var(--tx-818cf8, #818cf8)" }}>#{r.invoiceNo}</td>
                     <td style={{ padding:"10px 12px", fontSize:12, fontWeight:600, color:"rgba(var(--ink),.8)" }}>{r.customer}</td>
                     <td style={{ padding:"10px 12px", fontSize:12, color:"rgba(var(--ink),.6)" }}>{r.item}</td>
                     <td style={{ padding:"10px 12px", fontSize:11, color:"rgba(var(--ink),.35)", fontWeight:600 }}>{r.unit}</td>
                     <td style={{ padding:"10px 12px", textAlign:"right", fontSize:12, fontWeight:700, color:"rgba(var(--ink),.7)" }}>{fmt(r.qty)}</td>
                     <td style={{ padding:"10px 12px", textAlign:"right", fontSize:12, color:"rgba(var(--ink),.45)" }}>{fmt(r.rate)}</td>
-                    <td style={{ padding:"10px 12px", textAlign:"right", fontSize:13, fontWeight:800, color:"#34d399" }}>{fmt(r.amount)}</td>
+                    <td style={{ padding:"10px 12px", textAlign:"right", fontSize:13, fontWeight:800, color:"var(--tx-34d399, #34d399)" }}>{fmt(r.amount)}</td>
                     <td style={{ padding:"10px 12px", textAlign:"right" }}>
                       <span style={{
                         display:"inline-block", padding:"2px 8px", borderRadius:20, fontSize:10, fontWeight:700,
@@ -354,9 +354,9 @@ export default function SalesReportPage() {
                     <td colSpan={6} style={{ padding:"13px 12px", fontSize:11, fontWeight:800, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em" }}>
                       Grand Total — {rows.length} line item{rows.length!==1?"s":""}
                     </td>
-                    <td style={{ padding:"13px 12px", textAlign:"right", fontSize:15, fontWeight:900, color:"#818cf8" }}>{fmt(totalQty)}</td>
+                    <td style={{ padding:"13px 12px", textAlign:"right", fontSize:15, fontWeight:900, color:"var(--tx-818cf8, #818cf8)" }}>{fmt(totalQty)}</td>
                     <td/>
-                    <td style={{ padding:"13px 12px", textAlign:"right", fontSize:15, fontWeight:900, color:"#34d399" }}>Rs {fmt(totalAmount)}</td>
+                    <td style={{ padding:"13px 12px", textAlign:"right", fontSize:15, fontWeight:900, color:"var(--tx-34d399, #34d399)" }}>Rs {fmt(totalAmount)}</td>
                     <td/>
                   </tr>
                 </tfoot>

@@ -44,9 +44,9 @@ export default function WorkshopWarrantyPage() {
       })}
       summarize={(rows) => [
         { label: "Claims", value: rows.length, color: workshopAccent },
-        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
-        { label: "Claimed", value: rows.filter((row) => String(row.status) === "claimed").length, color: "#60a5fa" },
-        { label: "Expired", value: rows.filter((row) => String(row.status) === "expired").length, color: "#94a3b8" },
+        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Claimed", value: rows.filter((row) => String(row.status) === "claimed").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "Expired", value: rows.filter((row) => String(row.status) === "expired").length, color: "var(--tx-94a3b8, #94a3b8)" },
       ]}
     />
   );

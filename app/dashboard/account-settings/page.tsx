@@ -321,7 +321,7 @@ export default function AccountSettingsPage() {
               <div style={{ fontSize: 14, fontWeight: 700 }}>{name || email || "User"}</div>
               <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>Drag, zoom and reposition to center your face.</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
-                <label style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.12)", color: "#c7d2fe", fontSize: 13, fontWeight: 800, cursor: loading || uploadingPhoto ? "not-allowed" : "pointer", opacity: loading || uploadingPhoto ? 0.65 : 1 }}>
+                <label style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.12)", color: "var(--tx-c7d2fe, #c7d2fe)", fontSize: 13, fontWeight: 800, cursor: loading || uploadingPhoto ? "not-allowed" : "pointer", opacity: loading || uploadingPhoto ? 0.65 : 1 }}>
                   {uploadingPhoto ? "Uploading..." : "Upload Photo"}
                   <input type="file" accept="image/*" style={{ display: "none" }} disabled={loading || uploadingPhoto}
                     onChange={(e) => { setPendingAvatarFile(e.target.files?.[0] || null); e.target.value = ""; }} />
@@ -387,7 +387,7 @@ export default function AccountSettingsPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{email || "—"}</div>
                 </div>
                 <button onClick={() => setEmailStep("form")}
-                  style={{ padding: "10px 16px", borderRadius: 12, border: "1px solid rgba(245,158,11,.3)", background: "rgba(245,158,11,.1)", color: "#fcd34d", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                  style={{ padding: "10px 16px", borderRadius: 12, border: "1px solid rgba(245,158,11,.3)", background: "rgba(245,158,11,.1)", color: "var(--tx-fcd34d, #fcd34d)", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
                   Change Email
                 </button>
               </div>
@@ -423,7 +423,7 @@ export default function AccountSettingsPage() {
             {emailStep === "otp" && (
               <form onSubmit={handleEmailVerify}>
                 <div style={{ display: "grid", gap: 14 }}>
-                  <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>
+                  <div style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 13, color: "var(--tx-c7d2fe, #c7d2fe)", lineHeight: 1.6 }}>
                     A 6-digit OTP has been sent to your <strong>current email</strong> <strong>{maskedNewEmail}</strong>. It will expire in 15 minutes.
                   </div>
                   <label>
@@ -434,7 +434,7 @@ export default function AccountSettingsPage() {
                   </label>
                   <div style={{ display: "flex", gap: 10 }}>
                     <button type="submit" disabled={emailLoading || emailOtp.length !== 6}
-                      style={{ flex: 1, padding: "12px", borderRadius: 12, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.12)", color: "#6ee7b7", fontSize: 14, fontWeight: 800, cursor: "pointer", opacity: emailLoading || emailOtp.length !== 6 ? 0.55 : 1 }}>
+                      style={{ flex: 1, padding: "12px", borderRadius: 12, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.12)", color: "var(--tx-6ee7b7, #6ee7b7)", fontSize: 14, fontWeight: 800, cursor: "pointer", opacity: emailLoading || emailOtp.length !== 6 ? 0.55 : 1 }}>
                       {emailLoading ? "Verifying..." : "Confirm Email Change"}
                     </button>
                     <button type="button" onClick={cancelEmailChange}
@@ -501,7 +501,7 @@ export default function AccountSettingsPage() {
               <p style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 10 }}>
                 Need more detailed password requirements and real-time validation?
               </p>
-              <a href="/dashboard/change-password" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 12px", borderRadius: 10, textDecoration: "none", color: "#c7d2fe", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.2)", fontSize: 12, fontWeight: 700, transition: "all .2s" }}>
+              <a href="/dashboard/change-password" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 12px", borderRadius: 10, textDecoration: "none", color: "var(--tx-c7d2fe, #c7d2fe)", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.2)", fontSize: 12, fontWeight: 700, transition: "all .2s" }}>
                 Go to Detailed Change Password →
               </a>
             </div>
@@ -514,7 +514,7 @@ export default function AccountSettingsPage() {
               Currently under <strong style={{ color: "var(--ink-solid, white)" }}>{companyName || "your company"}</strong>.
               {isAdmin ? " As admin, you can change the company name and logo from company profile." : " Only admins can change the company name and logo."}
             </div>
-            <a href="/dashboard/company-profile" style={{ marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 14px", borderRadius: 12, textDecoration: "none", color: "#c7d2fe", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", fontWeight: 800, fontSize: 13 }}>
+            <a href="/dashboard/company-profile" style={{ marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 14px", borderRadius: 12, textDecoration: "none", color: "var(--tx-c7d2fe, #c7d2fe)", background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", fontWeight: 800, fontSize: 13 }}>
               Open Company Profile
             </a>
           </div>

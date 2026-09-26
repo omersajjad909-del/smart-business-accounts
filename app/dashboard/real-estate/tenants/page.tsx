@@ -40,9 +40,9 @@ const s = {
 };
 
 const statusConfig: Record<string, { label: string; color: string }> = {
-  active: { label: "Active", color: "#10b981" },
-  expired: { label: "Expired", color: "#ef4444" },
-  notice_given: { label: "Notice Given", color: "#f59e0b" },
+  active: { label: "Active", color: "var(--tx-10b981, #10b981)" },
+  expired: { label: "Expired", color: "var(--tx-ef4444, #ef4444)" },
+  notice_given: { label: "Notice Given", color: "var(--tx-f59e0b, #f59e0b)" },
 };
 
 export default function TenantsPage() {
@@ -101,10 +101,10 @@ export default function TenantsPage() {
 
       <div style={s.statsRow}>
         {[
-          { label: "Total Tenants", value: stats.total, color: "#a78bfa" },
-          { label: "Active", value: stats.active, color: "#10b981" },
-          { label: "Expiring in 30 days", value: stats.expiringSoon, color: "#f59e0b" },
-          { label: "Deposit Held", value: `Rs. ${(stats.depositHeld / 1000).toFixed(0)}K`, color: "#60a5fa" },
+          { label: "Total Tenants", value: stats.total, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active", value: stats.active, color: "var(--tx-10b981, #10b981)" },
+          { label: "Expiring in 30 days", value: stats.expiringSoon, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Deposit Held", value: `Rs. ${(stats.depositHeld / 1000).toFixed(0)}K`, color: "var(--tx-60a5fa, #60a5fa)" },
         ].map(st => (
           <div key={st.label} style={s.card}>
             <div style={s.cardLabel}>{st.label}</div>
@@ -127,7 +127,7 @@ export default function TenantsPage() {
           )}
 
           {tenants.map(t => {
-            const cfg = statusConfig[t.status] || { label: t.status, color: "#a78bfa" };
+            const cfg = statusConfig[t.status] || { label: t.status, color: "var(--tx-a78bfa, #a78bfa)" };
             return (
               <div key={t.id} className="tenant-card" style={s.tCard(selected === t.id)} onClick={() => setSelected(t.id === selected ? null : t.id)}>
                 <div style={s.tTop}>
@@ -152,7 +152,7 @@ export default function TenantsPage() {
             <div style={s.detailPanel}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                 <div style={s.dpTitle}>Tenant Details</div>
-                <span style={s.badge((statusConfig[selectedTenant.status] || { color: "#a78bfa" }).color)}>{(statusConfig[selectedTenant.status] || { label: selectedTenant.status }).label}</span>
+                <span style={s.badge((statusConfig[selectedTenant.status] || { color: "var(--tx-a78bfa, #a78bfa)" }).color)}>{(statusConfig[selectedTenant.status] || { label: selectedTenant.status }).label}</span>
               </div>
               {[
                 { label: "Full Name", value: selectedTenant.name },
@@ -172,8 +172,8 @@ export default function TenantsPage() {
                 </div>
               ))}
               <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-                <button style={{ flex: 1, background: "rgba(16,185,129,.12)", color: "#10b981", border: "1px solid rgba(16,185,129,.3)", borderRadius: 8, padding: "9px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Send Receipt</button>
-                <button style={{ flex: 1, background: "rgba(239,68,68,.12)", color: "#ef4444", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, padding: "9px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Notice</button>
+                <button style={{ flex: 1, background: "rgba(16,185,129,.12)", color: "var(--tx-10b981, #10b981)", border: "1px solid rgba(16,185,129,.3)", borderRadius: 8, padding: "9px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Send Receipt</button>
+                <button style={{ flex: 1, background: "rgba(239,68,68,.12)", color: "var(--tx-ef4444, #ef4444)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, padding: "9px 0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Notice</button>
               </div>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function TenantsPage() {
         <div style={s.overlay} onClick={() => setShowModal(false)}>
           <div style={s.modal} onClick={e => e.stopPropagation()}>
             <div style={s.mTitle}>Add New Tenant</div>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={s.formGrid}>
               <div style={{ gridColumn: "1/-1" }}><label style={s.lbl}>Full Name</label><input style={s.inp} placeholder="Muhammad Ali Khan" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} /></div>
               <div><label style={s.lbl}>Phone</label><input style={s.inp} placeholder="0300-0000000" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} /></div>

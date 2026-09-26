@@ -3,9 +3,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const ngoFont = "'Outfit','Inter',sans-serif";
-export const ngoBg = "rgba(255,255,255,.03)";
-export const ngoBorder = "rgba(255,255,255,.07)";
-export const ngoMuted = "rgba(255,255,255,.58)";
+export const ngoBg = "rgba(var(--ink),.03)";
+export const ngoBorder = "rgba(var(--ink),.07)";
+export const ngoMuted = "rgba(var(--ink),.58)";
 
 export type DonorRow = {
   id: string;

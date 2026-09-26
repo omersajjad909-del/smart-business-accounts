@@ -40,7 +40,7 @@ export default function SalesRegionPage() {
           <div style={{ fontSize: 28 }}>🏆</div>
           <div>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Top Region</div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: "#818cf8" }}>{topRegion.region}</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)" }}>{topRegion.region}</div>
             <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{cur} {fmt(topRegion.totalSales)} in sales · {topRegion.invoiceCount} invoices</div>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function SalesRegionPage() {
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)", fontWeight: 700 }}>{i + 1}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>📍 {r.region}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700 }}>{cur} {fmt(r.totalSales)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{cur} {fmt(r.totalProfit)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-34d399, #34d399)" }}>{cur} {fmt(r.totalProfit)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.marginPct.toFixed(1)}%</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.invoiceCount}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.customerCount}</td>

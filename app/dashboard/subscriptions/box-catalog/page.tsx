@@ -116,7 +116,7 @@ export default function SubscriptionBoxCatalogPage() {
                     <div>
                       <div style={{ fontSize: 16, fontWeight: 800 }}>{box.title}</div>
                       <div style={{ fontSize: 12, color: saasMuted, marginTop: 6 }}>{String(box.data?.planName || "-")} | ${(Number(box.amount || 0)).toLocaleString()}</div>
-                      <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{items.join(" • ") || "No items listed"}</div>
+                      <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 8 }}>{items.join(" • ") || "No items listed"}</div>
                     </div>
                     <span style={{ padding: isMobile ? "8px 8px" : "4px 10px", borderRadius: 999, background: `${saasStatusColor(box.status)}20`, color: saasStatusColor(box.status), fontSize: 12, fontWeight: 700 }}>{box.status}</span>
                   </div>

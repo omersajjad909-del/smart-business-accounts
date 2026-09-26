@@ -111,12 +111,12 @@ function StatCard({
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; color: string; bg: string }> = {
-    PRESENT:  { label: "Present",  color: "#16a34a", bg: "#dcfce7" },
+    PRESENT:  { label: "Present",  color: "var(--tx-16a34a, #16a34a)", bg: "#dcfce7" },
     ABSENT:   { label: "Absent",   color: "#dc2626", bg: "#fee2e2" },
     LATE:     { label: "Late",     color: "#7c3aed", bg: "#ede9fe" },
     LEAVE:    { label: "On Leave", color: "#2563eb", bg: "#dbeafe" },
-    HALF_DAY: { label: "Half Day", color: "#ea580c", bg: "#ffedd5" },
-    PAID:     { label: "Paid",     color: "#16a34a", bg: "#dcfce7" },
+    HALF_DAY: { label: "Half Day", color: "var(--tx-ea580c, #ea580c)", bg: "#ffedd5" },
+    PAID:     { label: "Paid",     color: "var(--tx-16a34a, #16a34a)", bg: "#dcfce7" },
     PENDING:  { label: "Pending",  color: "#b45309", bg: "#fef3c7" },
     PARTIAL:  { label: "Partial",  color: "#2563eb", bg: "#dbeafe" },
   };
@@ -338,10 +338,10 @@ export default function HrPayrollDashboard() {
 
   // ── Quick links ───────────────────────────────────────────────────────────
   const links = [
-    { href: "/dashboard/employees",  label: "Employees",  icon: "👥", color: "#6366f1" },
-    { href: "/dashboard/payroll",    label: "Payroll",    icon: "💰", color: "#22c55e" },
-    { href: "/dashboard/attendance", label: "Attendance", icon: "📅", color: "#3b82f6" },
-    { href: "/dashboard/advance",    label: "Advances",   icon: "💳", color: "#f59e0b" },
+    { href: "/dashboard/employees",  label: "Employees",  icon: "👥", color: "var(--tx-6366f1, #6366f1)" },
+    { href: "/dashboard/payroll",    label: "Payroll",    icon: "💰", color: "var(--tx-22c55e, #22c55e)" },
+    { href: "/dashboard/attendance", label: "Attendance", icon: "📅", color: "var(--tx-3b82f6, #3b82f6)" },
+    { href: "/dashboard/advance",    label: "Advances",   icon: "💳", color: "var(--tx-f59e0b, #f59e0b)" },
   ];
 
   return (

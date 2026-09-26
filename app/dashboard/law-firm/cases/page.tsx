@@ -108,9 +108,9 @@ export default function CasesPage() {
       </div>
 
       <div style={S.stats}>
-        <div style={S.stat}><div style={S.statLabel}>Active Cases</div><div style={{ ...S.statVal, color: '#34d399' }}>{active}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Hearings Next 7 Days</div><div style={{ ...S.statVal, color: '#fbbf24' }}>{hearingsThisWeek}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Won This Year</div><div style={{ ...S.statVal, color: '#818cf8' }}>{won}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Active Cases</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{active}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Hearings Next 7 Days</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)' }}>{hearingsThisWeek}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Won This Year</div><div style={{ ...S.statVal, color: 'var(--tx-818cf8, #818cf8)' }}>{won}</div></div>
         <div style={S.stat}><div style={S.statLabel}>Total Clients</div><div style={S.statVal}>{new Set(cases.map(c => c.client)).size}</div></div>
       </div>
 
@@ -147,7 +147,7 @@ export default function CasesPage() {
               </div>
               {days !== null && (
                 <div style={{ marginTop: 12, padding: '10px 14px', background: days <= 3 ? 'rgba(248,113,113,.1)' : 'rgba(251,191,36,.08)', borderRadius: 8, fontSize: 13 }}>
-                  ⚖️ Next hearing: <strong>{c.nextHearing}</strong> — <span style={{ color: days <= 3 ? '#f87171' : '#fbbf24' }}>{days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Today!' : `in ${days} days`}</span>
+                  ⚖️ Next hearing: <strong>{c.nextHearing}</strong> — <span style={{ color: days <= 3 ? 'var(--tx-f87171, #f87171)' : 'var(--tx-fbbf24, #fbbf24)' }}>{days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Today!' : `in ${days} days`}</span>
                 </div>
               )}
             </div>

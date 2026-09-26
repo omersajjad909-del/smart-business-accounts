@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const ecommerceFont = "'Outfit','Inter',sans-serif";
-export const ecommerceBg = "rgba(255,255,255,.03)";
-export const ecommerceBorder = "rgba(255,255,255,.07)";
-export const ecommerceMuted = "rgba(255,255,255,.5)";
+export const ecommerceBg = "rgba(var(--ink),.03)";
+export const ecommerceBorder = "rgba(var(--ink),.07)";
+export const ecommerceMuted = "rgba(var(--ink),.5)";
 
 export const platformOptions = ["Website", "Daraz", "Amazon", "Instagram", "Facebook", "TikTok Shop", "WhatsApp"];
 export const returnReasons = ["Damaged", "Wrong Item", "Quality Issue", "Changed Mind", "Size Issue"];

@@ -84,10 +84,10 @@ export default function TradingOrderDeskPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Quotations", value: quotations.length, color: "#38bdf8" },
-          { label: "Accepted Quotes", value: acceptedQuotations, color: "#34d399" },
-          { label: "Delivered Challans", value: deliveredChallans, color: "#f59e0b" },
-          { label: "Sale Return Value", value: formatMoney(returnedValue), color: "#f87171" },
+          { label: "Quotations", value: quotations.length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Accepted Quotes", value: acceptedQuotations, color: "var(--tx-34d399, #34d399)" },
+          { label: "Delivered Challans", value: deliveredChallans, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Sale Return Value", value: formatMoney(returnedValue), color: "var(--tx-f87171, #f87171)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
@@ -114,7 +114,7 @@ export default function TradingOrderDeskPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customerName || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.vehicleNo || row.driverName || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.total)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{formatMoney(row.total)}</td>
                 </tr>
               ))}
               {recentSales.length === 0 && (
@@ -134,7 +134,7 @@ export default function TradingOrderDeskPage() {
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
                     <span style={{ fontWeight: 700 }}>{row.quotationNo}</span>
-                    <span style={{ color: "#38bdf8", fontSize: 11, textTransform: "uppercase" }}>{row.status || "Draft"}</span>
+                    <span style={{ color: "var(--tx-38bdf8, #38bdf8)", fontSize: 11, textTransform: "uppercase" }}>{row.status || "Draft"}</span>
                   </div>
                   <div style={{ fontSize: 12, color: tradingMuted }}>{row.customer?.name || row.customerName || "Walk-in customer"}</div>
                   <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>{formatDate(row.date)}</div>
@@ -149,11 +149,11 @@ export default function TradingOrderDeskPage() {
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.16)" }}>
                 <div style={{ fontSize: 12, color: tradingMuted }}>Delivery Challans</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#f59e0b" }}>{challans.length}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{challans.length}</div>
               </div>
               <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.16)" }}>
                 <div style={{ fontSize: 12, color: tradingMuted }}>Sale Returns</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: "#f87171" }}>{saleReturns.length}</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>{saleReturns.length}</div>
               </div>
             </div>
           </div>

@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const itFont = "'Outfit','Inter',sans-serif";
-export const itBg = "rgba(255,255,255,.03)";
-export const itBorder = "rgba(255,255,255,.07)";
-export const itMuted = "rgba(255,255,255,.58)";
+export const itBg = "rgba(var(--ink),.03)";
+export const itBorder = "rgba(var(--ink),.07)";
+export const itMuted = "rgba(var(--ink),.58)";
 
 export type ItProject = {
   id: string;

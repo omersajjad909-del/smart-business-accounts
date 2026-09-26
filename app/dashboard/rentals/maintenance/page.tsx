@@ -44,9 +44,9 @@ export default function RentalsMaintenancePage() {
       })}
       summarize={(rows) => [
         { label: "Maintenance", value: rows.length, color: rentalsAccent },
-        { label: "Scheduled", value: rows.filter((row) => String(row.status) === "scheduled").length, color: "#60a5fa" },
-        { label: "In Progress", value: rows.filter((row) => String(row.status) === "in_progress").length, color: "#fbbf24" },
-        { label: "Done", value: rows.filter((row) => String(row.status) === "done").length, color: "#34d399" },
+        { label: "Scheduled", value: rows.filter((row) => String(row.status) === "scheduled").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "In Progress", value: rows.filter((row) => String(row.status) === "in_progress").length, color: "var(--tx-fbbf24, #fbbf24)" },
+        { label: "Done", value: rows.filter((row) => String(row.status) === "done").length, color: "var(--tx-34d399, #34d399)" },
       ]}
     />
   );

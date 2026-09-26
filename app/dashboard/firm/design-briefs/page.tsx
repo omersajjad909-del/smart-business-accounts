@@ -109,9 +109,9 @@ export default function DesignBriefsPage() {
       </div>
       <div style={S.kpiGrid}>
         <div style={S.kpi}><div style={S.kpiLabel}>Total Briefs</div><div style={S.kpiVal}>{kpis.total}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Draft</div><div style={{ ...S.kpiVal, color: "#94a3b8" }}>{kpis.draft}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Revision</div><div style={{ ...S.kpiVal, color: "#f59e0b" }}>{kpis.revision}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Approved</div><div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.approved}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Draft</div><div style={{ ...S.kpiVal, color: "var(--tx-94a3b8, #94a3b8)" }}>{kpis.draft}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Revision</div><div style={{ ...S.kpiVal, color: "var(--tx-f59e0b, #f59e0b)" }}>{kpis.revision}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Approved</div><div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.approved}</div></div>
       </div>
       <div style={S.panel}>
         {loading ? <div style={S.loading}>Loading briefs…</div> : (

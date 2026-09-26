@@ -80,12 +80,12 @@ export default function TradingConversionCenterPage() {
   const unchallanedSales = Math.max(salesInvoices.length - challans.length, 0);
 
   const metrics = [
-    { label: "Open Quotations", value: quotationOpen, color: "#38bdf8" },
-    { label: "Accepted Quotes", value: quotationAccepted, color: "#34d399" },
-    { label: "Pending POs", value: pendingPos.length, color: "#f59e0b" },
-    { label: "GRN Pending PI", value: grnWithoutInvoice.length, color: "#a78bfa" },
-    { label: "Pending Dispatch", value: pendingDispatch.length, color: "#f97316" },
-    { label: "Sales Missing Challan", value: unchallanedSales, color: "#f87171" },
+    { label: "Open Quotations", value: quotationOpen, color: "var(--tx-38bdf8, #38bdf8)" },
+    { label: "Accepted Quotes", value: quotationAccepted, color: "var(--tx-34d399, #34d399)" },
+    { label: "Pending POs", value: pendingPos.length, color: "var(--tx-f59e0b, #f59e0b)" },
+    { label: "GRN Pending PI", value: grnWithoutInvoice.length, color: "var(--tx-a78bfa, #a78bfa)" },
+    { label: "Pending Dispatch", value: pendingDispatch.length, color: "var(--tx-f97316, #f97316)" },
+    { label: "Sales Missing Challan", value: unchallanedSales, color: "var(--tx-f87171, #f87171)" },
   ];
 
   return (
@@ -124,7 +124,7 @@ export default function TradingConversionCenterPage() {
               <div key={entry.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                   <span style={{ fontWeight: 700 }}>{entry.quotationNo}</span>
-                  <span style={{ color: normalizeStatus(entry.status) === "ACCEPTED" ? "#34d399" : "#38bdf8", fontSize: 11, textTransform: "uppercase" }}>{entry.status || "Draft"}</span>
+                  <span style={{ color: normalizeStatus(entry.status) === "ACCEPTED" ? "var(--tx-34d399, #34d399)" : "var(--tx-38bdf8, #38bdf8)", fontSize: 11, textTransform: "uppercase" }}>{entry.status || "Draft"}</span>
                 </div>
                 <div style={{ fontSize: 12, color: tradingMuted, marginTop: 4 }}>{entry.customer?.name || entry.customerName || "Walk-in customer"}</div>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{formatDate(entry.date)} · {formatMoney(entry.total)}</div>
@@ -149,7 +149,7 @@ export default function TradingConversionCenterPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{entry.poNo}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{entry.supplier?.name || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(entry.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#f59e0b", fontWeight: 700 }}>{formatMoney(sumLineAmount(entry.items))}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{formatMoney(sumLineAmount(entry.items))}</td>
                 </tr>
               ))}
               {pendingPos.length === 0 && (

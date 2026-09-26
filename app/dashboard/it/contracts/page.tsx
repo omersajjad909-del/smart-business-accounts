@@ -129,10 +129,10 @@ export default function ContractsPage() {
       </div>
 
       <div style={S.stats}>
-        <div style={S.stat}><div style={S.statLabel}>Active Contracts</div><div style={{ ...S.statVal, color: '#34d399' }}>{active}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Expiring in 30 Days</div><div style={{ ...S.statVal, color: '#fbbf24' }}>{expiring}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Active Contracts</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{active}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Expiring in 30 Days</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)' }}>{expiring}</div></div>
         <div style={S.stat}><div style={S.statLabel}>Total Contract Value</div><div style={{ ...S.statVal, color: '#7c3aed', fontSize: 22 }}>Rs. {(totalValue / 100000).toFixed(1)}L</div></div>
-        <div style={S.stat}><div style={S.statLabel}>MRR from Retainers</div><div style={{ ...S.statVal, color: '#38bdf8', fontSize: 22 }}>Rs. {mrr.toLocaleString()}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>MRR from Retainers</div><div style={{ ...S.statVal, color: 'var(--tx-38bdf8, #38bdf8)', fontSize: 22 }}>Rs. {mrr.toLocaleString()}</div></div>
       </div>
 
       <div style={S.tabs}>
@@ -165,7 +165,7 @@ export default function ContractsPage() {
                 <div style={S.infoItem}><div style={S.infoLabel}>Value</div><div style={S.infoVal}>Rs. {(c.value / 1000).toFixed(0)}K</div></div>
                 <div style={S.infoItem}><div style={S.infoLabel}>Payment</div><div style={S.infoVal}>{c.payment}</div></div>
                 <div style={S.infoItem}><div style={S.infoLabel}>Start</div><div style={S.infoVal}>{c.start}</div></div>
-                <div style={S.infoItem}><div style={S.infoLabel}>End / Days Left</div><div style={{ ...S.infoVal, color: c.daysLeft <= 14 ? '#f87171' : c.daysLeft <= 30 ? '#fbbf24' : '#fff' }}>{c.end} ({c.daysLeft}d)</div></div>
+                <div style={S.infoItem}><div style={S.infoLabel}>End / Days Left</div><div style={{ ...S.infoVal, color: c.daysLeft <= 14 ? 'var(--tx-f87171, #f87171)' : c.daysLeft <= 30 ? 'var(--tx-fbbf24, #fbbf24)' : '#fff' }}>{c.end} ({c.daysLeft}d)</div></div>
               </div>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(var(--ink),.5)', marginBottom: 6 }}>
@@ -174,8 +174,8 @@ export default function ContractsPage() {
                 <div style={S.progressBar}><div style={S.progressFill(pct, pct >= 90 ? '#f87171' : '#7c3aed')} /></div>
               </div>
               <div style={S.actRow}>
-                {(c.status === 'Expiring' || c.status === 'Expired') && <button style={{ ...S.actBtn, color: '#34d399' }} onClick={() => renew(c.id, c.end)}>Renew</button>}
-                {c.status === 'Active' && <button style={{ ...S.actBtn, color: '#f87171' }} onClick={() => terminate(c.id)}>Terminate</button>}
+                {(c.status === 'Expiring' || c.status === 'Expired') && <button style={{ ...S.actBtn, color: 'var(--tx-34d399, #34d399)' }} onClick={() => renew(c.id, c.end)}>Renew</button>}
+                {c.status === 'Active' && <button style={{ ...S.actBtn, color: 'var(--tx-f87171, #f87171)' }} onClick={() => terminate(c.id)}>Terminate</button>}
                 <button style={S.actBtn}>View Details</button>
               </div>
             </div>

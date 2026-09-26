@@ -137,10 +137,10 @@ export default function EcommerceOrdersPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Orders", value: orders.length, color: "#818cf8" },
-          { label: "Pending / Processing", value: orders.filter((order) => order.status === "pending" || order.status === "processing").length, color: "#f59e0b" },
-          { label: "Shipped", value: orders.filter((order) => order.status === "shipped").length, color: "#60a5fa" },
-          { label: "Delivered Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#34d399" },
+          { label: "Total Orders", value: orders.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Pending / Processing", value: orders.filter((order) => order.status === "pending" || order.status === "processing").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Shipped", value: orders.filter((order) => order.status === "shipped").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Delivered Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -150,7 +150,7 @@ export default function EcommerceOrdersPage() {
       </div>
 
       {error && (
-        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "#fca5a5", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
+        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -180,7 +180,7 @@ export default function EcommerceOrdersPage() {
                     <div style={{ fontSize: 11, color: ecommerceMuted, maxWidth: 260, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{order.address}</div>
                   </td>
                   <td style={tdStyle}>{order.quantity}</td>
-                  <td style={{ ...tdStyle, color: "#34d399", fontWeight: 800 }}>Rs. {order.amount.toLocaleString()}</td>
+                  <td style={{ ...tdStyle, color: "var(--tx-34d399, #34d399)", fontWeight: 800 }}>Rs. {order.amount.toLocaleString()}</td>
                   <td style={tdStyle}>{order.platform}</td>
                   <td style={tdStyle}>{fmtDate(order.createdAt)}</td>
                   <td style={tdStyle}>
@@ -196,7 +196,7 @@ export default function EcommerceOrdersPage() {
                         </button>
                       )}
                       {!["cancelled", "delivered"].includes(order.status) && (
-                        <button onClick={() => moveOrder(order.id, "cancelled")} style={{ ...actionButton, color: "#f87171", borderColor: "rgba(248,113,113,.35)" }}>
+                        <button onClick={() => moveOrder(order.id, "cancelled")} style={{ ...actionButton, color: "var(--tx-f87171, #f87171)", borderColor: "rgba(248,113,113,.35)" }}>
                           cancel
                         </button>
                       )}

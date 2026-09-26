@@ -44,7 +44,7 @@ const S = {
   cancelBtn: { padding: "9px 20px", borderRadius: 9, border: "1px solid var(--border)", background: "transparent", color: "var(--text-primary)", fontSize: 14, cursor: "pointer", fontFamily: "'Outfit','Inter',sans-serif" } as React.CSSProperties,
   saveBtn: { padding: "9px 20px", borderRadius: 9, border: "none", background: "#6366f1", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Outfit','Inter',sans-serif" } as React.CSSProperties,
   editBtn: { marginRight: 8, padding: "5px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "transparent", color: "var(--text-primary)", fontSize: 12, cursor: "pointer" } as React.CSSProperties,
-  delBtn: { padding: "5px 12px", borderRadius: 7, border: "1px solid #ef444455", background: "transparent", color: "#ef4444", fontSize: 12, cursor: "pointer" } as React.CSSProperties,
+  delBtn: { padding: "5px 12px", borderRadius: 7, border: "1px solid #ef444455", background: "transparent", color: "var(--tx-ef4444, #ef4444)", fontSize: 12, cursor: "pointer" } as React.CSSProperties,
 };
 
 function badge(label: string, colorMap: Record<string, string>) {
@@ -140,10 +140,10 @@ export default function MaintenanceJobsPage() {
       {/* KPIs */}
       <div style={S.kpiGrid}>
         {[
-          { label: "Total Jobs",       value: kpis.total,          color: "#6366f1" },
-          { label: "Pending",          value: kpis.pending,        color: "#f59e0b" },
-          { label: "In-Progress",      value: kpis.inProgress,     color: "#3b82f6" },
-          { label: "Completed Today",  value: kpis.completedToday, color: "#22c55e" },
+          { label: "Total Jobs",       value: kpis.total,          color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Pending",          value: kpis.pending,        color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "In-Progress",      value: kpis.inProgress,     color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Completed Today",  value: kpis.completedToday, color: "var(--tx-22c55e, #22c55e)" },
         ].map(k => (
           <div key={k.label} style={S.kpiCard}>
             <div style={S.kpiLabel}>{k.label}</div>
@@ -172,7 +172,7 @@ export default function MaintenanceJobsPage() {
               <tr><td colSpan={9} style={{ ...S.td, textAlign: "center", color: "var(--text-muted)", padding: 40 }}>No jobs found. Click "+ New Job" to get started.</td></tr>
             ) : filtered.map(r => (
               <tr key={r.id}>
-                <td style={{ ...S.td, fontWeight: 600, color: "#6366f1" }}>{String(r.data.jobNo || "—")}</td>
+                <td style={{ ...S.td, fontWeight: 600, color: "var(--tx-6366f1, #6366f1)" }}>{String(r.data.jobNo || "—")}</td>
                 <td style={S.td}>{String(r.data.client || "—")}</td>
                 <td style={{ ...S.td, color: "var(--text-muted)" }}>{String(r.data.assetType || "—")}</td>
                 <td style={{ ...S.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{String(r.data.issue || "—")}</td>

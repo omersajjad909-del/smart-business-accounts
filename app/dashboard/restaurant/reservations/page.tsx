@@ -177,10 +177,10 @@ export default function RestaurantReservationsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Booked", value: reservations.filter((row) => row.status === "booked").length, color: "#f59e0b" },
-          { label: "Confirmed", value: reservations.filter((row) => row.status === "confirmed").length, color: "#38bdf8" },
-          { label: "Arrived", value: reservations.filter((row) => row.status === "arrived").length, color: "#34d399" },
-          { label: "Cancelled", value: reservations.filter((row) => row.status === "cancelled").length, color: "#ef4444" },
+          { label: "Booked", value: reservations.filter((row) => row.status === "booked").length, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Confirmed", value: reservations.filter((row) => row.status === "confirmed").length, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Arrived", value: reservations.filter((row) => row.status === "arrived").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Cancelled", value: reservations.filter((row) => row.status === "cancelled").length, color: "var(--tx-ef4444, #ef4444)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8 }}>{card.label}</div>
@@ -206,13 +206,13 @@ export default function RestaurantReservationsPage() {
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{reservation.tableRef}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{reservation.guests}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{reservation.reservationDate || "-"}</td>
-                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "uppercase", fontSize: 11, fontWeight: 700, color: "#fca5a5" }}>{reservation.status}</td>
+                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "uppercase", fontSize: 11, fontWeight: 700, color: "var(--tx-fca5a5, #fca5a5)" }}>{reservation.status}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={() => editReservation(reservation)} style={{ padding: "6px 10px", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#c7d2fe", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Edit</button>
                   {reservation.status === "booked" && <button onClick={() => void moveReservation(reservation, "confirmed")} style={{ padding: "6px 10px", background: "rgba(56,189,248,.15)", border: "1px solid rgba(56,189,248,.3)", color: "#38bdf8", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Confirm</button>}
                   {reservation.status === "confirmed" && <button onClick={() => void moveReservation(reservation, "arrived")} style={{ padding: "6px 10px", background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Arrived</button>}
-                  {reservation.status !== "cancelled" && reservation.status !== "arrived" && <button onClick={() => void moveReservation(reservation, "cancelled")} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Cancel</button>}
-                  <button onClick={() => void removeReservation(reservation)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Delete</button>
+                  {reservation.status !== "cancelled" && reservation.status !== "arrived" && <button onClick={() => void moveReservation(reservation, "cancelled")} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Cancel</button>}
+                  <button onClick={() => void removeReservation(reservation)} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -229,7 +229,7 @@ export default function RestaurantReservationsPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 40 }}>
           <div style={{ width: 520, background: "var(--dk-161b27, #161b27)", border: `1px solid ${restaurantBorder}`, borderRadius: 16, padding: 28 }}>
             <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>{editingId ? "Edit Reservation" : "New Reservation"}</h2>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
+            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Guest Name</label>

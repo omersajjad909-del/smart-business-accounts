@@ -122,9 +122,9 @@ export default function RetailBranchesPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Branches", val: items.length,                           color: "#818cf8" },
-          { label: "Active",         val: items.filter(b => b.isActive).length,   color: "#10b981" },
-          { label: "Cities",         val: cities,                                  color: "#f59e0b" },
+          { label: "Total Branches", val: items.length,                           color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",         val: items.filter(b => b.isActive).length,   color: "var(--tx-10b981, #10b981)" },
+          { label: "Cities",         val: cities,                                  color: "var(--tx-f59e0b, #f59e0b)" },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{kpi.label}</div>
@@ -158,7 +158,7 @@ export default function RetailBranchesPage() {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{b.name}</div>
-                  <div style={{ fontSize: 11, color: "#818cf8", fontWeight: 600 }}>{b.code}</div>
+                  <div style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>{b.code}</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 12, color: "var(--text-muted)", marginBottom: 14 }}>
@@ -166,13 +166,13 @@ export default function RetailBranchesPage() {
                 {b.phone      && <span>📞 {b.phone}</span>}
                 {b.managerName && <span>👤 {b.managerName}</span>}
                 {b.address    && <span>🏢 {b.address}</span>}
-                <span style={{ color: b.isActive ? "#10b981" : "#f87171", fontWeight: 600 }}>
+                <span style={{ color: b.isActive ? "var(--tx-10b981, #10b981)" : "var(--tx-f87171, #f87171)", fontWeight: 600 }}>
                   {b.isActive ? "● Active" : "● Inactive"}
                 </span>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => openEdit(b)} style={{ flex: 1, background: "rgba(99,102,241,.1)", color: "#818cf8", border: "none", borderRadius: 8, padding: "8px 0", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Edit</button>
-                <button onClick={() => remove(b.id)} disabled={deleting === b.id} style={{ flex: 1, background: "rgba(239,68,68,.08)", color: "#ef4444", border: "none", borderRadius: 8, padding: "8px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: deleting === b.id ? .5 : 1 }}>
+                <button onClick={() => openEdit(b)} style={{ flex: 1, background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)", border: "none", borderRadius: 8, padding: "8px 0", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Edit</button>
+                <button onClick={() => remove(b.id)} disabled={deleting === b.id} style={{ flex: 1, background: "rgba(239,68,68,.08)", color: "var(--tx-ef4444, #ef4444)", border: "none", borderRadius: 8, padding: "8px 0", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: deleting === b.id ? .5 : 1 }}>
                   {deleting === b.id ? "..." : "Delete"}
                 </button>
               </div>

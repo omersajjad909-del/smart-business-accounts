@@ -149,7 +149,7 @@ export default function DemoSessionTimer() {
         <div
           onClick={() => !clearing && setConfirmClear(false)}
           style={{
-            position: "fixed", inset: 0, zIndex: 9999, background: "rgba(4,6,20,.75)",
+            position: "fixed", inset: 0, zIndex: 9999, background: "rgba(var(--dkr-040614, 4,6,20),0.75)",
             backdropFilter: "blur(6px)", display: "flex", alignItems: "center",
             justifyContent: "center", padding: 20, fontFamily: FONT,
           }}
@@ -169,7 +169,7 @@ export default function DemoSessionTimer() {
               This cannot be undone.
             </div>
             {clearError && (
-              <div style={{ fontSize: 12.5, color: "#fca5a5", marginBottom: 14 }}>{clearError}</div>
+              <div style={{ fontSize: 12.5, color: "var(--tx-fca5a5, #fca5a5)", marginBottom: 14 }}>{clearError}</div>
             )}
             <div style={{ display: "flex", gap: 10 }}>
               <button
@@ -205,7 +205,7 @@ export default function DemoSessionTimer() {
         <div
           onClick={() => !ending && setConfirmEnd(false)}
           style={{
-            position: "fixed", inset: 0, zIndex: 9999, background: "rgba(4,6,20,.75)",
+            position: "fixed", inset: 0, zIndex: 9999, background: "rgba(var(--dkr-040614, 4,6,20),0.75)",
             backdropFilter: "blur(6px)", display: "flex", alignItems: "center",
             justifyContent: "center", padding: 20, fontFamily: FONT,
           }}

@@ -32,13 +32,13 @@ type OverviewState = {
 };
 
 const quickLinks = [
-  { label: "Order Desk", href: "/dashboard/trading/order-desk", color: "#38bdf8" },
-  { label: "Procurement", href: "/dashboard/trading/procurement", color: "#34d399" },
-  { label: "Stock Control", href: "/dashboard/trading/stock-control", color: "#f59e0b" },
-  { label: "Outstandings", href: "/dashboard/trading/outstandings", color: "#a78bfa" },
-  { label: "Dispatch Board", href: "/dashboard/trading/dispatch-board", color: "#f97316" },
-  { label: "Conversion Center", href: "/dashboard/trading/conversion-center", color: "#22c55e" },
-  { label: "Trading Analytics", href: "/dashboard/trading/analytics", color: "#fb7185" },
+  { label: "Order Desk", href: "/dashboard/trading/order-desk", color: "var(--tx-38bdf8, #38bdf8)" },
+  { label: "Procurement", href: "/dashboard/trading/procurement", color: "var(--tx-34d399, #34d399)" },
+  { label: "Stock Control", href: "/dashboard/trading/stock-control", color: "var(--tx-f59e0b, #f59e0b)" },
+  { label: "Outstandings", href: "/dashboard/trading/outstandings", color: "var(--tx-a78bfa, #a78bfa)" },
+  { label: "Dispatch Board", href: "/dashboard/trading/dispatch-board", color: "var(--tx-f97316, #f97316)" },
+  { label: "Conversion Center", href: "/dashboard/trading/conversion-center", color: "var(--tx-22c55e, #22c55e)" },
+  { label: "Trading Analytics", href: "/dashboard/trading/analytics", color: "var(--tx-fb7185, #fb7185)" },
 ];
 
 export default function TradingOverviewPage() {
@@ -108,7 +108,7 @@ export default function TradingOverviewPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", marginBottom: 26 }}>
         <div>
-          <div style={{ fontSize: 12, letterSpacing: ".12em", color: "rgba(56,189,248,.8)", textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>
+          <div style={{ fontSize: 12, letterSpacing: ".12em", color: "rgba(var(--txr-38bdf8, 56,189,248),.8)", textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>
             Trading Control Center
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px" }}>Trading / Wholesale Workspace</h1>
@@ -138,11 +138,11 @@ export default function TradingOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>Commercial Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 10 }}>
             {[
-              { label: "Quotations", value: data.quotations.length, sub: "Sales pipeline", color: "#38bdf8" },
-              { label: "Sales Invoices", value: data.salesInvoices.length, sub: "Booked orders", color: "#34d399" },
-              { label: "Purchase Orders", value: data.purchaseOrders.length, sub: "Supplier buying", color: "#f59e0b" },
-              { label: "Purchase Invoices", value: data.purchaseInvoices.length, sub: "Received cost", color: "#a78bfa" },
-              { label: "Delivery Challans", value: data.challans.length, sub: "Dispatch docs", color: "#f97316" },
+              { label: "Quotations", value: data.quotations.length, sub: "Sales pipeline", color: "var(--tx-38bdf8, #38bdf8)" },
+              { label: "Sales Invoices", value: data.salesInvoices.length, sub: "Booked orders", color: "var(--tx-34d399, #34d399)" },
+              { label: "Purchase Orders", value: data.purchaseOrders.length, sub: "Supplier buying", color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Purchase Invoices", value: data.purchaseInvoices.length, sub: "Received cost", color: "var(--tx-a78bfa, #a78bfa)" },
+              { label: "Delivery Challans", value: data.challans.length, sub: "Dispatch docs", color: "var(--tx-f97316, #f97316)" },
             ].map((entry) => (
               <div key={entry.label} style={{ background: "rgba(var(--ink),.02)", border: `1px solid ${tradingBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 14px" }}>
                 <div style={{ fontSize: 11, color: tradingMuted, marginBottom: 6 }}>{entry.label}</div>
@@ -153,7 +153,7 @@ export default function TradingOverviewPage() {
           </div>
         </div>
 
-        <div style={{ background: "linear-gradient(135deg,rgba(56,189,248,.12),rgba(15,23,42,.85))", border: "1px solid rgba(56,189,248,.18)", borderRadius: 16, padding: 20 }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(56,189,248,.12),rgba(var(--dkr-0f172a, 15,23,42),0.85))", border: "1px solid rgba(56,189,248,.18)", borderRadius: 16, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>Ready-to-run desks</div>
           <div style={{ fontSize: 13, color: tradingMuted, marginBottom: 14 }}>
             Trading business ko alag alag departments ke bajaye focused desks me break kiya gaya hai.
@@ -192,7 +192,7 @@ export default function TradingOverviewPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.invoiceNo}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.customerName || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.total)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{formatMoney(row.total)}</td>
                 </tr>
               ))}
               {recentSales.length === 0 && (
@@ -222,7 +222,7 @@ export default function TradingOverviewPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.invoiceNo}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.supplier?.name || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#a78bfa", fontWeight: 700 }}>{formatMoney(row.total)}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700 }}>{formatMoney(row.total)}</td>
                 </tr>
               ))}
               {recentProcurement.length === 0 && (

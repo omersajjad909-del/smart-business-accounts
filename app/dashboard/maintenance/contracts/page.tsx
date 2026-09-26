@@ -46,10 +46,10 @@ export default function MaintenanceContractsPage() {
         },
       })}
       summarize={(rows) => [
-        { label: "Contracts", value: rows.length, color: "#34d399" },
-        { label: "Active", value: rows.filter((row) => row.status === "active").length, color: "#22c55e" },
-        { label: "Renewal Due", value: rows.filter((row) => row.status === "renewal_due").length, color: "#f59e0b" },
-        { label: "Annual Value", value: `Rs. ${rows.reduce((sum, row) => sum + Number(row.value || 0), 0).toLocaleString()}`, color: "#60a5fa" },
+        { label: "Contracts", value: rows.length, color: "var(--tx-34d399, #34d399)" },
+        { label: "Active", value: rows.filter((row) => row.status === "active").length, color: "var(--tx-22c55e, #22c55e)" },
+        { label: "Renewal Due", value: rows.filter((row) => row.status === "renewal_due").length, color: "var(--tx-f59e0b, #f59e0b)" },
+        { label: "Annual Value", value: `Rs. ${rows.reduce((sum, row) => sum + Number(row.value || 0), 0).toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
       ]}
     />
   );

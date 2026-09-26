@@ -161,7 +161,7 @@ export default function SupplierStatementPage() {
                   ))}
                 </div>
               )}
-              {selected && <div style={{ marginTop: 5, fontSize: 11, color: "#a78bfa" }}>✓ {selected.name}</div>}
+              {selected && <div style={{ marginTop: 5, fontSize: 11, color: "var(--tx-a78bfa, #a78bfa)" }}>✓ {selected.name}</div>}
             </div>
 
             <button onClick={generate} disabled={!selected} style={{
@@ -191,7 +191,7 @@ export default function SupplierStatementPage() {
               }}>⟵ Change Supplier</button>
               <button onClick={() => window.print()} style={{
                 padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(139,92,246,.3)",
-                cursor: "pointer", background: "rgba(139,92,246,.08)", color: "#a78bfa",
+                cursor: "pointer", background: "rgba(139,92,246,.08)", color: "var(--tx-a78bfa, #a78bfa)",
                 fontSize: 12, fontWeight: 600, fontFamily: FONT,
               }}>🖨 Print</button>
             </div>
@@ -227,7 +227,7 @@ export default function SupplierStatementPage() {
               <>
                 <div style={{ padding: "12px 24px", background: "rgba(139,92,246,.06)", borderBottom: "1px solid rgba(var(--ink),.06)", display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600 }}>
                   <span style={{ color: "rgba(var(--ink),.4)" }}>Opening Balance</span>
-                  <span style={{ color: "#a78bfa" }}>{fmt(statement.openingBalance)}</span>
+                  <span style={{ color: "var(--tx-a78bfa, #a78bfa)" }}>{fmt(statement.openingBalance)}</span>
                 </div>
 
                 <div style={{ overflowX: "auto" }}>
@@ -249,13 +249,13 @@ export default function SupplierStatementPage() {
                       ) : statement.transactions.map((tx, i) => (
                         <tr key={i} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),.012)" }}
                           onMouseEnter={e => e.currentTarget.style.background = "rgba(139,92,246,.05)"}
-                          onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(255,255,255,.012)"}
+                          onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(var(--ink),.012)"}
                         >
                           <td style={{ padding: "10px 16px", color: "rgba(var(--ink),.4)", whiteSpace: "nowrap", fontSize: 12 }}>{tx.date}</td>
                           <td style={{ padding: "10px 16px", color: "rgba(var(--ink),.7)" }}>{tx.description}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.debit > 0 ? "#f87171" : "rgba(var(--ink),.18)" }}>{tx.debit > 0 ? fmt(tx.debit) : "—"}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.credit > 0 ? "#34d399" : "rgba(var(--ink),.18)" }}>{tx.credit > 0 ? fmt(tx.credit) : "—"}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 800, color: tx.balance >= 0 ? "#a78bfa" : "#f87171" }}>{fmt(tx.balance)}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.debit > 0 ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.18)" }}>{tx.debit > 0 ? fmt(tx.debit) : "—"}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.credit > 0 ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.18)" }}>{tx.credit > 0 ? fmt(tx.credit) : "—"}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 800, color: tx.balance >= 0 ? "var(--tx-a78bfa, #a78bfa)" : "var(--tx-f87171, #f87171)" }}>{fmt(tx.balance)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -264,7 +264,7 @@ export default function SupplierStatementPage() {
 
                 <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", background: "rgba(139,92,246,.08)", borderTop: "1px solid rgba(139,92,246,.2)", display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800 }}>
                   <span style={{ color: "rgba(var(--ink),.5)" }}>Closing Balance</span>
-                  <span style={{ color: statement.closingBalance >= 0 ? "#a78bfa" : "#f87171" }}>
+                  <span style={{ color: statement.closingBalance >= 0 ? "var(--tx-a78bfa, #a78bfa)" : "var(--tx-f87171, #f87171)" }}>
                     {fmt(statement.closingBalance)} <span style={{ fontSize: 11 }}>{statement.closingBalance >= 0 ? "Dr" : "Cr"}</span>
                   </span>
                 </div>

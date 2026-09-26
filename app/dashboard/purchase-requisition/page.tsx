@@ -25,18 +25,18 @@ interface PurchaseRequisitionRecord extends PurchaseRequisitionData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_META: Record<PRStatus, { label: string; color: string; bg: string; border: string }> = {
-  DRAFT:   { label: "Draft",    color: "#94a3b8", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" },
-  PENDING: { label: "Pending",  color: "#fbbf24", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
-  APPROVED:{ label: "Approved", color: "#4ade80", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
-  REJECTED:{ label: "Rejected", color: "#f87171", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.35)" },
-  ORDERED: { label: "Ordered",  color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  DRAFT:   { label: "Draft",    color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" },
+  PENDING: { label: "Pending",  color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
+  APPROVED:{ label: "Approved", color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",  border: "rgba(74,222,128,.35)"  },
+  REJECTED:{ label: "Rejected", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.35)" },
+  ORDERED: { label: "Ordered",  color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
 };
 
 const PRIORITY_META: Record<PRPriority, { label: string; color: string; bg: string; border: string }> = {
-  LOW:    { label: "Low",    color: "#94a3b8", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" },
-  MEDIUM: { label: "Medium", color: "#60a5fa", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
-  HIGH:   { label: "High",   color: "#fbbf24", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
-  URGENT: { label: "Urgent", color: "#f87171", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.35)" },
+  LOW:    { label: "Low",    color: "var(--tx-94a3b8, #94a3b8)", bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.35)" },
+  MEDIUM: { label: "Medium", color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)",  border: "rgba(96,165,250,.35)"  },
+  HIGH:   { label: "High",   color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
+  URGENT: { label: "Urgent", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)", border: "rgba(248,113,113,.35)" },
 };
 
 const DEPARTMENTS = ["Procurement", "Operations", "Sales", "Finance", "IT", "HR", "Warehouse", "Admin", "Other"];
@@ -138,10 +138,10 @@ export default function PurchaseRequisitionPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total PRs",       value: kpis.total,    color: "#a78bfa" },
-          { label: "Pending Approval",value: kpis.pending,  color: "#fbbf24" },
-          { label: "Approved",        value: kpis.approved, color: "#4ade80" },
-          { label: "Urgent",          value: kpis.urgent,   color: "#f87171" },
+          { label: "Total PRs",       value: kpis.total,    color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Pending Approval",value: kpis.pending,  color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Approved",        value: kpis.approved, color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Urgent",          value: kpis.urgent,   color: "var(--tx-f87171, #f87171)" },
         ].map(k => (
           <div key={k.label} style={{ ...s.panel, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{k.label}</div>
@@ -155,7 +155,7 @@ export default function PurchaseRequisitionPage() {
         <div style={{ ...s.panel, padding: 24, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{editing ? "Edit" : "New"} Purchase Requisition</h2>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)", true)}>✕ Close</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)", true)}>✕ Close</button>
           </div>
 
           {/* Row 1 */}
@@ -218,7 +218,7 @@ export default function PurchaseRequisitionPage() {
                       <td style={s.td}><input value={item.unit} onChange={e => setItem(i, "unit", e.target.value)} style={s.inp} placeholder="PCS" /></td>
                       <td style={s.td}><input type="number" min="0" value={item.estimatedCost} onChange={e => setItem(i, "estimatedCost", Number(e.target.value))} style={s.inp} placeholder="0" /></td>
                       <td style={s.td}><input value={item.description} onChange={e => setItem(i, "description", e.target.value)} style={s.inp} placeholder="Optional" /></td>
-                      <td style={s.td}>{form.items.length > 1 && <button onClick={() => removeItem(i)} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: "0 4px" }}>×</button>}</td>
+                      <td style={s.td}>{form.items.length > 1 && <button onClick={() => removeItem(i)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16, padding: "0 4px" }}>×</button>}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -240,7 +240,7 @@ export default function PurchaseRequisitionPage() {
 
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={handleSave} disabled={saving} style={s.btn(ACCENT)}>{saving ? "Saving…" : editing ? "Update PR" : "Submit PR"}</button>
-            <button onClick={() => setShowForm(false)} style={s.btn("rgba(255,255,255,.08)")}>Cancel</button>
+            <button onClick={() => setShowForm(false)} style={s.btn("rgba(var(--ink),.08)")}>Cancel</button>
           </div>
         </div>
       )}
@@ -294,7 +294,7 @@ export default function PurchaseRequisitionPage() {
                     <td style={s.td}><span style={s.badge(pMeta)}>{pMeta.label}</span></td>
                     <td style={s.td}><span style={s.badge(sMeta)}>{sMeta.label}</span></td>
                     <td style={{ ...s.td, textAlign: "right" as const }}>
-                      <button onClick={() => openEdit(r)} style={{ ...s.btn("rgba(255,255,255,.08)", true), marginRight: 6 }}>Edit</button>
+                      <button onClick={() => openEdit(r)} style={{ ...s.btn("rgba(var(--ink),.08)", true), marginRight: 6 }}>Edit</button>
                       <button onClick={async () => { if (confirm("Delete this PR?")) await remove(r.id); }} style={s.btn("rgba(248,113,113,.15)", true)}>Delete</button>
                     </td>
                   </tr>

@@ -79,7 +79,7 @@ export default function GymAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: gymFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-86efac, #86efac)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Membership Health, Class Demand & Trainer Utilization</h1>
         <p style={{ margin: 0, fontSize: 14, color: gymMuted, maxWidth: 760 }}>
           Compare revenue, renewal pressure, occupancy, and staff load to get a fast reading of your fitness business.
@@ -95,7 +95,7 @@ export default function GymAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Membership Plan Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Membership Plan Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {planMix.length === 0 ? (
               <div style={{ color: gymMuted, fontSize: 13 }}>Add memberships to view the plan mix.</div>
@@ -117,7 +117,7 @@ export default function GymAnalyticsPage() {
         </div>
 
         <div style={{ background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Class Occupancy</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Class Occupancy</div>
           <div style={{ display: "grid", gap: 10 }}>
             {classLoad.length === 0 ? (
               <div style={{ color: gymMuted, fontSize: 13 }}>Build a class schedule to view occupancy.</div>
@@ -127,7 +127,7 @@ export default function GymAnalyticsPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{gymClass.name}</div>
                   <div style={{ fontSize: 12, color: gymMuted }}>{gymClass.enrolled}/{gymClass.capacity} seats filled</div>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: gymClass.pct >= 90 ? "#f87171" : gymClass.pct >= 70 ? "#fbbf24" : "#34d399" }}>{gymClass.pct}%</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: gymClass.pct >= 90 ? "var(--tx-f87171, #f87171)" : gymClass.pct >= 70 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>{gymClass.pct}%</div>
               </div>
             ))}
           </div>
@@ -135,7 +135,7 @@ export default function GymAnalyticsPage() {
       </div>
 
       <div style={{ marginTop: 18, background: gymBg, border: `1px solid ${gymBorder}`, borderRadius: 20, padding: 22 }}>
-        <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Trainer Load Board</div>
+        <div style={{ fontSize: 13, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Trainer Load Board</div>
         <div style={{ display: "grid", gap: 10 }}>
           {trainerLoad.length === 0 ? (
             <div style={{ color: gymMuted, fontSize: 13 }}>Add trainers to view the load board.</div>
@@ -146,7 +146,7 @@ export default function GymAnalyticsPage() {
                 <div style={{ fontSize: 12, color: gymMuted }}>{trainer.specialization}</div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{trainer.activeClients} clients</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{trainer.activeClients} clients</div>
                 <div style={{ fontSize: 12, color: gymMuted }}>Rs. {trainer.salary.toLocaleString()} salary</div>
               </div>
             </div>

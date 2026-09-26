@@ -342,7 +342,7 @@ export function BusinessRecordWorkspace({
             borderRadius: 10,
             border: "1px solid transparent",
             background: "transparent",
-            color: "#f87171",
+            color: "var(--tx-f87171, #f87171)",
             fontSize: 12,
             fontWeight: 700,
             padding: "8px 12px",
@@ -663,7 +663,7 @@ export function BusinessRecordWorkspace({
               </label>
             ))}
           </div>
-          {error ? <div style={{ marginTop: 12, fontSize: 12, color: "#f87171" }}>{error}</div> : null}
+          {error ? <div style={{ marginTop: 12, fontSize: 12, color: "var(--tx-f87171, #f87171)" }}>{error}</div> : null}
           <button
             type="submit"
             disabled={saving}

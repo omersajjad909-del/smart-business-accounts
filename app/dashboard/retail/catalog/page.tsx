@@ -57,8 +57,8 @@ function CatalogBarcode({ value, height = 48, moduleWidth = 1.5 }: { value: stri
 // ──────────────────────────────────────────────────────────────────────────────
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 const UNITS = ["Pcs", "Kg", "Gram", "Ltr", "ML", "Meter", "Foot", "Box", "Pack", "Dozen", "Pair", "Set", "Bag", "Bottle", "Can", "Carton"];
 
@@ -366,7 +366,7 @@ export default function ProductCatalogPage() {
           <button
             onClick={syncAllToItemMaster}
             title="Sync all catalog products to Item Master"
-            style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+            style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
           >
             🔗 Sync to Item Master
           </button>
@@ -382,9 +382,9 @@ export default function ProductCatalogPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Total Products", val: totalProducts, color: "#f97316" },
-          { label: "Active", val: activeProducts, color: "#34d399" },
-          { label: "Avg Margin", val: `${avgMargin}%`, color: "#818cf8" },
+          { label: "Total Products", val: totalProducts, color: "var(--tx-f97316, #f97316)" },
+          { label: "Active", val: activeProducts, color: "var(--tx-34d399, #34d399)" },
+          { label: "Avg Margin", val: `${avgMargin}%`, color: "var(--tx-818cf8, #818cf8)" },
         ].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
             <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div>
@@ -436,17 +436,17 @@ export default function ProductCatalogPage() {
                 <td style={{ padding: "13px 16px", fontSize: 13 }}>{p.category || <span style={{ color: "rgba(var(--ink),.2)" }}>—</span>}</td>
                 <td style={{ padding: "13px 16px", fontSize: 11, color: "rgba(var(--ink),.4)" }}>{p.sku}</td>
                 <td style={{ padding: "13px 16px" }}>
-                  <span style={{ background: "rgba(99,102,241,.12)", color: "#a5b4fc", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{p.unit}</span>
+                  <span style={{ background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{p.unit}</span>
                 </td>
                 <td style={{ padding: "13px 16px", fontSize: 13 }}>Rs. {p.costPrice.toLocaleString()}</td>
-                <td style={{ padding: "13px 16px", color: "#34d399", fontWeight: 600 }}>Rs. {p.price.toLocaleString()}</td>
-                <td style={{ padding: "13px 16px", fontWeight: 600, color: p.margin > 30 ? "#34d399" : "#f59e0b" }}>{p.margin}%</td>
+                <td style={{ padding: "13px 16px", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>Rs. {p.price.toLocaleString()}</td>
+                <td style={{ padding: "13px 16px", fontWeight: 600, color: p.margin > 30 ? "var(--tx-34d399, #34d399)" : "var(--tx-f59e0b, #f59e0b)" }}>{p.margin}%</td>
                 <td style={{ padding: "13px 16px" }}>
-                  <span style={{ fontWeight: 700, color: p.stock <= 0 ? "#f87171" : p.stock <= 5 ? "#f59e0b" : "#34d399" }}>
+                  <span style={{ fontWeight: 700, color: p.stock <= 0 ? "var(--tx-f87171, #f87171)" : p.stock <= 5 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-34d399, #34d399)" }}>
                     {p.stock}
                   </span>
-                  {p.stock <= 0 && <span style={{ fontSize: 10, marginLeft: 4, color: "#f87171" }}>OUT</span>}
-                  {p.stock > 0 && p.stock <= 5 && <span style={{ fontSize: 10, marginLeft: 4, color: "#f59e0b" }}>LOW</span>}
+                  {p.stock <= 0 && <span style={{ fontSize: 10, marginLeft: 4, color: "var(--tx-f87171, #f87171)" }}>OUT</span>}
+                  {p.stock > 0 && p.stock <= 5 && <span style={{ fontSize: 10, marginLeft: 4, color: "var(--tx-f59e0b, #f59e0b)" }}>LOW</span>}
                 </td>
                 <td style={{ padding: "13px 16px" }}>
                   <span style={{ display: "inline-block", background: p.status === "active" ? "rgba(52,211,153,.15)" : "rgba(107,114,128,.15)", color: p.status === "active" ? "#34d399" : "#6b7280", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>
@@ -457,14 +457,14 @@ export default function ProductCatalogPage() {
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <button
                       onClick={() => openReceive(p)}
-                      style={{ padding: "5px 10px", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                      style={{ padding: "5px 10px", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "var(--tx-34d399, #34d399)", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                     >
                       📦 Receive
                     </button>
                     {p.sku && (
                       <button
                         onClick={() => openCatPrint(p)}
-                        style={{ padding: "5px 10px", background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                        style={{ padding: "5px 10px", background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", color: "var(--tx-a5b4fc, #a5b4fc)", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                       >
                         🖨 Barcode
                       </button>
@@ -477,13 +477,13 @@ export default function ProductCatalogPage() {
                     </button>
                     <button
                       onClick={() => update(p.id, { status: p.status === "active" ? "inactive" : "active" })}
-                      style={{ padding: "5px 10px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.25)", color: "#f59e0b", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                      style={{ padding: "5px 10px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.25)", color: "var(--tx-f59e0b, #f59e0b)", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                     >
                       {p.status === "active" ? "Disable" : "Enable"}
                     </button>
                     <button
                       onClick={() => setDeleteId(p.id)}
-                      style={{ padding: "5px 10px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                      style={{ padding: "5px 10px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
                     >
                       Delete
                     </button>
@@ -677,8 +677,8 @@ export default function ProductCatalogPage() {
             </div>
             {receiveForm.qty > 0 && (
               <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(99,102,241,.08)", borderRadius: 8, fontSize: 12, color: "rgba(var(--ink),.6)" }}>
-                Stock after: <strong style={{ color: "#34d399" }}>{receiveProduct.stock + receiveForm.qty}</strong>
-                {receiveForm.costPrice > 0 && <span style={{ marginLeft: 14 }}>Total cost: <strong style={{ color: "#f59e0b" }}>Rs. {(receiveForm.qty * receiveForm.costPrice).toLocaleString()}</strong></span>}
+                Stock after: <strong style={{ color: "var(--tx-34d399, #34d399)" }}>{receiveProduct.stock + receiveForm.qty}</strong>
+                {receiveForm.costPrice > 0 && <span style={{ marginLeft: 14 }}>Total cost: <strong style={{ color: "var(--tx-f59e0b, #f59e0b)" }}>Rs. {(receiveForm.qty * receiveForm.costPrice).toLocaleString()}</strong></span>}
               </div>
             )}
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>

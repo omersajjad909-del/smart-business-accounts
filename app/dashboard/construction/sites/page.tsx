@@ -69,7 +69,7 @@ export default function ConstructionSitesPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Sites", val: sites.length, color: "#f97316" }, { label: "Active", val: sites.filter((s) => s.status === "active").length, color: "#34d399" }, { label: "Total Workers", val: sites.reduce((a, s) => a + s.workers, 0), color: "#818cf8" }].map((s) => (
+        {[{ label: "Total Sites", val: sites.length, color: "var(--tx-f97316, #f97316)" }, { label: "Active", val: sites.filter((s) => s.status === "active").length, color: "var(--tx-34d399, #34d399)" }, { label: "Total Workers", val: sites.reduce((a, s) => a + s.workers, 0), color: "var(--tx-818cf8, #818cf8)" }].map((s) => (
           <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -88,7 +88,7 @@ export default function ConstructionSitesPage() {
               <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>Location: {site.location}</div>
               <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>Supervisor: {site.supervisor}</div>
               <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 12 }}>Workers: {site.workers} · {site.phone}</div>
-              <div style={{ fontSize: 12, color: "#fdba74", marginBottom: 12 }}>Open projects: {activeProjects.length}</div>
+              <div style={{ fontSize: 12, color: "var(--tx-fdba74, #fdba74)", marginBottom: 12 }}>Open projects: {activeProjects.length}</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {site.status !== "maintenance" && <button onClick={() => changeStatus(site.id, "maintenance")} style={{ padding: "5px 10px", background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Maintenance</button>}
                 {site.status === "inactive" && <button onClick={() => changeStatus(site.id, "active")} style={{ padding: "5px 10px", background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>Activate</button>}
@@ -116,7 +116,7 @@ export default function ConstructionSitesPage() {
                 <input type="number" value={form.workers} onChange={(e) => setForm((f) => ({ ...f, workers: Number(e.target.value) }))} style={{ width: "100%", background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Site</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>

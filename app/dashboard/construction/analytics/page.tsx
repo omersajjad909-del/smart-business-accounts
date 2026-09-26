@@ -39,10 +39,10 @@ export default function ConstructionAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 18 }}>
         {[
-          { label: "Projects", value: data.summary.projects, color: "#fb923c" },
-          { label: "Low Materials", value: data.summary.lowStockMaterials, color: "#ef4444" },
-          { label: "Exposure", value: `Rs. ${data.summary.contractExposure.toLocaleString()}`, color: "#f59e0b" },
-          { label: "Billing", value: `Rs. ${data.summary.certifiedBilling.toLocaleString()}`, color: "#34d399" },
+          { label: "Projects", value: data.summary.projects, color: "var(--tx-fb923c, #fb923c)" },
+          { label: "Low Materials", value: data.summary.lowStockMaterials, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Exposure", value: `Rs. ${data.summary.contractExposure.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Billing", value: `Rs. ${data.summary.certifiedBilling.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: constructionMuted, marginBottom: 8 }}>{card.label}</div>
@@ -58,7 +58,7 @@ export default function ConstructionAnalyticsPage() {
             {data.sites.map((site) => (
               <div key={site.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span>{site.name}</span>
-                <span style={{ color: "#60a5fa", fontWeight: 800 }}>{site.workers}</span>
+                <span style={{ color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800 }}>{site.workers}</span>
               </div>
             ))}
             {data.sites.length === 0 && <div style={{ color: constructionMuted, fontSize: 13 }}>No site data yet.</div>}
@@ -71,7 +71,7 @@ export default function ConstructionAnalyticsPage() {
             {Object.entries(materialSpendBySite).sort((a, b) => b[1] - a[1]).map(([site, amount]) => (
               <div key={site} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span>{site}</span>
-                <span style={{ color: "#34d399", fontWeight: 800 }}>Rs. {amount.toLocaleString()}</span>
+                <span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 800 }}>Rs. {amount.toLocaleString()}</span>
               </div>
             ))}
             {Object.keys(materialSpendBySite).length === 0 && <div style={{ color: constructionMuted, fontSize: 13 }}>No material spend yet.</div>}

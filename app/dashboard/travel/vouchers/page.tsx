@@ -30,8 +30,8 @@ import {
 import { VoucherPrint } from "./VoucherPrint";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.08)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.08)";
 const accent = "#38bdf8";
 
 const input: React.CSSProperties = {
@@ -342,12 +342,12 @@ export default function UmrahVouchersPage() {
         </div>
 
         {problems.length > 0 && (
-          <div style={{ marginTop: 18, padding: "12px 15px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "#fbbf24", fontSize: 12.5, lineHeight: 1.8 }}>
+          <div style={{ marginTop: 18, padding: "12px 15px", borderRadius: 12, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 12.5, lineHeight: 1.8 }}>
             {problems.map((p) => <div key={p}>{p}</div>)}
           </div>
         )}
         {error && (
-          <div style={{ marginTop: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5 }}>
+          <div style={{ marginTop: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12.5 }}>
             {error}
           </div>
         )}

@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const F = "'Outfit','Inter',sans-serif";
-const BG = "rgba(255,255,255,0.03)";
-const BD = "rgba(255,255,255,0.07)";
+const BG = "rgba(var(--ink),0.03)";
+const BD = "rgba(var(--ink),0.07)";
 const inp: React.CSSProperties = {
   fontFamily: F, padding: "9px 12px", background: BG,
   border: `1px solid ${BD}`, borderRadius: 8,
@@ -24,9 +24,9 @@ const PLATFORM_COLOR: Record<Platform, string> = {
   Shopify: "#96bf48", WooCommerce: "#7f54b3", Daraz: "#f85606", Amazon: "#ff9900", Custom: "#6366f1",
 };
 const STATUS_META: Record<SyncStatus, { label: string; color: string; bg: string }> = {
-  active: { label: "Active", color: "#10b981", bg: "rgba(16,185,129,.12)" },
-  paused: { label: "Paused", color: "#f59e0b", bg: "rgba(245,158,11,.12)" },
-  error:  { label: "Error",  color: "#ef4444", bg: "rgba(239,68,68,.12)"  },
+  active: { label: "Active", color: "var(--tx-10b981, #10b981)", bg: "rgba(16,185,129,.12)" },
+  paused: { label: "Paused", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)" },
+  error:  { label: "Error",  color: "var(--tx-ef4444, #ef4444)", bg: "rgba(239,68,68,.12)"  },
 };
 
 const BLANK = {
@@ -121,10 +121,10 @@ export default function OnlineSyncPage() {
       {/* KPI row */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Stores Connected", value: stores.length,  color: "#a78bfa" },
-          { label: "Active Syncs",     value: totalActive,    color: "#10b981" },
-          { label: "Products Synced",  value: totalProducts,  color: "#38bdf8" },
-          { label: "Orders Today",     value: totalOrders,    color: "#fbbf24" },
+          { label: "Stores Connected", value: stores.length,  color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active Syncs",     value: totalActive,    color: "var(--tx-10b981, #10b981)" },
+          { label: "Products Synced",  value: totalProducts,  color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Orders Today",     value: totalOrders,    color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(k => (
           <div key={k.label} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: .5 }}>{k.label}</div>
@@ -188,7 +188,7 @@ export default function OnlineSyncPage() {
 
                 <div style={{ display: "flex", gap: 14, marginBottom: 14, fontSize: 12 }}>
                   <span style={{ color: "var(--text-muted)" }}>Products: <b style={{ color: "var(--text-primary)" }}>{store.productCount}</b></span>
-                  <span style={{ color: "var(--text-muted)" }}>Today: <b style={{ color: "#fbbf24" }}>{store.ordersToday} orders</b></span>
+                  <span style={{ color: "var(--text-muted)" }}>Today: <b style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>{store.ordersToday} orders</b></span>
                 </div>
                 {store.lastSync && (
                   <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 12 }}>Last sync: {store.lastSync}</div>
@@ -202,7 +202,7 @@ export default function OnlineSyncPage() {
                     {store.status === "active" ? "⏸" : "▶"}
                   </button>
                   <button onClick={() => openEdit(store)} style={{ padding: "7px 10px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: `1px solid ${BD}`, background: "none", color: "var(--text-muted)", fontFamily: F }}>✎</button>
-                  <button onClick={() => handleDelete(store.id)} style={{ padding: "7px 10px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: "none", background: "rgba(239,68,68,.1)", color: "#f87171", fontFamily: F }}>✕</button>
+                  <button onClick={() => handleDelete(store.id)} style={{ padding: "7px 10px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: "none", background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", fontFamily: F }}>✕</button>
                 </div>
               </div>
             );

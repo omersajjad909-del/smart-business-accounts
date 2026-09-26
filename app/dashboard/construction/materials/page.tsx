@@ -76,7 +76,7 @@ export default function ConstructionMaterialsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Materials", val: materials.length, color: "#f97316" }, { label: "Total Value", val: `Rs. ${totalValue.toLocaleString()}`, color: "#34d399" }, { label: "Suppliers", val: new Set(materials.map((m) => m.supplier).filter(Boolean)).size, color: "#818cf8" }].map((s) => (
+        {[{ label: "Total Materials", val: materials.length, color: "var(--tx-f97316, #f97316)" }, { label: "Total Value", val: `Rs. ${totalValue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }, { label: "Suppliers", val: new Set(materials.map((m) => m.supplier).filter(Boolean)).size, color: "var(--tx-818cf8, #818cf8)" }].map((s) => (
           <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -95,10 +95,10 @@ export default function ConstructionMaterialsPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{m.unit}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600 }}>{m.quantity}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {m.unitCost.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 600 }}>Rs. {(m.quantity * m.unitCost).toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>Rs. {(m.quantity * m.unitCost).toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{m.supplier || "—"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{m.site}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "#fdba74" }}>{m.project || "—"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "var(--tx-fdba74, #fdba74)" }}>{m.project || "—"}</td>
               </tr>
             ))}
             {!loading && materials.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No materials yet.</td></tr>}
@@ -139,7 +139,7 @@ export default function ConstructionMaterialsPage() {
                 <input type="number" value={form.unitCost} onChange={(e) => setForm((f) => ({ ...f, unitCost: Number(e.target.value) }))} style={{ width: "100%", background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
-            {error && <div style={{ marginTop: 12, color: "#fda4af", fontSize: 12 }}>{error}</div>}
+            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Material</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>

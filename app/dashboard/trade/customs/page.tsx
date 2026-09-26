@@ -79,16 +79,16 @@ interface DeclarationRecord {
 const STATUSES = ["FILED", "UNDER_EXAMINATION", "DUTY_PAID", "CLEARED", "HELD"] as const;
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  FILED:             { label: "Filed",             color: "#9ca3af", bg: "#9ca3af18", border: "#9ca3af44" },
-  UNDER_EXAMINATION: { label: "Under Examination", color: "#fbbf24", bg: "#fbbf2418", border: "#fbbf2444" },
-  DUTY_PAID:         { label: "Duty Paid",          color: "#3b82f6", bg: "#3b82f618", border: "#3b82f644" },
-  CLEARED:           { label: "Cleared",            color: "#22c55e", bg: "#22c55e18", border: "#22c55e44" },
-  HELD:              { label: "Held",               color: "#ef4444", bg: "#ef444418", border: "#ef444444" },
+  FILED:             { label: "Filed",             color: "var(--tx-9ca3af, #9ca3af)", bg: "#9ca3af18", border: "#9ca3af44" },
+  UNDER_EXAMINATION: { label: "Under Examination", color: "var(--tx-fbbf24, #fbbf24)", bg: "#fbbf2418", border: "#fbbf2444" },
+  DUTY_PAID:         { label: "Duty Paid",          color: "var(--tx-3b82f6, #3b82f6)", bg: "#3b82f618", border: "#3b82f644" },
+  CLEARED:           { label: "Cleared",            color: "var(--tx-22c55e, #22c55e)", bg: "#22c55e18", border: "#22c55e44" },
+  HELD:              { label: "Held",               color: "var(--tx-ef4444, #ef4444)", bg: "#ef444418", border: "#ef444444" },
 };
 
 const TYPE_META = {
-  Import: { color: "#3b82f6", bg: "#3b82f618", border: "#3b82f644" },
-  Export: { color: "#22c55e", bg: "#22c55e18", border: "#22c55e44" },
+  Import: { color: "var(--tx-3b82f6, #3b82f6)", bg: "#3b82f618", border: "#3b82f644" },
+  Export: { color: "var(--tx-22c55e, #22c55e)", bg: "#22c55e18", border: "#22c55e44" },
 };
 
 const FILTER_TABS = [
@@ -422,11 +422,11 @@ export default function CustomsClearancePage() {
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Declarations", value: kpis.total, color: "#a78bfa" },
-          { label: "Pending (Filed)",    value: kpis.pending,   color: "#9ca3af" },
-          { label: "Under Examination",  value: kpis.underExam, color: "#fbbf24" },
-          { label: "Cleared",            value: kpis.cleared,   color: "#22c55e" },
-          { label: "Total Duties Paid",  value: fmt(kpis.dutiesPaid), color: "#3b82f6" },
+          { label: "Total Declarations", value: kpis.total, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Pending (Filed)",    value: kpis.pending,   color: "var(--tx-9ca3af, #9ca3af)" },
+          { label: "Under Examination",  value: kpis.underExam, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Cleared",            value: kpis.cleared,   color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Total Duties Paid",  value: fmt(kpis.dutiesPaid), color: "var(--tx-3b82f6, #3b82f6)" },
         ].map(k => (
           <div key={k.label} style={s.kpi as React.CSSProperties}>
             <div style={{ fontSize: 22, fontWeight: 800, color: k.color, marginBottom: 4 }}>{k.value}</div>
@@ -475,10 +475,10 @@ export default function CustomsClearancePage() {
                 const goods   = d.hsLines.map(h => h.description).filter(Boolean).join("; ") || "—";
                 return (
                   <tr key={d.id} style={{ transition: "background .15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
-                    <td style={{ ...s.td, fontWeight: 700, color: "#60a5fa" }}>{d.declarationNo}</td>
+                    <td style={{ ...s.td, fontWeight: 700, color: "var(--tx-60a5fa, #60a5fa)" }}>{d.declarationNo}</td>
                     <td style={s.td}><span style={s.badge(tm.color, tm.bg, tm.border)}>{d.type}</span></td>
                     <td style={{ ...s.td, maxWidth: 160 }}>
                       <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>{d.shipperName || "—"}</div>
@@ -488,9 +488,9 @@ export default function CustomsClearancePage() {
                     <td style={{ ...s.td, maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", color: "var(--text-muted)" }}>{goods}</td>
                     <td style={{ ...s.td, textAlign: "right" }}>{fmt(d.cifFobValue)}</td>
                     <td style={{ ...s.td, textAlign: "right" }}>{d.dutyRate}%</td>
-                    <td style={{ ...s.td, textAlign: "right", color: "#fbbf24" }}>{fmt(d.dutyAmount)}</td>
-                    <td style={{ ...s.td, textAlign: "right", color: "#a78bfa" }}>{fmt(d.vatTaxAmount)}</td>
-                    <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "#22c55e" }}>{fmt(d.totalPayable)}</td>
+                    <td style={{ ...s.td, textAlign: "right", color: "var(--tx-fbbf24, #fbbf24)" }}>{fmt(d.dutyAmount)}</td>
+                    <td style={{ ...s.td, textAlign: "right", color: "var(--tx-a78bfa, #a78bfa)" }}>{fmt(d.vatTaxAmount)}</td>
+                    <td style={{ ...s.td, textAlign: "right", fontWeight: 700, color: "var(--tx-22c55e, #22c55e)" }}>{fmt(d.totalPayable)}</td>
                     <td style={s.td}>{d.filingDate || "—"}</td>
                     <td style={s.td}>{d.clearanceDate || d.expectedClearanceDate || "—"}</td>
                     <td style={s.td}>
@@ -534,7 +534,7 @@ export default function CustomsClearancePage() {
             <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 22 }}>This action cannot be undone.</div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => doDelete(confirmDelete)} style={{ ...s.btn("#ef4444"), flex: 1 }}>Delete</button>
-              <button onClick={() => setConfirmDelete(null)} style={{ ...s.btn("rgba(255,255,255,.08)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => setConfirmDelete(null)} style={{ ...s.btn("rgba(var(--ink),.08)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -644,7 +644,7 @@ export default function CustomsClearancePage() {
                           <input type="number" min="0" step="0.01" value={line.unitValue} onChange={e => updateHsLine(i, "unitValue", parseFloat(e.target.value) || 0)} style={{ ...s.inp, padding: "6px 8px", fontSize: 12 }} />
                         </td>
                         <td style={{ padding: "6px 8px", width: 120 }}>
-                          <div style={{ padding: "6px 8px", fontSize: 12, color: "#22c55e", fontWeight: 600 }}>{fmt(line.totalValue)}</div>
+                          <div style={{ padding: "6px 8px", fontSize: 12, color: "var(--tx-22c55e, #22c55e)", fontWeight: 600 }}>{fmt(line.totalValue)}</div>
                         </td>
                         <td style={{ padding: "6px 8px", width: 36 }}>
                           {hsLines.length > 1 && (
@@ -673,22 +673,22 @@ export default function CustomsClearancePage() {
                 <input type="number" min="0" max="100" step="0.01" value={form.additionalTaxRate} onChange={e => setField("additionalTaxRate", e.target.value)} style={s.inp} placeholder="0.00" />
               </div>
               <div>
-                <label style={s.label}>WHT Rate (%) <span style={{ color: "#f59e0b", fontWeight: 400 }}>Withholding Tax on Import</span></label>
+                <label style={s.label}>WHT Rate (%) <span style={{ color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 400 }}>Withholding Tax on Import</span></label>
                 <input type="number" min="0" max="100" step="0.01" value={form.whtRate} onChange={e => setField("whtRate", e.target.value)} style={{ ...s.inp, borderColor: "#f59e0b66" }} placeholder="e.g. 6 (registered) or 9 (unregistered)" />
               </div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 14, marginBottom: 14 }}>
               <div>
-                <label style={s.label}>Duty Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
+                <label style={s.label}>Duty Amount ($) <span style={{ color: "var(--tx-9ca3af, #9ca3af)", fontWeight: 400 }}>(auto)</span></label>
                 <input type="number" min="0" step="0.01" value={form.dutyAmount} onChange={e => setField("dutyAmount", e.target.value)} style={{ ...s.inp, borderColor: "#fbbf2466" }} placeholder="0.00" />
               </div>
               <div>
-                <label style={s.label}>VAT / Tax Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
+                <label style={s.label}>VAT / Tax Amount ($) <span style={{ color: "var(--tx-9ca3af, #9ca3af)", fontWeight: 400 }}>(auto)</span></label>
                 <input type="number" min="0" step="0.01" value={form.vatTaxAmount} onChange={e => setField("vatTaxAmount", e.target.value)} style={{ ...s.inp, borderColor: "#a78bfa66" }} placeholder="0.00" />
               </div>
               <div>
-                <label style={s.label}>WHT Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
+                <label style={s.label}>WHT Amount ($) <span style={{ color: "var(--tx-9ca3af, #9ca3af)", fontWeight: 400 }}>(auto)</span></label>
                 <input type="number" min="0" step="0.01" value={form.whtAmount} onChange={e => setField("whtAmount", e.target.value)} style={{ ...s.inp, borderColor: "#f59e0b66" }} placeholder="0.00" />
               </div>
               <div>
@@ -701,7 +701,7 @@ export default function CustomsClearancePage() {
             <div style={{ background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.25)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Total Payable (Duty + VAT + WHT + Other)</span>
-                <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>
+                <span style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-22c55e, #22c55e)" }}>
                   {fmt(
                     (parseFloat(form.dutyAmount || "0") || 0) +
                     (parseFloat(form.vatTaxAmount || "0") || 0) +
@@ -713,7 +713,7 @@ export default function CustomsClearancePage() {
               <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--text-muted)" }}>
                 <span>Duty: {fmt(parseFloat(form.dutyAmount || "0") || 0)}</span>
                 <span>VAT: {fmt(parseFloat(form.vatTaxAmount || "0") || 0)}</span>
-                {(parseFloat(form.whtAmount || "0") || 0) > 0 && <span style={{ color: "#f59e0b" }}>WHT: {fmt(parseFloat(form.whtAmount || "0") || 0)}</span>}
+                {(parseFloat(form.whtAmount || "0") || 0) > 0 && <span style={{ color: "var(--tx-f59e0b, #f59e0b)" }}>WHT: {fmt(parseFloat(form.whtAmount || "0") || 0)}</span>}
                 <span>Other: {fmt(parseFloat(form.otherCharges || "0") || 0)}</span>
               </div>
             </div>
@@ -753,7 +753,7 @@ export default function CustomsClearancePage() {
             </div>
 
             {error && (
-              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "#fca5a5" }}>
+              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "var(--tx-fca5a5, #fca5a5)" }}>
                 {error}
               </div>
             )}
@@ -762,7 +762,7 @@ export default function CustomsClearancePage() {
               <button onClick={save} disabled={saving} style={{ ...s.btn("#3b82f6"), flex: 1, opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : editId ? "Update Declaration" : "Create Declaration"}
               </button>
-              <button onClick={closeModal} style={{ ...s.btn("rgba(255,255,255,.07)"), flex: 0.4 }}>Cancel</button>
+              <button onClick={closeModal} style={{ ...s.btn("rgba(var(--ink),.07)"), flex: 0.4 }}>Cancel</button>
             </div>
           </div>
         </div>

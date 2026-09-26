@@ -36,7 +36,7 @@ export default function HotelGuestHistoryPage() {
                   <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.visits}</td>
                   <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.lastStay}</td>
                   <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.phone || "—"}</td>
-                  <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399" }}>Rs. {row.totalSpend.toLocaleString()}</td>
+                  <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)" }}>Rs. {row.totalSpend.toLocaleString()}</td>
                   <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.notes || "—"}</td>
                 </tr>
               ))}
@@ -52,7 +52,7 @@ export default function HotelGuestHistoryPage() {
               <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.guest}</div>
                 <div style={{ fontSize: 12, color: hotelMuted, marginTop: 4 }}>Room {row.room} · {row.checkIn} to {row.checkOut}</div>
-                <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>{row.phone || "No phone"}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>{row.phone || "No phone"}</div>
               </div>
             ))}
             {liveGuests.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No guests currently checked in.</div>}

@@ -45,11 +45,11 @@ export default function DistributionOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Active Routes", value: summary.activeRoutes, color: "#f97316" },
-          { label: "Delivered", value: summary.delivered, color: "#34d399" },
-          { label: "Failed", value: summary.failed, color: "#ef4444" },
-          { label: "Van Revenue", value: `Rs. ${summary.vanRevenue.toLocaleString()}`, color: "#38bdf8" },
-          { label: "Recovery", value: `${summary.recoveryRate}%`, color: "#a78bfa" },
+          { label: "Active Routes", value: summary.activeRoutes, color: "var(--tx-f97316, #f97316)" },
+          { label: "Delivered", value: summary.delivered, color: "var(--tx-34d399, #34d399)" },
+          { label: "Failed", value: summary.failed, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Van Revenue", value: `Rs. ${summary.vanRevenue.toLocaleString()}`, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Recovery", value: `${summary.recoveryRate}%`, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 8 }}>{card.label}</div>
@@ -75,12 +75,12 @@ export default function DistributionOverviewPage() {
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{metric.route}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{metric.area || "-"}</td>
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{metric.driver || "-"}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#38bdf8", fontWeight: 700 }}>{metric.deliveries}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{metric.delivered}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#ef4444", fontWeight: 700 }}>{metric.failed}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {metric.revenue.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#38bdf8", fontWeight: 700 }}>Rs. {metric.collected.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: metric.recoveryRate >= 80 ? "#22c55e" : "#f59e0b", fontWeight: 700 }}>{metric.recoveryRate}%</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>{metric.deliveries}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{metric.delivered}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-ef4444, #ef4444)", fontWeight: 700 }}>{metric.failed}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {metric.revenue.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>Rs. {metric.collected.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: metric.recoveryRate >= 80 ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{metric.recoveryRate}%</td>
               </tr>
             ))}
             {routeMetrics.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No route metrics available yet.</td></tr>}

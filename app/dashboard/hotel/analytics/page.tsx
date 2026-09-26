@@ -44,7 +44,7 @@ export default function HotelAnalyticsPage() {
             {Object.entries(roomMix).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
               <div key={type} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{type}</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#fdba74" }}>{count}</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-fdba74, #fdba74)" }}>{count}</span>
               </div>
             ))}
             {Object.keys(roomMix).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No room data yet.</div>}
@@ -55,10 +55,10 @@ export default function HotelAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Reservation Health</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Reserved", value: reservations.filter((row) => row.status === "reserved").length, color: "#818cf8" },
-              { label: "Checked in", value: reservations.filter((row) => row.status === "checked_in").length, color: "#34d399" },
-              { label: "Checked out", value: reservations.filter((row) => row.status === "checked_out").length, color: "#94a3b8" },
-              { label: "Pending housekeeping", value: housekeeping.filter((row) => row.status !== "completed").length, color: "#f59e0b" },
+              { label: "Reserved", value: reservations.filter((row) => row.status === "reserved").length, color: "var(--tx-818cf8, #818cf8)" },
+              { label: "Checked in", value: reservations.filter((row) => row.status === "checked_in").length, color: "var(--tx-34d399, #34d399)" },
+              { label: "Checked out", value: reservations.filter((row) => row.status === "checked_out").length, color: "var(--tx-94a3b8, #94a3b8)" },
+              { label: "Pending housekeeping", value: housekeeping.filter((row) => row.status !== "completed").length, color: "var(--tx-f59e0b, #f59e0b)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: hotelMuted }}>{row.label}</span>
@@ -75,7 +75,7 @@ export default function HotelAnalyticsPage() {
           {Object.entries(serviceByRoom).sort((a, b) => b[1] - a[1]).map(([room, amount]) => (
             <div key={room} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
               <span style={{ fontSize: 13 }}>Room {room}</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {amount.toLocaleString()}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {amount.toLocaleString()}</span>
             </div>
           ))}
           {Object.keys(serviceByRoom).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No delivered room service yet.</div>}

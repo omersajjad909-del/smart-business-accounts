@@ -145,7 +145,7 @@ export default function StudentsPage() {
 
         {selStudent ? (
           <div style={S.detailPanel}>
-            <div style={{ fontSize: "32px", fontWeight: 700, color: "#6366f1", marginBottom: "4px" }}>
+            <div style={{ fontSize: "32px", fontWeight: 700, color: "var(--tx-6366f1, #6366f1)", marginBottom: "4px" }}>
               {selStudent.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
             </div>
             <div style={S.detailTitle}>{selStudent.name}</div>
@@ -204,7 +204,7 @@ export default function StudentsPage() {
                 </select>
               </div>
             </div>
-            {error && <div style={{ color: "#fda4af", fontSize: "12px", marginTop: "4px" }}>{error}</div>}
+            {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: "12px", marginTop: "4px" }}>{error}</div>}
             <div style={S.modalBtns}>
               <button style={S.cancelBtn} onClick={() => { setShowModal(false); setError(""); }}>Cancel</button>
               <button style={S.btn} onClick={handleCreate}>Add Student</button>

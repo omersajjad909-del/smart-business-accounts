@@ -42,10 +42,10 @@ export default function MediaClientsPage() {
       summarize={(rows) => {
         const retainer = rows.reduce((sum, row) => sum + Number(row.retainer || 0), 0);
         return [
-          { label: "Clients", value: rows.length, color: "#a78bfa" },
-          { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
-          { label: "At Risk", value: rows.filter((row) => String(row.status) === "at_risk").length, color: "#f87171" },
-          { label: "Retainers", value: retainer.toLocaleString(), color: "#fbbf24" },
+          { label: "Clients", value: rows.length, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "At Risk", value: rows.filter((row) => String(row.status) === "at_risk").length, color: "var(--tx-f87171, #f87171)" },
+          { label: "Retainers", value: retainer.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

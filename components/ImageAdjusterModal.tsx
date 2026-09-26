@@ -247,7 +247,7 @@ export default function ImageAdjusterModal({
         position: "fixed",
         inset: 0,
         zIndex: 2000,
-        background: "rgba(3,6,23,0.92)",
+        background: "rgba(var(--dkr-030617, 3,6,23),0.92)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

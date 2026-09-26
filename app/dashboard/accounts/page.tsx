@@ -545,10 +545,10 @@ export default function ChartOfAccounts() {
               <input type="date" value={form.openDate} onChange={e => f("openDate", e.target.value)} style={{ ...inp(), colorScheme: "dark" }} />
             </Field>
             <Field label="Debit (Dr)">
-              <input type="number" value={form.openDebit} onChange={e => f("openDebit", e.target.value)} placeholder="0.00" style={{ ...inp(), color: "#f87171" }} />
+              <input type="number" value={form.openDebit} onChange={e => f("openDebit", e.target.value)} placeholder="0.00" style={{ ...inp(), color: "var(--tx-f87171, #f87171)" }} />
             </Field>
             <Field label="Credit (Cr)">
-              <input type="number" value={form.openCredit} onChange={e => f("openCredit", e.target.value)} placeholder="0.00" style={{ ...inp(), color: "#34d399" }} />
+              <input type="number" value={form.openCredit} onChange={e => f("openCredit", e.target.value)} placeholder="0.00" style={{ ...inp(), color: "var(--tx-34d399, #34d399)" }} />
             </Field>
             {!showTax && !showBankIban && (
               <Field label="Credit Limit">
@@ -684,10 +684,10 @@ export default function ChartOfAccounts() {
                       {a.strn && <div>STRN: {a.strn}</div>}
                       {!a.ntn && !a.strn && "—"}
                     </td>
-                    <td style={{ padding: "13px 16px", color: "#f87171", textAlign: "right", fontWeight: 600, fontSize: 13 }}>
+                    <td style={{ padding: "13px 16px", color: "var(--tx-f87171, #f87171)", textAlign: "right", fontWeight: 600, fontSize: 13 }}>
                       {a.openDebit ? Number(a.openDebit).toLocaleString() : "—"}
                     </td>
-                    <td style={{ padding: "13px 16px", color: "#34d399", textAlign: "right", fontWeight: 600, fontSize: 13 }}>
+                    <td style={{ padding: "13px 16px", color: "var(--tx-34d399, #34d399)", textAlign: "right", fontWeight: 600, fontSize: 13 }}>
                       {a.openCredit ? Number(a.openCredit).toLocaleString() : "—"}
                     </td>
                     <td style={{ padding: "13px 16px" }}>
@@ -698,7 +698,7 @@ export default function ChartOfAccounts() {
                         >Edit</button>
                         <button
                           onClick={() => deleteAccount(a.id)}
-                          style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+                          style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "var(--tx-f87171, #f87171)", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
                         >Del</button>
                       </div>
                     </td>

@@ -90,9 +90,9 @@ export default function ClassesPage() {
 
       <div style={S.stats}>
         <div style={S.stat}><div style={S.statLabel}>Total Classes</div><div style={S.statVal}>{classes.length}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Classes Open</div><div style={{ ...S.statVal, color: '#34d399' }}>{open}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Members Enrolled</div><div style={{ ...S.statVal, color: '#38bdf8' }}>{totalEnrolled}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Avg Occupancy</div><div style={{ ...S.statVal, color: '#fbbf24' }}>{avgOccupancy}%</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Classes Open</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{open}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Members Enrolled</div><div style={{ ...S.statVal, color: 'var(--tx-38bdf8, #38bdf8)' }}>{totalEnrolled}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Avg Occupancy</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)' }}>{avgOccupancy}%</div></div>
       </div>
 
       {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
@@ -127,7 +127,7 @@ export default function ClassesPage() {
               </div>
               <div style={S.actRow}>
                 <button style={S.actBtn}>Edit</button>
-                <button style={{ ...S.actBtn, color: c.status === 'Cancelled' ? '#34d399' : '#f87171' }} onClick={() => toggleStatus(c.id, c.status, c.enrolled, c.capacity)}>{c.status === 'Cancelled' ? 'Activate' : 'Cancel'}</button>
+                <button style={{ ...S.actBtn, color: c.status === 'Cancelled' ? 'var(--tx-34d399, #34d399)' : 'var(--tx-f87171, #f87171)' }} onClick={() => toggleStatus(c.id, c.status, c.enrolled, c.capacity)}>{c.status === 'Cancelled' ? 'Activate' : 'Cancel'}</button>
               </div>
             </div>
           );

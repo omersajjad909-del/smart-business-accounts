@@ -471,10 +471,10 @@ export default function TripsPage() {
     const margin = trips.reduce((sum, trip) => sum + trip.marginTotal, 0);
     const open = trips.filter((trip) => !["completed", "cancelled"].includes(trip.status)).length;
     return [
-      { label: "Trips", value: String(trips.length), color: "#38bdf8" },
-      { label: "Open", value: String(open), color: open ? "#fbbf24" : "#34d399" },
-      { label: "Sales", value: money(sale), color: "#60a5fa" },
-      { label: "Margin", value: money(margin), color: margin >= 0 ? "#34d399" : "#f87171" },
+      { label: "Trips", value: String(trips.length), color: "var(--tx-38bdf8, #38bdf8)" },
+      { label: "Open", value: String(open), color: open ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" },
+      { label: "Sales", value: money(sale), color: "var(--tx-60a5fa, #60a5fa)" },
+      { label: "Margin", value: money(margin), color: margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" },
     ];
   }, [trips, symbol]);
 
@@ -601,7 +601,7 @@ export default function TripsPage() {
                       </span>
                       <span style={{ textAlign: "right", whiteSpace: "nowrap", fontSize: 12.5 }}>
                         <span style={{ color: T.text, fontWeight: 700 }}>{money(record.sale)}</span>
-                        <span style={{ display: "block", fontSize: 11, color: record.margin >= 0 ? "#34d399" : "#f87171" }}>
+                        <span style={{ display: "block", fontSize: 11, color: record.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                           margin {money(record.margin)}
                         </span>
                       </span>
@@ -791,7 +791,7 @@ export default function TripsPage() {
                   disabled={items.length <= 1}
                   style={{
                     height: 36, padding: "0 10px", borderRadius: 9, border: "none", background: "transparent",
-                    color: items.length <= 1 ? T.muted : "#f87171", fontSize: 12, fontWeight: 700,
+                    color: items.length <= 1 ? T.muted : "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700,
                     cursor: items.length <= 1 ? "not-allowed" : "pointer", fontFamily: "inherit",
                   }}
                 >
@@ -836,7 +836,7 @@ export default function TripsPage() {
             <div style={{ display: "flex", gap: 18, flexWrap: "wrap", fontSize: 12.5 }}>
               <span style={{ color: T.muted }}>Sells for <strong style={{ color: T.text }}>{money(draftTotals.sale)}</strong></span>
               <span style={{ color: T.muted }}>Costs <strong style={{ color: T.text }}>{money(draftTotals.cost)}</strong></span>
-              <span style={{ color: draftTotals.margin >= 0 ? "#34d399" : "#f87171", fontWeight: 800 }}>
+              <span style={{ color: draftTotals.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 800 }}>
                 Margin {money(draftTotals.margin)}
               </span>
             </div>
@@ -848,7 +848,7 @@ export default function TripsPage() {
             </div>
           </div>
 
-          {error ? <div style={{ fontSize: 12.5, color: "#f87171" }}>{error}</div> : null}
+          {error ? <div style={{ fontSize: 12.5, color: "var(--tx-f87171, #f87171)" }}>{error}</div> : null}
         </section>
       ) : null}
 
@@ -909,7 +909,7 @@ export default function TripsPage() {
                       {/* Said on the line, because a service that came off a
                           desk record is edited there, not here. */}
                       {item.sourceRecordId ? (
-                        <span style={{ fontSize: 10, color: "#a78bfa", border: "1px solid rgba(167,139,250,.4)", borderRadius: 999, padding: "2px 7px" }}>
+                        <span style={{ fontSize: 10, color: "var(--tx-a78bfa, #a78bfa)", border: "1px solid rgba(167,139,250,.4)", borderRadius: 999, padding: "2px 7px" }}>
                           linked
                         </span>
                       ) : null}
@@ -930,7 +930,7 @@ export default function TripsPage() {
                         </button>
                       ) : null}
                       {money(item.sale * item.qty)}
-                      <span style={{ color: (item.sale - item.cost) >= 0 ? "#34d399" : "#f87171" }}>
+                      <span style={{ color: (item.sale - item.cost) >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                         ({money((item.sale - item.cost) * item.qty)})
                       </span>
                       {!trip.invoiceNo && item.id ? (
@@ -952,7 +952,7 @@ export default function TripsPage() {
                 <div style={{ display: "flex", gap: 18, flexWrap: "wrap", fontSize: 12.5 }}>
                   <span style={{ color: T.muted }}>Sale <strong style={{ color: T.text }}>{money(trip.saleTotal)}</strong></span>
                   <span style={{ color: T.muted }}>Cost <strong style={{ color: T.text }}>{money(trip.costTotal)}</strong></span>
-                  <span style={{ color: trip.marginTotal >= 0 ? "#34d399" : "#f87171", fontWeight: 800 }}>
+                  <span style={{ color: trip.marginTotal >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 800 }}>
                     Margin {money(trip.marginTotal)}
                   </span>
                 </div>
@@ -1033,7 +1033,7 @@ export default function TripsPage() {
                   <button
                     type="button"
                     onClick={() => remove(trip)}
-                    style={{ border: "none", background: "transparent", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                    style={{ border: "none", background: "transparent", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                   >
                     Remove
                   </button>

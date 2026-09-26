@@ -26,8 +26,8 @@ import { bookingMoney, readBooking } from "@/lib/umrahBooking";
 import { occupancyName, readDeparture, seatPosition } from "@/lib/umrahPackage";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.08)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.08)";
 const accent = "#38bdf8";
 
 /** How far ahead "about to fly" reaches. A visa is filed inside this window. */
@@ -149,7 +149,7 @@ export default function TravelOverviewPage() {
   ];
 
   return (
-    <div style={{ padding: isMobile ? "15px 13px" : "24px 28px", color: "#e2e8f0", fontFamily: ff }}>
+    <div style={{ padding: isMobile ? "15px 13px" : "24px 28px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: ff }}>
       {/* Across every desk at once: what is not a problem today and is an
           expensive problem the week it lands. */}
       <AttentionPanel />
@@ -183,7 +183,7 @@ export default function TravelOverviewPage() {
       {/* The one that earns the page. */}
       {attention.length > 0 && (
         <div style={{ background: "rgba(239,68,68,.06)", border: "1px solid rgba(239,68,68,.25)", borderRadius: 14, padding: isMobile ? "14px 13px" : "18px 20px", marginBottom: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#fca5a5", marginBottom: 4 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)", marginBottom: 4 }}>
             Flying soon, not ready
           </div>
           <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 13 }}>
@@ -198,7 +198,7 @@ export default function TravelOverviewPage() {
                     {a.departure} · {a.reasons.join(" · ")}
                   </div>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 800, color: a.days <= 7 ? "#ef4444" : "#fbbf24", whiteSpace: "nowrap" }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: a.days <= 7 ? "var(--tx-ef4444, #ef4444)" : "var(--tx-fbbf24, #fbbf24)", whiteSpace: "nowrap" }}>
                   {a.days === 0 ? "today" : a.days === 1 ? "tomorrow" : `${a.days} days`}
                 </span>
               </div>
@@ -235,7 +235,7 @@ export default function TravelOverviewPage() {
                   </div>
                 </div>
                 <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: seats.left === 0 ? "#fbbf24" : "#22c55e" }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: seats.left === 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-22c55e, #22c55e)" }}>
                     {seats.over > 0 ? `${seats.over} over` : `${seats.left} left`}
                   </div>
                   <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>{seats.sold} of {seats.quota} sold</div>
@@ -246,8 +246,8 @@ export default function TravelOverviewPage() {
                   <div style={{ width: `${seats.percent}%`, height: "100%", background: seats.over > 0 ? "#ef4444" : seats.percent >= 90 ? "#fbbf24" : "#22c55e" }} />
                 </div>
                 <span style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>
-                  collected <strong style={{ color: "#34d399" }}>{collected.toLocaleString()}</strong>
-                  {owed > 0 ? <> · owed <strong style={{ color: "#fbbf24" }}>{owed.toLocaleString()}</strong></> : null}
+                  collected <strong style={{ color: "var(--tx-34d399, #34d399)" }}>{collected.toLocaleString()}</strong>
+                  {owed > 0 ? <> · owed <strong style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>{owed.toLocaleString()}</strong></> : null}
                 </span>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import { BRAND_ORDER, BRAND_PRESETS, type BrandKey } from "@/lib/brandPalette";
 import { getCurrentUser } from "@/lib/auth";
@@ -31,6 +32,7 @@ export default function AppearancePage() {
   const { isMobile } = useResponsive();
   const currentUser = getCurrentUser() as { role?: string } | null;
   const isAdmin = String(currentUser?.role || "").toUpperCase() === "ADMIN";
+  const { resolvedTheme, setTheme } = useTheme();
 
   const [prefs, setPrefs] = useState<UserPrefs>({ themeMode: "auto", density: "comfortable", sidebarDefault: "expanded" });
   const [brand, setBrand] = useState<CompanyBranding>({ name: "", logoUrl: null, brandColor: "teal" });
@@ -61,21 +63,6 @@ export default function AppearancePage() {
     document.documentElement.style.setProperty("--accent-soft", preset.accentSoft);
     document.documentElement.style.setProperty("--accent-rgb", preset.accentRgb);
   }, [preset.accent, preset.accentStrong, preset.accentSoft, preset.accentRgb]);
-
-  useEffect(() => {
-    // Apply theme mode preview
-    const root = document.documentElement;
-    // Dark-only for now — previewing light here would strip the class off the
-    // whole app, not just this page.
-    if (!ALLOW_LIGHT_THEME) { root.classList.add("dark"); return; }
-    if (prefs.themeMode === "dark") root.classList.add("dark");
-    else if (prefs.themeMode === "light") root.classList.remove("dark");
-    else {
-      // auto
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      root.classList.toggle("dark", prefersDark);
-    }
-  }, [prefs.themeMode]);
 
   async function saveUserPrefs(patch: Partial<UserPrefs>) {
     const next = { ...prefs, ...patch };
@@ -201,7 +188,7 @@ export default function AppearancePage() {
                 disabled={!isAdmin || logoUploading}
                 style={{
                   padding: "9px 16px", borderRadius: 10, border: "1px solid var(--card-border, rgba(var(--ink),.12))",
-                  background: "var(--accent-soft, rgba(13,148,136,.1))", color: "var(--accent, #0d9488)",
+                  background: "var(--accent-soft, rgba(13,148,136,.1))", color: "var(--accent, var(--tx-0d9488, #0d9488))",
                   fontSize: 13, fontWeight: 700, cursor: (!isAdmin || logoUploading) ? "not-allowed" : "pointer",
                 }}
               >
@@ -212,7 +199,7 @@ export default function AppearancePage() {
                   onClick={removeLogo}
                   style={{
                     padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(239,68,68,.25)",
-                    background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 13, fontWeight: 700, cursor: "pointer",
+                    background: "rgba(239,68,68,.08)", color: "var(--tx-f87171, #f87171)", fontSize: 13, fontWeight: 700, cursor: "pointer",
                   }}
                 >
                   Remove
@@ -284,20 +271,20 @@ export default function AppearancePage() {
           </div>
         </div>
 
-        {/* Theme mode — Light and Auto are hidden while the light palette is
-            unfinished. The stored preference is left alone, so whoever had
-            Light selected gets it back untouched when it returns. */}
+        {/* Theme mode. No "Auto": the OS never picks the theme (see
+            lib/themeConfig), and the selection shown is the live theme, so a
+            stored "auto" simply reads as the default, Dark. */}
         <div style={{ marginBottom: 22 }}>
           <div style={LABEL}>Theme</div>
           {ALLOW_LIGHT_THEME ? (
             <SegmentedControl
-              value={prefs.themeMode}
-              options={[{v:"light",l:"☀️ Light"},{v:"dark",l:"🌙 Dark"},{v:"auto",l:"🖥 Auto"}]}
-              onChange={v => saveUserPrefs({ themeMode: v as ThemeMode })}
+              value={resolvedTheme === "light" ? "light" : "dark"}
+              options={[{v:"light",l:"☀️ Light"},{v:"dark",l:"🌙 Dark"}]}
+              onChange={v => { setTheme(v); saveUserPrefs({ themeMode: v as ThemeMode }); }}
             />
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <div style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", fontSize: 13, fontWeight: 700, color: "#a5b4fc" }}>
+              <div style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", fontSize: 13, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                 🌙 Dark
               </div>
               <div style={{ fontSize: 12, color: "rgba(var(--ink),.38)" }}>

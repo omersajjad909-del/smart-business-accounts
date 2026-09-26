@@ -8,9 +8,9 @@ const isMobile = false;
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#34d399";
-const BG = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.08)";
-const MUTED = "rgba(255,255,255,.45)";
+const BG = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.08)";
+const MUTED = "rgba(var(--ink),.45)";
 
 const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
@@ -166,7 +166,7 @@ export default function NotificationsConfigPage() {
       {!config.enabled && (
         <div style={{ background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 12, padding: isMobile ? "8px 9px" : "14px 18px", marginBottom: 20, display: "flex", gap: 12, alignItems: "center" }}>
           <span style={{ fontSize: 20 }}>⚠️</span>
-          <div style={{ fontSize: 13, color: "#f87171" }}>Notifications are <strong>disabled</strong>. Toggle the switch above to enable.</div>
+          <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>Notifications are <strong>disabled</strong>. Toggle the switch above to enable.</div>
         </div>
       )}
 
@@ -256,7 +256,7 @@ export default function NotificationsConfigPage() {
       {/* Templates Tab */}
       {activeTab === "templates" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 16px", fontSize: 12, color: "#6ee7b7" }}>
+          <div style={{ background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", borderRadius: 10, padding: isMobile ? "8px 8px" : "12px 16px", fontSize: 12, color: "var(--tx-6ee7b7, #6ee7b7)" }}>
             Available variables: <code style={{ background: "rgba(var(--ink),.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{customer}}"}</code> <code style={{ background: "rgba(var(--ink),.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{amount}}"}</code> <code style={{ background: "rgba(var(--ink),.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{date}}"}</code> <code style={{ background: "rgba(var(--ink),.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{business}}"}</code> <code style={{ background: "rgba(var(--ink),.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{product}}"}</code> <code style={{ background: "rgba(var(--ink),.07)", padding: isMobile ? "8px 8px" : "1px 5px", borderRadius: 4 }}>{"{{qty}}"}</code>
           </div>
           {(Object.entries(config.templates) as [keyof NotifConfig["templates"], string][]).map(([key, val]) => (

@@ -12,11 +12,11 @@ type Update = {
 };
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string; bg: string }> = {
-  feature: { label: "New Feature", icon: "✨", color: "#818cf8", bg: "rgba(129,140,248,.15)" },
-  improvement: { label: "Improvement", icon: "⚡", color: "#38bdf8", bg: "rgba(56,189,248,.15)" },
-  bugfix: { label: "Bug Fix", icon: "🐛", color: "#34d399", bg: "rgba(52,211,153,.15)" },
-  announcement: { label: "Announcement", icon: "📣", color: "#fbbf24", bg: "rgba(251,191,36,.15)" },
-  maintenance: { label: "Maintenance", icon: "🔧", color: "#f87171", bg: "rgba(248,113,113,.15)" },
+  feature: { label: "New Feature", icon: "✨", color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.15)" },
+  improvement: { label: "Improvement", icon: "⚡", color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.15)" },
+  bugfix: { label: "Bug Fix", icon: "🐛", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.15)" },
+  announcement: { label: "Announcement", icon: "📣", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.15)" },
+  maintenance: { label: "Maintenance", icon: "🔧", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.15)" },
 };
 
 export default function WhatsNew() {
@@ -196,7 +196,7 @@ export default function WhatsNew() {
                         transition: "all .15s",
                       }}
                       onMouseEnter={(e) => {
-                        if (!isSelected) e.currentTarget.style.background = "rgba(255,255,255,.04)";
+                        if (!isSelected) e.currentTarget.style.background = "rgba(var(--ink),.04)";
                       }}
                       onMouseLeave={(e) => {
                         if (!isSelected) e.currentTarget.style.background = "transparent";

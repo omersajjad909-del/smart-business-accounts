@@ -115,10 +115,10 @@ export default function TravelVisasPage() {
         const totalCost = rows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
         return [
           { label: "Cases", value: rows.length, color: travelAccent },
-          { label: "Submitted", value: rows.filter((row) => String(row.status) === "submitted").length, color: "#fbbf24" },
-          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "#34d399" },
-          { label: "Invoice Ready", value: rows.filter((row) => !String(row.invoiceNo || "")).length, color: "#f97316" },
-          { label: "Margin", value: (totalValue - totalCost).toLocaleString(), color: "#a78bfa" },
+          { label: "Submitted", value: rows.filter((row) => String(row.status) === "submitted").length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Invoice Ready", value: rows.filter((row) => !String(row.invoiceNo || "")).length, color: "var(--tx-f97316, #f97316)" },
+          { label: "Margin", value: (totalValue - totalCost).toLocaleString(), color: "var(--tx-a78bfa, #a78bfa)" },
         ];
       }}
     />

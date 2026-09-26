@@ -311,7 +311,7 @@ export default function EmployeesPage() {
                       </button>
                       <button onClick={() => handleDelete(emp.id)}
                         style={{ padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(248,113,113,.25)",
-                          background: "rgba(248,113,113,.1)", color: "#f87171", fontSize: 12, fontWeight: 600,
+                          background: "rgba(248,113,113,.1)", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 600,
                           cursor: "pointer", fontFamily: ff }}>
                         Delete
                       </button>

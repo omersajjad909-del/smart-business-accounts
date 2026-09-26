@@ -118,12 +118,12 @@ export default function BranchReportsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginBottom: 28 }}>
         {[
-          { label: "Total Sales", val: `Rs ${combined.sales.toLocaleString()}`, color: "#10b981" },
-          { label: "Total Purchases", val: `Rs ${combined.purchases.toLocaleString()}`, color: "#818cf8" },
-          { label: "Gross Profit", val: `Rs ${combined.profit.toLocaleString()}`, color: "#f59e0b" },
-          { label: "Expenses", val: `Rs ${combined.expenses.toLocaleString()}`, color: "#ef4444" },
-          { label: "Transactions", val: combined.transactions.toLocaleString(), color: "#6366f1" },
-          { label: "Customers Served", val: combined.customers.toLocaleString(), color: "#34d399" },
+          { label: "Total Sales", val: `Rs ${combined.sales.toLocaleString()}`, color: "var(--tx-10b981, #10b981)" },
+          { label: "Total Purchases", val: `Rs ${combined.purchases.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Gross Profit", val: `Rs ${combined.profit.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Expenses", val: `Rs ${combined.expenses.toLocaleString()}`, color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Transactions", val: combined.transactions.toLocaleString(), color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Customers Served", val: combined.customers.toLocaleString(), color: "var(--tx-34d399, #34d399)" },
         ].map((kpi) => (
           <div key={kpi.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>{kpi.label}</div>
@@ -137,10 +137,10 @@ export default function BranchReportsPage() {
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Enterprise Summary</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12 }}>
             {[
-              { label: "Top Profit Branch", value: topPerformingBranch?.name || "N/A", color: "#34d399" },
-              { label: "Low Margin Branches", value: String(lowMarginBranches), color: lowMarginBranches ? "#f59e0b" : "#22c55e" },
-              { label: "Low Traffic Branches", value: String(lowTrafficBranches), color: lowTrafficBranches ? "#f97316" : "#22c55e" },
-              { label: "Active Branches", value: String(selectedRows.filter((row) => row.isActive).length), color: "#818cf8" },
+              { label: "Top Profit Branch", value: topPerformingBranch?.name || "N/A", color: "var(--tx-34d399, #34d399)" },
+              { label: "Low Margin Branches", value: String(lowMarginBranches), color: lowMarginBranches ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" },
+              { label: "Low Traffic Branches", value: String(lowTrafficBranches), color: lowTrafficBranches ? "var(--tx-f97316, #f97316)" : "var(--tx-22c55e, #22c55e)" },
+              { label: "Active Branches", value: String(selectedRows.filter((row) => row.isActive).length), color: "var(--tx-818cf8, #818cf8)" },
             ].map((item) => (
               <div key={item.label} style={{ border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 16px", background: "rgba(var(--ink),.02)" }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{item.label}</div>
@@ -153,13 +153,13 @@ export default function BranchReportsPage() {
         <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Action Watchlist</div>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: "var(--text-muted)" }}>
-            Profit Risk: <span style={{ color: lowMarginBranches ? "#f59e0b" : "#22c55e" }}>{loading ? "..." : `${lowMarginBranches} branch(es)`}</span>
+            Profit Risk: <span style={{ color: lowMarginBranches ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" }}>{loading ? "..." : `${lowMarginBranches} branch(es)`}</span>
             <br />
-            Traffic Risk: <span style={{ color: lowTrafficBranches ? "#f97316" : "#22c55e" }}>{loading ? "..." : `${lowTrafficBranches} branch(es)`}</span>
+            Traffic Risk: <span style={{ color: lowTrafficBranches ? "var(--tx-f97316, #f97316)" : "var(--tx-22c55e, #22c55e)" }}>{loading ? "..." : `${lowTrafficBranches} branch(es)`}</span>
             <br />
-            Best Performer: <span style={{ color: "#34d399" }}>{loading ? "..." : topPerformingBranch?.name || "N/A"}</span>
+            Best Performer: <span style={{ color: "var(--tx-34d399, #34d399)" }}>{loading ? "..." : topPerformingBranch?.name || "N/A"}</span>
             <br />
-            Focus Area: <span style={{ color: "#c4b5fd" }}>{selectedBranch === "all" ? "Cross-branch comparison" : branchOptions.find((entry) => entry.id === selectedBranch)?.name || "Selected branch"}</span>
+            Focus Area: <span style={{ color: "var(--tx-c4b5fd, #c4b5fd)" }}>{selectedBranch === "all" ? "Cross-branch comparison" : branchOptions.find((entry) => entry.id === selectedBranch)?.name || "Selected branch"}</span>
           </div>
         </div>
       </div>
@@ -195,12 +195,12 @@ export default function BranchReportsPage() {
                 return (
                   <tr key={row.id} style={{ borderTop: "1px solid var(--border)", background: index % 2 === 0 ? "transparent" : "rgba(99,102,241,.02)" }}>
                     <td style={{ padding: "11px 16px", fontWeight: 600 }}>{row.name}</td>
-                    <td style={{ padding: "11px 16px", color: "#10b981", fontWeight: 600 }}>Rs {row.sales.toLocaleString()}</td>
-                    <td style={{ padding: "11px 16px", color: "#818cf8" }}>Rs {row.purchases.toLocaleString()}</td>
-                    <td style={{ padding: "11px 16px", color: "#ef4444" }}>Rs {row.expenses.toLocaleString()}</td>
-                    <td style={{ padding: "11px 16px", color: "#f59e0b", fontWeight: 600 }}>Rs {row.profit.toLocaleString()}</td>
+                    <td style={{ padding: "11px 16px", color: "var(--tx-10b981, #10b981)", fontWeight: 600 }}>Rs {row.sales.toLocaleString()}</td>
+                    <td style={{ padding: "11px 16px", color: "var(--tx-818cf8, #818cf8)" }}>Rs {row.purchases.toLocaleString()}</td>
+                    <td style={{ padding: "11px 16px", color: "var(--tx-ef4444, #ef4444)" }}>Rs {row.expenses.toLocaleString()}</td>
+                    <td style={{ padding: "11px 16px", color: "var(--tx-f59e0b, #f59e0b)", fontWeight: 600 }}>Rs {row.profit.toLocaleString()}</td>
                     <td style={{ padding: "11px 16px" }}>
-                      <span style={{ background: "rgba(16,185,129,.1)", color: "#10b981", padding: "2px 8px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{margin}%</span>
+                      <span style={{ background: "rgba(16,185,129,.1)", color: "var(--tx-10b981, #10b981)", padding: "2px 8px", borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{margin}%</span>
                     </td>
                     <td style={{ padding: "11px 16px" }}>{row.transactions}</td>
                   </tr>

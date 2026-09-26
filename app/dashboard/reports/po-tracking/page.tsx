@@ -16,11 +16,11 @@ interface Row { poNumber: string; supplierName: string; poDate: string; expected
 // "draft"/"sent"/"received", which matched none of them.
 const STATUS: Record<string, Badge> = {
   draft:           { label: "Draft",       color: "var(--text-muted)", bg: "var(--app-bg)" },
-  pending:         { label: "Pending",     color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  approved:        { label: "Approved",    color: "#818cf8", bg: "rgba(129,140,248,.1)" },
-  partial:         { label: "Partial",     color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  fully_received:  { label: "Received ✓",  color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  cancelled:       { label: "Cancelled",   color: "#f87171", bg: "rgba(248,113,113,.1)" },
+  pending:         { label: "Pending",     color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" },
+  approved:        { label: "Approved",    color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)" },
+  partial:         { label: "Partial",     color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" },
+  fully_received:  { label: "Received ✓",  color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
+  cancelled:       { label: "Cancelled",   color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function PoTrackingPage() {
@@ -72,7 +72,7 @@ export default function PoTrackingPage() {
         <div style={{ marginBottom: 20, padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: "rgba(251,191,36,.07)", border: "1px solid rgba(251,191,36,.25)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>⏳</span>
           <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
-            <span style={{ fontWeight: 700, color: "#fbbf24" }}>{cur} {fmt(pendingTotal)}</span> worth of POs awaiting delivery
+            <span style={{ fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)" }}>{cur} {fmt(pendingTotal)}</span> worth of POs awaiting delivery
           </span>
         </div>
       )}
@@ -95,14 +95,14 @@ export default function PoTrackingPage() {
                 <tr key={i} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#818cf8" }}>{r.poNumber}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)" }}>{r.poNumber}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.supplierName}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.poDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.expectedDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(r.receivedDate)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.totalValue)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#34d399" }}>{r.receivedValue > 0 ? `${cur} ${fmt(r.receivedValue)}` : "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.pendingValue > 0 ? "#fbbf24" : "var(--text-muted)" }}>{r.pendingValue > 0 ? `${cur} ${fmt(r.pendingValue)}` : "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-34d399, #34d399)" }}>{r.receivedValue > 0 ? `${cur} ${fmt(r.receivedValue)}` : "—"}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.pendingValue > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--text-muted)" }}>{r.pendingValue > 0 ? `${cur} ${fmt(r.pendingValue)}` : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: s.bg, color: s.color }}>{s.label}</span>
                   </td>

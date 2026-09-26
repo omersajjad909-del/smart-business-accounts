@@ -40,7 +40,7 @@ export default function MaintenanceAnalyticsPage() {
   return (
     <div style={{ minHeight: "100vh", padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: maintenanceFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#86efac", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Maintenance Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-86efac, #86efac)", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>Maintenance Analytics</div>
         <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>Contract health, schedule discipline, and field performance</h1>
         <p style={{ margin: 0, fontSize: 14, color: maintenanceMuted, maxWidth: 760 }}>
           AMC value, visit adherence, job completion, and parts dependency ko operational analytics view me read karein.
@@ -49,10 +49,10 @@ export default function MaintenanceAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Contract Value", value: `Rs. ${summary.contractValue.toLocaleString()}`, color: "#34d399" },
-          { label: "Job Completion", value: `${completionRate}%`, color: "#60a5fa" },
-          { label: "Schedule Adherence", value: `${scheduleAdherence}%`, color: "#22c55e" },
-          { label: "Low Stock Parts", value: summary.lowStockParts, color: "#f87171" },
+          { label: "Contract Value", value: `Rs. ${summary.contractValue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Job Completion", value: `${completionRate}%`, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Schedule Adherence", value: `${scheduleAdherence}%`, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Low Stock Parts", value: summary.lowStockParts, color: "var(--tx-f87171, #f87171)" },
         ].map((card) => (
           <div key={card.label} style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 12, color: maintenanceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -63,7 +63,7 @@ export default function MaintenanceAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#bbf7d0", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Contract Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-bbf7d0, #bbf7d0)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Contract Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Active contracts", value: `${summary.activeContracts} active`, tone: "#34d399" },
@@ -80,7 +80,7 @@ export default function MaintenanceAnalyticsPage() {
         </div>
 
         <div style={{ background: maintenanceBg, border: `1px solid ${maintenanceBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#facc15", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Field Ops Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-facc15, #facc15)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Field Ops Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Open jobs", value: `${summary.openJobs} open`, tone: "#60a5fa" },

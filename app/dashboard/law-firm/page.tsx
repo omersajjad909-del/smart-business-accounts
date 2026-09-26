@@ -38,7 +38,7 @@ export default function LawFirmOverviewPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: lawFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#fdba74", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Law Firm</div>
+        <div style={{ fontSize: 12, color: "var(--tx-fdba74, #fdba74)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Law Firm</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Practice Control Center</h1>
         <p style={{ margin: 0, fontSize: 14, color: lawMuted, maxWidth: 760 }}>
           Cases, hearings, client dues, legal billing, aur time tracking ko ek hi practice management dashboard me monitor karein.
@@ -55,7 +55,7 @@ export default function LawFirmOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(146,64,14,.14), rgba(251,191,36,.08))", border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fed7aa", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Practice Flow</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fed7aa, #fed7aa)", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Practice Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12 }}>
             {[
               { title: "Open Client", body: "Client file, contact details, aur account standing maintain karein." },
@@ -73,7 +73,7 @@ export default function LawFirmOverviewPage() {
         </div>
 
         <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 24 }}>
-          <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
+          <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
               { href: "/dashboard/law-firm/cases", label: "Open Case Desk", hint: "Matter register and hearing schedule" },
@@ -93,7 +93,7 @@ export default function LawFirmOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Recent Matters</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Recent Matters</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topMatters.length === 0 ? (
               <div style={{ color: lawMuted, fontSize: 13 }}>Cases add karne ke baad yahan active matters show honge.</div>
@@ -103,14 +103,14 @@ export default function LawFirmOverviewPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{legalCase.title}</div>
                   <div style={{ fontSize: 12, color: lawMuted }}>{legalCase.client} · {legalCase.court}</div>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: legalCase.status === "Active" ? "#34d399" : "#94a3b8" }}>{legalCase.status}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: legalCase.status === "Active" ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>{legalCase.status}</div>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ background: lawBg, border: `1px solid ${lawBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Unbilled time", value: `Rs. ${summary.unbilledTime.toLocaleString()}`, tone: "#60a5fa" },

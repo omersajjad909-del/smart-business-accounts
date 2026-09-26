@@ -79,10 +79,10 @@ export default function TradingProcurementPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Purchase Orders", value: purchaseOrders.length, color: "#34d399" },
-          { label: "Pending PO Value", value: formatMoney(pendingPoValue), color: "#f59e0b" },
-          { label: "Purchase Invoices", value: formatMoney(invoiceValue), color: "#a78bfa" },
-          { label: "GRNs Logged", value: grns.length, color: "#38bdf8" },
+          { label: "Purchase Orders", value: purchaseOrders.length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Pending PO Value", value: formatMoney(pendingPoValue), color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Purchase Invoices", value: formatMoney(invoiceValue), color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "GRNs Logged", value: grns.length, color: "var(--tx-38bdf8, #38bdf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradingBg, border: `1px solid ${tradingBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradingMuted, marginBottom: 8 }}>{card.label}</div>
@@ -108,8 +108,8 @@ export default function TradingProcurementPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.poNo}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.supplier?.name || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: String(row.status || "").toUpperCase() === "PENDING" ? "#f59e0b" : "#34d399", fontWeight: 700 }}>{row.status || row.approvalStatus || "-"}</td>
-                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(sumLineAmount(row.items))}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: String(row.status || "").toUpperCase() === "PENDING" ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{row.status || row.approvalStatus || "-"}</td>
+                  <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{formatMoney(sumLineAmount(row.items))}</td>
                 </tr>
               ))}
               {purchaseOrders.length === 0 && (
@@ -129,7 +129,7 @@ export default function TradingProcurementPage() {
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontWeight: 700 }}>{row.grnNo}</span>
-                    <span style={{ color: "#38bdf8", fontSize: 11 }}>{row.status || "Received"}</span>
+                    <span style={{ color: "var(--tx-38bdf8, #38bdf8)", fontSize: 11 }}>{row.status || "Received"}</span>
                   </div>
                   <div style={{ fontSize: 12, color: tradingMuted, marginTop: 6 }}>{row.supplier?.name || "-"}</div>
                   <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{row.po?.poNo || "Direct GRN"} · {formatDate(row.date)}</div>
@@ -146,7 +146,7 @@ export default function TradingProcurementPage() {
                 <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.16)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontWeight: 700 }}>{row.invoiceNo}</span>
-                    <span style={{ color: "#a78bfa", fontWeight: 700 }}>{formatMoney(row.total)}</span>
+                    <span style={{ color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700 }}>{formatMoney(row.total)}</span>
                   </div>
                   <div style={{ fontSize: 12, color: tradingMuted, marginTop: 6 }}>{row.supplier?.name || "-"}</div>
                   <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{formatDate(row.date)}</div>

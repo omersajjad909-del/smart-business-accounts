@@ -44,10 +44,10 @@ export default function ForecastPage() {
       {summary && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
           {[
-            { label: "Next Month",    value: `${cur} ${fmt(summary.nextMonthForecast)}`,    color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
-            { label: "Next Quarter",  value: `${cur} ${fmt(summary.nextQuarterForecast)}`,  color: "#6366f1", bg: "rgba(99,102,241,.07)",   border: "rgba(99,102,241,.2)" },
-            { label: "Growth Rate",   value: `${summary.growthRatePct > 0 ? "+" : ""}${summary.growthRatePct.toFixed(1)}%`, color: summary.growthRatePct >= 0 ? "#34d399" : "#f87171", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
-            { label: "Confidence",    value: `${summary.confidence.toFixed(0)}%`,           color: "#fbbf24", bg: "rgba(251,191,36,.07)",   border: "rgba(251,191,36,.2)" },
+            { label: "Next Month",    value: `${cur} ${fmt(summary.nextMonthForecast)}`,    color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)" },
+            { label: "Next Quarter",  value: `${cur} ${fmt(summary.nextQuarterForecast)}`,  color: "var(--tx-6366f1, #6366f1)", bg: "rgba(99,102,241,.07)",   border: "rgba(99,102,241,.2)" },
+            { label: "Growth Rate",   value: `${summary.growthRatePct > 0 ? "+" : ""}${summary.growthRatePct.toFixed(1)}%`, color: summary.growthRatePct >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", bg: "rgba(52,211,153,.07)", border: "rgba(52,211,153,.2)" },
+            { label: "Confidence",    value: `${summary.confidence.toFixed(0)}%`,           color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.07)",   border: "rgba(251,191,36,.2)" },
           ].map((c, i) => (
             <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
               <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -96,13 +96,13 @@ export default function ForecastPage() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.month}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700 }}>{r.actual !== null ? `${cur} ${fmt(r.actual)}` : "—"}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "#818cf8" }}>{cur} {fmt(r.forecast)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, color: "var(--tx-818cf8, #818cf8)" }}>{cur} {fmt(r.forecast)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{cur} {fmt(r.lowerBound)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{cur} {fmt(r.upperBound)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>
                     {r.actual !== null
-                      ? <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(99,102,241,.1)", color: "#6366f1" }}>Actual</span>
-                      : <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(129,140,248,.1)", color: "#818cf8" }}>Forecast</span>}
+                      ? <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(99,102,241,.1)", color: "var(--tx-6366f1, #6366f1)" }}>Actual</span>
+                      : <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(129,140,248,.1)", color: "var(--tx-818cf8, #818cf8)" }}>Forecast</span>}
                   </td>
                 </tr>
               ))}

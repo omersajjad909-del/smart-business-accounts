@@ -335,7 +335,7 @@ export default function AdminControlPage() {
   }
 
   if (!isAdmin) return (
-    <div style={{ padding: 40, textAlign: "center", color: "#f87171", fontFamily: ff }}>
+    <div style={{ padding: 40, textAlign: "center", color: "var(--tx-f87171, #f87171)", fontFamily: ff }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
       <div style={{ fontSize: 18, fontWeight: 800 }}>Admin Only</div>
       <div style={{ fontSize: 13, color: MUTED, marginTop: 6 }}>This page is only accessible to account owners and admins.</div>
@@ -355,10 +355,10 @@ export default function AdminControlPage() {
       {!loading && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
           {[
-            { label: "Plan",           value: company?.plan || "STARTER",     color: "#818cf8" },
-            { label: "Branches",       value: branches.length,                color: "#34d399" },
-            { label: "Team Members",   value: users.length,                   color: "#38bdf8" },
-            { label: "Assigned Users", value: Object.values(settings.branchAssignments).filter(a => a.length > 0).length, color: "#f59e0b" },
+            { label: "Plan",           value: company?.plan || "STARTER",     color: "var(--tx-818cf8, #818cf8)" },
+            { label: "Branches",       value: branches.length,                color: "var(--tx-34d399, #34d399)" },
+            { label: "Team Members",   value: users.length,                   color: "var(--tx-38bdf8, #38bdf8)" },
+            { label: "Assigned Users", value: Object.values(settings.branchAssignments).filter(a => a.length > 0).length, color: "var(--tx-f59e0b, #f59e0b)" },
           ].map(k => (
             <div key={k.label} style={{ background: BG, border: `1px solid ${BDR}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
               <div style={{ fontSize: 11, color: MUTED, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>{k.label}</div>
@@ -485,7 +485,7 @@ export default function AdminControlPage() {
                     <input type="file" accept="image/*" onChange={e => void handleLogoUpload(e.target.files?.[0] || null)} style={{ ...inp, padding: "7px 10px" }} />
                     <div style={{ marginTop: 5, fontSize: 11, color: MUTED }}>PNG, JPG or SVG. Or paste a direct URL below.</div>
                     <input style={{ ...inp, marginTop: 8 }} value={settings.printPreferences.logoUrl} onChange={e => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, logoUrl: e.target.value } }))} placeholder="https://…" />
-                    {settings.printPreferences.logoUrl && <button onClick={() => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, logoUrl: "" } }))} style={{ marginTop: 6, background: "none", border: "none", color: "#f87171", fontSize: 12, cursor: "pointer", fontFamily: ff }}>✕ Clear logo</button>}
+                    {settings.printPreferences.logoUrl && <button onClick={() => setSettings(s => ({ ...s, printPreferences: { ...s.printPreferences, logoUrl: "" } }))} style={{ marginTop: 6, background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, cursor: "pointer", fontFamily: ff }}>✕ Clear logo</button>}
                   </div>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -552,7 +552,7 @@ export default function AdminControlPage() {
                       live preview. Sales invoice, PO, challan, GRN and the rest each keep their own.
                     </span>
                   </span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#818cf8", whiteSpace: "nowrap" }}>Open →</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--tx-818cf8, #818cf8)", whiteSpace: "nowrap" }}>Open →</span>
                 </Link>
               </div>
 
@@ -598,7 +598,7 @@ export default function AdminControlPage() {
                     <div key={b.id} style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderRadius: 10, border: `1px solid ${BDR}`, background: "rgba(var(--ink),.02)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14 }}>{b.code} · {b.name}</div>
-                        <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{b.city || "No city"} · <span style={{ color: b.isActive ? "#34d399" : "#f87171" }}>{b.isActive ? "Active" : "Inactive"}</span></div>
+                        <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{b.city || "No city"} · <span style={{ color: b.isActive ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{b.isActive ? "Active" : "Inactive"}</span></div>
                       </div>
                       <div style={{ display: "flex", gap: 8 }}>
                         <Btn variant="secondary" onClick={() => setBranchForm({ id: b.id, code: b.code, name: b.name, city: b.city || "", address: b.address || "", latitude: typeof b.latitude === "number" ? b.latitude.toString() : "", longitude: typeof b.longitude === "number" ? b.longitude.toString() : "", isActive: b.isActive })}>Edit</Btn>
@@ -629,7 +629,7 @@ export default function AdminControlPage() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 14 }}>{user.name}</div>
-                          <div style={{ fontSize: 12, color: MUTED }}>{user.email} · <span style={{ color: "#818cf8" }}>{user.role}</span> · <span style={{ color: user.active ? "#34d399" : "#f87171" }}>{user.active ? "Active" : "Inactive"}</span></div>
+                          <div style={{ fontSize: 12, color: MUTED }}>{user.email} · <span style={{ color: "var(--tx-818cf8, #818cf8)" }}>{user.role}</span> · <span style={{ color: user.active ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{user.active ? "Active" : "Inactive"}</span></div>
                         </div>
                         <div style={{ fontSize: 12, color: MUTED }}>{user.role === "ADMIN" ? "Full access" : `${assigned.length} branch(es)`}</div>
                       </div>
@@ -751,7 +751,7 @@ export default function AdminControlPage() {
                         ACCOUNT {i + 1}{i === 0 ? " · PRIMARY" : ""}
                       </div>
                       <button onClick={() => setSettings(s => ({ ...s, bankAccounts: s.bankAccounts.filter((_, x) => x !== i) }))}
-                        style={{ background: "transparent", border: `1px solid ${BDR}`, color: "#f87171", borderRadius: 7, padding: "4px 10px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
+                        style={{ background: "transparent", border: `1px solid ${BDR}`, color: "var(--tx-f87171, #f87171)", borderRadius: 7, padding: "4px 10px", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}>
                         Remove
                       </button>
                     </div>

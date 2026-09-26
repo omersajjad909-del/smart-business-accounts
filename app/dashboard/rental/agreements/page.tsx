@@ -50,10 +50,10 @@ export default function RentalAgreementsPage() {
         const active = rows.filter((row) => String(row.status) === "active").length;
         const closed = rows.filter((row) => String(row.status) === "closed").length;
         return [
-          { label: "Agreements", value: rows.length, color: "#22c55e" },
-          { label: "Active", value: active, color: "#60a5fa" },
-          { label: "Closed", value: closed, color: "#94a3b8" },
-          { label: "Contract Value", value: value.toLocaleString(), color: "#fbbf24" },
+          { label: "Agreements", value: rows.length, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Active", value: active, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Closed", value: closed, color: "var(--tx-94a3b8, #94a3b8)" },
+          { label: "Contract Value", value: value.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

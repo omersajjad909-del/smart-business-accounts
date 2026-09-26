@@ -17,37 +17,37 @@ const TYPES: {
   {
     // This is the old "Write a Review" page in type form — rating, consent and
     // all. There is no separate review page any more.
-    id: "feedback", label: "Write a Review", icon: "⭐", color: "#34d399",
+    id: "feedback", label: "Write a Review", icon: "⭐", color: "var(--tx-34d399, #34d399)",
     noun: "review", desc: "Rate your experience",
     placeholder: "What do you like? What's working well? Share your overall experience with FinovaOS...",
   },
   {
-    id: "complaint", label: "Complaint", icon: "⚠️", color: "#f87171",
+    id: "complaint", label: "Complaint", icon: "⚠️", color: "var(--tx-f87171, #f87171)",
     noun: "complaint", desc: "Issue or problem",
     placeholder: "What happened? Which page, what went wrong, since when — describe in detail...",
   },
   {
-    id: "suggestion", label: "Suggestion", icon: "💡", color: "#fbbf24",
+    id: "suggestion", label: "Suggestion", icon: "💡", color: "var(--tx-fbbf24, #fbbf24)",
     noun: "suggestion", desc: "New idea or improvement",
     placeholder: "What is your idea? What feature should be added or improved...",
   },
   {
-    id: "bug", label: "Bug Report", icon: "🐛", color: "#a78bfa",
+    id: "bug", label: "Bug Report", icon: "🐛", color: "var(--tx-a78bfa, #a78bfa)",
     noun: "bug report", desc: "Technical error or glitch",
     placeholder: "Which page, what happened, what was expected, also mention browser/device...",
   },
   {
-    id: "general", label: "General", icon: "💬", color: "#60a5fa",
+    id: "general", label: "General", icon: "💬", color: "var(--tx-60a5fa, #60a5fa)",
     noun: "message", desc: "Anything else",
     placeholder: "Share anything you'd like us to know...",
   },
 ];
 
 const PRIORITIES = [
-  { value: "low",    label: "Low",    color: "#34d399" },
-  { value: "normal", label: "Normal", color: "#60a5fa" },
-  { value: "high",   label: "High",   color: "#fbbf24" },
-  { value: "urgent", label: "Urgent", color: "#f87171" },
+  { value: "low",    label: "Low",    color: "var(--tx-34d399, #34d399)" },
+  { value: "normal", label: "Normal", color: "var(--tx-60a5fa, #60a5fa)" },
+  { value: "high",   label: "High",   color: "var(--tx-fbbf24, #fbbf24)" },
+  { value: "urgent", label: "Urgent", color: "var(--tx-f87171, #f87171)" },
 ];
 
 const MODULES = [
@@ -58,9 +58,9 @@ const MODULES = [
 ];
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
-  open:        { label: "⏳ Pending Review", color: "#60a5fa" },
-  in_progress: { label: "🔄 In Progress",    color: "#fbbf24" },
-  resolved:    { label: "✅ Resolved",        color: "#34d399" },
+  open:        { label: "⏳ Pending Review", color: "var(--tx-60a5fa, #60a5fa)" },
+  in_progress: { label: "🔄 In Progress",    color: "var(--tx-fbbf24, #fbbf24)" },
+  resolved:    { label: "✅ Resolved",        color: "var(--tx-34d399, #34d399)" },
   closed:      { label: "🔒 Closed",          color: "#64748b" },
 };
 
@@ -79,8 +79,8 @@ type HistoryItem = {
  */
 function reviewStage(item: HistoryItem): { label: string; color: string } | null {
   if (item.type !== "feedback" || !item.rating) return null;
-  if (item.testimonialId) return { label: "🌐 Live on website", color: "#34d399" };
-  if (item.publishConsent) return { label: "⏳ Awaiting approval", color: "#fbbf24" };
+  if (item.testimonialId) return { label: "🌐 Live on website", color: "var(--tx-34d399, #34d399)" };
+  if (item.publishConsent) return { label: "⏳ Awaiting approval", color: "var(--tx-fbbf24, #fbbf24)" };
   return { label: "🔒 Private review", color: "#64748b" };
 }
 
@@ -274,7 +274,7 @@ export default function FeedbackPage() {
           textAlign: "center", padding: isMobile ? "22px 11px" : "40px 24px",
         }}>
           <div style={{ fontSize: "48px", marginBottom: "12px" }}>✅</div>
-          <div style={{ fontSize: "18px", fontWeight: 700, color: "#34d399", marginBottom: "6px" }}>
+          <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--tx-34d399, #34d399)", marginBottom: "6px" }}>
             Received! Thank you
           </div>
           <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "16px" }}>
@@ -310,7 +310,7 @@ export default function FeedbackPage() {
               marginBottom: "18px", padding: "10px 14px", borderRadius: "9px",
               background: "rgba(129,140,248,.10)", border: "1px solid rgba(129,140,248,.30)",
             }}>
-              <span style={{ fontSize: "12.5px", color: "#a5b4fc" }}>
+              <span style={{ fontSize: "12.5px", color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                 ✎ Editing your earlier submission <b>#{editingId.slice(-8).toUpperCase()}</b> — saving replaces it rather than adding a new one.
               </span>
               <button
@@ -366,7 +366,7 @@ export default function FeedbackPage() {
               background: "var(--app-bg)", border: "1px solid var(--border)",
             }}>
               <label style={{ ...labelStyle, marginBottom: "9px" }}>
-                Your Rating <span style={{ color: "#ef4444" }}>*</span>
+                Your Rating <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span>
               </label>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                 <div
@@ -405,7 +405,7 @@ export default function FeedbackPage() {
                 </div>
                 <span style={{
                   fontSize: "12px", fontWeight: 600,
-                  color: (hoverStar || rating) ? "#fbbf24" : "var(--text-muted)",
+                  color: (hoverStar || rating) ? "var(--tx-fbbf24, #fbbf24)" : "var(--text-muted)",
                 }}>
                   {["Tap a star to rate", "Poor", "Fair", "Good", "Very good", "Excellent"][hoverStar || rating]}
                 </span>
@@ -454,7 +454,7 @@ export default function FeedbackPage() {
           <div style={{ marginBottom: "14px" }}>
             <label style={labelStyle}>
               Subject{subjectRequired
-                ? <span style={{ color: "#ef4444" }}> *</span>
+                ? <span style={{ color: "var(--tx-ef4444, #ef4444)" }}> *</span>
                 : <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> (optional)</span>}
             </label>
             <input
@@ -512,7 +512,7 @@ export default function FeedbackPage() {
 
           {/* Message */}
           <div style={{ marginBottom: "20px" }}>
-            <label style={labelStyle}>Details <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={labelStyle}>Details <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
@@ -525,7 +525,7 @@ export default function FeedbackPage() {
             />
             <div style={{
               fontSize: "11px", marginTop: "5px", textAlign: "right",
-              color: message.length < 20 ? "#f87171" : "var(--text-muted)",
+              color: message.length < 20 ? "var(--tx-f87171, #f87171)" : "var(--text-muted)",
             }}>
               {message.length} characters (minimum 20)
             </div>
@@ -586,7 +586,7 @@ export default function FeedbackPage() {
               <div style={{ display: "flex", gap: "6px", marginTop: "10px", flexWrap: "wrap" }}>
                 <span style={{
                   fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "10px",
-                  background: "rgba(99,102,241,0.1)", color: "#818cf8",
+                  background: "rgba(99,102,241,0.1)", color: "var(--tx-818cf8, #818cf8)",
                   border: "1px solid rgba(99,102,241,0.2)",
                 }}>
                   Role: {user.role}
@@ -616,7 +616,7 @@ export default function FeedbackPage() {
             <div style={{
               padding: "10px 14px", borderRadius: "8px", marginBottom: "14px",
               background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.25)",
-              fontSize: "13px", color: "#f87171",
+              fontSize: "13px", color: "var(--tx-f87171, #f87171)",
             }}>
               {error}
             </div>
@@ -687,7 +687,7 @@ export default function FeedbackPage() {
                       </span>
                       {/* The stars the user gave, so a review reads as a review at a glance. */}
                       {item.rating ? (
-                        <span style={{ fontSize: "11px", color: "#fbbf24", letterSpacing: "1px" }}>
+                        <span style={{ fontSize: "11px", color: "var(--tx-fbbf24, #fbbf24)", letterSpacing: "1px" }}>
                           {"★".repeat(item.rating)}<span style={{ opacity: .3 }}>{"★".repeat(5 - item.rating)}</span>
                         </span>
                       ) : null}

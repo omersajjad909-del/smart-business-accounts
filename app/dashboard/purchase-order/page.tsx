@@ -386,10 +386,10 @@ export default function PurchaseOrderPage() {
                       <td style={{ padding: isMobile ? "8px 8px" : "13px 16px" }}>
                         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           {(!po.approvalStatus || po.approvalStatus === "PENDING") && (
-                            <button onClick={() => approvePO(po)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(52,211,153,0.4)", background: "rgba(52,211,153,0.1)", color: "#34d399", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>✓ Approve</button>
+                            <button onClick={() => approvePO(po)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(52,211,153,0.4)", background: "rgba(52,211,153,0.1)", color: "var(--tx-34d399, #34d399)", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>✓ Approve</button>
                           )}
                           <button onClick={() => startEdit(po)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: `1px solid ${ACCENT}`, background: "rgba(99,102,241,0.1)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
-                          <button onClick={() => deletePO(po.id)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Del</button>
+                          <button onClick={() => deletePO(po.id)} style={{ padding: isMobile ? "8px 8px" : "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "var(--tx-f87171, #f87171)", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Del</button>
                         </div>
                       </td>
                     </tr>
@@ -457,7 +457,7 @@ export default function PurchaseOrderPage() {
                         <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: 12, marginBottom: 10, background: "var(--panel-bg-2)" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                             <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" }}>Item {i + 1}</span>
-                            <button type="button" tabIndex={-1} onKeyDown={e => e.preventDefault()} onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: 6, color: "#f87171", cursor: rows.length === 1 ? "not-allowed" : "pointer", opacity: rows.length === 1 ? 0.3 : 1, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}>
+                            <button type="button" tabIndex={-1} onKeyDown={e => e.preventDefault()} onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: 6, color: "var(--tx-f87171, #f87171)", cursor: rows.length === 1 ? "not-allowed" : "pointer", opacity: rows.length === 1 ? 0.3 : 1, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}>
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
                             </button>
                           </div>
@@ -603,7 +603,7 @@ export default function PurchaseOrderPage() {
                                     onClick={() => removeRow(i)}
                                     onKeyDown={e => e.preventDefault()}
                                     title="Remove row"
-                                    style={{ opacity: 0, transition: "opacity .15s", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: 6, color: "#f87171", cursor: "pointer", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                                    style={{ opacity: 0, transition: "opacity .15s", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: 6, color: "var(--tx-f87171, #f87171)", cursor: "pointer", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
                                   >
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
                                   </button>

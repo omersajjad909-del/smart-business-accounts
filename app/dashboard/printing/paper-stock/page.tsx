@@ -46,10 +46,10 @@ export default function PrintStockPage() {
         const quantity = rows.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
         const lowStock = rows.filter((row) => Number(row.quantity || 0) <= Number(row.reorderLevel || 0)).length;
         return [
-          { label: "Stock Lines", value: rows.length, color: "#60a5fa" },
-          { label: "Units on Hand", value: quantity.toLocaleString(), color: "#34d399" },
-          { label: "Low Stock", value: lowStock, color: "#f87171" },
-          { label: "Suppliers", value: new Set(rows.map((row) => String(row.supplier || ""))).size, color: "#fbbf24" },
+          { label: "Stock Lines", value: rows.length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Units on Hand", value: quantity.toLocaleString(), color: "var(--tx-34d399, #34d399)" },
+          { label: "Low Stock", value: lowStock, color: "var(--tx-f87171, #f87171)" },
+          { label: "Suppliers", value: new Set(rows.map((row) => String(row.supplier || ""))).size, color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

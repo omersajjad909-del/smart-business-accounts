@@ -162,7 +162,7 @@ export default function UsersPage() {
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"50vh" }}>
       <div style={{ padding:32, borderRadius:16, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", textAlign:"center" }}>
         <div style={{ fontSize:32, marginBottom:12 }}>⚠️</div>
-        <div style={{ fontSize:16, fontWeight:700, color:"#f87171" }}>Access Denied</div>
+        <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-f87171, #f87171)" }}>Access Denied</div>
         <div style={{ fontSize:13, color:"rgba(var(--ink),0.4)", marginTop:6 }}>Only ADMIN can manage users.</div>
       </div>
     </div>
@@ -214,7 +214,7 @@ export default function UsersPage() {
             <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),0.4)", marginBottom:2 }}>
               {plan} Plan — Users
             </div>
-            <div style={{ fontSize:16, fontWeight:800, color: atLimit ? "#f87171" : "#a5b4fc" }}>
+            <div style={{ fontSize:16, fontWeight:800, color: atLimit ? "var(--tx-f87171, #f87171)" : "var(--tx-a5b4fc, #a5b4fc)" }}>
               {users.length} / {maxUsers === null ? "∞" : maxUsers}
             </div>
           </div>
@@ -226,9 +226,9 @@ export default function UsersPage() {
         <div style={{ ...card, background:"rgba(248,113,113,0.08)", border:"1px solid rgba(248,113,113,0.25)", marginBottom:16, display:"flex", alignItems:"center", gap:14 }}>
           <span style={{ fontSize:22 }}>🚫</span>
           <div>
-            <div style={{ fontWeight:700, color:"#f87171", fontSize:13 }}>User Limit Reached</div>
+            <div style={{ fontWeight:700, color:"var(--tx-f87171, #f87171)", fontSize:13 }}>User Limit Reached</div>
             <div style={{ fontSize:12, color:"rgba(var(--ink),0.45)", marginTop:2 }}>
-              Your <strong style={{ color:"#a5b4fc" }}>{plan}</strong> plan allows max <strong style={{ color:"#a5b4fc" }}>{maxUsers} users</strong>. Upgrade to add more team members.
+              Your <strong style={{ color:"var(--tx-a5b4fc, #a5b4fc)" }}>{plan}</strong> plan allows max <strong style={{ color:"var(--tx-a5b4fc, #a5b4fc)" }}>{maxUsers} users</strong>. Upgrade to add more team members.
             </div>
           </div>
         </div>
@@ -272,7 +272,7 @@ export default function UsersPage() {
             {inviting ? "Sending…" : "Send Invite"}
           </button>
         </div>
-        {inviteMsg && <div style={{ marginTop:10, fontSize:12, color: inviteMsg.includes("sent") ? "#34d399" : "#f87171" }}>{inviteMsg}</div>}
+        {inviteMsg && <div style={{ marginTop:10, fontSize:12, color: inviteMsg.includes("sent") ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{inviteMsg}</div>}
         {inviteLink && (
           <div style={{ marginTop:12 }}>
             <div style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),0.4)", marginBottom:6 }}>Invite Link</div>
@@ -292,7 +292,7 @@ export default function UsersPage() {
 
         {/* Error */}
         {saveError && (
-          <div style={{ marginBottom:14, padding:"10px 14px", borderRadius:8, background:"rgba(248,113,113,0.1)", border:"1px solid rgba(248,113,113,0.25)", fontSize:12, color:"#f87171" }}>
+          <div style={{ marginBottom:14, padding:"10px 14px", borderRadius:8, background:"rgba(248,113,113,0.1)", border:"1px solid rgba(248,113,113,0.25)", fontSize:12, color:"var(--tx-f87171, #f87171)" }}>
             {saveError}
           </div>
         )}
@@ -362,7 +362,7 @@ export default function UsersPage() {
                 <td style={{ padding:"12px 16px", textAlign:"right" }}>
                   <div style={{ display:"flex", gap:8, justifyContent:"flex-end" }}>
                     <button onClick={() => edit(u)} style={{ ...btnGhost, padding:"5px 12px", fontSize:12 }}>Edit</button>
-                    <button onClick={() => remove(u.id)} style={{ padding:"5px 12px", borderRadius:8, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#f87171", fontWeight:600, fontSize:12, cursor:"pointer" }}>Remove</button>
+                    <button onClick={() => remove(u.id)} style={{ padding:"5px 12px", borderRadius:8, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"var(--tx-f87171, #f87171)", fontWeight:600, fontSize:12, cursor:"pointer" }}>Remove</button>
                   </div>
                 </td>
               </tr>

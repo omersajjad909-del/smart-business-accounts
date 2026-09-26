@@ -59,10 +59,10 @@ export default function AutomotiveAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Sold Value", value: `$${data.summary.soldValue.toLocaleString()}`, color: "#34d399" },
-          { label: "Scheduled Drives", value: data.summary.scheduledDrives, color: "#60a5fa" },
-          { label: "Won Deals", value: data.summary.wonDeals, color: "#22c55e" },
-          { label: "Lost Deals", value: data.summary.lostDeals, color: "#ef4444" },
+          { label: "Sold Value", value: `$${data.summary.soldValue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Scheduled Drives", value: data.summary.scheduledDrives, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Won Deals", value: data.summary.wonDeals, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Lost Deals", value: data.summary.lostDeals, color: "var(--tx-ef4444, #ef4444)" },
         ].map((card) => (
           <div key={card.label} style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: autoMuted, marginBottom: 8 }}>{card.label}</div>
@@ -78,7 +78,7 @@ export default function AutomotiveAnalyticsPage() {
             {availableByType.map((row) => (
               <div key={row.type} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: autoMuted }}>{row.type}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{row.count}</span>
               </div>
             ))}
             {!availableByType.length ? <div style={{ color: autoMuted, fontSize: 13 }}>No vehicle stock yet.</div> : null}
@@ -91,7 +91,7 @@ export default function AutomotiveAnalyticsPage() {
             {dealsByStatus.map((row) => (
               <div key={row.status} style={{ display: "flex", justifyContent: "space-between", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", padding: "10px 12px" }}>
                 <span style={{ fontSize: 13, color: autoMuted }}>{row.status}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#c084fc" }}>{row.count}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-c084fc, #c084fc)" }}>{row.count}</span>
               </div>
             ))}
             {!dealsByStatus.length ? <div style={{ color: autoMuted, fontSize: 13 }}>No deal pipeline yet.</div> : null}

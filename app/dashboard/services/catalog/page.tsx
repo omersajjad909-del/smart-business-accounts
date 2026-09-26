@@ -6,8 +6,8 @@ import { mapServiceCatalogRecord } from "../_shared";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 
 export default function ServiceCatalogPage() {
   const { isMobile } = useResponsive();
@@ -44,8 +44,8 @@ export default function ServiceCatalogPage() {
             <div style={{ fontSize: 16, fontWeight: 800 }}>{service.name}</div>
             <div style={{ marginTop: 8, fontSize: 12, color: "rgba(var(--ink),.45)" }}>{service.scope || "No scope added"}</div>
             <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-              <span style={{ color: "#38bdf8" }}>{service.billingType}</span>
-              <span style={{ color: "#22c55e", fontWeight: 700 }}>Rs. {service.rate.toLocaleString()}</span>
+              <span style={{ color: "var(--tx-38bdf8, #38bdf8)" }}>{service.billingType}</span>
+              <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 700 }}>Rs. {service.rate.toLocaleString()}</span>
             </div>
             <div style={{ marginTop: 6, fontSize: 11, color: "rgba(var(--ink),.4)" }}>TAT: {service.turnaroundDays} days</div>
           </div>

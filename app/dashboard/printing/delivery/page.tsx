@@ -47,10 +47,10 @@ export default function PrintDeliveryPage() {
         const dispatched = rows.filter((row) => String(row.status) === "dispatched").length;
         const delivered = rows.filter((row) => String(row.status) === "delivered").length;
         return [
-          { label: "Dispatches", value: rows.length, color: "#60a5fa" },
-          { label: "Ready", value: ready, color: "#fbbf24" },
-          { label: "In Transit", value: dispatched, color: "#a78bfa" },
-          { label: "Delivered", value: delivered, color: "#34d399" },
+          { label: "Dispatches", value: rows.length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Ready", value: ready, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "In Transit", value: dispatched, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Delivered", value: delivered, color: "var(--tx-34d399, #34d399)" },
         ];
       }}
     />

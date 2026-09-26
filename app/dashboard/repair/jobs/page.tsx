@@ -44,9 +44,9 @@ export default function RepairJobsPage() {
       })}
       summarize={(rows) => [
         { label: "Jobs", value: rows.length, color: repairAccent },
-        { label: "Diagnosis", value: rows.filter((row) => String(row.status) === "diagnosis").length, color: "#fbbf24" },
-        { label: "Repairing", value: rows.filter((row) => String(row.status) === "repairing").length, color: "#60a5fa" },
-        { label: "Ready", value: rows.filter((row) => String(row.status) === "ready").length, color: "#34d399" },
+        { label: "Diagnosis", value: rows.filter((row) => String(row.status) === "diagnosis").length, color: "var(--tx-fbbf24, #fbbf24)" },
+        { label: "Repairing", value: rows.filter((row) => String(row.status) === "repairing").length, color: "var(--tx-60a5fa, #60a5fa)" },
+        { label: "Ready", value: rows.filter((row) => String(row.status) === "ready").length, color: "var(--tx-34d399, #34d399)" },
       ]}
     />
   );

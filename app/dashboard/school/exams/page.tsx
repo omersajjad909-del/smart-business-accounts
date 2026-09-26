@@ -4,8 +4,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const GRADE_COLOR: Record<string, string> = { "A+": "#34d399", A: "#34d399", B: "#818cf8", C: "#fbbf24", D: "#fb923c", F: "#f87171" };
 
 export default function ExamsPage() {
@@ -64,7 +64,7 @@ export default function ExamsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Results", val: results.length, color: "#6366f1" }, { label: "Pass", val: passCount, color: "#34d399" }, { label: "Fail", val: results.length - passCount, color: "#ef4444" }, { label: "Avg Score", val: `${avgPct}%`, color: "#f59e0b" }].map(s => (
+        {[{ label: "Total Results", val: results.length, color: "var(--tx-6366f1, #6366f1)" }, { label: "Pass", val: passCount, color: "var(--tx-34d399, #34d399)" }, { label: "Fail", val: results.length - passCount, color: "var(--tx-ef4444, #ef4444)" }, { label: "Avg Score", val: `${avgPct}%`, color: "var(--tx-f59e0b, #f59e0b)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -84,7 +84,7 @@ export default function ExamsPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{r.class}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{r.examName}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{r.obtainedMarks}/{r.totalMarks}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600, color: r.percentage >= 50 ? "#34d399" : "#ef4444" }}>{r.percentage}%</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600, color: r.percentage >= 50 ? "var(--tx-34d399, #34d399)" : "var(--tx-ef4444, #ef4444)" }}>{r.percentage}%</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <span style={{ fontWeight: 800, color: GRADE_COLOR[r.grade] || "#fff", fontSize: 16 }}>{r.grade}</span>
                 </td>
@@ -119,7 +119,7 @@ export default function ExamsPage() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-              {error && <div style={{ color: "#fda4af", fontSize: 12, flex: 1 }}>{error}</div>}
+              {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#6366f1", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Save Result</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>

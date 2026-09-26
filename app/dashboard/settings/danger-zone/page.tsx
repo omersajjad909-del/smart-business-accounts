@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
+const bg = "rgba(var(--ink),0.03)";
 const border = "rgba(239,68,68,0.35)";
 
 const field: React.CSSProperties = {
@@ -138,13 +138,13 @@ export default function DangerZonePage() {
       </p>
 
       {error && (
-        <div style={{ marginTop: 18, padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12.5 }}>
+        <div style={{ marginTop: 18, padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12.5 }}>
           {error}
         </div>
       )}
 
       {done && (
-        <div style={{ marginTop: 18, padding: "10px 14px", borderRadius: 10, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.28)", color: "#86efac", fontSize: 12.5 }}>
+        <div style={{ marginTop: 18, padding: "10px 14px", borderRadius: 10, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.28)", color: "var(--tx-86efac, #86efac)", fontSize: 12.5 }}>
           System reset. Every record has been cleared — your login, company and plan are untouched.
         </div>
       )}
@@ -155,7 +155,7 @@ export default function DangerZonePage() {
         <div style={{ marginTop: 18, background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "16px 14px" : "20px 22px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
             <div style={{ maxWidth: 480 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: "#fca5a5" }}>Reset All System</div>
+              <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Reset All System</div>
               <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", margin: "6px 0 0", lineHeight: 1.7 }}>
                 Permanently deletes every invoice, voucher, ledger entry, contact, employee, bank
                 account and record this company has ever entered. Your login, the company itself
@@ -175,7 +175,7 @@ export default function DangerZonePage() {
                 onClick={openConfirm}
                 style={{
                   padding: "10px 18px", borderRadius: 10, border: "1px solid rgba(239,68,68,.5)",
-                  background: "rgba(239,68,68,.12)", color: "#fca5a5", fontSize: 13, fontWeight: 800,
+                  background: "rgba(239,68,68,.12)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 13, fontWeight: 800,
                   fontFamily: ff, cursor: "pointer", whiteSpace: "nowrap",
                 }}
               >
@@ -208,7 +208,7 @@ export default function DangerZonePage() {
 
             {step === "credentials" ? (
               <>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#fca5a5" }}>Reset all system data?</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Reset all system data?</div>
                 <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
                   This deletes everything this company has recorded, and it cannot be undone.
                   Nothing is deleted yet — confirm your password and the company name, and we will
@@ -225,10 +225,10 @@ export default function DangerZonePage() {
               </>
             ) : (
               <>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "#fca5a5" }}>Enter the code we emailed you</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Enter the code we emailed you</div>
                 <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
                   A 6-digit code was sent to <strong style={{ color: "var(--ink-solid, #fff)" }}>{sentTo}</strong>. It expires
-                  in 15 minutes. <strong style={{ color: "#fca5a5" }}>Nothing has been deleted yet</strong> —
+                  in 15 minutes. <strong style={{ color: "var(--tx-fca5a5, #fca5a5)" }}>Nothing has been deleted yet</strong> —
                   entering this code is what deletes it.
                 </p>
 
@@ -247,7 +247,7 @@ export default function DangerZonePage() {
             )}
 
             {modalError && (
-              <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", fontSize: 12 }}>
+              <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>
                 {modalError}
               </div>
             )}

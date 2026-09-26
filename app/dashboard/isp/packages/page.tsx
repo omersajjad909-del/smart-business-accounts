@@ -88,7 +88,7 @@ export default function IspPackagesPage() {
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{row.name}</div>
                     <div style={{ fontSize: 12, color: ispMuted, marginTop: 6 }}>{row.speed} | {row.quota}</div>
-                    <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>Rs. {row.price.toLocaleString()} / month</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 8 }}>Rs. {row.price.toLocaleString()} / month</div>
                   </div>
                   <span style={{ padding: isMobile ? "8px 8px" : "4px 10px", borderRadius: 999, background: `${ispStatusColor(row.status)}20`, color: ispStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
                 </div>

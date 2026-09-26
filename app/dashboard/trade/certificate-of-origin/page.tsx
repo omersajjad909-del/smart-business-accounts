@@ -55,10 +55,10 @@ interface COORecord extends COOData {
 const COO_TYPES: COOType[] = ["Non-Preferential","Preferential","GSP","Form-E","Form-D","EUR.1"];
 
 const STATUS_META: Record<COOStatus, { label: string; color: string; bg: string; border: string }> = {
-  DRAFT:     { label: "Draft",     color: "#9ca3af", bg: "rgba(156,163,175,.12)", border: "rgba(156,163,175,.35)" },
-  SUBMITTED: { label: "Submitted", color: "#fbbf24", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
-  ISSUED:    { label: "Issued",    color: "#4ade80", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
-  REJECTED:  { label: "Rejected",  color: "#f87171", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
+  DRAFT:     { label: "Draft",     color: "var(--tx-9ca3af, #9ca3af)", bg: "rgba(156,163,175,.12)", border: "rgba(156,163,175,.35)" },
+  SUBMITTED: { label: "Submitted", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.35)"  },
+  ISSUED:    { label: "Issued",    color: "var(--tx-4ade80, #4ade80)", bg: "rgba(74,222,128,.12)",   border: "rgba(74,222,128,.35)"  },
+  REJECTED:  { label: "Rejected",  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)",  border: "rgba(248,113,113,.35)" },
   EXPIRED:   { label: "Expired",   color: "#6b7280", bg: "rgba(107,114,128,.12)",  border: "rgba(107,114,128,.35)" },
 };
 
@@ -225,10 +225,10 @@ export default function CertificateOfOriginPage() {
       {/* KPIs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total",     value: kpis.total,     color: "#a78bfa" },
-          { label: "Issued",    value: kpis.issued,    color: "#4ade80" },
-          { label: "Submitted", value: kpis.submitted, color: "#fbbf24" },
-          { label: "Draft",     value: kpis.draft,     color: "#9ca3af" },
+          { label: "Total",     value: kpis.total,     color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Issued",    value: kpis.issued,    color: "var(--tx-4ade80, #4ade80)" },
+          { label: "Submitted", value: kpis.submitted, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Draft",     value: kpis.draft,     color: "var(--tx-9ca3af, #9ca3af)" },
           { label: "Expired",   value: kpis.expired,   color: "#6b7280" },
         ].map(k => (
           <div key={k.label} style={s.kpi as React.CSSProperties}>
@@ -273,11 +273,11 @@ export default function CertificateOfOriginPage() {
                 const sm = STATUS_META[c.status];
                 return (
                   <tr key={c.id}
-                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.03)")}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.03)")}
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
-                    <td style={{ ...s.td, fontWeight: 700, color: "#f59e0b" }}>{c.certNo}</td>
-                    <td style={s.td}><span style={{ background: "rgba(245,158,11,.1)", color: "#fbbf24", border: "1px solid rgba(245,158,11,.25)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{c.type}</span></td>
+                    <td style={{ ...s.td, fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)" }}>{c.certNo}</td>
+                    <td style={s.td}><span style={{ background: "rgba(245,158,11,.1)", color: "var(--tx-fbbf24, #fbbf24)", border: "1px solid rgba(245,158,11,.25)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{c.type}</span></td>
                     <td style={s.td}>
                       <div style={{ fontWeight: 600 }}>{c.exporterName || "—"}</div>
                       {c.exporterAddress && <div style={{ fontSize: 11, color: "var(--text-muted)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>{c.exporterAddress}</div>}
@@ -320,7 +320,7 @@ export default function CertificateOfOriginPage() {
             <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 22 }}>This action cannot be undone.</div>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => doDelete(confirmDel)} style={{ ...s.btn("#ef4444"), flex: 1 }}>Delete</button>
-              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(255,255,255,.08)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => setConfirmDel(null)} style={{ ...s.btn("rgba(var(--ink),.08)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -447,14 +447,14 @@ export default function CertificateOfOriginPage() {
             </div>
 
             {error && (
-              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "#fca5a5" }}>{error}</div>
+              <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, fontSize: 13, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>
             )}
 
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} disabled={saving} style={{ ...s.btn("#f59e0b"), flex: 1, opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving…" : editId ? "Update Certificate" : "Create Certificate"}
               </button>
-              <button onClick={closeModal} style={{ ...s.btn("rgba(255,255,255,.07)"), flex: 0.4 }}>Cancel</button>
+              <button onClick={closeModal} style={{ ...s.btn("rgba(var(--ink),.07)"), flex: 0.4 }}>Cancel</button>
             </div>
           </div>
         </div>

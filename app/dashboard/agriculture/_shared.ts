@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const agricultureFont = "'Outfit','Inter',sans-serif";
-export const agricultureBg = "rgba(255,255,255,.03)";
-export const agricultureBorder = "rgba(255,255,255,.07)";
-export const agricultureMuted = "rgba(255,255,255,.58)";
+export const agricultureBg = "rgba(var(--ink),.03)";
+export const agricultureBorder = "rgba(var(--ink),.07)";
+export const agricultureMuted = "rgba(var(--ink),.58)";
 
 export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
   try {

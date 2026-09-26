@@ -82,10 +82,10 @@ export default function EcommerceProductsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total Products", value: products.length, color: "#818cf8" },
-          { label: "Active Listings", value: products.filter((product) => product.status === "active").length, color: "#34d399" },
-          { label: "Low Stock", value: lowStock, color: "#f59e0b" },
-          { label: "Sales Value", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "#a78bfa" },
+          { label: "Total Products", value: products.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active Listings", value: products.filter((product) => product.status === "active").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Low Stock", value: lowStock, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Sales Value", value: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: ecommerceBg, border: `1px solid ${ecommerceBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: ecommerceMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
@@ -95,7 +95,7 @@ export default function EcommerceProductsPage() {
       </div>
 
       {error && (
-        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "#fca5a5", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
+        <div style={{ marginBottom: 16, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.28)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 12, padding: "12px 14px", fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -121,8 +121,8 @@ export default function EcommerceProductsPage() {
                   <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{product.category}</td>
                   <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: ecommerceMuted }}>{product.sku}</td>
                   <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{product.platform}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 700 }}>Rs. {product.price.toLocaleString()}</td>
-                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: product.stock === 0 ? "#f87171" : "#fff", fontWeight: product.stock <= 5 ? 700 : 500 }}>{product.stock}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {product.price.toLocaleString()}</td>
+                  <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: product.stock === 0 ? "var(--tx-f87171, #f87171)" : "#fff", fontWeight: product.stock <= 5 ? 700 : 500 }}>{product.stock}</td>
                   <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{product.sales}</td>
                   <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                     <button

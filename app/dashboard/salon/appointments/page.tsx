@@ -135,10 +135,10 @@ export default function SalonAppointmentsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
-          { label: "Today Total", value: todayTotal, color: "#ec4899" },
-          { label: "Confirmed / Active", value: activeQueue, color: "#60a5fa" },
-          { label: "In Progress", value: inProgress, color: "#a78bfa" },
-          { label: "Revenue", value: `Rs. ${revenue.toLocaleString()}`, color: "#34d399" },
+          { label: "Today Total", value: todayTotal, color: "var(--tx-ec4899, #ec4899)" },
+          { label: "Confirmed / Active", value: activeQueue, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "In Progress", value: inProgress, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Revenue", value: `Rs. ${revenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
         ].map((stat) => (
           <div key={stat.label} style={{ background: salonBg, border: `1px solid ${salonBorder}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: stat.color }}>{stat.value}</div>
@@ -221,7 +221,7 @@ export default function SalonAppointmentsPage() {
                     <div style={{ fontSize: 13, color: "rgba(var(--ink),.7)" }}>{appointment.service} • {appointment.date}</div>
                   </div>
                   <div style={{ minWidth: 92, textAlign: "right" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {appointment.price.toLocaleString()}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {appointment.price.toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: salonMuted }}>{appointment.apptNo}</div>
                   </div>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
@@ -235,7 +235,7 @@ export default function SalonAppointmentsPage() {
                       <button onClick={() => moveStatus(appointment.id, appointment.status, "completed")} style={{ padding: "6px 10px", background: "rgba(52,211,153,.16)", border: "1px solid rgba(52,211,153,.28)", color: "#34d399", borderRadius: 8, cursor: "pointer", fontFamily: salonFont, fontSize: 11, fontWeight: 700 }}>Complete</button>
                     )}
                     {(appointment.status === "booked" || appointment.status === "confirmed") && (
-                      <button onClick={() => moveStatus(appointment.id, appointment.status, "cancelled")} style={{ padding: "6px 10px", background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.24)", color: "#f87171", borderRadius: 8, cursor: "pointer", fontFamily: salonFont, fontSize: 11, fontWeight: 700 }}>Cancel</button>
+                      <button onClick={() => moveStatus(appointment.id, appointment.status, "cancelled")} style={{ padding: "6px 10px", background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.24)", color: "var(--tx-f87171, #f87171)", borderRadius: 8, cursor: "pointer", fontFamily: salonFont, fontSize: 11, fontWeight: 700 }}>Cancel</button>
                     )}
                   </div>
                 </div>
@@ -297,7 +297,7 @@ export default function SalonAppointmentsPage() {
               </div>
             </div>
 
-            {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fda4af" }}>{error}</div>}
+            {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fda4af, #fda4af)" }}>{error}</div>}
 
             <div style={{ display: "flex", gap: 12, marginTop: 22 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ec4899", border: "none", borderRadius: 10, color: "#fff", fontFamily: salonFont, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Book Appointment</button>

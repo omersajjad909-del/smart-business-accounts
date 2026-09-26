@@ -165,10 +165,10 @@ export default function TravelersPage() {
   const stats = useMemo(() => {
     const withPassport = travelers.filter((t) => t.passportNo).length;
     return [
-      { label: "Travellers", value: travelers.length, color: "#38bdf8" },
-      { label: "With Passport", value: withPassport, color: "#34d399" },
-      { label: "No Passport Yet", value: travelers.length - withPassport, color: travelers.length - withPassport ? "#f4c25b" : "#34d399" },
-      { label: "Expiring in 6 Months", value: expiring.length, color: expiring.length ? "#f87171" : "#34d399" },
+      { label: "Travellers", value: travelers.length, color: "var(--tx-38bdf8, #38bdf8)" },
+      { label: "With Passport", value: withPassport, color: "var(--tx-34d399, #34d399)" },
+      { label: "No Passport Yet", value: travelers.length - withPassport, color: travelers.length - withPassport ? "var(--tx-f4c25b, #f4c25b)" : "var(--tx-34d399, #34d399)" },
+      { label: "Expiring in 6 Months", value: expiring.length, color: expiring.length ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" },
     ];
   }, [travelers, expiring]);
 
@@ -205,7 +205,7 @@ export default function TravelersPage() {
       {/* The six-month rule, before the airline applies it at the desk. */}
       {expiring.length ? (
         <div style={{ border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.08)", borderRadius: 14, padding: 16, marginBottom: 18 }}>
-          <div style={{ fontSize: 13.5, fontWeight: 800, color: "#f87171", marginBottom: 4 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--tx-f87171, #f87171)", marginBottom: 4 }}>
             ⚠️ {expiring.length} passport{expiring.length === 1 ? "" : "s"} expiring within six months
           </div>
           <div style={{ fontSize: 12, color: T.muted, marginBottom: 10 }}>
@@ -279,7 +279,7 @@ export default function TravelersPage() {
             </Field>
           </div>
 
-          {error ? <div style={{ fontSize: 12.5, color: "#f87171" }}>{error}</div> : null}
+          {error ? <div style={{ fontSize: 12.5, color: "var(--tx-f87171, #f87171)" }}>{error}</div> : null}
 
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" }}>
             {form.id ? <GhostButton onClick={() => setForm({ ...empty })}>Cancel</GhostButton> : null}
@@ -344,7 +344,7 @@ export default function TravelersPage() {
                       <button
                         type="button"
                         onClick={() => remove(traveler)}
-                        style={{ border: "none", background: "transparent", color: "#f87171", borderRadius: 9, padding: "6px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                        style={{ border: "none", background: "transparent", color: "var(--tx-f87171, #f87171)", borderRadius: 9, padding: "6px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
                       >
                         Remove
                       </button>

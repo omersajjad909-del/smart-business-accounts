@@ -5,20 +5,20 @@ import { useResponsive } from "@/hooks/useResponsive";
 const FONT = "'Outfit','Inter',sans-serif";
 
 const MODULES = [
-  { href: "/dashboard/accounts",        icon: "📒", label: "Chart of Accounts",   desc: "Manage your full account hierarchy", color: "#6366f1" },
-  { href: "/dashboard/cpv",             icon: "💸", label: "CPV",                 desc: "Cash Payment Voucher",               color: "#f87171" },
-  { href: "/dashboard/crv",             icon: "💰", label: "CRV",                 desc: "Cash Receipt Voucher",               color: "#34d399" },
-  { href: "/dashboard/jv",              icon: "📝", label: "Journal Voucher",      desc: "Manual journal entries (JV)",        color: "#818cf8" },
-  { href: "/dashboard/opening-balances",icon: "⚖️", label: "Opening Balances",    desc: "Set balances for new financial year", color: "#fbbf24" },
-  { href: "/dashboard/advance-payment", icon: "📤", label: "Advance Payment",      desc: "Track advance payments to vendors",  color: "#38bdf8" },
-  { href: "/dashboard/contra",          icon: "🔄", label: "Contra Entry",         desc: "Bank to cash & vice versa",          color: "#a78bfa" },
-  { href: "/dashboard/credit-note",     icon: "🔻", label: "Credit Notes",         desc: "Issue credit to customers",          color: "#f59e0b" },
-  { href: "/dashboard/debit-note",      icon: "🔺", label: "Debit Notes",          desc: "Raise debit against vendors",        color: "#fb923c" },
-  { href: "/dashboard/petty-cash",      icon: "🪙", label: "Petty Cash",           desc: "Manage small day-to-day expenses",   color: "#4ade80" },
-  { href: "/dashboard/loans",           icon: "🏦", label: "Loans",                desc: "Track loans payable & receivable",   color: "#60a5fa" },
-  { href: "/dashboard/fixed-assets",    icon: "🏗️", label: "Fixed Assets",         desc: "Asset register & depreciation",      color: "#e879f9" },
-  { href: "/dashboard/currencies",      icon: "💱", label: "Currencies",           desc: "Multi-currency exchange rates",      color: "#2dd4bf" },
-  { href: "/dashboard/recurring-transactions", icon: "🔁", label: "Recurring Transactions", desc: "Auto-post repeating entries", color: "#94a3b8" },
+  { href: "/dashboard/accounts",        icon: "📒", label: "Chart of Accounts",   desc: "Manage your full account hierarchy", color: "var(--tx-6366f1, #6366f1)" },
+  { href: "/dashboard/cpv",             icon: "💸", label: "CPV",                 desc: "Cash Payment Voucher",               color: "var(--tx-f87171, #f87171)" },
+  { href: "/dashboard/crv",             icon: "💰", label: "CRV",                 desc: "Cash Receipt Voucher",               color: "var(--tx-34d399, #34d399)" },
+  { href: "/dashboard/jv",              icon: "📝", label: "Journal Voucher",      desc: "Manual journal entries (JV)",        color: "var(--tx-818cf8, #818cf8)" },
+  { href: "/dashboard/opening-balances",icon: "⚖️", label: "Opening Balances",    desc: "Set balances for new financial year", color: "var(--tx-fbbf24, #fbbf24)" },
+  { href: "/dashboard/advance-payment", icon: "📤", label: "Advance Payment",      desc: "Track advance payments to vendors",  color: "var(--tx-38bdf8, #38bdf8)" },
+  { href: "/dashboard/contra",          icon: "🔄", label: "Contra Entry",         desc: "Bank to cash & vice versa",          color: "var(--tx-a78bfa, #a78bfa)" },
+  { href: "/dashboard/credit-note",     icon: "🔻", label: "Credit Notes",         desc: "Issue credit to customers",          color: "var(--tx-f59e0b, #f59e0b)" },
+  { href: "/dashboard/debit-note",      icon: "🔺", label: "Debit Notes",          desc: "Raise debit against vendors",        color: "var(--tx-fb923c, #fb923c)" },
+  { href: "/dashboard/petty-cash",      icon: "🪙", label: "Petty Cash",           desc: "Manage small day-to-day expenses",   color: "var(--tx-4ade80, #4ade80)" },
+  { href: "/dashboard/loans",           icon: "🏦", label: "Loans",                desc: "Track loans payable & receivable",   color: "var(--tx-60a5fa, #60a5fa)" },
+  { href: "/dashboard/fixed-assets",    icon: "🏗️", label: "Fixed Assets",         desc: "Asset register & depreciation",      color: "var(--tx-e879f9, #e879f9)" },
+  { href: "/dashboard/currencies",      icon: "💱", label: "Currencies",           desc: "Multi-currency exchange rates",      color: "var(--tx-2dd4bf, #2dd4bf)" },
+  { href: "/dashboard/recurring-transactions", icon: "🔁", label: "Recurring Transactions", desc: "Auto-post repeating entries", color: "var(--tx-94a3b8, #94a3b8)" },
 ];
 
 export default function AccountingPage() {

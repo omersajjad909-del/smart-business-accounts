@@ -51,9 +51,9 @@ export default function BreakevenPage() {
           {/* Key metrics */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
             {[
-              { label: "Break-even Units",   value: `${fmt(data.breakevenUnits || 0)} units`,       color: "#818cf8", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)", desc: "Units to sell to cover all costs" },
-              { label: "Break-even Revenue", value: `${cur} ${fmt(data.breakevenRevenue || 0)}`,    color: "#fbbf24", bg: "rgba(251,191,36,.07)",  border: "rgba(251,191,36,.2)",  desc: "Revenue needed to break even" },
-              { label: "Margin of Safety",   value: `${(data.marginOfSafety || 0).toFixed(1)}%`,   color: data.marginOfSafety > 20 ? "#34d399" : "#f87171", bg: data.marginOfSafety > 20 ? "rgba(52,211,153,.07)" : "rgba(248,113,113,.07)", border: data.marginOfSafety > 20 ? "rgba(52,211,153,.2)" : "rgba(248,113,113,.2)", desc: "Buffer before reaching break-even" },
+              { label: "Break-even Units",   value: `${fmt(data.breakevenUnits || 0)} units`,       color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.07)", border: "rgba(129,140,248,.2)", desc: "Units to sell to cover all costs" },
+              { label: "Break-even Revenue", value: `${cur} ${fmt(data.breakevenRevenue || 0)}`,    color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.07)",  border: "rgba(251,191,36,.2)",  desc: "Revenue needed to break even" },
+              { label: "Margin of Safety",   value: `${(data.marginOfSafety || 0).toFixed(1)}%`,   color: data.marginOfSafety > 20 ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", bg: data.marginOfSafety > 20 ? "rgba(52,211,153,.07)" : "rgba(248,113,113,.07)", border: data.marginOfSafety > 20 ? "rgba(52,211,153,.2)" : "rgba(248,113,113,.2)", desc: "Buffer before reaching break-even" },
             ].map((c, i) => (
               <div key={i} style={{ borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px", background: c.bg, border: `1px solid ${c.border}` }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{c.label}</div>
@@ -66,10 +66,10 @@ export default function BreakevenPage() {
           {/* Cost breakdown */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
             {[
-              { label: "Fixed Costs (monthly)", value: `${cur} ${fmt(data.fixedCosts || 0)}`, desc: "Rent, salaries, utilities — don't change with sales", color: "#f87171" },
-              { label: "Variable Cost/Unit",     value: `${cur} ${fmt(data.variableCostPerUnit || 0)}`, desc: "Raw material, packaging, shipping per unit", color: "#fbbf24" },
-              { label: "Avg Selling Price/Unit", value: `${cur} ${fmt(data.avgSellingPrice || 0)}`, desc: "Average price you sell at", color: "#34d399" },
-              { label: "Contribution Margin",    value: `${cur} ${fmt((data.avgSellingPrice || 0) - (data.variableCostPerUnit || 0))}`, desc: "Revenue − Variable Cost per unit", color: "#818cf8" },
+              { label: "Fixed Costs (monthly)", value: `${cur} ${fmt(data.fixedCosts || 0)}`, desc: "Rent, salaries, utilities — don't change with sales", color: "var(--tx-f87171, #f87171)" },
+              { label: "Variable Cost/Unit",     value: `${cur} ${fmt(data.variableCostPerUnit || 0)}`, desc: "Raw material, packaging, shipping per unit", color: "var(--tx-fbbf24, #fbbf24)" },
+              { label: "Avg Selling Price/Unit", value: `${cur} ${fmt(data.avgSellingPrice || 0)}`, desc: "Average price you sell at", color: "var(--tx-34d399, #34d399)" },
+              { label: "Contribution Margin",    value: `${cur} ${fmt((data.avgSellingPrice || 0) - (data.variableCostPerUnit || 0))}`, desc: "Revenue − Variable Cost per unit", color: "var(--tx-818cf8, #818cf8)" },
             ].map((c, i) => (
               <div key={i} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px" }}>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{c.label}</div>

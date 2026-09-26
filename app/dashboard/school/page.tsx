@@ -50,11 +50,11 @@ export default function SchoolOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Students", value: summary.students, color: "#818cf8" },
-          { label: "Active Students", value: summary.activeStudents, color: "#34d399" },
-          { label: "Collected Fees", value: `Rs. ${summary.collectedFees.toLocaleString()}`, color: "#60a5fa" },
-          { label: "Pending Fees", value: `Rs. ${summary.pendingFees.toLocaleString()}`, color: "#f87171" },
-          { label: "Pass Rate", value: `${summary.passRate}%`, color: "#f59e0b" },
+          { label: "Students", value: summary.students, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active Students", value: summary.activeStudents, color: "var(--tx-34d399, #34d399)" },
+          { label: "Collected Fees", value: `Rs. ${summary.collectedFees.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Pending Fees", value: `Rs. ${summary.pendingFees.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
+          { label: "Pass Rate", value: `${summary.passRate}%`, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((card) => (
           <div key={card.label} style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 14, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: schoolMuted, marginBottom: 8 }}>{card.label}</div>
@@ -68,11 +68,11 @@ export default function SchoolOverviewPage() {
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Academic Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Scheduled periods", value: summary.schedules, color: "#a5b4fc" },
-              { label: "Fee defaulters", value: summary.defaulters, color: "#f87171" },
-              { label: "Pending admissions", value: summary.pendingAdmissions, color: "#f59e0b" },
-              { label: "Teachers", value: summary.teachers, color: "#34d399" },
-              { label: "Attendance today", value: `${summary.attendancePresent}/${summary.attendanceTotal}`, color: "#60a5fa" },
+              { label: "Scheduled periods", value: summary.schedules, color: "var(--tx-a5b4fc, #a5b4fc)" },
+              { label: "Fee defaulters", value: summary.defaulters, color: "var(--tx-f87171, #f87171)" },
+              { label: "Pending admissions", value: summary.pendingAdmissions, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Teachers", value: summary.teachers, color: "var(--tx-34d399, #34d399)" },
+              { label: "Attendance today", value: `${summary.attendancePresent}/${summary.attendanceTotal}`, color: "var(--tx-60a5fa, #60a5fa)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: schoolMuted }}>{row.label}</span>
@@ -89,7 +89,7 @@ export default function SchoolOverviewPage() {
               <div key={student.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{student.name}</div>
                 <div style={{ fontSize: 12, color: schoolMuted, marginTop: 4 }}>Roll {student.rollNo} | Class {student.className}{student.section ? `-${student.section}` : ""}</div>
-                <div style={{ fontSize: 12, color: "#fca5a5", marginTop: 6 }}>Fee status: {student.feeStatus}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)", marginTop: 6 }}>Fee status: {student.feeStatus}</div>
               </div>
             ))}
             {students.filter((row) => row.feeStatus === "overdue").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No overdue student accounts right now.</div>}

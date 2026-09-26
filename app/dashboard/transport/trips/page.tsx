@@ -64,9 +64,9 @@ export default function TripsPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Today's Trips", value: todayTrips, color: "#2563eb" },
-          { label: "In Transit", value: inTransit, color: "#3b82f6" },
-          { label: "Completed", value: completed, color: "#22c55e" },
-          { label: "Net Revenue", value: `Rs. ${netRevenue.toLocaleString()}`, color: "#f59e0b" },
+          { label: "In Transit", value: inTransit, color: "var(--tx-3b82f6, #3b82f6)" },
+          { label: "Completed", value: completed, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Net Revenue", value: `Rs. ${netRevenue.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((s) => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -77,7 +77,7 @@ export default function TripsPage() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {["all", "scheduled", "in_transit", "completed", "cancelled"].map((s) => (
-          <button key={s} onClick={() => setFilterStatus(s)} style={{ ...btn(filterStatus === s ? "#2563eb" : "rgba(255,255,255,.07)"), padding: "8px 16px" }}>{s === "all" ? "All" : statusLabel[s]}</button>
+          <button key={s} onClick={() => setFilterStatus(s)} style={{ ...btn(filterStatus === s ? "#2563eb" : "rgba(var(--ink),.07)"), padding: "8px 16px" }}>{s === "all" ? "All" : statusLabel[s]}</button>
         ))}
       </div>
 
@@ -112,9 +112,9 @@ export default function TripsPage() {
                   </div>
                 </div>
                 <div style={{ textAlign: "right", minWidth: 140 }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: "#22c55e" }}>Rs. {t.fare.toLocaleString()}</div>
-                  <div style={{ fontSize: 12, color: "#ef4444" }}>Exp: Rs. {t.expenses.toLocaleString()}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: profit >= 0 ? "#22c55e" : "#ef4444", marginTop: 4 }}>Net: Rs. {profit.toLocaleString()}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: "var(--tx-22c55e, #22c55e)" }}>Rs. {t.fare.toLocaleString()}</div>
+                  <div style={{ fontSize: 12, color: "var(--tx-ef4444, #ef4444)" }}>Exp: Rs. {t.expenses.toLocaleString()}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: profit >= 0 ? "var(--tx-22c55e, #22c55e)" : "var(--tx-ef4444, #ef4444)", marginTop: 4 }}>Net: Rs. {profit.toLocaleString()}</div>
                 </div>
               </div>
             </div>
@@ -140,10 +140,10 @@ export default function TripsPage() {
                 </select>
               </div>
             </div>
-            {error && <div style={{ marginTop: 14, fontSize: 12, color: "#fca5a5" }}>{error}</div>}
+            {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
               <button onClick={addTrip} style={{ ...btn("#2563eb"), flex: 1 }}>Create Trip</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(255,255,255,.07)"), flex: 1 }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ ...btn("rgba(var(--ink),.07)"), flex: 1 }}>Cancel</button>
             </div>
           </div>
         </div>

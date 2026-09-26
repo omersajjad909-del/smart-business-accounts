@@ -33,10 +33,10 @@ export default function HospitalAnalyticsPage() {
   }, {}), [appointments]);
 
   const statusBars = [
-    { label: "Patient occupancy", value: patients.filter((row) => row.status === "admitted" || row.status === "icu").length, total: Math.max(patients.length, 1), color: "#3b82f6" },
-    { label: "Appointment completion", value: appointments.filter((row) => row.status === "completed").length, total: Math.max(appointments.length, 1), color: "#22c55e" },
-    { label: "Prescription dispensing", value: prescriptions.filter((row) => row.status === "completed").length, total: Math.max(prescriptions.length, 1), color: "#a78bfa" },
-    { label: "Lab completion", value: labs.filter((row) => row.status === "completed").length, total: Math.max(labs.length, 1), color: "#f59e0b" },
+    { label: "Patient occupancy", value: patients.filter((row) => row.status === "admitted" || row.status === "icu").length, total: Math.max(patients.length, 1), color: "var(--tx-3b82f6, #3b82f6)" },
+    { label: "Appointment completion", value: appointments.filter((row) => row.status === "completed").length, total: Math.max(appointments.length, 1), color: "var(--tx-22c55e, #22c55e)" },
+    { label: "Prescription dispensing", value: prescriptions.filter((row) => row.status === "completed").length, total: Math.max(prescriptions.length, 1), color: "var(--tx-a78bfa, #a78bfa)" },
+    { label: "Lab completion", value: labs.filter((row) => row.status === "completed").length, total: Math.max(labs.length, 1), color: "var(--tx-f59e0b, #f59e0b)" },
   ];
 
   return (
@@ -73,7 +73,7 @@ export default function HospitalAnalyticsPage() {
             {Object.entries(departmentLoad).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([dept, count]) => (
               <div key={dept} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{dept}</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#93c5fd" }}>{count}</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{count}</span>
               </div>
             ))}
             {Object.keys(departmentLoad).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No appointment load yet.</div>}
@@ -88,7 +88,7 @@ export default function HospitalAnalyticsPage() {
             {Object.entries(doctorLoad).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([doctor, count]) => (
               <div key={doctor} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13 }}>{doctor}</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#c4b5fd" }}>{count}</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-c4b5fd, #c4b5fd)" }}>{count}</span>
               </div>
             ))}
             {Object.keys(doctorLoad).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No doctor assignments yet.</div>}
@@ -99,10 +99,10 @@ export default function HospitalAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Clinical Backlog</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "ICU patients", value: patients.filter((row) => row.status === "icu").length, color: "#ef4444" },
-              { label: "Unconfirmed appointments", value: appointments.filter((row) => row.status === "scheduled").length, color: "#f59e0b" },
-              { label: "Active prescriptions", value: prescriptions.filter((row) => row.status === "active").length, color: "#22c55e" },
-              { label: "Urgent pending labs", value: labs.filter((row) => row.urgent && row.status !== "completed").length, color: "#f97316" },
+              { label: "ICU patients", value: patients.filter((row) => row.status === "icu").length, color: "var(--tx-ef4444, #ef4444)" },
+              { label: "Unconfirmed appointments", value: appointments.filter((row) => row.status === "scheduled").length, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Active prescriptions", value: prescriptions.filter((row) => row.status === "active").length, color: "var(--tx-22c55e, #22c55e)" },
+              { label: "Urgent pending labs", value: labs.filter((row) => row.urgent && row.status !== "completed").length, color: "var(--tx-f97316, #f97316)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>

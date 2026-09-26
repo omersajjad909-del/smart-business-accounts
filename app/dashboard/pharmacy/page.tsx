@@ -55,11 +55,11 @@ export default function PharmacyOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Medicines", value: summary.medicines, color: "#fb7185" },
-          { label: "Low Stock", value: summary.lowStock, color: "#f59e0b" },
-          { label: "Expired", value: summary.expired, color: "#f87171" },
-          { label: "Counter Revenue", value: `Rs. ${summary.counterRevenue.toLocaleString()}`, color: "#34d399" },
-          { label: "Purchase Spend", value: `Rs. ${summary.purchaseSpend.toLocaleString()}`, color: "#60a5fa" },
+          { label: "Medicines", value: summary.medicines, color: "var(--tx-fb7185, #fb7185)" },
+          { label: "Low Stock", value: summary.lowStock, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Expired", value: summary.expired, color: "var(--tx-f87171, #f87171)" },
+          { label: "Counter Revenue", value: `Rs. ${summary.counterRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Purchase Spend", value: `Rs. ${summary.purchaseSpend.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: isMobile ? "11px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: pharmacyMuted, marginBottom: 8 }}>{card.label}</div>
@@ -76,7 +76,7 @@ export default function PharmacyOverviewPage() {
               <div key={row.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.patient}</div>
                 <div style={{ fontSize: 12, color: pharmacyMuted, marginTop: 4 }}>Dr. {row.doctor} | {row.date || "No date"}</div>
-                <div style={{ fontSize: 12, color: "#fda4af", marginTop: 6 }}>{row.drugs}</div>
+                <div style={{ fontSize: 12, color: "var(--tx-fda4af, #fda4af)", marginTop: 6 }}>{row.drugs}</div>
               </div>
             ))}
             {prescriptions.filter((row) => row.status !== "dispensed").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No pending prescriptions right now.</div>}
@@ -87,11 +87,11 @@ export default function PharmacyOverviewPage() {
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Inventory value", value: `Rs. ${summary.inventoryValue.toLocaleString()}`, color: "#60a5fa" },
-              { label: "Dispensed prescriptions", value: summary.dispensedPrescriptions, color: "#34d399" },
-              { label: "Pending prescriptions", value: summary.pendingPrescriptions, color: "#f59e0b" },
-              { label: "Counter sales", value: summary.counterSales, color: "#fb7185" },
-              { label: "Active batches", value: summary.activeBatches, color: "#c084fc" },
+              { label: "Inventory value", value: `Rs. ${summary.inventoryValue.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Dispensed prescriptions", value: summary.dispensedPrescriptions, color: "var(--tx-34d399, #34d399)" },
+              { label: "Pending prescriptions", value: summary.pendingPrescriptions, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Counter sales", value: summary.counterSales, color: "var(--tx-fb7185, #fb7185)" },
+              { label: "Active batches", value: summary.activeBatches, color: "var(--tx-c084fc, #c084fc)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: pharmacyMuted }}>{row.label}</span>

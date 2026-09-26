@@ -1,8 +1,8 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const distributionFont = "'Outfit','Inter',sans-serif";
-export const distributionBg = "rgba(255,255,255,0.03)";
-export const distributionBorder = "rgba(255,255,255,0.07)";
+export const distributionBg = "rgba(var(--ink),0.03)";
+export const distributionBorder = "rgba(var(--ink),0.07)";
 
 export const todayIso = () => new Date().toISOString().slice(0, 10);
 

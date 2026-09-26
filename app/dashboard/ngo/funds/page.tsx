@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 export default function FundsPage() {
   const { isMobile } = useResponsive();
@@ -72,10 +72,10 @@ export default function FundsPage() {
 
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap:16, marginBottom:24 }}>
         {[
-          { label:"Total Funds", value:funds.length, color:"#6366f1" },
-          { label:"Total Balance", value:`Rs. ${(totalBalance/1000000).toFixed(2)}M`, color:"#22c55e" },
-          { label:"Received This Month", value:`Rs. ${(receivedThisMonth/1000).toFixed(0)}K`, color:"#3b82f6" },
-          { label:"Spent This Month", value:`Rs. ${(spentThisMonth/1000).toFixed(0)}K`, color:"#ef4444" },
+          { label:"Total Funds", value:funds.length, color:"var(--tx-6366f1, #6366f1)" },
+          { label:"Total Balance", value:`Rs. ${(totalBalance/1000000).toFixed(2)}M`, color:"var(--tx-22c55e, #22c55e)" },
+          { label:"Received This Month", value:`Rs. ${(receivedThisMonth/1000).toFixed(0)}K`, color:"var(--tx-3b82f6, #3b82f6)" },
+          { label:"Spent This Month", value:`Rs. ${(spentThisMonth/1000).toFixed(0)}K`, color:"var(--tx-ef4444, #ef4444)" },
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:26, fontWeight:700, color:s.color }}>{s.value}</div>
@@ -102,15 +102,15 @@ export default function FundsPage() {
               </div>
               <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap:8, marginBottom:12, textAlign:"center" }}>
                 <div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#22c55e" }}>Rs. {(f.balance/1000).toFixed(0)}K</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-22c55e, #22c55e)" }}>Rs. {(f.balance/1000).toFixed(0)}K</div>
                   <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>Balance</div>
                 </div>
                 <div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#3b82f6" }}>Rs. {(f.totalReceived/1000).toFixed(0)}K</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-3b82f6, #3b82f6)" }}>Rs. {(f.totalReceived/1000).toFixed(0)}K</div>
                   <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>Received</div>
                 </div>
                 <div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"#ef4444" }}>Rs. {(f.totalSpent/1000).toFixed(0)}K</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-ef4444, #ef4444)" }}>Rs. {(f.totalSpent/1000).toFixed(0)}K</div>
                   <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>Spent</div>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function FundsPage() {
                 <div style={{ fontSize:13, fontWeight:600 }}>{t.description}</div>
                 <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>{t.fund} · {t.reference} · {t.date}</div>
               </div>
-              <div style={{ fontWeight:700, fontSize:15, color:t.type==="receipt"?"#22c55e":"#ef4444" }}>
+              <div style={{ fontWeight:700, fontSize:15, color:t.type==="receipt"?"var(--tx-22c55e, #22c55e)":"var(--tx-ef4444, #ef4444)" }}>
                 {t.type==="receipt"?"+":"-"}Rs. {t.amount.toLocaleString()}
               </div>
             </div>

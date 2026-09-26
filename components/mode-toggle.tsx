@@ -10,8 +10,8 @@ export function ModeToggle() {
 
   React.useEffect(() => { setMounted(true) }, [])
 
-  // Dark-only for now. Rendering nothing rather than a disabled button keeps
-  // the header clean; the call sites do not need to know.
+  // Rendering nothing rather than a disabled button keeps the header clean
+  // when light is switched off; the call sites do not need to know.
   if (!ALLOW_LIGHT_THEME) return null
 
   if (!mounted) return <div style={{ width: 36, height: 36 }} />
@@ -20,7 +20,17 @@ export function ModeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        const next = isDark ? "light" : "dark"
+        setTheme(next)
+        // Saved to the account too, so AppearanceApplier restores the same
+        // choice on other devices. Signed-out pages just get a 401 — harmless.
+        fetch("/api/preferences/user", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ themeMode: next }),
+        }).catch(() => {})
+      }}
       aria-label="Toggle theme"
       style={{
         display: "flex", alignItems: "center", justifyContent: "center",

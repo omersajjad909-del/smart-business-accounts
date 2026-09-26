@@ -48,10 +48,10 @@ export default function RestaurantOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Menu Items", value: data.summary.menuItems, color: "#f87171" },
-          { label: "Active Tables", value: data.summary.activeTables, color: "#38bdf8" },
-          { label: "Open Kitchen Orders", value: data.summary.kitchenOrders, color: "#f59e0b" },
-          { label: "Avg Recipe Margin", value: `${data.summary.avgRecipeMargin}%`, color: "#34d399" },
+          { label: "Menu Items", value: data.summary.menuItems, color: "var(--tx-f87171, #f87171)" },
+          { label: "Active Tables", value: data.summary.activeTables, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Open Kitchen Orders", value: data.summary.kitchenOrders, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Avg Recipe Margin", value: `${data.summary.avgRecipeMargin}%`, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: restaurantMuted, marginBottom: 8 }}>{card.label}</div>
@@ -65,10 +65,10 @@ export default function RestaurantOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Service Reading</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Open orders", value: data.summary.openOrders, color: "#38bdf8" },
-              { label: "Ready kitchen orders", value: data.summary.readyOrders, color: "#34d399" },
-              { label: "Reservations", value: data.summary.reservations, color: "#a78bfa" },
-              { label: "Sales value", value: `Rs. ${data.summary.salesValue.toLocaleString()}`, color: "#f59e0b" },
+              { label: "Open orders", value: data.summary.openOrders, color: "var(--tx-38bdf8, #38bdf8)" },
+              { label: "Ready kitchen orders", value: data.summary.readyOrders, color: "var(--tx-34d399, #34d399)" },
+              { label: "Reservations", value: data.summary.reservations, color: "var(--tx-a78bfa, #a78bfa)" },
+              { label: "Sales value", value: `Rs. ${data.summary.salesValue.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ color: restaurantMuted }}>{row.label}</span>

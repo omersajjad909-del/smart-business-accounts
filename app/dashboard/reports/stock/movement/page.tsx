@@ -11,9 +11,9 @@ function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigi
 interface MovementRow { itemName: string; category: string; qtySold: number; qtyPurchased: number; turnoverDays: number; movementTag: "fast" | "slow" | "dead"; lastSaleDate?: string; stockQty: number; }
 
 const TAG: Record<string, Badge> = {
-  fast: { label: "Fast Moving 🔥", color: "#34d399", bg: "rgba(52,211,153,.1)" },
-  slow: { label: "Slow Moving ⚠️", color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-  dead: { label: "Dead Stock 💀",  color: "#f87171", bg: "rgba(248,113,113,.1)" },
+  fast: { label: "Fast Moving 🔥", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" },
+  slow: { label: "Slow Moving ⚠️", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" },
+  dead: { label: "Dead Stock 💀",  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)" },
 };
 
 export default function StockMovementPage() {
@@ -78,7 +78,7 @@ export default function StockMovementPage() {
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600 }}>{r.itemName}</td>
                   <td style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)" }}>{r.category || "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{fmt(r.qtySold)}</td>
-                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.stockQty === 0 ? "#f87171" : "var(--text-primary)" }}>{fmt(r.stockQty)}</td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: r.stockQty === 0 ? "var(--tx-f87171, #f87171)" : "var(--text-primary)" }}>{fmt(r.stockQty)}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 13 }}>{r.turnoverDays > 0 ? `${r.turnoverDays}d` : "—"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.lastSaleDate ? fmtDate(r.lastSaleDate) : "Never"}</td>
                   <td style={{ padding: "12px 14px", textAlign: "right" }}>

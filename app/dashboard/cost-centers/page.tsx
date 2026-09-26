@@ -83,8 +83,8 @@ export default function CostCentersPage() {
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total",    value: items.length,         color: "#6366f1", bg: "rgba(99,102,241,.07)",  border: "rgba(99,102,241,.2)" },
-          { label: "Active",   value: activeItems.length,   color: "#34d399", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
+          { label: "Total",    value: items.length,         color: "var(--tx-6366f1, #6366f1)", bg: "rgba(99,102,241,.07)",  border: "rgba(99,102,241,.2)" },
+          { label: "Active",   value: activeItems.length,   color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.07)",  border: "rgba(52,211,153,.2)" },
           { label: "Inactive", value: inactiveItems.length, color: "#6b7280", bg: "rgba(107,114,128,.06)", border: "rgba(107,114,128,.15)" },
         ].map(s => (
           <div key={s.label} style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 18px", background: s.bg, border: `1px solid ${s.border}` }}>
@@ -96,7 +96,7 @@ export default function CostCentersPage() {
 
       {/* Form */}
       <div style={{ background: "var(--panel-bg)", border: `1.5px solid ${editId ? "rgba(99,102,241,.4)" : "var(--border)"}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "20px 22px", marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: editId ? "#818cf8" : "var(--text-primary)" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: editId ? "var(--tx-818cf8, #818cf8)" : "var(--text-primary)" }}>
           {editId ? "✏️ Edit Cost Center" : "➕ New Cost Center"}
         </div>
         <form onSubmit={submit}>
@@ -129,7 +129,7 @@ export default function CostCentersPage() {
                 Cancel
               </button>
             )}
-            {msg && <span style={{ fontSize: 12, fontWeight: 700, color: "#34d399", padding: "9px 14px", borderRadius: 9, background: "rgba(52,211,153,.1)" }}>✓ {msg}</span>}
+            {msg && <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-34d399, #34d399)", padding: "9px 14px", borderRadius: 9, background: "rgba(52,211,153,.1)" }}>✓ {msg}</span>}
           </div>
         </form>
       </div>
@@ -170,7 +170,7 @@ export default function CostCentersPage() {
                   Edit
                 </button>
                 <button onClick={() => remove(c.id)}
-                  style={{ padding: "6px 14px", borderRadius: 8, border: "1.5px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "#f87171", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
+                  style={{ padding: "6px 14px", borderRadius: 8, border: "1.5px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
                   Delete
                 </button>
               </div>
@@ -180,7 +180,7 @@ export default function CostCentersPage() {
       )}
 
       {/* Usage tip */}
-      <div style={{ marginTop: 20, padding: "12px 16px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 12, color: "#d97706", lineHeight: 1.6 }}>
+      <div style={{ marginTop: 20, padding: "12px 16px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 12, color: "var(--tx-d97706, #d97706)", lineHeight: 1.6 }}>
         <strong>How to use cost centers:</strong> When creating an Expense Voucher, Sales Invoice, or Purchase Order, select a cost center to tag that transaction. Then view cost-center-wise spending in Reports → Expense Breakdown (select "By Cost Center") or Budget vs Actual (filter by cost center).
       </div>
     </div>

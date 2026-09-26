@@ -108,9 +108,9 @@ export default function ConsultancyDeliverablesPage() {
 
       <div style={S.kpiGrid}>
         <div style={S.kpi}><div style={S.kpiLabel}>Total Deliverables</div><div style={S.kpiVal}>{kpis.total}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Pending</div><div style={{ ...S.kpiVal, color: "#f59e0b" }}>{kpis.pending}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Submitted</div><div style={{ ...S.kpiVal, color: "#38bdf8" }}>{kpis.submitted}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Approved</div><div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.approved}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Pending</div><div style={{ ...S.kpiVal, color: "var(--tx-f59e0b, #f59e0b)" }}>{kpis.pending}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Submitted</div><div style={{ ...S.kpiVal, color: "var(--tx-38bdf8, #38bdf8)" }}>{kpis.submitted}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Approved</div><div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.approved}</div></div>
       </div>
 
       <div style={S.panel}>

@@ -3,9 +3,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const firmFont = "'Outfit','Inter',sans-serif";
-export const firmBg = "rgba(255,255,255,.03)";
-export const firmBorder = "rgba(255,255,255,.07)";
-export const firmMuted = "rgba(255,255,255,.58)";
+export const firmBg = "rgba(var(--ink),.03)";
+export const firmBorder = "rgba(var(--ink),.07)";
+export const firmMuted = "rgba(var(--ink),.58)";
 
 export type FirmClient = {
   id: string;

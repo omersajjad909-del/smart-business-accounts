@@ -6,9 +6,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
 const ACCENT = "#e879f9";
-const BG = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.08)";
-const MUTED = "rgba(255,255,255,.45)";
+const BG = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.08)";
+const MUTED = "rgba(var(--ink),.45)";
 
 const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
 const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const, letterSpacing: ".06em", display: "block", marginBottom: 5 };
@@ -90,9 +90,9 @@ export default function ProductVariantsPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Products with Variants", value: totalProducts, color: ACCENT },
-          { label: "Variant Groups",          value: activeGroups,  color: "#818cf8" },
-          { label: "Total Variant Values",    value: totalVariants, color: "#34d399" },
-          { label: "Attribute Types",         value: new Set(groups.map(g => g.attribute)).size, color: "#fbbf24" },
+          { label: "Variant Groups",          value: activeGroups,  color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Total Variant Values",    value: totalVariants, color: "var(--tx-34d399, #34d399)" },
+          { label: "Attribute Types",         value: new Set(groups.map(g => g.attribute)).size, color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(k => (
           <div key={k.label} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>{k.label}</div>
@@ -132,7 +132,7 @@ export default function ProductVariantsPage() {
                 <td style={td}>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                     {g.values.map(v => (
-                      <span key={v} style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(var(--ink),.07)", color: "#e2e8f0", fontSize: 12, fontWeight: 600 }}>{v}</span>
+                      <span key={v} style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(var(--ink),.07)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 12, fontWeight: 600 }}>{v}</span>
                     ))}
                   </div>
                 </td>
@@ -143,10 +143,10 @@ export default function ProductVariantsPage() {
                   </span>
                 </td>
                 <td style={td}>
-                  <button onClick={() => update(g.id, { status: g.status === "active" ? "inactive" : "active" })} style={{ background: "none", border: "none", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>
+                  <button onClick={() => update(g.id, { status: g.status === "active" ? "inactive" : "active" })} style={{ background: "none", border: "none", color: "var(--tx-818cf8, #818cf8)", fontSize: 12, fontWeight: 700, cursor: "pointer", marginRight: 10 }}>
                     {g.status === "active" ? "Disable" : "Enable"}
                   </button>
-                  <button onClick={() => remove(g.id)} style={{ background: "none", border: "none", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Remove</button>
+                  <button onClick={() => remove(g.id)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Remove</button>
                 </td>
               </tr>
             ))}

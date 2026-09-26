@@ -126,10 +126,10 @@ export default function StockAdjustmentPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
-          { label: "Total Adjustments", val: adjustments.length, color: "#818cf8" },
-          { label: "Pending Approval", val: pending, color: "#f59e0b" },
-          { label: "Approved", val: approved, color: "#10b981" },
-          { label: "Net Qty Variance", val: totalDiff > 0 ? `+${totalDiff}` : String(totalDiff), color: totalDiff < 0 ? "#ef4444" : "#10b981" },
+          { label: "Total Adjustments", val: adjustments.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Pending Approval", val: pending, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Approved", val: approved, color: "var(--tx-10b981, #10b981)" },
+          { label: "Net Qty Variance", val: totalDiff > 0 ? `+${totalDiff}` : String(totalDiff), color: totalDiff < 0 ? "var(--tx-ef4444, #ef4444)" : "var(--tx-10b981, #10b981)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{k.label}</div>
@@ -155,13 +155,13 @@ export default function StockAdjustmentPage() {
             <tbody>
               {adjustments.map((row, i) => (
                 <tr key={row.id} style={{ borderTop: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(99,102,241,.02)" }}>
-                  <td style={{ padding: "11px 14px", fontWeight: 700, color: "#f59e0b" }}>{row.adjId}</td>
+                  <td style={{ padding: "11px 14px", fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)" }}>{row.adjId}</td>
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{row.date}</td>
                   <td style={{ padding: "11px 14px", fontWeight: 500 }}>{row.itemName}</td>
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{row.itemCode || "—"}</td>
                   <td style={{ padding: "11px 14px" }}>{row.systemQty}</td>
                   <td style={{ padding: "11px 14px" }}>{row.physicalQty}</td>
-                  <td style={{ padding: "11px 14px", fontWeight: 700, color: row.diff < 0 ? "#ef4444" : row.diff > 0 ? "#10b981" : "var(--text-muted)" }}>
+                  <td style={{ padding: "11px 14px", fontWeight: 700, color: row.diff < 0 ? "var(--tx-ef4444, #ef4444)" : row.diff > 0 ? "var(--tx-10b981, #10b981)" : "var(--text-muted)" }}>
                     {row.diff > 0 ? `+${row.diff}` : row.diff}
                   </td>
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{row.reason}</td>
@@ -170,7 +170,7 @@ export default function StockAdjustmentPage() {
                   </td>
                   <td style={{ padding: "11px 14px" }}>
                     {row.status === "PENDING" && (
-                      <button onClick={() => handleApprove(row)} disabled={approving === row.id} style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", opacity: approving === row.id ? 0.6 : 1 }}>
+                      <button onClick={() => handleApprove(row)} disabled={approving === row.id} style={{ background: "rgba(16,185,129,.1)", color: "var(--tx-10b981, #10b981)", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", opacity: approving === row.id ? 0.6 : 1 }}>
                         {approving === row.id ? "…" : "Approve"}
                       </button>
                     )}
@@ -199,7 +199,7 @@ export default function StockAdjustmentPage() {
                       <button key={item.id} onMouseDown={() => selectItem(item)} style={{ display: "block", width: "100%", textAlign: "left", padding: "9px 12px", background: "none", border: "none", color: "var(--text-primary)", cursor: "pointer", fontSize: 13 }}>
                         <span style={{ fontWeight: 600 }}>{item.name}</span>
                         {item.code && <span style={{ color: "var(--text-muted)", marginLeft: 8, fontSize: 11 }}>{item.code}</span>}
-                        <span style={{ float: "right", color: "#10b981", fontSize: 11 }}>Qty: {item.qty ?? "?"}</span>
+                        <span style={{ float: "right", color: "var(--tx-10b981, #10b981)", fontSize: 11 }}>Qty: {item.qty ?? "?"}</span>
                       </button>
                     ))}
                   </div>

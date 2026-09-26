@@ -114,9 +114,9 @@ export default function ConsultancyProposalsPage() {
 
       <div style={S.kpiGrid}>
         <div style={S.kpi}><div style={S.kpiLabel}>Total Proposals</div><div style={S.kpiVal}>{kpis.total}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Sent</div><div style={{ ...S.kpiVal, color: "#38bdf8" }}>{kpis.sent}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Won</div><div style={{ ...S.kpiVal, color: "#34d399" }}>{kpis.won}</div></div>
-        <div style={S.kpi}><div style={S.kpiLabel}>Pipeline Value</div><div style={{ ...S.kpiVal, color: "#818cf8" }}>${kpis.pipeline.toLocaleString()}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Sent</div><div style={{ ...S.kpiVal, color: "var(--tx-38bdf8, #38bdf8)" }}>{kpis.sent}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Won</div><div style={{ ...S.kpiVal, color: "var(--tx-34d399, #34d399)" }}>{kpis.won}</div></div>
+        <div style={S.kpi}><div style={S.kpiLabel}>Pipeline Value</div><div style={{ ...S.kpiVal, color: "var(--tx-818cf8, #818cf8)" }}>${kpis.pipeline.toLocaleString()}</div></div>
       </div>
 
       <div style={S.panel}>

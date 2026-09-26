@@ -51,10 +51,10 @@ export default function ConstructionOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Active Projects", value: summary.activeProjects, color: "#fb923c" },
-          { label: "Active Sites", value: summary.activeSites, color: "#34d399" },
-          { label: "Material Value", value: `Rs. ${summary.materialValue.toLocaleString()}`, color: "#60a5fa" },
-          { label: "Open Contracts", value: `Rs. ${summary.contractExposure.toLocaleString()}`, color: "#f59e0b" },
+          { label: "Active Projects", value: summary.activeProjects, color: "var(--tx-fb923c, #fb923c)" },
+          { label: "Active Sites", value: summary.activeSites, color: "var(--tx-34d399, #34d399)" },
+          { label: "Material Value", value: `Rs. ${summary.materialValue.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Open Contracts", value: `Rs. ${summary.contractExposure.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" },
         ].map((card) => (
           <div key={card.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: constructionMuted, marginBottom: 8 }}>{card.label}</div>
@@ -73,7 +73,7 @@ export default function ConstructionOverviewPage() {
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{project.name}</div>
                   <div style={{ fontSize: 12, color: constructionMuted }}>{project.client || "No client"} | {project.progress}% progress</div>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "active" ? "#34d399" : "#94a3b8" }}>{project.status}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "active" ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>{project.status}</div>
               </div>
             ))}
             {projects.length === 0 && <div style={{ color: constructionMuted, fontSize: 13 }}>No projects yet.</div>}
@@ -84,11 +84,11 @@ export default function ConstructionOverviewPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Commercial Snapshot</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "BOQ items", value: summary.boqItems, color: "#f59e0b" },
-              { label: "Certified billing", value: `Rs. ${summary.certifiedBilling.toLocaleString()}`, color: "#34d399" },
-              { label: "Expenses booked", value: `Rs. ${summary.expenses.toLocaleString()}`, color: "#60a5fa" },
-              { label: "Contractor payouts", value: `Rs. ${summary.contractorPayments.toLocaleString()}`, color: "#a78bfa" },
-              { label: "Live subcontractors", value: subcontractors.filter((row) => row.status === "active").length, color: "#fb923c" },
+              { label: "BOQ items", value: summary.boqItems, color: "var(--tx-f59e0b, #f59e0b)" },
+              { label: "Certified billing", value: `Rs. ${summary.certifiedBilling.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+              { label: "Expenses booked", value: `Rs. ${summary.expenses.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
+              { label: "Contractor payouts", value: `Rs. ${summary.contractorPayments.toLocaleString()}`, color: "var(--tx-a78bfa, #a78bfa)" },
+              { label: "Live subcontractors", value: subcontractors.filter((row) => row.status === "active").length, color: "var(--tx-fb923c, #fb923c)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <span style={{ fontSize: 13, color: constructionMuted }}>{row.label}</span>

@@ -4,8 +4,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
+const bg = "rgba(var(--ink),0.03)";
+const border = "rgba(var(--ink),0.07)";
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function SchedulePage() {
@@ -62,8 +62,8 @@ export default function SchedulePage() {
                     <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{p.subject}</div>
                     <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)" }}>{p.teacher}</div>
                     <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)" }}>Class: {p.class} · Rm: {p.room}</div>
-                    <div style={{ fontSize: 10, color: "#818cf8", marginTop: 2 }}>{p.time} · P{p.period}</div>
-                    <button onClick={() => remove(p.id)} style={{ marginTop: 4, padding: "2px 6px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#ef4444", borderRadius: 4, fontSize: 9, cursor: "pointer" }}>Remove</button>
+                    <div style={{ fontSize: 10, color: "var(--tx-818cf8, #818cf8)", marginTop: 2 }}>{p.time} · P{p.period}</div>
+                    <button onClick={() => remove(p.id)} style={{ marginTop: 4, padding: "2px 6px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-ef4444, #ef4444)", borderRadius: 4, fontSize: 9, cursor: "pointer" }}>Remove</button>
                   </div>
                 ))}
                 {dayPeriods.length === 0 && !loading && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: 16, textAlign: "center", fontSize: 11, color: "rgba(var(--ink),.2)" }}>Free</div>}
@@ -96,7 +96,7 @@ export default function SchedulePage() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-              {error && <div style={{ color: "#fda4af", fontSize: 12, flex: 1 }}>{error}</div>}
+              {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#6366f1", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Period</button>
               <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>

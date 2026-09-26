@@ -129,10 +129,10 @@ export default function AttachmentsPage() {
       {/* KPI */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
-          { label: "Total Files", value: kpis.total, color: "#6366f1" },
-          { label: "Total Size", value: formatBytes(kpis.totalSize), color: "#a5b4fc" },
-          { label: "PDFs", value: kpis.pdfs, color: "#f87171" },
-          { label: "Images", value: kpis.images, color: "#34d399" },
+          { label: "Total Files", value: kpis.total, color: "var(--tx-6366f1, #6366f1)" },
+          { label: "Total Size", value: formatBytes(kpis.totalSize), color: "var(--tx-a5b4fc, #a5b4fc)" },
+          { label: "PDFs", value: kpis.pdfs, color: "var(--tx-f87171, #f87171)" },
+          { label: "Images", value: kpis.images, color: "var(--tx-34d399, #34d399)" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>{k.label}</div>
@@ -180,7 +180,7 @@ export default function AttachmentsPage() {
                   <td style={td}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{ fontSize: 20 }}>{fileIcon(a.fileType)}</span>
-                      <a href={a.fileUrl} target="_blank" rel="noreferrer" style={{ fontWeight: 600, color: "#a5b4fc", textDecoration: "none", fontSize: 13 }}>
+                      <a href={a.fileUrl} target="_blank" rel="noreferrer" style={{ fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none", fontSize: 13 }}>
                         {a.fileName}
                       </a>
                     </div>
@@ -191,7 +191,7 @@ export default function AttachmentsPage() {
                   <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{formatBytes(a.fileSize)}</td>
                   <td style={td}>
                     {a.entityType && a.entityType !== "General" ? (
-                      <span style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#a5b4fc" }}>
+                      <span style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                         {a.entityType}
                       </span>
                     ) : <span style={{ color: "var(--text-muted)", fontSize: 12 }}>General</span>}
@@ -204,7 +204,7 @@ export default function AttachmentsPage() {
                         ⬇ Download
                       </a>
                       <button onClick={() => handleDelete(a.id)}
-                        style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: "0 4px", lineHeight: 1, fontFamily: FONT }}>
+                        style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 16, padding: "0 4px", lineHeight: 1, fontFamily: FONT }}>
                         ×
                       </button>
                     </div>
@@ -250,7 +250,7 @@ export default function AttachmentsPage() {
               <input ref={fileRef} type="file" multiple style={{ display: "none" }} onChange={e => handleUpload(e.target.files)}
                 accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" />
               {uploading ? (
-                <div style={{ color: "#6366f1", fontWeight: 600 }}>Uploading…</div>
+                <div style={{ color: "var(--tx-6366f1, #6366f1)", fontWeight: 600 }}>Uploading…</div>
               ) : (
                 <>
                   <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
@@ -260,7 +260,7 @@ export default function AttachmentsPage() {
               )}
             </div>
 
-            {error && <div style={{ color: "#f87171", fontSize: 12, marginBottom: 12 }}>{error}</div>}
+            {error && <div style={{ color: "var(--tx-f87171, #f87171)", fontSize: 12, marginBottom: 12 }}>{error}</div>}
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button onClick={() => { setUploadModal(false); setError(null); }}

@@ -21,7 +21,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     icon: "🔗",
     label: "API Access",
     desc: "Generate REST API keys and connect third-party apps to your FinovaOS data",
-    color: "#6366f1",
+    color: "var(--tx-6366f1, #6366f1)",
     badge: "Developer",
     statusKey: "api",
   },
@@ -30,7 +30,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     icon: "🏦",
     label: "Bank Connect",
     desc: "Link your bank account via Plaid for automatic transaction sync and reconciliation",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     badge: "Finance",
     statusKey: "bank",
   },
@@ -39,7 +39,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     icon: "🔐",
     label: "SSO / SAML",
     desc: "Single Sign-On with Google Workspace, Azure AD, Okta, or custom SAML 2.0",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     badge: "Security",
     statusKey: "sso",
   },
@@ -48,7 +48,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     icon: "💬",
     label: "Notifications & Messaging",
     desc: "Configure WhatsApp Business, SMS providers, and SMTP email for alerts and invoices",
-    color: "#4ade80",
+    color: "var(--tx-4ade80, #4ade80)",
     badge: "Messaging",
     statusKey: "notifications",
   },
@@ -57,7 +57,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     icon: "📥",
     label: "Import Wizard",
     desc: "Bulk import customers, vendors, inventory items, and transactions from Excel or CSV",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     badge: "Data",
     statusKey: "import",
   },
@@ -66,7 +66,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     icon: "🪝",
     label: "Webhooks",
     desc: "Send real-time event notifications to your own endpoints when invoices, payments, or orders are created",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     badge: "Developer",
     statusKey: "webhooks",
   },
@@ -135,26 +135,26 @@ export default function IntegrationsPage() {
   const getStatus = (item: IntegrationItem): { label: string; color: string; bg: string } => {
     switch (item.statusKey) {
       case "api":
-        if (apiAccessAvailable === false) return { label: "Locked in custom plan", color: "#f59e0b", bg: "rgba(245,158,11,.12)" };
+        if (apiAccessAvailable === false) return { label: "Locked in custom plan", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)" };
         if (apiKeyCount === null) return { label: "Loading…", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
         return apiKeyCount > 0
-          ? { label: `${apiKeyCount} Active Key${apiKeyCount > 1 ? "s" : ""}`, color: "#34d399", bg: "rgba(52,211,153,.1)" }
+          ? { label: `${apiKeyCount} Active Key${apiKeyCount > 1 ? "s" : ""}`, color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" }
           : { label: "Not configured", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
       case "bank":
         if (bankCount === null) return { label: "Loading…", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
         return bankCount > 0
-          ? { label: `${bankCount} Account${bankCount > 1 ? "s" : ""} linked`, color: "#34d399", bg: "rgba(52,211,153,.1)" }
+          ? { label: `${bankCount} Account${bankCount > 1 ? "s" : ""} linked`, color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" }
           : { label: "Not connected", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
       case "sso":
         if (ssoEnabled === null) return { label: "Loading…", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
         return ssoEnabled
-          ? { label: "Enabled", color: "#34d399", bg: "rgba(52,211,153,.1)" }
+          ? { label: "Enabled", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" }
           : { label: "Disabled", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
       case "notifications":
         if (notifSetup === null) return { label: "Loading…", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
         return notifSetup
-          ? { label: "Configured", color: "#34d399", bg: "rgba(52,211,153,.1)" }
-          : { label: "Not set up", color: "#fbbf24", bg: "rgba(251,191,36,.1)" };
+          ? { label: "Configured", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)" }
+          : { label: "Not set up", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)" };
       default:
         return { label: "Configure", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
     }
@@ -181,9 +181,9 @@ export default function IntegrationsPage() {
       {/* Summary strip */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { icon: "🔌", label: "Connected", value: `${connected} / 4`, color: connected > 0 ? "#34d399" : "#6b7280", bg: connected > 0 ? "rgba(52,211,153,.08)" : "rgba(107,114,128,.06)", border: connected > 0 ? "rgba(52,211,153,.2)" : "rgba(107,114,128,.15)" },
-          { icon: "🔗", label: "API Keys Active", value: apiKeyCount === null ? "…" : String(apiKeyCount), color: "#6366f1", bg: "rgba(99,102,241,.08)", border: "rgba(99,102,241,.2)" },
-          { icon: "🏦", label: "Bank Accounts Linked", value: bankCount === null ? "…" : String(bankCount), color: "#38bdf8", bg: "rgba(56,189,248,.08)", border: "rgba(56,189,248,.2)" },
+          { icon: "🔌", label: "Connected", value: `${connected} / 4`, color: connected > 0 ? "var(--tx-34d399, #34d399)" : "#6b7280", bg: connected > 0 ? "rgba(52,211,153,.08)" : "rgba(107,114,128,.06)", border: connected > 0 ? "rgba(52,211,153,.2)" : "rgba(107,114,128,.15)" },
+          { icon: "🔗", label: "API Keys Active", value: apiKeyCount === null ? "…" : String(apiKeyCount), color: "var(--tx-6366f1, #6366f1)", bg: "rgba(99,102,241,.08)", border: "rgba(99,102,241,.2)" },
+          { icon: "🏦", label: "Bank Accounts Linked", value: bankCount === null ? "…" : String(bankCount), color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.08)", border: "rgba(56,189,248,.2)" },
         ].map(s => (
           <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius: 12, background: s.bg, border: `1px solid ${s.border}`, display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 22 }}>{s.icon}</span>

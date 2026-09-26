@@ -116,10 +116,10 @@ export default function SupportPage() {
       </div>
 
       <div style={S.stats}>
-        <div style={S.stat}><div style={S.statLabel}>Open Tickets</div><div style={{ ...S.statVal, color: '#f87171' }}>{open}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Critical Issues</div><div style={{ ...S.statVal, color: '#ef4444' }}>{critical}</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Avg Response</div><div style={{ ...S.statVal, color: '#38bdf8' }}>2.4h</div></div>
-        <div style={S.stat}><div style={S.statLabel}>Resolved Today</div><div style={{ ...S.statVal, color: '#34d399' }}>{resolved}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Open Tickets</div><div style={{ ...S.statVal, color: 'var(--tx-f87171, #f87171)' }}>{open}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Critical Issues</div><div style={{ ...S.statVal, color: 'var(--tx-ef4444, #ef4444)' }}>{critical}</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Avg Response</div><div style={{ ...S.statVal, color: 'var(--tx-38bdf8, #38bdf8)' }}>2.4h</div></div>
+        <div style={S.stat}><div style={S.statLabel}>Resolved Today</div><div style={{ ...S.statVal, color: 'var(--tx-34d399, #34d399)' }}>{resolved}</div></div>
       </div>
 
       <div style={{ ...S.filters, marginBottom: 12 }}>

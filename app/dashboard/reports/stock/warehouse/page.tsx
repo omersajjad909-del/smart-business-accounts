@@ -45,8 +45,8 @@ export default function WarehouseStockPage() {
             <div key={i} onClick={() => setSelected(selected === w.name ? "all" : w.name)}
               style={{ borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px", background: selected === w.name ? "rgba(99,102,241,.1)" : "var(--panel-bg)", border: `1px solid ${selected === w.name ? "rgba(99,102,241,.4)" : "var(--border)"}`, cursor: "pointer" }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>🏭 {w.name}</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "#818cf8", marginBottom: 4 }}>{cur} {fmt(w.totalValue)}</div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{w.totalItems} items {w.lowStockCount > 0 && <span style={{ color: "#f87171" }}>• {w.lowStockCount} low stock</span>}</div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)", marginBottom: 4 }}>{cur} {fmt(w.totalValue)}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{w.totalItems} items {w.lowStockCount > 0 && <span style={{ color: "var(--tx-f87171, #f87171)" }}>• {w.lowStockCount} low stock</span>}</div>
             </div>
           ))}
         </div>
@@ -75,13 +75,13 @@ export default function WarehouseStockPage() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "11px 14px", fontSize: 13, fontWeight: 600 }}>{r.itemName}</td>
                   <td style={{ padding: "11px 14px", fontSize: 12, color: "var(--text-muted)" }}>{r.category || "—"}</td>
-                  <td style={{ padding: "11px 14px", fontSize: 12, color: "#818cf8" }}>{r.warehouseName}</td>
-                  <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: isLow ? "#f87171" : "var(--text-primary)" }}>{fmt(r.qty)}</td>
+                  <td style={{ padding: "11px 14px", fontSize: 12, color: "var(--tx-818cf8, #818cf8)" }}>{r.warehouseName}</td>
+                  <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: isLow ? "var(--tx-f87171, #f87171)" : "var(--text-primary)" }}>{fmt(r.qty)}</td>
                   <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 13 }}>{cur} {fmt(r.value)}</td>
                   <td style={{ padding: "11px 14px", textAlign: "right", fontSize: 12, color: "var(--text-muted)" }}>{r.reorderLevel > 0 ? fmt(r.reorderLevel) : "—"}</td>
                   <td style={{ padding: "11px 14px", textAlign: "right" }}>
-                    {isLow ? <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(248,113,113,.1)", color: "#f87171" }}>Low Stock</span>
-                    : <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(52,211,153,.1)", color: "#34d399" }}>OK</span>}
+                    {isLow ? <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(248,113,113,.1)", color: "var(--tx-f87171, #f87171)" }}>Low Stock</span>
+                    : <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(52,211,153,.1)", color: "var(--tx-34d399, #34d399)" }}>OK</span>}
                   </td>
                 </tr>
               );

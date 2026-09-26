@@ -324,55 +324,55 @@ export default function CPVPage() {
     finally { setSaving(false); }
   }
 
-  const inp: React.CSSProperties = { background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", borderRadius:8, color:"rgba(255,255,255,.85)", padding:"8px 12px", fontSize:13, fontFamily:ff, outline:"none", width:"100%", boxSizing:"border-box" };
-  const lbl: React.CSSProperties = { fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:5, display:"block" };
+  const inp: React.CSSProperties = { background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", borderRadius:8, color:"rgba(var(--ink),.85)", padding:"8px 12px", fontSize:13, fontFamily:ff, outline:"none", width:"100%", boxSizing:"border-box" };
+  const lbl: React.CSSProperties = { fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:5, display:"block" };
   const clickInp: React.CSSProperties = { ...inp, cursor:"pointer", caretColor:"transparent" };
 
   return (
-    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1200 }}>
+    <div style={{ padding: isMobile ? "13px 13px" : "24px 28px", fontFamily:ff, color:"rgba(var(--ink),.85)", maxWidth:1200 }}>
 
       {/* ── CHART OF ACCOUNT MODAL ── */}
       {pickerOpen && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.78)", zIndex:2000, display:"flex", alignItems:"center", justifyContent:"center" }} onClick={closePicker}>
-          <div style={{ background:"#0c0e1a", border:"1px solid rgba(255,255,255,.15)", borderRadius:14, width:640, maxHeight:580, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.9)" }} onClick={e => e.stopPropagation()}>
-            <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom:"1px solid rgba(255,255,255,.1)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <span style={{ fontWeight:800, fontSize:15, color:"rgba(255,255,255,.9)", letterSpacing:".05em" }}>CHART OF ACCOUNT</span>
-              <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Choices in list: {filteredPickerAccts.length}</span>
+          <div style={{ background:"var(--dk-0c0e1a, #0c0e1a)", border:"1px solid rgba(var(--ink),.15)", borderRadius:14, width:640, maxHeight:580, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.9)" }} onClick={e => e.stopPropagation()}>
+            <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom:"1px solid rgba(var(--ink),.1)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <span style={{ fontWeight:800, fontSize:15, color:"rgba(var(--ink),.9)", letterSpacing:".05em" }}>CHART OF ACCOUNT</span>
+              <span style={{ fontSize:11, color:"rgba(var(--ink),.35)" }}>Choices in list: {filteredPickerAccts.length}</span>
             </div>
-            <div style={{ padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.07)" }}>
+            <div style={{ padding:"10px 20px", borderBottom:"1px solid rgba(var(--ink),.07)" }}>
               <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                <span style={{ fontSize:12, color:"rgba(255,255,255,.4)", minWidth:30 }}>Find</span>
+                <span style={{ fontSize:12, color:"rgba(var(--ink),.4)", minWidth:30 }}>Find</span>
                 <input autoFocus placeholder="Search by name or code…" value={pickerSearch} onChange={e => setPickerSearch(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && filteredPickerAccts.length > 0) confirmPicker(filteredPickerAccts.find(a => a.id === pickerSelected) || filteredPickerAccts[0]); if (e.key === "Escape") closePicker(); }}
                   style={{ ...inp, flex:1, fontSize:13 }} />
               </div>
             </div>
             <div style={{ flex:1, overflowY:"auto", maxHeight:380 }}>
-              {pickerLoading ? <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.35)", fontSize:13 }}>Loading accounts…</div>
-              : filteredPickerAccts.length === 0 ? <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>No accounts found.</div>
+              {pickerLoading ? <div style={{ padding:48, textAlign:"center", color:"rgba(var(--ink),.35)", fontSize:13 }}>Loading accounts…</div>
+              : filteredPickerAccts.length === 0 ? <div style={{ padding:48, textAlign:"center", color:"rgba(var(--ink),.25)", fontSize:13 }}>No accounts found.</div>
               : <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                  <thead><tr style={{ background:"rgba(255,255,255,.05)", position:"sticky", top:0, zIndex:1 }}>
-                    <th style={{ padding:"8px 16px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", textAlign:"left", width:130 }}>CODE</th>
-                    <th style={{ padding:"8px 16px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", textAlign:"left" }}>TITLE</th>
+                  <thead><tr style={{ background:"rgba(var(--ink),.05)", position:"sticky", top:0, zIndex:1 }}>
+                    <th style={{ padding:"8px 16px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", textAlign:"left", width:130 }}>CODE</th>
+                    <th style={{ padding:"8px 16px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", textAlign:"left" }}>TITLE</th>
                   </tr></thead>
                   <tbody>
                     {filteredPickerAccts.map(a => (
                       <tr key={a.id} tabIndex={0} onClick={() => setPickerSelected(a.id)} onDoubleClick={() => confirmPicker(a)}
                         onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); confirmPicker(a); } }}
-                        style={{ background: pickerSelected === a.id ? `rgba(99,102,241,.3)` : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,.04)", outline:"none" }}
-                        onMouseEnter={e => { if (pickerSelected !== a.id) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.05)"; }}
+                        style={{ background: pickerSelected === a.id ? `rgba(99,102,241,.3)` : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(var(--ink),.04)", outline:"none" }}
+                        onMouseEnter={e => { if (pickerSelected !== a.id) (e.currentTarget as HTMLElement).style.background = "rgba(var(--ink),.05)"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = pickerSelected === a.id ? `rgba(99,102,241,.3)` : "transparent"; }}>
-                        <td style={{ padding:"9px 16px", fontSize:12, color:"rgba(255,255,255,.45)", fontFamily:"monospace", letterSpacing:".04em" }}>{a.code}</td>
-                        <td style={{ padding:"9px 16px", fontSize:13, color:"rgba(255,255,255,.82)", fontWeight: pickerSelected === a.id ? 700 : 400 }}>{a.name}</td>
+                        <td style={{ padding:"9px 16px", fontSize:12, color:"rgba(var(--ink),.45)", fontFamily:"monospace", letterSpacing:".04em" }}>{a.code}</td>
+                        <td style={{ padding:"9px 16px", fontSize:13, color:"rgba(var(--ink),.82)", fontWeight: pickerSelected === a.id ? 700 : 400 }}>{a.name}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>}
             </div>
-            <div style={{ padding:"12px 20px", borderTop:"1px solid rgba(255,255,255,.08)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <span style={{ fontSize:11, color:"rgba(255,255,255,.28)" }}>Double-click or select + OK to confirm</span>
+            <div style={{ padding:"12px 20px", borderTop:"1px solid rgba(var(--ink),.08)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <span style={{ fontSize:11, color:"rgba(var(--ink),.28)" }}>Double-click or select + OK to confirm</span>
               <div style={{ display:"flex", gap:8 }}>
-                <button onClick={closePicker} style={{ padding:"8px 20px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.6)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel</button>
+                <button onClick={closePicker} style={{ padding:"8px 20px", borderRadius:8, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.6)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel</button>
                 <button onClick={() => { const acc = filteredPickerAccts.find(a => a.id === pickerSelected) || filteredPickerAccts[0]; if (acc) confirmPicker(acc); }} disabled={filteredPickerAccts.length === 0}
                   style={{ padding:"8px 28px", borderRadius:8, background:BLUE, border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:filteredPickerAccts.length === 0 ? 0.4 : 1 }}>OK</button>
               </div>
@@ -384,10 +384,10 @@ export default function CPVPage() {
       {/* ── Title ── */}
       <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
         <div>
-          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color: queryMode ? "#facc15" : BLUE }}>
+          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color: queryMode ? "var(--tx-facc15, #facc15)" : BLUE }}>
             {queryMode ? "🔍 QUERY MODE — CPV" : "Cash Payment Voucher (CPV)"}
           </h1>
-          <p style={{ margin:"4px 0 0", fontSize:12, color: queryMode ? "rgba(250,204,21,.5)" : "rgba(255,255,255,.35)" }}>
+          <p style={{ margin:"4px 0 0", fontSize:12, color: queryMode ? "rgba(var(--txr-facc15, 250,204,21),.5)" : "rgba(var(--ink),.35)" }}>
             {queryMode ? "Enter search criteria then press F8 to execute" : "Make cash or bank payments to suppliers, banks, or customers (e.g. refunds)"}
           </p>
         </div>
@@ -395,27 +395,27 @@ export default function CPVPage() {
           {queryIdx >= 0 && !queryMode && (
             <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", borderRadius:10, padding:"6px 12px" }}>
               <button onClick={() => navTo(queryIdx - 1)} disabled={queryIdx === 0}
-                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:queryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize:13, cursor:queryIdx===0?"default":"pointer", fontFamily:ff }}>◀</button>
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:queryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize:13, cursor:queryIdx===0?"default":"pointer", fontFamily:ff }}>◀</button>
               <span style={{ fontSize:12, color:BLUE, fontWeight:700, minWidth:80, textAlign:"center" }}>
                 {queryResults[queryIdx]?.voucherNo} · {queryIdx + 1} / {queryResults.length}
               </span>
               <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
-                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:queryIdx===queryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize:13, cursor:queryIdx===queryResults.length-1?"default":"pointer", fontFamily:ff }}>▶</button>
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:queryIdx===queryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize:13, cursor:queryIdx===queryResults.length-1?"default":"pointer", fontFamily:ff }}>▶</button>
               <button onClick={deleteVoucher} disabled={saving || !editing} title="Delete this voucher and its ledger entries"
                 style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.14)", border:"1px solid rgba(248,113,113,.35)", color:"#f87171", fontSize:11, fontWeight:700, cursor:(saving||!editing)?"default":"pointer", fontFamily:ff, opacity:(saving||!editing)?0.5:1 }}>🗑 Delete</button>
               <button onClick={exitQueryMode}
-                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"var(--tx-f87171, #f87171)", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
             </div>
           )}
           {!queryMode && queryIdx < 0 && (
             <>
               <div style={{ background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
-                <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Next CPV #</div>
+                <div style={{ fontSize:10, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Next CPV #</div>
                 <div style={{ fontSize:16, fontWeight:800, color:BLUE }}>CPV-{vouchers.length + 1}</div>
               </div>
-              <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
-                <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Saved Vouchers</div>
-                <div style={{ fontSize:16, fontWeight:800, color:"rgba(255,255,255,.7)" }}>{vouchers.length}</div>
+              <div style={{ background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.08)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
+                <div style={{ fontSize:10, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Saved Vouchers</div>
+                <div style={{ fontSize:16, fontWeight:800, color:"rgba(var(--ink),.7)" }}>{vouchers.length}</div>
               </div>
             </>
           )}
@@ -430,24 +430,24 @@ export default function CPVPage() {
       {/* ── QUERY MODE FORM ── */}
       {queryMode && (
         <div style={{ background:"rgba(250,204,21,.04)", border:"2px solid rgba(250,204,21,.3)", borderRadius:16, padding:28, marginBottom:28 }}>
-          <div style={{ marginBottom:16, fontSize:12, color:"rgba(250,204,21,.7)" }}>
-            Enter criteria below — leave blank to get all records. Use <b style={{color:"#facc15"}}>&gt;</b>, <b style={{color:"#facc15"}}>&lt;</b>, <b style={{color:"#facc15"}}>&gt;=</b> for date range.
+          <div style={{ marginBottom:16, fontSize:12, color:"rgba(var(--txr-facc15, 250,204,21),.7)" }}>
+            Enter criteria below — leave blank to get all records. Use <b style={{color:"var(--tx-facc15, #facc15)"}}>&gt;</b>, <b style={{color:"var(--tx-facc15, #facc15)"}}>&lt;</b>, <b style={{color:"var(--tx-facc15, #facc15)"}}>&gt;=</b> for date range.
           </div>
           <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "180px 240px 1fr", gap:16, marginBottom:24 }}>
             <div>
-              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>CPV # (e.g. CPV-5)</label>
+              <label style={{ ...lbl, color:"rgba(var(--txr-facc15, 250,204,21),.6)" }}>CPV # (e.g. CPV-5)</label>
               <input autoFocus value={queryCpvNo} onChange={e => setQueryCpvNo(e.target.value)} placeholder="CPV-1 or blank for all…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCpvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+              <label style={{ ...lbl, color:"rgba(var(--txr-facc15, 250,204,21),.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
               <input value={queryDate} onChange={e => setQueryDate(e.target.value)} placeholder=">010125 or 01-01-2025 or blank…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCpvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }} />
             </div>
             <div>
-              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Party / Account (name or code)</label>
+              <label style={{ ...lbl, color:"rgba(var(--txr-facc15, 250,204,21),.6)" }}>Party / Account (name or code)</label>
               <input value={queryParty} onChange={e => setQueryParty(e.target.value)} placeholder="e.g. Supplier name, PURCH, or blank…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCpvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }} />
@@ -459,23 +459,23 @@ export default function CPVPage() {
               <span style={{ background:"rgba(0,0,0,.2)", borderRadius:4, padding:"1px 7px", fontSize:11 }}>F8</span>
               Execute Query
             </button>
-            <button onClick={exitQueryMode} style={{ padding:"10px 20px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel (Esc)</button>
-            <span style={{ fontSize:11, color:"rgba(250,204,21,.4)", marginLeft:8 }}>
-              <b style={{color:"rgba(250,204,21,.7)"}}>&gt;010425</b> after &nbsp;·&nbsp; <b style={{color:"rgba(250,204,21,.7)"}}>&lt;010425</b> before &nbsp;·&nbsp; <b style={{color:"rgba(250,204,21,.7)"}}>010425</b> exact
+            <button onClick={exitQueryMode} style={{ padding:"10px 20px", borderRadius:9, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.5)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel (Esc)</button>
+            <span style={{ fontSize:11, color:"rgba(var(--txr-facc15, 250,204,21),.4)", marginLeft:8 }}>
+              <b style={{color:"rgba(var(--txr-facc15, 250,204,21),.7)"}}>&gt;010425</b> after &nbsp;·&nbsp; <b style={{color:"rgba(var(--txr-facc15, 250,204,21),.7)"}}>&lt;010425</b> before &nbsp;·&nbsp; <b style={{color:"rgba(var(--txr-facc15, 250,204,21),.7)"}}>010425</b> exact
             </span>
           </div>
         </div>
       )}
 
       {/* ── FORM ── */}
-      <div style={{ background:"rgba(255,255,255,.03)", border:`1px solid ${editing ? "rgba(250,204,21,.35)" : "rgba(255,255,255,.08)"}`, borderRadius:16, padding:24, marginBottom:24, display: queryMode ? "none" : undefined }}>
+      <div style={{ background:"rgba(var(--ink),.03)", border:`1px solid ${editing ? "rgba(250,204,21,.35)" : "rgba(var(--ink),.08)"}`, borderRadius:16, padding:24, marginBottom:24, display: queryMode ? "none" : undefined }}>
         {editing && (
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:10, marginBottom:18, padding:"9px 14px", borderRadius:10, background:"rgba(250,204,21,.07)", border:"1px solid rgba(250,204,21,.25)" }}>
-            <span style={{ fontSize:12, color:"#facc15", fontWeight:700 }}>
+            <span style={{ fontSize:12, color:"var(--tx-facc15, #facc15)", fontWeight:700 }}>
               ✎ Editing {editing.voucherNo} — row changes are saved only when you press “Update CPV”.
             </span>
             <button onClick={resetForm}
-              style={{ padding:"4px 12px", borderRadius:6, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.5)", fontSize:11, cursor:"pointer", fontFamily:ff }}>
+              style={{ padding:"4px 12px", borderRadius:6, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.5)", fontSize:11, cursor:"pointer", fontFamily:ff }}>
               Cancel edit
             </button>
           </div>
@@ -499,24 +499,24 @@ export default function CPVPage() {
           <div><label style={lbl}>Voucher Narration</label><input value={narration} onChange={e => setNarration(e.target.value)} placeholder="Optional overall narration…" style={inp} /></div>
         </div>
 
-        <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:10, overflow:"hidden", marginBottom:14 }}>
+        <div style={{ border:"1px solid rgba(var(--ink),.08)", borderRadius:10, overflow:"hidden", marginBottom:14 }}>
           <table style={{ width:"100%", borderCollapse:"collapse" }}>
             <thead>
-              <tr style={{ background:"rgba(255,255,255,.05)", borderBottom:"1px solid rgba(255,255,255,.1)" }}>
-                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", width:36 }}>#</th>
-                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:120 }}>A/c Code</th>
-                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Account Title</th>
-                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Narration</th>
-                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"right", width:140 }}>Amount</th>
+              <tr style={{ background:"rgba(var(--ink),.05)", borderBottom:"1px solid rgba(var(--ink),.1)" }}>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", width:36 }}>#</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:120 }}>A/c Code</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Account Title</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Narration</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"right", width:140 }}>Amount</th>
                 <th style={{ padding:"9px 10px", width:70 }}></th>
               </tr>
             </thead>
             <tbody>
               {entries.map((row, i) => (
-                <tr key={row.id} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.015)")}
+                <tr key={row.id} style={{ borderBottom:"1px solid rgba(var(--ink),.04)" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.015)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <td style={{ padding:"5px 10px", fontSize:11, color:"rgba(255,255,255,.28)", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
+                  <td style={{ padding:"5px 10px", fontSize:11, color:"rgba(var(--ink),.28)", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
                   <td style={{ padding:"4px 6px", width:120 }}>
                     <input id={`cpv-code-${row.id}`} value={row.accountCode} placeholder="—" readOnly onClick={() => openPicker(row.id)} style={{ ...clickInp, fontSize:12, fontFamily:"monospace", letterSpacing:".03em" }} />
                   </td>
@@ -546,7 +546,7 @@ export default function CPVPage() {
                         disabled={!row.accountId || !Number(row.amount)}
                         style={{ padding:"4px 8px", borderRadius:6, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:BLUE, fontSize:11, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}>🧾</button>
                       <button onClick={() => removeRow(row.id)}
-                        style={{ padding:"4px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
+                        style={{ padding:"4px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"var(--tx-f87171, #f87171)", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
                     </div>
                   </td>
                 </tr>
@@ -557,16 +557,16 @@ export default function CPVPage() {
 
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
           <button onClick={() => setEntries(prev => [...prev, newRow()])}
-            style={{ padding:"8px 18px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.45)", fontSize:12, cursor:"pointer", fontFamily:ff }}>
+            style={{ padding:"8px 18px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),.45)", fontSize:12, cursor:"pointer", fontFamily:ff }}>
             + Add Row
           </button>
           <div style={{ display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>
+              <div style={{ fontSize:10, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>
               <div style={{ fontSize:22, fontWeight:900, color:BLUE }}>{company?.baseCurrency || "PKR"} {fmt(total)}</div>
             </div>
             <button onClick={() => printVoucher(entries, previewVoucherNo, date, mode, total, company, narration)} disabled={total <= 0}
-              style={{ padding:"10px 18px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.65)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}>
+              style={{ padding:"10px 18px", borderRadius:9, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.65)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}>
               🖨 Print Voucher
             </button>
             <button onClick={save} disabled={saving || total <= 0}
@@ -580,7 +580,7 @@ export default function CPVPage() {
       {/* ── Keyboard shortcuts ── */}
       <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
         {(queryMode ? [
-          { key:"F8", label:"Execute Query", color:"#facc15" },
+          { key:"F8", label:"Execute Query", color:"var(--tx-facc15, #facc15)" },
           { key:"Esc", label:"Cancel Query", color:undefined },
         ] : queryIdx >= 0 ? [
           { key:"F7", label:"New Query", color:BLUE },
@@ -592,9 +592,9 @@ export default function CPVPage() {
           { key:"Enter", label:"Next Field / Account", color:undefined },
           { key:"Esc", label:"Close Popup", color:undefined },
         ]).map(s => (
-          <div key={s.key} style={{ display:"flex", alignItems:"center", gap:4, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:6, padding:"4px 10px" }}>
-            <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "rgba(255,255,255,.5)", borderRadius:4, padding:"1px 7px", fontSize:10, fontWeight:800, fontFamily:"monospace", border:`1px solid ${s.color ? `${s.color}44` : "rgba(255,255,255,.1)"}` }}>{s.key}</span>
-            <span style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>{s.label}</span>
+          <div key={s.key} style={{ display:"flex", alignItems:"center", gap:4, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", borderRadius:6, padding:"4px 10px" }}>
+            <span style={{ background: s.color ? `${s.color}22` : "rgba(var(--ink),.06)", color: s.color || "rgba(var(--ink),.5)", borderRadius:4, padding:"1px 7px", fontSize:10, fontWeight:800, fontFamily:"monospace", border:`1px solid ${s.color ? `${s.color}44` : "rgba(var(--ink),.1)"}` }}>{s.key}</span>
+            <span style={{ fontSize:11, color:"rgba(var(--ink),.3)" }}>{s.label}</span>
           </div>
         ))}
       </div>

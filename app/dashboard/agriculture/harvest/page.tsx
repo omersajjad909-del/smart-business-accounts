@@ -6,8 +6,8 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { useResponsive } from "@/hooks/useResponsive";
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,.03)";
-const border = "rgba(255,255,255,.07)";
+const bg = "rgba(var(--ink),.03)";
+const border = "rgba(var(--ink),.07)";
 
 export default function HarvestPage() {
   const { isMobile } = useResponsive();
@@ -54,7 +54,7 @@ export default function HarvestPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Harvests", val: harvests.length, color: "#34d399" }, { label: "Total Quantity", val: `${totalQuantity.toLocaleString()} kg`, color: "#f59e0b" }, { label: "Total Revenue", val: `Rs. ${totalRevenue.toLocaleString()}`, color: "#818cf8" }].map(s => (
+        {[{ label: "Total Harvests", val: harvests.length, color: "var(--tx-34d399, #34d399)" }, { label: "Total Quantity", val: `${totalQuantity.toLocaleString()} kg`, color: "var(--tx-f59e0b, #f59e0b)" }, { label: "Total Revenue", val: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
@@ -74,7 +74,7 @@ export default function HarvestPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12 }}>{h.date}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600 }}>{h.quantity} {h.unit}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {h.salePrice.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "#34d399", fontWeight: 600 }}>Rs. {h.revenue.toLocaleString()}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>Rs. {h.revenue.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{h.buyer}</td>
               </tr>
             ))}

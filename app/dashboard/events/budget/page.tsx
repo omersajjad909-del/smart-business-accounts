@@ -45,10 +45,10 @@ export default function EventBudgetPage() {
       summarize={(rows) => {
         const totalBudget = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
         return [
-          { label: "Budget Lines", value: rows.length, color: "#fb7185" },
-          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "#34d399" },
-          { label: "Spent", value: rows.filter((row) => String(row.status) === "spent").length, color: "#60a5fa" },
-          { label: "Planned Value", value: totalBudget.toLocaleString(), color: "#fbbf24" },
+          { label: "Budget Lines", value: rows.length, color: "var(--tx-fb7185, #fb7185)" },
+          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Spent", value: rows.filter((row) => String(row.status) === "spent").length, color: "var(--tx-60a5fa, #60a5fa)" },
+          { label: "Planned Value", value: totalBudget.toLocaleString(), color: "var(--tx-fbbf24, #fbbf24)" },
         ];
       }}
     />

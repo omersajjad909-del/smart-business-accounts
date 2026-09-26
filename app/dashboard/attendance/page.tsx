@@ -351,10 +351,10 @@ export default function AttendancePage() {
             {/* Stat cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 10, padding: "16px 24px 0", flexShrink: 0 }}>
               {[
-                { label: "Present",  val: stats.present, color: "#34d399", bg: "rgba(52,211,153,.08)",  bd: "rgba(52,211,153,.2)"  },
-                { label: "Absent",   val: stats.absent,  color: "#f87171", bg: "rgba(248,113,113,.08)", bd: "rgba(248,113,113,.2)" },
-                { label: "Leave",    val: stats.leave,   color: "#fbbf24", bg: "rgba(251,191,36,.08)",  bd: "rgba(251,191,36,.2)"  },
-                { label: "Holiday",  val: stats.holiday, color: "#a78bfa", bg: "rgba(167,139,250,.08)", bd: "rgba(167,139,250,.2)" },
+                { label: "Present",  val: stats.present, color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.08)",  bd: "rgba(52,211,153,.2)"  },
+                { label: "Absent",   val: stats.absent,  color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.08)", bd: "rgba(248,113,113,.2)" },
+                { label: "Leave",    val: stats.leave,   color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.08)",  bd: "rgba(251,191,36,.2)"  },
+                { label: "Holiday",  val: stats.holiday, color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.08)", bd: "rgba(167,139,250,.2)" },
                 { label: "Total",    val: stats.present+stats.absent+stats.leave+stats.holiday,
                   color: ACCENT, bg: `${ACCENT}10`, bd: `${ACCENT}30` },
               ].map(s => (
@@ -470,12 +470,12 @@ export default function AttendancePage() {
                             <div>
                               <span style={{ display: "block", textAlign: "center", fontSize: 9, fontWeight: 700,
                                 padding: "3px 4px", borderRadius: 6,
-                                background: "rgba(167,139,250,.08)", color: "rgba(167,139,250,.5)",
+                                background: "rgba(167,139,250,.08)", color: "rgba(var(--txr-a78bfa, 167,139,250),.5)",
                                 border: "1px solid rgba(167,139,250,.15)" }}>
                                 HOLIDAY
                               </span>
                               {isHoliday && (
-                                <div style={{ fontSize: 8, textAlign: "center", color: "rgba(167,139,250,.7)",
+                                <div style={{ fontSize: 8, textAlign: "center", color: "rgba(var(--txr-a78bfa, 167,139,250),.7)",
                                   marginTop: 3, fontWeight: 600 }}>
                                   {defaultHolidayName(date).slice(0, 18)}
                                 </div>

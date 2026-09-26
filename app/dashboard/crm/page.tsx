@@ -13,12 +13,12 @@ type Opportunity = { id: string; title: string; value?: number; stage: string; c
 type Interaction = { id: string; type: string; notes?: string; contact?: { name: string }; date?: string; createdAt: string };
 
 const STAGE_META: Record<string, { label: string; color: string; bg: string }> = {
-  LEAD:        { label: "Lead",        color: "#60a5fa", bg: "rgba(96,165,250,.12)"  },
-  QUALIFIED:   { label: "Qualified",   color: "#a78bfa", bg: "rgba(167,139,250,.12)" },
-  PROPOSAL:    { label: "Proposal",    color: "#fbbf24", bg: "rgba(251,191,36,.12)"  },
-  NEGOTIATION: { label: "Negotiation", color: "#fb923c", bg: "rgba(251,146,60,.12)"  },
-  WON:         { label: "Won",         color: "#34d399", bg: "rgba(52,211,153,.12)"  },
-  LOST:        { label: "Lost",        color: "#f87171", bg: "rgba(248,113,113,.12)" },
+  LEAD:        { label: "Lead",        color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)"  },
+  QUALIFIED:   { label: "Qualified",   color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)" },
+  PROPOSAL:    { label: "Proposal",    color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)"  },
+  NEGOTIATION: { label: "Negotiation", color: "var(--tx-fb923c, #fb923c)", bg: "rgba(251,146,60,.12)"  },
+  WON:         { label: "Won",         color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)"  },
+  LOST:        { label: "Lost",        color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)" },
 };
 
 const TYPE_ICON: Record<string, string> = { CALL: "📞", EMAIL: "📧", MEETING: "🤝", NOTE: "📝" };
@@ -53,10 +53,10 @@ export default function CRMOverview() {
     : `$${n.toLocaleString()}`;
 
   const STATS = [
-    { label: "Total Contacts",      value: contacts.length,   icon: "👥", color: "#818cf8", href: "/dashboard/crm/contacts"      },
-    { label: "Open Opportunities",  value: openOpps.length,   icon: "🎯", color: "#34d399", href: "/dashboard/crm/opportunities" },
-    { label: "Pipeline Value",      value: fmt(totalValue),   icon: "💰", color: "#fbbf24", href: "/dashboard/crm/opportunities" },
-    { label: "Interactions",        value: interactions.length, icon: "💬", color: "#c084fc", href: "/dashboard/crm/interactions" },
+    { label: "Total Contacts",      value: contacts.length,   icon: "👥", color: "var(--tx-818cf8, #818cf8)", href: "/dashboard/crm/contacts"      },
+    { label: "Open Opportunities",  value: openOpps.length,   icon: "🎯", color: "var(--tx-34d399, #34d399)", href: "/dashboard/crm/opportunities" },
+    { label: "Pipeline Value",      value: fmt(totalValue),   icon: "💰", color: "var(--tx-fbbf24, #fbbf24)", href: "/dashboard/crm/opportunities" },
+    { label: "Interactions",        value: interactions.length, icon: "💬", color: "var(--tx-c084fc, #c084fc)", href: "/dashboard/crm/interactions" },
   ];
 
   const NAV = [
@@ -134,7 +134,7 @@ export default function CRMOverview() {
               <div key={o.id} style={{ padding: "8px 0", borderBottom: i < opps.length - 1 ? "1px solid var(--border)" : "none" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 5 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, marginRight: 8 }}>{o.title}</div>
-                  {o.value ? <span style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", flexShrink: 0 }}>{fmt(o.value)}</span> : null}
+                  {o.value ? <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", flexShrink: 0 }}>{fmt(o.value)}</span> : null}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 20, background: meta.bg, color: meta.color }}>{meta.label}</span>
@@ -197,7 +197,7 @@ export default function CRMOverview() {
             })}
           </div>
           {wonCount > 0 && (
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#34d399", whiteSpace: "nowrap" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-34d399, #34d399)", whiteSpace: "nowrap" }}>
               Win Rate: {Math.round((wonCount / opps.length) * 100)}%
             </div>
           )}

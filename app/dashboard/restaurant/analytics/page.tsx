@@ -36,12 +36,12 @@ export default function RestaurantAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Sales Value", value: `Rs. ${data.summary.salesValue.toLocaleString()}`, color: "#34d399" },
-          { label: "Average Ticket", value: `Rs. ${averageTicket.toLocaleString()}`, color: "#fca5a5" },
-          { label: "Occupied Rate", value: `${data.tables.length ? Math.round((data.summary.occupiedTables / data.tables.length) * 100) : 0}%`, color: "#38bdf8" },
-          { label: "Ready Orders", value: data.summary.readyOrders, color: "#f59e0b" },
-          { label: "Low Margin Recipes", value: lowMarginRecipes, color: lowMarginRecipes ? "#ef4444" : "#22c55e" },
-          { label: "Reservation Cancellations", value: `${data.summary.cancellationRate}%`, color: data.summary.cancellationRate > 20 ? "#ef4444" : "#94a3b8" },
+          { label: "Sales Value", value: `Rs. ${data.summary.salesValue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" },
+          { label: "Average Ticket", value: `Rs. ${averageTicket.toLocaleString()}`, color: "var(--tx-fca5a5, #fca5a5)" },
+          { label: "Occupied Rate", value: `${data.tables.length ? Math.round((data.summary.occupiedTables / data.tables.length) * 100) : 0}%`, color: "var(--tx-38bdf8, #38bdf8)" },
+          { label: "Ready Orders", value: data.summary.readyOrders, color: "var(--tx-f59e0b, #f59e0b)" },
+          { label: "Low Margin Recipes", value: lowMarginRecipes, color: lowMarginRecipes ? "var(--tx-ef4444, #ef4444)" : "var(--tx-22c55e, #22c55e)" },
+          { label: "Reservation Cancellations", value: `${data.summary.cancellationRate}%`, color: data.summary.cancellationRate > 20 ? "var(--tx-ef4444, #ef4444)" : "var(--tx-94a3b8, #94a3b8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
             <div style={{ fontSize: 12, color: restaurantMuted, marginBottom: 8 }}>{card.label}</div>

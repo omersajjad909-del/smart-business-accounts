@@ -50,7 +50,7 @@ export default function NgoAnalyticsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", minHeight: "100vh", color: "var(--ink-solid, #fff)", fontFamily: ngoFont }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>NGO Analytics</div>
+        <div style={{ fontSize: 12, color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>NGO Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Fundraising mix, aid burden, aur mission accountability</h1>
         <p style={{ margin: 0, fontSize: 14, color: ngoMuted, maxWidth: 760 }}>
           Is page se NGO leadership ko donor base, beneficiary spread, receipts vs expenses, aur fund balances ka quick strategic view milta hai.
@@ -66,7 +66,7 @@ export default function NgoAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
         <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Donor Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Donor Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {donorMix.length === 0 ? (
               <div style={{ color: ngoMuted, fontSize: 13 }}>Donor mix show karne ke liye donor records add karein.</div>
@@ -88,14 +88,14 @@ export default function NgoAnalyticsPage() {
         </div>
 
         <div style={{ background: ngoBg, border: `1px solid ${ngoBorder}`, borderRadius: 20, padding: 22 }}>
-          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Beneficiary Mix</div>
+          <div style={{ fontSize: 13, color: "var(--tx-60a5fa, #60a5fa)", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Beneficiary Mix</div>
           <div style={{ display: "grid", gap: 10 }}>
             {beneficiaryMix.length === 0 ? (
               <div style={{ color: ngoMuted, fontSize: 13 }}>Beneficiary mix dekhne ke liye aid profiles add karein.</div>
             ) : beneficiaryMix.map(([category, count]) => (
               <div key={category} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div style={{ fontSize: 14, fontWeight: 700, textTransform: "capitalize" }}>{category}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{count}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{count}</div>
               </div>
             ))}
           </div>
