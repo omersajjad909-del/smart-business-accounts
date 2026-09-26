@@ -195,7 +195,7 @@ export default function ProfitLossPage() {
       {!showModal && (
         <>
           {/* Top bar */}
-          <div className="no-print" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 10 }}>
             <div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>Reports › <span style={{ color: "#a5b4fc" }}>Profit & Loss</span></div>
               <h1 style={{ fontSize: 24, fontWeight: 900, color: "#fff", margin: 0, letterSpacing: "-.02em" }}>Profit & Loss Statement</h1>

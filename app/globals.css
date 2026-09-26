@@ -1253,3 +1253,87 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* ── Reports: one print sheet for all of them ───────────────────────────────
+   app/dashboard/reports/layout.tsx wraps every report in .report-print-doc.
+   On paper: the sidebar, topbar and demo timer go; the report's own buttons
+   and pop-ups go; the dark theme turns into black ink on white; scrollers
+   let their content out. A report with special needs (the ledger, trial
+   balance) layers its own print CSS on top of this.
+
+   `:not(#__rp)` adds id-level specificity on purpose: the dark/light theme
+   overrides above use !important with up to three classes plus an attribute,
+   and would otherwise put white text back on the paper. */
+@media print {
+  .dashboard-root:has(.report-print-doc) {
+    display: block !important;
+    min-height: auto !important;
+  }
+  .dashboard-root:has(.report-print-doc) *:not(:has(.report-print-doc)):not(.report-print-doc):not(.report-print-doc *) {
+    display: none !important;
+  }
+  .dashboard-root:has(.report-print-doc) :has(.report-print-doc) {
+    display: block !important;
+    margin: 0 !important;
+    max-width: none !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    position: static !important;
+    width: 100% !important;
+  }
+  body:has(.report-print-doc),
+  .dashboard-root:has(.report-print-doc) {
+    background: #fff !important;
+  }
+
+  .dashboard-root .report-print-doc *:not(#__rp) {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+    background: transparent !important;
+    background-image: none !important;
+    border-color: #bbb !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  .dashboard-root .report-print-doc [style*="position: sticky"]:not(#__rp) {
+    position: static !important;
+  }
+
+  /* Floating things outside the dashboard (cookie banner, toasts) too. */
+  body:has(.report-print-doc) [style*="position: fixed"]:not(#__rp) {
+    display: none !important;
+  }
+
+  /* Controls are for the screen. */
+  .dashboard-root .report-print-doc :is(button, .no-print, .print\:hidden, [role="dialog"], [style*="position: fixed"]):not(#__rp) {
+    display: none !important;
+  }
+  .dashboard-root .report-print-doc :is(input, select, textarea):not(#__rp) {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .dashboard-root .report-print-doc table:not(#__rp) {
+    display: table !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: collapse !important;
+  }
+  .dashboard-root .report-print-doc :is(th, td):not(#__rp) {
+    padding: 4px 6px !important;
+    font-size: 8.5pt !important;
+    white-space: normal !important;
+  }
+  .dashboard-root .report-print-doc thead { display: table-header-group; }
+  .dashboard-root .report-print-doc tr { break-inside: avoid; }
+  .dashboard-root .report-print-doc svg text:not(#__rp) { fill: #000 !important; }
+}

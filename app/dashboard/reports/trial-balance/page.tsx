@@ -44,7 +44,7 @@ const PRINT_CSS = `
     box-shadow: none !important; text-shadow: none !important;
   }
   .tb-doc { border: none !important; border-radius: 0 !important; overflow: visible !important; }
-  .tb-doc .tb-head { padding: 0 0 10px !important; border-bottom: 2px solid #000 !important; }
+  .tb-doc .tb-head:not(#__rp) { padding: 0 0 10px !important; border-bottom: 2px solid #000 !important; }
   .tb-doc .tb-scroll { overflow: visible !important; }
   .tb-doc table { min-width: 0 !important; font-size: 9pt !important; }
   .tb-doc th, .tb-doc td { padding: 4px 6px !important; font-size: 8.5pt !important; }
@@ -53,10 +53,10 @@ const PRINT_CSS = `
   .tb-doc .tb-c-num  { width: 11.5% !important; }
   .tb-doc thead { display: table-header-group; }
   .tb-doc tr { break-inside: avoid; }
-  .tb-doc .tb-group { border-bottom: 2px solid #000 !important; }
-  .tb-doc .tb-cat-title { background: #f1f1f1 !important; font-weight: 800 !important; }
-  .tb-doc .tb-subtotal td { border-top: 1px solid #000 !important; font-weight: 700 !important; }
-  .tb-doc .tb-grand td, .tb-doc .tb-diff { border-top: 2px solid #000 !important; font-weight: 800 !important; }
+  .tb-doc .tb-group:not(#__rp) { border-bottom: 2px solid #000 !important; }
+  .tb-doc .tb-cat-title:not(#__rp) { background: #f1f1f1 !important; font-weight: 800 !important; }
+  .tb-doc .tb-subtotal td:not(#__rp) { border-top: 1px solid #000 !important; font-weight: 700 !important; }
+  .tb-doc .tb-grand td:not(#__rp), .tb-doc .tb-diff:not(#__rp) { border-top: 2px solid #000 !important; font-weight: 800 !important; }
 }`;
 
 export default function TrialBalancePage() {
