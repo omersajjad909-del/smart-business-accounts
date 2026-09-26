@@ -6,7 +6,6 @@ import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
-import { useResponsive } from "@/hooks/useResponsive";
 
 type TBRow = {
   code: string; name: string; category: string;
@@ -25,8 +24,38 @@ const fmt = (n: number, cur = "") =>
 
 const today = new Date().toISOString().slice(0, 10);
 
+const NUM_COLS = ["opDr", "opCr", "trDr", "trCr", "clDr", "clCr"];
+const GROUPS = [
+  { label: "Opening Balance",     color: "rgba(129,140,248,.5)" },
+  { label: "Period Transactions", color: "rgba(52,211,153,.4)" },
+  { label: "Closing Balance",     color: "rgba(251,191,36,.4)" },
+];
+
+// The report prints as a plain black-on-white sheet. `print-doc-a4` on the card
+// lets the shared rule in globals.css hide the sidebar, topbar, toolbar and demo
+// timer; this sheet only has to turn the dark card into paper. @page lives here,
+// not in globals.css, so only this report prints sideways.
+const PRINT_CSS = `
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  .tb-doc, .tb-doc * {
+    background: #fff !important; color: #000 !important; border-color: #bbb !important;
+    box-shadow: none !important; text-shadow: none !important;
+  }
+  .tb-doc { border: none !important; border-radius: 0 !important; overflow: visible !important; }
+  .tb-doc .tb-head { padding: 0 0 10px !important; border-bottom: 2px solid #000 !important; }
+  .tb-doc .tb-scroll { overflow: visible !important; }
+  .tb-doc table { min-width: 0 !important; font-size: 9pt !important; }
+  .tb-doc th, .tb-doc td { padding: 4px 6px !important; font-size: 8.5pt !important; }
+  .tb-doc thead { display: table-header-group; }
+  .tb-doc tr { break-inside: avoid; }
+  .tb-doc .tb-group { border-bottom: 2px solid #000 !important; }
+  .tb-doc .tb-cat-title { background: #f1f1f1 !important; font-weight: 800 !important; }
+  .tb-doc .tb-subtotal td { border-top: 1px solid #000 !important; font-weight: 700 !important; }
+  .tb-doc .tb-grand td, .tb-doc .tb-diff { border-top: 2px solid #000 !important; font-weight: 800 !important; }
+}`;
+
 export default function TrialBalancePage() {
-  const { isMobile } = useResponsive();
   const router  = useRouter();
   const fromRef = useRef<HTMLInputElement>(null);
   const toRef   = useRef<HTMLInputElement>(null);
@@ -96,6 +125,10 @@ export default function TrialBalancePage() {
     borderBottom: "1px solid rgba(255,255,255,.04)", borderRight: "1px solid rgba(255,255,255,.03)",
     color: "rgba(255,255,255,.65)",
   });
+  const grandTd: React.CSSProperties = {
+    padding: "14px", fontSize: 13, fontWeight: 800, textAlign: "right", whiteSpace: "nowrap",
+    borderTop: "2px solid rgba(99,102,241,.3)", borderRight: "1px solid rgba(255,255,255,.04)",
+  };
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "11px 14px", borderRadius: 10, fontSize: 14,
     background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
@@ -104,6 +137,7 @@ export default function TrialBalancePage() {
 
   return (
     <div style={{ fontFamily:"'Outfit','Inter',sans-serif", color:"rgba(255,255,255,.85)" }}>
+      <style>{PRINT_CSS}</style>
 
       {/* ── MODAL ── */}
       {showModal && (
@@ -166,9 +200,9 @@ export default function TrialBalancePage() {
             </div>
           </div>
 
-          <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, overflow:"hidden" }}>
+          <div className="print-doc-a4 tb-doc" style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, overflow:"hidden" }}>
             {/* Header */}
-            <div style={{ padding:"32px 36px 28px", background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(79,70,229,.06))", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
+            <div className="tb-head" style={{ padding:"32px 36px 28px", background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(79,70,229,.06))", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                 <div>
                   <div style={{ fontSize:22, fontWeight:900, letterSpacing:"-.5px", color:"white" }}>{companyInfo?.name || "—"}</div>
@@ -181,13 +215,6 @@ export default function TrialBalancePage() {
                   <div style={{ fontSize:11, color:"rgba(255,255,255,.25)", marginTop:8 }}>Generated: {fmtDate(new Date())}</div>
                 </div>
               </div>
-              {rows.length > 0 && (
-                <div style={{ marginTop:24, paddingTop:16, borderTop:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"flex-end", gap:1 }}>
-                  {[{ label:"Opening Balance", cols:2, color:"rgba(129,140,248,.5)" }, { label:"Period Transactions", cols:2, color:"rgba(52,211,153,.4)" }, { label:"Closing Balance", cols:2, color:"rgba(251,191,36,.4)" }].map(g => (
-                    <div key={g.label} style={{ width:g.cols*120, textAlign:"center", fontSize:9, fontWeight:700, color:g.color, letterSpacing:".1em", textTransform:"uppercase", paddingBottom:6, borderBottom:`2px solid ${g.color}` }}>{g.label}</div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {loading ? (
@@ -196,103 +223,86 @@ export default function TrialBalancePage() {
               <div style={{ padding:"80px 0", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No data found for this period</div>
             ) : (
               <>
-                {categories.map((cat, ci) => {
-                  const list = rows.filter(r => r.category === cat);
-                  const sub = list.reduce((a, r) => ({ opD:a.opD+(r.opDebit||0), opC:a.opC+(r.opCredit||0), trD:a.trD+(r.transDebit||0), trC:a.trC+(r.transCredit||0), clD:a.clD+(r.clDebit||0), clC:a.clC+(r.clCredit||0) }), { opD:0, opC:0, trD:0, trC:0, clD:0, clC:0 });
-                  return (
-                    <div key={cat} style={{ borderBottom: ci < categories.length-1 ? "1px solid rgba(255,255,255,.06)" : "none" }}>
-                      <div style={{ padding:"10px 20px", fontSize:10, fontWeight:800, color:"#818cf8", letterSpacing:".1em", textTransform:"uppercase", background:"rgba(99,102,241,.06)", borderBottom:"1px solid rgba(255,255,255,.05)" }}>{cat}</div>
-                      <div style={{ overflowX:"auto" }}>
-                        <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
-                          <thead>
-                            <tr>
-                              <th style={thStyle()}>Code</th>
-                              <th style={{ ...thStyle(), minWidth:200 }}>Account Name</th>
-                              <th style={thStyle(true)}>Op Dr</th><th style={thStyle(true)}>Op Cr</th>
-                              <th style={{ ...thStyle(true), color:"rgba(52,211,153,.6)" }}>Tr Dr</th>
-                              <th style={{ ...thStyle(true), color:"rgba(52,211,153,.6)" }}>Tr Cr</th>
-                              <th style={{ ...thStyle(true), color:"rgba(251,191,36,.6)" }}>Cl Dr</th>
-                              <th style={{ ...thStyle(true), color:"rgba(251,191,36,.6)", borderRight:"none" }}>Cl Cr</th>
+                {/* One table for every category, so each column sits on the same line from top to bottom.
+                    Separate tables per category each sized their own columns and never lined up. */}
+                <div className="tb-scroll" style={{ overflowX:"auto" }}>
+                  <table style={{ width:"100%", minWidth:1040, borderCollapse:"collapse", tableLayout:"fixed", fontSize:12 }}>
+                    <colgroup>
+                      <col style={{ width:110 }}/>
+                      <col/>
+                      {NUM_COLS.map(k => <col key={k} style={{ width:140 }}/>)}
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th colSpan={2} style={{ borderBottom:"none" }}/>
+                        {GROUPS.map(g => (
+                          <th key={g.label} colSpan={2} className="tb-group" style={{ padding:"14px 0 6px", fontSize:9, fontWeight:700, color:g.color, letterSpacing:".1em", textTransform:"uppercase", textAlign:"center", borderBottom:`2px solid ${g.color}` }}>{g.label}</th>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th style={thStyle()}>Code</th>
+                        <th style={thStyle()}>Account Name</th>
+                        <th style={thStyle(true)}>Op Dr</th><th style={thStyle(true)}>Op Cr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(52,211,153,.6)" }}>Tr Dr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(52,211,153,.6)" }}>Tr Cr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(251,191,36,.6)" }}>Cl Dr</th>
+                        <th style={{ ...thStyle(true), color:"rgba(251,191,36,.6)", borderRight:"none" }}>Cl Cr</th>
+                      </tr>
+                    </thead>
+                    {categories.map(cat => {
+                      const list = rows.filter(r => r.category === cat);
+                      const sub = list.reduce((a, r) => ({ opD:a.opD+(r.opDebit||0), opC:a.opC+(r.opCredit||0), trD:a.trD+(r.transDebit||0), trC:a.trC+(r.transCredit||0), clD:a.clD+(r.clDebit||0), clC:a.clC+(r.clCredit||0) }), { opD:0, opC:0, trD:0, trC:0, clD:0, clC:0 });
+                      return (
+                        <tbody key={cat} className="tb-cat">
+                          <tr>
+                            <td colSpan={8} className="tb-cat-title" style={{ padding:"10px 20px", fontSize:10, fontWeight:800, color:"#818cf8", letterSpacing:".1em", textTransform:"uppercase", background:"rgba(99,102,241,.06)", borderTop:"1px solid rgba(255,255,255,.06)", borderBottom:"1px solid rgba(255,255,255,.05)" }}>{cat}</td>
+                          </tr>
+                          {list.map((r, i) => (
+                            <tr key={i} style={{ background: i%2===0 ? "transparent" : "rgba(255,255,255,.012)" }}
+                              onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.05)")}
+                              onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.012)")}>
+                              <td style={{ ...tdStyle(), color:"#818cf8", fontWeight:600, fontSize:11 }}>{r.code}</td>
+                              <td style={{ ...tdStyle(), color:"rgba(255,255,255,.8)", fontWeight:600, overflow:"hidden", textOverflow:"ellipsis" }} title={r.name}>{r.name}</td>
+                              <td style={tdStyle(true)}>{r.opDebit  ? fmt(r.opDebit)  : "—"}</td>
+                              <td style={tdStyle(true)}>{r.opCredit ? fmt(r.opCredit) : "—"}</td>
+                              <td style={{ ...tdStyle(true), color:r.transDebit  ? "#34d399":"rgba(255,255,255,.2)" }}>{r.transDebit  ? fmt(r.transDebit)  : "—"}</td>
+                              <td style={{ ...tdStyle(true), color:r.transCredit ? "#f87171":"rgba(255,255,255,.2)" }}>{r.transCredit ? fmt(r.transCredit) : "—"}</td>
+                              <td style={{ ...tdStyle(true,true), color:r.clDebit  ? "#fbbf24":"rgba(255,255,255,.2)" }}>{r.clDebit  ? fmt(r.clDebit)  : "—"}</td>
+                              <td style={{ ...tdStyle(true,true), color:r.clCredit ? "#fbbf24":"rgba(255,255,255,.2)", borderRight:"none" }}>{r.clCredit ? fmt(r.clCredit) : "—"}</td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            {list.map((r, i) => (
-                              <tr key={i} style={{ background: i%2===0 ? "transparent" : "rgba(255,255,255,.012)" }}
-                                onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.05)")}
-                                onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(255,255,255,.012)")}>
-                                <td style={{ ...tdStyle(), color:"#818cf8", fontWeight:600, fontSize:11 }}>{r.code}</td>
-                                <td style={{ ...tdStyle(), color:"rgba(255,255,255,.8)", fontWeight:600 }}>{r.name}</td>
-                                <td style={tdStyle(true)}>{r.opDebit  ? fmt(r.opDebit)  : "—"}</td>
-                                <td style={tdStyle(true)}>{r.opCredit ? fmt(r.opCredit) : "—"}</td>
-                                <td style={{ ...tdStyle(true), color:r.transDebit  ? "#34d399":"rgba(255,255,255,.2)" }}>{r.transDebit  ? fmt(r.transDebit)  : "—"}</td>
-                                <td style={{ ...tdStyle(true), color:r.transCredit ? "#f87171":"rgba(255,255,255,.2)" }}>{r.transCredit ? fmt(r.transCredit) : "—"}</td>
-                                <td style={{ ...tdStyle(true,true), color:r.clDebit  ? "#fbbf24":"rgba(255,255,255,.2)" }}>{r.clDebit  ? fmt(r.clDebit)  : "—"}</td>
-                                <td style={{ ...tdStyle(true,true), color:r.clCredit ? "#fbbf24":"rgba(255,255,255,.2)", borderRight:"none" }}>{r.clCredit ? fmt(r.clCredit) : "—"}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                          <tfoot>
-                            <tr style={{ background:"rgba(255,255,255,.03)", borderTop:"1px solid rgba(255,255,255,.07)" }}>
-                              <td colSpan={2} style={{ ...tdStyle(), fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>{cat} Subtotal</td>
-                              <td style={{ ...tdStyle(true,true), color:"rgba(255,255,255,.5)" }}>{fmt(sub.opD)}</td>
-                              <td style={{ ...tdStyle(true,true), color:"rgba(255,255,255,.5)" }}>{fmt(sub.opC)}</td>
-                              <td style={{ ...tdStyle(true,true), color:"#34d399" }}>{fmt(sub.trD)}</td>
-                              <td style={{ ...tdStyle(true,true), color:"#f87171" }}>{fmt(sub.trC)}</td>
-                              <td style={{ ...tdStyle(true,true), color:"#fbbf24" }}>{fmt(sub.clD)}</td>
-                              <td style={{ ...tdStyle(true,true), color:"#fbbf24", borderRight:"none" }}>{fmt(sub.clC)}</td>
-                            </tr>
-                          </tfoot>
-                        </table>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* Grand totals */}
-                <div style={{ borderTop:"2px solid rgba(99,102,241,.3)", background:"rgba(99,102,241,.08)", display:"flex", alignItems:"stretch" }}>
-                  {/* Totals aligned to table columns */}
-                  <div style={{ flex:1, overflowX:"auto" }}>
-                    <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                      <tbody>
-                        <tr>
-                          <td colSpan={2} style={{ padding: isMobile ? "12px 10px" : "14px 20px", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.4)", letterSpacing:".1em", textTransform:"uppercase", whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.05)" }}>
-                            Grand Total
-                          </td>
-                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
-                            <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Op Dr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(t.opDebit, cur)}</div>
-                          </td>
-                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
-                            <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Op Cr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(t.opCredit, cur)}</div>
-                          </td>
-                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
-                            <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Tr Dr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#34d399" }}>{fmt(t.transDebit, cur)}</div>
-                          </td>
-                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
-                            <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Tr Cr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#f87171" }}>{fmt(t.transCredit, cur)}</div>
-                          </td>
-                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
-                            <div style={{ fontSize:9, fontWeight:700, color:"rgba(251,191,36,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Cl Dr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(t.clDebit, cur)}</div>
-                          </td>
-                          <td style={{ padding: isMobile ? "12px 10px" : "14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const }}>
-                            <div style={{ fontSize:9, fontWeight:700, color:"rgba(251,191,36,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Cl Cr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(t.clCredit, cur)}</div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  {/* Balanced box — far right */}
-                  <div style={{ flexShrink:0, display:"flex", alignItems:"center", padding:"0 24px", borderLeft:`2px solid ${isBalanced?"rgba(52,211,153,.25)":"rgba(248,113,113,.25)"}`, background:isBalanced?"rgba(52,211,153,.07)":"rgba(248,113,113,.07)" }}>
-                    <div style={{ textAlign:"center" }}>
-                      <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:5 }}>Difference</div>
-                      <div style={{ fontSize:18, fontWeight:900, color:isBalanced?"#34d399":"#f87171", whiteSpace:"nowrap" }}>{isBalanced ? "✓ Balanced" : fmt(Math.abs(difference), cur)}</div>
-                    </div>
-                  </div>
+                          ))}
+                          <tr className="tb-subtotal" style={{ background:"rgba(255,255,255,.03)" }}>
+                            <td colSpan={2} style={{ ...tdStyle(), fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>{cat} Subtotal</td>
+                            <td style={{ ...tdStyle(true,true), color:"rgba(255,255,255,.5)" }}>{fmt(sub.opD)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"rgba(255,255,255,.5)" }}>{fmt(sub.opC)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"#34d399" }}>{fmt(sub.trD)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"#f87171" }}>{fmt(sub.trC)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"#fbbf24" }}>{fmt(sub.clD)}</td>
+                            <td style={{ ...tdStyle(true,true), color:"#fbbf24", borderRight:"none" }}>{fmt(sub.clC)}</td>
+                          </tr>
+                        </tbody>
+                      );
+                    })}
+                    <tfoot>
+                      <tr className="tb-grand" style={{ background:"rgba(99,102,241,.08)" }}>
+                        <td colSpan={2} style={{ ...grandTd, textAlign:"left", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.4)", letterSpacing:".1em", textTransform:"uppercase" }}>
+                          Grand Total{cur ? ` (${cur})` : ""}
+                        </td>
+                        <td style={{ ...grandTd, color:"rgba(255,255,255,.7)" }}>{fmt(t.opDebit)}</td>
+                        <td style={{ ...grandTd, color:"rgba(255,255,255,.7)" }}>{fmt(t.opCredit)}</td>
+                        <td style={{ ...grandTd, color:"#34d399" }}>{fmt(t.transDebit)}</td>
+                        <td style={{ ...grandTd, color:"#f87171" }}>{fmt(t.transCredit)}</td>
+                        <td style={{ ...grandTd, color:"#fbbf24" }}>{fmt(t.clDebit)}</td>
+                        <td style={{ ...grandTd, color:"#fbbf24", borderRight:"none" }}>{fmt(t.clCredit)}</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={8} className="tb-diff" style={{ padding:"14px 20px", textAlign:"right", background:isBalanced?"rgba(52,211,153,.07)":"rgba(248,113,113,.07)", borderTop:`1px solid ${isBalanced?"rgba(52,211,153,.25)":"rgba(248,113,113,.25)"}` }}>
+                          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".1em", textTransform:"uppercase", marginRight:14 }}>Difference</span>
+                          <span style={{ fontSize:16, fontWeight:900, color:isBalanced?"#34d399":"#f87171" }}>{isBalanced ? "✓ Balanced" : fmt(Math.abs(difference), cur)}</span>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
                 {cur && <div style={{ padding:"12px 24px", borderTop:"1px solid rgba(255,255,255,.05)", fontSize:11, color:"rgba(255,255,255,.2)" }}>All amounts in {cur}</div>}
               </>

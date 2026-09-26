@@ -734,6 +734,25 @@ export async function seedDemoCompany(
     });
   };
 
+  // Posts one balanced voucher into Voucher/VoucherEntry — what the trial
+  // balance and ledger read — and mirrors each line into `ledger`. Sales,
+  // purchases and expenses used to go through `post` alone, so the demo's
+  // trial balance showed receipts against customers who had never been billed
+  // and no sales, purchases or expenses at all.
+  const postVoucher = (
+    v: { type: string; voucherNo: string; date: Date; branchId: string; narration: string; invoiceId?: string },
+    lines: [accCode: string | { id: string }, debit: number, credit: number, description: string][],
+  ) => {
+    const voucherId = randomUUID();
+    vouchers.push({ id: voucherId, companyId, branchId: v.branchId, voucherNo: v.voucherNo, type: v.type, date: v.date, narration: v.narration });
+    for (const [acc, debit, credit, description] of lines) {
+      const accId = typeof acc === "string" ? accountId[acc] : acc.id;
+      voucherEntries.push({ id: randomUUID(), companyId, voucherId, accountId: accId, amount: round2(debit - credit) });
+      post(acc, debit, credit, description, v.date, { voucherId, invoiceId: v.invoiceId });
+    }
+    return voucherId;
+  };
+
   // ── Opening position ──────────────────────────────────────────────────
   const openingStock = items.reduce((s, it) => s + it.openingQty * it.purchaseRate, 0);
   const openingCash = 450_000;
@@ -893,9 +912,14 @@ export async function seedDemoCompany(
       notes: "Goods received in full",
     });
 
-    post(A.PURCHASES, net, 0, `Purchase PI-${1001 + i}`, date, { invoiceId: invId });
-    post(A.TAX_PAYABLE, tax, 0, `Input tax PI-${1001 + i}`, date, { invoiceId: invId });
-    post({ id: supplier.id }, 0, total, `Purchase PI-${1001 + i}`, date, { invoiceId: invId });
+    postVoucher(
+      { type: "PI", voucherNo: `PI-${1001 + i}`, date, branchId: branchFor(i), narration: `Purchase Invoice PI-${1001 + i} from ${supplier.name}`, invoiceId: invId },
+      [
+        [A.PURCHASES, net, 0, `Purchase PI-${1001 + i}`],
+        [A.TAX_PAYABLE, tax, 0, `Input tax PI-${1001 + i}`],
+        [{ id: supplier.id }, 0, total, `Purchase PI-${1001 + i}`],
+      ],
+    );
 
     // First two purchases carry a PO + GRN so those pages are populated too.
     if (viaGrn) {
@@ -1012,16 +1036,14 @@ export async function seedDemoCompany(
       location: "MAIN",
     });
 
-    post({ id: customer.id }, total, 0, `Sales SI-${2001 + i}`, date, { invoiceId: invId });
-    post(
-      p.itemCategory === "SERVICE" && accountId["4002"] ? "4002" : A.SALES,
-      0,
-      net,
-      `Sales SI-${2001 + i}`,
-      date,
-      { invoiceId: invId },
+    postVoucher(
+      { type: "SI", voucherNo: `SI-${2001 + i}`, date, branchId: branchFor(i), narration: `Sales Invoice SI-${2001 + i} — ${customer.name}`, invoiceId: invId },
+      [
+        [{ id: customer.id }, total, 0, `Sales SI-${2001 + i}`],
+        [p.itemCategory === "SERVICE" && accountId["4002"] ? "4002" : A.SALES, 0, net, `Sales SI-${2001 + i}`],
+        [A.TAX_PAYABLE, 0, tax, `Output tax SI-${2001 + i}`],
+      ],
     );
-    post(A.TAX_PAYABLE, 0, tax, `Output tax SI-${2001 + i}`, date, { invoiceId: invId });
 
     // Two open quotations so the quotation page is not empty.
     if (i < 2) {
@@ -1133,18 +1155,29 @@ export async function seedDemoCompany(
   p.expenses.forEach(([description, accCode, amount, category], i) => {
     const evId = randomUUID();
     const date = daysAgo(25 - i * 5);
+    const expenseCode = accCode in accountId ? accCode : A.OFFICE;
+    const payCode = i % 2 === 0 ? A.BANK : A.CASH;
+    const expVoucherNo = `EXP-${tag}-${String(601 + i)}`;
+    const voucherId = postVoucher(
+      { type: "EXPENSE", voucherNo: expVoucherNo, date, branchId: mainBranch, narration: description },
+      [
+        [expenseCode, amount, 0, description],
+        [payCode, 0, amount, description],
+      ],
+    );
     expenseVouchers.push({
       id: evId,
       companyId,
       branchId: mainBranch,
       // Globally unique column.
-      voucherNo: `EXP-${tag}-${String(601 + i)}`,
+      voucherNo: expVoucherNo,
+      voucherId,
       date,
       description,
       totalAmount: amount,
       approvalStatus: "APPROVED",
-      expenseAccountId: accountId[accCode] || accountId[A.OFFICE],
-      paymentAccountId: accountId[i % 2 === 0 ? A.BANK : A.CASH],
+      expenseAccountId: accountId[expenseCode],
+      paymentAccountId: accountId[payCode],
     });
     expenseItems.push({
       id: randomUUID(),
@@ -1153,8 +1186,6 @@ export async function seedDemoCompany(
       amount,
       category,
     });
-    post(accCode in accountId ? accCode : A.OFFICE, amount, 0, description, date);
-    post(i % 2 === 0 ? A.BANK : A.CASH, 0, amount, description, date);
   });
 
   // ── HR: employees, attendance, payroll ────────────────────────────────
@@ -1257,8 +1288,13 @@ export async function seedDemoCompany(
     }
   });
 
-  post(A.SALARIES, paidPayrollTotal, 0, `Payroll ${lastMonth}`, daysAgo(28));
-  post(A.BANK, 0, paidPayrollTotal, `Payroll ${lastMonth}`, daysAgo(28));
+  postVoucher(
+    { type: "JV", voucherNo: `PAY-${lastMonth}`, date: daysAgo(28), branchId: mainBranch, narration: `Payroll ${lastMonth}` },
+    [
+      [A.SALARIES, paidPayrollTotal, 0, `Payroll ${lastMonth}`],
+      [A.BANK, 0, paidPayrollTotal, `Payroll ${lastMonth}`],
+    ],
+  );
 
   // ── CRM contacts ──────────────────────────────────────────────────────
   const contacts = [
