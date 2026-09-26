@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
       return {
         canReCheckout: true,
         reCheckoutLabel: "Continue on full plan",
-        reCheckoutReason: "Your 3 discounted launch months are complete. Continue on the regular monthly price to keep your workspace running without interruption.",
+        reCheckoutReason: "Your discounted launch months are complete. Continue on the regular monthly price to keep your workspace running without interruption.",
       };
     }
     if (!subscription?.stripeSubscriptionId) {

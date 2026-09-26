@@ -389,19 +389,37 @@ function tierOf(planCode: string): SafepayTier | null {
   return null;
 }
 
+/** How many discounted months the launch offer gives in total. */
+export const SAFEPAY_INTRO_MONTHS = 3;
+
 /**
- * Plan ids live in SAFEPAY_<PRODUCTION|SANDBOX>_PLAN_<TIER>_<MONTHLY|INTRO>,
- * kept per environment because a sandbox plan id means nothing to production.
+ * Plan ids live in SAFEPAY_<PRODUCTION|SANDBOX>_PLAN_<TIER>_<suffix>, kept per
+ * environment because a sandbox plan id means nothing to production.
+ *
+ *   _MONTHLY  full price, billing cycles 0
+ *   _INTRO    half price, billing cycles 3 — a brand-new customer
+ *   _INTRO_2  half price, billing cycles 2 — switched over after 1 discounted month
+ *   _INTRO_1  half price, billing cycles 1 — switched over after 2 discounted months
+ *
+ * The shorter intros exist for customers moving from Lemon Squeezy part-way
+ * through the offer, so they get exactly the discounted months they have left.
  */
-function planEnv(tier: SafepayTier, intro: boolean): string {
+function planEnv(tier: SafepayTier, introCycles: number): string {
   const stage = isProduction() ? "PRODUCTION" : "SANDBOX";
-  return env(`SAFEPAY_${stage}_PLAN_${tier}_${intro ? "INTRO" : "MONTHLY"}`);
+  const suffix =
+    introCycles <= 0                    ? "MONTHLY"
+    : introCycles >= SAFEPAY_INTRO_MONTHS ? "INTRO"
+    : `INTRO_${introCycles}`;
+  return env(`SAFEPAY_${stage}_PLAN_${tier}_${suffix}`);
 }
 
-/** The Safepay plan id for a tier, or "" when that plan is not configured. */
-export function getSafepayPlanId(planCode: string, intro: boolean): string {
+/**
+ * The Safepay plan id for a tier, or "" when that plan is not configured.
+ * `introCycles` is the number of half-price months to give; 0 = full price.
+ */
+export function getSafepayPlanId(planCode: string, introCycles: number): string {
   const tier = tierOf(planCode);
-  return tier ? planEnv(tier, intro) : "";
+  return tier ? planEnv(tier, introCycles) : "";
 }
 
 /** Reverse of getSafepayPlanId — which tier a webhook's plan id belongs to. */
@@ -409,8 +427,10 @@ export function resolveSafepayPlanId(planId: string): { planCode: SafepayTier; i
   const id = String(planId || "").trim();
   if (!id) return null;
   for (const tier of ["STARTER", "PRO", "ENTERPRISE"] as const) {
-    if (planEnv(tier, false) === id) return { planCode: tier, intro: false };
-    if (planEnv(tier, true) === id) return { planCode: tier, intro: true };
+    if (planEnv(tier, 0) === id) return { planCode: tier, intro: false };
+    for (let n = 1; n <= SAFEPAY_INTRO_MONTHS; n++) {
+      if (planEnv(tier, n) === id) return { planCode: tier, intro: true };
+    }
   }
   return null;
 }

@@ -10,6 +10,7 @@ import {
   createSafepayCheckout,
   createSafepaySubscriptionCheckout,
   getSafepayPlanId,
+  SAFEPAY_INTRO_MONTHS,
   isSafepayAllowedForCompany,
   isSafepayCheckoutEnabled,
   usdToPkr,
@@ -357,7 +358,10 @@ export async function POST(req: NextRequest) {
       // custom plans, yearly — and any tier whose plan id is not configured falls
       // through to the one-off payment below, which prices it exactly.
       if (!appliedCoupon && billingCycle === "MONTHLY" && seatsPkr === 0 && pkrKey) {
-        let introEligible = false;
+        // Half-price months still owed under the launch offer: all 3 for a new
+        // customer, fewer for one switching from Lemon Squeezy part-way through
+        // it, none once any Safepay intro has been paid.
+        let introCycles = 0;
         try {
           const [paidMonths, priorIntro] = await Promise.all([
             prisma.platformInvoice.count({
@@ -374,11 +378,17 @@ export async function POST(req: NextRequest) {
               select: { id: true },
             }),
           ]);
-          introEligible = paidMonths === 0 && !priorIntro;
+          // Hand-picked companies get the whole offer again regardless of what
+          // they paid elsewhere — a goodwill call made per customer, not a rule.
+          const fullIntro = (process.env.SAFEPAY_FULL_INTRO_COMPANY_IDS || "")
+            .split(",").map(s => s.trim()).filter(Boolean).includes(companyId);
+          if (!priorIntro) {
+            introCycles = fullIntro ? SAFEPAY_INTRO_MONTHS : Math.max(0, SAFEPAY_INTRO_MONTHS - paidMonths);
+          }
         } catch { /* unknown history — charge the full plan rather than guess */ }
 
-        const introPlanId = introEligible ? getSafepayPlanId(planCode, true) : "";
-        const planId = introPlanId || getSafepayPlanId(planCode, false);
+        const introPlanId = introCycles > 0 ? getSafepayPlanId(planCode, introCycles) : "";
+        const planId = introPlanId || getSafepayPlanId(planCode, 0);
 
         if (planId) {
           const intro = Boolean(introPlanId);
@@ -402,6 +412,7 @@ export async function POST(req: NextRequest) {
                 orderId,
                 safepayPlanId: planId,
                 intro,
+                introCycles: intro ? introCycles : 0,
                 pkrBasePrice,
                 displayCurrency: "PKR",
                 displayCountry:  "PK",

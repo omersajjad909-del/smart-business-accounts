@@ -1343,7 +1343,7 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
           to: uc.user.email,
           subject: "Your FinovaOS launch offer has ended — continue your plan",
           html: `<p>Hi ${String(uc.user.name || "there").replace(/[<>&"]/g, "")},</p>
-<p>Your 3 discounted months on the ${planCode} plan are complete. Your account stays active until the end of the current billing period.</p>
+<p>Your discounted launch months on the ${planCode} plan are complete. Your account stays active until the end of the current billing period.</p>
 <p>To keep using FinovaOS without interruption, continue on the regular monthly plan — the card saved in your Safepay wallet can be reused.</p>
 <p><a href="${link}">Continue my plan</a></p>`,
           companyId,
