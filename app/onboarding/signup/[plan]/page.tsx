@@ -658,6 +658,13 @@ export default function SignupByPlanPage() {
         .fu{animation:fadeUp .55s ease both;}
         .d1{animation-delay:.08s;} .d2{animation-delay:.16s;} .d3{animation-delay:.24s;}
         select option{background:#0c0f2e;color:white;}
+        /* Safari ignores padding on native selects — strip the chrome so the inline padding applies */
+        .signup-form select{
+          -webkit-appearance:none;-moz-appearance:none;appearance:none;
+          background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+          background-repeat:no-repeat !important;background-position:right 14px center !important;background-size:13px !important;
+          padding-right:38px !important;line-height:normal;
+        }
         input[type=text]::placeholder,input[type=email]::placeholder,input[type=password]::placeholder{color:rgba(255,255,255,.18);}
         .check-box{
           width:18px;height:18px;min-width:18px;
