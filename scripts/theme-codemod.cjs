@@ -14,6 +14,11 @@
  *   dark rgba() in a background  -> rgba(var(--dkr-xxxxxx, r,g,b),a)
  *   pale/bright text colour      -> var(--tx-xxxxxx, #xxxxxx) or rgba(var(--txr-xxxxxx, r,g,b),a)
  *                                   (only colours that would fail 4.5:1 on white)
+ *   faint ink text               -> rgba(var(--ink),var(--ta-30, .3))   alpha raised in light,
+ *                                   where a .3 grey on white is unreadable
+ *
+ * Colour values held in theme objects and consts (T.muted, const BORDER = …)
+ * are recognised by their name: text-ish, surface-ish or border-ish.
  *
  * Only style-like object properties and CSS text in template literals are
  * touched. SVG/chart props (fill, stroke, tick objects) are left alone because
@@ -111,6 +116,36 @@ function rewriteTextColour(s) {
   });
 }
 
+// Faint text alphas that read on a dark page but vanish on white.
+function boostInkAlpha(s) {
+  return s.replace(/rgba\(var\(--ink\),\s*(\d*\.?\d+)\)/g, (m, a) => {
+    const n = parseFloat(a);
+    if (!(n < 0.75)) return m;
+    return `rgba(var(--ink),var(--ta-${String(Math.round(n * 100)).padStart(2, "0")}, ${a}))`;
+  });
+}
+
+const COLOUR_ONLY = /^\s*(#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)|white)\s*$/;
+// What a named colour (theme-object key or const) is for.
+function roleOf(name) {
+  if (!name) return null;
+  if (/(^|_|[a-z])(bg|Bg|BG)|panel|surface|card|background|base|elev|sheet|modal|overlay|input|field|row|stripe|hover/i.test(name)) return "bg";
+  if (/border|line|divider|stroke|outline|rule|sep/i.test(name)) return "border";
+  if (/text|muted|dim|sub|label|fg|faint|title|heading|ink|hint|caption|placeholder|soft|mute|secondary|tertiary/i.test(name)) return "text";
+  return null;
+}
+function rewriteByRole(s, role) {
+  s = rewriteInk(s);
+  if (role === "bg") return rewriteDarkRgba(rewriteDarkHex(s, "bg"));
+  if (role === "border") return rewriteDarkHex(s, "border");
+  if (role === "text") {
+    const v = s.trim().toLowerCase();
+    if (v === "#fff" || v === "#ffffff" || v === "white") return `var(--ink-solid, ${s})`;
+    return boostInkAlpha(rewriteTextColour(s));
+  }
+  return s;
+}
+
 function propName(node) {
   if (!node) return null;
   if (ts.isIdentifier(node) || ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
@@ -174,7 +209,7 @@ function transformFile(file) {
   // colours as plain strings; neither can resolve var(), so those files only
   // get the style-property rewrites.
   const hasPrintHtml = /document\.write|<!DOCTYPE/i.test(src);
-  const hasCanvas = /getContext\(/.test(src);
+  const hasCanvas = /(fillStyle|strokeStyle|shadowColor)\s*=/.test(src);
   const sf = ts.createSourceFile(file, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const edits = [];
 
@@ -194,6 +229,8 @@ function transformFile(file) {
       next = rewriteInk(next);
       if (BG_PROPS.has(key)) next = rewriteDarkRgba(rewriteDarkHex(next, "bg"));
       else if (BORDER_PROPS.has(key)) next = rewriteDarkHex(next, "border");
+
+      if (key === "color" || key === "WebkitTextFillColor") next = boostInkAlpha(next);
 
       if ((key === "color" || key === "WebkitTextFillColor") && prop.parent && ts.isObjectLiteralExpression(prop.parent)) {
         // Text on a coloured button or badge keeps its colour; only text sitting
@@ -216,6 +253,12 @@ function transformFile(file) {
           }
         }
       }
+    } else if (!hasCanvas && ts.isStringLiteral(node) && COLOUR_ONLY.test(rawText) &&
+               roleOf(key || (ts.isVariableDeclaration(node.parent) && ts.isIdentifier(node.parent.name) ? node.parent.name.text : null))) {
+      // A colour in a theme object or const, e.g. T = { muted: "rgba(255,255,255,.38)" },
+      // const BORDER = "rgba(255,255,255,.08)". The name says what it paints.
+      const name = key || node.parent.name.text;
+      next = rewriteByRole(next, roleOf(name));
     } else if (!key && !hasCanvas && ts.isStringLiteral(node) && /^\s*rgba\(\s*255\s*,\s*255\s*,\s*255\s*,[^)]*\)\s*$/.test(rawText)) {
       // A bare colour value held in a const or passed to a style helper:
       // const border = "rgba(255,255,255,.07)";  s.btn("rgba(255,255,255,.08)")
