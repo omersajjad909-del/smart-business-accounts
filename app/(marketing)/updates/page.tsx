@@ -13,11 +13,11 @@ type Update = {
 };
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string; bg: string; border: string }> = {
-  feature:      { label: "New Feature",   icon: "✨", color: "#818cf8", bg: "rgba(129,140,248,.1)",  border: "rgba(129,140,248,.25)" },
-  improvement:  { label: "Improvement",   icon: "⚡", color: "#38bdf8", bg: "rgba(56,189,248,.1)",   border: "rgba(56,189,248,.25)"  },
-  bugfix:       { label: "Bug Fix",        icon: "🐛", color: "#34d399", bg: "rgba(52,211,153,.1)",   border: "rgba(52,211,153,.25)"  },
-  announcement: { label: "Announcement",  icon: "📣", color: "#fbbf24", bg: "rgba(251,191,36,.1)",   border: "rgba(251,191,36,.25)"  },
-  maintenance:  { label: "Maintenance",   icon: "🔧", color: "#f87171", bg: "rgba(248,113,113,.1)",  border: "rgba(248,113,113,.25)" },
+  feature:      { label: "New Feature",   icon: "✨", color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.1)",  border: "rgba(129,140,248,.25)" },
+  improvement:  { label: "Improvement",   icon: "⚡", color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.1)",   border: "rgba(56,189,248,.25)"  },
+  bugfix:       { label: "Bug Fix",        icon: "🐛", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.1)",   border: "rgba(52,211,153,.25)"  },
+  announcement: { label: "Announcement",  icon: "📣", color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.1)",   border: "rgba(251,191,36,.25)"  },
+  maintenance:  { label: "Maintenance",   icon: "🔧", color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.1)",  border: "rgba(248,113,113,.25)" },
 };
 const fallback = TYPE_CONFIG.feature;
 
@@ -54,18 +54,18 @@ function SkeletonCard({ i }: { i: number }) {
   return (
     <div style={{ display:"grid", gridTemplateColumns:"80px 1fr", gap:24, opacity: 1 - i * 0.2 }}>
       <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", paddingTop:4, gap:6 }}>
-        <div style={{ width:40, height:14, borderRadius:6, background:"rgba(255,255,255,.06)" }}/>
-        <div style={{ width:28, height:11, borderRadius:5, background:"rgba(255,255,255,.04)" }}/>
+        <div style={{ width:40, height:14, borderRadius:6, background:"rgba(var(--ink),.06)" }}/>
+        <div style={{ width:28, height:11, borderRadius:5, background:"rgba(var(--ink),.04)" }}/>
       </div>
-      <div style={{ borderRadius:20, padding:"28px 28px", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)" }}>
+      <div style={{ borderRadius:20, padding:"28px 28px", background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)" }}>
         <div style={{ display:"flex", gap:8, marginBottom:18 }}>
-          <div style={{ width:90, height:22, borderRadius:20, background:"rgba(255,255,255,.06)" }}/>
-          <div style={{ width:60, height:22, borderRadius:20, background:"rgba(255,255,255,.04)" }}/>
+          <div style={{ width:90, height:22, borderRadius:20, background:"rgba(var(--ink),.06)" }}/>
+          <div style={{ width:60, height:22, borderRadius:20, background:"rgba(var(--ink),.04)" }}/>
         </div>
-        <div style={{ width:"70%", height:20, borderRadius:7, background:"rgba(255,255,255,.06)", marginBottom:14 }}/>
-        <div style={{ width:"100%", height:13, borderRadius:5, background:"rgba(255,255,255,.04)", marginBottom:8 }}/>
-        <div style={{ width:"88%", height:13, borderRadius:5, background:"rgba(255,255,255,.04)", marginBottom:8 }}/>
-        <div style={{ width:"60%", height:13, borderRadius:5, background:"rgba(255,255,255,.04)" }}/>
+        <div style={{ width:"70%", height:20, borderRadius:7, background:"rgba(var(--ink),.06)", marginBottom:14 }}/>
+        <div style={{ width:"100%", height:13, borderRadius:5, background:"rgba(var(--ink),.04)", marginBottom:8 }}/>
+        <div style={{ width:"88%", height:13, borderRadius:5, background:"rgba(var(--ink),.04)", marginBottom:8 }}/>
+        <div style={{ width:"60%", height:13, borderRadius:5, background:"rgba(var(--ink),.04)" }}/>
       </div>
     </div>
   );
@@ -88,9 +88,9 @@ function UpdateCard({ update, index }: { update: Update; index: number }) {
     >
       {/* Date sidebar */}
       <div className="upd-date-col" style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", paddingTop:8, gap:2 }}>
-        <div style={{ fontSize:20, fontWeight:800, color:"rgba(255,255,255,.55)", fontFamily:"'Lora',serif", lineHeight:1 }}>{dt.day}</div>
-        <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.25)", letterSpacing:".05em", textTransform:"uppercase" as const }}>{dt.month}</div>
-        <div style={{ fontSize:10, color:"rgba(255,255,255,.15)", marginTop:2 }}>{dt.year}</div>
+        <div style={{ fontSize:20, fontWeight:800, color:"rgba(var(--ink),var(--ta-55, .55))", fontFamily:"'Lora',serif", lineHeight:1 }}>{dt.day}</div>
+        <div style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),var(--ta-25, .25))", letterSpacing:".05em", textTransform:"uppercase" as const }}>{dt.month}</div>
+        <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-15, .15))", marginTop:2 }}>{dt.year}</div>
       </div>
 
       {/* Card */}
@@ -99,10 +99,10 @@ function UpdateCard({ update, index }: { update: Update; index: number }) {
         onMouseLeave={() => setHovered(false)}
         style={{
           borderRadius:20, padding:"26px 28px",
-          background: hovered ? "rgba(255,255,255,.04)" : "rgba(255,255,255,.025)",
-          border:`1.5px solid ${hovered ? tc.border : "rgba(255,255,255,.07)"}`,
+          background: hovered ? "rgba(var(--ink),.04)" : "rgba(var(--ink),.025)",
+          border:`1.5px solid ${hovered ? tc.border : "rgba(var(--ink),.07)"}`,
           transition:"all .25s ease",
-          boxShadow: hovered ? `0 12px 40px rgba(0,0,0,.3), 0 0 0 1px ${tc.color}15` : "none",
+          boxShadow: hovered ? `0 12px 40px rgba(0,0,0,.3), 0 0 0 1px color-mix(in srgb, ${tc.color} 8.2%, transparent)` : "none",
           position:"relative", overflow:"hidden",
         }}
       >
@@ -126,15 +126,15 @@ function UpdateCard({ update, index }: { update: Update; index: number }) {
           {update.version && (
             <span style={{
               padding:"4px 10px", borderRadius:20,
-              background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)",
-              fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)",
+              background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.1)",
+              fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))",
               fontFamily:"'Roboto Mono',monospace",
             }}>
               {update.version}
             </span>
           )}
           {/* Mobile date */}
-          <span className="upd-mobile-date" style={{ display:"none", fontSize:11, color:"rgba(255,255,255,.25)", marginLeft:"auto" }}>
+          <span className="upd-mobile-date" style={{ display:"none", fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", marginLeft:"auto" }}>
             {dt.full}
           </span>
         </div>
@@ -142,7 +142,7 @@ function UpdateCard({ update, index }: { update: Update; index: number }) {
         {/* Title */}
         <h2 style={{
           fontFamily:"'Lora',serif", fontSize:"clamp(16px,2vw,21px)",
-          fontWeight:700, color: hovered ? "white" : "rgba(255,255,255,.9)",
+          fontWeight:700, color: hovered ? "var(--ink-solid, white)" : "rgba(var(--ink),.9)",
           letterSpacing:"-.3px", lineHeight:1.3, marginBottom:12,
           transition:"color .2s",
         }}>
@@ -151,7 +151,7 @@ function UpdateCard({ update, index }: { update: Update; index: number }) {
 
         {/* Body */}
         <div style={{
-          fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.8,
+          fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.8,
           whiteSpace:"pre-wrap" as const,
         }}>
           {update.body}
@@ -187,7 +187,7 @@ export default function UpdatesPage() {
   }, {});
 
   return (
-    <main style={{ minHeight:"100vh", background:"linear-gradient(180deg,#06071a 0%,#080c22 50%,#06071a 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif", overflowX:"hidden" }}>
+    <main style={{ minHeight:"100vh", background:"linear-gradient(180deg,var(--dk-06071a, #06071a) 0%,var(--dk-080c22, #080c22) 50%,var(--dk-06071a, #06071a) 100%)", color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif", overflowX:"hidden" }}>
       <style>{`
         
         *,*::before,*::after{box-sizing:border-box;}
@@ -198,14 +198,14 @@ export default function UpdatesPage() {
           display:inline-flex; align-items:center; gap:6px;
           padding:7px 16px; border-radius:20px; cursor:pointer;
           font-size:12px; font-weight:700; font-family:'Outfit',sans-serif;
-          border:1.5px solid rgba(255,255,255,.08);
-          background:rgba(255,255,255,.03);
-          color:rgba(255,255,255,.35);
+          border:1.5px solid rgba(var(--ink),.08);
+          background:rgba(var(--ink),.03);
+          color:rgba(var(--ink),var(--ta-35, .35));
           transition:all .18s ease; white-space:nowrap;
         }
-        .upd-filter-btn:hover{color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.06);}
-        .upd-filter-btn.active{color:white; background:rgba(129,140,248,.12); border-color:rgba(129,140,248,.35);}
-        .upd-timeline-line{position:absolute; left:79px; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,transparent,rgba(255,255,255,.07) 10%,rgba(255,255,255,.07) 90%,transparent);}
+        .upd-filter-btn:hover{color:rgba(var(--ink),.75);border-color:rgba(var(--ink),.16);background:rgba(var(--ink),.06);}
+        .upd-filter-btn.active{color:var(--ink-solid, white); background:rgba(129,140,248,.12); border-color:rgba(129,140,248,.35);}
+        .upd-timeline-line{position:absolute; left:79px; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,transparent,rgba(var(--ink),.07) 10%,rgba(var(--ink),.07) 90%,transparent);}
         @media(max-width:640px){
           .upd-date-col{display:none!important;}
           .upd-mobile-date{display:inline!important;}
@@ -229,10 +229,10 @@ export default function UpdatesPage() {
           opacity:mounted?1:0, transform:mounted?"none":"translateY(20px)", transition:"opacity .6s ease, transform .6s ease" }}>
 
           {/* Breadcrumb */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginBottom:24, fontSize:12, color:"rgba(255,255,255,.25)" }}>
-            <a href="/" style={{ color:"rgba(255,255,255,.3)", textDecoration:"none" }}>Home</a>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginBottom:24, fontSize:12, color:"rgba(var(--ink),var(--ta-25, .25))" }}>
+            <a href="/" style={{ color:"rgba(var(--ink),var(--ta-30, .3))", textDecoration:"none" }}>Home</a>
             <span>›</span>
-            <span style={{ color:"rgba(255,255,255,.55)" }}>Updates</span>
+            <span style={{ color:"rgba(var(--ink),var(--ta-55, .55))" }}>Updates</span>
           </div>
 
           {/* Badge */}
@@ -241,20 +241,20 @@ export default function UpdatesPage() {
             marginBottom:24 }}>
             <span style={{ width:8, height:8, borderRadius:"50%", background:"#818cf8",
               display:"inline-block", animation:"pulse-dot 2s infinite" }}/>
-            <span style={{ fontSize:11, fontWeight:800, color:"#a5b4fc", letterSpacing:".08em" }}>PRODUCT CHANGELOG</span>
+            <span style={{ fontSize:11, fontWeight:800, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".08em" }}>PRODUCT CHANGELOG</span>
           </div>
 
           <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(32px,5vw,52px)", fontWeight:700,
-            color:"white", letterSpacing:"-1.5px", lineHeight:1.1, margin:"0 0 16px" }}>
+            color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1.1, margin:"0 0 16px" }}>
             What&rsquo;s new in
             <span style={{ display:"block", fontStyle:"italic",
-              backgroundImage:"linear-gradient(90deg,#818cf8 0%,#c4b5fd 50%,#38bdf8 100%)",
+              backgroundImage:"linear-gradient(90deg,var(--tx-818cf8, #818cf8) 0%,var(--tx-c4b5fd, #c4b5fd) 50%,var(--tx-38bdf8, #38bdf8) 100%)",
               WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               FinovaOS
             </span>
           </h1>
 
-          <p style={{ fontSize:16, color:"rgba(255,255,255,.4)", lineHeight:1.8, maxWidth:440, margin:"0 auto" }}>
+          <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.8, maxWidth:440, margin:"0 auto" }}>
             Every feature shipped, every bug fixed, every improvement made — logged here in real time.
           </p>
         </div>
@@ -275,8 +275,8 @@ export default function UpdatesPage() {
                 {!loading && count > 0 && (
                   <span style={{
                     padding:"1px 7px", borderRadius:10, fontSize:10, fontWeight:800,
-                    background: filter === f.id ? "rgba(129,140,248,.2)" : "rgba(255,255,255,.06)",
-                    color: filter === f.id ? "#a5b4fc" : "rgba(255,255,255,.25)",
+                    background: filter === f.id ? "rgba(129,140,248,.2)" : "rgba(var(--ink),.06)",
+                    color: filter === f.id ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-25, .25))",
                   }}>{count}</span>
                 )}
               </button>
@@ -294,14 +294,14 @@ export default function UpdatesPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ padding:"80px 40px", textAlign:"center", borderRadius:24,
-            background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
+            background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)" }}>
             <div style={{ fontSize:48, marginBottom:16 }}>
               {filter === "all" ? "📭" : TYPE_CONFIG[filter]?.icon || "🔍"}
             </div>
-            <h3 style={{ fontSize:18, fontWeight:700, color:"rgba(255,255,255,.7)", marginBottom:8 }}>
+            <h3 style={{ fontSize:18, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))", marginBottom:8 }}>
               {filter === "all" ? "No updates yet" : `No ${FILTERS.find(f=>f.id===filter)?.label} yet`}
             </h3>
-            <p style={{ fontSize:14, color:"rgba(255,255,255,.25)" }}>
+            <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-25, .25))" }}>
               {filter === "all"
                 ? "Updates will appear here as we ship new features."
                 : "Try switching to a different filter above."}
@@ -309,8 +309,8 @@ export default function UpdatesPage() {
             {filter !== "all" && (
               <button onClick={() => setFilter("all")} style={{
                 marginTop:20, padding:"9px 22px", borderRadius:12,
-                background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)",
-                color:"rgba(255,255,255,.6)", fontSize:13, fontWeight:700, cursor:"pointer",
+                background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)",
+                color:"rgba(var(--ink),var(--ta-60, .6))", fontSize:13, fontWeight:700, cursor:"pointer",
               }}>
                 View all updates
               </button>
@@ -347,10 +347,10 @@ export default function UpdatesPage() {
               🚀
             </div>
             <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,3vw,28px)", fontWeight:700,
-              color:"white", margin:"0 0 10px", letterSpacing:"-.5px" }}>
+              color:"var(--ink-solid, white)", margin:"0 0 10px", letterSpacing:"-.5px" }}>
               Want to see these in action?
             </h2>
-            <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", maxWidth:380, margin:"0 auto 28px", lineHeight:1.75 }}>
+            <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", maxWidth:380, margin:"0 auto 28px", lineHeight:1.75 }}>
               Every update ships straight into your workspace. Start today and get access to everything we build.
             </p>
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
@@ -364,8 +364,8 @@ export default function UpdatesPage() {
               </Link>
               <Link href="/pricing" style={{
                 padding:"12px 24px", borderRadius:13,
-                background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
-                color:"rgba(255,255,255,.7)", fontWeight:700, fontSize:14, textDecoration:"none",
+                background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)",
+                color:"rgba(var(--ink),var(--ta-70, .7))", fontWeight:700, fontSize:14, textDecoration:"none",
               }}>
                 View Pricing
               </Link>

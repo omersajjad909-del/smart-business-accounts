@@ -14,7 +14,7 @@ const GROUPS: Group[] = [
   {
     title: "Getting Started",
     icon: "🚀",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     items: [
       {
         q: "What exactly is FinovaOS?",
@@ -37,7 +37,7 @@ const GROUPS: Group[] = [
   {
     title: "Pricing & Billing",
     icon: "💳",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     items: [
       {
         q: "How is FinovaOS priced?",
@@ -60,7 +60,7 @@ const GROUPS: Group[] = [
   {
     title: "Accounting & Inventory",
     icon: "📊",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     items: [
       {
         q: "How is inventory valued?",
@@ -83,7 +83,7 @@ const GROUPS: Group[] = [
   {
     title: "Manufacturing",
     icon: "🏭",
-    color: "#f472b6",
+    color: "var(--tx-f472b6, #f472b6)",
     items: [
       {
         q: "How does production costing work?",
@@ -102,7 +102,7 @@ const GROUPS: Group[] = [
   {
     title: "Security & Data",
     icon: "🔐",
-    color: "#60a5fa",
+    color: "var(--tx-60a5fa, #60a5fa)",
     items: [
       {
         q: "Where is my data stored?",
@@ -121,7 +121,7 @@ const GROUPS: Group[] = [
   {
     title: "Support",
     icon: "💬",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     items: [
       {
         q: "How do I get help?",
@@ -139,18 +139,18 @@ const GROUPS: Group[] = [
   },
 ];
 
-const CARD = "rgba(255,255,255,.03)";
-const BORDER = "rgba(255,255,255,.08)";
+const CARD = "rgba(var(--ink),.03)";
+const BORDER = "rgba(var(--ink),.08)";
 
 export default function FaqPage() {
   const [open, setOpen] = useState<string | null>("0-0");
 
   return (
     <main style={{
-      background: "linear-gradient(180deg,#060919 0%,#0a0e24 40%,#060919 100%)",
+      background: "linear-gradient(180deg,var(--dk-060919, #060919) 0%,var(--dk-0a0e24, #0a0e24) 40%,var(--dk-060919, #060919) 100%)",
       minHeight: "100vh",
       fontFamily: "'Outfit','DM Sans',system-ui,sans-serif",
-      color: "white",
+      color: "var(--ink-solid, white)",
     }}>
       {/* Hero */}
       <section style={{ maxWidth: 900, margin: "0 auto", padding: "110px 24px 48px", textAlign: "center" }}>
@@ -159,14 +159,14 @@ export default function FaqPage() {
           borderRadius: 100, background: "rgba(99,102,241,.1)",
           border: "1px solid rgba(99,102,241,.2)", marginBottom: 22,
         }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".08em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", letterSpacing: ".08em", textTransform: "uppercase" }}>
             Frequently Asked
           </span>
         </div>
         <h1 style={{ fontSize: "clamp(30px,5vw,46px)", fontWeight: 800, margin: "0 0 16px", lineHeight: 1.15, letterSpacing: "-.02em" }}>
           Questions, answered plainly
         </h1>
-        <p style={{ fontSize: 16, color: "rgba(255,255,255,.45)", lineHeight: 1.75, margin: "0 auto", maxWidth: 620 }}>
+        <p style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.75, margin: "0 auto", maxWidth: 620 }}>
           What FinovaOS does, how it is priced, and how it handles your books. If
           something is not here, ask us — we answer properly.
         </p>
@@ -190,7 +190,7 @@ export default function FaqPage() {
                 return (
                   <div key={id} style={{
                     background: CARD,
-                    border: `1px solid ${isOpen ? `${group.color}44` : BORDER}`,
+                    border: `1px solid ${isOpen ? `color-mix(in srgb, ${group.color} 26.7%, transparent)` : BORDER}`,
                     borderRadius: 14,
                     overflow: "hidden",
                     transition: "border-color .2s",
@@ -202,15 +202,15 @@ export default function FaqPage() {
                         width: "100%", textAlign: "left", cursor: "pointer",
                         background: "none", border: "none", padding: "16px 18px",
                         display: "flex", alignItems: "center", justifyContent: "space-between",
-                        gap: 16, color: "white", fontSize: 14.5, fontWeight: 600,
+                        gap: 16, color: "var(--ink-solid, white)", fontSize: 14.5, fontWeight: 600,
                         fontFamily: "inherit", lineHeight: 1.5,
                       }}
                     >
                       {item.q}
                       <span aria-hidden style={{
                         flexShrink: 0, width: 22, height: 22, borderRadius: 7,
-                        background: isOpen ? `${group.color}22` : "rgba(255,255,255,.05)",
-                        color: isOpen ? group.color : "rgba(255,255,255,.4)",
+                        background: isOpen ? `color-mix(in srgb, ${group.color} 13.3%, transparent)` : "rgba(var(--ink),.05)",
+                        color: isOpen ? group.color : "rgba(var(--ink),var(--ta-40, .4))",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 15, fontWeight: 400, lineHeight: 1,
                         transition: "all .2s",
@@ -233,7 +233,7 @@ export default function FaqPage() {
                     >
                       <p style={{
                         margin: 0, padding: isOpen ? "0 18px 18px" : "0 18px",
-                        fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.8,
+                        fontSize: 14, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.8,
                         overflow: "hidden", minHeight: 0,
                       }}>
                         {item.a}
@@ -255,7 +255,7 @@ export default function FaqPage() {
           border: "1px solid rgba(99,102,241,.22)",
         }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px" }}>Still have a question?</h2>
-          <p style={{ fontSize: 14.5, color: "rgba(255,255,255,.45)", margin: "0 0 24px", lineHeight: 1.7 }}>
+          <p style={{ fontSize: 14.5, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 24px", lineHeight: 1.7 }}>
             Tell us about your business and we will show you exactly how it would run on FinovaOS.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -266,8 +266,8 @@ export default function FaqPage() {
             }}>Book a Demo →</Link>
             <Link href="/contact" style={{
               padding: "12px 24px", borderRadius: 11, textDecoration: "none",
-              background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
-              color: "rgba(255,255,255,.75)", fontSize: 14, fontWeight: 600,
+              background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`,
+              color: "rgba(var(--ink),.75)", fontSize: 14, fontWeight: 600,
             }}>Contact Us</Link>
           </div>
         </div>

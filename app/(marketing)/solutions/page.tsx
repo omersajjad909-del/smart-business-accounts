@@ -12,9 +12,9 @@ const INDUSTRIES = [
     label: "Trading",
     title: "Built for Trading Companies",
     subtitle: "From procurement to delivery — every dollar tracked.",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.22)",
-    dim:  "rgba(129,140,248,.08)",
+    dim:  "rgba(var(--txr-818cf8, 129,140,248),.08)",
     border:"rgba(129,140,248,.3)",
     pain: "Spreadsheets can't keep up with daily purchase, sale, and payment volumes.",
     stats: [{ val:"87%", label:"Less reconciliation time" },{ val:"3×", label:"Faster month-end close" },{ val:"Zero", label:"Data entry errors" }],
@@ -36,9 +36,9 @@ const INDUSTRIES = [
     label: "Distribution",
     title: "Distribution & Route Sales",
     subtitle: "Multi-route, multi-warehouse — one dashboard.",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.22)",
-    dim:  "rgba(52,211,153,.08)",
+    dim:  "rgba(var(--txr-34d399, 52,211,153),.08)",
     border:"rgba(52,211,153,.3)",
     pain: "Managing depots, routes, and credit limits across dozens of customers is chaos without the right system.",
     stats: [{ val:"5×", label:"More branches, no extra staff" },{ val:"99%", label:"Delivery reconciliation accuracy" },{ val:"2 hrs", label:"Daily route settlement" }],
@@ -62,9 +62,9 @@ const INDUSTRIES = [
     label: "Wholesale",
     title: "Wholesale & Bulk Trading",
     subtitle: "Slab pricing, dealer ledgers, and credit control — under one roof.",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     glow: "rgba(245,158,11,.22)",
-    dim:  "rgba(245,158,11,.08)",
+    dim:  "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     border:"rgba(245,158,11,.3)",
     pain: "Every dealer has a different rate, a different credit limit, and a different payment history — and it all lives in one person's head.",
     stats: [{ val:"Per dealer", label:"Rate & credit control" },{ val:"100%", label:"Bulk order traceability" },{ val:"Instant", label:"Outstanding ageing view" }],
@@ -86,9 +86,9 @@ const INDUSTRIES = [
     label: "Manufacturing",
     title: "Manufacturing & Production",
     subtitle: "Raw material to finished goods — costs under control.",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.22)",
-    dim:  "rgba(251,191,36,.08)",
+    dim:  "rgba(var(--txr-fbbf24, 251,191,36),.08)",
     border:"rgba(251,191,36,.3)",
     pain: "Without accurate costing, you don't know if each production run is actually profitable.",
     stats: [{ val:"18%", label:"Average margin improvement" },{ val:"40%", label:"Less waste via stock tracking" },{ val:"Daily", label:"Production cost visibility" }],
@@ -110,9 +110,9 @@ const INDUSTRIES = [
     label: "Services",
     title: "Service Businesses & Agencies",
     subtitle: "Project billing, expenses, and payroll — simplified.",
-    color: "#f87171",
+    color: "var(--tx-f87171, #f87171)",
     glow: "rgba(248,113,113,.22)",
-    dim:  "rgba(248,113,113,.08)",
+    dim:  "rgba(var(--txr-f87171, 248,113,113),.08)",
     border:"rgba(248,113,113,.3)",
     pain: "Chasing clients for payments and manually tracking project expenses kills productivity.",
     stats: [{ val:"65%", label:"Faster invoice collection" },{ val:"Zero", label:"Missed billable expenses" },{ val:"1 day", label:"Monthly close (was 2 weeks)" }],
@@ -134,9 +134,9 @@ const INDUSTRIES = [
     label: "Retail",
     title: "Retail & Multi-Store",
     subtitle: "One system for every counter, every shift.",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.22)",
-    dim:  "rgba(167,139,250,.08)",
+    dim:  "rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border:"rgba(167,139,250,.3)",
     pain: "Separate systems for each store means no consolidated view and constant manual reconciliation.",
     stats: [{ val:"12 min", label:"Daily store reconciliation" },{ val:"100%", label:"Inventory accuracy" },{ val:"Real-time", label:"Cross-store stock visibility" }],
@@ -158,9 +158,9 @@ const INDUSTRIES = [
     label: "Restaurant",
     title: "Restaurant & Food Business",
     subtitle: "Tables, kitchen, and cash — all in sync.",
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
     glow: "rgba(249,115,22,.22)",
-    dim:  "rgba(249,115,22,.08)",
+    dim:  "rgba(var(--txr-f97316, 249,115,22),.08)",
     border:"rgba(249,115,22,.3)",
     pain: "Lost orders, kitchen miscommunication, and end-of-day cash discrepancies drain profit every shift.",
     stats: [{ val:"30%", label:"Less food wastage" },{ val:"2×", label:"Faster table turnover" },{ val:"Zero", label:"Cash shortage at close" }],
@@ -182,9 +182,9 @@ const INDUSTRIES = [
     label: "Hospital / Clinic",
     title: "Healthcare & Clinic Management",
     subtitle: "Patient care backed by airtight financials.",
-    color: "#ef4444",
+    color: "var(--tx-ef4444, #ef4444)",
     glow: "rgba(239,68,68,.22)",
-    dim:  "rgba(239,68,68,.08)",
+    dim:  "rgba(var(--txr-ef4444, 239,68,68),.08)",
     border:"rgba(239,68,68,.3)",
     pain: "Billing errors, pharmacy stock-outs, and manual patient records cost you revenue and reputation.",
     stats: [{ val:"95%", label:"Billing accuracy" },{ val:"60%", label:"Less stock wastage" },{ val:"Instant", label:"Patient ledger lookup" }],
@@ -206,9 +206,9 @@ const INDUSTRIES = [
     label: "Hotel",
     title: "Hotel & Hospitality",
     subtitle: "Rooms, reservations, and revenue — fully managed.",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     glow: "rgba(6,182,212,.22)",
-    dim:  "rgba(6,182,212,.08)",
+    dim:  "rgba(var(--txr-06b6d4, 6,182,212),.08)",
     border:"rgba(6,182,212,.3)",
     pain: "Manual reservation logs, disconnected billing, and invisible room occupancy hurt both guests and profits.",
     stats: [{ val:"98%", label:"Reservation accuracy" },{ val:"3×", label:"Faster check-in/check-out" },{ val:"Live", label:"Occupancy dashboard" }],
@@ -230,9 +230,9 @@ const INDUSTRIES = [
     label: "Pharmacy",
     title: "Pharmacy & Medical Store",
     subtitle: "Stock, prescriptions, and compliance — simplified.",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.22)",
-    dim:  "rgba(52,211,153,.08)",
+    dim:  "rgba(var(--txr-34d399, 52,211,153),.08)",
     border:"rgba(52,211,153,.3)",
     pain: "Expired medicines on shelves, out-of-stock essentials, and manual prescription records are daily risks.",
     stats: [{ val:"100%", label:"Expiry compliance" },{ val:"40%", label:"Lower dead stock" },{ val:"Instant", label:"Drug lookup & billing" }],
@@ -254,9 +254,9 @@ const INDUSTRIES = [
     label: "Travel Agency",
     title: "Travel Agencies & Visa Consultants",
     subtitle: "Airline tickets, visa processing, and customer travel files — all in one desk.",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     glow: "rgba(56,189,248,.22)",
-    dim:  "rgba(56,189,248,.08)",
+    dim:  "rgba(var(--txr-38bdf8, 56,189,248),.08)",
     border:"rgba(56,189,248,.3)",
     pain: "Passenger details, PNRs, travel dates, embassy submissions, and service fees get scattered fast without a proper workflow.",
     stats: [{ val:"Live", label:"Ticketing pipeline" },{ val:"Zero", label:"Missed visa follow-up" },{ val:"Full", label:"Quote to invoice visibility" }],
@@ -278,9 +278,9 @@ const INDUSTRIES = [
     label: "Construction",
     title: "Construction & Contracting",
     subtitle: "Sites, budgets, and subcontractors — under control.",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.22)",
-    dim:  "rgba(251,191,36,.08)",
+    dim:  "rgba(var(--txr-fbbf24, 251,191,36),.08)",
     border:"rgba(251,191,36,.3)",
     pain: "Projects go over budget because material costs, labour, and subcontractor payments are tracked in silos.",
     stats: [{ val:"22%", label:"Average cost overrun reduction" },{ val:"Real-time", label:"Budget vs actual tracking" },{ val:"Zero", label:"Duplicate subcontractor payments" }],
@@ -302,9 +302,9 @@ const INDUSTRIES = [
     label: "E-Commerce",
     title: "E-Commerce & Online Retail",
     subtitle: "Every sales channel — one dashboard for all.",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.22)",
-    dim:  "rgba(167,139,250,.08)",
+    dim:  "rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border:"rgba(167,139,250,.3)",
     pain: "Selling on multiple platforms means fragmented orders, inventory discrepancies, and profit blind spots.",
     stats: [{ val:"All platforms", label:"In one dashboard" },{ val:"Real-time", label:"Order & inventory sync" },{ val:"4×", label:"Faster seller reporting" }],
@@ -326,9 +326,9 @@ const INDUSTRIES = [
     label: "Agriculture",
     title: "Agriculture & Farming",
     subtitle: "Crops, livestock, and harvest — all tracked.",
-    color: "#84cc16",
+    color: "var(--tx-84cc16, #84cc16)",
     glow: "rgba(132,204,22,.22)",
-    dim:  "rgba(132,204,22,.08)",
+    dim:  "rgba(var(--txr-84cc16, 132,204,22),.08)",
     border:"rgba(132,204,22,.3)",
     pain: "Crop expenses, fertilizer costs, and harvest revenue are never consolidated — so profitability is guesswork.",
     stats: [{ val:"Full", label:"Season cost tracking" },{ val:"Real-time", label:"Field & livestock records" },{ val:"Clear", label:"Profit per crop" }],
@@ -374,9 +374,9 @@ const INDUSTRIES = [
     label: "Salon & Spa",
     title: "Salon, Spa & Beauty Business",
     subtitle: "Appointments, staff, and daily cash — sorted.",
-    color: "#ec4899",
+    color: "var(--tx-ec4899, #ec4899)",
     glow: "rgba(236,72,153,.22)",
-    dim:  "rgba(236,72,153,.08)",
+    dim:  "rgba(var(--txr-ec4899, 236,72,153),.08)",
     border:"rgba(236,72,153,.3)",
     pain: "No-shows, cash shortages, and untracked staff commissions eat into beauty business profits every week.",
     stats: [{ val:"50%", label:"Fewer no-shows with reminders" },{ val:"Accurate", label:"Staff commission tracking" },{ val:"Daily", label:"Revenue per service report" }],
@@ -398,9 +398,9 @@ const INDUSTRIES = [
     label: "School & Education",
     title: "Schools, Academies & Institutes",
     subtitle: "Students, fees, and results — all in one system.",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.22)",
-    dim:  "rgba(129,140,248,.08)",
+    dim:  "rgba(var(--txr-818cf8, 129,140,248),.08)",
     border:"rgba(129,140,248,.3)",
     pain: "Fee defaulters go unnoticed, exam records are scattered, and staff payroll takes days to reconcile.",
     stats: [{ val:"90%", label:"Fee collection on time" },{ val:"Zero", label:"Lost exam records" },{ val:"1 hr", label:"Monthly payroll closure" }],
@@ -422,9 +422,9 @@ const INDUSTRIES = [
     label: "NGO & Non-Profit",
     title: "NGOs & Non-Profit Organizations",
     subtitle: "Donor funds, projects, and compliance — transparent.",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.22)",
-    dim:  "rgba(52,211,153,.08)",
+    dim:  "rgba(var(--txr-34d399, 52,211,153),.08)",
     border:"rgba(52,211,153,.3)",
     pain: "Donor reporting takes weeks because grant funds, project expenses, and overheads are mixed together.",
     stats: [{ val:"Fund-wise", label:"Expense tracking" },{ val:"Instant", label:"Donor reports" },{ val:"100%", label:"Audit readiness" }],
@@ -446,9 +446,9 @@ const INDUSTRIES = [
     label: "Real Estate",
     title: "Real Estate & Property Management",
     subtitle: "Properties, tenants, and rent — effortlessly managed.",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     glow: "rgba(245,158,11,.22)",
-    dim:  "rgba(245,158,11,.08)",
+    dim:  "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     border:"rgba(245,158,11,.3)",
     pain: "Scattered rent records, missed maintenance, and manual payment follow-ups waste hours every month.",
     stats: [{ val:"Zero", label:"Missed rent payments" },{ val:"Live", label:"Occupancy & vacancy view" },{ val:"Full", label:"Property-wise P&L" }],
@@ -472,9 +472,9 @@ const INDUSTRIES = [
     label: "Automotive",
     title: "Car Showroom, Workshop & Rental",
     subtitle: "Vehicle sales, service jobs, spare parts — all in one platform.",
-    color: "#0ea5e9",
+    color: "var(--tx-0ea5e9, #0ea5e9)",
     glow: "rgba(14,165,233,.22)",
-    dim:  "rgba(14,165,233,.08)",
+    dim:  "rgba(var(--txr-0ea5e9, 14,165,233),.08)",
     border:"rgba(14,165,233,.3)",
     pain: "Tracking vehicle stock, workshop job cards, spare parts, and customer payments across separate systems is costing you sales.",
     stats: [{ val:"100%", label:"Job card accuracy" },{ val:"Live", label:"Vehicle stock view" },{ val:"Zero", label:"Parts shrinkage" }],
@@ -498,9 +498,9 @@ const INDUSTRIES = [
     label: "Media & Advertising",
     title: "Advertising & Digital Marketing Agencies",
     subtitle: "Client billing, campaign budgets, and media costs — simplified.",
-    color: "#f43f5e",
+    color: "var(--tx-f43f5e, #f43f5e)",
     glow: "rgba(244,63,94,.22)",
-    dim:  "rgba(244,63,94,.08)",
+    dim:  "rgba(var(--txr-f43f5e, 244,63,94),.08)",
     border:"rgba(244,63,94,.3)",
     pain: "Agency finances are complex — retainers, project billing, media spend recovery, and client-wise P&L all in separate spreadsheets.",
     stats: [{ val:"3×", label:"Faster client invoicing" },{ val:"100%", label:"Media cost recovery" },{ val:"Live", label:"Client profitability" }],
@@ -524,9 +524,9 @@ const INDUSTRIES = [
     label: "SaaS & ISP",
     title: "SaaS Companies & Internet Service Providers",
     subtitle: "Recurring billing, MRR tracking, and subscriber management.",
-    color: "#6366f1",
+    color: "var(--tx-6366f1, #6366f1)",
     glow: "rgba(99,102,241,.22)",
-    dim:  "rgba(99,102,241,.08)",
+    dim:  "rgba(var(--txr-6366f1, 99,102,241),.08)",
     border:"rgba(99,102,241,.3)",
     pain: "Manual subscription tracking, missed renewals, and no visibility into MRR growth.",
     stats: [{ val:"Zero", label:"Missed renewals" },{ val:"Live", label:"MRR & ARR dashboard" },{ val:"Auto", label:"Recurring billing" }],
@@ -550,9 +550,9 @@ const INDUSTRIES = [
     label: "Solar & Energy",
     title: "Solar Companies & Energy Businesses",
     subtitle: "Projects, equipment stock, AMC contracts — fully managed.",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     glow: "rgba(245,158,11,.22)",
-    dim:  "rgba(245,158,11,.08)",
+    dim:  "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     border:"rgba(245,158,11,.3)",
     pain: "Project costing is guesswork — panels, inverters, labour, and freight costs tracked in separate sheets.",
     stats: [{ val:"Accurate", label:"Project cost tracking" },{ val:"Live", label:"Equipment stock levels" },{ val:"Zero", label:"Missed AMC renewals" }],
@@ -576,9 +576,9 @@ const INDUSTRIES = [
     label: "Import / Export",
     title: "Import, Export & Clearing Agents",
     subtitle: "Shipments, LC/TT, customs costs, and local sales — all in one ledger.",
-    color: "#0891b2",
+    color: "var(--tx-0891b2, #0891b2)",
     glow: "rgba(8,145,178,.22)",
-    dim:  "rgba(8,145,178,.08)",
+    dim:  "rgba(var(--txr-0891b2, 8,145,178),.08)",
     border:"rgba(8,145,178,.3)",
     pain: "Import costing is scattered across emails — freight, customs duty, clearing charges, and port fees all end up in one wrong number.",
     stats: [{ val:"Accurate", label:"Landed cost per shipment" },{ val:"Live", label:"Goods in transit visibility" },{ val:"Full", label:"Duty & levy tracking" }],
@@ -602,9 +602,9 @@ const INDUSTRIES = [
     label: "Clearing & Forwarding",
     title: "Clearing & Forwarding Agents",
     subtitle: "Per-consignment job costing, agency billing, and document control.",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.22)",
-    dim:  "rgba(167,139,250,.08)",
+    dim:  "rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border:"rgba(167,139,250,.3)",
     pain: "Duty paid on a client's behalf, port charges, demurrage, and your own agency fee all blur together — so nobody knows what a job actually earned.",
     stats: [{ val:"Per job", label:"Consignment profitability" },{ val:"Zero", label:"Unbilled reimbursables" },{ val:"Live", label:"Consignment status board" }],
@@ -835,9 +835,9 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
     >
       <div style={{
         width:"100%", maxWidth:440, borderRadius:24,
-        background:"linear-gradient(145deg,rgba(15,18,50,.98),rgba(12,15,46,.98))",
-        border:"1.5px solid rgba(255,255,255,.1)",
-        boxShadow:"0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04)",
+        background:"linear-gradient(145deg,rgba(var(--dkr-0f1232, 15,18,50),0.98),rgba(var(--dkr-0c0f2e, 12,15,46),0.98))",
+        border:"1.5px solid rgba(var(--ink),.1)",
+        boxShadow:"0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(var(--ink),.04)",
         padding:"36px 32px", position:"relative", overflow:"hidden",
       }}>
         {/* Ambient glow */}
@@ -848,14 +848,14 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
         {/* Close button */}
         <button onClick={onClose} style={{
           position:"absolute", top:16, right:16,
-          background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.12)",
+          background:"rgba(var(--ink),.07)", border:"1px solid rgba(var(--ink),.12)",
           borderRadius:"50%", width:32, height:32,
-          color:"rgba(255,255,255,.5)", fontSize:16, cursor:"pointer",
+          color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:16, cursor:"pointer",
           display:"flex", alignItems:"center", justifyContent:"center",
           fontFamily:"inherit", transition:"all .2s",
         }}
-          onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.14)"; e.currentTarget.style.color="white"; }}
-          onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.07)"; e.currentTarget.style.color="rgba(255,255,255,.5)"; }}
+          onMouseEnter={e => { e.currentTarget.style.background="rgba(var(--ink),.14)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background="rgba(var(--ink),.07)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-50, .5))"; }}
         >✕</button>
 
         <div style={{ position:"relative" }}>
@@ -867,21 +867,21 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
             letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:16,
           }}>PHASE {ind.phase} — COMING SOON</div>
 
-          <h3 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"white",
+          <h3 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"var(--ink-solid, white)",
             letterSpacing:"-.5px", lineHeight:1.25, marginBottom:8 }}>
             Get notified when {ind.label} launches
           </h3>
-          <p style={{ fontSize:13.5, color:"rgba(255,255,255,.4)", lineHeight:1.7, marginBottom:28 }}>
+          <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.7, marginBottom:28 }}>
             We&apos;ll send you one email the moment {ind.label} goes live — including early access and any launch offer.
           </p>
 
           {done ? (
             <div style={{ textAlign:"center" as const, padding:"16px 0 8px" }}>
               <div style={{ fontSize:52, marginBottom:14 }}>🎉</div>
-              <div style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"white", marginBottom:8 }}>
+              <div style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:8 }}>
                 You&apos;re on the list!
               </div>
-              <p style={{ fontSize:13.5, color:"rgba(255,255,255,.4)", lineHeight:1.7, marginBottom:24 }}>
+              <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.7, marginBottom:24 }}>
                 We&apos;ll notify you as soon as {ind.label} is ready. Keep an eye on your inbox.
               </p>
               <button onClick={onClose} style={{
@@ -896,7 +896,7 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
               <div style={{ marginBottom:16 }}>
                 <label style={{
                   display:"block", fontSize:11, fontWeight:700,
-                  color:"rgba(255,255,255,.4)", marginBottom:8,
+                  color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:8,
                   letterSpacing:".07em", textTransform:"uppercase" as const,
                 }}>Your Email</label>
                 <input
@@ -907,15 +907,15 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
                   placeholder="you@company.com"
                   style={{
                     width:"100%", padding:"13px 16px", borderRadius:12,
-                    background:"rgba(255,255,255,.06)",
-                    border:`1.5px solid ${error ? "rgba(239,68,68,.5)" : "rgba(255,255,255,.12)"}`,
-                    color:"white", fontSize:14, fontFamily:"inherit", outline:"none",
+                    background:"rgba(var(--ink),.06)",
+                    border:`1.5px solid ${error ? "rgba(239,68,68,.5)" : "rgba(var(--ink),.12)"}`,
+                    color:"var(--ink-solid, white)", fontSize:14, fontFamily:"inherit", outline:"none",
                     transition:"border-color .2s", boxSizing:"border-box" as const,
                   }}
-                  onFocus={e => { e.currentTarget.style.borderColor = `${ind.color}80`; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = error ? "rgba(239,68,68,.5)" : "rgba(255,255,255,.12)"; }}
+                  onFocus={e => { e.currentTarget.style.borderColor = `color-mix(in srgb, ${ind.color} 50.2%, transparent)`; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = error ? "rgba(239,68,68,.5)" : "rgba(var(--ink),.12)"; }}
                 />
-                {error && <div style={{ fontSize:12, color:"#f87171", marginTop:6 }}>{error}</div>}
+                {error && <div style={{ fontSize:12, color:"var(--tx-f87171, #f87171)", marginTop:6 }}>{error}</div>}
               </div>
 
               <button
@@ -924,9 +924,9 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
                 style={{
                   width:"100%", padding:"13px", borderRadius:12, border:"none",
                   background: !loading && email.trim()
-                    ? `linear-gradient(135deg,${ind.color},${ind.color}cc)`
-                    : "rgba(255,255,255,.08)",
-                  color: !loading && email.trim() ? "#0f172a" : "rgba(255,255,255,.3)",
+                    ? `linear-gradient(135deg,${ind.color},color-mix(in srgb, ${ind.color} 80%, transparent))`
+                    : "rgba(var(--ink),.08)",
+                  color: !loading && email.trim() ? "#0f172a" : "rgba(var(--ink),var(--ta-30, .3))",
                   fontWeight:800, fontSize:15,
                   cursor: loading || !email.trim() ? "not-allowed" : "pointer",
                   fontFamily:"inherit", transition:"all .25s",
@@ -936,7 +936,7 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
                 {loading ? "Saving..." : `🔔 Notify me when ${ind.label} launches`}
               </button>
 
-              <p style={{ fontSize:11.5, color:"rgba(255,255,255,.22)", textAlign:"center" as const, marginTop:14, lineHeight:1.6 }}>
+              <p style={{ fontSize:11.5, color:"rgba(var(--ink),var(--ta-22, .22))", textAlign:"center" as const, marginTop:14, lineHeight:1.6 }}>
                 No spam — just one launch notification.
               </p>
             </>
@@ -950,7 +950,7 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
 /* ─── Small components ─── */
 function Check({ color }: { color: string }) {
   return (
-    <div style={{ width:20, height:20, borderRadius:"50%", background:`${color}18`, border:`1px solid ${color}35`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+    <div style={{ width:20, height:20, borderRadius:"50%", background:`color-mix(in srgb, ${color} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 20.8%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
       <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
     </div>
   );
@@ -969,8 +969,8 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
   return (
     <section ref={ref} id={ind.id} className="sol-section" style={{
       padding:"100px 24px",
-      background: index % 2 === 0 ? "transparent" : "rgba(255,255,255,.02)",
-      borderTop:"1px solid rgba(255,255,255,.05)",
+      background: index % 2 === 0 ? "transparent" : "rgba(var(--ink),.02)",
+      borderTop:"1px solid rgba(var(--ink),.05)",
       position:"relative", overflow:"hidden",
     }}>
       {/* Ambient orb */}
@@ -1007,7 +1007,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                     display:"inline-flex", alignItems:"center", gap:5,
                     padding:"4px 10px", borderRadius:20,
                     background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.35)",
-                    fontSize:10, fontWeight:700, color:"#fbbf24", letterSpacing:".07em", textTransform:"uppercase",
+                    fontSize:10, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)", letterSpacing:".07em", textTransform:"uppercase",
                     animation:"floatBadge 3s ease-in-out infinite",
                   }}>
                     ⏳ Coming Soon
@@ -1018,7 +1018,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                     display:"inline-flex", alignItems:"center", gap:5,
                     padding:"4px 10px", borderRadius:20,
                     background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.35)",
-                    fontSize:10, fontWeight:700, color:"#34d399", letterSpacing:".07em", textTransform:"uppercase",
+                    fontSize:10, fontWeight:700, color:"var(--tx-34d399, #34d399)", letterSpacing:".07em", textTransform:"uppercase",
                   }}>
                     🟢 Live Now
                   </div>
@@ -1028,7 +1028,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
 
             <h2 style={{
               fontFamily:"'Lora',serif", fontSize:"clamp(26px,3vw,40px)",
-              fontWeight:700, color:"white", letterSpacing:"-1px", lineHeight:1.15, marginBottom:12,
+              fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1px", lineHeight:1.15, marginBottom:12,
               opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)",
               transition:"all .55s ease .06s",
             }}>
@@ -1046,26 +1046,26 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
             <div style={{
               padding:"14px 18px", borderRadius:12,
               background:"rgba(239,68,68,.06)", border:"1px solid rgba(239,68,68,.18)",
-              fontSize:13, color:"rgba(255,255,255,.5)", lineHeight:1.7,
+              fontSize:13, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.7,
               marginBottom:28, display:"flex", alignItems:"flex-start", gap:10,
               opacity:visible?1:0, transition:"opacity .5s ease .15s",
             }}>
               <span style={{ fontSize:16, flexShrink:0 }}>⚠️</span>
-              <span><strong style={{ color:"rgba(255,255,255,.7)" }}>The problem: </strong>{ind.pain}</span>
+              <span><strong style={{ color:"rgba(var(--ink),var(--ta-70, .7))" }}>The problem: </strong>{ind.pain}</span>
             </div>
 
             {/* Workflow strip */}
             {WORKFLOWS[ind.id] && (
               <div style={{
                 marginBottom:20, padding:"12px 16px", borderRadius:12,
-                background:"rgba(255,255,255,.02)", border:`1px solid ${ind.border}`,
+                background:"rgba(var(--ink),.02)", border:`1px solid ${ind.border}`,
                 opacity:visible?1:0, transition:"opacity .5s ease .18s",
               }}>
                 <div style={{ fontSize:9.5, fontWeight:700, color:ind.color, letterSpacing:".1em", textTransform:"uppercase" as const, marginBottom:10 }}>Typical Workflow</div>
                 <div style={{ display:"flex", alignItems:"center", gap:4, flexWrap:"wrap" as const }}>
                   {WORKFLOWS[ind.id].map((step, si) => (
                     <span key={si} style={{ display:"inline-flex", alignItems:"center", gap:4 }}>
-                      <span style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.72)", padding:"4px 9px", borderRadius:7, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", whiteSpace:"nowrap" as const }}>{step}</span>
+                      <span style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),var(--ta-72, .72))", padding:"4px 9px", borderRadius:7, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.08)", whiteSpace:"nowrap" as const }}>{step}</span>
                       {si < WORKFLOWS[ind.id].length - 1 && (
                         <span style={{ fontSize:11, color:ind.color, opacity:.5, fontWeight:700 }}>→</span>
                       )}
@@ -1087,7 +1087,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                   background:ind.dim, border:`1px solid ${ind.border}`,
                 }}>
                   <div style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:ind.color, letterSpacing:"-.5px" }}>{val}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:500, marginTop:3, lineHeight:1.4 }}>{label}</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:500, marginTop:3, lineHeight:1.4 }}>{label}</div>
                 </div>
               ))}
             </div>
@@ -1096,26 +1096,26 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
             {!comingSoon && (
             <div style={{
               padding:"18px 20px", borderRadius:16,
-              background:"rgba(255,255,255,.03)", border:`1.5px solid ${ind.border}`,
+              background:"rgba(var(--ink),.03)", border:`1.5px solid ${ind.border}`,
               opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(14px)",
               transition:"all .55s ease .28s",
               position:"relative", overflow:"hidden",
             }}>
               <div style={{ position:"absolute", top:10, right:16, fontSize:42, color:ind.color, opacity:.08, fontFamily:"Georgia,serif", userSelect:"none" }}>&quot;</div>
-              <p style={{ fontSize:13.5, color:"rgba(255,255,255,.65)", lineHeight:1.75, fontStyle:"italic", marginBottom:12 }}>
+              <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-65, .65))", lineHeight:1.75, fontStyle:"italic", marginBottom:12 }}>
                 &quot;{ind.quote}&quot;
               </p>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ width:34, height:34, borderRadius:"50%",
-                  background:`linear-gradient(135deg,${ind.color}66,${ind.color}33)`,
+                  background:`linear-gradient(135deg,color-mix(in srgb, ${ind.color} 40%, transparent),color-mix(in srgb, ${ind.color} 20%, transparent))`,
                   border:`1.5px solid ${ind.border}`,
                   display:"flex", alignItems:"center", justifyContent:"center",
                   fontSize:13, fontWeight:800, color:ind.color }}>
                   {ind.quoteName[0]}
                 </div>
                 <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.85)" }}>{ind.quoteName}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:1 }}>{ind.quoteTitle}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.85)" }}>{ind.quoteName}</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:1 }}>{ind.quoteTitle}</div>
                 </div>
               </div>
             </div>
@@ -1132,7 +1132,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                     display:"inline-flex", alignItems:"center", gap:8,
                     padding:"13px 28px", borderRadius:13,
                     background:"rgba(251,191,36,.12)", border:"1.5px solid rgba(251,191,36,.4)",
-                    color:"#fbbf24", fontWeight:800, fontSize:14,
+                    color:"var(--tx-fbbf24, #fbbf24)", fontWeight:800, fontSize:14,
                     cursor:"pointer", fontFamily:"inherit", transition:"all .25s",
                   }}
                     onMouseEnter={e => { e.currentTarget.style.background="rgba(251,191,36,.2)"; e.currentTarget.style.transform="translateY(-2px)"; }}
@@ -1143,24 +1143,24 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                   <Link href={`/for/${IND_BIZ_KEY[ind.id] || ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:6,
                     padding:"13px 22px", borderRadius:13,
-                    background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
-                    color:"rgba(255,255,255,.7)", fontWeight:700, fontSize:14,
+                    background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)",
+                    color:"rgba(var(--ink),var(--ta-70, .7))", fontWeight:700, fontSize:14,
                     textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
                   }}
-                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.1)"; e.currentTarget.style.color="white"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.06)"; e.currentTarget.style.color="rgba(255,255,255,.7)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.background="rgba(var(--ink),.1)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background="rgba(var(--ink),.06)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-70, .7))"; }}
                   >
                     Learn More →
                   </Link>
-                  <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Phase {ind.phase} — Coming Soon</span>
+                  <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Phase {ind.phase} — Coming Soon</span>
                 </div>
               ) : (
                 <div style={{ display:"flex", gap:12, flexWrap:"wrap", alignItems:"center" }}>
                   <Link href={`/onboarding/signup/starter?businessType=${IND_BIZ_KEY[ind.id] || ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:8,
                     padding:"13px 28px", borderRadius:13,
-                    background:`linear-gradient(135deg,${ind.color},${ind.color}cc)`,
-                    color:"#0f172a", fontWeight:800, fontSize:14,
+                    background:`linear-gradient(135deg,${ind.color},color-mix(in srgb, ${ind.color} 80%, transparent))`,
+                    color:"var(--mk-on-accent, #0f172a)", fontWeight:800, fontSize:14,
                     textDecoration:"none", fontFamily:"inherit",
                     boxShadow:`0 6px 24px ${ind.glow}`, transition:"all .25s",
                   }}
@@ -1175,12 +1175,12 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                   <Link href={`/for/${IND_BIZ_KEY[ind.id] || ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:6,
                     padding:"13px 22px", borderRadius:13,
-                    background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
-                    color:"rgba(255,255,255,.7)", fontWeight:700, fontSize:14,
+                    background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)",
+                    color:"rgba(var(--ink),var(--ta-70, .7))", fontWeight:700, fontSize:14,
                     textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
                   }}
-                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.1)"; e.currentTarget.style.color="white"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.06)"; e.currentTarget.style.color="rgba(255,255,255,.7)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.background="rgba(var(--ink),.1)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background="rgba(var(--ink),.06)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-70, .7))"; }}
                   >
                     View Details →
                   </Link>
@@ -1199,14 +1199,14 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                   onMouseLeave={() => setHoveredFeat(null)}
                   style={{
                     borderRadius:16, padding:"18px",
-                    background: hoveredFeat===fi ? "rgba(255,255,255,.07)" : "rgba(255,255,255,.03)",
-                    border:`1.5px solid ${hoveredFeat===fi ? ind.border : "rgba(255,255,255,.07)"}`,
+                    background: hoveredFeat===fi ? "rgba(var(--ink),.07)" : "rgba(var(--ink),.03)",
+                    border:`1.5px solid ${hoveredFeat===fi ? ind.border : "rgba(var(--ink),.07)"}`,
                     backdropFilter:"blur(16px)",
                     transition:"all .3s ease",
                     opacity:visible?1:0,
                     transform:visible ? hoveredFeat===fi?"translateY(-4px)":"translateY(0)" : "translateY(24px)",
                     transitionDelay:visible?`${fi*60}ms`:"0ms",
-                    boxShadow:hoveredFeat===fi?`0 12px 32px rgba(0,0,0,.25), 0 0 0 1px ${ind.color}20`:"none",
+                    boxShadow:hoveredFeat===fi?`0 12px 32px rgba(0,0,0,.25), 0 0 0 1px color-mix(in srgb, ${ind.color} 12.5%, transparent)`:"none",
                     position:"relative", overflow:"hidden",
                     cursor:"default",
                   }}
@@ -1217,8 +1217,8 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                       borderRadius:"16px 16px 0 0" }}/>
                   )}
                   <div style={{ fontSize:22, marginBottom:10 }}>{f.icon}</div>
-                  <div style={{ fontSize:13.5, fontWeight:700, color:"rgba(255,255,255,.88)", marginBottom:6, lineHeight:1.3 }}>{f.title}</div>
-                  <div style={{ fontSize:12.5, color:"rgba(255,255,255,.38)", lineHeight:1.65 }}>{f.desc}</div>
+                  <div style={{ fontSize:13.5, fontWeight:700, color:"rgba(var(--ink),.88)", marginBottom:6, lineHeight:1.3 }}>{f.title}</div>
+                  <div style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-38, .38))", lineHeight:1.65 }}>{f.desc}</div>
                 </div>
               ))}
             </div>
@@ -1291,7 +1291,7 @@ export default function SolutionsPage() {
         <meta name="description" content="Industry-specific business solutions for trading, distribution, manufacturing, retail, restaurant, hospital, hotel, pharmacy, construction, e-commerce, agriculture, transport, salon, school, NGO, and real estate."/>
       </Head>
 
-      <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
+      <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 30%,var(--dk-080c1e, #080c1e) 100%)", color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
         <style>{`
           
           *,*::before,*::after{box-sizing:border-box;}
@@ -1304,13 +1304,13 @@ export default function SolutionsPage() {
             display:inline-flex; align-items:center; gap:6px;
             padding:7px 14px; border-radius:20px; cursor:pointer;
             font-size:12.5px; font-weight:600; font-family:'Outfit',sans-serif;
-            border:1.5px solid rgba(255,255,255,.08);
-            background:rgba(255,255,255,.03);
-            color:rgba(255,255,255,.4);
+            border:1.5px solid rgba(var(--ink),.08);
+            background:rgba(var(--ink),.03);
+            color:rgba(var(--ink),var(--ta-40, .4));
             transition:all .2s; white-space:nowrap;
           }
-          .tab-pill:hover{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);}
-          .tab-pill.active{color:white;border-color:var(--tab-color,#818cf8);background:color-mix(in srgb,var(--tab-color,#818cf8) 12%,transparent);box-shadow:0 0 12px color-mix(in srgb,var(--tab-color,#818cf8) 20%,transparent);}
+          .tab-pill:hover{color:rgba(var(--ink),.85);border-color:rgba(var(--ink),.18);background:rgba(var(--ink),.06);}
+          .tab-pill.active{color:var(--ink-solid, white);border-color:var(--tab-color,#818cf8);background:color-mix(in srgb,var(--tab-color,#818cf8) 12%,transparent);box-shadow:0 0 12px color-mix(in srgb,var(--tab-color,#818cf8) 20%,transparent);}
           @media(max-width:900px){
             .industry-grid{grid-template-columns:1fr!important;gap:36px!important;direction:ltr!important;}
             .cross-grid{grid-template-columns:repeat(2,1fr)!important;}
@@ -1359,7 +1359,7 @@ export default function SolutionsPage() {
               display:"inline-flex", alignItems:"center", gap:8,
               padding:"6px 16px", borderRadius:24,
               background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)",
-              fontSize:11, fontWeight:700, color:"#a5b4fc",
+              fontSize:11, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)",
               letterSpacing:".09em", textTransform:"uppercase", marginBottom:24,
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .5s ease",
@@ -1371,21 +1371,21 @@ export default function SolutionsPage() {
             <h1 style={{
               fontFamily:"'Lora',serif",
               fontSize:"clamp(36px,5.5vw,64px)",
-              fontWeight:700, color:"white",
+              fontWeight:700, color:"var(--ink-solid, white)",
               letterSpacing:"-2px", lineHeight:1.08, marginBottom:18,
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(20px)",
               transition:"all .6s ease .08s",
             }}>
               One platform.
               <span style={{ display:"block", fontStyle:"italic",
-                background:"linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd)",
+                background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd))",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                 Every industry.
               </span>
             </h1>
 
             <p style={{
-              fontSize:17, color:"rgba(255,255,255,.45)", lineHeight:1.8,
+              fontSize:17, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.8,
               maxWidth:560, margin:"0 auto 48px",
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .6s ease .16s",
@@ -1415,13 +1415,13 @@ export default function SolutionsPage() {
               <Link href="/contact?subject=custom-industry" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 24px", borderRadius:13,
-                border:"1.5px solid rgba(255,255,255,.12)",
-                background:"rgba(255,255,255,.04)",
-                color:"rgba(255,255,255,.65)", fontWeight:600, fontSize:14,
+                border:"1.5px solid rgba(var(--ink),.12)",
+                background:"rgba(var(--ink),.04)",
+                color:"rgba(var(--ink),var(--ta-65, .65))", fontWeight:600, fontSize:14,
                 textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
               }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(255,255,255,.28)"; e.currentTarget.style.color="white"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,.12)"; e.currentTarget.style.color="rgba(255,255,255,.65)"; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(var(--ink),.28)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(var(--ink),.12)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-65, .65))"; }}
               >
                 🏗️ Don&apos;t see your industry?
               </Link>
@@ -1443,13 +1443,13 @@ export default function SolutionsPage() {
                   {/* Category label */}
                   <div style={{
                     width:100, flexShrink:0, paddingTop:6, paddingRight:16,
-                    fontSize:9, fontWeight:800, color:"rgba(255,255,255,.22)",
+                    fontSize:9, fontWeight:800, color:"rgba(var(--ink),var(--ta-22, .22))",
                     letterSpacing:".12em", textTransform:"uppercase",
                     textAlign:"right", whiteSpace:"nowrap",
                   }}>{group.label}</div>
 
                   {/* Vertical divider */}
-                  <div style={{ width:1, flexShrink:0, alignSelf:"stretch", background:"rgba(255,255,255,.1)", marginRight:16 }} />
+                  <div style={{ width:1, flexShrink:0, alignSelf:"stretch", background:"rgba(var(--ink),.1)", marginRight:16 }} />
 
                   {/* Pills */}
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center", flex:1 }}>
@@ -1475,15 +1475,15 @@ export default function SolutionsPage() {
         </section>
 
         {/* ── SCROLLING TICKER ── */}
-        <div style={{ overflow:"hidden", borderTop:"1px solid rgba(255,255,255,.05)", borderBottom:"1px solid rgba(255,255,255,.05)", padding:"14px 0", background:"rgba(255,255,255,.02)", position:"relative" }}>
-          <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(90deg,#080c1e,transparent)", zIndex:2, pointerEvents:"none" }}/>
-          <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(270deg,#080c1e,transparent)", zIndex:2, pointerEvents:"none" }}/>
+        <div style={{ overflow:"hidden", borderTop:"1px solid rgba(var(--ink),.05)", borderBottom:"1px solid rgba(var(--ink),.05)", padding:"14px 0", background:"rgba(var(--ink),.02)", position:"relative" }}>
+          <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(90deg,var(--dk-080c1e, #080c1e),transparent)", zIndex:2, pointerEvents:"none" }}/>
+          <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(270deg,var(--dk-080c1e, #080c1e),transparent)", zIndex:2, pointerEvents:"none" }}/>
           <div style={{ display:"flex", animation:"scrollTick 24s linear infinite", width:"max-content" }}>
             {[...Array(2)].map((_,ri) =>
               ["Trading Companies","Distributors","Manufacturers","Service Firms","Retail Chains","Restaurants","Hospitals & Clinics","Hotels","Pharmacies","Construction Firms","E-Commerce Sellers","Agriculture","Transport & Logistics","Salons & Spas","Schools & Academies","NGOs","Real Estate","Car Showrooms","Car Workshops","Spare Parts Stores","Car Rentals","Advertising Agencies","Digital Marketing","Printing Press","SaaS Companies","ISPs","Accounting Firms","Consultancies","Mobile Repair","Equipment Maintenance","Solar Companies","Import Companies","Export Companies","Clearing Agents","Event Planners","Wedding Planners","Equipment Rental","Franchise Chains"].map(name => (
                 <div key={`${ri}-${name}`} style={{
-                  padding:"0 28px", borderRight:"1px solid rgba(255,255,255,.06)",
-                  fontSize:12.5, fontWeight:700, color:"rgba(255,255,255,.22)",
+                  padding:"0 28px", borderRight:"1px solid rgba(var(--ink),.06)",
+                  fontSize:12.5, fontWeight:700, color:"rgba(var(--ink),var(--ta-22, .22))",
                   letterSpacing:".06em", textTransform:"uppercase", whiteSpace:"nowrap",
                 }}>
                   {name}
@@ -1506,7 +1506,7 @@ export default function SolutionsPage() {
             appears here on its own. */}
 
         {/* ── CROSS-PLATFORM FEATURES ── */}
-        <section style={{ padding:"100px 24px", background:"rgba(255,255,255,.02)", borderTop:"1px solid rgba(255,255,255,.06)" }}>
+        <section style={{ padding:"100px 24px", background:"rgba(var(--ink),.02)", borderTop:"1px solid rgba(var(--ink),.06)" }}>
           <div ref={crossRef} style={{ maxWidth:1100, margin:"0 auto" }}>
             <div style={{
               textAlign:"center", marginBottom:60,
@@ -1515,17 +1515,17 @@ export default function SolutionsPage() {
             }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:20,
                 background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.28)",
-                fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".09em", textTransform:"uppercase", marginBottom:18 }}>
+                fontSize:11, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".09em", textTransform:"uppercase", marginBottom:18 }}>
                 <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
                 Every Plan Includes
               </div>
-              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,46px)", fontWeight:700, color:"white", letterSpacing:"-1px", lineHeight:1.15, marginBottom:14 }}>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,46px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1px", lineHeight:1.15, marginBottom:14 }}>
                 Built for global businesses.{" "}
-                <span style={{ fontStyle:"italic", background:"linear-gradient(135deg,#818cf8,#6366f1)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+                <span style={{ fontStyle:"italic", background:"linear-gradient(135deg,var(--tx-818cf8, #818cf8),var(--tx-6366f1, #6366f1))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                   Ready for everywhere.
                 </span>
               </h2>
-              <p style={{ fontSize:15.5, color:"rgba(255,255,255,.4)", maxWidth:480, margin:"0 auto", lineHeight:1.8 }}>
+              <p style={{ fontSize:15.5, color:"rgba(var(--ink),var(--ta-40, .4))", maxWidth:480, margin:"0 auto", lineHeight:1.8 }}>
                 No matter your industry, every plan ships with these fundamentals.
               </p>
             </div>
@@ -1544,8 +1544,8 @@ export default function SolutionsPage() {
                     onMouseLeave={() => setCrossHover(null)}
                     style={{
                       borderRadius:18, padding:"24px",
-                      background:hov?"rgba(255,255,255,.07)":"rgba(255,255,255,.03)",
-                      border:`1.5px solid ${hov?"rgba(99,102,241,.4)":"rgba(255,255,255,.07)"}`,
+                      background:hov?"rgba(var(--ink),.07)":"rgba(var(--ink),.03)",
+                      border:`1.5px solid ${hov?"rgba(99,102,241,.4)":"rgba(var(--ink),.07)"}`,
                       backdropFilter:"blur(16px)", transition:"all .3s",
                       transform:hov?"translateY(-4px)":"translateY(0)",
                       boxShadow:hov?"0 16px 40px rgba(0,0,0,.25)":"none",
@@ -1553,8 +1553,8 @@ export default function SolutionsPage() {
                     }}
                   >
                     <div style={{ fontSize:28, marginBottom:14 }}>{f.icon}</div>
-                    <div style={{ fontSize:14.5, fontWeight:700, color:"rgba(255,255,255,.9)", marginBottom:7 }}>{f.title}</div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.38)", lineHeight:1.7 }}>{f.desc}</div>
+                    <div style={{ fontSize:14.5, fontWeight:700, color:"rgba(var(--ink),.9)", marginBottom:7 }}>{f.title}</div>
+                    <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-38, .38))", lineHeight:1.7 }}>{f.desc}</div>
                   </div>
                 );
               })}
@@ -1566,7 +1566,7 @@ export default function SolutionsPage() {
         <section style={{ padding:"80px 24px", maxWidth:1100, margin:"0 auto" }}>
           <div ref={ctaRef} className="sol-cta-inner" style={{
             borderRadius:28, overflow:"hidden", position:"relative",
-            background:"linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%)",
+            background:"var(--mk-card-indigo, linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%))",
             padding:"72px 48px", textAlign:"center",
             boxShadow:"0 32px 80px rgba(99,102,241,.35)",
             border:"1px solid rgba(165,180,252,.2)",
@@ -1592,23 +1592,23 @@ export default function SolutionsPage() {
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"6px 16px", borderRadius:24,
                 background:"rgba(251,191,36,.12)", border:"1.5px solid rgba(251,191,36,.3)",
-                fontSize:11, fontWeight:800, color:"#fbbf24",
+                fontSize:11, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)",
                 letterSpacing:".09em", textTransform:"uppercase", marginBottom:22,
                 animation:"floatBadge 3s ease-in-out infinite",
               }}>
                 🔥 50% OFF — First 3 Months
               </div>
 
-              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4.5vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14 }}>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4.5vw,50px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14 }}>
                 Find the perfect solution
                 <span style={{ display:"block", fontStyle:"italic",
-                  background:"linear-gradient(135deg,#a5b4fc,#818cf8)",
+                  background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8))",
                   WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                   for your industry.
                 </span>
               </h2>
 
-              <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", marginBottom:40, maxWidth:480, margin:"0 auto 40px", lineHeight:1.8 }}>
+              <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:40, maxWidth:480, margin:"0 auto 40px", lineHeight:1.8 }}>
                 Discount applies automatically. Secure hosted checkout. Cancel anytime.
               </p>
 
@@ -1627,13 +1627,13 @@ export default function SolutionsPage() {
                 </Link>
                 <Link href="/support" style={{
                   padding:"13px 32px", borderRadius:14,
-                  border:"1.5px solid rgba(255,255,255,.2)",
-                  background:"rgba(255,255,255,.06)", backdropFilter:"blur(8px)",
-                  color:"rgba(255,255,255,.75)", fontWeight:700, fontSize:15,
+                  border:"1.5px solid rgba(var(--ink),.2)",
+                  background:"rgba(var(--ink),.06)", backdropFilter:"blur(8px)",
+                  color:"rgba(var(--ink),.75)", fontWeight:700, fontSize:15,
                   textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, transition:"all .25s",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(255,255,255,.4)"; e.currentTarget.style.color="white"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,.2)"; e.currentTarget.style.color="rgba(255,255,255,.75)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(var(--ink),.4)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(var(--ink),.2)"; e.currentTarget.style.color="rgba(var(--ink),.75)"; }}
                 >
                   Talk to Sales
                 </Link>
@@ -1652,10 +1652,10 @@ export default function SolutionsPage() {
               boxShadow:"0 0 60px rgba(99,102,241,.08)",
             }}>
               <div style={{ fontSize:36, marginBottom:14 }}>🏗️</div>
-              <h2 style={{ fontSize:22, fontWeight:800, color:"white", margin:"0 0 10px" }}>
+              <h2 style={{ fontSize:22, fontWeight:800, color:"var(--ink-solid, white)", margin:"0 0 10px" }}>
                 Don&apos;t see your industry?
               </h2>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 0 24px", lineHeight:1.7 }}>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", margin:"0 0 24px", lineHeight:1.7 }}>
                 We build custom industry configurations on request. Tell us your business type,
                 the modules you need, and we&apos;ll set it up for you — usually within 48 hours.
               </p>
@@ -1674,18 +1674,18 @@ export default function SolutionsPage() {
                 </Link>
                 <Link href="/contact" style={{
                   padding:"12px 24px", borderRadius:12,
-                  border:"1.5px solid rgba(255,255,255,.12)",
+                  border:"1.5px solid rgba(var(--ink),.12)",
                   background:"transparent",
-                  color:"rgba(255,255,255,.55)", fontWeight:600, fontSize:14,
+                  color:"rgba(var(--ink),var(--ta-55, .55))", fontWeight:600, fontSize:14,
                   textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, transition:"all .2s",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(255,255,255,.3)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color="rgba(255,255,255,.55)"; e.currentTarget.style.borderColor="rgba(255,255,255,.12)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.color="var(--ink-solid, white)"; e.currentTarget.style.borderColor="rgba(var(--ink),.3)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))"; e.currentTarget.style.borderColor="rgba(var(--ink),.12)"; }}
                 >
                   💬 Talk to Us
                 </Link>
               </div>
-              <p style={{ fontSize:12, color:"rgba(255,255,255,.2)", marginTop:16 }}>
+              <p style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-20, .2))", marginTop:16 }}>
                 60+ industries configured · Free setup on all plans
               </p>
             </div>
@@ -1695,9 +1695,9 @@ export default function SolutionsPage() {
         {/* Footer links */}
         <div style={{ paddingBottom:48, display:"flex", justifyContent:"center", gap:28, flexWrap:"wrap" }}>
           {["Privacy Policy","Terms of Use","Security","Help Center","Contact Sales"].map(t => (
-            <a key={t} href="#" style={{ fontSize:12, color:"rgba(255,255,255,.22)", textDecoration:"none", fontWeight:500, transition:"color .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color="rgba(255,255,255,.65)")}
-              onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,.22)")}>
+            <a key={t} href="#" style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-22, .22))", textDecoration:"none", fontWeight:500, transition:"color .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color="rgba(var(--ink),var(--ta-65, .65))")}
+              onMouseLeave={e => (e.currentTarget.style.color="rgba(var(--ink),var(--ta-22, .22))")}>
               {t}
             </a>
           ))}

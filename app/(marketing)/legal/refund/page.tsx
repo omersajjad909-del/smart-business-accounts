@@ -10,8 +10,8 @@ const SECTIONS = [
   {
     id: "overview",
     icon: "↩️",
-    color: "#818cf8",
-    dim: "rgba(129,140,248,.08)",
+    color: "var(--tx-818cf8, #818cf8)",
+    dim: "rgba(var(--txr-818cf8, 129,140,248),.08)",
     border: "rgba(129,140,248,.25)",
     title: "Overview",
     content: [
@@ -28,8 +28,8 @@ const SECTIONS = [
   {
     id: "plans",
     icon: "💳",
-    color: "#34d399",
-    dim: "rgba(52,211,153,.08)",
+    color: "var(--tx-34d399, #34d399)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.08)",
     border: "rgba(52,211,153,.25)",
     title: "Subscription Plans",
     content: [
@@ -50,8 +50,8 @@ const SECTIONS = [
   {
     id: "eligibility",
     icon: "✅",
-    color: "#f59e0b",
-    dim: "rgba(245,158,11,.08)",
+    color: "var(--tx-f59e0b, #f59e0b)",
+    dim: "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     border: "rgba(245,158,11,.25)",
     title: "Refund Eligibility",
     content: [
@@ -72,8 +72,8 @@ const SECTIONS = [
   {
     id: "non-refundable",
     icon: "🚫",
-    color: "#f87171",
-    dim: "rgba(248,113,113,.08)",
+    color: "var(--tx-f87171, #f87171)",
+    dim: "rgba(var(--txr-f87171, 248,113,113),.08)",
     border: "rgba(248,113,113,.25)",
     title: "Non-Refundable Situations",
     content: [
@@ -102,8 +102,8 @@ const SECTIONS = [
   {
     id: "how-to-request",
     icon: "📧",
-    color: "#a78bfa",
-    dim: "rgba(167,139,250,.08)",
+    color: "var(--tx-a78bfa, #a78bfa)",
+    dim: "rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border: "rgba(167,139,250,.25)",
     title: "How to Request a Refund",
     content: [
@@ -128,8 +128,8 @@ const SECTIONS = [
   {
     id: "cancellation",
     icon: "🚪",
-    color: "#06b6d4",
-    dim: "rgba(6,182,212,.08)",
+    color: "var(--tx-06b6d4, #06b6d4)",
+    dim: "rgba(var(--txr-06b6d4, 6,182,212),.08)",
     border: "rgba(6,182,212,.25)",
     title: "Cancellation vs Refund",
     content: [
@@ -150,8 +150,8 @@ const SECTIONS = [
   {
     id: "chargebacks",
     icon: "⚠️",
-    color: "#f97316",
-    dim: "rgba(249,115,22,.08)",
+    color: "var(--tx-f97316, #f97316)",
+    dim: "rgba(var(--txr-f97316, 249,115,22),.08)",
     border: "rgba(249,115,22,.25)",
     title: "Chargebacks & Disputes",
     content: [
@@ -172,8 +172,8 @@ const SECTIONS = [
   {
     id: "taxes",
     icon: "🧾",
-    color: "#f59e0b",
-    dim: "rgba(245,158,11,.08)",
+    color: "var(--tx-f59e0b, #f59e0b)",
+    dim: "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     border: "rgba(245,158,11,.25)",
     title: "Taxes & Regulatory Fees",
     content: [
@@ -190,8 +190,8 @@ const SECTIONS = [
   {
     id: "denial",
     icon: "⛔",
-    color: "#f87171",
-    dim: "rgba(248,113,113,.08)",
+    color: "var(--tx-f87171, #f87171)",
+    dim: "rgba(var(--txr-f87171, 248,113,113),.08)",
     border: "rgba(248,113,113,.25)",
     title: "Refund Denial",
     content: [
@@ -208,8 +208,8 @@ const SECTIONS = [
   {
     id: "changes",
     icon: "📝",
-    color: "#818cf8",
-    dim: "rgba(129,140,248,.08)",
+    color: "var(--tx-818cf8, #818cf8)",
+    dim: "rgba(var(--txr-818cf8, 129,140,248),.08)",
     border: "rgba(129,140,248,.25)",
     title: "Changes to This Policy",
     content: [
@@ -222,8 +222,8 @@ const SECTIONS = [
   {
     id: "contact",
     icon: "🤝",
-    color: "#34d399",
-    dim: "rgba(52,211,153,.08)",
+    color: "var(--tx-34d399, #34d399)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.08)",
     border: "rgba(52,211,153,.25)",
     title: "Contact Us",
     content: [
@@ -251,7 +251,7 @@ function Section({ s, index }: { s: typeof SECTIONS[0]; index: number }) {
   return (
     <div ref={ref} id={s.id} style={{
       padding:"40px 0",
-      borderTop:"1px solid rgba(255,255,255,.06)",
+      borderTop:"1px solid rgba(var(--ink),.06)",
       opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(20px)",
       transition:"all .6s cubic-bezier(.22,1,.36,1)",
     }}>
@@ -274,7 +274,7 @@ function Section({ s, index }: { s: typeof SECTIONS[0]; index: number }) {
           <h2 style={{
             fontFamily:"'Lora',serif",
             fontSize:"clamp(17px,2.5vw,22px)",
-            fontWeight:700, color:"white",
+            fontWeight:700, color:"var(--ink-solid, white)",
             letterSpacing:"-.4px", lineHeight:1.2, margin:0,
           }}>
             {s.title}
@@ -286,15 +286,15 @@ function Section({ s, index }: { s: typeof SECTIONS[0]; index: number }) {
         {s.content.map((c) => (
           <div key={c.sub} style={{
             padding:"16px 20px", borderRadius:14,
-            background:"rgba(255,255,255,.03)",
-            border:"1px solid rgba(255,255,255,.07)",
+            background:"rgba(var(--ink),.03)",
+            border:"1px solid rgba(var(--ink),.07)",
             borderLeft:`3px solid ${s.color}`,
           }}
-            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,.055)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,.03)"; }}
+            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(var(--ink),.055)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(var(--ink),.03)"; }}
           >
-            <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.45)", marginBottom:5, textTransform:"uppercase", letterSpacing:".06em" }}>{c.sub}</div>
-            <div style={{ fontSize:13.5, color:"rgba(255,255,255,.55)", lineHeight:1.8 }}>{c.body}</div>
+            <div style={{ fontSize:12, fontWeight:700, color:"rgba(var(--ink),var(--ta-45, .45))", marginBottom:5, textTransform:"uppercase", letterSpacing:".06em" }}>{c.sub}</div>
+            <div style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-55, .55))", lineHeight:1.8 }}>{c.body}</div>
           </div>
         ))}
       </div>
@@ -319,8 +319,8 @@ export default function RefundPolicyPage() {
   return (
     <div style={{
       minHeight:"100vh",
-      background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)",
-      color:"white",
+      background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 30%,var(--dk-080c1e, #080c1e) 100%)",
+      color:"var(--ink-solid, white)",
       fontFamily:"'Outfit','DM Sans',sans-serif",
     }}>
       <style>{`
@@ -332,14 +332,14 @@ export default function RefundPolicyPage() {
           display:flex;align-items:center;gap:9px;
           padding:7px 12px;border-radius:10px;
           font-size:11.5px;font-weight:600;
-          color:rgba(255,255,255,.35);
+          color:rgba(var(--ink),var(--ta-35, .35));
           cursor:pointer;transition:all .2s;
           border:1px solid transparent;
           text-align:left;background:none;
           font-family:inherit;width:100%;
         }
-        .toc-btn:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.04);}
-        .toc-btn.active{color:white;background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);}
+        .toc-btn:hover{color:rgba(var(--ink),var(--ta-70, .7));background:rgba(var(--ink),.04);}
+        .toc-btn.active{color:var(--ink-solid, white);background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);}
         @media(max-width:1000px){
           .layout-grid{grid-template-columns:1fr!important;}
           .toc-sidebar{display:none!important;}
@@ -364,13 +364,13 @@ export default function RefundPolicyPage() {
           <div ref={heroRef}>
             <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:28,
               opacity:heroVisible?1:0, transition:"opacity .5s" }}>
-              <Link href="/" style={{ fontSize:12, color:"rgba(255,255,255,.28)", textDecoration:"none", fontWeight:500 }}
-                onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.6)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.28)")}>
+              <Link href="/" style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-28, .28))", textDecoration:"none", fontWeight:500 }}
+                onMouseEnter={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-60, .6))")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-28, .28))")}>
                 Home
               </Link>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:500 }}>Refund Policy</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-45, .45))", fontWeight:500 }}>Refund Policy</span>
             </div>
 
             <div style={{ display:"flex", alignItems:"flex-start", gap:20, flexWrap:"wrap" }}>
@@ -379,7 +379,7 @@ export default function RefundPolicyPage() {
                   display:"inline-flex", alignItems:"center", gap:7,
                   padding:"5px 14px", borderRadius:22,
                   background:"rgba(129,140,248,.1)", border:"1.5px solid rgba(129,140,248,.28)",
-                  fontSize:10.5, fontWeight:700, color:"#c7d2fe",
+                  fontSize:10.5, fontWeight:700, color:"var(--tx-c7d2fe, #c7d2fe)",
                   letterSpacing:".09em", textTransform:"uppercase", marginBottom:18,
                   opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(12px)",
                   transition:"all .5s ease .06s",
@@ -391,14 +391,14 @@ export default function RefundPolicyPage() {
                 <h1 style={{
                   fontFamily:"'Lora',serif",
                   fontSize:"clamp(32px,4.5vw,52px)",
-                  fontWeight:700, color:"white",
+                  fontWeight:700, color:"var(--ink-solid, white)",
                   letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:14,
                   opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
                   transition:"all .6s ease .1s",
                 }}>
                   Refund Policy
                   <span style={{ display:"block", fontStyle:"italic",
-                    background:"linear-gradient(135deg,#c7d2fe,#818cf8)",
+                    background:"linear-gradient(135deg,var(--tx-c7d2fe, #c7d2fe),var(--tx-818cf8, #818cf8))",
                     WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
                     fontSize:"80%" }}>
                     Honest. Clear. No surprises.
@@ -406,7 +406,7 @@ export default function RefundPolicyPage() {
                 </h1>
 
                 <p style={{
-                  fontSize:15, color:"rgba(255,255,255,.4)", lineHeight:1.8, maxWidth:560,
+                  fontSize:15, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.8, maxWidth:560,
                   opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(12px)",
                   transition:"all .6s ease .16s",
                 }}>
@@ -417,8 +417,8 @@ export default function RefundPolicyPage() {
               {/* Summary card */}
               <div style={{
                 borderRadius:20, padding:"24px 28px", minWidth:250,
-                background:"rgba(255,255,255,.04)",
-                border:"1.5px solid rgba(255,255,255,.09)",
+                background:"rgba(var(--ink),.04)",
+                border:"1.5px solid rgba(var(--ink),.09)",
                 backdropFilter:"blur(20px)",
                 boxShadow:"0 16px 48px rgba(0,0,0,.3)",
                 opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
@@ -427,7 +427,7 @@ export default function RefundPolicyPage() {
               }}>
                 <div style={{ position:"absolute", top:0, left:"15%", right:"15%", height:1,
                   background:"linear-gradient(90deg,transparent,rgba(129,140,248,.5),transparent)" }}/>
-                <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:14 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:14 }}>
                   Quick Summary
                 </div>
                 {[
@@ -440,13 +440,13 @@ export default function RefundPolicyPage() {
                 ].map(({ icon, text }) => (
                   <div key={text} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                     <span style={{ fontSize:15 }}>{icon}</span>
-                    <span style={{ fontSize:12.5, color:"rgba(255,255,255,.6)", fontWeight:500 }}>{text}</span>
+                    <span style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-60, .6))", fontWeight:500 }}>{text}</span>
                   </div>
                 ))}
-                <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid rgba(255,255,255,.07)" }}>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.22)", lineHeight:1.6 }}>
+                <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid rgba(var(--ink),.07)" }}>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-22, .22))", lineHeight:1.6 }}>
                     Questions? Contact us at<br/>
-                    <a href={EMAIL_HREF} rel="noopener noreferrer" style={{ color:"#818cf8", textDecoration:"none", fontWeight:600 }}>{EMAIL}</a>
+                    <a href={EMAIL_HREF} rel="noopener noreferrer" style={{ color:"var(--tx-818cf8, #818cf8)", textDecoration:"none", fontWeight:600 }}>{EMAIL}</a>
                   </div>
                 </div>
               </div>
@@ -463,11 +463,11 @@ export default function RefundPolicyPage() {
           <aside className="toc-sidebar" style={{ position:"sticky", top:40 }}>
             <div style={{
               borderRadius:16, padding:"14px 10px",
-              background:"rgba(255,255,255,.03)",
-              border:"1px solid rgba(255,255,255,.07)",
+              background:"rgba(var(--ink),.03)",
+              border:"1px solid rgba(var(--ink),.07)",
               backdropFilter:"blur(16px)",
             }}>
-              <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.25)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:10, paddingLeft:12 }}>
+              <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-25, .25))", letterSpacing:".1em", textTransform:"uppercase", marginBottom:10, paddingLeft:12 }}>
                 Contents
               </div>
               {SECTIONS.map(s => (
@@ -487,24 +487,24 @@ export default function RefundPolicyPage() {
             {/* Footer contact */}
             <div style={{
               marginTop:40, padding:"28px 32px", borderRadius:20,
-              background:"rgba(255,255,255,.03)",
-              border:"1.5px solid rgba(255,255,255,.08)",
+              background:"rgba(var(--ink),.03)",
+              border:"1.5px solid rgba(var(--ink),.08)",
               backdropFilter:"blur(16px)",
               position:"relative", overflow:"hidden",
             }}>
               <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
                 background:"linear-gradient(90deg,transparent,rgba(129,140,248,.4),transparent)" }}/>
-              <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", marginBottom:8 }}>
+              <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:8 }}>
                 Need a Refund or Have a Question?
               </h3>
-              <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.8, marginBottom:16 }}>
+              <p style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.8, marginBottom:16 }}>
                 Email us directly — we respond within 2–3 business days and handle all refund requests personally.
               </p>
               <a href={EMAIL_HREF} rel="noopener noreferrer" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"10px 18px", borderRadius:12,
                 background:"rgba(129,140,248,.08)", border:"1px solid rgba(129,140,248,.25)",
-                color:"#c7d2fe", textDecoration:"none", fontSize:13, fontWeight:600,
+                color:"var(--tx-c7d2fe, #c7d2fe)", textDecoration:"none", fontSize:13, fontWeight:600,
                 marginBottom:18,
               }}>
                 📧 {EMAIL}
@@ -513,24 +513,24 @@ export default function RefundPolicyPage() {
                 <Link href="/legal/terms" style={{
                   display:"inline-flex", alignItems:"center", gap:7,
                   padding:"9px 16px", borderRadius:10,
-                  background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)",
-                  color:"rgba(255,255,255,.55)", fontWeight:600, fontSize:13, textDecoration:"none",
+                  background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.1)",
+                  color:"rgba(var(--ink),var(--ta-55, .55))", fontWeight:600, fontSize:13, textDecoration:"none",
                 }}>
                   📋 Terms of Service →
                 </Link>
                 <Link href="/legal/privacy" style={{
                   display:"inline-flex", alignItems:"center", gap:7,
                   padding:"9px 16px", borderRadius:10,
-                  background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)",
-                  color:"rgba(255,255,255,.55)", fontWeight:600, fontSize:13, textDecoration:"none",
+                  background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.1)",
+                  color:"rgba(var(--ink),var(--ta-55, .55))", fontWeight:600, fontSize:13, textDecoration:"none",
                 }}>
                   🔏 Privacy Policy →
                 </Link>
                 <Link href="/legal/delivery" style={{
                   display:"inline-flex", alignItems:"center", gap:7,
                   padding:"9px 16px", borderRadius:10,
-                  background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)",
-                  color:"rgba(255,255,255,.55)", fontWeight:600, fontSize:13, textDecoration:"none",
+                  background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.1)",
+                  color:"rgba(var(--ink),var(--ta-55, .55))", fontWeight:600, fontSize:13, textDecoration:"none",
                 }}>
                   📦 Service Delivery →
                 </Link>
@@ -539,8 +539,8 @@ export default function RefundPolicyPage() {
 
             <div style={{ marginTop:20, padding:"14px 18px", borderRadius:12,
               background:"rgba(129,140,248,.05)", border:"1px solid rgba(129,140,248,.15)" }}>
-              <p style={{ fontSize:12, color:"rgba(255,255,255,.3)", lineHeight:1.7, margin:0 }}>
-                <span style={{ fontWeight:700, color:"rgba(129,140,248,.6)" }}>Note: </span>
+              <p style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", lineHeight:1.7, margin:0 }}>
+                <span style={{ fontWeight:700, color:"rgba(var(--txr-818cf8, 129,140,248),var(--ta-60, .6))" }}>Note: </span>
                 This document should be reviewed by a qualified legal professional licensed in your jurisdiction before the platform goes live in production.
               </p>
             </div>

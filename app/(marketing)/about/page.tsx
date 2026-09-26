@@ -46,12 +46,12 @@ const MODULES = [
 ];
 
 const INDUSTRIES = [
-  { icon: "🏪", title: "Retail", desc: "POS-ready invoicing, branch stock control, customer loyalty, and daily sales reporting.", color: "#ec4899" },
-  { icon: "📦", title: "Trading & Wholesale", desc: "Full PO → GRN → purchase invoice flow with landed cost and outstanding balance tracking.", color: "#38bdf8" },
-  { icon: "🚚", title: "Distribution", desc: "Route-based sales, multi-warehouse transfers, van stock management, and collections.", color: "#8b5cf6" },
-  { icon: "🏭", title: "Manufacturing", desc: "Bills of materials, production orders, raw material consumption, and job costing.", color: "#f59e0b" },
-  { icon: "🚢", title: "Import / Export", desc: "Commercial invoices, packing lists, shipment tracking, LC/TT activity, and trade costing.", color: "#14b8a6" },
-  { icon: "⚓", title: "Clearing & Forwarding", desc: "Import and export shipments, customs clearance, GDs, invoices, consignments, and client billing in one desk.", color: "#818cf8"},
+  { icon: "🏪", title: "Retail", desc: "POS-ready invoicing, branch stock control, customer loyalty, and daily sales reporting.", color: "var(--tx-ec4899, #ec4899)" },
+  { icon: "📦", title: "Trading & Wholesale", desc: "Full PO → GRN → purchase invoice flow with landed cost and outstanding balance tracking.", color: "var(--tx-38bdf8, #38bdf8)" },
+  { icon: "🚚", title: "Distribution", desc: "Route-based sales, multi-warehouse transfers, van stock management, and collections.", color: "var(--tx-8b5cf6, #8b5cf6)" },
+  { icon: "🏭", title: "Manufacturing", desc: "Bills of materials, production orders, raw material consumption, and job costing.", color: "var(--tx-f59e0b, #f59e0b)" },
+  { icon: "🚢", title: "Import / Export", desc: "Commercial invoices, packing lists, shipment tracking, LC/TT activity, and trade costing.", color: "var(--tx-14b8a6, #14b8a6)" },
+  { icon: "⚓", title: "Clearing & Forwarding", desc: "Import and export shipments, customs clearance, GDs, invoices, consignments, and client billing in one desk.", color: "var(--tx-818cf8, #818cf8)"},
 ];
 
 const TIMELINE = [
@@ -59,51 +59,51 @@ const TIMELINE = [
     year: "2025",
     title: "The Frustration",
     desc: "Existing ERP software was either priced out of reach, built for Western markets, or took months to implement. Operational businesses — traders, distributors, manufacturers — were running on spreadsheets and manual work.",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
   },
   {
     year: "Early 2025",
     title: "First Version Ships",
     desc: "Core accounting, invoicing, inventory, and multi-branch support went live. Built specifically for trading and wholesale businesses first — the industry with the most operational complexity and the least software support.",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
   },
   {
     year: "Mid 2025",
     title: "Platform Expands",
     desc: "Payroll, CRM, AI-powered insights, landed cost, multi-currency, and procurement modules followed. Every feature was requested by real customers — not added for feature-parity with legacy software.",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
   },
   {
     year: "Now",
     title: "Growing Every Week",
     desc: "Six focused industries. Weekly releases. A complete operating platform for businesses that actually work hard — with a growing base of teams relying on it every day.",
-    color: "#6366f1",
+    color: "var(--tx-6366f1, #6366f1)",
   },
 ];
 
 const VALUES = [
-  { icon: "🎯", title: "Purpose-built, not adapted", desc: "We didn't take a generic accounting tool and add modules. FinovaOS was designed from scratch for operational businesses — the ones running multiple locations, multiple currencies, and complex supply chains.", color: "#818cf8" },
-  { icon: "🔒", title: "Your data stays yours", desc: "We don't sell your data. Financial records are encrypted at rest, isolated per workspace, and fully under your control. Full export available at any time.", color: "#34d399" },
-  { icon: "⚡", title: "Speed is a feature", desc: "Fast interface, fast reports, fast support. We measure month-end close time in hours, not days. Performance is something we take seriously at every level.", color: "#fbbf24" },
-  { icon: "📞", title: "Real humans in support", desc: "When something breaks, a real person responds — not a chatbot ticket queue. Your business can't wait for a three-day resolution time.", color: "#38bdf8" },
-  { icon: "🚀", title: "We ship every week", desc: "Our roadmap runs on real customer feedback. Every week, something improves. No waiting months for a feature that was requested a year ago.", color: "#c4b5fd" },
-  { icon: "💡", title: "Affordable by design", desc: "Enterprise-level features at a price growing businesses can actually afford. No hidden fees, no per-module paywalls, no charges that appear at renewal.", color: "#f9a8d4" },
+  { icon: "🎯", title: "Purpose-built, not adapted", desc: "We didn't take a generic accounting tool and add modules. FinovaOS was designed from scratch for operational businesses — the ones running multiple locations, multiple currencies, and complex supply chains.", color: "var(--tx-818cf8, #818cf8)" },
+  { icon: "🔒", title: "Your data stays yours", desc: "We don't sell your data. Financial records are encrypted at rest, isolated per workspace, and fully under your control. Full export available at any time.", color: "var(--tx-34d399, #34d399)" },
+  { icon: "⚡", title: "Speed is a feature", desc: "Fast interface, fast reports, fast support. We measure month-end close time in hours, not days. Performance is something we take seriously at every level.", color: "var(--tx-fbbf24, #fbbf24)" },
+  { icon: "📞", title: "Real humans in support", desc: "When something breaks, a real person responds — not a chatbot ticket queue. Your business can't wait for a three-day resolution time.", color: "var(--tx-38bdf8, #38bdf8)" },
+  { icon: "🚀", title: "We ship every week", desc: "Our roadmap runs on real customer feedback. Every week, something improves. No waiting months for a feature that was requested a year ago.", color: "var(--tx-c4b5fd, #c4b5fd)" },
+  { icon: "💡", title: "Affordable by design", desc: "Enterprise-level features at a price growing businesses can actually afford. No hidden fees, no per-module paywalls, no charges that appear at renewal.", color: "var(--tx-f9a8d4, #f9a8d4)" },
 ];
 
 const COMMITMENTS = [
-  { icon: "🔐", title: "No data selling — ever", desc: "Your business data is yours. We will never sell, license, or share it with advertisers, data brokers, or any third party for commercial purposes.", color: "#34d399" },
-  { icon: "📤", title: "Export everything, anytime", desc: "Full export in CSV, Excel, and PDF formats — always available, no restrictions. You are never locked into our platform.", color: "#38bdf8" },
-  { icon: "🗑️", title: "Clean deletion on exit", desc: "Cancel and a 90-day wind-down begins. After that, your data is permanently purged from our servers and we confirm it in writing.", color: "#f87171" },
-  { icon: "🤝", title: "Transparent pricing", desc: "What you see on the pricing page is what you pay. No per-seat surprises, no feature paywalls activated after signup, no fine print charges.", color: "#fbbf24" },
-  { icon: "🛡️", title: "Security without compromise", desc: "AES-256 encryption at rest, TLS in transit, isolated workspaces, and role-based access controls. Built on enterprise-grade infrastructure.", color: "#a78bfa" },
-  { icon: "🔔", title: "14 days notice on changes", desc: "Any material change to Terms, Privacy Policy, or pricing comes with at least 14 days advance notice via email before taking effect.", color: "#818cf8" },
+  { icon: "🔐", title: "No data selling — ever", desc: "Your business data is yours. We will never sell, license, or share it with advertisers, data brokers, or any third party for commercial purposes.", color: "var(--tx-34d399, #34d399)" },
+  { icon: "📤", title: "Export everything, anytime", desc: "Full export in CSV, Excel, and PDF formats — always available, no restrictions. You are never locked into our platform.", color: "var(--tx-38bdf8, #38bdf8)" },
+  { icon: "🗑️", title: "Clean deletion on exit", desc: "Cancel and a 90-day wind-down begins. After that, your data is permanently purged from our servers and we confirm it in writing.", color: "var(--tx-f87171, #f87171)" },
+  { icon: "🤝", title: "Transparent pricing", desc: "What you see on the pricing page is what you pay. No per-seat surprises, no feature paywalls activated after signup, no fine print charges.", color: "var(--tx-fbbf24, #fbbf24)" },
+  { icon: "🛡️", title: "Security without compromise", desc: "AES-256 encryption at rest, TLS in transit, isolated workspaces, and role-based access controls. Built on enterprise-grade infrastructure.", color: "var(--tx-a78bfa, #a78bfa)" },
+  { icon: "🔔", title: "14 days notice on changes", desc: "Any material change to Terms, Privacy Policy, or pricing comes with at least 14 days advance notice via email before taking effect.", color: "var(--tx-818cf8, #818cf8)" },
 ];
 
 const STATS = [
-  { value: "2025", label: "Year Founded", color: "#818cf8" },
-  { value: "6", label: "Industry Verticals", color: "#34d399" },
-  { value: "50+", label: "Core Modules", color: "#fbbf24" },
-  { value: "Weekly", label: "Release Cadence", color: "#38bdf8" },
+  { value: "2025", label: "Year Founded", color: "var(--tx-818cf8, #818cf8)" },
+  { value: "6", label: "Industry Verticals", color: "var(--tx-34d399, #34d399)" },
+  { value: "50+", label: "Core Modules", color: "var(--tx-fbbf24, #fbbf24)" },
+  { value: "Weekly", label: "Release Cadence", color: "var(--tx-38bdf8, #38bdf8)" },
 ];
 
 export default function AboutPage() {
@@ -113,8 +113,8 @@ export default function AboutPage() {
   return (
     <main className="about-page" style={{
       minHeight: "100vh",
-      background: "linear-gradient(160deg,#04061a 0%,#070a22 50%,#0a0620 100%)",
-      color: "white",
+      background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-070a22, #070a22) 50%,var(--dk-0a0620, #0a0620) 100%)",
+      color: "var(--ink-solid, white)",
       fontFamily: "'Outfit','Inter',sans-serif",
       overflowX: "hidden",
     }}>
@@ -129,8 +129,8 @@ export default function AboutPage() {
 
         .about-btn-primary{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:13px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-family:inherit;font-size:14px;font-weight:700;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 22px rgba(99,102,241,.4);transition:all .22s;}
         .about-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.55);}
-        .about-btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:13px;border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.62);background:rgba(255,255,255,.04);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .22s;}
-        .about-btn-ghost:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;transform:translateY(-1px);}
+        .about-btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:13px;border:1.5px solid rgba(var(--ink),.1);color:rgba(var(--ink),var(--ta-62, .62));background:rgba(var(--ink),.04);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .22s;}
+        .about-btn-ghost:hover{border-color:rgba(var(--ink),.22);background:rgba(var(--ink),.08);color:var(--ink-solid, #fff);transform:translateY(-1px);}
 
         .val-card{transition:transform .22s,box-shadow .22s,border-color .22s;}
         .val-card:hover{transform:translateY(-5px)!important;}
@@ -147,7 +147,7 @@ export default function AboutPage() {
           .ab-2col{grid-template-columns:1fr!important;}
           .ab-3col{grid-template-columns:repeat(2,1fr)!important;}
           .ab-stats{flex-direction:column!important;}
-          .ab-stat-item{border-right:none!important;border-bottom:1px solid rgba(255,255,255,.07)!important;}
+          .ab-stat-item{border-right:none!important;border-bottom:1px solid rgba(var(--ink),.07)!important;}
           .ab-stat-item:last-child{border-bottom:none!important;}
         }
         @media(max-width:640px){
@@ -196,11 +196,11 @@ export default function AboutPage() {
           {/* Breadcrumb */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 28,
             opacity: heroVis ? 1 : 0, transition: "opacity .5s ease" }}>
-            <Link href="/" style={{ fontSize: 12, color: "rgba(255,255,255,.3)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.65)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.3)")}>Home</Link>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>About</span>
+            <Link href="/" style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-65, .65))")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-30, .3))")}>Home</Link>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+            <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", fontWeight: 500 }}>About</span>
           </div>
 
           {/* Badges row */}
@@ -215,27 +215,27 @@ export default function AboutPage() {
               borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)",
             }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: "pulse 2s infinite", display: "inline-block" }} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>OUR STORY</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>OUR STORY</span>
             </div>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 13px",
               borderRadius: 100, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)",
             }}>
               <span style={{ fontSize: 12 }}>🇵🇰</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", letterSpacing: ".06em" }}>PSEB Registered IT Exporter</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)", letterSpacing: ".06em" }}>PSEB Registered IT Exporter</span>
             </div>
           </div>
 
           <h1 style={{
             fontFamily: "'Lora',serif",
             fontSize: "clamp(38px,5.5vw,68px)", fontWeight: 700, lineHeight: 1.08,
-            letterSpacing: "-2px", color: "#fff", marginBottom: 22,
+            letterSpacing: "-2px", color: "var(--ink-solid, #fff)", marginBottom: 22,
             opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(20px)",
             transition: "opacity .6s ease .1s, transform .6s ease .1s",
           }}>
             Built for businesses that{" "}
             <span style={{
-              background: "linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
+              background: "linear-gradient(135deg,var(--tx-818cf8, #818cf8),var(--tx-a78bfa, #a78bfa),var(--tx-60a5fa, #60a5fa))",
               backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               animation: "gradShift 4s ease infinite",
             }}>
@@ -244,7 +244,7 @@ export default function AboutPage() {
           </h1>
 
           <p style={{
-            fontSize: "clamp(15px,2vw,17px)", color: "rgba(255,255,255,.45)", lineHeight: 1.85,
+            fontSize: "clamp(15px,2vw,17px)", color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.85,
             maxWidth: 540, margin: "0 auto 40px",
             opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(20px)",
             transition: "opacity .6s ease .2s, transform .6s ease .2s",
@@ -281,14 +281,14 @@ export default function AboutPage() {
             pointerEvents: "none" }} />
           <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: 1,
             background: "linear-gradient(90deg,transparent,rgba(99,102,241,.5),transparent)" }} />
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".1em",
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", letterSpacing: ".1em",
             textTransform: "uppercase", marginBottom: 20, position: "relative" }}>
             OUR MISSION
           </div>
           <p style={{
             fontFamily: "'Lora',serif",
             fontSize: "clamp(20px,3vw,32px)", fontWeight: 600,
-            color: "rgba(255,255,255,.92)", lineHeight: 1.55,
+            color: "rgba(var(--ink),.92)", lineHeight: 1.55,
             maxWidth: 780, margin: "0 auto", position: "relative",
             fontStyle: "italic",
           }}>
@@ -303,20 +303,20 @@ export default function AboutPage() {
       <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
         <div className="ab-stats" style={{
           display: "flex", borderRadius: 20,
-          background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+          background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
           overflow: "hidden",
         }}>
           {STATS.map((s, i) => (
             <div key={s.label} className="ab-stat-item" style={{
               flex: 1, padding: "36px 28px", textAlign: "center",
-              borderRight: i < STATS.length - 1 ? "1px solid rgba(255,255,255,.07)" : "none",
+              borderRight: i < STATS.length - 1 ? "1px solid rgba(var(--ink),.07)" : "none",
             }}>
               <div style={{
                 fontFamily: "'Lora',serif",
                 fontSize: "clamp(28px,4vw,44px)", fontWeight: 700,
                 color: s.color, letterSpacing: "-1px", lineHeight: 1, marginBottom: 10,
               }}>{s.value}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", textTransform: "uppercase" }}>{s.label}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em", textTransform: "uppercase" }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -330,7 +330,7 @@ export default function AboutPage() {
 
           {/* Story text */}
           <div>
-            <div className="section-label" style={{ background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)", color: "#a5b4fc" }}>
+            <div className="section-label" style={{ background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)", color: "var(--tx-a5b4fc, #a5b4fc)" }}>
               <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#6366f1", animation: "blink 2s ease infinite" }} />
               HOW IT STARTED
             </div>
@@ -343,14 +343,14 @@ export default function AboutPage() {
                 "The expensive enterprise options existed, but they required months of setup, expensive consultants, and ongoing licensing fees that made no sense for a business with 20 employees. The affordable options simply didn't have the features.",
                 "FinovaOS started as an answer to that gap. A platform that could handle the full operational complexity of a trading or manufacturing business — without requiring a dedicated IT team to run it.",
               ].map((text, i) => (
-                <p key={i} style={{ fontSize: 14.5, color: "rgba(255,255,255,.48)", lineHeight: 1.85, margin: 0 }}>{text}</p>
+                <p key={i} style={{ fontSize: 14.5, color: "rgba(var(--ink),var(--ta-48, .48))", lineHeight: 1.85, margin: 0 }}>{text}</p>
               ))}
             </div>
           </div>
 
           {/* Timeline */}
           <div>
-            <div className="section-label" style={{ background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", color: "#34d399" }}>
+            <div className="section-label" style={{ background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", color: "var(--tx-34d399, #34d399)" }}>
               <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#34d399" }} />
               TIMELINE
             </div>
@@ -364,17 +364,17 @@ export default function AboutPage() {
                 <div key={t.year} style={{ display: "flex", gap: 24, marginBottom: i < TIMELINE.length - 1 ? 28 : 0 }}>
                   <div style={{ flexShrink: 0, width: 42, paddingTop: 6, display: "flex", justifyContent: "center" }}>
                     <div style={{ width: 14, height: 14, borderRadius: "50%", background: t.color,
-                      border: "3px solid #04061a", boxShadow: `0 0 12px ${t.color}80`, zIndex: 1 }} />
+                      border: "3px solid var(--dkb-04061a, #04061a)", boxShadow: `0 0 12px color-mix(in srgb, ${t.color} 50.2%, transparent)`, zIndex: 1 }} />
                   </div>
                   <div style={{
-                    flex: 1, background: "rgba(255,255,255,.03)",
-                    border: "1px solid rgba(255,255,255,.07)",
+                    flex: 1, background: "rgba(var(--ink),.03)",
+                    border: "1px solid rgba(var(--ink),.07)",
                     borderLeft: `3px solid ${t.color}`,
                     borderRadius: "0 14px 14px 0", padding: "16px 20px",
                   }}>
                     <div style={{ fontSize: 10, fontWeight: 800, color: t.color, letterSpacing: ".08em", marginBottom: 5 }}>{t.year}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 7 }}>{t.title}</div>
-                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.42)", lineHeight: 1.75 }}>{t.desc}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 7 }}>{t.title}</div>
+                    <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.75 }}>{t.desc}</div>
                   </div>
                 </div>
               ))}
@@ -388,14 +388,14 @@ export default function AboutPage() {
       ════════════════════════════════ */}
       <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div className="section-label" style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", color: "#fbbf24" }}>
+          <div className="section-label" style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", color: "var(--tx-fbbf24, #fbbf24)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#fbbf24" }} />
             THE PLATFORM
           </div>
           <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.2, marginBottom: 14 }}>
             One platform. Every tool your business needs.
           </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 520, margin: "0 auto" }}>
+          <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-38, .38))", maxWidth: 520, margin: "0 auto" }}>
             No switching between apps. No broken integrations. No re-entering data. Everything connected from day one.
           </p>
         </div>
@@ -403,11 +403,11 @@ export default function AboutPage() {
         <div className="ab-mod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 12 }}>
           {MODULES.map(m => (
             <div key={m.label} className="mod-tile" style={{
-              background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)",
+              background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)",
               borderRadius: 14, padding: "18px 10px", textAlign: "center", cursor: "default",
             }}>
               <div style={{ fontSize: 24, marginBottom: 8 }}>{m.icon}</div>
-              <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.42)", letterSpacing: ".04em" }}>{m.label}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(var(--ink),var(--ta-42, .42))", letterSpacing: ".04em" }}>{m.label}</div>
             </div>
           ))}
         </div>
@@ -418,14 +418,14 @@ export default function AboutPage() {
       ════════════════════════════════ */}
       <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div className="section-label" style={{ background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.22)", color: "#38bdf8" }}>
+          <div className="section-label" style={{ background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.22)", color: "var(--tx-38bdf8, #38bdf8)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#38bdf8" }} />
             WHO WE SERVE
           </div>
           <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.2, marginBottom: 14 }}>
             Built for your industry
           </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 500, margin: "0 auto" }}>
+          <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-38, .38))", maxWidth: 500, margin: "0 auto" }}>
             Not a generic tool adapted for your business — a platform designed around how each industry actually operates.
           </p>
         </div>
@@ -433,23 +433,23 @@ export default function AboutPage() {
           {INDUSTRIES.map(ind => (
             <div key={ind.title} className="ind-card" style={{
               padding: "28px 24px", borderRadius: 18,
-              background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+              background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
               position: "relative", overflow: "hidden",
             }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = `${ind.color}0d`;
-                (e.currentTarget as HTMLElement).style.borderColor = `${ind.color}35`;
+                (e.currentTarget as HTMLElement).style.background = `color-mix(in srgb, ${ind.color} 5.1%, transparent)`;
+                (e.currentTarget as HTMLElement).style.borderColor = `color-mix(in srgb, ${ind.color} 20.8%, transparent)`;
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.03)";
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,.07)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(var(--ink),.03)";
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(var(--ink),.07)";
               }}
             >
               <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%",
-                background: `radial-gradient(circle,${ind.color}18,transparent 70%)`, pointerEvents: "none" }} />
+                background: `radial-gradient(circle,color-mix(in srgb, ${ind.color} 9.4%, transparent),transparent 70%)`, pointerEvents: "none" }} />
               <div style={{ fontSize: 28, marginBottom: 14 }}>{ind.icon}</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{ind.title}</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.75 }}>{ind.desc}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 8 }}>{ind.title}</div>
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.75 }}>{ind.desc}</div>
             </div>
           ))}
         </div>
@@ -460,14 +460,14 @@ export default function AboutPage() {
       ════════════════════════════════ */}
       <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div className="section-label" style={{ background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.22)", color: "#c4b5fd" }}>
+          <div className="section-label" style={{ background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.22)", color: "var(--tx-c4b5fd, #c4b5fd)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#a78bfa" }} />
             WHAT MAKES US DIFFERENT
           </div>
           <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.2, marginBottom: 14 }}>
             Our principles
           </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 480, margin: "0 auto" }}>
+          <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-38, .38))", maxWidth: 480, margin: "0 auto" }}>
             The decisions we made — and refused to make — define what kind of software FinovaOS is.
           </p>
         </div>
@@ -475,24 +475,24 @@ export default function AboutPage() {
           {VALUES.map(v => (
             <div key={v.title} className="val-card" style={{
               padding: "28px 24px", borderRadius: 18,
-              background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+              background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
             }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = v.color + "40";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 14px 44px ${v.color}14`;
+                (e.currentTarget as HTMLDivElement).style.borderColor = `color-mix(in srgb, ${v.color} 25.1%, transparent)`;
+                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 14px 44px color-mix(in srgb, ${v.color} 7.8%, transparent)`;
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,.07)";
+                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(var(--ink),.07)";
                 (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
               }}
             >
-              <div style={{ width: 46, height: 46, borderRadius: 13, background: `${v.color}18`,
-                border: `1px solid ${v.color}30`, display: "flex", alignItems: "center",
+              <div style={{ width: 46, height: 46, borderRadius: 13, background: `color-mix(in srgb, ${v.color} 9.4%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${v.color} 18.8%, transparent)`, display: "flex", alignItems: "center",
                 justifyContent: "center", fontSize: 22, marginBottom: 16 }}>
                 {v.icon}
               </div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{v.title}</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.75 }}>{v.desc}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, #fff)", marginBottom: 8 }}>{v.title}</div>
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.75 }}>{v.desc}</div>
             </div>
           ))}
         </div>
@@ -503,14 +503,14 @@ export default function AboutPage() {
       ════════════════════════════════ */}
       <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div className="section-label" style={{ background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", color: "#34d399" }}>
+          <div className="section-label" style={{ background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", color: "var(--tx-34d399, #34d399)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#34d399" }} />
             OUR COMMITMENTS
           </div>
           <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.2, marginBottom: 14 }}>
             What we promise — in writing
           </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 480, margin: "0 auto" }}>
+          <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-38, .38))", maxWidth: 480, margin: "0 auto" }}>
             These aren't marketing claims. They're documented in our Terms of Service and Privacy Policy.
           </p>
         </div>
@@ -518,44 +518,44 @@ export default function AboutPage() {
           {COMMITMENTS.map(c => (
             <div key={c.title} className="commit-card" style={{
               padding: "24px 22px", borderRadius: 18,
-              background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+              background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
               display: "flex", flexDirection: "column", gap: 12,
             }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = `${c.color}08`;
-                (e.currentTarget as HTMLElement).style.borderColor = `${c.color}30`;
+                (e.currentTarget as HTMLElement).style.background = `color-mix(in srgb, ${c.color} 3.1%, transparent)`;
+                (e.currentTarget as HTMLElement).style.borderColor = `color-mix(in srgb, ${c.color} 18.8%, transparent)`;
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.03)";
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,.07)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(var(--ink),.03)";
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(var(--ink),.07)";
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 11, background: `${c.color}14`,
-                  border: `1px solid ${c.color}28`, display: "flex", alignItems: "center",
+                <div style={{ width: 40, height: 40, borderRadius: 11, background: `color-mix(in srgb, ${c.color} 7.8%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${c.color} 15.7%, transparent)`, display: "flex", alignItems: "center",
                   justifyContent: "center", fontSize: 19, flexShrink: 0 }}>
                   {c.icon}
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.3 }}>{c.title}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, #fff)", lineHeight: 1.3 }}>{c.title}</div>
               </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.75 }}>{c.desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.75 }}>{c.desc}</div>
             </div>
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: 28 }}>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/legal/terms" style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px",
-              borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)",
-              color: "rgba(255,255,255,.5)", textDecoration: "none", fontSize: 13, fontWeight: 600, transition: "all .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "white")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.5)")}>
+              borderRadius: 10, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)",
+              color: "rgba(var(--ink),var(--ta-50, .5))", textDecoration: "none", fontSize: 13, fontWeight: 600, transition: "all .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--ink-solid, white)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-50, .5))")}>
               Read Terms of Service →
             </Link>
             <Link href="/legal/privacy" style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px",
-              borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)",
-              color: "rgba(255,255,255,.5)", textDecoration: "none", fontSize: 13, fontWeight: 600, transition: "all .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "white")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.5)")}>
+              borderRadius: 10, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)",
+              color: "rgba(var(--ink),var(--ta-50, .5))", textDecoration: "none", fontSize: 13, fontWeight: 600, transition: "all .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--ink-solid, white)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-50, .5))")}>
               Read Privacy Policy →
             </Link>
           </div>
@@ -567,14 +567,14 @@ export default function AboutPage() {
       ════════════════════════════════ */}
       <FadeIn style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 90px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div className="section-label" style={{ background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.22)", color: "#fbbf24" }}>
+          <div className="section-label" style={{ background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.22)", color: "var(--tx-fbbf24, #fbbf24)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#f59e0b" }} />
             THE PEOPLE & COMPANY BEHIND THIS
           </div>
           <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.2, marginBottom: 14 }}>
             Who built FinovaOS
           </h2>
-          <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 500, margin: "0 auto" }}>
+          <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-38, .38))", maxWidth: 500, margin: "0 auto" }}>
             FinovaOS is the flagship product of Finova Forge — a software company founded in Pakistan with a global reach.
           </p>
         </div>
@@ -597,17 +597,17 @@ export default function AboutPage() {
               boxShadow: "0 8px 32px rgba(245,158,11,.3)",
               marginBottom: 20,
             }}>U</div>
-            <h3 style={{ fontSize: 22, fontWeight: 900, color: "white", margin: "0 0 6px", letterSpacing: "-.4px" }}>Umer Sajjad</h3>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 16 }}>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "var(--ink-solid, white)", margin: "0 0 6px", letterSpacing: "-.4px" }}>Umer Sajjad</h3>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 16 }}>
               Founder & CEO — Finova Forge
             </div>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,.45)", lineHeight: 1.85, margin: "0 0 24px" }}>
+            <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.85, margin: "0 0 24px" }}>
               Passionate about building software that fits how real businesses work — without the enterprise complexity, price tag, or six-month implementation timelines.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
               {["Pakistan 🇵🇰", "Est. 2025"].map(tag => (
                 <span key={tag} style={{
-                  fontSize: 11, fontWeight: 700, color: "rgba(245,158,11,.7)",
+                  fontSize: 11, fontWeight: 700, color: "rgba(var(--txr-f59e0b, 245,158,11),var(--ta-70, .7))",
                   background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.18)",
                   borderRadius: 100, padding: "4px 12px",
                 }}>{tag}</span>
@@ -621,7 +621,7 @@ export default function AboutPage() {
             {/* Finova Forge */}
             <div style={{
               flex: 1, borderRadius: 20, padding: "28px 28px",
-              background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
+              background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)",
               position: "relative", overflow: "hidden",
             }}>
               <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120,
@@ -633,17 +633,17 @@ export default function AboutPage() {
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 20, flexShrink: 0 }}>🔨</div>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>Finova Forge</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>Parent Company · Software Studio</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink-solid, white)" }}>Finova Forge</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>Parent Company · Software Studio</div>
                 </div>
               </div>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.8, margin: "0 0 16px" }}>
+              <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.8, margin: "0 0 16px" }}>
                 Finova Forge is the software company that designs, builds, and ships FinovaOS. Founded in 2025 in Pakistan — registered as a PSEB-certified IT exporter — with a mission to build purpose-built business software for underserved markets worldwide.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {["PSEB Registered", "IT Exporter", "Founded 2025","Pakistan"].map(t => (
-                  <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
-                    background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
+                  <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))",
+                    background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>
                 ))}
               </div>
@@ -664,16 +664,16 @@ export default function AboutPage() {
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 20, flexShrink: 0 }}>🖥️</div>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>FinovaOS</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>Flagship Product · Cloud ERP</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink-solid, white)" }}>FinovaOS</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>Flagship Product · Cloud ERP</div>
                 </div>
               </div>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.8, margin: "0 0 16px" }}>
+              <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.8, margin: "0 0 16px" }}>
                 FinovaOS is Finova Forge's flagship product — a complete cloud-based business management platform covering accounting, inventory, HR, invoicing, CRM, payroll, and more. Built specifically for operational businesses that need real depth, not surface-level tools.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {["Cloud ERP", "60+ Features", "6 Industries", "Weekly Releases"].map(t => (
-                  <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(99,102,241,.8)",
+                  <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--txr-6366f1, 99,102,241),var(--ta-80, .8))",
                     background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>
                 ))}
@@ -685,14 +685,14 @@ export default function AboutPage() {
         {/* Quote from founder */}
         <div style={{
           borderRadius: 20, padding: "32px 40px",
-          background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)",
+          background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)",
           textAlign: "center", position: "relative", overflow: "hidden",
         }}>
           <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: 1,
             background: "linear-gradient(90deg,transparent,rgba(245,158,11,.35),transparent)" }} />
-          <div style={{ fontSize: 28, color: "rgba(245,158,11,.3)", fontFamily: "Georgia,serif", lineHeight: 1, marginBottom: 12 }}>"</div>
+          <div style={{ fontSize: 28, color: "rgba(var(--txr-f59e0b, 245,158,11),var(--ta-30, .3))", fontFamily: "Georgia,serif", lineHeight: 1, marginBottom: 12 }}>"</div>
           <p style={{ fontFamily: "'Lora',serif", fontSize: "clamp(15px,2vw,19px)", fontWeight: 600,
-            color: "rgba(255,255,255,.75)", lineHeight: 1.7, maxWidth: 680, margin: "0 auto 20px", fontStyle: "italic" }}>
+            color: "rgba(var(--ink),.75)", lineHeight: 1.7, maxWidth: 680, margin: "0 auto 20px", fontStyle: "italic" }}>
             I built FinovaOS because I saw businesses running on spreadsheets that should have had proper software a decade ago. The goal was simple — make something powerful enough for serious operations, but simple enough to set up in a day.
           </p>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
@@ -701,8 +701,8 @@ export default function AboutPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 14, fontWeight: 900, color: "white" }}>U</div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>Umer Sajjad</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Founder & CEO, Finova Forge</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>Umer Sajjad</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>Founder & CEO, Finova Forge</div>
             </div>
           </div>
         </div>
@@ -726,7 +726,7 @@ export default function AboutPage() {
             <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(26px,4vw,40px)", fontWeight: 700, letterSpacing: "-1.4px", marginBottom: 14, lineHeight: 1.15 }}>
               Ready to run your business smarter?
             </h2>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,.42)", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 32px" }}>
+            <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 32px" }}>
               Start today — 50% off your first 3 months, 14-day money-back guarantee. No risk, no lock-in.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
@@ -738,7 +738,7 @@ export default function AboutPage() {
             </div>
             <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
               {["✓ 14-day money-back guarantee", "✓ 50% off first 3 months", "✓ Cancel anytime"].map(t => (
-                <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>{t}</span>
+                <span key={t} style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>{t}</span>
               ))}
             </div>
           </div>

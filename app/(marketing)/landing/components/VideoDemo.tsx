@@ -36,7 +36,7 @@ function useCountUp(target: number, active: boolean, duration = 1400) {
 }
 
 /* ── Cursor blink span ── */
-function Cursor({ color = "#818cf8" }: { color?: string }) {
+function Cursor({ color = "var(--tx-818cf8, #818cf8)" }: { color?: string }) {
   return <span style={{ display:"inline-block", width:2, height:"1em", background:color, marginLeft:1, verticalAlign:"middle", animation:"blink .7s ease infinite" }}/>;
 }
 
@@ -79,10 +79,10 @@ function InvoiceDemo({ step }: { step: number }) {
         </div>
         <div style={{ display:"flex", gap:8, alignItems:"center" }}>
           {step >= 11 && (
-            <Badge text="✓ SENT" color="#34d399" bg="rgba(52,211,153,.12)" border="rgba(52,211,153,.3)" />
+            <Badge text="✓ SENT" color="var(--tx-34d399, #34d399)" bg="rgba(52,211,153,.12)" border="rgba(52,211,153,.3)" />
           )}
           {step < 11 && (
-            <Badge text="DRAFT" color="#818cf8" bg="rgba(99,102,241,.12)" border="rgba(99,102,241,.25)" />
+            <Badge text="DRAFT" color="var(--tx-818cf8, #818cf8)" bg="rgba(99,102,241,.12)" border="rgba(99,102,241,.25)" />
           )}
         </div>
       </div>
@@ -94,7 +94,7 @@ function InvoiceDemo({ step }: { step: number }) {
           padding:"9px 12px", borderRadius:8,
           border:`1.5px solid ${step === 2 ? "rgba(129,140,248,.5)" : step >= 3 ? "rgba(52,211,153,.3)" : "rgba(var(--ink),.08)"}`,
           background:"rgba(var(--ink),.03)", fontSize:12, fontWeight:600,
-          color: step >= 3 ? "white" : "rgba(var(--ink),var(--ta-60, .6))",
+          color: step >= 3 ? "var(--ink-solid, white)" : "rgba(var(--ink),var(--ta-60, .6))",
           transition:"all .3s",
         }}>
           {step >= 3 ? "Al-Raza Traders" : step === 2 ? <>{customer}<Cursor /></> : <span style={{ color:"rgba(var(--ink),var(--ta-20, .2))" }}>Select customer…</span>}
@@ -102,7 +102,7 @@ function InvoiceDemo({ step }: { step: number }) {
         {step === 3 && (
           <div style={{ background:"rgba(var(--dkr-0a0d28, 10,13,40),0.98)", border:"1px solid rgba(99,102,241,.3)", borderRadius:8, marginTop:2, padding:"6px 0", animation:"slideIn .2s ease both" }}>
             {["Al-Raza Traders — Lahore","Al-Raza Electronics"].map((s,i) => (
-              <div key={i} style={{ padding:"7px 12px", fontSize:11, color: i===0?"#a5b4fc":"rgba(var(--ink),var(--ta-40, .4))", background: i===0?"rgba(99,102,241,.1)":"transparent", cursor:"pointer" }}>{s}</div>
+              <div key={i} style={{ padding:"7px 12px", fontSize:11, color: i===0?"var(--tx-a5b4fc, #a5b4fc)":"rgba(var(--ink),var(--ta-40, .4))", background: i===0?"rgba(99,102,241,.1)":"transparent", cursor:"pointer" }}>{s}</div>
             ))}
           </div>
         )}
@@ -224,9 +224,9 @@ function DashboardDemo({ step }: { step: number }) {
       {/* KPI cards */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
         {[
-          { l:"Total Revenue",   v:`Rs. ${(rev/100000).toFixed(1)}L`,  c:"#34d399", i:"📈" },
-          { l:"Total Expenses",  v:`Rs. ${(exp/100000).toFixed(1)}L`,  c:"#f97316", i:"📉" },
-          { l:"Cash Balance",    v:`Rs. ${(cash/100000).toFixed(1)}L`, c:"#818cf8", i:"🏦" },
+          { l:"Total Revenue",   v:`Rs. ${(rev/100000).toFixed(1)}L`,  c:"var(--tx-34d399, #34d399)", i:"📈" },
+          { l:"Total Expenses",  v:`Rs. ${(exp/100000).toFixed(1)}L`,  c:"var(--tx-f97316, #f97316)", i:"📉" },
+          { l:"Cash Balance",    v:`Rs. ${(cash/100000).toFixed(1)}L`, c:"var(--tx-818cf8, #818cf8)", i:"🏦" },
         ].map((kpi, i) => (
           <div key={kpi.l} style={{
             padding:"12px", borderRadius:10,
@@ -317,11 +317,11 @@ function PayrollDemo({ step }: { step: number }) {
   const total = useCountUp(3_60_000, step >= 8);
 
   const employees = [
-    { name:"Ahmed Raza",   role:"Branch Manager",    gross:"Rs. 90,000", eobi:"Rs. 900",  net:"Rs. 85,500", avatar:"A", c:"#818cf8" },
-    { name:"Sara Khan",    role:"Senior Accountant", gross:"Rs. 65,000", eobi:"Rs. 650",  net:"Rs. 62,350", avatar:"S", c:"#34d399" },
-    { name:"Hassan Ali",   role:"Sales Executive",   gross:"Rs. 72,000", eobi:"Rs. 720",  net:"Rs. 68,880", avatar:"H", c:"#fbbf24" },
-    { name:"Fatima Malik", role:"HR Executive",      gross:"Rs. 58,000", eobi:"Rs. 580",  net:"Rs. 55,420", avatar:"F", c:"#f87171" },
-    { name:"Bilal Ahmed",  role:"Warehouse Incharge",gross:"Rs. 48,000", eobi:"Rs. 480",  net:"Rs. 46,320", avatar:"B", c:"#a78bfa" },
+    { name:"Ahmed Raza",   role:"Branch Manager",    gross:"Rs. 90,000", eobi:"Rs. 900",  net:"Rs. 85,500", avatar:"A", c:"var(--tx-818cf8, #818cf8)" },
+    { name:"Sara Khan",    role:"Senior Accountant", gross:"Rs. 65,000", eobi:"Rs. 650",  net:"Rs. 62,350", avatar:"S", c:"var(--tx-34d399, #34d399)" },
+    { name:"Hassan Ali",   role:"Sales Executive",   gross:"Rs. 72,000", eobi:"Rs. 720",  net:"Rs. 68,880", avatar:"H", c:"var(--tx-fbbf24, #fbbf24)" },
+    { name:"Fatima Malik", role:"HR Executive",      gross:"Rs. 58,000", eobi:"Rs. 580",  net:"Rs. 55,420", avatar:"F", c:"var(--tx-f87171, #f87171)" },
+    { name:"Bilal Ahmed",  role:"Warehouse Incharge",gross:"Rs. 48,000", eobi:"Rs. 480",  net:"Rs. 46,320", avatar:"B", c:"var(--tx-a78bfa, #a78bfa)" },
   ];
 
   const processing = step === 7;
@@ -335,7 +335,7 @@ function PayrollDemo({ step }: { step: number }) {
           <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>June 2026 · 5 employees</div>
         </div>
         {step >= 13 && (
-          <Badge text="✓ All Disbursed" color="#34d399" bg="rgba(52,211,153,.12)" border="rgba(52,211,153,.3)" />
+          <Badge text="✓ All Disbursed" color="var(--tx-34d399, #34d399)" bg="rgba(52,211,153,.12)" border="rgba(52,211,153,.3)" />
         )}
       </div>
 
@@ -343,9 +343,9 @@ function PayrollDemo({ step }: { step: number }) {
       {step >= 2 && (
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6, animation:"slideIn .35s ease both" }}>
           {[
-            { l:"Gross Total", v:"Rs. 3,33,000", c:"#818cf8" },
-            { l:"Deductions",  v:"Rs. 3,330",    c:"#f87171" },
-            { l:"Net Payable", v:`Rs. ${(total/100).toFixed(0) !== "0" ? (total/1000).toFixed(1)+"K" : "—"}`, c:"#34d399" },
+            { l:"Gross Total", v:"Rs. 3,33,000", c:"var(--tx-818cf8, #818cf8)" },
+            { l:"Deductions",  v:"Rs. 3,330",    c:"var(--tx-f87171, #f87171)" },
+            { l:"Net Payable", v:`Rs. ${(total/100).toFixed(0) !== "0" ? (total/1000).toFixed(1)+"K" : "—"}`, c:"var(--tx-34d399, #34d399)" },
           ].map(s => (
             <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", textAlign:"center" }}>
               <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:4 }}>{s.l}</div>
@@ -369,7 +369,7 @@ function PayrollDemo({ step }: { step: number }) {
             transform: shown ? "translateX(0)" : "translateX(-10px)",
             transition:`all .4s ease`,
           }}>
-            <div style={{ width:28, height:28, borderRadius:"50%", background:`linear-gradient(135deg,${emp.c},${emp.c}88)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"white", flexShrink:0 }}>
+            <div style={{ width:28, height:28, borderRadius:"50%", background:`linear-gradient(135deg,${emp.c},color-mix(in srgb, ${emp.c} 53.3%, transparent))`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"white", flexShrink:0 }}>
               {emp.avatar}
             </div>
             <div style={{ flex:1, minWidth:0 }}>
@@ -418,11 +418,11 @@ function PayrollDemo({ step }: { step: number }) {
 ══════════════════════════════ */
 function InventoryDemo({ step }: { step: number }) {
   const items = [
-    { name:"Paracetamol 500mg Tab",   cat:"Tablet",  stock:1240, max:2000, alert:false, exp:"Dec 2026", batch:"B-2024-109", c:"#34d399" },
-    { name:"Amoxicillin 250mg Cap",   cat:"Capsule", stock:48,   max:500,  alert:true,  exp:"Mar 2026", batch:"B-2024-088", c:"#f87171" },
-    { name:"Vitamin C 1000mg Tab",    cat:"Tablet",  stock:560,  max:800,  alert:false, exp:"Aug 2027", batch:"B-2025-022", c:"#34d399" },
-    { name:"Cetirizine 10mg Tab",     cat:"Tablet",  stock:22,   max:300,  alert:true,  exp:"Jan 2026", batch:"B-2024-071", c:"#f87171" },
-    { name:"Metformin 500mg Tab",     cat:"Tablet",  stock:390,  max:500,  alert:false, exp:"Jun 2027", batch:"B-2025-015", c:"#818cf8" },
+    { name:"Paracetamol 500mg Tab",   cat:"Tablet",  stock:1240, max:2000, alert:false, exp:"Dec 2026", batch:"B-2024-109", c:"var(--tx-34d399, #34d399)" },
+    { name:"Amoxicillin 250mg Cap",   cat:"Capsule", stock:48,   max:500,  alert:true,  exp:"Mar 2026", batch:"B-2024-088", c:"var(--tx-f87171, #f87171)" },
+    { name:"Vitamin C 1000mg Tab",    cat:"Tablet",  stock:560,  max:800,  alert:false, exp:"Aug 2027", batch:"B-2025-022", c:"var(--tx-34d399, #34d399)" },
+    { name:"Cetirizine 10mg Tab",     cat:"Tablet",  stock:22,   max:300,  alert:true,  exp:"Jan 2026", batch:"B-2024-071", c:"var(--tx-f87171, #f87171)" },
+    { name:"Metformin 500mg Tab",     cat:"Tablet",  stock:390,  max:500,  alert:false, exp:"Jun 2027", batch:"B-2025-015", c:"var(--tx-818cf8, #818cf8)" },
   ];
 
   return (
@@ -433,15 +433,15 @@ function InventoryDemo({ step }: { step: number }) {
           <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Pharmacy Stock · Real-time</div>
         </div>
         <div style={{ display:"flex", gap:6 }}>
-          {step >= 4 && <Badge text="2 Low Stock" color="#f87171" bg="rgba(248,113,113,.1)" border="rgba(248,113,113,.25)" />}
-          {step >= 5 && <Badge text="1 Expiring" color="#fbbf24" bg="rgba(251,191,36,.1)" border="rgba(251,191,36,.25)" />}
+          {step >= 4 && <Badge text="2 Low Stock" color="var(--tx-f87171, #f87171)" bg="rgba(248,113,113,.1)" border="rgba(248,113,113,.25)" />}
+          {step >= 5 && <Badge text="1 Expiring" color="var(--tx-fbbf24, #fbbf24)" bg="rgba(251,191,36,.1)" border="rgba(251,191,36,.25)" />}
         </div>
       </div>
 
       {/* Summary */}
       {step >= 2 && (
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6, animation:"slideIn .35s ease both" }}>
-          {[{ l:"Total SKUs", v:"128", c:"#818cf8" },{ l:"In Stock", v:"126", c:"#34d399" },{ l:"Low Stock", v:"2", c:"#f87171" },{ l:"Expiring", v:"1", c:"#fbbf24" }].map(s => (
+          {[{ l:"Total SKUs", v:"128", c:"var(--tx-818cf8, #818cf8)" },{ l:"In Stock", v:"126", c:"var(--tx-34d399, #34d399)" },{ l:"Low Stock", v:"2", c:"var(--tx-f87171, #f87171)" },{ l:"Expiring", v:"1", c:"var(--tx-fbbf24, #fbbf24)" }].map(s => (
             <div key={s.l} style={{ padding:"7px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", textAlign:"center" }}>
               <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:3 }}>{s.l}</div>
               <div style={{ fontSize:15, fontWeight:800, color:s.c }}>{s.v}</div>
@@ -560,9 +560,9 @@ function AIDemo({ step }: { step: number }) {
       {step >= 2 && (
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6, animation:"slideIn .35s ease both" }}>
           {[
-            { l:"Transactions Analysed", v:txCount.toLocaleString(), c:"#a78bfa", i:"🔍" },
-            { l:"Anomalies Found",       v:step >= 3 ? String(anomalyN) : "—", c:"#f87171", i:"⚠️" },
-            { l:"AI Accuracy",           v:"98.7%", c:"#34d399", i:"✓" },
+            { l:"Transactions Analysed", v:txCount.toLocaleString(), c:"var(--tx-a78bfa, #a78bfa)", i:"🔍" },
+            { l:"Anomalies Found",       v:step >= 3 ? String(anomalyN) : "—", c:"var(--tx-f87171, #f87171)", i:"⚠️" },
+            { l:"AI Accuracy",           v:"98.7%", c:"var(--tx-34d399, #34d399)", i:"✓" },
           ].map(s => (
             <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", textAlign:"center" }}>
               <div style={{ fontSize:14, marginBottom:4 }}>{s.i}</div>
@@ -580,7 +580,7 @@ function AIDemo({ step }: { step: number }) {
             <span style={{ animation:"blink 1.5s ease infinite" }}>⚠️</span> Anomaly Detected
           </div>
           <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.6 }}>
-            {step === 4 ? <>{anomalyText}<Cursor color="#f87171"/></> : "Unusual expense: Rs. 45,000 to 'Unknown Vendor' on 22 June — flagged for review."}
+            {step === 4 ? <>{anomalyText}<Cursor color="var(--tx-f87171, #f87171)"/></> : "Unusual expense: Rs. 45,000 to 'Unknown Vendor' on 22 June — flagged for review."}
           </div>
           {step >= 5 && (
             <div style={{ display:"flex", gap:8, marginTop:8 }}>
@@ -643,7 +643,7 @@ function AIDemo({ step }: { step: number }) {
           </div>
           <p style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-62, .62))", margin:0, lineHeight:1.75 }}>
             {summaryText}
-            {summaryText.length < 225 && <Cursor color="#a78bfa"/>}
+            {summaryText.length < 225 && <Cursor color="var(--tx-a78bfa, #a78bfa)"/>}
           </p>
         </div>
       )}
@@ -917,7 +917,7 @@ export default function VideoDemo() {
               {/* Browser bar */}
               <div style={{ background:"rgba(var(--dkr-0e122c, 14,18,44),0.98)", padding:"10px 16px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ display:"flex", gap:5 }}>
-                  {["#f87171","#fbbf24","#34d399"].map((c,i) => (
+                  {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i) => (
                     <div key={i} style={{ width:10, height:10, borderRadius:"50%", background:c, opacity:.7 }}/>
                   ))}
                 </div>
@@ -963,7 +963,7 @@ export default function VideoDemo() {
                       <span style={{ fontSize:12, fontWeight:700, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{tab.label}</span>
                     </div>
                     {playing && (
-                      <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", borderRadius:20, background:`${tab.color}15`, border:`1px solid ${tab.color}30` }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", borderRadius:20, background:`color-mix(in srgb, ${tab.color} 8.2%, transparent)`, border:`1px solid color-mix(in srgb, ${tab.color} 18.8%, transparent)` }}>
                         {!done ? (
                           <svg width="9" height="9" viewBox="0 0 24 24" style={{ animation:"spin .8s linear infinite" }}>
                             <circle cx="12" cy="12" r="9" stroke={tab.color} strokeWidth="3" fill="none" strokeDasharray="40" strokeDashoffset="10"/>
@@ -1000,7 +1000,7 @@ export default function VideoDemo() {
               {/* Progress bar */}
               <div style={{ height:3, background:"rgba(var(--ink),.04)" }}>
                 <div style={{
-                  height:"100%", background:`linear-gradient(90deg,${tab.color},${tab.color}88)`,
+                  height:"100%", background:`linear-gradient(90deg,${tab.color},color-mix(in srgb, ${tab.color} 53.3%, transparent))`,
                   width: playing ? `${(step / maxSteps) * 100}%` : "0%",
                   transition:"width .8s ease", borderRadius:2,
                 }}/>

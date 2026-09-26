@@ -70,8 +70,8 @@ export default function WaitlistPage() {
     <main
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(180deg,#060919 0%,#0a0f29 45%,#060919 100%)",
-        color: "white",
+        background: "linear-gradient(180deg,var(--dk-060919, #060919) 0%,var(--dk-0a0f29, #0a0f29) 45%,var(--dk-060919, #060919) 100%)",
+        color: "var(--ink-solid, white)",
         fontFamily: "'Outfit','DM Sans',sans-serif",
         position: "relative",
         overflow: "hidden",
@@ -131,7 +131,7 @@ export default function WaitlistPage() {
                 borderRadius: 999,
                 background: "rgba(99,102,241,.1)",
                 border: "1px solid rgba(99,102,241,.22)",
-                color: "#a5b4fc",
+                color: "var(--tx-a5b4fc, #a5b4fc)",
                 fontSize: 11,
                 fontWeight: 800,
                 letterSpacing: ".08em",
@@ -152,12 +152,12 @@ export default function WaitlistPage() {
               }}
             >
               Modern Cloud ERP
-              <span style={{ display: "block", color: "#a5b4fc" }}>
+              <span style={{ display: "block", color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                 Built for Growing Businesses
               </span>
             </h1>
 
-            <p style={{ maxWidth: 620, fontSize: 17, lineHeight: 1.85, color: "rgba(255,255,255,.56)", margin: "0 0 28px" }}>
+            <p style={{ maxWidth: 620, fontSize: 17, lineHeight: 1.85, color: "rgba(var(--ink),var(--ta-56, .56))", margin: "0 0 28px" }}>
               Join the early access list and be among the first to experience AI-powered business management for accounting,
               inventory, invoicing, payroll, operations, and reporting in one polished platform.
             </p>
@@ -169,12 +169,12 @@ export default function WaitlistPage() {
                   style={{
                     padding: "11px 14px",
                     borderRadius: 14,
-                    background: "rgba(255,255,255,.035)",
-                    border: "1px solid rgba(255,255,255,.08)",
+                    background: "rgba(var(--ink),.035)",
+                    border: "1px solid rgba(var(--ink),.08)",
                     minWidth: 124,
                   }}
                 >
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", textTransform: "uppercase", letterSpacing: ".08em", fontWeight: 700 }}>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-36, .36))", textTransform: "uppercase", letterSpacing: ".08em", fontWeight: 700 }}>
                     {item.label}
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 800, marginTop: 4 }}>{item.value}</div>
@@ -186,18 +186,18 @@ export default function WaitlistPage() {
               style={{
                 borderRadius: 22,
                 padding: 24,
-                background: "rgba(255,255,255,.03)",
-                border: "1px solid rgba(255,255,255,.08)",
+                background: "rgba(var(--ink),.03)",
+                border: "1px solid rgba(var(--ink),.08)",
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#c4b5fd", marginBottom: 14, letterSpacing: ".06em", textTransform: "uppercase" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-c4b5fd, #c4b5fd)", marginBottom: 14, letterSpacing: ".06em", textTransform: "uppercase" }}>
                 Why Join
               </div>
               <div style={{ display: "grid", gap: 10 }}>
                 {BENEFITS.map((benefit) => (
                   <div key={benefit} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <span style={{ color: "#34d399", fontWeight: 900 }}>✓</span>
-                    <span style={{ color: "rgba(255,255,255,.72)", lineHeight: 1.7, fontSize: 14 }}>{benefit}</span>
+                    <span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 900 }}>✓</span>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.7, fontSize: 14 }}>{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -208,14 +208,14 @@ export default function WaitlistPage() {
             style={{
               borderRadius: 24,
               padding: 28,
-              background: "linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.03))",
-              border: "1px solid rgba(255,255,255,.1)",
+              background: "linear-gradient(180deg,rgba(var(--ink),.05),rgba(var(--ink),.03))",
+              border: "1px solid rgba(var(--ink),.1)",
               boxShadow: "0 24px 60px rgba(0,0,0,.28)",
             }}
           >
             <div style={{ marginBottom: 18 }}>
               <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-.03em" }}>Join the Waitlist</div>
-              <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,.48)", fontSize: 14, lineHeight: 1.7 }}>
+              <p style={{ margin: "8px 0 0", color: "rgba(var(--ink),var(--ta-48, .48))", fontSize: 14, lineHeight: 1.7 }}>
                 Name, email, and company are enough to get started. We&apos;ll use this to invite you into early access and onboarding.
               </p>
             </div>
@@ -230,9 +230,9 @@ export default function WaitlistPage() {
                   width: "100%",
                   padding: "14px 16px",
                   borderRadius: 14,
-                  background: "rgba(255,255,255,.05)",
-                  border: "1px solid rgba(255,255,255,.12)",
-                  color: "white",
+                  background: "rgba(var(--ink),.05)",
+                  border: "1px solid rgba(var(--ink),.12)",
+                  color: "var(--ink-solid, white)",
                   fontSize: 14,
                 }}
               />
@@ -246,9 +246,9 @@ export default function WaitlistPage() {
                   width: "100%",
                   padding: "14px 16px",
                   borderRadius: 14,
-                  background: "rgba(255,255,255,.05)",
-                  border: "1px solid rgba(255,255,255,.12)",
-                  color: "white",
+                  background: "rgba(var(--ink),.05)",
+                  border: "1px solid rgba(var(--ink),.12)",
+                  color: "var(--ink-solid, white)",
                   fontSize: 14,
                 }}
               />
@@ -261,20 +261,20 @@ export default function WaitlistPage() {
                   width: "100%",
                   padding: "14px 16px",
                   borderRadius: 14,
-                  background: "rgba(255,255,255,.05)",
-                  border: "1px solid rgba(255,255,255,.12)",
-                  color: "white",
+                  background: "rgba(var(--ink),.05)",
+                  border: "1px solid rgba(var(--ink),.12)",
+                  color: "var(--ink-solid, white)",
                   fontSize: 14,
                 }}
               />
 
               {error && (
-                <div style={{ padding: "12px 14px", borderRadius: 14, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.22)", color: "#fca5a5", fontSize: 13, fontWeight: 700 }}>
+                <div style={{ padding: "12px 14px", borderRadius: 14, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.22)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 13, fontWeight: 700 }}>
                   {error}
                 </div>
               )}
               {success && (
-                <div style={{ padding: "12px 14px", borderRadius: 14, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.22)", color: "#86efac", fontSize: 13, fontWeight: 700 }}>
+                <div style={{ padding: "12px 14px", borderRadius: 14, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.22)", color: "var(--tx-86efac, #86efac)", fontSize: 13, fontWeight: 700 }}>
                   {success}
                 </div>
               )}
@@ -288,7 +288,7 @@ export default function WaitlistPage() {
                   padding: "15px 18px",
                   borderRadius: 14,
                   border: "none",
-                  background: loading ? "rgba(255,255,255,.1)" : "linear-gradient(135deg,#818cf8,#6366f1)",
+                  background: loading ? "rgba(var(--ink),.1)" : "linear-gradient(135deg,#818cf8,#6366f1)",
                   color: "white",
                   fontSize: 15,
                   fontWeight: 800,
@@ -301,13 +301,13 @@ export default function WaitlistPage() {
               </button>
             </form>
 
-            <div style={{ marginTop: 16, fontSize: 12.5, color: "rgba(255,255,255,.34)", lineHeight: 1.7 }}>
+            <div style={{ marginTop: 16, fontSize: 12.5, color: "rgba(var(--ink),var(--ta-34, .34))", lineHeight: 1.7 }}>
               By joining, you agree to our{" "}
-              <Link href="/legal/privacy" style={{ color: "#a5b4fc", textDecoration: "none" }}>
+              <Link href="/legal/privacy" style={{ color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none" }}>
                 Privacy Policy
               </Link>{" "}
               and{" "}
-              <Link href="/legal/terms" style={{ color: "#a5b4fc", textDecoration: "none" }}>
+              <Link href="/legal/terms" style={{ color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none" }}>
                 Terms of Service
               </Link>.
             </div>

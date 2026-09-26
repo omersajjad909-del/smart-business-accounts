@@ -145,7 +145,7 @@ function renderText(text: string): React.ReactNode[] {
       const inner = num[2].replace(/\*\*(.*?)\*\*/g, "|||$1|||");
       return (
         <span key={i} style={{ display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start" }}>
-          <span style={{ minWidth: 20, height: 20, borderRadius: "50%", background: "rgba(99,102,241,.4)", color: "#c7d2fe", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>{num[1]}</span>
+          <span style={{ minWidth: 20, height: 20, borderRadius: "50%", background: "rgba(99,102,241,.4)", color: "var(--tx-c7d2fe, #c7d2fe)", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>{num[1]}</span>
           <span style={{ color: "rgba(var(--ink),.88)", fontSize: 13.5, lineHeight: 1.75 }}>
             {inner.split("|||").map((p, j) => j % 2 === 1
               ? <strong key={j} style={{ color: "var(--ink-solid, white)" }}>{p}</strong> : p)}
@@ -434,12 +434,12 @@ export default function ChatWidget() {
                 <div style={{ fontSize: 14, fontWeight: 800, color: "white", letterSpacing: "-.2px" }}>FinovaOS Support</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: agentReplied ? "#34d399" : escalated ? "#f59e0b" : "#6366f1", animation: "shimmer 2s ease infinite" }} />
-                  <span style={{ fontSize: 11, color: agentReplied ? "#34d399" : escalated ? "#fbbf24" : "#818cf8", fontWeight: 600 }}>
+                  <span style={{ fontSize: 11, color: agentReplied ? "var(--tx-34d399, #34d399)" : escalated ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>
                     {agentReplied ? "Agent • Online" : escalated ? "Connecting to agent…" : "AI Assistant • Online"}
                   </span>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} aria-label="Close chat" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 9, cursor: "pointer", color: "rgba(255,255,255,.6)", padding: "6px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <button onClick={() => setOpen(false)} aria-label="Close chat" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 9, cursor: "pointer", color: "rgba(var(--ink),var(--ta-60, .6))", padding: "6px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>

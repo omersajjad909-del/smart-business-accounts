@@ -194,9 +194,49 @@ function backgroundIsNeutral(text) {
     if (/var\(--(ink|dkr-)/.test(c)) return true; // already repainted by an earlier pass
     const n = (c.match(/[\d.]+/g) || []).map(Number);
     if (n.length < 3) return false;
-    return (n[0] === 255 && n[1] === 255 && n[2] === 255) || Math.max(n[0], n[1], n[2]) <= 64 || (n[3] !== undefined && n[3] <= 0.12);
+    // A tint of .3 or less is a pale wash over the page in light mode, so text
+    // on it needs the same repaint as text on the page itself.
+    return (n[0] === 255 && n[1] === 255 && n[2] === 255) || Math.max(n[0], n[1], n[2]) <= 64 || (n[3] !== undefined && n[3] <= 0.3);
   });
   return hexes.every((h) => isDarkSurface(h.slice(1))) && rgbDark;
+}
+
+// The literal background of a style object: null when none, undefined when dynamic.
+function siblingBackground(obj) {
+  let bg = null;
+  for (const p of obj.properties) {
+    if (ts.isPropertyAssignment(p) && BG_PROPS.has(propName(p.name))) {
+      const t = literalText(p.initializer);
+      if (t === undefined) return "dynamic"; // not neutral: leave it alone
+      bg = t;
+    }
+  }
+  return bg;
+}
+function clipsToText(obj) {
+  return obj.properties.some((p) => ts.isPropertyAssignment(p) &&
+    /^(WebkitBackgroundClip|backgroundClip)$/.test(propName(p.name) || "") &&
+    literalText(p.initializer) === "text");
+}
+
+// CSS text in <style> blocks: per rule, repaint white and pale text (hover
+// states included) unless the same rule sets a coloured background, and lift
+// faint text alphas — the same decisions as for style objects.
+function rewriteCssRules(css) {
+  return css.replace(/\{([^{}]*)\}/g, (whole, body) => {
+    const bgs = [...body.matchAll(/background(?:-color|-image)?\s*:\s*([^;]*)/g)].map((m) => m[1].replace(/\s*!important\s*$/, ""));
+    if (!bgs.every(backgroundIsNeutral)) return whole;
+    const next = body.replace(/(^|[;\s{])color\s*:\s*([^;]*)/g, (d, lead, val) => {
+      const imp = /!important/.test(val) ? " !important" : "";
+      const v = val.replace(/\s*!important\s*$/, "").trim();
+      const lv = v.toLowerCase();
+      let out;
+      if (lv === "#fff" || lv === "#ffffff" || lv === "white") out = `var(--ink-solid, ${v})`;
+      else out = boostInkAlpha(rewriteTextColour(rewriteInk(v)));
+      return `${lead}color:${out}${imp}`;
+    });
+    return `{${next}}`;
+  });
 }
 
 function transformFile(file) {
@@ -226,7 +266,16 @@ function transformFile(file) {
     let next = rawText;
 
     if (key && INK_PROPS.has(key)) {
-      next = rewriteInk(next);
+      // Semi-transparent white text on a coloured button or badge stays white:
+      // the button is coloured in both themes.
+      const onColour = (key === "color" || key === "WebkitTextFillColor") && prop.parent &&
+        ts.isObjectLiteralExpression(prop.parent) && !backgroundIsNeutral(siblingBackground(prop.parent));
+      if (!onColour) next = rewriteInk(next);
+      // Gradient text (background-clip: text): its colours are text colours,
+      // so they get the same darker-on-white variables as plain text.
+      if (BG_PROPS.has(key) && prop.parent && ts.isObjectLiteralExpression(prop.parent) && clipsToText(prop.parent)) {
+        next = rewriteTextColour(next);
+      }
       if (BG_PROPS.has(key)) next = rewriteDarkRgba(rewriteDarkHex(next, "bg"));
       else if (BORDER_PROPS.has(key)) next = rewriteDarkHex(next, "border");
 
@@ -284,6 +333,7 @@ function transformFile(file) {
         next = rewriteInk(next);
         next = next.replace(/(background(?:-color|-image)?\s*:[^;}{]*)/g, (d) => rewriteDarkHex(d, "bg"));
         next = next.replace(/((?:border|outline)(?:-[a-z]+)*\s*:[^;}{]*)/g, (d) => rewriteDarkHex(d, "border"));
+        next = rewriteCssRules(next);
       }
     }
     return next;

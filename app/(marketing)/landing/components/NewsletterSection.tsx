@@ -167,7 +167,7 @@ export default function NewsletterSection() {
                 }}>
                   <div style={{
                     width:28, height:28, borderRadius:8, flexShrink:0,
-                    background:`${color}18`, border:`1px solid ${color}30`,
+                    background:`color-mix(in srgb, ${color} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 18.8%, transparent)`,
                     display:"flex", alignItems:"center", justifyContent:"center",
                   }}>
                     {icon}
@@ -373,35 +373,6 @@ export default function NewsletterSection() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Social proof under card */}
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginTop:16, justifyContent:"center" }}>
-              <div style={{ display:"flex" }}>
-                {["#6366f1","#8b5cf6","#06b6d4","#10b981"].map((c, i) => (
-                  <div key={i} style={{
-                    width:24, height:24, borderRadius:"50%",
-                    background:`linear-gradient(135deg,${c},${c}88)`,
-                    border:"2px solid var(--dkb-060818, #060818)",
-                    marginLeft: i === 0 ? 0 : -7,
-                    display:"flex", alignItems:"center", justifyContent:"center",
-                    fontSize:9, fontWeight:800, color:"white",
-                    position:"relative", zIndex:4-i,
-                  }}>
-                    {["T","A","R","F"][i]}
-                  </div>
-                ))}
-              </div>
-              <div style={{ display:"flex", gap:2 }}>
-                {[...Array(5)].map((_,i) => (
-                  <svg key={i} width="11" height="11" viewBox="0 0 24 24" fill="#fbbf24">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                ))}
-              </div>
-              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))" }}>
-                Trusted by growing businesses worldwide
-              </span>
             </div>
           </div>
 

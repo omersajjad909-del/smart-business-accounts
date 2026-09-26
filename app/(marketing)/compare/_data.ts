@@ -104,7 +104,7 @@ export const ROWS: FeatureRow[] = [
 ];
 
 export const COMPETITORS = [
-  { key: "finova",     label: "FinovaOS",    color: "#818cf8", logo: "F", highlight: true },
+  { key: "finova",     label: "FinovaOS",    color: "var(--tx-818cf8, #818cf8)", logo: "F", highlight: true },
   { key: "xero",       label: "Xero",        color: "#4b5563", logo: "X" },
   { key: "zoho",       label: "Zoho Books",  color: "#4b5563", logo: "Z" },
   { key: "wave",       label: "Wave",        color: "#4b5563", logo: "W" },

@@ -15,9 +15,9 @@ const SUBJECTS = [
 ];
 
 const PRIORITIES = [
-  { label: "Low", desc: "General questions", color: "#34d399" },
-  { label: "Medium", desc: "Affecting workflow", color: "#fbbf24" },
-  { label: "High", desc: "Business critical", color: "#f87171" },
+  { label: "Low", desc: "General questions", color: "var(--tx-34d399, #34d399)" },
+  { label: "Medium", desc: "Affecting workflow", color: "var(--tx-fbbf24, #fbbf24)" },
+  { label: "High", desc: "Business critical", color: "var(--tx-f87171, #f87171)" },
 ];
 
 export default function SupportTicketPage() {
@@ -65,8 +65,8 @@ export default function SupportTicketPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(160deg,#06071a 0%,#0c0f2e 40%,#0f0c2e 70%,#080c1e 100%)",
-        color: "white",
+        background: "linear-gradient(160deg,var(--dk-06071a, #06071a) 0%,var(--dk-0c0f2e, #0c0f2e) 40%,var(--dk-0f0c2e, #0f0c2e) 70%,var(--dk-080c1e, #080c1e) 100%)",
+        color: "var(--ink-solid, white)",
         fontFamily: "'Outfit','DM Sans',sans-serif",
         position: "relative",
         overflow: "hidden",
@@ -81,11 +81,11 @@ export default function SupportTicketPage() {
         @keyframes orb2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-30px,20px) scale(1.08)} }
         .st-fade-1 { opacity:0; animation:fadeUp .65s ease forwards .1s; }
         .st-fade-2 { opacity:0; animation:fadeUp .65s ease forwards .25s; }
-        .st-input { width:100%; padding:11px 15px; background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); border-radius:11px; font-size:14px; font-family:inherit; color:rgba(255,255,255,.85); transition:all .2s; outline:none; }
-        .st-input::placeholder { color:rgba(255,255,255,.22); }
+        .st-input { width:100%; padding:11px 15px; background:rgba(var(--ink),.05); border:1.5px solid rgba(var(--ink),.1); border-radius:11px; font-size:14px; font-family:inherit; color:rgba(var(--ink),.85); transition:all .2s; outline:none; }
+        .st-input::placeholder { color:rgba(var(--ink),var(--ta-22, .22)); }
         .st-input:focus { border-color:rgba(99,102,241,.6); background:rgba(99,102,241,.06); box-shadow:0 0 0 3px rgba(99,102,241,.12); }
-        select.st-input option { background:#0c0f2e; color:white; }
-        .st-label { display:block; font-size:11px; font-weight:700; color:rgba(255,255,255,.38); letter-spacing:.07em; text-transform:uppercase; margin-bottom:7px; }
+        select.st-input option { background:var(--dk-0c0f2e, #0c0f2e); color:var(--ink-solid, white); }
+        .st-label { display:block; font-size:11px; font-weight:700; color:rgba(var(--ink),var(--ta-38, .38)); letter-spacing:.07em; text-transform:uppercase; margin-bottom:7px; }
       `}</style>
 
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
@@ -106,44 +106,44 @@ export default function SupportTicketPage() {
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "56px 24px 100px", position: "relative", zIndex: 1 }}>
         <div className="st-fade-1" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 22 }}>
-          <Link href="/support" style={{ color: "rgba(255,255,255,.65)", textDecoration: "none", fontWeight: 600, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <Link href="/support" style={{ color: "rgba(var(--ink),var(--ta-65, .65))", textDecoration: "none", fontWeight: 600, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 18, lineHeight: 1 }}>←</span> Back to Support
           </Link>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.32)", fontWeight: 600 }}>Support Ticket</div>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-32, .32))", fontWeight: 600 }}>Support Ticket</div>
         </div>
 
         <div className="st-fade-2" style={{ textAlign: "center", marginBottom: 38 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "7px 14px 7px 10px", borderRadius: 24, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", marginBottom: 18 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981" }} />
-            <span style={{ fontSize: 11, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".08em", textTransform: "uppercase" }}>Submit a ticket</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em", textTransform: "uppercase" }}>Submit a ticket</span>
           </div>
           <h1 style={{ fontFamily: "'Lora', serif", fontSize: "clamp(32px, 4vw, 46px)", fontWeight: 700, letterSpacing: "-1px", marginBottom: 10 }}>
             Tell us what&apos;s going on
           </h1>
-          <p style={{ fontSize: 14.5, color: "rgba(255,255,255,.42)", maxWidth: 620, margin: "0 auto", lineHeight: 1.8 }}>
+          <p style={{ fontSize: 14.5, color: "rgba(var(--ink),var(--ta-42, .42))", maxWidth: 620, margin: "0 auto", lineHeight: 1.8 }}>
             We usually respond within 24 hours (often much faster). Include details so we can help you in one reply.
           </p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 360px", gap: 22, alignItems: "start" }}>
-          <div style={{ borderRadius: 18, background: "rgba(255,255,255,.04)", border: "1.5px solid rgba(255,255,255,.08)", backdropFilter: "blur(18px)", boxShadow: "0 10px 42px rgba(0,0,0,.28)", overflow: "hidden" }}>
+          <div style={{ borderRadius: 18, background: "rgba(var(--ink),.04)", border: "1.5px solid rgba(var(--ink),.08)", backdropFilter: "blur(18px)", boxShadow: "0 10px 42px rgba(0,0,0,.28)", overflow: "hidden" }}>
             <div style={{ padding: "18px 18px 0" }}>
               {status === "success" && (
                 <div style={{ padding: "14px 14px", borderRadius: 14, background: "rgba(16,185,129,.1)", border: "1px solid rgba(16,185,129,.22)", marginBottom: 14 }}>
-                  <div style={{ fontWeight: 800, color: "#34d399", fontSize: 13, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
+                  <div style={{ fontWeight: 800, color: "var(--tx-34d399, #34d399)", fontSize: 13, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
                     Ticket submitted
                   </div>
-                  <div style={{ fontSize: 13.5, color: "rgba(255,255,255,.7)", lineHeight: 1.6 }}>
-                    Ticket ID: <span style={{ fontWeight: 800, color: "white" }}>{ticketId}</span>
+                  <div style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-70, .7))", lineHeight: 1.6 }}>
+                    Ticket ID: <span style={{ fontWeight: 800, color: "var(--ink-solid, white)" }}>{ticketId}</span>
                   </div>
                 </div>
               )}
               {status === "error" && (
                 <div style={{ padding: "14px 14px", borderRadius: 14, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.22)", marginBottom: 14 }}>
-                  <div style={{ fontWeight: 800, color: "#f87171", fontSize: 13, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
+                  <div style={{ fontWeight: 800, color: "var(--tx-f87171, #f87171)", fontSize: 13, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
                     Submission failed
                   </div>
-                  <div style={{ fontSize: 13.5, color: "rgba(255,255,255,.65)", lineHeight: 1.6 }}>{errorMsg}</div>
+                  <div style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-65, .65))", lineHeight: 1.6 }}>{errorMsg}</div>
                 </div>
               )}
             </div>
@@ -172,8 +172,8 @@ export default function SupportTicketPage() {
                         style={{
                           padding: "10px 10px",
                           borderRadius: 12,
-                          border: `1.5px solid ${priority === p.label ? p.color + "66" : "rgba(255,255,255,.1)"}`,
-                          background: priority === p.label ? p.color + "16" : "rgba(255,255,255,.04)",
+                          border: `1.5px solid ${priority === p.label ? `color-mix(in srgb, ${p.color} 40%, transparent)` : "rgba(var(--ink),.1)"}`,
+                          background: priority === p.label ? `color-mix(in srgb, ${p.color} 8.6%, transparent)` : "rgba(var(--ink),.04)",
                           cursor: "pointer",
                           fontFamily: "inherit",
                           transition: "all .2s",
@@ -182,9 +182,9 @@ export default function SupportTicketPage() {
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                           <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.color }} />
-                          <span style={{ fontSize: 12.5, fontWeight: 800, color: priority === p.label ? "white" : "rgba(255,255,255,.7)" }}>{p.label}</span>
+                          <span style={{ fontSize: 12.5, fontWeight: 800, color: priority === p.label ? "var(--ink-solid, white)" : "rgba(var(--ink),var(--ta-70, .7))" }}>{p.label}</span>
                         </div>
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.3 }}>{p.desc}</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", lineHeight: 1.3 }}>{p.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -217,20 +217,20 @@ export default function SupportTicketPage() {
                       gap: 8,
                       padding: "10px 14px",
                       borderRadius: 12,
-                      border: "1.5px solid rgba(255,255,255,.12)",
-                      background: "rgba(255,255,255,.04)",
-                      color: "rgba(255,255,255,.7)",
+                      border: "1.5px solid rgba(var(--ink),.12)",
+                      background: "rgba(var(--ink),.04)",
+                      color: "rgba(var(--ink),var(--ta-70, .7))",
                       fontWeight: 700,
                       fontSize: 13,
                     }}
                   >
                     📎 Attach file
                   </span>
-                  {attachmentName ? <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)" }}>{attachmentName}</span> : null}
+                  {attachmentName ? <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{attachmentName}</span> : null}
                 </label>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  {/* <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Sends to /api/support/ticket</span> */}
+                  {/* <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>Sends to /api/support/ticket</span> */}
                 </div>
               </div>
 
@@ -266,32 +266,32 @@ export default function SupportTicketPage() {
             </form>
           </div>
 
-          <div style={{ borderRadius: 18, background: "rgba(255,255,255,.035)", border: "1.5px solid rgba(255,255,255,.08)", backdropFilter: "blur(18px)", boxShadow: "0 10px 42px rgba(0,0,0,.22)" }}>
+          <div style={{ borderRadius: 18, background: "rgba(var(--ink),.035)", border: "1.5px solid rgba(var(--ink),.08)", backdropFilter: "blur(18px)", boxShadow: "0 10px 42px rgba(0,0,0,.22)" }}>
             <div style={{ padding: "18px 18px 14px" }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 10 }}>
                 Quick options
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 12 }}>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(129,140,248,.14)", border: "1px solid rgba(129,140,248,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>✉️</div>
                   <div>
-                    <div style={{ fontSize: 13.5, fontWeight: 800, color: "white", marginBottom: 2 }}>Email support</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>support@finovaos.app</div>
+                    <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--ink-solid, white)", marginBottom: 2 }}>Email support</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>support@finovaos.app</div>
                   </div>
                 </a>
 
-                <Link href="/support" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 12 }}>
+                <Link href="/support" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(52,211,153,.14)", border: "1px solid rgba(52,211,153,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>📚</div>
                   <div>
-                    <div style={{ fontSize: 13.5, fontWeight: 800, color: "white", marginBottom: 2 }}>Support center</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>FAQs, guides, contact options</div>
+                    <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--ink-solid, white)", marginBottom: 2 }}>Support center</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>FAQs, guides, contact options</div>
                   </div>
                 </Link>
               </div>
 
-              <div style={{ height: 1, background: "rgba(255,255,255,.07)", margin: "16px 0" }} />
+              <div style={{ height: 1, background: "rgba(var(--ink),.07)", margin: "16px 0" }} />
 
-              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
+              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.7 }}>
                 Include your company name, the page URL, and screenshots if possible. This helps us resolve issues faster.
               </div>
             </div>

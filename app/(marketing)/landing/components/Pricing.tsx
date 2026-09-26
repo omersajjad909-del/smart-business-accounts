@@ -133,7 +133,7 @@ const DEFAULT_PLAN_HIGHLIGHTS = {
 
 function Check({ color }: { color: string }) {
   return (
-    <div style={{ width:18, height:18, borderRadius:6, background:`${color}18`, border:`1px solid ${color}30`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+    <div style={{ width:18, height:18, borderRadius:6, background:`color-mix(in srgb, ${color} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 18.8%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
       <svg width="9" height="9" viewBox="0 0 12 10" fill="none">
         <path d="M1 5.5L4.5 9 11 1" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
@@ -201,11 +201,11 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
         background: plan.featured
           ? `linear-gradient(160deg, rgba(99,102,241,.14), rgba(79,70,229,.08))`
           : hov ? "rgba(var(--ink),.06)" : "rgba(var(--ink),.03)",
-        border: `1.5px solid ${plan.featured ? plan.color + "60" : hov ? plan.color + "40" : "rgba(var(--ink),.08)"}`,
+        border: `1.5px solid ${plan.featured ? `color-mix(in srgb, ${plan.color} 37.6%, transparent)` : hov ? `color-mix(in srgb, ${plan.color} 25.1%, transparent)` : "rgba(var(--ink),.08)"}`,
         display: "flex", flexDirection: "column",
         position: "relative", overflow: "hidden",
         boxShadow: plan.featured
-          ? `0 24px 64px ${plan.glow}, 0 0 0 1px ${plan.color}25`
+          ? `0 24px 64px ${plan.glow}, 0 0 0 1px color-mix(in srgb, ${plan.color} 14.5%, transparent)`
           : hov ? `0 16px 40px ${plan.glow}` : "none",
         opacity: vis ? 1 : 0,
         transform: vis ? (plan.featured ? "scale(1.03)" : "scale(1)") : "translateY(24px)",
@@ -226,7 +226,7 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
       )}
 
       {/* Plan name */}
-      <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"4px 12px", borderRadius:20, marginBottom:14, alignSelf:"flex-start", background:`${plan.color}12`, border:`1px solid ${plan.color}25`, fontSize:11, fontWeight:700, color:plan.color }}>
+      <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"4px 12px", borderRadius:20, marginBottom:14, alignSelf:"flex-start", background:`color-mix(in srgb, ${plan.color} 7.1%, transparent)`, border:`1px solid color-mix(in srgb, ${plan.color} 14.5%, transparent)`, fontSize:11, fontWeight:700, color:plan.color }}>
         {plan.name}
       </div>
 
@@ -253,7 +253,7 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
                   SAVE 20% · BILLED YEARLY
                 </span>
               ) : (
-                <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
+                <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"var(--tx-fb923c, #fb923c)" }}>
                   50% OFF × 3 months
                 </span>
               )}
@@ -290,7 +290,7 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
           ? `linear-gradient(135deg,${plan.color},#6366f1)`
           : "rgba(var(--ink),.08)",
         color: plan.featured ? "white" : "var(--ink-solid, white)", fontWeight:700, fontSize:14, textDecoration:"none",
-        border: plan.featured ? "none" : `1.5px solid ${plan.color}35`,
+        border: plan.featured ? "none" : `1.5px solid color-mix(in srgb, ${plan.color} 20.8%, transparent)`,
         boxShadow: plan.featured ? `0 6px 20px ${plan.glow}` : "none",
         transition:"all .25s",
       }}
@@ -444,7 +444,7 @@ export default function PricingSection() {
                 }}>
                   {b === "monthly" ? "Monthly" : "Yearly"}
                   {b === "yearly" && (
-                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "#fde68a" : "rgba(var(--txr-fbbf24, 251,191,36),.5)", background: billing==="yearly" ? "rgba(0,0,0,.18)" : "rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
+                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "var(--tx-fde68a, #fde68a)" : "rgba(var(--txr-fbbf24, 251,191,36),var(--ta-50, .5))", background: billing==="yearly" ? "rgba(0,0,0,.18)" : "rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
                       −20%
                     </span>
                   )}

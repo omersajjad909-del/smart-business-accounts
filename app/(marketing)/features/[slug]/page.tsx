@@ -23,7 +23,7 @@ const MODULES: Record<string, {
   accounting: {
     slug: "accounting",
     icon: "📊",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.15)",
     title: "Accounting & Ledger",
     tagline: "Full double-entry accounting. No shortcuts.",
@@ -46,7 +46,7 @@ const MODULES: Record<string, {
   invoicing: {
     slug: "invoicing",
     icon: "🧾",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.15)",
     title: "Invoicing",
     tagline: "Get paid faster. Track every rupee owed.",
@@ -69,7 +69,7 @@ const MODULES: Record<string, {
   inventory: {
     slug: "inventory",
     icon: "📦",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.15)",
     title: "Inventory Management",
     tagline: "Know exactly what you have. Everywhere. Always.",
@@ -92,7 +92,7 @@ const MODULES: Record<string, {
   "bank-reconciliation": {
     slug: "bank-reconciliation",
     icon: "🏦",
-    color: "#60a5fa",
+    color: "var(--tx-60a5fa, #60a5fa)",
     glow: "rgba(96,165,250,.15)",
     title: "Bank Reconciliation",
     tagline: "Close your books in hours, not days.",
@@ -115,7 +115,7 @@ const MODULES: Record<string, {
   "hr-payroll": {
     slug: "hr-payroll",
     icon: "👥",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.15)",
     title: "HR & Payroll",
     tagline: "Pay your team right. Every time.",
@@ -138,7 +138,7 @@ const MODULES: Record<string, {
   crm: {
     slug: "crm",
     icon: "🤝",
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
     glow: "rgba(249,115,22,.15)",
     title: "CRM",
     tagline: "Never lose a lead. Never miss a follow-up.",
@@ -161,7 +161,7 @@ const MODULES: Record<string, {
   "multi-branch": {
     slug: "multi-branch",
     icon: "🏢",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     glow: "rgba(6,182,212,.15)",
     title: "Multi-Branch & Multi-Company",
     tagline: "One login. All your businesses.",
@@ -184,7 +184,7 @@ const MODULES: Record<string, {
   "role-access": {
     slug: "role-access",
     icon: "🔐",
-    color: "#ec4899",
+    color: "var(--tx-ec4899, #ec4899)",
     glow: "rgba(236,72,153,.15)",
     title: "Role-Based Access Control",
     tagline: "The right access for the right person.",
@@ -207,7 +207,7 @@ const MODULES: Record<string, {
   reports: {
     slug: "reports",
     icon: "📈",
-    color: "#10b981",
+    color: "var(--tx-10b981, #10b981)",
     glow: "rgba(16,185,129,.15)",
     title: "Reports & Analytics",
     tagline: "Every number. One screen. Zero waiting.",
@@ -230,7 +230,7 @@ const MODULES: Record<string, {
   pos: {
     slug: "pos",
     icon: "🛒",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     glow: "rgba(245,158,11,.15)",
     title: "Point of Sale (POS)",
     tagline: "Fast checkout. Automatic books.",
@@ -253,7 +253,7 @@ const MODULES: Record<string, {
   "purchase-grn": {
     slug: "purchase-grn",
     icon: "📋",
-    color: "#8b5cf6",
+    color: "var(--tx-8b5cf6, #8b5cf6)",
     glow: "rgba(139,92,246,.15)",
     title: "Purchase & GRN",
     tagline: "Control your procurement end-to-end.",
@@ -276,7 +276,7 @@ const MODULES: Record<string, {
   "multi-currency": {
     slug: "multi-currency",
     icon: "🌍",
-    color: "#14b8a6",
+    color: "var(--tx-14b8a6, #14b8a6)",
     glow: "rgba(20,184,166,.15)",
     title: "Multi-Currency",
     tagline: "Do business in any currency. Anywhere.",
@@ -344,8 +344,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
 
   return (
     <div style={{
-      background: "linear-gradient(160deg,#05071a 0%,#080c22 50%,#070a1e 100%)",
-      minHeight: "100vh", fontFamily: "'Outfit', sans-serif", color: "white",
+      background: "linear-gradient(160deg,var(--dk-05071a, #05071a) 0%,var(--dk-080c22, #080c22) 50%,var(--dk-070a1e, #070a1e) 100%)",
+      minHeight: "100vh", fontFamily: "'Outfit', sans-serif", color: "var(--ink-solid, white)",
     }}>
       <style>{`
         
@@ -353,16 +353,16 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
         .cap-card { transition: all .25s; }
-        .cap-card:hover { background: rgba(255,255,255,.07) !important; border-color: ${m.color}50 !important; transform: translateY(-3px); }
+        .cap-card:hover { background: rgba(var(--ink),.07) !important; border-color: color-mix(in srgb, ${m.color} 31.4%, transparent) !important; transform: translateY(-3px); }
         .rel-card { transition: all .2s; }
-        .rel-card:hover { background: rgba(255,255,255,.07) !important; border-color: rgba(255,255,255,.2) !important; }
+        .rel-card:hover { background: rgba(var(--ink),.07) !important; border-color: rgba(var(--ink),.2) !important; }
       `}</style>
 
       {/* ── Hero ── */}
       <section style={{
         padding: "100px 24px 80px",
         position: "relative", overflow: "hidden",
-        borderBottom: "1px solid rgba(255,255,255,.06)",
+        borderBottom: "1px solid rgba(var(--ink),.06)",
       }}>
         {/* BG glow */}
         <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
@@ -372,16 +372,16 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
 
         <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", position: "relative", animation: "fadeUp .6s ease both" }}>
           {/* Breadcrumb */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:28, fontSize:13, color:"rgba(255,255,255,.35)" }}>
-            <Link href="/features" style={{ color:"rgba(255,255,255,.35)", textDecoration:"none" }}>Features</Link>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginBottom:28, fontSize:13, color:"rgba(var(--ink),var(--ta-35, .35))" }}>
+            <Link href="/features" style={{ color:"rgba(var(--ink),var(--ta-35, .35))", textDecoration:"none" }}>Features</Link>
             <span>›</span>
-            <span style={{ color:"rgba(255,255,255,.6)" }}>{m.title}</span>
+            <span style={{ color:"rgba(var(--ink),var(--ta-60, .6))" }}>{m.title}</span>
           </div>
 
           {/* Icon */}
           <div style={{
             width: 72, height: 72, borderRadius: 20, margin: "0 auto 24px",
-            background: `${m.color}18`, border: `1.5px solid ${m.color}35`,
+            background: `color-mix(in srgb, ${m.color} 9.4%, transparent)`, border: `1.5px solid color-mix(in srgb, ${m.color} 20.8%, transparent)`,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 32,
             boxShadow: `0 8px 32px ${m.glow}`,
@@ -393,7 +393,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 7,
             padding: "5px 14px", borderRadius: 100, marginBottom: 20,
-            background: `${m.color}15`, border: `1.5px solid ${m.color}30`,
+            background: `color-mix(in srgb, ${m.color} 8.2%, transparent)`, border: `1.5px solid color-mix(in srgb, ${m.color} 18.8%, transparent)`,
           }}>
             <span style={{ width:6, height:6, borderRadius:"50%", background:m.color, display:"inline-block", animation:"blink 2s ease infinite" }} />
             <span style={{ fontSize:11, fontWeight:700, color:m.color, letterSpacing:".08em" }}>FINOVA MODULE</span>
@@ -409,7 +409,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
             fontSize: 20, color: m.color, fontWeight: 600, marginBottom: 20, letterSpacing: "-.2px",
           }}>{m.tagline}</p>
 
-          <p style={{ fontSize: 16.5, color: "rgba(255,255,255,.48)", lineHeight: 1.8, marginBottom: 40, maxWidth: 620, margin: "0 auto 40px" }}>
+          <p style={{ fontSize: 16.5, color: "rgba(var(--ink),var(--ta-48, .48))", lineHeight: 1.8, marginBottom: 40, maxWidth: 620, margin: "0 auto 40px" }}>
             {m.description}
           </p>
 
@@ -417,8 +417,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
           <div style={{ display: "flex", justifyContent: "center", gap: 40, flexWrap: "wrap", marginBottom: 44 }}>
             {m.stats.map((s) => (
               <div key={s.label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 24, fontWeight: 800, color: "white", letterSpacing: "-.5px" }}>{s.val}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3, fontWeight: 500 }}>{s.label}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.5px" }}>{s.val}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 3, fontWeight: 500 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -437,9 +437,9 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
             <Link href="/demo" style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "12px 22px", borderRadius: 12, fontSize: 14, fontWeight: 600,
-              border: "1.5px solid rgba(255,255,255,.12)",
-              background: "rgba(255,255,255,.04)",
-              color: "rgba(255,255,255,.7)", textDecoration: "none",
+              border: "1.5px solid rgba(var(--ink),.12)",
+              background: "rgba(var(--ink),.04)",
+              color: "rgba(var(--ink),var(--ta-70, .7))", textDecoration: "none",
             }}>
               Watch Demo
             </Link>
@@ -448,7 +448,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
       </section>
 
       {/* ── Capabilities ── */}
-      <section style={{ padding: "80px 24px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <section style={{ padding: "80px 24px", borderBottom: "1px solid rgba(var(--ink),.06)" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <h2 style={{
             fontFamily: "'Lora', serif",
@@ -458,7 +458,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
           }}>
             What&apos;s included
           </h2>
-          <p style={{ textAlign:"center", fontSize:15, color:"rgba(255,255,255,.4)", marginBottom:48 }}>
+          <p style={{ textAlign:"center", fontSize:15, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:48 }}>
             Everything you need — nothing you don&apos;t.
           </p>
 
@@ -466,12 +466,12 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
             {m.capabilities.map((c, i) => (
               <div key={i} className="cap-card" style={{
                 borderRadius: 14, padding: "20px 18px",
-                background: "rgba(255,255,255,.04)",
-                border: "1px solid rgba(255,255,255,.07)",
+                background: "rgba(var(--ink),.04)",
+                border: "1px solid rgba(var(--ink),.07)",
               }}>
                 <div style={{ fontSize: 22, marginBottom: 10 }}>{c.icon}</div>
-                <h3 style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.9)", marginBottom: 6 }}>{c.title}</h3>
-                <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.38)", lineHeight: 1.7 }}>{c.desc}</p>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),.9)", marginBottom: 6 }}>{c.title}</h3>
+                <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.7 }}>{c.desc}</p>
               </div>
             ))}
           </div>
@@ -479,13 +479,13 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
       </section>
 
       {/* ── Who it's for ── */}
-      <section style={{ padding: "72px 24px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <section style={{ padding: "72px 24px", borderBottom: "1px solid rgba(var(--ink),.06)" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
           <div>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 7,
               padding: "5px 14px", borderRadius: 100, marginBottom: 18,
-              background: `${m.color}15`, border: `1px solid ${m.color}30`,
+              background: `color-mix(in srgb, ${m.color} 8.2%, transparent)`, border: `1px solid color-mix(in srgb, ${m.color} 18.8%, transparent)`,
               fontSize: 11, fontWeight: 700, color: m.color, letterSpacing: ".08em",
             }}>
               WHO IT&apos;S FOR
@@ -497,7 +497,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
             }}>
               Built for businesses like yours
             </h2>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,.42)", lineHeight: 1.8 }}>
+            <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.8 }}>
               Whether you&apos;re running a single outlet or a multi-branch operation, {m.title} adapts to your workflow.
             </p>
           </div>
@@ -506,10 +506,10 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
               <div key={w} style={{
                 display: "flex", alignItems: "center", gap: 12,
                 padding: "14px 18px", borderRadius: 12,
-                background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)",
+                background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)",
               }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,.75)" }}>{w}</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: "rgba(var(--ink),.75)" }}>{w}</span>
               </div>
             ))}
           </div>
@@ -526,15 +526,15 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
           }}>
             Works great with
           </h2>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,.38)", marginBottom: 28 }}>These modules connect seamlessly with {m.title}.</p>
+          <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-38, .38))", marginBottom: 28 }}>These modules connect seamlessly with {m.title}.</p>
 
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
             {m.related.map((r) => (
               <Link key={r} href={`/features/${r}`} className="rel-card" style={{
                 display: "inline-flex", alignItems: "center", gap: 10,
                 padding: "14px 20px", borderRadius: 14,
-                background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
-                textDecoration: "none", color: "rgba(255,255,255,.75)", fontWeight: 600, fontSize: 14,
+                background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)",
+                textDecoration: "none", color: "rgba(var(--ink),.75)", fontWeight: 600, fontSize: 14,
               }}>
                 <span>{MODULES[r]?.icon}</span>
                 <span>{RELATED_LABELS[r]}</span>
@@ -558,14 +558,14 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
                 display: "inline-flex", alignItems: "center", gap: 7,
                 padding: "4px 12px", borderRadius: 100, marginBottom: 12,
                 background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.25)",
-                fontSize: 11, fontWeight: 700, color: "#fbbf24",
+                fontSize: 11, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)",
               }}>
                 🏷️ 50% OFF — FIRST 3 MONTHS
               </div>
               <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(18px,2.5vw,24px)", fontWeight:700, marginBottom:6, letterSpacing:"-.4px" }}>
                 Ready to try {m.title}?
               </h3>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.4)" }}>All modules included in every plan. No add-on fees.</p>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))" }}>All modules included in every plan. No add-on fees.</p>
             </div>
             <div style={{ display:"flex", gap:12, position:"relative", flexWrap:"wrap" }}>
               <Link href="/pricing" style={{
@@ -580,9 +580,9 @@ export default async function FeaturePage({ params }: { params: Promise<{ slug: 
               <Link href="/features" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 22px", borderRadius:12, fontSize:14, fontWeight:600,
-                border:"1.5px solid rgba(255,255,255,.12)",
-                background:"rgba(255,255,255,.04)",
-                color:"rgba(255,255,255,.7)", textDecoration:"none",
+                border:"1.5px solid rgba(var(--ink),.12)",
+                background:"rgba(var(--ink),.04)",
+                color:"rgba(var(--ink),var(--ta-70, .7))", textDecoration:"none",
               }}>
                 All Features
               </Link>

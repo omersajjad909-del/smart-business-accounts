@@ -255,8 +255,8 @@ function ModuleCard({
       onClick={() => setActive(isOpen ? null : cat.label)}
       style={{
         borderRadius: 16, padding: "20px 22px",
-        background: isOpen ? `${cat.color}0d` : "rgba(var(--ink),.03)",
-        border: `1.5px solid ${isOpen ? cat.color + "40" : "rgba(var(--ink),.07)"}`,
+        background: isOpen ? `color-mix(in srgb, ${cat.color} 5.1%, transparent)` : "rgba(var(--ink),.03)",
+        border: `1.5px solid ${isOpen ? `color-mix(in srgb, ${cat.color} 25.1%, transparent)` : "rgba(var(--ink),.07)"}`,
         cursor: "pointer", transition: "all .25s",
         opacity: hVis ? 1 : 0,
         transform: hVis ? "translateY(0)" : "translateY(20px)",
@@ -266,7 +266,7 @@ function ModuleCard({
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: isOpen ? 16 : 0 }}>
         <div style={{
           width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-          background: `${cat.color}18`, border: `1px solid ${cat.color}30`,
+          background: `color-mix(in srgb, ${cat.color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${cat.color} 18.8%, transparent)`,
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
         }}>
           {cat.icon}

@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 const TYPE_CONFIG: Record<string,{label:string;icon:string;color:string;bg:string}> = {
-  feature:      { label:"New Feature",  icon:"✨", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
-  improvement:  { label:"Improvement",  icon:"⚡", color:"#38bdf8", bg:"rgba(56,189,248,.12)"  },
-  bugfix:       { label:"Bug Fix",      icon:"🐛", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
-  announcement: { label:"Announcement", icon:"📣", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
-  maintenance:  { label:"Maintenance",  icon:"🔧", color:"#f87171", bg:"rgba(248,113,113,.12)" },
+  feature:      { label:"New Feature",  icon:"✨", color:"var(--tx-818cf8, #818cf8)", bg:"rgba(129,140,248,.12)" },
+  improvement:  { label:"Improvement",  icon:"⚡", color:"var(--tx-38bdf8, #38bdf8)", bg:"rgba(56,189,248,.12)"  },
+  bugfix:       { label:"Bug Fix",      icon:"🐛", color:"var(--tx-34d399, #34d399)", bg:"rgba(52,211,153,.12)"  },
+  announcement: { label:"Announcement", icon:"📣", color:"var(--tx-fbbf24, #fbbf24)", bg:"rgba(251,191,36,.12)"  },
+  maintenance:  { label:"Maintenance",  icon:"🔧", color:"var(--tx-f87171, #f87171)", bg:"rgba(248,113,113,.12)" },
 };
 
 // Fallback data if API has nothing yet
@@ -69,7 +69,7 @@ export default function ChangelogPage() {
   }, {});
 
   return (
-    <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)", color:"white", fontFamily:"'DM Sans','Outfit',system-ui,sans-serif", overflowX:"hidden" }}>
+    <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)", color:"var(--ink-solid, white)", fontFamily:"'DM Sans','Outfit',system-ui,sans-serif", overflowX:"hidden" }}>
 
       {/* Hero */}
       <Section style={{ padding:"120px 24px 60px", textAlign:"center", position:"relative", overflow:"hidden" }}>
@@ -77,12 +77,12 @@ export default function ChangelogPage() {
         <div style={{ maxWidth:600, margin:"0 auto", position:"relative", zIndex:1 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", marginBottom:22, opacity:heroVis?1:0, transition:"all .5s ease" }}>
             <div style={{ width:6, height:6, borderRadius:"50%", background:"#34d399", animation:"blink 2s ease infinite" }}/>
-            <span style={{ fontSize:12, fontWeight:800, color:"#34d399", letterSpacing:".06em" }}>ALWAYS IMPROVING</span>
+            <span style={{ fontSize:12, fontWeight:800, color:"var(--tx-34d399, #34d399)", letterSpacing:".06em" }}>ALWAYS IMPROVING</span>
           </div>
           <h1 style={{ fontSize:"clamp(34px,5vw,54px)", fontWeight:900, letterSpacing:"-.03em", lineHeight:1.1, fontFamily:"Lora,serif", margin:"0 0 18px", opacity:heroVis?1:0, transition:"all .6s ease .1s" }}>
             Product Changelog
           </h1>
-          <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:440, margin:"0 auto", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
+          <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.75, maxWidth:440, margin:"0 auto", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
             Every improvement, fix, and new feature — documented publicly. We ship every week.
           </p>
         </div>
@@ -92,14 +92,14 @@ export default function ChangelogPage() {
       <Section>
         <div style={{ maxWidth:780, margin:"0 auto", padding:"0 24px 24px", display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center" }}>
           <button onClick={()=>setFilter("all")}
-            style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"none", background:filter==="all"?"rgba(255,255,255,.1)":"rgba(255,255,255,.04)", color:filter==="all"?"white":"rgba(255,255,255,.4)" }}>
+            style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"none", background:filter==="all"?"rgba(var(--ink),.1)":"rgba(var(--ink),.04)", color:filter==="all"? "var(--ink-solid, white)" :"rgba(var(--ink),var(--ta-40, .4))" }}>
             All
           </button>
           {Object.entries(TYPE_CONFIG).map(([k,v])=>(
             <button key={k} onClick={()=>setFilter(k)}
               style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"none",
-                background:filter===k?v.bg:"rgba(255,255,255,.04)",
-                color:filter===k?v.color:"rgba(255,255,255,.4)" }}>
+                background:filter===k?v.bg:"rgba(var(--ink),.04)",
+                color:filter===k?v.color:"rgba(var(--ink),var(--ta-40, .4))" }}>
               {v.icon} {v.label}
             </button>
           ))}
@@ -110,15 +110,15 @@ export default function ChangelogPage() {
       <Section>
         <div style={{ maxWidth:780, margin:"0 auto", padding:"0 24px 100px" }}>
           {loading ? (
-            <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.2)" }}>Loading...</div>
+            <div style={{ padding:48, textAlign:"center", color:"rgba(var(--ink),var(--ta-20, .2))" }}>Loading...</div>
           ) : Object.entries(grouped).length === 0 ? (
-            <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.2)" }}>No entries found.</div>
+            <div style={{ padding:48, textAlign:"center", color:"rgba(var(--ink),var(--ta-20, .2))" }}>No entries found.</div>
           ) : Object.entries(grouped).map(([month, entries])=>(
             <div key={month} style={{ marginBottom:48 }}>
               {/* Month header */}
               <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:20 }}>
-                <span style={{ fontSize:14, fontWeight:800, color:"rgba(255,255,255,.6)", letterSpacing:".04em" }}>{month}</span>
-                <div style={{ flex:1, height:1, background:"rgba(255,255,255,.07)" }}/>
+                <span style={{ fontSize:14, fontWeight:800, color:"rgba(var(--ink),var(--ta-60, .6))", letterSpacing:".04em" }}>{month}</span>
+                <div style={{ flex:1, height:1, background:"rgba(var(--ink),.07)" }}/>
               </div>
 
               {/* Entries */}
@@ -131,22 +131,22 @@ export default function ChangelogPage() {
                   return (
                     <div key={u.id} style={{ position:"relative", marginBottom:24 }}>
                       {/* Dot */}
-                      <div style={{ position:"absolute", left:-28+7-5, top:6, width:12, height:12, borderRadius:"50%", background:tc.color, border:"3px solid #080c1e", boxShadow:`0 0 8px ${tc.color}66` }}/>
+                      <div style={{ position:"absolute", left:-28+7-5, top:6, width:12, height:12, borderRadius:"50%", background:tc.color, border:"3px solid var(--dkb-080c1e, #080c1e)", boxShadow:`0 0 8px color-mix(in srgb, ${tc.color} 40%, transparent)` }}/>
 
-                      <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"20px 22px", transition:"border-color .2s" }}
-                        onMouseEnter={e=>e.currentTarget.style.borderColor=`${tc.color}44`}
-                        onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.07)"}
+                      <div style={{ background:"rgba(var(--ink),.03)", borderRadius:16, border:"1px solid rgba(var(--ink),.07)", padding:"20px 22px", transition:"border-color .2s" }}
+                        onMouseEnter={e=>e.currentTarget.style.borderColor=`color-mix(in srgb, ${tc.color} 26.7%, transparent)`}
+                        onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(var(--ink),.07)"}
                       >
                         {/* Header */}
                         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                           <span style={{ padding:"3px 10px", borderRadius:20, background:tc.bg, color:tc.color, fontSize:10, fontWeight:800 }}>{tc.icon} {tc.label}</span>
-                          {u.version && <span style={{ padding:"3px 10px", borderRadius:20, background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.4)", fontSize:10, fontWeight:700, fontFamily:"monospace" }}>{u.version}</span>}
-                          <span style={{ fontSize:11, color:"rgba(255,255,255,.25)", marginLeft:"auto" }}>
+                          {u.version && <span style={{ padding:"3px 10px", borderRadius:20, background:"rgba(var(--ink),.06)", color:"rgba(var(--ink),var(--ta-40, .4))", fontSize:10, fontWeight:700, fontFamily:"monospace" }}>{u.version}</span>}
+                          <span style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", marginLeft:"auto" }}>
                             {new Date(u.createdAt).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
                           </span>
                         </div>
-                        <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:7 }}>{u.title}</div>
-                        <div style={{ fontSize:13, color:"rgba(255,255,255,.5)", lineHeight:1.7 }}>{u.body}</div>
+                        <div style={{ fontSize:15, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:7 }}>{u.title}</div>
+                        <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.7 }}>{u.body}</div>
                       </div>
                     </div>
                   );
@@ -158,10 +158,10 @@ export default function ChangelogPage() {
           {/* Subscribe */}
           <div style={{ padding:"32px 28px", borderRadius:18, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", textAlign:"center" }}>
             <div style={{ fontSize:22, marginBottom:10 }}>🔔</div>
-            <div style={{ fontSize:16, fontWeight:800, color:"white", marginBottom:6 }}>Stay up to date</div>
-            <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", margin:"0 auto 20px", maxWidth:340 }}>Get notified when we ship something new. No noise, just real updates.</p>
+            <div style={{ fontSize:16, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:6 }}>Stay up to date</div>
+            <p style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", margin:"0 auto 20px", maxWidth:340 }}>Get notified when we ship something new. No noise, just real updates.</p>
             <div style={{ display:"flex", gap:10, maxWidth:380, margin:"0 auto" }}>
-              <input placeholder="your@email.com" style={{ flex:1, padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"white", fontSize:13, outline:"none" }}/>
+              <input placeholder="your@email.com" style={{ flex:1, padding:"10px 14px", borderRadius:10, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", fontSize:13, outline:"none" }}/>
               <button style={{ padding:"10px 20px", borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0 }}>Notify Me</button>
             </div>
           </div>

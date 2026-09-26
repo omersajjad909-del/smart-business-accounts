@@ -300,11 +300,11 @@ function MegaPanel({
               <Link key={card.title} href={card.href} className="fn-hc"
                 onClick={onClose}
                 style={{ borderColor:card.border, boxShadow:`0 4px 16px ${card.glow}` }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = card.color + "55"; e.currentTarget.style.boxShadow = `0 8px 26px ${card.glow}`; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = `color-mix(in srgb, ${card.color} 33.3%, transparent)`; e.currentTarget.style.boxShadow = `0 8px 26px ${card.glow}`; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = card.border; e.currentTarget.style.boxShadow = `0 4px 16px ${card.glow}`; }}
               >
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                  <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background:`${card.color}15`, border:`1px solid ${card.color}25`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15 }}>
+                  <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background:`color-mix(in srgb, ${card.color} 8.2%, transparent)`, border:`1px solid color-mix(in srgb, ${card.color} 14.5%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15 }}>
                     {card.emoji}
                   </div>
                   <span style={{ fontSize:12.5, fontWeight:700, color:"rgba(var(--ink),.85)", lineHeight:1.3 }}>
@@ -529,7 +529,7 @@ export default function Navbar() {
                 footerLink="See all features"
                 footerHref="/features"
                 onClose={() => setActiveMega(null)}
-                accentColor="#818cf8"
+                accentColor="var(--tx-818cf8, #818cf8)"
               />
             )}
 
@@ -541,7 +541,7 @@ export default function Navbar() {
                 footerLink="Explore all solutions"
                 footerHref="/solutions"
                 onClose={() => setActiveMega(null)}
-                accentColor="#a78bfa"
+                accentColor="var(--tx-a78bfa, #a78bfa)"
               />
             )}
           </div>

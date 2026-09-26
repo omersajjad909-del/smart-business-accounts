@@ -1194,7 +1194,7 @@ function renderText(text: string) {
   const parts = text.split(/\*\*(.*?)\*\*/g);
   return parts.map((p, i) =>
     i % 2 === 1
-      ? <strong key={i} style={{ color:"white", fontWeight:700 }}>{p}</strong>
+      ? <strong key={i} style={{ color:"var(--ink-solid, white)", fontWeight:700 }}>{p}</strong>
       : <span key={i}>{p}</span>
   );
 }
@@ -1207,20 +1207,20 @@ function ArticleContent({ blocks }: { blocks: typeof ARTICLES[string]["content"]
         switch (block.type) {
           case "intro":
             return (
-              <p key={i} style={{ fontSize:16, color:"rgba(255,255,255,.65)", lineHeight:1.8, borderLeft:"3px solid rgba(129,140,248,.5)", paddingLeft:16, fontStyle:"italic", margin:0 }}>
+              <p key={i} style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-65, .65))", lineHeight:1.8, borderLeft:"3px solid rgba(129,140,248,.5)", paddingLeft:16, fontStyle:"italic", margin:0 }}>
                 {block.text}
               </p>
             );
           case "heading":
             return (
-              <h3 key={i} style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", letterSpacing:"-.3px", margin:"8px 0 0", display:"flex", alignItems:"center", gap:10 }}>
+              <h3 key={i} style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.3px", margin:"8px 0 0", display:"flex", alignItems:"center", gap:10 }}>
                 <span style={{ width:3, height:18, borderRadius:2, background:"linear-gradient(#818cf8,#6366f1)", display:"inline-block", flexShrink:0 }}/>
                 {block.text}
               </h3>
             );
           case "para":
             return (
-              <p key={i} style={{ fontSize:14.5, color:"rgba(255,255,255,.6)", lineHeight:1.85, margin:0 }}>
+              <p key={i} style={{ fontSize:14.5, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.85, margin:0 }}>
                 {block.text && renderText(block.text)}
               </p>
             );
@@ -1230,7 +1230,7 @@ function ArticleContent({ blocks }: { blocks: typeof ARTICLES[string]["content"]
                 <div style={{ width:28, height:28, borderRadius:"50%", flexShrink:0, background:"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:"white", boxShadow:"0 4px 12px rgba(99,102,241,.4)", marginTop:1 }}>
                   {block.step}
                 </div>
-                <p style={{ fontSize:14.5, color:"rgba(255,255,255,.65)", lineHeight:1.8, margin:0, paddingTop:3 }}>
+                <p style={{ fontSize:14.5, color:"rgba(var(--ink),var(--ta-65, .65))", lineHeight:1.8, margin:0, paddingTop:3 }}>
                   {block.text && renderText(block.text)}
                 </p>
               </div>
@@ -1239,8 +1239,8 @@ function ArticleContent({ blocks }: { blocks: typeof ARTICLES[string]["content"]
             return (
               <div key={i} style={{ padding:"14px 16px", borderRadius:12, background:"rgba(52,211,153,.07)", border:"1.5px solid rgba(52,211,153,.22)", display:"flex", gap:12, alignItems:"flex-start" }}>
                 <span style={{ fontSize:16, flexShrink:0, marginTop:1 }}>💡</span>
-                <p style={{ fontSize:13.5, color:"rgba(255,255,255,.6)", lineHeight:1.75, margin:0 }}>
-                  <strong style={{ color:"#34d399", fontWeight:700 }}>Tip: </strong>
+                <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.75, margin:0 }}>
+                  <strong style={{ color:"var(--tx-34d399, #34d399)", fontWeight:700 }}>Tip: </strong>
                   {block.text && renderText(block.text)}
                 </p>
               </div>
@@ -1249,8 +1249,8 @@ function ArticleContent({ blocks }: { blocks: typeof ARTICLES[string]["content"]
             return (
               <div key={i} style={{ padding:"14px 16px", borderRadius:12, background:"rgba(251,191,36,.06)", border:"1.5px solid rgba(251,191,36,.22)", display:"flex", gap:12, alignItems:"flex-start" }}>
                 <span style={{ fontSize:16, flexShrink:0, marginTop:1 }}>⚠️</span>
-                <p style={{ fontSize:13.5, color:"rgba(255,255,255,.6)", lineHeight:1.75, margin:0 }}>
-                  <strong style={{ color:"#fbbf24", fontWeight:700 }}>Note: </strong>
+                <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.75, margin:0 }}>
+                  <strong style={{ color:"var(--tx-fbbf24, #fbbf24)", fontWeight:700 }}>Note: </strong>
                   {block.text && renderText(block.text)}
                 </p>
               </div>
@@ -1259,7 +1259,7 @@ function ArticleContent({ blocks }: { blocks: typeof ARTICLES[string]["content"]
             return (
               <ul key={i} style={{ paddingLeft:0, margin:0, display:"flex", flexDirection:"column", gap:8, listStyle:"none" }}>
                 {block.items?.map((item, j) => (
-                  <li key={j} style={{ display:"flex", alignItems:"flex-start", gap:10, fontSize:14, color:"rgba(255,255,255,.6)", lineHeight:1.75 }}>
+                  <li key={j} style={{ display:"flex", alignItems:"flex-start", gap:10, fontSize:14, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.75 }}>
                     <div style={{ width:6, height:6, borderRadius:"50%", background:"#818cf8", flexShrink:0, marginTop:8 }}/>
                     <span>{renderText(item)}</span>
                   </li>
@@ -1288,19 +1288,19 @@ export default async function HelpArticlePage({
   if (!article) notFound();
 
   return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 30%,var(--dk-080c1e, #080c1e) 100%)", color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
       <style>{`
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orbDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(16px,-14px)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-        .hc-crumb{color:rgba(255,255,255,.28);text-decoration:none;transition:color .2s}
-        .hc-crumb:hover{color:rgba(255,255,255,.6)}
-        .hc-related{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);text-decoration:none;transition:all .22s}
+        .hc-crumb{color:rgba(var(--ink),var(--ta-28, .28));text-decoration:none;transition:color .2s}
+        .hc-crumb:hover{color:rgba(var(--ink),var(--ta-60, .6))}
+        .hc-related{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:rgba(var(--ink),.03);border:1px solid rgba(var(--ink),.07);text-decoration:none;transition:all .22s}
         .hc-related:hover{background:rgba(99,102,241,.08);border-color:rgba(129,140,248,.3);transform:translateX(4px)}
-        .hc-back{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.35);text-decoration:none;transition:color .2s}
-        .hc-back:hover{color:#818cf8}
-        .hc-mail{font-size:13px;font-weight:600;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}
-        .hc-mail:hover{color:white}
+        .hc-back{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:rgba(var(--ink),var(--ta-35, .35));text-decoration:none;transition:color .2s}
+        .hc-back:hover{color:var(--tx-818cf8, #818cf8)}
+        .hc-mail{font-size:13px;font-weight:600;color:rgba(var(--ink),var(--ta-30, .3));text-decoration:none;transition:color .2s}
+        .hc-mail:hover{color:var(--ink-solid, white)}
       `}</style>
 
       {/* BG */}
@@ -1322,31 +1322,31 @@ export default async function HelpArticlePage({
               <Link href={href} className="hc-crumb" style={{ fontSize:12, fontWeight:500 }}>
                 {label}
               </Link>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
             </span>
           ))}
-          <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:500 }}>{article.title}</span>
+          <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-45, .45))", fontWeight:500 }}>{article.title}</span>
         </div>
 
         {/* Article header */}
         <div style={{ marginBottom:36 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16, flexWrap:"wrap" }}>
-            <div style={{ padding:"4px 12px", borderRadius:20, background:"rgba(129,140,248,.1)", border:"1.5px solid rgba(129,140,248,.28)", fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".08em", textTransform:"uppercase" }}>
+            <div style={{ padding:"4px 12px", borderRadius:20, background:"rgba(129,140,248,.1)", border:"1.5px solid rgba(129,140,248,.28)", fontSize:11, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".08em", textTransform:"uppercase" }}>
               {article.category}
             </div>
-            <div style={{ display:"flex", alignItems:"center", gap:5, fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:500 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:5, fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:500 }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               {article.time} read
             </div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.25)", fontWeight:500 }}>Updated {article.updatedAt}</div>
+            <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-25, .25))", fontWeight:500 }}>Updated {article.updatedAt}</div>
           </div>
-          <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(24px,3.5vw,36px)", fontWeight:700, color:"white", letterSpacing:"-1px", lineHeight:1.15, margin:0 }}>
+          <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(24px,3.5vw,36px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1px", lineHeight:1.15, margin:0 }}>
             {article.title}
           </h1>
         </div>
 
         {/* Article body */}
-        <div style={{ borderRadius:22, padding:"32px 32px", background:"rgba(255,255,255,.03)", border:"1.5px solid rgba(255,255,255,.08)", backdropFilter:"blur(16px)", marginBottom:28, position:"relative", overflow:"hidden" }}>
+        <div style={{ borderRadius:22, padding:"32px 32px", background:"rgba(var(--ink),.03)", border:"1.5px solid rgba(var(--ink),.08)", backdropFilter:"blur(16px)", marginBottom:28, position:"relative", overflow:"hidden" }}>
           <div style={{ position:"absolute", top:0, left:"15%", right:"15%", height:1, background:"linear-gradient(90deg,transparent,rgba(99,102,241,.5),transparent)" }}/>
           <ArticleContent blocks={article.content}/>
         </div>
@@ -1357,7 +1357,7 @@ export default async function HelpArticlePage({
         {/* Related articles */}
         {article.related.length > 0 && (
           <div style={{ marginBottom:40 }}>
-            <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", marginBottom:14 }}>Related Articles</h3>
+            <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:14 }}>Related Articles</h3>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               {article.related.map((rel, i) => (
                 <Link key={i} href={`/help/${rel.slug}`} className="hc-related">
@@ -1366,10 +1366,10 @@ export default async function HelpArticlePage({
                     <polyline points="14 2 14 8 20 8"/>
                   </svg>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:13.5, fontWeight:600, color:"rgba(255,255,255,.7)" }}>{rel.title}</div>
-                    <div style={{ fontSize:11.5, color:"rgba(255,255,255,.28)", marginTop:2 }}>{rel.category}</div>
+                    <div style={{ fontSize:13.5, fontWeight:600, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{rel.title}</div>
+                    <div style={{ fontSize:11.5, color:"rgba(var(--ink),var(--ta-28, .28))", marginTop:2 }}>{rel.category}</div>
                   </div>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2.5">
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                   </svg>
                 </Link>
@@ -1379,7 +1379,7 @@ export default async function HelpArticlePage({
         )}
 
         {/* Footer */}
-        <div style={{ paddingTop:28, borderTop:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
+        <div style={{ paddingTop:28, borderTop:"1px solid rgba(var(--ink),.07)", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
           <Link href="/help" className="hc-back">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -1406,11 +1406,11 @@ function HelpfulWidget() {
   // import { useState } from "react"
   // export default function HelpfulWidget() { ... }
   return (
-    <div style={{ borderRadius:16, padding:"20px 22px", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", marginBottom:32, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
-      <span style={{ fontSize:14, fontWeight:600, color:"rgba(255,255,255,.45)" }}>Was this article helpful?</span>
+    <div style={{ borderRadius:16, padding:"20px 22px", background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", marginBottom:32, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
+      <span style={{ fontSize:14, fontWeight:600, color:"rgba(var(--ink),var(--ta-45, .45))" }}>Was this article helpful?</span>
       <div style={{ display:"flex", gap:8 }}>
-        <a href="?helpful=yes" style={{ padding:"8px 18px", borderRadius:10, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.25)", color:"#34d399", fontSize:13, fontWeight:600, textDecoration:"none" }}>👍 Yes</a>
-        <a href="?helpful=no"  style={{ padding:"8px 18px", borderRadius:10, background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.2)",  color:"#f87171", fontSize:13, fontWeight:600, textDecoration:"none" }}>👎 No</a>
+        <a href="?helpful=yes" style={{ padding:"8px 18px", borderRadius:10, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.25)", color:"var(--tx-34d399, #34d399)", fontSize:13, fontWeight:600, textDecoration:"none" }}>👍 Yes</a>
+        <a href="?helpful=no"  style={{ padding:"8px 18px", borderRadius:10, background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.2)",  color:"var(--tx-f87171, #f87171)", fontSize:13, fontWeight:600, textDecoration:"none" }}>👎 No</a>
       </div>
     </div>
   );

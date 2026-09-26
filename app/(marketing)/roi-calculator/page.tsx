@@ -15,8 +15,8 @@ function Slider({ label, value, min, max, step = 1, onChange, format }: {
   return (
     <div style={{ marginBottom: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-        <span style={{ fontSize: 14, color: "#94a3b8" }}>{label}</span>
-        <span style={{ fontSize: 16, fontWeight: 700, color: "#818cf8" }}>{format(value)}</span>
+        <span style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)" }}>{label}</span>
+        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{format(value)}</span>
       </div>
       <input type="range" min={min} max={max} step={step} value={value}
         onChange={e => onChange(Number(e.target.value))}
@@ -31,7 +31,7 @@ function Slider({ label, value, min, max, step = 1, onChange, format }: {
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div className="roi-card" style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: 28, ...style }}>
+    <div className="roi-card" style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, padding: 28, ...style }}>
       {children}
     </div>
   );
@@ -80,7 +80,7 @@ export default function ROICalculatorPage() {
   ];
 
   const s = {
-    page: { minHeight: "100vh", background: "linear-gradient(160deg,#04061a 0%,#080c2a 60%,#04061a 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "#e2e8f0" } as React.CSSProperties,
+    page: { minHeight: "100vh", background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-080c2a, #080c2a) 60%,var(--dk-04061a, #04061a) 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--tx-e2e8f0, #e2e8f0)" } as React.CSSProperties,
   };
 
   return (
@@ -112,13 +112,13 @@ export default function ROICalculatorPage() {
 
       {/* Hero */}
       <div className="roi-hero" style={{ textAlign: "center", padding: "60px 24px 40px", maxWidth: 640, margin: "0 auto" }}>
-        <div style={{ display: "inline-block", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
+        <div style={{ display: "inline-block", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "var(--tx-34d399, #34d399)", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
           ROI Calculator
         </div>
         <h1 style={{ fontSize: "clamp(26px,5vw,48px)", fontWeight: 800, margin: "0 0 14px", lineHeight: 1.2 }}>
-          How much will FinovaOS<br /><span style={{ background: "linear-gradient(135deg,#34d399,#818cf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>save your business?</span>
+          How much will FinovaOS<br /><span style={{ background: "linear-gradient(135deg,var(--tx-34d399, #34d399),var(--tx-818cf8, #818cf8))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>save your business?</span>
         </h1>
-        <p style={{ color: "#94a3b8", fontSize: 15, margin: 0 }}>Adjust the sliders to match your business. See your personalised ROI in real time.</p>
+        <p style={{ color: "var(--tx-94a3b8, #94a3b8)", fontSize: 15, margin: 0 }}>Adjust the sliders to match your business. See your personalised ROI in real time.</p>
       </div>
 
       {/* Main layout */}
@@ -131,24 +131,24 @@ export default function ROICalculatorPage() {
           <Card>
             <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700 }}>Plan & Currency</h3>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 10 }}>Currency</div>
+              <div style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", marginBottom: 10 }}>Currency</div>
               <div style={{ display: "flex", gap: 8 }}>
                 {(["USD", "PKR"] as const).map(c => (
                   <button key={c} onClick={() => setCurrency(c)}
-                    style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: `1px solid ${currency === c ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.1)"}`, background: currency === c ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.03)", color: currency === c ? "#818cf8" : "#64748b", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>
+                    style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: `1px solid ${currency === c ? "rgba(99,102,241,.5)" : "rgba(var(--ink),.1)"}`, background: currency === c ? "rgba(99,102,241,.15)" : "rgba(var(--ink),.03)", color: currency === c ? "var(--tx-818cf8, #818cf8)" : "#64748b", cursor: "pointer", fontWeight: 700, fontSize: 14 }}>
                     {c === "USD" ? "$ USD" : "₨ PKR"}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 10 }}>FinovaOS Plan</div>
+              <div style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", marginBottom: 10 }}>FinovaOS Plan</div>
               <div className="roi-plan-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
                 {PLANS.map(p => (
                   <button key={p.name} onClick={() => setPlan(p)} className="roi-plan-btn"
-                    style={{ padding: "10px 8px", borderRadius: 10, border: `1px solid ${plan.name === p.name ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.1)"}`, background: plan.name === p.name ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.03)", color: plan.name === p.name ? "#818cf8" : "#64748b", cursor: "pointer", textAlign: "center" }}>
+                    style={{ padding: "10px 8px", borderRadius: 10, border: `1px solid ${plan.name === p.name ? "rgba(99,102,241,.5)" : "rgba(var(--ink),.1)"}`, background: plan.name === p.name ? "rgba(99,102,241,.15)" : "rgba(var(--ink),.03)", color: plan.name === p.name ? "var(--tx-818cf8, #818cf8)" : "#64748b", cursor: "pointer", textAlign: "center" }}>
                     <div style={{ fontSize: 12, fontWeight: 700 }}>{p.name}</div>
-                    <div style={{ fontSize: 13, color: plan.name === p.name ? "#818cf8" : "#94a3b8", fontWeight: 600 }}>{fmt(p.price)}/mo</div>
+                    <div style={{ fontSize: 13, color: plan.name === p.name ? "var(--tx-818cf8, #818cf8)" : "var(--tx-94a3b8, #94a3b8)", fontWeight: 600 }}>{fmt(p.price)}/mo</div>
                   </button>
                 ))}
               </div>
@@ -178,19 +178,19 @@ export default function ROICalculatorPage() {
           {/* ROI Summary */}
           <Card style={{ background: "linear-gradient(135deg,rgba(99,102,241,.15),rgba(52,211,153,.08))", border: "1px solid rgba(99,102,241,.3)", marginBottom: 16 }}>
             <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 6 }}>Annual Net Savings</div>
-              <div className="roi-summary-num" style={{ fontSize: 42, fontWeight: 800, color: "#34d399", lineHeight: 1, wordBreak: "break-word" }}>{fmt(netAnnualROI)}</div>
+              <div style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", marginBottom: 6 }}>Annual Net Savings</div>
+              <div className="roi-summary-num" style={{ fontSize: 42, fontWeight: 800, color: "var(--tx-34d399, #34d399)", lineHeight: 1, wordBreak: "break-word" }}>{fmt(netAnnualROI)}</div>
               <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>after FinovaOS subscription cost</div>
             </div>
 
             <div className="roi-stats" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
               {[
-                { label: "Monthly savings", value: fmt(totalMonthlySavings), color: "#818cf8" },
-                { label: "ROI multiple",    value: `${roiMultiple}x`,         color: "#34d399" },
-                { label: "Payback period",  value: `${paybackMonths} months`, color: "#fbbf24" },
-                { label: "Plan cost/yr",    value: fmt(annualPlanCost),        color: "#94a3b8" },
+                { label: "Monthly savings", value: fmt(totalMonthlySavings), color: "var(--tx-818cf8, #818cf8)" },
+                { label: "ROI multiple",    value: `${roiMultiple}x`,         color: "var(--tx-34d399, #34d399)" },
+                { label: "Payback period",  value: `${paybackMonths} months`, color: "var(--tx-fbbf24, #fbbf24)" },
+                { label: "Plan cost/yr",    value: fmt(annualPlanCost),        color: "var(--tx-94a3b8, #94a3b8)" },
               ].map(i => (
-                <div key={i.label} className="roi-stat-cell" style={{ background: "rgba(0,0,0,.2)", borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
+                <div key={i.label} className="roi-stat-cell" style={{ background: "var(--mk-inset, rgba(0,0,0,.2))", borderRadius: 12, padding: "12px 14px", textAlign: "center" }}>
                   <div className="roi-stat-value" style={{ fontSize: 18, fontWeight: 800, color: i.color, wordBreak: "break-word" }}>{i.value}</div>
                   <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{i.label}</div>
                 </div>
@@ -205,19 +205,19 @@ export default function ROICalculatorPage() {
 
           {/* Breakdown */}
           <Card>
-            <h3 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".04em" }}>Savings Breakdown</h3>
+            <h3 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 700, color: "var(--tx-94a3b8, #94a3b8)", textTransform: "uppercase", letterSpacing: ".04em" }}>Savings Breakdown</h3>
             {breakdownItems.map((item, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "12px 0", borderBottom: i < breakdownItems.length - 1 ? "1px solid rgba(255,255,255,.05)" : "none", gap: 12 }}>
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "12px 0", borderBottom: i < breakdownItems.length - 1 ? "1px solid rgba(var(--ink),.05)" : "none", gap: 12 }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{item.label}</div>
                   <div style={{ fontSize: 11, color: "#64748b" }}>{item.desc}</div>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399", flexShrink: 0 }}>{fmt(item.value)}<span style={{ fontSize: 10, color: "#64748b" }}>/mo</span></div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-34d399, #34d399)", flexShrink: 0 }}>{fmt(item.value)}<span style={{ fontSize: 10, color: "#64748b" }}>/mo</span></div>
               </div>
             ))}
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.1)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(var(--ink),.1)" }}>
               <span style={{ fontWeight: 700 }}>Total per month</span>
-              <span style={{ fontWeight: 800, color: "#818cf8" }}>{fmt(totalMonthlySavings)}</span>
+              <span style={{ fontWeight: 800, color: "var(--tx-818cf8, #818cf8)" }}>{fmt(totalMonthlySavings)}</span>
             </div>
           </Card>
 

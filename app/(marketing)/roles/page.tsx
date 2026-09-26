@@ -12,25 +12,25 @@ export default function RolesPage() {
   return (
     <main style={{
       minHeight:"100vh",
-      background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)",
-      color:"white",
+      background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)",
+      color:"var(--ink-solid, white)",
       fontFamily:"'DM Sans','Outfit',system-ui,sans-serif",
       display:"flex", alignItems:"center", justifyContent:"center",
       padding:"24px", textAlign:"center",
     }}>
       <div style={{ maxWidth:560 }}>
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", marginBottom:24 }}>
-          <span style={{ fontSize:12, fontWeight:800, color:"#818cf8", letterSpacing:".06em" }}>TEAMS & ROLES</span>
+          <span style={{ fontSize:12, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".06em" }}>TEAMS & ROLES</span>
         </div>
         <h1 style={{ fontSize:"clamp(32px,6vw,52px)", fontWeight:900, letterSpacing:"-.03em", lineHeight:1.15, fontFamily:"Lora,Georgia,serif", margin:"0 0 20px" }}>
           Coming soon
         </h1>
-        <p style={{ fontSize:15, color:"rgba(255,255,255,.5)", lineHeight:1.75, margin:"0 auto 24px" }}>
+        <p style={{ fontSize:15, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.75, margin:"0 auto 24px" }}>
           We're not actively hiring right now. Leave your email and we'll let you know the moment roles open up.
         </p>
         <ComingSoonSubscribe list="careers" />
         <div style={{ marginTop:24 }}>
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=partnerships@finovaos.app" style={{ fontSize:13, color:"rgba(255,255,255,.4)", textDecoration:"underline" }}>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=partnerships@finovaos.app" style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", textDecoration:"underline" }}>
             Or send a speculative application to partnerships@finovaos.app
           </a>
         </div>
@@ -50,7 +50,7 @@ const DEPARTMENTS = [
     id: "engineering",
     name: "Engineering",
     icon: "⚙️",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.15)",
     border: "rgba(129,140,248,.25)",
     headcount: 52,
@@ -63,7 +63,7 @@ const DEPARTMENTS = [
     id: "product",
     name: "Product & Design",
     icon: "🎨",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.12)",
     border: "rgba(52,211,153,.25)",
     headcount: 18,
@@ -76,7 +76,7 @@ const DEPARTMENTS = [
     id: "sales",
     name: "Sales & Marketing",
     icon: "💼",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.12)",
     border: "rgba(251,191,36,.25)",
     headcount: 24,
@@ -89,7 +89,7 @@ const DEPARTMENTS = [
     id: "customer",
     name: "Customer Success",
     icon: "🤝",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     glow: "rgba(56,189,248,.12)",
     border: "rgba(56,189,248,.25)",
     headcount: 16,
@@ -102,7 +102,7 @@ const DEPARTMENTS = [
     id: "operations",
     name: "Operations",
     icon: "🏢",
-    color: "#c4b5fd",
+    color: "var(--tx-c4b5fd, #c4b5fd)",
     glow: "rgba(196,181,253,.12)",
     border: "rgba(196,181,253,.25)",
     headcount: 10,
@@ -117,7 +117,7 @@ const ENGINEERING_LADDER = [
   {
     level: "L1",
     title: "Engineer I",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     yoe: "0–2 years",
     desc: "You write clean, tested code with guidance. You're learning fast, asking great questions, and shipping features with support from your team.",
     focus: ["Code quality", "Learning velocity", "Communication"],
@@ -125,7 +125,7 @@ const ENGINEERING_LADDER = [
   {
     level: "L2",
     title: "Engineer II",
-    color: "#6366f1",
+    color: "var(--tx-6366f1, #6366f1)",
     yoe: "2–4 years",
     desc: "You work independently on well-defined problems. You review code, mentor juniors, and consistently deliver features on time.",
     focus: ["Independence", "Code review", "Technical depth"],
@@ -141,7 +141,7 @@ const ENGINEERING_LADDER = [
   {
     level: "L4",
     title: "Staff Engineer",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     yoe: "8–12 years",
     desc: "You define engineering strategy across multiple teams. Your architectural decisions shape the platform. You're a force multiplier.",
     focus: ["Architecture", "Org-wide impact", "Engineering strategy"],
@@ -149,7 +149,7 @@ const ENGINEERING_LADDER = [
   {
     level: "L5",
     title: "Principal Engineer",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     yoe: "12+ years",
     desc: "You set the technical direction for the entire company. You solve our hardest problems and your influence is felt across all of FinovaOS.",
     focus: ["Company-wide vision", "Industry expertise", "Executive partnership"],
@@ -159,30 +159,30 @@ const ENGINEERING_LADDER = [
 /* Hidden — not currently hiring. Kept for when we resume posting roles.
 const ALL_ROLES = [
   // Engineering
-  { title:"Senior Backend Engineer",      dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"#818cf8" },
-  { title:"Frontend Engineer (React)",    dept:"engineering", location:"Remote",          type:"Full-time", level:"Mid–Senior", color:"#818cf8" },
-  { title:"DevOps / Platform Engineer",   dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"#818cf8" },
-  { title:"Mobile Engineer (RN)",         dept:"engineering", location:"Remote",          type:"Full-time", level:"Mid–Senior", color:"#818cf8" },
-  { title:"Security Engineer",            dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"#818cf8" },
-  { title:"QA Engineer",                  dept:"engineering", location:"Remote",          type:"Full-time", level:"Mid",        color:"#818cf8" },
+  { title:"Senior Backend Engineer",      dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"var(--tx-818cf8, #818cf8)" },
+  { title:"Frontend Engineer (React)",    dept:"engineering", location:"Remote",          type:"Full-time", level:"Mid–Senior", color:"var(--tx-818cf8, #818cf8)" },
+  { title:"DevOps / Platform Engineer",   dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"var(--tx-818cf8, #818cf8)" },
+  { title:"Mobile Engineer (RN)",         dept:"engineering", location:"Remote",          type:"Full-time", level:"Mid–Senior", color:"var(--tx-818cf8, #818cf8)" },
+  { title:"Security Engineer",            dept:"engineering", location:"Remote",          type:"Full-time", level:"Senior",     color:"var(--tx-818cf8, #818cf8)" },
+  { title:"QA Engineer",                  dept:"engineering", location:"Remote",          type:"Full-time", level:"Mid",        color:"var(--tx-818cf8, #818cf8)" },
   // Product
-  { title:"Product Manager — Accounting", dept:"product",     location:"Remote",          type:"Full-time", level:"Senior",     color:"#34d399" },
-  { title:"Senior Product Designer",      dept:"product",     location:"Remote",          type:"Full-time", level:"Senior",     color:"#34d399" },
-  { title:"UX Researcher",                dept:"product",     location:"Remote",          type:"Full-time", level:"Mid",        color:"#34d399" },
-  { title:"Product Analyst",              dept:"product",     location:"Remote",          type:"Full-time", level:"Mid",        color:"#34d399" },
+  { title:"Product Manager — Accounting", dept:"product",     location:"Remote",          type:"Full-time", level:"Senior",     color:"var(--tx-34d399, #34d399)" },
+  { title:"Senior Product Designer",      dept:"product",     location:"Remote",          type:"Full-time", level:"Senior",     color:"var(--tx-34d399, #34d399)" },
+  { title:"UX Researcher",                dept:"product",     location:"Remote",          type:"Full-time", level:"Mid",        color:"var(--tx-34d399, #34d399)" },
+  { title:"Product Analyst",              dept:"product",     location:"Remote",          type:"Full-time", level:"Mid",        color:"var(--tx-34d399, #34d399)" },
   // Sales
-  { title:"Account Executive — MENA",    dept:"sales",       location:"Dubai, UAE",       type:"Full-time", level:"Mid–Senior", color:"#fbbf24" },
-  { title:"Account Executive — UK/EU",   dept:"sales",       location:"London (Remote)",  type:"Full-time", level:"Mid–Senior", color:"#fbbf24" },
-  { title:"Partnerships Manager",         dept:"sales",       location:"Remote",           type:"Full-time", level:"Mid",        color:"#fbbf24" },
-  { title:"Growth Marketing Manager",     dept:"sales",       location:"Remote",           type:"Full-time", level:"Senior",     color:"#fbbf24" },
+  { title:"Account Executive — MENA",    dept:"sales",       location:"Dubai, UAE",       type:"Full-time", level:"Mid–Senior", color:"var(--tx-fbbf24, #fbbf24)" },
+  { title:"Account Executive — UK/EU",   dept:"sales",       location:"London (Remote)",  type:"Full-time", level:"Mid–Senior", color:"var(--tx-fbbf24, #fbbf24)" },
+  { title:"Partnerships Manager",         dept:"sales",       location:"Remote",           type:"Full-time", level:"Mid",        color:"var(--tx-fbbf24, #fbbf24)" },
+  { title:"Growth Marketing Manager",     dept:"sales",       location:"Remote",           type:"Full-time", level:"Senior",     color:"var(--tx-fbbf24, #fbbf24)" },
   // Customer Success
-  { title:"Customer Success Manager",     dept:"customer",    location:"Remote",           type:"Full-time", level:"Mid",        color:"#38bdf8" },
-  { title:"Technical Support Engineer",   dept:"customer",    location:"Remote",           type:"Full-time", level:"Mid",        color:"#38bdf8" },
-  { title:"Onboarding Specialist",        dept:"customer",    location:"Remote / Global",  type:"Full-time", level:"Junior",     color:"#38bdf8" },
+  { title:"Customer Success Manager",     dept:"customer",    location:"Remote",           type:"Full-time", level:"Mid",        color:"var(--tx-38bdf8, #38bdf8)" },
+  { title:"Technical Support Engineer",   dept:"customer",    location:"Remote",           type:"Full-time", level:"Mid",        color:"var(--tx-38bdf8, #38bdf8)" },
+  { title:"Onboarding Specialist",        dept:"customer",    location:"Remote / Global",  type:"Full-time", level:"Junior",     color:"var(--tx-38bdf8, #38bdf8)" },
   // Operations
-  { title:"Finance Manager",              dept:"operations",  location:"Remote",           type:"Full-time", level:"Senior",     color:"#c4b5fd" },
-  { title:"People Operations Manager",    dept:"operations",  location:"Remote",           type:"Full-time", level:"Mid",        color:"#c4b5fd" },
-  { title:"Legal & Compliance Counsel",   dept:"operations",  location:"Remote",           type:"Contract",  level:"Senior",     color:"#c4b5fd" },
+  { title:"Finance Manager",              dept:"operations",  location:"Remote",           type:"Full-time", level:"Senior",     color:"var(--tx-c4b5fd, #c4b5fd)" },
+  { title:"People Operations Manager",    dept:"operations",  location:"Remote",           type:"Full-time", level:"Mid",        color:"var(--tx-c4b5fd, #c4b5fd)" },
+  { title:"Legal & Compliance Counsel",   dept:"operations",  location:"Remote",           type:"Contract",  level:"Senior",     color:"var(--tx-c4b5fd, #c4b5fd)" },
 ];
 */
 const ALL_ROLES: {
@@ -218,7 +218,7 @@ function SectionLabel({ text }: { text: string }) {
   return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:14 }}>
       <div style={{ height:1, width:32, background:"rgba(99,102,241,.4)" }}/>
-      <span style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".12em", textTransform:"uppercase" }}>{text}</span>
+      <span style={{ fontSize:11, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".12em", textTransform:"uppercase" }}>{text}</span>
       <div style={{ height:1, width:32, background:"rgba(99,102,241,.4)" }}/>
     </div>
   );
@@ -239,14 +239,14 @@ function LegacyRolesPage() {
   );
 
   const LEVEL_COLOR: Record<string,string> = {
-    Junior:"#34d399", Mid:"#818cf8", "Mid–Senior":"#38bdf8", Senior:"#fbbf24",
+    Junior:"var(--tx-34d399, #34d399)", Mid:"var(--tx-818cf8, #818cf8)", "Mid–Senior":"var(--tx-38bdf8, #38bdf8)", Senior:"var(--tx-fbbf24, #fbbf24)",
   };
 
   return (
     <main style={{
       minHeight:"100vh",
-      background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)",
-      color:"white", fontFamily:"'DM Sans','Outfit',system-ui,sans-serif", overflowX:"hidden",
+      background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)",
+      color:"var(--ink-solid, white)", fontFamily:"'DM Sans','Outfit',system-ui,sans-serif", overflowX:"hidden",
     }}>
 
       {/* ── HERO ── */}
@@ -254,22 +254,22 @@ function LegacyRolesPage() {
         <div style={{ position:"absolute", top:-100, left:"50%", transform:"translateX(-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ maxWidth:680, margin:"0 auto", position:"relative", zIndex:1 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", marginBottom:24, opacity:heroVis?1:0, transform:heroVis?"translateY(0)":"translateY(16px)", transition:"all .5s ease" }}>
-            <span style={{ fontSize:12, fontWeight:800, color:"#818cf8", letterSpacing:".06em" }}>TEAMS & ROLES</span>
+            <span style={{ fontSize:12, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".06em" }}>TEAMS & ROLES</span>
           </div>
           <h1 style={{ fontSize:"clamp(36px,6vw,62px)", fontWeight:900, letterSpacing:"-.03em", lineHeight:1.1, fontFamily:"Lora,Georgia,serif", margin:"0 0 20px", opacity:heroVis?1:0, transform:heroVis?"translateY(0)":"translateY(20px)", transition:"all .6s ease .1s" }}>
             How we're organised
-            <span style={{ display:"block", background:"linear-gradient(90deg,#818cf8,#c4b5fd,#38bdf8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+            <span style={{ display:"block", background:"linear-gradient(90deg,var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd),var(--tx-38bdf8, #38bdf8))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               and where you fit
             </span>
           </h1>
-          <p style={{ fontSize:"clamp(15px,2vw,17px)", color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
+          <p style={{ fontSize:"clamp(15px,2vw,17px)", color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
             A focused team across 5 departments, building globally, one mission. Find your place.
           </p>
           <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", opacity:heroVis?1:0, transition:"all .6s ease .3s" }}>
             <a href="#departments" style={{ padding:"12px 28px", borderRadius:12, fontWeight:800, fontSize:13, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", boxShadow:"0 4px 24px rgba(79,70,229,.4)" }}>
               Explore Departments
             </a>
-            <a href="#open-roles" style={{ padding:"12px 28px", borderRadius:12, fontWeight:700, fontSize:13, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", textDecoration:"none" }}>
+            <a href="#open-roles" style={{ padding:"12px 28px", borderRadius:12, fontWeight:700, fontSize:13, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.8)", textDecoration:"none" }}>
               See Open Roles ↓
             </a>
           </div>
@@ -281,10 +281,10 @@ function LegacyRolesPage() {
         <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 80px" }}>
           <div className="roles-5col" style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:12 }}>
             {DEPARTMENTS.map(d=>(
-              <div key={d.id} style={{ background:`linear-gradient(135deg,${d.glow},rgba(255,255,255,.02))`, borderRadius:16, border:`1px solid ${d.border}`, padding:"20px 18px", textAlign:"center" }}>
+              <div key={d.id} style={{ background:`linear-gradient(135deg,${d.glow},rgba(var(--ink),.02))`, borderRadius:16, border:`1px solid ${d.border}`, padding:"20px 18px", textAlign:"center" }}>
                 <div style={{ fontSize:28, marginBottom:10 }}>{d.icon}</div>
                 <div style={{ fontSize:22, fontWeight:900, color:d.color, fontFamily:"Lora,serif" }}>{d.headcount}</div>
-                <div style={{ fontSize:12, color:"white", fontWeight:700, marginTop:4 }}>{d.name}</div>
+                <div style={{ fontSize:12, color:"var(--ink-solid, white)", fontWeight:700, marginTop:4 }}>{d.name}</div>
               </div>
             ))}
           </div>
@@ -302,49 +302,49 @@ function LegacyRolesPage() {
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
             {DEPARTMENTS.map(d=>(
-              <div key={d.id} style={{ background:"rgba(255,255,255,.03)", borderRadius:20, border:`1px solid rgba(255,255,255,.07)`, overflow:"hidden" }}>
+              <div key={d.id} style={{ background:"rgba(var(--ink),.03)", borderRadius:20, border:`1px solid rgba(var(--ink),.07)`, overflow:"hidden" }}>
                 {/* Header */}
                 <div
                   onClick={()=>setExpanded(expanded===d.id?null:d.id)}
                   style={{ padding:"24px 28px", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", gap:16 }}
                 >
                   <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-                    <div style={{ width:52, height:52, borderRadius:14, background:`${d.color}20`, border:`1px solid ${d.color}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{d.icon}</div>
+                    <div style={{ width:52, height:52, borderRadius:14, background:`color-mix(in srgb, ${d.color} 12.5%, transparent)`, border:`1px solid color-mix(in srgb, ${d.color} 25.1%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{d.icon}</div>
                     <div>
-                      <div style={{ fontSize:18, fontWeight:800, color:"white" }}>{d.name}</div>
-                      <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{d.headcount} people · {d.teams.length} sub-teams</div>
+                      <div style={{ fontSize:18, fontWeight:800, color:"var(--ink-solid, white)" }}>{d.name}</div>
+                      <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", marginTop:2 }}>{d.headcount} people · {d.teams.length} sub-teams</div>
                     </div>
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                    <span style={{ padding:"5px 14px", borderRadius:20, background:`${d.color}20`, color:d.color, fontSize:11, fontWeight:800 }}>{d.headcount} people</span>
-                    <span style={{ fontSize:20, color:"rgba(255,255,255,.3)", transform:expanded===d.id?"rotate(180deg)":"rotate(0)", transition:"transform .2s", display:"inline-block" }}>⌄</span>
+                    <span style={{ padding:"5px 14px", borderRadius:20, background:`color-mix(in srgb, ${d.color} 12.5%, transparent)`, color:d.color, fontSize:11, fontWeight:800 }}>{d.headcount} people</span>
+                    <span style={{ fontSize:20, color:"rgba(var(--ink),var(--ta-30, .3))", transform:expanded===d.id?"rotate(180deg)":"rotate(0)", transition:"transform .2s", display:"inline-block" }}>⌄</span>
                   </div>
                 </div>
 
                 {/* Expanded */}
                 {expanded===d.id && (
-                  <div style={{ padding:"0 28px 28px", borderTop:"1px solid rgba(255,255,255,.07)" }}>
+                  <div style={{ padding:"0 28px 28px", borderTop:"1px solid rgba(var(--ink),.07)" }}>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, paddingTop:24 }}>
                       <div>
-                        <p style={{ fontSize:14, color:"rgba(255,255,255,.55)", lineHeight:1.75, margin:"0 0 20px" }}>{d.desc}</p>
+                        <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-55, .55))", lineHeight:1.75, margin:"0 0 20px" }}>{d.desc}</p>
                         {/* Leads */}
                         <div style={{ marginBottom:16 }}>
-                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Leadership</div>
+                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Leadership</div>
                           {d.leads.map(l=>(
                             <div key={l} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                              <div style={{ width:28, height:28, borderRadius:8, background:`${d.color}25`, border:`1px solid ${d.color}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:d.color }}>
+                              <div style={{ width:28, height:28, borderRadius:8, background:`color-mix(in srgb, ${d.color} 14.5%, transparent)`, border:`1px solid color-mix(in srgb, ${d.color} 25.1%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:d.color }}>
                                 {l[0]}
                               </div>
-                              <span style={{ fontSize:12, color:"rgba(255,255,255,.6)", fontWeight:600 }}>{l}</span>
+                              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-60, .6))", fontWeight:600 }}>{l}</span>
                             </div>
                           ))}
                         </div>
                         {/* Sub-teams */}
                         <div>
-                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Sub-Teams</div>
+                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Sub-Teams</div>
                           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                             {d.teams.map(t=>(
-                              <span key={t} style={{ padding:"4px 12px", borderRadius:20, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", fontSize:11, color:"rgba(255,255,255,.6)", fontWeight:600 }}>{t}</span>
+                              <span key={t} style={{ padding:"4px 12px", borderRadius:20, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", fontSize:11, color:"rgba(var(--ink),var(--ta-60, .6))", fontWeight:600 }}>{t}</span>
                             ))}
                           </div>
                         </div>
@@ -352,30 +352,30 @@ function LegacyRolesPage() {
                       <div>
                         {/* Tools */}
                         <div style={{ marginBottom:20 }}>
-                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Tools & Stack</div>
+                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Tools & Stack</div>
                           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                             {d.tools.map(t=>(
-                              <span key={t} style={{ padding:"4px 12px", borderRadius:20, background:`${d.color}15`, border:`1px solid ${d.color}30`, fontSize:11, color:d.color, fontWeight:700 }}>{t}</span>
+                              <span key={t} style={{ padding:"4px 12px", borderRadius:20, background:`color-mix(in srgb, ${d.color} 8.2%, transparent)`, border:`1px solid color-mix(in srgb, ${d.color} 18.8%, transparent)`, fontSize:11, color:d.color, fontWeight:700 }}>{t}</span>
                             ))}
                           </div>
                         </div>
                         {/* Open roles in this dept */}
                         <div>
-                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>
+                          <div style={{ fontSize:10, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>
                             Open Roles — {ALL_ROLES.filter(r=>r.dept===d.id).length} positions
                           </div>
                           {ALL_ROLES.filter(r=>r.dept===d.id).slice(0,4).map(r=>(
                             <Link key={r.title} href={`/careers?dept=${d.id}`}
-                              style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"8px 12px", borderRadius:9, background:"rgba(255,255,255,.04)", marginBottom:6, textDecoration:"none", transition:"background .15s" }}
+                              style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"8px 12px", borderRadius:9, background:"rgba(var(--ink),.04)", marginBottom:6, textDecoration:"none", transition:"background .15s" }}
                               onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,.1)")}
-                              onMouseLeave={e=>(e.currentTarget.style.background="rgba(255,255,255,.04)")}
+                              onMouseLeave={e=>(e.currentTarget.style.background="rgba(var(--ink),.04)")}
                             >
-                              <span style={{ fontSize:12, color:"rgba(255,255,255,.7)", fontWeight:600 }}>{r.title}</span>
-                              <span style={{ padding:"2px 8px", borderRadius:20, background:`${LEVEL_COLOR[r.level]||"#818cf8"}20`, color:LEVEL_COLOR[r.level]||"#818cf8", fontSize:9, fontWeight:800 }}>{r.level}</span>
+                              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-70, .7))", fontWeight:600 }}>{r.title}</span>
+                              <span style={{ padding:"2px 8px", borderRadius:20, background:`color-mix(in srgb, ${LEVEL_COLOR[r.level]||"#818cf8"} 12.5%, transparent)`, color:LEVEL_COLOR[r.level]||"var(--tx-818cf8, #818cf8)", fontSize:9, fontWeight:800 }}>{r.level}</span>
                             </Link>
                           ))}
                           {ALL_ROLES.filter(r=>r.dept===d.id).length > 4 && (
-                            <Link href="/careers" style={{ fontSize:12, color:"#818cf8", fontWeight:700, textDecoration:"none", display:"block", marginTop:8 }}>
+                            <Link href="/careers" style={{ fontSize:12, color:"var(--tx-818cf8, #818cf8)", fontWeight:700, textDecoration:"none", display:"block", marginTop:8 }}>
                               +{ALL_ROLES.filter(r=>r.dept===d.id).length - 4} more roles →
                             </Link>
                           )}
@@ -398,7 +398,7 @@ function LegacyRolesPage() {
             <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 14px" }}>
               Clear paths, no guesswork
             </h2>
-            <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", maxWidth:480, margin:"0 auto" }}>
+            <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", maxWidth:480, margin:"0 auto" }}>
               We publish our full engineering ladder. You'll always know exactly where you are, and what it takes to grow.
             </p>
           </div>
@@ -407,8 +407,8 @@ function LegacyRolesPage() {
               <div key={l.level} style={{
                 display:"grid", gridTemplateColumns:"80px 1fr auto",
                 gap:20, alignItems:"center",
-                background:"rgba(255,255,255,.03)", borderRadius:16,
-                border:"1px solid rgba(255,255,255,.07)", padding:"22px 24px",
+                background:"rgba(var(--ink),.03)", borderRadius:16,
+                border:"1px solid rgba(var(--ink),.07)", padding:"22px 24px",
                 borderLeft:`4px solid ${l.color}`,
                 transition:"transform .2s",
               }}
@@ -417,22 +417,22 @@ function LegacyRolesPage() {
               >
                 <div style={{ textAlign:"center" }}>
                   <div style={{ fontSize:13, fontWeight:800, color:l.color, letterSpacing:".06em" }}>{l.level}</div>
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:3 }}>{l.yoe}</div>
+                  <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-25, .25))", marginTop:3 }}>{l.yoe}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize:16, fontWeight:700, color:"white", marginBottom:5 }}>{l.title}</div>
-                  <div style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.65, maxWidth:580 }}>{l.desc}</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:5 }}>{l.title}</div>
+                  <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.65, maxWidth:580 }}>{l.desc}</div>
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:6, minWidth:160 }}>
                   {l.focus.map(f=>(
-                    <span key={f} style={{ padding:"3px 10px", borderRadius:20, background:`${l.color}15`, color:l.color, fontSize:10, fontWeight:700, textAlign:"center" }}>{f}</span>
+                    <span key={f} style={{ padding:"3px 10px", borderRadius:20, background:`color-mix(in srgb, ${l.color} 8.2%, transparent)`, color:l.color, fontSize:10, fontWeight:700, textAlign:"center" }}>{f}</span>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ marginTop:20, padding:"16px 20px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7 }}>
-            💡 <strong style={{ color:"white" }}>Note:</strong> We also have a parallel management track (Engineering Manager → Director → VP) for those who want to lead teams rather than deepen technical expertise.
+          <div style={{ marginTop:20, padding:"16px 20px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", fontSize:13, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.7 }}>
+            💡 <strong style={{ color:"var(--ink-solid, white)" }}>Note:</strong> We also have a parallel management track (Engineering Manager → Director → VP) for those who want to lead teams rather than deepen technical expertise.
           </div>
         </div>
       </Section>
@@ -451,34 +451,34 @@ function LegacyRolesPage() {
             {[{id:"all",label:"All"}, ...DEPARTMENTS.map(d=>({id:d.id,label:d.name}))].map(d=>(
               <button key={d.id} onClick={()=>setActiveDept(d.id)}
                 style={{ padding:"7px 16px", borderRadius:20, fontSize:12, fontWeight:700, cursor:"pointer", border:"none",
-                  background:activeDept===d.id?"linear-gradient(135deg,#4f46e5,#7c3aed)":"rgba(255,255,255,.05)",
-                  color:activeDept===d.id?"white":"rgba(255,255,255,.4)" }}>
+                  background:activeDept===d.id?"linear-gradient(135deg,#4f46e5,#7c3aed)":"rgba(var(--ink),.05)",
+                  color:activeDept===d.id?"white":"rgba(var(--ink),var(--ta-40, .4))" }}>
                 {d.label}
               </button>
             ))}
           </div>
           {/* Table */}
           <div className="roles-table-wrap">
-          <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden", minWidth:600 }}>
-            <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.07)", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>
+          <div style={{ background:"rgba(var(--ink),.03)", borderRadius:16, border:"1px solid rgba(var(--ink),.07)", overflow:"hidden", minWidth:600 }}>
+            <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"10px 20px", borderBottom:"1px solid rgba(var(--ink),.07)", fontSize:10, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".06em", textTransform:"uppercase" }}>
               <span>Role</span><span>Department</span><span>Location</span><span>Level</span><span style={{textAlign:"right"}}>Apply</span>
             </div>
             {filteredRoles.length===0 && (
-              <div style={{ padding:"32px 20px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>
+              <div style={{ padding:"32px 20px", textAlign:"center", color:"rgba(var(--ink),var(--ta-30, .3))", fontSize:13 }}>
                 We're not actively hiring for any roles right now — check back soon.
               </div>
             )}
             {filteredRoles.map((r,i)=>(
-              <div key={r.title+i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"14px 20px", borderBottom:i<filteredRoles.length-1?"1px solid rgba(255,255,255,.04)":"none", alignItems:"center", transition:"background .15s" }}
+              <div key={r.title+i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"14px 20px", borderBottom:i<filteredRoles.length-1?"1px solid rgba(var(--ink),.04)":"none", alignItems:"center", transition:"background .15s" }}
                 onMouseEnter={e=>e.currentTarget.style.background="rgba(99,102,241,.05)"}
                 onMouseLeave={e=>e.currentTarget.style.background="transparent"}
               >
-                <span style={{ fontSize:13, fontWeight:600, color:"white" }}>{r.title}</span>
+                <span style={{ fontSize:13, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.title}</span>
                 <span style={{ fontSize:12, color:r.color, fontWeight:600, textTransform:"capitalize" }}>{r.dept}</span>
-                <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>📍 {r.location}</span>
-                <span style={{ padding:"3px 10px", borderRadius:20, background:`${LEVEL_COLOR[r.level]||"#818cf8"}20`, color:LEVEL_COLOR[r.level]||"#818cf8", fontSize:10, fontWeight:800, width:"fit-content" }}>{r.level}</span>
+                <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>📍 {r.location}</span>
+                <span style={{ padding:"3px 10px", borderRadius:20, background:`color-mix(in srgb, ${LEVEL_COLOR[r.level]||"#818cf8"} 12.5%, transparent)`, color:LEVEL_COLOR[r.level]||"var(--tx-818cf8, #818cf8)", fontSize:10, fontWeight:800, width:"fit-content" }}>{r.level}</span>
                 <div style={{ display:"flex", justifyContent:"flex-end" }}>
-                  <Link href="/careers" style={{ padding:"6px 14px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.25)", color:"#818cf8", fontSize:11, fontWeight:700, textDecoration:"none" }}>
+                  <Link href="/careers" style={{ padding:"6px 14px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.25)", color:"var(--tx-818cf8, #818cf8)", fontSize:11, fontWeight:700, textDecoration:"none" }}>
                     Apply →
                   </Link>
                 </div>
@@ -495,14 +495,14 @@ function LegacyRolesPage() {
           <h2 style={{ fontSize:"clamp(22px,3vw,32px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 12px" }}>
             Ready to find your role?
           </h2>
-          <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", margin:"0 auto 28px", maxWidth:400, lineHeight:1.7 }}>
+          <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", margin:"0 auto 28px", maxWidth:400, lineHeight:1.7 }}>
             Browse all open positions or send us a speculative application — we're always interested in exceptional people.
           </p>
           <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
             <Link href="/careers" style={{ padding:"13px 30px", borderRadius:12, fontWeight:800, fontSize:14, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", boxShadow:"0 4px 24px rgba(79,70,229,.4)" }}>
               See All Jobs
             </Link>
-            <Link href="/culture" style={{ padding:"13px 30px", borderRadius:12, fontWeight:700, fontSize:14, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", textDecoration:"none" }}>
+            <Link href="/culture" style={{ padding:"13px 30px", borderRadius:12, fontWeight:700, fontSize:14, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.8)", textDecoration:"none" }}>
               Our Culture →
             </Link>
           </div>

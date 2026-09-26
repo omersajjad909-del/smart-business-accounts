@@ -11,9 +11,9 @@ const CATEGORIES = [
     id: "accounting",
     label: "Accounting & Finance",
     emoji: "📊",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.22)",
-    dim: "rgba(129,140,248,.08)",
+    dim: "rgba(var(--txr-818cf8, 129,140,248),.08)",
     border: "rgba(129,140,248,.3)",
     items: [
       {
@@ -88,9 +88,9 @@ const CATEGORIES = [
     id: "sales",
     label: "Sales & Invoicing",
     emoji: "🧾",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.22)",
-    dim: "rgba(52,211,153,.08)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.08)",
     border: "rgba(52,211,153,.3)",
     items: [
       {
@@ -135,9 +135,9 @@ const CATEGORIES = [
     id: "purchases",
     label: "Purchases & Payables",
     emoji: "🛒",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.22)",
-    dim: "rgba(251,191,36,.08)",
+    dim: "rgba(var(--txr-fbbf24, 251,191,36),.08)",
     border: "rgba(251,191,36,.3)",
     items: [
       {
@@ -176,9 +176,9 @@ const CATEGORIES = [
     id: "inventory",
     label: "Inventory & Stock",
     emoji: "📦",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     glow: "rgba(56,189,248,.22)",
-    dim: "rgba(56,189,248,.08)",
+    dim: "rgba(var(--txr-38bdf8, 56,189,248),.08)",
     border: "rgba(56,189,248,.3)",
     items: [
       {
@@ -211,9 +211,9 @@ const CATEGORIES = [
     id: "hr",
     label: "HR & Payroll",
     emoji: "👥",
-    color: "#f87171",
+    color: "var(--tx-f87171, #f87171)",
     glow: "rgba(248,113,113,.22)",
-    dim: "rgba(248,113,113,.08)",
+    dim: "rgba(var(--txr-f87171, 248,113,113),.08)",
     border: "rgba(248,113,113,.3)",
     items: [
       {
@@ -246,9 +246,9 @@ const CATEGORIES = [
     id: "banking",
     label: "Banking & Cash Flow",
     emoji: "🏦",
-    color: "#2dd4bf",
+    color: "var(--tx-2dd4bf, #2dd4bf)",
     glow: "rgba(45,212,191,.22)",
-    dim: "rgba(45,212,191,.08)",
+    dim: "rgba(var(--txr-2dd4bf, 45,212,191),.08)",
     border: "rgba(45,212,191,.3)",
     items: [
       {
@@ -281,9 +281,9 @@ const CATEGORIES = [
     id: "crm",
     label: "CRM & Contacts",
     emoji: "🤝",
-    color: "#c4b5fd",
+    color: "var(--tx-c4b5fd, #c4b5fd)",
     glow: "rgba(196,181,253,.22)",
-    dim: "rgba(196,181,253,.08)",
+    dim: "rgba(var(--txr-c4b5fd, 196,181,253),.08)",
     border: "rgba(196,181,253,.3)",
     items: [
       {
@@ -310,9 +310,9 @@ const CATEGORIES = [
     id: "admin",
     label: "Administration & Security",
     emoji: "🔒",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.22)",
-    dim: "rgba(167,139,250,.08)",
+    dim: "rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border: "rgba(167,139,250,.3)",
     items: [
       {
@@ -381,9 +381,9 @@ const CATEGORIES = [
     id: "industries",
     label: "Industry Solutions",
     emoji: "🏭",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     glow: "rgba(245,158,11,.22)",
-    dim: "rgba(245,158,11,.08)",
+    dim: "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     border: "rgba(245,158,11,.3)",
     items: [
       {
@@ -442,8 +442,8 @@ const CATEGORIES = [
    MOCK SCREEN COMPONENTS — Feature-specific designs
 ══════════════════════════════════════════════════════════ */
 function MockScreen({ type, color }: { type: string; color: string }) {
-  const dim = `${color}15`;
-  const border = `${color}25`;
+  const dim = `color-mix(in srgb, ${color} 8.2%, transparent)`;
+  const border = `color-mix(in srgb, ${color} 14.5%, transparent)`;
 
   const screens: Record<string, React.ReactNode> = {
     // Ledger
@@ -452,19 +452,19 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
           <div style={{ fontSize:11, fontWeight:700, color, opacity:.8 }}>General Ledger</div>
           <div style={{ display:"flex", gap:6 }}>
-            {["DR","CR","BAL"].map(t=><div key={t} style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", width:36, textAlign:"right" }}>{t}</div>)}
+            {["DR","CR","BAL"].map(t=><div key={t} style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", width:36, textAlign:"right" }}>{t}</div>)}
           </div>
         </div>
         {[
           { acc:"Cash & Bank",   dr:"124,500",cr:"38,200",  bal:"86,300",  c:color },
-          { acc:"Sales Revenue", dr:"0",       cr:"420,000", bal:"420,000", c:"#34d399" },
-          { acc:"Cost of Goods", dr:"210,000", cr:"0",       bal:"210,000", c:"#f87171" },
-          { acc:"Accounts Rec.", dr:"85,000",  cr:"12,000",  bal:"73,000",  c:"#fbbf24" },
-          { acc:"Expenses",      dr:"45,000",  cr:"0",       bal:"45,000",  c:"#f87171" },
+          { acc:"Sales Revenue", dr:"0",       cr:"420,000", bal:"420,000", c:"var(--tx-34d399, #34d399)" },
+          { acc:"Cost of Goods", dr:"210,000", cr:"0",       bal:"210,000", c:"var(--tx-f87171, #f87171)" },
+          { acc:"Accounts Rec.", dr:"85,000",  cr:"12,000",  bal:"73,000",  c:"var(--tx-fbbf24, #fbbf24)" },
+          { acc:"Expenses",      dr:"45,000",  cr:"0",       bal:"45,000",  c:"var(--tx-f87171, #f87171)" },
         ].map(r=>(
-          <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:`1px solid rgba(255,255,255,.05)` }}>
-            <div style={{ fontSize:10, fontWeight:600, color:"rgba(255,255,255,.7)", flex:1 }}>{r.acc}</div>
-            {[r.dr,r.cr,r.bal].map((v,i)=><div key={i} style={{ fontSize:10, fontWeight:700, color:i===2?r.c:"rgba(255,255,255,.5)", width:46, textAlign:"right" }}>{v}</div>)}
+          <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:`1px solid rgba(var(--ink),.05)` }}>
+            <div style={{ fontSize:10, fontWeight:600, color:"rgba(var(--ink),var(--ta-70, .7))", flex:1 }}>{r.acc}</div>
+            {[r.dr,r.cr,r.bal].map((v,i)=><div key={i} style={{ fontSize:10, fontWeight:700, color:i===2?r.c:"rgba(var(--ink),var(--ta-50, .5))", width:46, textAlign:"right" }}>{v}</div>)}
           </div>
         ))}
         <div style={{ marginTop:4, padding:"6px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, display:"flex", justifyContent:"flex-end", gap:12 }}>
@@ -486,15 +486,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         ].map((r,i)=>(
           <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:r.sub?"7px 8px":"5px 8px", borderRadius:r.sub?8:0,
             background:r.sub?dim:"transparent", border:r.sub?`1px solid ${border}`:"none",
-            borderBottom:!r.sub?"1px solid rgba(255,255,255,.05)":"none" }}>
-            <span style={{ fontSize:10, fontWeight:r.sub?700:500, color:r.sub?"white":"rgba(255,255,255,.5)" }}>{r.label}</span>
-            <span style={{ fontSize:10, fontWeight:700, color:r.positive?"#34d399":"#f87171" }}>{r.val}</span>
+            borderBottom:!r.sub?"1px solid rgba(var(--ink),.05)":"none" }}>
+            <span style={{ fontSize:10, fontWeight:r.sub?700:500, color:r.sub?"var(--ink-solid, white)":"rgba(var(--ink),var(--ta-50, .5))" }}>{r.label}</span>
+            <span style={{ fontSize:10, fontWeight:700, color:r.positive?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" }}>{r.val}</span>
           </div>
         ))}
-        <div style={{ marginTop:4, height:4, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+        <div style={{ marginTop:4, height:4, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
           <div style={{ width:"73%", height:"100%", borderRadius:2, background:`linear-gradient(90deg,${color},#34d399)` }}/>
         </div>
-        <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", textAlign:"right" }}>Profit Margin: 36.6%</div>
+        <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", textAlign:"right" }}>Profit Margin: 36.6%</div>
       </div>
     ),
 
@@ -504,26 +504,26 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:6 }}>Balance Sheet</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
           <div>
-            <div style={{ fontSize:9, fontWeight:800, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:6 }}>Assets</div>
+            <div style={{ fontSize:9, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".06em", marginBottom:6 }}>Assets</div>
             {[["Cash & Bank","124,500"],["Receivables","85,000"],["Inventory","210,000"],["Fixed Assets","380,000"]].map(([l,v])=>(
-              <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-                <span style={{ fontSize:9, color:"rgba(255,255,255,.5)" }}>{l}</span>
-                <span style={{ fontSize:9, fontWeight:700, color:"#34d399" }}>{v}</span>
+              <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+                <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{l}</span>
+                <span style={{ fontSize:9, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>{v}</span>
               </div>
             ))}
           </div>
           <div>
-            <div style={{ fontSize:9, fontWeight:800, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:6 }}>Liabilities & Equity</div>
+            <div style={{ fontSize:9, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".06em", marginBottom:6 }}>Liabilities & Equity</div>
             {[["Payables","92,000"],["Loans","180,000"],["Capital","427,500"],["Retained","100,000"]].map(([l,v])=>(
-              <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-                <span style={{ fontSize:9, color:"rgba(255,255,255,.5)" }}>{l}</span>
+              <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+                <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{l}</span>
                 <span style={{ fontSize:9, fontWeight:700, color }}>{v}</span>
               </div>
             ))}
           </div>
         </div>
         <div style={{ marginTop:6, padding:"6px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, display:"flex", justifyContent:"space-between" }}>
-          <span style={{ fontSize:10, color:"rgba(255,255,255,.5)" }}>Total Assets = Total L+E</span>
+          <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-50, .5))" }}>Total Assets = Total L+E</span>
           <span style={{ fontSize:10, fontWeight:800, color }}>799,500 ✓</span>
         </div>
       </div>
@@ -534,19 +534,19 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Tax Summary — Q1 2025</div>
         {[
-          { label:"Taxable Sales",      val:"$142,000", color:"rgba(255,255,255,.6)" },
-          { label:"Sales Tax Collected",val:"$14,200",  color:"#f87171" },
-          { label:"Input Tax",          val:"$7,100",   color:"#34d399" },
+          { label:"Taxable Sales",      val:"$142,000", color:"rgba(var(--ink),var(--ta-60, .6))" },
+          { label:"Sales Tax Collected",val:"$14,200",  color:"var(--tx-f87171, #f87171)" },
+          { label:"Input Tax",          val:"$7,100",   color:"var(--tx-34d399, #34d399)" },
           { label:"Net Tax Payable",    val:"$7,100",   color },
         ].map(r=>(
-          <div key={r.label} style={{ display:"flex", justifyContent:"space-between", padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-            <span style={{ fontSize:10, color:"rgba(255,255,255,.55)" }}>{r.label}</span>
+          <div key={r.label} style={{ display:"flex", justifyContent:"space-between", padding:"7px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+            <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-55, .55))" }}>{r.label}</span>
             <span style={{ fontSize:10, fontWeight:700, color:r.color }}>{r.val}</span>
           </div>
         ))}
         <div style={{ marginTop:4, padding:"8px 12px", borderRadius:10, background:dim, border:`1px solid ${border}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <span style={{ fontSize:10, color:"rgba(255,255,255,.5)" }}>Tax Authority Export</span>
-          <div style={{ padding:"3px 10px", borderRadius:20, background:color+"30", color, fontSize:9, fontWeight:800 }}>READY ↓</div>
+          <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-50, .5))" }}>Tax Authority Export</span>
+          <div style={{ padding:"3px 10px", borderRadius:20, background:`color-mix(in srgb, ${color} 18.8%, transparent)`, color, fontSize:9, fontWeight:800 }}>READY ↓</div>
         </div>
       </div>
     ),
@@ -556,27 +556,27 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:2 }}>Bank Reconciliation</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:4 }}>
-          <div style={{ padding:"8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)", textAlign:"center" }}>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginBottom:3 }}>Bank Balance</div>
-            <div style={{ fontSize:13, fontWeight:800, color:"#34d399" }}>124,500</div>
+          <div style={{ padding:"8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)", textAlign:"center" }}>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:3 }}>Bank Balance</div>
+            <div style={{ fontSize:13, fontWeight:800, color:"var(--tx-34d399, #34d399)" }}>124,500</div>
           </div>
-          <div style={{ padding:"8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)", textAlign:"center" }}>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginBottom:3 }}>Book Balance</div>
+          <div style={{ padding:"8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)", textAlign:"center" }}>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:3 }}>Book Balance</div>
             <div style={{ fontSize:13, fontWeight:800, color }}>124,500</div>
           </div>
         </div>
         {[
-          { desc:"HBL Payment Ref #4421", status:"matched",   c:"#34d399" },
-          { desc:"Supplier MCB Transfer",  status:"matched",   c:"#34d399" },
-          { desc:"Bank Charge 0.1%",       status:"unmatched", c:"#f87171" },
-          { desc:"UBL Credit Ref #8823",   status:"matched",   c:"#34d399" },
+          { desc:"HBL Payment Ref #4421", status:"matched",   c:"var(--tx-34d399, #34d399)" },
+          { desc:"Supplier MCB Transfer",  status:"matched",   c:"var(--tx-34d399, #34d399)" },
+          { desc:"Bank Charge 0.1%",       status:"unmatched", c:"var(--tx-f87171, #f87171)" },
+          { desc:"UBL Credit Ref #8823",   status:"matched",   c:"var(--tx-34d399, #34d399)" },
         ].map(r=>(
-          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.02)", border:`1px solid rgba(255,255,255,.04)` }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)" }}>{r.desc}</span>
-            <span style={{ fontSize:8, fontWeight:800, color:r.c, padding:"2px 8px", borderRadius:10, background:`${r.c}18` }}>{r.status.toUpperCase()}</span>
+          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(var(--ink),.02)", border:`1px solid rgba(var(--ink),.04)` }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))" }}>{r.desc}</span>
+            <span style={{ fontSize:8, fontWeight:800, color:r.c, padding:"2px 8px", borderRadius:10, background:`color-mix(in srgb, ${r.c} 9.4%, transparent)` }}>{r.status.toUpperCase()}</span>
           </div>
         ))}
-        <div style={{ marginTop:2, fontSize:9, color:"rgba(255,255,255,.25)", textAlign:"right" }}>3 / 4 matched automatically</div>
+        <div style={{ marginTop:2, fontSize:9, color:"rgba(var(--ink),var(--ta-25, .25))", textAlign:"right" }}>3 / 4 matched automatically</div>
       </div>
     ),
 
@@ -590,13 +590,13 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { dept:"Marketing",   revenue:"120,000", expense:"95,000",  profit:"25,000",  pct:21 },
           { dept:"Admin",       revenue:"0",       expense:"65,000",  profit:"-65,000", pct:0  },
         ].map(r=>(
-          <div key={r.dept} style={{ padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.dept} style={{ padding:"7px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
-              <span style={{ fontSize:10, fontWeight:700, color:"white" }}>{r.dept}</span>
-              <span style={{ fontSize:10, fontWeight:700, color:r.pct>0?"#34d399":"#f87171" }}>{r.profit}</span>
+              <span style={{ fontSize:10, fontWeight:700, color:"var(--ink-solid, white)" }}>{r.dept}</span>
+              <span style={{ fontSize:10, fontWeight:700, color:r.pct>0?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" }}>{r.profit}</span>
             </div>
-            <div style={{ height:3, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
-              <div style={{ width:`${r.pct}%`, height:"100%", borderRadius:2, background:r.pct>0?color:"#f87171" }}/>
+            <div style={{ height:3, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
+              <div style={{ width:`${r.pct}%`, height:"100%", borderRadius:2, background:r.pct>0?color:"var(--tx-f87171, #f87171)" }}/>
             </div>
           </div>
         ))}
@@ -613,12 +613,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { cat:"Salaries",    budget:300000, actual:300000, pct:100},
           { cat:"Travel",      budget:30000,  actual:38000,  pct:127},
         ].map(r=>(
-          <div key={r.cat} style={{ padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.cat} style={{ padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-              <span style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.6)" }}>{r.cat}</span>
-              <span style={{ fontSize:9, fontWeight:800, color:r.pct>100?"#f87171":r.pct>90?"#fbbf24":"#34d399" }}>{r.pct}%</span>
+              <span style={{ fontSize:9, fontWeight:600, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{r.cat}</span>
+              <span style={{ fontSize:9, fontWeight:800, color:r.pct>100?"var(--tx-f87171, #f87171)":r.pct>90?"var(--tx-fbbf24, #fbbf24)":"var(--tx-34d399, #34d399)" }}>{r.pct}%</span>
             </div>
-            <div style={{ height:4, borderRadius:2, background:"rgba(255,255,255,.06)", overflow:"hidden" }}>
+            <div style={{ height:4, borderRadius:2, background:"rgba(var(--ink),.06)", overflow:"hidden" }}>
               <div style={{ width:`${Math.min(r.pct,100)}%`, height:"100%", borderRadius:2, background:r.pct>100?"#f87171":r.pct>90?"#fbbf24":color }}/>
             </div>
           </div>
@@ -630,9 +630,9 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     journal: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Journal Voucher #JV-2025-089</div>
-        <div style={{ padding:"8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)", marginBottom:4 }}>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", marginBottom:6 }}>Narration: Monthly depreciation — March 2025</div>
-          <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", borderBottom:"1px solid rgba(255,255,255,.06)", paddingBottom:4, marginBottom:4 }}>
+        <div style={{ padding:"8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)", marginBottom:4 }}>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:6 }}>Narration: Monthly depreciation — March 2025</div>
+          <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", borderBottom:"1px solid rgba(var(--ink),.06)", paddingBottom:4, marginBottom:4 }}>
             <span>Account</span><span>Debit</span><span>Credit</span>
           </div>
           {[
@@ -640,20 +640,20 @@ function MockScreen({ type, color }: { type: string; color: string }) {
             { acc:"Accumulated Depr.",      dr:"—",      cr:"12,500" },
           ].map(r=>(
             <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0" }}>
-              <span style={{ fontSize:9, color:"rgba(255,255,255,.6)" }}>{r.acc}</span>
-              <span style={{ fontSize:9, fontWeight:700, color:"#f87171" }}>{r.dr}</span>
-              <span style={{ fontSize:9, fontWeight:700, color:"#34d399" }}>{r.cr}</span>
+              <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{r.acc}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"var(--tx-f87171, #f87171)" }}>{r.dr}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>{r.cr}</span>
             </div>
           ))}
         </div>
         <div style={{ display:"flex", gap:6 }}>
-          <div style={{ flex:1, padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)", textAlign:"center" }}>
-            <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>Total DR</div>
-            <div style={{ fontSize:11, fontWeight:800, color:"#f87171" }}>12,500</div>
+          <div style={{ flex:1, padding:"5px 8px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)", textAlign:"center" }}>
+            <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Total DR</div>
+            <div style={{ fontSize:11, fontWeight:800, color:"var(--tx-f87171, #f87171)" }}>12,500</div>
           </div>
           <div style={{ flex:1, padding:"5px 8px", borderRadius:7, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
-            <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>Total CR</div>
-            <div style={{ fontSize:11, fontWeight:800, color:"#34d399" }}>12,500</div>
+            <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Total CR</div>
+            <div style={{ fontSize:11, fontWeight:800, color:"var(--tx-34d399, #34d399)" }}>12,500</div>
           </div>
         </div>
         <div style={{ padding:"5px 8px", borderRadius:7, background:dim, border:`1px solid ${border}`, fontSize:9, color, fontWeight:700, textAlign:"center" }}>
@@ -667,25 +667,25 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
           <div>
-            <div style={{ fontSize:11, fontWeight:800, color:"white" }}>INVOICE</div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.35)" }}>#INV-2025-0847</div>
+            <div style={{ fontSize:11, fontWeight:800, color:"var(--ink-solid, white)" }}>INVOICE</div>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-35, .35))" }}>#INV-2025-0847</div>
           </div>
-          <div style={{ padding:"3px 10px", borderRadius:20, background:"rgba(52,211,153,.15)", color:"#34d399", fontSize:8, fontWeight:800 }}>SENT</div>
+          <div style={{ padding:"3px 10px", borderRadius:20, background:"rgba(52,211,153,.15)", color:"var(--tx-34d399, #34d399)", fontSize:8, fontWeight:800 }}>SENT</div>
         </div>
-        <div style={{ height:1, background:"rgba(255,255,255,.06)" }}/>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:"rgba(255,255,255,.3)" }}>
-          <div>To: <span style={{ color:"white", fontWeight:600 }}>Mahmood Trading Co.</span></div>
-          <div>Due: <span style={{ color:"#f87171", fontWeight:600 }}>Mar 31, 2025</span></div>
+        <div style={{ height:1, background:"rgba(var(--ink),.06)" }}/>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))" }}>
+          <div>To: <span style={{ color:"var(--ink-solid, white)", fontWeight:600 }}>Mahmood Trading Co.</span></div>
+          <div>Due: <span style={{ color:"var(--tx-f87171, #f87171)", fontWeight:600 }}>Mar 31, 2025</span></div>
         </div>
         {[["Web Development Services","1","$4,250"],["Monthly Maintenance","3","$750"],["Domain & Hosting","1","$250"]].map(([desc,qty,amt])=>(
-          <div key={desc} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{desc}</span>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.3)", width:20, textAlign:"center" }}>{qty}</span>
+          <div key={desc} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{desc}</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", width:20, textAlign:"center" }}>{qty}</span>
             <span style={{ fontSize:9, fontWeight:700, color:color, width:70, textAlign:"right" }}>{amt}</span>
           </div>
         ))}
         <div style={{ display:"flex", justifyContent:"space-between", padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}` }}>
-          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.7)" }}>Total</span>
+          <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))" }}>Total</span>
           <span style={{ fontSize:11, fontWeight:800, color }}>$6,500</span>
         </div>
       </div>
@@ -696,20 +696,20 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div style={{ fontSize:11, fontWeight:700, color, opacity:.8 }}>Quotations Pipeline</div>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.3)" }}>12 active</div>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))" }}>12 active</div>
         </div>
         {[
-          { client:"Al-Noor Traders",    val:"$21,000", status:"ACCEPTED", c:"#34d399" },
-          { client:"Sunrise Corp",       val:"$9,250",  status:"SENT",     c:"#fbbf24" },
-          { client:"Global Exports Ltd", val:"$44,500", status:"DRAFT",    c:"rgba(255,255,255,.3)" },
-          { client:"Tech Solutions PK",  val:"$12,500", status:"SENT",     c:"#fbbf24" },
+          { client:"Al-Noor Traders",    val:"$21,000", status:"ACCEPTED", c:"var(--tx-34d399, #34d399)" },
+          { client:"Sunrise Corp",       val:"$9,250",  status:"SENT",     c:"var(--tx-fbbf24, #fbbf24)" },
+          { client:"Global Exports Ltd", val:"$44,500", status:"DRAFT",    c:"rgba(var(--ink),var(--ta-30, .3))" },
+          { client:"Tech Solutions PK",  val:"$12,500", status:"SENT",     c:"var(--tx-fbbf24, #fbbf24)" },
         ].map(r=>(
-          <div key={r.client} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.client} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div>
-              <div style={{ fontSize:10, fontWeight:600, color:"white" }}>{r.client}</div>
+              <div style={{ fontSize:10, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.client}</div>
               <div style={{ fontSize:9, fontWeight:700, color }}>{r.val}</div>
             </div>
-            <span style={{ fontSize:8, fontWeight:800, color:r.c, padding:"2px 8px", borderRadius:10, background:`${r.c}18` }}>{r.status}</span>
+            <span style={{ fontSize:8, fontWeight:800, color:r.c, padding:"2px 8px", borderRadius:10, background:`color-mix(in srgb, ${r.c} 9.4%, transparent)` }}>{r.status}</span>
           </div>
         ))}
       </div>
@@ -721,15 +721,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:2 }}>Delivery Challan #DC-0234</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
           {[["Customer","Global Traders Ltd"],["Driver","Kamran Ali"],["Vehicle","TRK-1234"],["Date","Mar 17, 2025"]].map(([l,v])=>(
-            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>{l}</div>
-              <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{v}</div>
+            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l}</div>
+              <div style={{ fontSize:9, fontWeight:700, color:"var(--ink-solid, white)" }}>{v}</div>
             </div>
           ))}
         </div>
         {[["Premium Cotton Fabric","50 meters"],["Plain White Sheets","100 pcs"],["Packaging Material","1 box"]].map(([item,qty])=>(
-          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)" }}>{item}</span>
+          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))" }}>{item}</span>
             <span style={{ fontSize:9, fontWeight:700, color }}>{qty}</span>
           </div>
         ))}
@@ -744,21 +744,21 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Sales Return #SR-0089</div>
         <div style={{ padding:"8px", borderRadius:8, background:"rgba(248,113,113,.06)", border:"1px solid rgba(248,113,113,.15)", marginBottom:4 }}>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Against Invoice: INV-2025-0812</div>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:4 }}>Against Invoice: INV-2025-0812</div>
           <div style={{ display:"flex", justifyContent:"space-between" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.6)" }}>Customer: Al-Noor Traders</span>
-            <span style={{ fontSize:9, fontWeight:800, color:"#f87171" }}>Return</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Customer: Al-Noor Traders</span>
+            <span style={{ fontSize:9, fontWeight:800, color:"var(--tx-f87171, #f87171)" }}>Return</span>
           </div>
         </div>
         {[["Cotton Fabric (Damaged)","10 mtrs","$900"],["Wrong Size Delivered","5 pcs","$225"]].map(([item,qty,val])=>(
-          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{item}</span>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.35)", width:44 }}>{qty}</span>
-            <span style={{ fontSize:9, fontWeight:700, color:"#f87171" }}>{val}</span>
+          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{item}</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-35, .35))", width:44 }}>{qty}</span>
+            <span style={{ fontSize:9, fontWeight:700, color:"var(--tx-f87171, #f87171)" }}>{val}</span>
           </div>
         ))}
         <div style={{ padding:"6px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, display:"flex", justifyContent:"space-between" }}>
-          <span style={{ fontSize:9, color:"rgba(255,255,255,.5)" }}>Credit Note Issued</span>
+          <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>Credit Note Issued</span>
           <span style={{ fontSize:9, fontWeight:800, color }}>$1,125 ✓</span>
         </div>
       </div>
@@ -769,17 +769,17 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Accounts Receivable Aging</div>
         {[
-          { range:"Current (0–30d)",  amt:"$21,000", c:"#34d399", w:"100%" },
-          { range:"31–60 days",       amt:"$9,250",  c:"#fbbf24", w:"44%"  },
-          { range:"61–90 days",       amt:"$4,750",  c:"#f87171", w:"23%"  },
+          { range:"Current (0–30d)",  amt:"$21,000", c:"var(--tx-34d399, #34d399)", w:"100%" },
+          { range:"31–60 days",       amt:"$9,250",  c:"var(--tx-fbbf24, #fbbf24)", w:"44%"  },
+          { range:"61–90 days",       amt:"$4,750",  c:"var(--tx-f87171, #f87171)", w:"23%"  },
           { range:"Over 90 days",     amt:"$2,100",  c:"#ef4444", w:"10%"  },
         ].map(r=>(
-          <div key={r.range} style={{ padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.range} style={{ padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-              <span style={{ fontSize:9, color:"rgba(255,255,255,.5)" }}>{r.range}</span>
+              <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{r.range}</span>
               <span style={{ fontSize:9, fontWeight:700, color:r.c }}>{r.amt}</span>
             </div>
-            <div style={{ height:3, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+            <div style={{ height:3, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
               <div style={{ width:r.w, height:"100%", borderRadius:2, background:r.c }}/>
             </div>
           </div>
@@ -798,14 +798,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { client:"US Customer",    curr:"USD", amt:"$ 3,200",    pkr:"≈ $3,200" },
           { client:"KSA Distributor",curr:"SAR", amt:"SAR 12,000", pkr:"≈ $3,200" },
         ].map(r=>(
-          <div key={r.client} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.client} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div>
-              <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.client}</div>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.pkr}</div>
+              <div style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.client}</div>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.pkr}</div>
             </div>
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:9, fontWeight:800, color }}>{r.amt}</div>
-              <div style={{ fontSize:8, padding:"1px 6px", borderRadius:10, background:`${color}20`, color, fontWeight:700 }}>{r.curr}</div>
+              <div style={{ fontSize:8, padding:"1px 6px", borderRadius:10, background:`color-mix(in srgb, ${color} 12.5%, transparent)`, color, fontWeight:700 }}>{r.curr}</div>
             </div>
           </div>
         ))}
@@ -822,16 +822,16 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { po:"PO-0419", supplier:"Packaging Supply",   status:"RECEIVED", val:"$2,100"  },
           { po:"PO-0418", supplier:"Chemical Suppliers", status:"RECEIVED", val:"$4,775"  },
         ].map(r=>{
-          const sc = r.status==="RECEIVED"?"#34d399":r.status==="PARTIAL"?"#fbbf24":"rgba(255,255,255,.4)";
+          const sc = r.status==="RECEIVED"?"var(--tx-34d399, #34d399)":r.status==="PARTIAL"?"var(--tx-fbbf24, #fbbf24)":"rgba(var(--ink),.4)";
           return (
-            <div key={r.po} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div key={r.po} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
               <div>
                 <div style={{ fontSize:9, fontWeight:700, color }}>{r.po}</div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.45)" }}>{r.supplier}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-45, .45))" }}>{r.supplier}</div>
               </div>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{r.val}</div>
-                <span style={{ fontSize:7, fontWeight:800, color:sc, padding:"1px 6px", borderRadius:10, background:`${sc}18` }}>{r.status}</span>
+                <div style={{ fontSize:9, fontWeight:700, color:"var(--ink-solid, white)" }}>{r.val}</div>
+                <span style={{ fontSize:7, fontWeight:800, color:sc, padding:"1px 6px", borderRadius:10, background:`color-mix(in srgb, ${sc} 9.4%, transparent)` }}>{r.status}</span>
               </div>
             </div>
           );
@@ -843,25 +843,25 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     purchase: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Purchase Invoice #PI-0312</div>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:"rgba(255,255,255,.4)", marginBottom:4 }}>
-          <span>Supplier: <span style={{ color:"white", fontWeight:600 }}>Textile Mills Ltd</span></span>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:4 }}>
+          <span>Supplier: <span style={{ color:"var(--ink-solid, white)", fontWeight:600 }}>Textile Mills Ltd</span></span>
           <span>Ref PO: <span style={{ color, fontWeight:600 }}>PO-0421</span></span>
         </div>
         {[["Cotton Yarn 40/2","500 kg","$9,000"],["Polyester Fiber","200 kg","$3,000"],["Dyes & Chemicals","50 kg","$2,000"]].map(([item,qty,amt])=>(
-          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{item}</span>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.3)", width:44 }}>{qty}</span>
+          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{item}</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", width:44 }}>{qty}</span>
             <span style={{ fontSize:9, fontWeight:700, color }}>{amt}</span>
           </div>
         ))}
         <div style={{ display:"flex", gap:6, marginTop:4 }}>
           <div style={{ flex:1, padding:"5px 8px", borderRadius:7, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
-            <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>Total</div>
+            <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Total</div>
             <div style={{ fontSize:11, fontWeight:800, color }}>$14,000</div>
           </div>
           <div style={{ flex:1, padding:"5px 8px", borderRadius:7, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)", textAlign:"center" }}>
-            <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>Stock Updated</div>
-            <div style={{ fontSize:10, fontWeight:800, color:"#34d399" }}>✓ Auto</div>
+            <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Stock Updated</div>
+            <div style={{ fontSize:10, fontWeight:800, color:"var(--tx-34d399, #34d399)" }}>✓ Auto</div>
           </div>
         </div>
       </div>
@@ -872,20 +872,20 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Accounts Payable Aging</div>
         {[
-          { supplier:"Textile Mills Ltd",  amt:"$14,000", due:"5 days",   c:"#f87171" },
-          { supplier:"Raw Materials Co",   amt:"$7,250",  due:"12 days",  c:"#fbbf24" },
-          { supplier:"Chemical Suppliers", amt:"$4,775",  due:"28 days",  c:"#34d399" },
-          { supplier:"Packaging Supply",   amt:"$2,100",  due:"45 days",  c:"#34d399" },
+          { supplier:"Textile Mills Ltd",  amt:"$14,000", due:"5 days",   c:"var(--tx-f87171, #f87171)" },
+          { supplier:"Raw Materials Co",   amt:"$7,250",  due:"12 days",  c:"var(--tx-fbbf24, #fbbf24)" },
+          { supplier:"Chemical Suppliers", amt:"$4,775",  due:"28 days",  c:"var(--tx-34d399, #34d399)" },
+          { supplier:"Packaging Supply",   amt:"$2,100",  due:"45 days",  c:"var(--tx-34d399, #34d399)" },
         ].map(r=>(
-          <div key={r.supplier} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.supplier} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div>
-              <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.supplier}</div>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>Due in {r.due}</div>
+              <div style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.supplier}</div>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>Due in {r.due}</div>
             </div>
             <span style={{ fontSize:9, fontWeight:700, color:r.c }}>{r.amt}</span>
           </div>
         ))}
-        <div style={{ fontSize:9, fontWeight:800, color:"#f87171", textAlign:"right" }}>Total Payable: $28,125</div>
+        <div style={{ fontSize:9, fontWeight:800, color:"var(--tx-f87171, #f87171)", textAlign:"right" }}>Total Payable: $28,125</div>
       </div>
     ),
 
@@ -898,12 +898,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { supplier:"Chemical Co",    advance:"$2,500", used:"$0",     balance:"$2,500" },
           { supplier:"Raw Materials",  advance:"$3,750", used:"$3,750", balance:"$0" },
         ].map(r=>(
-          <div key={r.supplier} style={{ padding:"8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-            <div style={{ fontSize:10, fontWeight:600, color:"white", marginBottom:5 }}>{r.supplier}</div>
+          <div key={r.supplier} style={{ padding:"8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+            <div style={{ fontSize:10, fontWeight:600, color:"var(--ink-solid, white)", marginBottom:5 }}>{r.supplier}</div>
             <div style={{ display:"flex", gap:8 }}>
-              {[["Advance",r.advance,"rgba(255,255,255,.4)"],["Used",r.used,"#fbbf24"],["Balance",r.balance,color]].map(([l,v,c])=>(
+              {[["Advance",r.advance,"rgba(var(--ink),.4)"],["Used",r.used,"var(--tx-fbbf24, #fbbf24)"],["Balance",r.balance,color]].map(([l,v,c])=>(
                 <div key={String(l)} style={{ flex:1, textAlign:"center" }}>
-                  <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
+                  <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l}</div>
                   <div style={{ fontSize:9, fontWeight:700, color:c as string }}>{v}</div>
                 </div>
               ))}
@@ -923,12 +923,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { desc:"NY to London Travel",       cat:"Travel",  amt:"$1,100", status:"PENDING"  },
           { desc:"Office Stationery",         cat:"Supplies",amt:"$210",   status:"APPROVED" },
         ].map(r=>{
-          const sc = r.status==="APPROVED"?"#34d399":"#fbbf24";
+          const sc = r.status==="APPROVED"?"var(--tx-34d399, #34d399)":"var(--tx-fbbf24, #fbbf24)";
           return (
-            <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.desc}</div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.cat}</div>
+                <div style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.desc}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.cat}</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:9, fontWeight:700, color }}>{r.amt}</div>
@@ -950,12 +950,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { item:"Dyes (Blue)",       stock:32,   min:50,  unit:"kg",  alert:true  },
           { item:"Packing Rolls",     stock:1200, min:200, unit:"pcs", alert:false },
         ].map(r=>(
-          <div key={r.item} style={{ padding:"6px 8px", borderRadius:8, background:r.alert?"rgba(248,113,113,.06)":"rgba(255,255,255,.03)", border:`1px solid ${r.alert?"rgba(248,113,113,.2)":"rgba(255,255,255,.05)"}` }}>
+          <div key={r.item} style={{ padding:"6px 8px", borderRadius:8, background:r.alert?"rgba(248,113,113,.06)":"rgba(var(--ink),.03)", border:`1px solid ${r.alert?"rgba(248,113,113,.2)":"rgba(var(--ink),.05)"}` }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-              <span style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.item}</span>
-              <span style={{ fontSize:9, fontWeight:700, color:r.alert?"#f87171":color }}>{r.stock} {r.unit} {r.alert?"⚠":"✓"}</span>
+              <span style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.item}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:r.alert?"var(--tx-f87171, #f87171)":color }}>{r.stock} {r.unit} {r.alert?"⚠":"✓"}</span>
             </div>
-            <div style={{ height:3, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+            <div style={{ height:3, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
               <div style={{ width:`${Math.min((r.stock/r.min)*30,100)}%`, height:"100%", borderRadius:2, background:r.alert?"#f87171":color }}/>
             </div>
           </div>
@@ -970,15 +970,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6, marginBottom:6 }}>
           {[["Total SKUs","284"],["Total Value","$ 210K"],["Locations","3"]].map(([l,v])=>(
             <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{l}</div>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{l}</div>
               <div style={{ fontSize:11, fontWeight:800, color }}>{v}</div>
             </div>
           ))}
         </div>
         {[["Cotton Yarn 40/2","420 kg","$7,560"],["Polyester Fiber","85 kg","$1,275"],["Finished Fabric","1,200 m","$48,000"]].map(([item,qty,val])=>(
-          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{item}</span>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.35)", width:50 }}>{qty}</span>
+          <div key={item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{item}</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-35, .35))", width:50 }}>{qty}</span>
             <span style={{ fontSize:9, fontWeight:700, color }}>{val}</span>
           </div>
         ))}
@@ -994,14 +994,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { loc:"Branch A",      items:142, val:"$55K"  },
           { loc:"Dubai Godown",  items:56,  val:"$15K"  },
         ].map(r=>(
-          <div key={r.loc} style={{ padding:"10px 12px", borderRadius:10, background:"rgba(255,255,255,.03)", border:`1px solid ${border}`, marginBottom:2 }}>
+          <div key={r.loc} style={{ padding:"10px 12px", borderRadius:10, background:"rgba(var(--ink),.03)", border:`1px solid ${border}`, marginBottom:2 }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-              <span style={{ fontSize:10, fontWeight:600, color:"white" }}>{r.loc}</span>
+              <span style={{ fontSize:10, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.loc}</span>
               <span style={{ fontSize:10, fontWeight:700, color }}>{r.val}</span>
             </div>
             <div style={{ display:"flex", gap:8 }}>
-              <span style={{ fontSize:9, color:"rgba(255,255,255,.4)" }}>{r.items} SKUs</span>
-              <div style={{ flex:1, height:4, borderRadius:2, background:"rgba(255,255,255,.06)", alignSelf:"center" }}>
+              <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))" }}>{r.items} SKUs</span>
+              <div style={{ flex:1, height:4, borderRadius:2, background:"rgba(var(--ink),.06)", alignSelf:"center" }}>
                 <div style={{ width:`${(r.items/284)*100}%`, height:"100%", borderRadius:2, background:color }}/>
               </div>
             </div>
@@ -1018,13 +1018,13 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Barcode Management</div>
         <div style={{ padding:"12px", borderRadius:10, background:dim, border:`1px solid ${border}`, textAlign:"center", marginBottom:4 }}>
-          <div style={{ fontFamily:"monospace", fontSize:24, letterSpacing:4, color:"white", marginBottom:4 }}>|||||||||||</div>
-          <div style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,.5)", letterSpacing:2 }}>6901234567890</div>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.35)", marginTop:4 }}>Cotton Yarn 40/2</div>
+          <div style={{ fontFamily:"monospace", fontSize:24, letterSpacing:4, color:"var(--ink-solid, white)", marginBottom:4 }}>|||||||||||</div>
+          <div style={{ fontFamily:"monospace", fontSize:10, color:"rgba(var(--ink),var(--ta-50, .5))", letterSpacing:2 }}>6901234567890</div>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:4 }}>Cotton Yarn 40/2</div>
         </div>
         {[["Item Code","CY-40-2-WHT"],["Category","Raw Material"],["Unit","Kg"],["Rate","$18/kg"]].map(([l,v])=>(
-          <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.4)" }}>{l}</span>
+          <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))" }}>{l}</span>
             <span style={{ fontSize:9, fontWeight:700, color }}>{v}</span>
           </div>
         ))}
@@ -1036,16 +1036,16 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Employee Profile</div>
         <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:6 }}>
-          <div style={{ width:40, height:40, borderRadius:12, background:`linear-gradient(135deg,${color}40,${color}20)`, border:`1px solid ${border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, color }}>MK</div>
+          <div style={{ width:40, height:40, borderRadius:12, background:`linear-gradient(135deg,color-mix(in srgb, ${color} 25.1%, transparent),color-mix(in srgb, ${color} 12.5%, transparent))`, border:`1px solid ${border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, color }}>MK</div>
           <div>
-            <div style={{ fontSize:11, fontWeight:700, color:"white" }}>Muhammad Kamran</div>
+            <div style={{ fontSize:11, fontWeight:700, color:"var(--ink-solid, white)" }}>Muhammad Kamran</div>
             <div style={{ fontSize:9, color }}>Senior Accountant</div>
           </div>
         </div>
         {[["Department","Finance"],["Joining","Jan 1, 2022"],["ID No.","ID-42101-1234567"],["Salary","$4,250"],["Social Security","Enrolled ✓"]].map(([l,v])=>(
-          <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.4)" }}>{l}</span>
-            <span style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.7)" }}>{v}</span>
+          <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))" }}>{l}</span>
+            <span style={{ fontSize:9, fontWeight:600, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{v}</span>
           </div>
         ))}
       </div>
@@ -1057,22 +1057,22 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Attendance — March 2025</div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3, marginBottom:8 }}>
           {["M","T","W","T","F","S","S"].map((d,i)=>(
-            <div key={i} style={{ textAlign:"center", fontSize:8, color:"rgba(255,255,255,.3)", fontWeight:700 }}>{d}</div>
+            <div key={i} style={{ textAlign:"center", fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:700 }}>{d}</div>
           ))}
           {[...Array(21)].map((_,i)=>{
             const status = i===5||i===6||i===12||i===13||i===19||i===20 ? "off" : i===8 ? "leave" : "present";
             return (
-              <div key={i} style={{ aspectRatio:"1", borderRadius:4, background:status==="present"?`${color}30`:status==="leave"?"rgba(251,191,36,.2)":"rgba(255,255,255,.04)", border:`1px solid ${status==="present"?border:status==="leave"?"rgba(251,191,36,.3)":"rgba(255,255,255,.06)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, fontWeight:700, color:status==="present"?color:status==="leave"?"#fbbf24":"rgba(255,255,255,.2)" }}>
+              <div key={i} style={{ aspectRatio:"1", borderRadius:4, background:status==="present"?`color-mix(in srgb, ${color} 18.8%, transparent)`:status==="leave"?"rgba(251,191,36,.2)":"rgba(var(--ink),.04)", border:`1px solid ${status==="present"?border:status==="leave"?"rgba(251,191,36,.3)":"rgba(var(--ink),.06)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, fontWeight:700, color:status==="present"?color:status==="leave"?"var(--tx-fbbf24, #fbbf24)":"rgba(var(--ink),var(--ta-20, .2))" }}>
                 {i+1}
               </div>
             );
           })}
         </div>
         <div style={{ display:"flex", gap:6 }}>
-          {[["Present","19",color],["Leave","1","#fbbf24"],["Absent","0","#f87171"]].map(([l,v,c])=>(
-            <div key={String(l)} style={{ flex:1, padding:"5px 6px", borderRadius:7, background:`${c}10`, border:`1px solid ${c}25`, textAlign:"center" }}>
+          {[["Present","19",color],["Leave","1","var(--tx-fbbf24, #fbbf24)"],["Absent","0","var(--tx-f87171, #f87171)"]].map(([l,v,c])=>(
+            <div key={String(l)} style={{ flex:1, padding:"5px 6px", borderRadius:7, background:`color-mix(in srgb, ${c} 6.3%, transparent)`, border:`1px solid color-mix(in srgb, ${c} 14.5%, transparent)`, textAlign:"center" }}>
               <div style={{ fontSize:11, fontWeight:800, color:c as string }}>{v}</div>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l}</div>
             </div>
           ))}
         </div>
@@ -1083,27 +1083,27 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     payroll: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Payslip — March 2025</div>
-        <div style={{ fontSize:10, fontWeight:600, color:"white", marginBottom:4 }}>Muhammad Kamran · Senior Accountant</div>
+        <div style={{ fontSize:10, fontWeight:600, color:"var(--ink-solid, white)", marginBottom:4 }}>Muhammad Kamran · Senior Accountant</div>
         <div>
-          <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".05em", marginBottom:4 }}>Earnings</div>
+          <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".05em", marginBottom:4 }}>Earnings</div>
           {[["Basic Salary","$3,250"],["HRA","$650"],["Conveyance","$250"],["Medical","$100"]].map(([l,v])=>(
             <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"2px 0" }}>
-              <span style={{ fontSize:9, color:"rgba(255,255,255,.5)" }}>{l}</span>
-              <span style={{ fontSize:9, fontWeight:600, color:"#34d399" }}>{v}</span>
+              <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{l}</span>
+              <span style={{ fontSize:9, fontWeight:600, color:"var(--tx-34d399, #34d399)" }}>{v}</span>
             </div>
           ))}
         </div>
         <div>
-          <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".05em", marginBottom:4 }}>Deductions</div>
+          <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".05em", marginBottom:4 }}>Deductions</div>
           {[["Social Security","$16"],["Income Tax","$163"],["Advance","$0"]].map(([l,v])=>(
             <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"2px 0" }}>
-              <span style={{ fontSize:9, color:"rgba(255,255,255,.5)" }}>{l}</span>
-              <span style={{ fontSize:9, fontWeight:600, color:"#f87171" }}>{v}</span>
+              <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{l}</span>
+              <span style={{ fontSize:9, fontWeight:600, color:"var(--tx-f87171, #f87171)" }}>{v}</span>
             </div>
           ))}
         </div>
         <div style={{ padding:"6px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, display:"flex", justifyContent:"space-between" }}>
-          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.7)" }}>Net Salary</span>
+          <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))" }}>Net Salary</span>
           <span style={{ fontSize:11, fontWeight:800, color }}>$4,071</span>
         </div>
       </div>
@@ -1118,12 +1118,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { name:"Sara Ahmed",     advance:"$750",   deducted:"$750",   balance:"$0"   },
           { name:"Kamran Sheikh",  advance:"$1,500", deducted:"$0",     balance:"$1,500"},
         ].map(r=>(
-          <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-            <div style={{ fontSize:10, fontWeight:600, color:"white", marginBottom:5 }}>{r.name}</div>
+          <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+            <div style={{ fontSize:10, fontWeight:600, color:"var(--ink-solid, white)", marginBottom:5 }}>{r.name}</div>
             <div style={{ display:"flex", gap:8 }}>
-              {[["Given",r.advance,"rgba(255,255,255,.5)"],["Deducted",r.deducted,"#fbbf24"],["Balance",r.balance,r.balance==="$0"?"#34d399":color]].map(([l,v,c])=>(
+              {[["Given",r.advance,"rgba(var(--ink),.5)"],["Deducted",r.deducted,"var(--tx-fbbf24, #fbbf24)"],["Balance",r.balance,r.balance==="$0"?"var(--tx-34d399, #34d399)":color]].map(([l,v,c])=>(
                 <div key={String(l)} style={{ flex:1 }}>
-                  <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
+                  <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l}</div>
                   <div style={{ fontSize:9, fontWeight:700, color:c as string }}>{v}</div>
                 </div>
               ))}
@@ -1143,16 +1143,16 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { name:"Sunrise Corp",    type:"LEAD",      co:"Potential Client", bal:"—" },
           { name:"Ali Distribution",type:"CUSTOMER",  co:"Distributor",     bal:"$2,100 DR" },
         ].map(r=>{
-          const tc = r.type==="CUSTOMER"?"#34d399":r.type==="SUPPLIER"?"#f87171":"#fbbf24";
+          const tc = r.type==="CUSTOMER"?"var(--tx-34d399, #34d399)":r.type==="SUPPLIER"?"var(--tx-f87171, #f87171)":"var(--tx-fbbf24, #fbbf24)";
           return (
-            <div key={r.name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div key={r.name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
               <div>
-                <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.name}</div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.co}</div>
+                <div style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.name}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.co}</div>
               </div>
               <div style={{ textAlign:"right" }}>
-                <span style={{ fontSize:7, fontWeight:800, color:tc, padding:"1px 6px", borderRadius:10, background:`${tc}18` }}>{r.type}</span>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.4)", marginTop:2 }}>{r.bal}</div>
+                <span style={{ fontSize:7, fontWeight:800, color:tc, padding:"1px 6px", borderRadius:10, background:`color-mix(in srgb, ${tc} 9.4%, transparent)` }}>{r.type}</span>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-40, .4))", marginTop:2 }}>{r.bal}</div>
               </div>
             </div>
           );
@@ -1165,16 +1165,16 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Sales Pipeline</div>
         {[
-          { stage:"Lead",        count:8,  val:"$60K", c:"rgba(255,255,255,.4)", w:"100%" },
-          { stage:"Prospect",    count:5,  val:"$42K", c:"#fbbf24",              w:"70%"  },
-          { stage:"Negotiation", count:3,  val:"$31K", c:"#818cf8",              w:"52%"  },
-          { stage:"Close",       count:2,  val:"$24K", c:"#38bdf8",              w:"40%"  },
-          { stage:"Won",         count:12, val:"$140K", c:"#34d399",              w:"233%" },
+          { stage:"Lead",        count:8,  val:"$60K", c:"rgba(var(--ink),var(--ta-40, .4))", w:"100%" },
+          { stage:"Prospect",    count:5,  val:"$42K", c:"var(--tx-fbbf24, #fbbf24)",              w:"70%"  },
+          { stage:"Negotiation", count:3,  val:"$31K", c:"var(--tx-818cf8, #818cf8)",              w:"52%"  },
+          { stage:"Close",       count:2,  val:"$24K", c:"var(--tx-38bdf8, #38bdf8)",              w:"40%"  },
+          { stage:"Won",         count:12, val:"$140K", c:"var(--tx-34d399, #34d399)",              w:"233%" },
         ].map(r=>(
           <div key={r.stage} style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ width:70, fontSize:9, color:"rgba(255,255,255,.5)" }}>{r.stage}</div>
-            <div style={{ flex:1, height:16, borderRadius:8, background:"rgba(255,255,255,.04)", overflow:"hidden", position:"relative" }}>
-              <div style={{ width:r.w, maxWidth:"100%", height:"100%", borderRadius:8, background:`${r.c}25`, border:`1px solid ${r.c}40` }}/>
+            <div style={{ width:70, fontSize:9, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{r.stage}</div>
+            <div style={{ flex:1, height:16, borderRadius:8, background:"rgba(var(--ink),.04)", overflow:"hidden", position:"relative" }}>
+              <div style={{ width:r.w, maxWidth:"100%", height:"100%", borderRadius:8, background:`color-mix(in srgb, ${r.c} 14.5%, transparent)`, border:`1px solid color-mix(in srgb, ${r.c} 25.1%, transparent)` }}/>
             </div>
             <div style={{ width:44, fontSize:9, fontWeight:700, color:r.c, textAlign:"right" }}>{r.count}</div>
           </div>
@@ -1189,14 +1189,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Activity Feed</div>
         {[
           { type:"📞", act:"Called — Tariq Mahmood re: Q2 order",   time:"2h ago",   c:color },
-          { type:"📧", act:"Email sent — proposal to Sunrise Corp",  time:"Yesterday",c:"#34d399" },
-          { type:"🤝", act:"Meeting — Al-Noor Traders office visit", time:"Mar 15",   c:"#fbbf24" },
-          { type:"⏰", act:"Follow-up due — Horizon Exports",        time:"Tomorrow", c:"#f87171" },
+          { type:"📧", act:"Email sent — proposal to Sunrise Corp",  time:"Yesterday",c:"var(--tx-34d399, #34d399)" },
+          { type:"🤝", act:"Meeting — Al-Noor Traders office visit", time:"Mar 15",   c:"var(--tx-fbbf24, #fbbf24)" },
+          { type:"⏰", act:"Follow-up due — Horizon Exports",        time:"Tomorrow", c:"var(--tx-f87171, #f87171)" },
         ].map(r=>(
-          <div key={r.act} style={{ display:"flex", gap:8, padding:"6px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+          <div key={r.act} style={{ display:"flex", gap:8, padding:"6px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
             <span style={{ fontSize:14, flexShrink:0 }}>{r.type}</span>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,.65)", lineHeight:1.4 }}>{r.act}</div>
+              <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-65, .65))", lineHeight:1.4 }}>{r.act}</div>
               <div style={{ fontSize:8, color:r.c, marginTop:2 }}>{r.time}</div>
             </div>
           </div>
@@ -1210,7 +1210,7 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Role Permissions</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:4, marginBottom:4 }}>
           {["Module","Admin","Acct.","Viewer"].map(h=>(
-            <div key={h} style={{ fontSize:8, fontWeight:800, color:"rgba(255,255,255,.3)", textTransform:"uppercase", textAlign:"center" }}>{h}</div>
+            <div key={h} style={{ fontSize:8, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", textAlign:"center" }}>{h}</div>
           ))}
         </div>
         {[
@@ -1221,10 +1221,10 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { module:"Users",     admin:true,  acct:false, viewer:false },
         ].map(r=>(
           <div key={r.module} style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:4, alignItems:"center" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.6)" }}>{r.module}</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{r.module}</span>
             {[r.admin,r.acct,r.viewer].map((v,i)=>(
               <div key={i} style={{ textAlign:"center" }}>
-                <div style={{ width:14, height:14, borderRadius:4, background:v?`${color}25`:"rgba(255,255,255,.04)", border:`1px solid ${v?border:"rgba(255,255,255,.08)"}`, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto", fontSize:8, color:v?color:"rgba(255,255,255,.2)" }}>
+                <div style={{ width:14, height:14, borderRadius:4, background:v?`color-mix(in srgb, ${color} 14.5%, transparent)`:"rgba(var(--ink),.04)", border:`1px solid ${v?border:"rgba(var(--ink),.08)"}`, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto", fontSize:8, color:v?color:"rgba(var(--ink),var(--ta-20, .2))" }}>
                   {v?"✓":"×"}
                 </div>
               </div>
@@ -1244,13 +1244,13 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { user:"Admin",     action:"Created Employee: Ali Hassan", time:"10:55 AM", ip:"192.168.1.1", type:"create" },
           { user:"Viewer",    action:"Viewed P&L Report March 2025", time:"10:30 AM", ip:"10.0.0.12",   type:"view"   },
         ].map(r=>{
-          const tc = r.type==="create"?"#34d399":r.type==="edit"?"#fbbf24":"rgba(255,255,255,.4)";
+          const tc = r.type==="create"?"var(--tx-34d399, #34d399)":r.type==="edit"?"var(--tx-fbbf24, #fbbf24)":"rgba(var(--ink),.4)";
           return (
-            <div key={r.action} style={{ display:"flex", gap:8, padding:"5px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+            <div key={r.action} style={{ display:"flex", gap:8, padding:"5px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
               <div style={{ width:5, height:5, borderRadius:"50%", background:tc, flexShrink:0, marginTop:3 }}/>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,.7)" }}><span style={{ color:tc, fontWeight:700 }}>{r.user}</span> — {r.action}</div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.25)", marginTop:1 }}>{r.time} · {r.ip}</div>
+                <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-70, .7))" }}><span style={{ color:tc, fontWeight:700 }}>{r.user}</span> — {r.action}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-25, .25))", marginTop:1 }}>{r.time} · {r.ip}</div>
               </div>
             </div>
           );
@@ -1263,20 +1263,20 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Company Switcher</div>
         {[
-          { name:"Mahmood Trading Co.",     type:"Trading",    status:"ACTIVE",  color:"#818cf8" },
-          { name:"Mahmood Exports Ltd.",    type:"Export",     status:"ACTIVE",  color:"#34d399" },
-          { name:"MM Real Estate",          type:"Property",   status:"ACTIVE",  color:"#fbbf24" },
-          { name:"Dubai Branch Office",     type:"Operations", status:"ACTIVE",  color:"#38bdf8" },
+          { name:"Mahmood Trading Co.",     type:"Trading",    status:"ACTIVE",  color:"var(--tx-818cf8, #818cf8)" },
+          { name:"Mahmood Exports Ltd.",    type:"Export",     status:"ACTIVE",  color:"var(--tx-34d399, #34d399)" },
+          { name:"MM Real Estate",          type:"Property",   status:"ACTIVE",  color:"var(--tx-fbbf24, #fbbf24)" },
+          { name:"Dubai Branch Office",     type:"Operations", status:"ACTIVE",  color:"var(--tx-38bdf8, #38bdf8)" },
         ].map((r,i)=>(
-          <div key={r.name} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 10px", borderRadius:10, background:i===0?`${r.color}15`:"rgba(255,255,255,.03)", border:`1px solid ${i===0?r.color+"40":"rgba(255,255,255,.06)"}`, cursor:"pointer" }}>
-            <div style={{ width:28, height:28, borderRadius:8, background:`${r.color}25`, border:`1px solid ${r.color}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:r.color }}>
+          <div key={r.name} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 10px", borderRadius:10, background:i===0?`color-mix(in srgb, ${r.color} 8.2%, transparent)`:"rgba(var(--ink),.03)", border:`1px solid ${i===0?`color-mix(in srgb, ${r.color} 25.1%, transparent)`:"rgba(var(--ink),.06)"}`, cursor:"pointer" }}>
+            <div style={{ width:28, height:28, borderRadius:8, background:`color-mix(in srgb, ${r.color} 14.5%, transparent)`, border:`1px solid color-mix(in srgb, ${r.color} 25.1%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:r.color }}>
               {r.name[0]}
             </div>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:10, fontWeight:600, color:i===0?"white":"rgba(255,255,255,.6)" }}>{r.name}</div>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>{r.type}</div>
+              <div style={{ fontSize:10, fontWeight:600, color:i===0? "var(--ink-solid, white)" :"rgba(var(--ink),var(--ta-60, .6))" }}>{r.name}</div>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{r.type}</div>
             </div>
-            {i===0 && <div style={{ fontSize:8, fontWeight:800, color:r.color, padding:"2px 8px", borderRadius:10, background:`${r.color}20` }}>ACTIVE</div>}
+            {i===0 && <div style={{ fontSize:8, fontWeight:800, color:r.color, padding:"2px 8px", borderRadius:10, background:`color-mix(in srgb, ${r.color} 12.5%, transparent)` }}>ACTIVE</div>}
           </div>
         ))}
       </div>
@@ -1291,15 +1291,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { branch:"Branch A",    revenue:"$40K",  expense:"$20K",  profit:"$20K",  pct:44  },
           { branch:"Dubai Office",revenue:"$20K",  expense:"$15K",  profit:"$5K",   pct:11  },
         ].map(r=>(
-          <div key={r.branch} style={{ padding:"8px 10px", borderRadius:10, background:"rgba(255,255,255,.03)", border:`1px solid ${border}` }}>
+          <div key={r.branch} style={{ padding:"8px 10px", borderRadius:10, background:"rgba(var(--ink),.03)", border:`1px solid ${border}` }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-              <span style={{ fontSize:10, fontWeight:600, color:"white" }}>{r.branch}</span>
+              <span style={{ fontSize:10, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.branch}</span>
               <span style={{ fontSize:10, fontWeight:700, color }}>{r.profit}</span>
             </div>
-            <div style={{ display:"flex", gap:12, fontSize:8, color:"rgba(255,255,255,.35)", marginBottom:4 }}>
+            <div style={{ display:"flex", gap:12, fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))", marginBottom:4 }}>
               <span>Rev: {r.revenue}</span><span>Exp: {r.expense}</span>
             </div>
-            <div style={{ height:3, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+            <div style={{ height:3, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
               <div style={{ width:`${r.pct}%`, height:"100%", borderRadius:2, background:color }}/>
             </div>
           </div>
@@ -1311,20 +1311,20 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     api: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>API Dashboard</div>
-        <div style={{ padding:"8px 10px", borderRadius:8, background:"rgba(0,0,0,.3)", border:"1px solid rgba(255,255,255,.08)", fontFamily:"monospace" }}>
-          <div style={{ fontSize:8, color:"rgba(52,211,153,.8)", marginBottom:4 }}>GET /api/v1/invoices</div>
-          <div style={{ fontSize:8, color:"rgba(255,255,255,.4)" }}>Authorization: Bearer sk_live_xxxx</div>
-          <div style={{ fontSize:8, color:"rgba(255,255,255,.25)", marginTop:4 }}>200 OK · 42ms</div>
+        <div style={{ padding:"8px 10px", borderRadius:8, background: "var(--mk-inset, rgba(0,0,0,.3))", border:"1px solid rgba(var(--ink),.08)", fontFamily:"monospace" }}>
+          <div style={{ fontSize:8, color:"rgba(var(--txr-34d399, 52,211,153),var(--ta-80, .8))", marginBottom:4 }}>GET /api/v1/invoices</div>
+          <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Authorization: Bearer sk_live_xxxx</div>
+          <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-25, .25))", marginTop:4 }}>200 OK · 42ms</div>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
           {[["Endpoints","47"],["Calls Today","1,240"],["Success Rate","99.8%"],["Avg Latency","38ms"]].map(([l,v])=>(
             <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
               <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{l}</div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Available on Enterprise Plan</div>
+        <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", textAlign:"center" }}>Available on Enterprise Plan</div>
       </div>
     ),
 
@@ -1337,15 +1337,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { name:"Sara Malik", amount:"100,000", paid:"40,000", bal:"60,000", emi:"5,000" },
           { name:"Usman Ali",  amount:"500,000", paid:"150,000",bal:"350,000", emi:"20,000" },
         ].map(r=>(
-          <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>
+          <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-              <span style={{ fontSize:10, fontWeight:600, color:"rgba(255,255,255,.8)" }}>{r.name}</span>
-              <span style={{ fontSize:9, color:"#f87171" }}>Bal: {r.bal}</span>
+              <span style={{ fontSize:10, fontWeight:600, color:"rgba(var(--ink),.8)" }}>{r.name}</span>
+              <span style={{ fontSize:9, color:"var(--tx-f87171, #f87171)" }}>Bal: {r.bal}</span>
             </div>
-            <div style={{ height:4, borderRadius:2, background:"rgba(255,255,255,.08)" }}>
+            <div style={{ height:4, borderRadius:2, background:"rgba(var(--ink),.08)" }}>
               <div style={{ width:`${Math.round(parseInt(r.paid.replace(",",""))/parseInt(r.amount.replace(",",""))*100)}%`, height:"100%", borderRadius:2, background:color }}/>
             </div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginTop:3 }}>EMI/month: {r.emi}</div>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:3 }}>EMI/month: {r.emi}</div>
           </div>
         ))}
       </div>
@@ -1356,7 +1356,7 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:2 }}>Petty Cash — Main Office</div>
         <div style={{ padding:"10px 12px", borderRadius:10, background:`rgba(45,212,191,.1)`, border:`1px solid rgba(45,212,191,.2)`, textAlign:"center" }}>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.4)" }}>Current Balance</div>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Current Balance</div>
           <div style={{ fontSize:22, fontWeight:800, color }}>$925</div>
         </div>
         {[
@@ -1365,12 +1365,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { desc:"Office Supplies",amt:"-1,200",cat:"Supplies" },
           { desc:"Cash Deposit",  amt:"+5,000", cat:"Deposit" },
         ].map(r=>(
-          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:6, background:"rgba(255,255,255,.03)" }}>
+          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:6, background:"rgba(var(--ink),.03)" }}>
             <div>
-              <span style={{ fontSize:10, color:"rgba(255,255,255,.7)" }}>{r.desc}</span>
-              <span style={{ fontSize:8, color:"rgba(255,255,255,.3)", marginLeft:6 }}>{r.cat}</span>
+              <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{r.desc}</span>
+              <span style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))", marginLeft:6 }}>{r.cat}</span>
             </div>
-            <span style={{ fontSize:10, fontWeight:700, color:r.amt.startsWith("-")?"#f87171":"#34d399" }}>{r.amt}</span>
+            <span style={{ fontSize:10, fontWeight:700, color:r.amt.startsWith("-")?"var(--tx-f87171, #f87171)":"var(--tx-34d399, #34d399)" }}>{r.amt}</span>
           </div>
         ))}
       </div>
@@ -1386,16 +1386,16 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { supplier:"Global Logistics",  amount:"4,775",  status:"PENDING" },
           { supplier:"Tech Solutions",    amount:"3,350",  status:"APPROVED" },
         ].map(r=>(
-          <div key={r.supplier} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.06)" }}>
-            <span style={{ fontSize:10, color:"rgba(255,255,255,.7)" }}>{r.supplier}</span>
+          <div key={r.supplier} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.06)" }}>
+            <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{r.supplier}</span>
             <div style={{ display:"flex", gap:8, alignItems:"center" }}>
               <span style={{ fontSize:10, fontWeight:700, color }}>{r.amount}</span>
-              <span style={{ fontSize:8, padding:"2px 6px", borderRadius:4, background:r.status==="APPROVED"?"rgba(52,211,153,.15)":"rgba(251,191,36,.15)", color:r.status==="APPROVED"?"#34d399":"#fbbf24" }}>{r.status}</span>
+              <span style={{ fontSize:8, padding:"2px 6px", borderRadius:4, background:r.status==="APPROVED"?"rgba(52,211,153,.15)":"rgba(251,191,36,.15)", color:r.status==="APPROVED"?"var(--tx-34d399, #34d399)":"var(--tx-fbbf24, #fbbf24)" }}>{r.status}</span>
             </div>
           </div>
         ))}
-        <div style={{ marginTop:4, display:"flex", justifyContent:"space-between", padding:"7px 8px", borderRadius:8, background:`${color}15`, border:`1px solid ${color}25` }}>
-          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.6)" }}>Total Batch</span>
+        <div style={{ marginTop:4, display:"flex", justifyContent:"space-between", padding:"7px 8px", borderRadius:8, background:`color-mix(in srgb, ${color} 8.2%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 14.5%, transparent)` }}>
+          <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Total Batch</span>
           <span style={{ fontSize:11, fontWeight:800, color }}>$43,875</span>
         </div>
       </div>
@@ -1410,15 +1410,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { doc:"EXP-2025-044", type:"Expense Voucher",  amount:"18,500",  by:"Sara" },
           { doc:"PO-2025-0213", type:"Purchase Order",   amount:"340,000", by:"Ali" },
         ].map(r=>(
-          <div key={r.doc} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>
+          <div key={r.doc} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)" }}>
             <div style={{ display:"flex", justifyContent:"space-between" }}>
               <span style={{ fontSize:10, fontWeight:600, color }}>{r.doc}</span>
-              <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.8)" }}>$ {r.amount}</span>
+              <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.8)" }}>$ {r.amount}</span>
             </div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", marginTop:2 }}>{r.type} · by {r.by}</div>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", marginTop:2 }}>{r.type} · by {r.by}</div>
             <div style={{ display:"flex", gap:6, marginTop:6 }}>
-              <div style={{ flex:1, padding:"3px 0", borderRadius:5, background:"rgba(52,211,153,.15)", border:"1px solid rgba(52,211,153,.25)", textAlign:"center", fontSize:9, color:"#34d399", fontWeight:700 }}>Approve</div>
-              <div style={{ flex:1, padding:"3px 0", borderRadius:5, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", textAlign:"center", fontSize:9, color:"#f87171", fontWeight:700 }}>Reject</div>
+              <div style={{ flex:1, padding:"3px 0", borderRadius:5, background:"rgba(52,211,153,.15)", border:"1px solid rgba(52,211,153,.25)", textAlign:"center", fontSize:9, color:"var(--tx-34d399, #34d399)", fontWeight:700 }}>Approve</div>
+              <div style={{ flex:1, padding:"3px 0", borderRadius:5, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", textAlign:"center", fontSize:9, color:"var(--tx-f87171, #f87171)", fontWeight:700 }}>Reject</div>
             </div>
           </div>
         ))}
@@ -1435,14 +1435,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { period:"Mar 2025", locked:false },
           { period:"Apr 2025", locked:false },
         ].map(r=>(
-          <div key={r.period} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)", border:`1px solid ${r.locked?"rgba(248,113,113,.2)":"rgba(52,211,153,.2)"}` }}>
-            <span style={{ fontSize:10, color:"rgba(255,255,255,.7)" }}>{r.period}</span>
-            <span style={{ fontSize:9, padding:"3px 8px", borderRadius:4, background:r.locked?"rgba(248,113,113,.1)":"rgba(52,211,153,.1)", color:r.locked?"#f87171":"#34d399", fontWeight:700 }}>
+          <div key={r.period} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.04)", border:`1px solid ${r.locked?"rgba(248,113,113,.2)":"rgba(52,211,153,.2)"}` }}>
+            <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{r.period}</span>
+            <span style={{ fontSize:9, padding:"3px 8px", borderRadius:4, background:r.locked?"rgba(248,113,113,.1)":"rgba(52,211,153,.1)", color:r.locked?"var(--tx-f87171, #f87171)":"var(--tx-34d399, #34d399)", fontWeight:700 }}>
               {r.locked?"🔒 Locked":"🔓 Open"}
             </span>
           </div>
         ))}
-        <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Admin override required to unlock</div>
+        <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", textAlign:"center" }}>Admin override required to unlock</div>
       </div>
     ),
 
@@ -1455,12 +1455,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { to:"Sara Textile",  channel:"SMS",      msg:"Payment reminder: $6,000 overdue by 7 days", time:"10:23 AM", sent:true },
           { to:"Ali Brothers",  channel:"WhatsApp", msg:"Your invoice INV-0888 has been approved", time:"10:24 AM", sent:true },
         ].map(r=>(
-          <div key={r.to} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>
+          <div key={r.to} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-              <span style={{ fontSize:10, fontWeight:600, color:"rgba(255,255,255,.8)" }}>{r.to}</span>
-              <span style={{ fontSize:8, padding:"2px 5px", borderRadius:3, background:r.channel==="WhatsApp"?"rgba(52,211,153,.15)":"rgba(56,189,248,.15)", color:r.channel==="WhatsApp"?"#34d399":"#38bdf8" }}>{r.channel}</span>
+              <span style={{ fontSize:10, fontWeight:600, color:"rgba(var(--ink),.8)" }}>{r.to}</span>
+              <span style={{ fontSize:8, padding:"2px 5px", borderRadius:3, background:r.channel==="WhatsApp"?"rgba(52,211,153,.15)":"rgba(56,189,248,.15)", color:r.channel==="WhatsApp"?"var(--tx-34d399, #34d399)":"var(--tx-38bdf8, #38bdf8)" }}>{r.channel}</span>
             </div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.4)" }}>{r.msg}</div>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))" }}>{r.msg}</div>
           </div>
         ))}
       </div>
@@ -1471,26 +1471,26 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:2 }}>
           <div style={{ fontSize:11, fontWeight:700, color, opacity:.8 }}>Cash Payment Voucher</div>
-          <div style={{ fontSize:9, padding:"2px 8px", borderRadius:10, background:`${color}20`, color, fontWeight:800 }}>#CPV-0421</div>
+          <div style={{ fontSize:9, padding:"2px 8px", borderRadius:10, background:`color-mix(in srgb, ${color} 12.5%, transparent)`, color, fontWeight:800 }}>#CPV-0421</div>
         </div>
-        <div style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)", marginBottom:4 }}>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Paid To: <span style={{ color:"white", fontWeight:600 }}>Al-Noor Traders</span></div>
+        <div style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)", marginBottom:4 }}>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:4 }}>Paid To: <span style={{ color:"var(--ink-solid, white)", fontWeight:600 }}>Al-Noor Traders</span></div>
           {[
             { acc:"Accounts Payable",   dr:"14,000", cr:"—" },
             { acc:"Cash & Bank",        dr:"—",      cr:"14,000" },
           ].map(r=>(
-            <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-              <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{r.acc}</span>
-              <span style={{ fontSize:9, fontWeight:700, color:"#f87171", width:50, textAlign:"right" }}>{r.dr}</span>
-              <span style={{ fontSize:9, fontWeight:700, color:"#34d399", width:50, textAlign:"right" }}>{r.cr}</span>
+            <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+              <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{r.acc}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"var(--tx-f87171, #f87171)", width:50, textAlign:"right" }}>{r.dr}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"var(--tx-34d399, #34d399)", width:50, textAlign:"right" }}>{r.cr}</span>
             </div>
           ))}
         </div>
         <div style={{ display:"flex", gap:6 }}>
-          {[["CPV","8",color],["CRV","12","#34d399"],["Pending","3","#fbbf24"]].map(([l,v,c])=>(
-            <div key={String(l)} style={{ flex:1, padding:"5px 8px", borderRadius:7, background:`${c}10`, border:`1px solid ${c}25`, textAlign:"center" }}>
+          {[["CPV","8",color],["CRV","12","var(--tx-34d399, #34d399)"],["Pending","3","var(--tx-fbbf24, #fbbf24)"]].map(([l,v,c])=>(
+            <div key={String(l)} style={{ flex:1, padding:"5px 8px", borderRadius:7, background:`color-mix(in srgb, ${c} 6.3%, transparent)`, border:`1px solid color-mix(in srgb, ${c} 14.5%, transparent)`, textAlign:"center" }}>
               <div style={{ fontSize:11, fontWeight:800, color:c as string }}>{v}</div>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l} Today</div>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l} Today</div>
             </div>
           ))}
         </div>
@@ -1506,9 +1506,9 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Opening Balances Setup</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:4 }}>
           {[["Financial Year","FY 2024–25"],["Start Date","Jul 1, 2024"],["Status","Locked ✓"],["Migration","Complete"]].map(([l,v])=>(
-            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
-              <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{v}</div>
+            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l}</div>
+              <div style={{ fontSize:9, fontWeight:700, color:"var(--ink-solid, white)" }}>{v}</div>
             </div>
           ))}
         </div>
@@ -1518,13 +1518,13 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { acc:"Payables",      bal:"92,000",  type:"Liability" },
           { acc:"Opening Stock", bal:"210,000", type:"Asset" },
         ].map(r=>(
-          <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{r.acc}</span>
-            <span style={{ fontSize:8, color:"rgba(255,255,255,.3)", marginRight:8 }}>{r.type}</span>
+          <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{r.acc}</span>
+            <span style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))", marginRight:8 }}>{r.type}</span>
             <span style={{ fontSize:9, fontWeight:700, color }}>{r.bal}</span>
           </div>
         ))}
-        <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Year-end closing posts carry-forward entries automatically</div>
+        <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", textAlign:"center" }}>Year-end closing posts carry-forward entries automatically</div>
       </div>
     ),
 
@@ -1538,14 +1538,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { desc:"Software Subscription",  freq:"Monthly",  next:"Apr 10", amt:"$149",   active:true  },
           { desc:"Annual Insurance",        freq:"Yearly",   next:"Dec 15", amt:"$2,400", active:false },
         ].map(r=>(
-          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div>
-              <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.desc}</div>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.freq} · Next: {r.next}</div>
+              <div style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.desc}</div>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.freq} · Next: {r.next}</div>
             </div>
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:9, fontWeight:700, color }}>{r.amt}</div>
-              <div style={{ fontSize:7, fontWeight:800, color:r.active?"#34d399":"rgba(255,255,255,.3)", marginTop:2 }}>{r.active?"● ACTIVE":"○ PAUSED"}</div>
+              <div style={{ fontSize:7, fontWeight:800, color:r.active?"var(--tx-34d399, #34d399)":"rgba(var(--ink),var(--ta-30, .3))", marginTop:2 }}>{r.active?"● ACTIVE":"○ PAUSED"}</div>
             </div>
           </div>
         ))}
@@ -1561,18 +1561,18 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { section:"Investing Activities",  amt:"-$42,000", positive:false, items:["Equipment purchase","- Software licenses"] },
           { section:"Financing Activities",  amt:"+$20,000", positive:true,  items:["Bank loan drawdown"] },
         ].map(r=>(
-          <div key={r.section} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.section} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-              <span style={{ fontSize:9, fontWeight:700, color:"white" }}>{r.section}</span>
-              <span style={{ fontSize:9, fontWeight:800, color:r.positive?"#34d399":"#f87171" }}>{r.amt}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"var(--ink-solid, white)" }}>{r.section}</span>
+              <span style={{ fontSize:9, fontWeight:800, color:r.positive?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" }}>{r.amt}</span>
             </div>
             {r.items.map(it=>(
-              <div key={it} style={{ fontSize:8, color:"rgba(255,255,255,.35)", paddingLeft:8, marginBottom:1 }}>· {it}</div>
+              <div key={it} style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))", paddingLeft:8, marginBottom:1 }}>· {it}</div>
             ))}
           </div>
         ))}
         <div style={{ padding:"6px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, display:"flex", justifyContent:"space-between" }}>
-          <span style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.6)" }}>Net Cash Change</span>
+          <span style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Net Cash Change</span>
           <span style={{ fontSize:10, fontWeight:800, color }}>+$62,200</span>
         </div>
       </div>
@@ -1585,8 +1585,8 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ display:"flex", gap:4, marginBottom:6 }}>
           {[["1","Upload","done"],["2","Map Fields","done"],["3","Validate","active"],["4","Import","idle"]].map(([n,l,s])=>(
             <div key={n} style={{ flex:1, textAlign:"center" }}>
-              <div style={{ width:20, height:20, borderRadius:"50%", background:s==="done"?`${color}30`:s==="active"?`${color}20`:"rgba(255,255,255,.05)", border:`1px solid ${s==="idle"?"rgba(255,255,255,.08)":border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:800, color:s==="done"||s==="active"?color:"rgba(255,255,255,.2)", margin:"0 auto 3px" }}>{s==="done"?"✓":n}</div>
-              <div style={{ fontSize:7, color:s==="active"?color:"rgba(255,255,255,.25)", fontWeight:s==="active"?700:400 }}>{l}</div>
+              <div style={{ width:20, height:20, borderRadius:"50%", background:s==="done"?`color-mix(in srgb, ${color} 18.8%, transparent)`:s==="active"?`color-mix(in srgb, ${color} 12.5%, transparent)`:"rgba(var(--ink),.05)", border:`1px solid ${s==="idle"?"rgba(var(--ink),.08)":border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:800, color:s==="done"||s==="active"?color:"rgba(var(--ink),var(--ta-20, .2))", margin:"0 auto 3px" }}>{s==="done"?"✓":n}</div>
+              <div style={{ fontSize:7, color:s==="active"?color:"rgba(var(--ink),var(--ta-25, .25))", fontWeight:s==="active"?700:400 }}>{l}</div>
             </div>
           ))}
         </div>
@@ -1596,9 +1596,9 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { field:"Amount → Total Amount",          ok:true  },
           { field:"Tax Code → (unmapped)",          ok:false },
         ].map(r=>(
-          <div key={r.field} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:r.ok?"rgba(255,255,255,.02)":"rgba(248,113,113,.05)", border:`1px solid ${r.ok?"rgba(255,255,255,.05)":"rgba(248,113,113,.2)"}` }}>
-            <span style={{ fontSize:8, color:r.ok?"rgba(255,255,255,.5)":"rgba(248,113,113,.8)" }}>{r.field}</span>
-            <span style={{ fontSize:9, color:r.ok?"#34d399":"#f87171" }}>{r.ok?"✓":"!"}</span>
+          <div key={r.field} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:r.ok?"rgba(var(--ink),.02)":"rgba(248,113,113,.05)", border:`1px solid ${r.ok?"rgba(var(--ink),.05)":"rgba(248,113,113,.2)"}` }}>
+            <span style={{ fontSize:8, color:r.ok?"rgba(var(--ink),var(--ta-50, .5))":"rgba(var(--txr-f87171, 248,113,113),var(--ta-80, .8))" }}>{r.field}</span>
+            <span style={{ fontSize:9, color:r.ok?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" }}>{r.ok?"✓":"!"}</span>
           </div>
         ))}
         <div style={{ padding:"5px 8px", borderRadius:7, background:dim, border:`1px solid ${border}`, fontSize:9, color, fontWeight:700, textAlign:"center" }}>
@@ -1613,22 +1613,22 @@ function MockScreen({ type, color }: { type: string; color: string }) {
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Production Order #WO-0091</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:4 }}>
           {[["Product","Finished Fabric 60\""],["Qty","500 meters"],["Start","Mar 18"],["Status","IN PROGRESS"]].map(([l,v])=>(
-            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
-              <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{v}</div>
+            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{l}</div>
+              <div style={{ fontSize:9, fontWeight:700, color:"var(--ink-solid, white)" }}>{v}</div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" as const, letterSpacing:".05em", marginBottom:4 }}>Bill of Materials</div>
+        <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase" as const, letterSpacing:".05em", marginBottom:4 }}>Bill of Materials</div>
         {[
           { material:"Cotton Yarn 40/2", required:"150 kg", available:"420 kg", ok:true  },
           { material:"Polyester Fiber",  required:"100 kg", available:"85 kg",  ok:false },
           { material:"Dyes (Blue)",      required:"20 kg",  available:"32 kg",  ok:true  },
         ].map(r=>(
-          <div key={r.material} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:`1px solid ${r.ok?"rgba(255,255,255,.05)":"rgba(248,113,113,.2)"}` }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.6)", flex:1 }}>{r.material}</span>
-            <span style={{ fontSize:8, color:"rgba(255,255,255,.35)", marginRight:8 }}>Need: {r.required}</span>
-            <span style={{ fontSize:8, fontWeight:700, color:r.ok?"#34d399":"#f87171" }}>{r.available} {r.ok?"✓":"⚠"}</span>
+          <div key={r.material} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(var(--ink),.03)", border:`1px solid ${r.ok?"rgba(var(--ink),.05)":"rgba(248,113,113,.2)"}` }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-60, .6))", flex:1 }}>{r.material}</span>
+            <span style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))", marginRight:8 }}>Need: {r.required}</span>
+            <span style={{ fontSize:8, fontWeight:700, color:r.ok?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)" }}>{r.available} {r.ok?"✓":"⚠"}</span>
           </div>
         ))}
       </div>
@@ -1649,19 +1649,19 @@ function MockScreen({ type, color }: { type: string; color: string }) {
             { t:"T7", status:"occupied", orders:1 },
             { t:"T8", status:"free",     orders:0 },
           ].map(r=>{
-            const c = r.status==="occupied"?color:r.status==="bill"?"#fbbf24":"rgba(255,255,255,.15)";
+            const c = r.status==="occupied"?color:r.status==="bill"?"var(--tx-fbbf24, #fbbf24)":"rgba(var(--ink),.15)";
             return (
-              <div key={r.t} style={{ aspectRatio:"1", borderRadius:8, background:`${c}18`, border:`1px solid ${c}40`, display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center" }}>
-                <div style={{ fontSize:9, fontWeight:800, color:r.status==="free"?"rgba(255,255,255,.3)":c }}>{r.t}</div>
+              <div key={r.t} style={{ aspectRatio:"1", borderRadius:8, background:`color-mix(in srgb, ${c} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${c} 25.1%, transparent)`, display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center" }}>
+                <div style={{ fontSize:9, fontWeight:800, color:r.status==="free"?"rgba(var(--ink),var(--ta-30, .3))":c }}>{r.t}</div>
                 {r.orders>0 && <div style={{ fontSize:7, color:`${c}`, marginTop:1 }}>{r.orders} items</div>}
               </div>
             );
           })}
         </div>
-        <div style={{ padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
-          <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.6)", marginBottom:4 }}>T3 — Active Order</div>
+        <div style={{ padding:"7px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
+          <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-60, .6))", marginBottom:4 }}>T3 — Active Order</div>
           {[["Biryani (2)","$24"],["Naan x4","$8"],["Drinks (3)","$12"]].map(([item,amt])=>(
-            <div key={item} style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(255,255,255,.45)", padding:"2px 0" }}>
+            <div key={item} style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(var(--ink),var(--ta-45, .45))", padding:"2px 0" }}>
               <span>{item}</span><span style={{ color }}>{amt}</span>
             </div>
           ))}
@@ -1678,14 +1678,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { name:"DHA Shop #12",          tenant:"Sunrise Store", rent:"$850",   status:"OVERDUE", due:"Mar 15" },
           { name:"Blue Area Office 3F",   tenant:"Tech Corp PK",  rent:"$2,500", status:"PAID",    due:"Mar 31" },
         ].map(r=>{
-          const sc = r.status==="PAID"?"#34d399":"#f87171";
+          const sc = r.status==="PAID"?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)";
           return (
-            <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:`1px solid ${r.status==="OVERDUE"?"rgba(248,113,113,.2)":"rgba(255,255,255,.05)"}` }}>
+            <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:`1px solid ${r.status==="OVERDUE"?"rgba(248,113,113,.2)":"rgba(var(--ink),.05)"}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                <span style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.name}</span>
-                <span style={{ fontSize:8, fontWeight:800, color:sc, padding:"1px 7px", borderRadius:10, background:`${sc}18` }}>{r.status}</span>
+                <span style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.name}</span>
+                <span style={{ fontSize:8, fontWeight:800, color:sc, padding:"1px 7px", borderRadius:10, background:`color-mix(in srgb, ${sc} 9.4%, transparent)` }}>{r.status}</span>
               </div>
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(255,255,255,.35)" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>
                 <span>{r.tenant}</span>
                 <span style={{ color }}>{r.rent}/mo</span>
               </div>
@@ -1704,7 +1704,7 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           {[["Students","248"],["Collected","$18,400"],["Pending","$4,200"]].map(([l,v])=>(
             <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
               <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{l}</div>
             </div>
           ))}
         </div>
@@ -1714,14 +1714,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { name:"Omar Farooq (Grade 5)",fee:"$250",  status:"OVERDUE", date:"—" },
           { name:"Hira Baig (Grade 11)", fee:"$300",  status:"PAID",    date:"Apr 1" },
         ].map(r=>{
-          const sc = r.status==="PAID"?"#34d399":"#f87171";
+          const sc = r.status==="PAID"?"var(--tx-34d399, #34d399)":"var(--tx-f87171, #f87171)";
           return (
-            <div key={r.name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.04)" }}>
+            <div key={r.name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.04)" }}>
               <div>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,.65)" }}>{r.name}</div>
-                <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{r.fee} · {r.date}</div>
+                <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-65, .65))" }}>{r.name}</div>
+                <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{r.fee} · {r.date}</div>
               </div>
-              <span style={{ fontSize:7, fontWeight:800, color:sc, padding:"1px 7px", borderRadius:10, background:`${sc}18` }}>{r.status}</span>
+              <span style={{ fontSize:7, fontWeight:800, color:sc, padding:"1px 7px", borderRadius:10, background:`color-mix(in srgb, ${sc} 9.4%, transparent)` }}>{r.status}</span>
             </div>
           );
         })}
@@ -1736,7 +1736,7 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           {[["Appointments","24"],["In Queue","7"],["Billed","$3,200"]].map(([l,v])=>(
             <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
               <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{l}</div>
             </div>
           ))}
         </div>
@@ -1745,12 +1745,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { patient:"Fatima Malik",  doctor:"Dr. Tariq", time:"10:30 AM", status:"WAITING", fee:"$200" },
           { patient:"Bilal Hussain", doctor:"Dr. Sana",  time:"11:00 AM", status:"PENDING", fee:"$150" },
         ].map(r=>{
-          const sc = r.status==="DONE"?"#34d399":r.status==="WAITING"?color:"rgba(255,255,255,.3)";
+          const sc = r.status==="DONE"?"var(--tx-34d399, #34d399)":r.status==="WAITING"?color:"rgba(var(--ink),.3)";
           return (
-            <div key={r.patient} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div key={r.patient} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
               <div>
-                <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.patient}</div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.doctor} · {r.time}</div>
+                <div style={{ fontSize:9, fontWeight:600, color:"var(--ink-solid, white)" }}>{r.patient}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.doctor} · {r.time}</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <span style={{ fontSize:7, fontWeight:800, color:sc, display:"block", marginBottom:2 }}>{r.status}</span>
@@ -1766,26 +1766,26 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     retail: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Point of Sale</div>
-        <div style={{ padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
-          <div style={{ fontFamily:"monospace", fontSize:11, letterSpacing:2, color:"rgba(255,255,255,.35)" }}>|||||||</div>
-          <div style={{ flex:1, fontSize:9, color:"rgba(255,255,255,.6)" }}>Scan or search item...</div>
+        <div style={{ padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+          <div style={{ fontFamily:"monospace", fontSize:11, letterSpacing:2, color:"rgba(var(--ink),var(--ta-35, .35))" }}>|||||||</div>
+          <div style={{ flex:1, fontSize:9, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Scan or search item...</div>
         </div>
         {[
           { item:"Basmati Rice 5kg",   qty:2, price:"$18.00", total:"$36.00" },
           { item:"Cooking Oil 3L",     qty:1, price:"$12.50", total:"$12.50" },
           { item:"Sugar 1kg x3",       qty:3, price:"$2.80",  total:"$8.40"  },
         ].map(r=>(
-          <div key={r.item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{r.item}</span>
-            <span style={{ fontSize:9, color:"rgba(255,255,255,.3)", width:20, textAlign:"center" }}>×{r.qty}</span>
+          <div key={r.item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(var(--ink),.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-55, .55))", flex:1 }}>{r.item}</span>
+            <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", width:20, textAlign:"center" }}>×{r.qty}</span>
             <span style={{ fontSize:9, fontWeight:700, color, width:46, textAlign:"right" }}>{r.total}</span>
           </div>
         ))}
         <div style={{ display:"flex", justifyContent:"space-between", padding:"8px 10px", borderRadius:8, background:dim, border:`1px solid ${border}` }}>
-          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.7)" }}>Total</span>
+          <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))" }}>Total</span>
           <span style={{ fontSize:12, fontWeight:800, color }}>$56.90</span>
         </div>
-        <div style={{ padding:"5px 8px", borderRadius:7, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.25)", fontSize:9, color:"#34d399", fontWeight:700, textAlign:"center" }}>
+        <div style={{ padding:"5px 8px", borderRadius:7, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.25)", fontSize:9, color:"var(--tx-34d399, #34d399)", fontWeight:700, textAlign:"center" }}>
           ✓ Stock synced · Posted to Accounts
         </div>
       </div>
@@ -1800,18 +1800,18 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { client:"Tech Solutions",  project:"Website Redesign", billed:"$7,000", remaining:"$3,000", pct:70 },
           { client:"Sunrise Media",   project:"SEO Retainer",     billed:"$1,200", remaining:"$0",     pct:100 },
         ].map(r=>(
-          <div key={r.client} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div key={r.client} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
               <div>
-                <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{r.client}</div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.project}</div>
+                <div style={{ fontSize:9, fontWeight:700, color:"var(--ink-solid, white)" }}>{r.client}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.project}</div>
               </div>
               <div style={{ textAlign:"right", fontSize:8 }}>
                 <div style={{ color, fontWeight:700 }}>{r.billed} billed</div>
-                <div style={{ color:"rgba(255,255,255,.35)" }}>{r.remaining} left</div>
+                <div style={{ color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.remaining} left</div>
               </div>
             </div>
-            <div style={{ height:3, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+            <div style={{ height:3, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
               <div style={{ width:`${r.pct}%`, height:"100%", borderRadius:2, background:r.pct===100?"#34d399":color }}/>
             </div>
           </div>
@@ -1827,7 +1827,7 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           {[["Stops","12"],["Delivered","8"],["Sales","$24,800"]].map(([l,v])=>(
             <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
               <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
-              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+              <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{l}</div>
             </div>
           ))}
         </div>
@@ -1837,12 +1837,12 @@ function MockScreen({ type, color }: { type: string; color: string }) {
           { stop:"Metro Store",       order:"$4,100", status:"PENDING",   limit:"NEAR MAX" },
           { stop:"City Traders",      order:"$2,800", status:"DELIVERED", limit:"OK"      },
         ].map(r=>{
-          const sc = r.status==="DELIVERED"?"#34d399":"#fbbf24";
+          const sc = r.status==="DELIVERED"?"var(--tx-34d399, #34d399)":"var(--tx-fbbf24, #fbbf24)";
           return (
-            <div key={r.stop} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.04)" }}>
+            <div key={r.stop} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.04)" }}>
               <div>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,.65)" }}>{r.stop}</div>
-                <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>Credit: {r.limit}</div>
+                <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-65, .65))" }}>{r.stop}</div>
+                <div style={{ fontSize:7, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Credit: {r.limit}</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:9, fontWeight:700, color }}>{r.order}</div>
@@ -1857,14 +1857,14 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     // Coming Soon (phase-2 fallback)
     comingSoon: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:14, textAlign:"center" }}>
-        <div style={{ width:54, height:54, borderRadius:16, background:`${color}12`, border:`1px solid ${color}22`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>🚀</div>
+        <div style={{ width:54, height:54, borderRadius:16, background:`color-mix(in srgb, ${color} 7.1%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 13.3%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>🚀</div>
         <div>
-          <div style={{ fontSize:14, fontWeight:800, color:"white", marginBottom:6 }}>Coming Soon</div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", lineHeight:1.65, maxWidth:180 }}>
+          <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:6 }}>Coming Soon</div>
+          <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", lineHeight:1.65, maxWidth:180 }}>
             This feature is actively in development and will be available in Phase 2.
           </div>
         </div>
-        <div style={{ padding:"5px 16px", borderRadius:20, background:`${color}14`, border:`1px solid ${color}28`, fontSize:10, fontWeight:700, color, letterSpacing:".04em" }}>
+        <div style={{ padding:"5px 16px", borderRadius:20, background:`color-mix(in srgb, ${color} 7.8%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 15.7%, transparent)`, fontSize:10, fontWeight:700, color, letterSpacing:".04em" }}>
           Phase 2 — Launching Soon
         </div>
       </div>
@@ -1874,18 +1874,18 @@ function MockScreen({ type, color }: { type: string; color: string }) {
     ai: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
         <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>AI Assistant</div>
-        <div style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)" }}>
-          <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", marginBottom:4 }}>You asked:</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.8)" }}>Which customer has the highest overdue balance this month?</div>
+        <div style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.08)" }}>
+          <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:4 }}>You asked:</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),.8)" }}>Which customer has the highest overdue balance this month?</div>
         </div>
-        <div style={{ padding:"8px 10px", borderRadius:8, background:`${color}12`, border:`1px solid ${color}25` }}>
+        <div style={{ padding:"8px 10px", borderRadius:8, background:`color-mix(in srgb, ${color} 7.1%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 14.5%, transparent)` }}>
           <div style={{ fontSize:9, color, marginBottom:4, fontWeight:700 }}>AI Response:</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.7)", lineHeight:1.5 }}>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-70, .7))", lineHeight:1.5 }}>
             <strong style={{ color }}>Ahmed Brothers</strong> has the highest overdue: $12,400 (61 days). Suggested action: send WhatsApp reminder or escalate to sales team.
           </div>
         </div>
-        <div style={{ display:"flex", gap:4, padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)" }}>
-          <input style={{ flex:1, background:"transparent", border:"none", outline:"none", fontSize:10, color:"rgba(255,255,255,.5)" }} defaultValue="Ask anything about your finances..." readOnly />
+        <div style={{ display:"flex", gap:4, padding:"6px 8px", borderRadius:8, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.08)" }}>
+          <input style={{ flex:1, background:"transparent", border:"none", outline:"none", fontSize:10, color:"rgba(var(--ink),var(--ta-50, .5))" }} defaultValue="Ask anything about your finances..." readOnly />
           <div style={{ fontSize:14, color }}>↑</div>
         </div>
       </div>
@@ -1895,15 +1895,15 @@ function MockScreen({ type, color }: { type: string; color: string }) {
   return (
     <div style={{
       width:"100%", aspectRatio:"16/9",
-      background:"linear-gradient(135deg,rgba(8,12,30,1) 0%,rgba(15,20,50,1) 100%)",
+      background:"linear-gradient(135deg,rgba(var(--dkr-080c1e, 8,12,30),1) 0%,rgba(var(--dkr-0f1432, 15,20,50),1) 100%)",
       borderRadius:14, overflow:"hidden", position:"relative", display:"flex", flexDirection:"column",
     }}>
       {/* Fake top bar */}
-      <div style={{ padding:"10px 16px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
-        {["#f87171","#fbbf24","#34d399"].map(c=>(
+      <div style={{ padding:"10px 16px", borderBottom:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+        {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map(c=>(
           <div key={c} style={{ width:9, height:9, borderRadius:"50%", background:c, opacity:.6 }}/>
         ))}
-        <div style={{ flex:1, height:7, borderRadius:4, background:"rgba(255,255,255,.05)", marginLeft:8 }}/>
+        <div style={{ flex:1, height:7, borderRadius:4, background:"rgba(var(--ink),.05)", marginLeft:8 }}/>
       </div>
       {/* Content */}
       <div style={{ flex:1, overflow:"hidden" }}>
@@ -1947,10 +1947,10 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
           <span style={{ width:5, height:5, borderRadius:"50%", background:color }}/>
           Feature {String(globalIndex+1).padStart(2,"0")}
         </div>
-        <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,2.5vw,28px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.25, marginBottom:12 }}>
+        <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,2.5vw,28px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.5px", lineHeight:1.25, marginBottom:12 }}>
           {feature.name}
         </h3>
-        <p style={{ fontSize:14.5, color:"rgba(255,255,255,.45)", lineHeight:1.8, marginBottom:22 }}>
+        <p style={{ fontSize:14.5, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.8, marginBottom:22 }}>
           {feature.description}
         </p>
         <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
@@ -1961,7 +1961,7 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
                   <path d="M1 5.5L4.5 9 11 1" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <span style={{ fontSize:13.5, color:"rgba(255,255,255,.68)", fontWeight:500 }}>{h}</span>
+              <span style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-68, .68))", fontWeight:500 }}>{h}</span>
             </div>
           ))}
         </div>
@@ -1969,8 +1969,8 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
 
       {/* Mock screen */}
       <div className="feat-row-mock" style={{ direction:"ltr" }}>
-        <div style={{ borderRadius:18, padding:3, background:`linear-gradient(135deg,${color}30,rgba(255,255,255,.04))`, boxShadow:`0 20px 56px rgba(0,0,0,.4), 0 0 0 1px ${border}` }}>
-          <div style={{ borderRadius:16, overflow:"hidden", background:"#080c1e" }}>
+        <div style={{ borderRadius:18, padding:3, background:`linear-gradient(135deg,color-mix(in srgb, ${color} 18.8%, transparent),rgba(var(--ink),.04))`, boxShadow:`0 20px 56px rgba(0,0,0,.4), 0 0 0 1px ${border}` }}>
+          <div style={{ borderRadius:16, overflow:"hidden", background:"var(--dk-080c1e, #080c1e)" }}>
             <MockScreen type={(feature as any).mockType || "ledger"} color={color}/>
           </div>
         </div>
@@ -1982,7 +1982,7 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
 function CategorySection({ cat, startIdx }: { cat: typeof CATEGORIES[0]; startIdx: number }) {
   const [headerRef, headerVisible] = useVisible(0.15);
   return (
-    <section id={cat.id} className="feat-section" style={{ padding:"90px 24px", borderTop:"1px solid rgba(255,255,255,.05)", position:"relative", overflow:"hidden" }}>
+    <section id={cat.id} className="feat-section" style={{ padding:"90px 24px", borderTop:"1px solid rgba(var(--ink),.05)", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:`radial-gradient(circle,${cat.glow},transparent 65%)`, top:-80, right:-80, pointerEvents:"none" }}/>
       <div style={{ maxWidth:1160, margin:"0 auto", position:"relative" }}>
         {/* Header */}
@@ -1995,7 +1995,7 @@ function CategorySection({ cat, startIdx }: { cat: typeof CATEGORIES[0]; startId
               <div style={{ width:24, height:3, borderRadius:2, background:cat.color }}/>
               <span style={{ fontSize:10.5, fontWeight:700, color:cat.color, letterSpacing:".1em", textTransform:"uppercase" as const }}>{cat.items.length} Features</span>
             </div>
-            <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, color:"white", letterSpacing:"-.6px", lineHeight:1.15, margin:0 }}>
+            <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.6px", lineHeight:1.15, margin:0 }}>
               {cat.label}
             </h2>
           </div>
@@ -2038,7 +2038,7 @@ export default function FeaturesPage() {
         <meta name="description" content={`${totalFeatures} features for accounting, inventory, HR, CRM and more — built for modern SMEs.`}/>
       </Head>
 
-      <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 25%,#080c1e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
+      <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 25%,var(--dk-080c1e, #080c1e) 100%)", color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
         <style>{`
           
           *,*::before,*::after{box-sizing:border-box;}
@@ -2046,8 +2046,8 @@ export default function FeaturesPage() {
           @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
           @keyframes floatBadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
           @keyframes rotateSlow{to{transform:rotate(360deg)}}
-          .feat-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:24px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);transition:all .25s;white-space:nowrap;}
-          .feat-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2);}
+          .feat-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:24px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;border:1.5px solid rgba(var(--ink),.08);background:rgba(var(--ink),.04);color:rgba(var(--ink),var(--ta-45, .45));transition:all .25s;white-space:nowrap;}
+          .feat-tab:hover{color:rgba(var(--ink),.8);border-color:rgba(var(--ink),.2);}
           @media(max-width:900px){
             .feat-row{grid-template-columns:1fr!important;direction:ltr!important;gap:36px!important;}
             .feat-row-copy{order:1!important;}
@@ -2058,7 +2058,7 @@ export default function FeaturesPage() {
             .feat-items-gap{gap:52px!important;}
             .feat-cta-inner{padding:48px 24px!important;}
             .feat-stats{padding:20px 16px!important;gap:0!important;flex-wrap:wrap!important;}
-            .feat-stat-item{padding:16px 20px!important;border-right:none!important;border-bottom:1px solid rgba(255,255,255,.07);flex:1 1 40%!important;min-width:120px!important;}
+            .feat-stat-item{padding:16px 20px!important;border-right:none!important;border-bottom:1px solid rgba(var(--ink),.07);flex:1 1 40%!important;min-width:120px!important;}
           }
           @media(max-width:600px){
             .feat-hero{padding:64px 16px 48px!important;}
@@ -2080,19 +2080,19 @@ export default function FeaturesPage() {
           </div>
 
           <div ref={heroRef} style={{ maxWidth:860, margin:"0 auto", textAlign:"center", position:"relative" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)", fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".09em", textTransform:"uppercase" as const, marginBottom:24, opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)", transition:"all .5s ease" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)", fontSize:11, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".09em", textTransform:"uppercase" as const, marginBottom:24, opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)", transition:"all .5s ease" }}>
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
               {totalFeatures} Features & Counting
             </div>
 
-            <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(36px,5.5vw,62px)", fontWeight:700, color:"white", letterSpacing:"-2px", lineHeight:1.08, marginBottom:18, opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(20px)", transition:"all .6s ease .08s" }}>
+            <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(36px,5.5vw,62px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-2px", lineHeight:1.08, marginBottom:18, opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(20px)", transition:"all .6s ease .08s" }}>
               All the tools you need
-              <span style={{ display:"block", fontStyle:"italic", background:"linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+              <span style={{ display:"block", fontStyle:"italic", background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                 to run your business.
               </span>
             </h1>
 
-            <p style={{ fontSize:17, color:"rgba(255,255,255,.45)", lineHeight:1.8, maxWidth:580, margin:"0 auto 44px", opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)", transition:"all .6s ease .16s" }}>
+            <p style={{ fontSize:17, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.8, maxWidth:580, margin:"0 auto 44px", opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)", transition:"all .6s ease .16s" }}>
               From double-entry accounting to real-time inventory — every feature purpose-built for the way modern SMEs actually operate.
             </p>
 
@@ -2102,9 +2102,9 @@ export default function FeaturesPage() {
                 onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 6px 24px rgba(99,102,241,.4)"; }}>
                 Get Started →
               </Link>
-              <Link href="/pricing" style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"12px 24px", borderRadius:13, border:"1.5px solid rgba(255,255,255,.12)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.65)", fontWeight:600, fontSize:14, textDecoration:"none", fontFamily:"inherit", transition:"all .25s" }}
-                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.28)"; e.currentTarget.style.color="white"; }}
-                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.12)"; e.currentTarget.style.color="rgba(255,255,255,.65)"; }}>
+              <Link href="/pricing" style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"12px 24px", borderRadius:13, border:"1.5px solid rgba(var(--ink),.12)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),var(--ta-65, .65))", fontWeight:600, fontSize:14, textDecoration:"none", fontFamily:"inherit", transition:"all .25s" }}
+                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.28)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.12)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-65, .65))"; }}>
                 View Pricing
               </Link>
             </div>
@@ -2123,17 +2123,17 @@ export default function FeaturesPage() {
         </section>
 
         {/* ── STATS STRIP ── */}
-        <div style={{ borderTop:"1px solid rgba(255,255,255,.05)", borderBottom:"1px solid rgba(255,255,255,.05)", background:"rgba(255,255,255,.02)" }}>
+        <div style={{ borderTop:"1px solid rgba(var(--ink),.05)", borderBottom:"1px solid rgba(var(--ink),.05)", background:"rgba(var(--ink),.02)" }}>
           <div className="feat-stats" style={{ maxWidth:1000, margin:"0 auto", padding:"28px 24px", display:"flex", justifyContent:"center", flexWrap:"wrap", gap:0 }}>
             {[
-              { val:`${totalFeatures}+`, label:"Total Features",     color:"#818cf8" },
-              { val:"7",                 label:"Core Modules",        color:"#34d399" },
-              { val:`${totalFeatures}+`,  label:"Individual Features",  color:"#fbbf24" },
-              { val:"10 min",            label:"To Get Started",      color:"#f87171" },
+              { val:`${totalFeatures}+`, label:"Total Features",     color:"var(--tx-818cf8, #818cf8)" },
+              { val:"7",                 label:"Core Modules",        color:"var(--tx-34d399, #34d399)" },
+              { val:`${totalFeatures}+`,  label:"Individual Features",  color:"var(--tx-fbbf24, #fbbf24)" },
+              { val:"10 min",            label:"To Get Started",      color:"var(--tx-f87171, #f87171)" },
             ].map(({ val, label, color },i)=>(
-              <div key={label} className="feat-stat-item" style={{ padding:"0 36px", textAlign:"center", borderRight:i<3?"1px solid rgba(255,255,255,.07)":"none" }}>
+              <div key={label} className="feat-stat-item" style={{ padding:"0 36px", textAlign:"center", borderRight:i<3?"1px solid rgba(var(--ink),.07)":"none" }}>
                 <div style={{ fontFamily:"'Lora',serif", fontSize:26, fontWeight:700, color, letterSpacing:"-.5px" }}>{val}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:500, marginTop:3 }}>{label}</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:500, marginTop:3 }}>{label}</div>
               </div>
             ))}
           </div>
@@ -2146,22 +2146,22 @@ export default function FeaturesPage() {
 
         {/* ── FINAL CTA ── */}
         <section style={{ padding:"80px 24px", maxWidth:1100, margin:"0 auto" }}>
-          <div ref={ctaRef} className="feat-cta-inner" style={{ borderRadius:28, overflow:"hidden", position:"relative", background:"linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%)", padding:"72px 48px", textAlign:"center", boxShadow:"0 32px 80px rgba(99,102,241,.35)", border:"1px solid rgba(165,180,252,.2)", opacity:ctaVisible?1:0, transform:ctaVisible?"translateY(0)":"translateY(20px)", transition:"all .7s ease" }}>
+          <div ref={ctaRef} className="feat-cta-inner" style={{ borderRadius:28, overflow:"hidden", position:"relative", background:"var(--mk-card-indigo, linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%))", padding:"72px 48px", textAlign:"center", boxShadow:"0 32px 80px rgba(99,102,241,.35)", border:"1px solid rgba(165,180,252,.2)", opacity:ctaVisible?1:0, transform:ctaVisible?"translateY(0)":"translateY(20px)", transition:"all .7s ease" }}>
             <div style={{ position:"absolute", width:520, height:520, borderRadius:"50%", border:"1px solid rgba(165,180,252,.07)", top:"50%", left:"50%", transform:"translate(-50%,-50%)", animation:"rotateSlow 30s linear infinite", pointerEvents:"none" }}>
               <div style={{ position:"absolute", top:-4, left:"50%", width:8, height:8, borderRadius:"50%", background:"#818cf8", marginLeft:-4, boxShadow:"0 0 12px rgba(129,140,248,.8)" }}/>
             </div>
             <div style={{ position:"absolute", width:380, height:380, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.12),transparent 70%)", top:-80, right:-60, pointerEvents:"none" }}/>
             <div style={{ position:"relative" }}>
-              <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(251,191,36,.12)", border:"1.5px solid rgba(251,191,36,.3)", fontSize:11, fontWeight:800, color:"#fbbf24", letterSpacing:".09em", textTransform:"uppercase" as const, marginBottom:22, animation:"floatBadge 3s ease-in-out infinite" }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(251,191,36,.12)", border:"1.5px solid rgba(251,191,36,.3)", fontSize:11, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", letterSpacing:".09em", textTransform:"uppercase" as const, marginBottom:22, animation:"floatBadge 3s ease-in-out infinite" }}>
                 🔥 Get Started Today — No Hidden Fees
               </div>
-              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4.5vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14 }}>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4.5vw,50px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14 }}>
                 Ready to transform
-                <span style={{ display:"block", fontStyle:"italic", background:"linear-gradient(135deg,#a5b4fc,#818cf8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+                <span style={{ display:"block", fontStyle:"italic", background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                   your business?
                 </span>
               </h2>
-              <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", marginBottom:40, maxWidth:460, margin:"0 auto 40px", lineHeight:1.8 }}>
+              <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:40, maxWidth:460, margin:"0 auto 40px", lineHeight:1.8 }}>
                 Purpose-built for SMEs who need accounting software that actually fits how they work.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
@@ -2170,9 +2170,9 @@ export default function FeaturesPage() {
                   onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 6px 24px rgba(251,191,36,.4)"; }}>
                   Get Started Now →
                 </Link>
-                <Link href="/contact" style={{ padding:"13px 32px", borderRadius:14, border:"1.5px solid rgba(255,255,255,.2)", background:"rgba(255,255,255,.06)", backdropFilter:"blur(8px)", color:"rgba(255,255,255,.75)", fontWeight:700, fontSize:15, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, transition:"all .25s" }}
-                  onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.4)"; e.currentTarget.style.color="white"; }}
-                  onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.2)"; e.currentTarget.style.color="rgba(255,255,255,.75)"; }}>
+                <Link href="/contact" style={{ padding:"13px 32px", borderRadius:14, border:"1.5px solid rgba(var(--ink),.2)", background:"rgba(var(--ink),.06)", backdropFilter:"blur(8px)", color:"rgba(var(--ink),.75)", fontWeight:700, fontSize:15, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, transition:"all .25s" }}
+                  onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.4)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                  onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.2)"; e.currentTarget.style.color="rgba(var(--ink),.75)"; }}>
                   Talk to Sales
                 </Link>
               </div>

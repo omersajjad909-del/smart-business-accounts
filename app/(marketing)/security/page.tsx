@@ -7,19 +7,19 @@ import { useEffect, useRef, useState } from "react";
 
 // What is live today (honest framing)
 const CERTIFICATIONS = [
-  { icon:"🔐", label:"TLS 1.3 Encryption",       sub:"All data in transit",       color:"#818cf8", glow:"rgba(129,140,248,.18)", border:"rgba(129,140,248,.35)" },
-  { icon:"🔒", label:"AES-256 Field Encryption",  sub:"Sensitive data at rest",    color:"#34d399", glow:"rgba(52,211,153,.18)",  border:"rgba(52,211,153,.35)"  },
-  { icon:"👤", label:"Role-Based Access (RBAC)",  sub:"Granular permissions",      color:"#fbbf24", glow:"rgba(251,191,36,.18)", border:"rgba(251,191,36,.35)"  },
-  { icon:"📋", label:"Immutable Audit Logs",      sub:"Append-only security trail",color:"#f87171", glow:"rgba(248,113,113,.18)",border:"rgba(248,113,113,.35)" },
+  { icon:"🔐", label:"TLS 1.3 Encryption",       sub:"All data in transit",       color:"var(--tx-818cf8, #818cf8)", glow:"rgba(129,140,248,.18)", border:"rgba(129,140,248,.35)" },
+  { icon:"🔒", label:"AES-256 Field Encryption",  sub:"Sensitive data at rest",    color:"var(--tx-34d399, #34d399)", glow:"rgba(52,211,153,.18)",  border:"rgba(52,211,153,.35)"  },
+  { icon:"👤", label:"Role-Based Access (RBAC)",  sub:"Granular permissions",      color:"var(--tx-fbbf24, #fbbf24)", glow:"rgba(251,191,36,.18)", border:"rgba(251,191,36,.35)"  },
+  { icon:"📋", label:"Immutable Audit Logs",      sub:"Append-only security trail",color:"var(--tx-f87171, #f87171)", glow:"rgba(248,113,113,.18)",border:"rgba(248,113,113,.35)" },
 ];
 
 const PILLARS = [
   {
     id:"encryption",
     icon:"🔒",
-    color:"#818cf8",
+    color:"var(--tx-818cf8, #818cf8)",
     glow:"rgba(129,140,248,.22)",
-    dim:"rgba(129,140,248,.08)",
+    dim:"rgba(var(--txr-818cf8, 129,140,248),.08)",
     border:"rgba(129,140,248,.3)",
     title:"Encryption — Active Now",
     subtitle:"Sensitive data is encrypted before it touches the database.",
@@ -32,9 +32,9 @@ const PILLARS = [
   {
     id:"access",
     icon:"👤",
-    color:"#34d399",
+    color:"var(--tx-34d399, #34d399)",
     glow:"rgba(52,211,153,.22)",
-    dim:"rgba(52,211,153,.08)",
+    dim:"rgba(var(--txr-34d399, 52,211,153),.08)",
     border:"rgba(52,211,153,.3)",
     title:"Access Control — Active Now",
     subtitle:"The right people see the right data. Nothing more.",
@@ -47,9 +47,9 @@ const PILLARS = [
   {
     id:"infrastructure",
     icon:"🏗️",
-    color:"#fbbf24",
+    color:"var(--tx-fbbf24, #fbbf24)",
     glow:"rgba(251,191,36,.22)",
-    dim:"rgba(251,191,36,.08)",
+    dim:"rgba(var(--txr-fbbf24, 251,191,36),.08)",
     border:"rgba(251,191,36,.3)",
     title:"Infrastructure & Uptime",
     subtitle:"Built on managed cloud infrastructure with automated backups.",
@@ -62,9 +62,9 @@ const PILLARS = [
   {
     id:"audit",
     icon:"📋",
-    color:"#f87171",
+    color:"var(--tx-f87171, #f87171)",
     glow:"rgba(248,113,113,.22)",
-    dim:"rgba(248,113,113,.08)",
+    dim:"rgba(var(--txr-f87171, 248,113,113),.08)",
     border:"rgba(248,113,113,.3)",
     title:"Audit Trails — Active Now",
     subtitle:"Every security action is logged and protected from modification.",
@@ -77,9 +77,9 @@ const PILLARS = [
   {
     id:"network",
     icon:"🌐",
-    color:"#a78bfa",
+    color:"var(--tx-a78bfa, #a78bfa)",
     glow:"rgba(167,139,250,.22)",
-    dim:"rgba(167,139,250,.08)",
+    dim:"rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border:"rgba(167,139,250,.3)",
     title:"Network & Application Security",
     subtitle:"Hardened against common web threats.",
@@ -92,9 +92,9 @@ const PILLARS = [
   {
     id:"privacy",
     icon:"🔏",
-    color:"#06b6d4",
+    color:"var(--tx-06b6d4, #06b6d4)",
     glow:"rgba(6,182,212,.22)",
-    dim:"rgba(6,182,212,.08)",
+    dim:"rgba(var(--txr-06b6d4, 6,182,212),.08)",
     border:"rgba(6,182,212,.3)",
     title:"Privacy & Data Ownership",
     subtitle:"Your data is yours. We are just the custodian.",
@@ -107,10 +107,10 @@ const PILLARS = [
 ];
 
 const STATS = [
-  { val:"AES-256", label:"Field Encryption", color:"#818cf8" },
-  { val:"TLS 1.3", label:"In Transit",       color:"#34d399" },
-  { val:"30 days", label:"Backup Retention", color:"#fbbf24" },
-  { val:"24/7",    label:"Monitoring",        color:"#f87171" },
+  { val:"AES-256", label:"Field Encryption", color:"var(--tx-818cf8, #818cf8)" },
+  { val:"TLS 1.3", label:"In Transit",       color:"var(--tx-34d399, #34d399)" },
+  { val:"30 days", label:"Backup Retention", color:"var(--tx-fbbf24, #fbbf24)" },
+  { val:"24/7",    label:"Monitoring",        color:"var(--tx-f87171, #f87171)" },
 ];
 
 /* ─── Hook ─── */
@@ -134,8 +134,8 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
   return (
     <section ref={ref} id={p.id} className="pillar-section" style={{
       padding:"88px 24px",
-      background: index % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)",
-      borderTop:"1px solid rgba(255,255,255,.05)",
+      background: index % 2 === 0 ? "transparent" : "rgba(var(--ink),.015)",
+      borderTop:"1px solid rgba(var(--ink),.05)",
       position:"relative", overflow:"hidden",
     }}>
       <div style={{
@@ -172,7 +172,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
             <h2 style={{
               fontFamily:"'Lora',serif",
               fontSize:"clamp(24px,3vw,38px)",
-              fontWeight:700, color:"white",
+              fontWeight:700, color:"var(--ink-solid, white)",
               letterSpacing:"-1px", lineHeight:1.15, marginBottom:10,
               opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(18px)",
               transition:"all .55s ease .06s",
@@ -202,8 +202,8 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
                     {pt.icon}
                   </div>
                   <div>
-                    <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.88)", marginBottom:4 }}>{pt.title}</div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.7 }}>{pt.desc}</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),.88)", marginBottom:4 }}>{pt.title}</div>
+                    <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.7 }}>{pt.desc}</div>
                   </div>
                 </div>
               ))}
@@ -214,10 +214,10 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
           <div className="pillar-visual" style={{ direction:"ltr" }}>
             <div style={{
               borderRadius:24, overflow:"hidden",
-              background:"rgba(255,255,255,.03)",
+              background:"rgba(var(--ink),.03)",
               border:`1.5px solid ${p.border}`,
               backdropFilter:"blur(20px)",
-              boxShadow:`0 24px 64px rgba(0,0,0,.4), 0 0 0 1px ${p.color}10`,
+              boxShadow:`0 24px 64px rgba(0,0,0,.4), 0 0 0 1px color-mix(in srgb, ${p.color} 6.3%, transparent)`,
               opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)",
               transition:"all .65s ease .2s",
               position:"relative",
@@ -229,7 +229,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
               {/* Card header */}
               <div style={{
                 padding:"20px 24px",
-                borderBottom:`1px solid rgba(255,255,255,.06)`,
+                borderBottom:`1px solid rgba(var(--ink),.06)`,
                 display:"flex", alignItems:"center", gap:12,
               }}>
                 <div style={{
@@ -241,15 +241,15 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
                   {p.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.85)" }}>{p.title}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2 }}>Security module</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.85)" }}>{p.title}</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:2 }}>Security module</div>
                 </div>
                 <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:6,
                   padding:"4px 10px", borderRadius:16,
                   background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)" }}>
                   <span style={{ width:5, height:5, borderRadius:"50%", background:"#34d399",
                     boxShadow:"0 0 8px rgba(52,211,153,.8)" }}/>
-                  <span style={{ fontSize:10, fontWeight:700, color:"#34d399" }}>ACTIVE</span>
+                  <span style={{ fontSize:10, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>ACTIVE</span>
                 </div>
               </div>
 
@@ -263,8 +263,8 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
                     style={{
                       display:"flex", alignItems:"center", gap:12,
                       padding:"12px 14px", borderRadius:12,
-                      background: hov===i ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.02)",
-                      border:`1px solid ${hov===i ? p.border : "rgba(255,255,255,.05)"}`,
+                      background: hov===i ? "rgba(var(--ink),.06)" : "rgba(var(--ink),.02)",
+                      border:`1px solid ${hov===i ? p.border : "rgba(var(--ink),.05)"}`,
                       transition:"all .25s", cursor:"default",
                     }}>
                     <div style={{
@@ -276,11 +276,11 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
                       {pt.icon}
                     </div>
                     <div style={{ flex:1 }}>
-                      <div style={{ fontSize:12.5, fontWeight:700, color:"rgba(255,255,255,.8)" }}>{pt.title}</div>
+                      <div style={{ fontSize:12.5, fontWeight:700, color:"rgba(var(--ink),.8)" }}>{pt.title}</div>
                     </div>
                     <div style={{
                       width:18, height:18, borderRadius:"50%",
-                      background:`${p.color}18`, border:`1px solid ${p.border}`,
+                      background:`color-mix(in srgb, ${p.color} 9.4%, transparent)`, border:`1px solid ${p.border}`,
                       display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
                     }}>
                       <svg width="8" height="8" viewBox="0 0 12 10" fill="none">
@@ -326,8 +326,8 @@ export default function SecurityPage() {
 
       <div style={{
         minHeight:"100vh",
-        background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)",
-        color:"white",
+        background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 30%,var(--dk-080c1e, #080c1e) 100%)",
+        color:"var(--ink-solid, white)",
         fontFamily:"'Outfit','DM Sans',sans-serif",
       }}>
         <style>{`
@@ -355,8 +355,8 @@ export default function SecurityPage() {
           .cert-chip{
             display:inline-flex;align-items:center;gap:12px;
             padding:12px 18px;border-radius:16px;
-            background:rgba(255,255,255,.04);
-            border:1.5px solid rgba(255,255,255,.09);
+            background:rgba(var(--ink),.04);
+            border:1.5px solid rgba(var(--ink),.09);
             backdropFilter:blur(12px);
             transition:all .25s;cursor:default;
             position:relative;overflow:hidden;
@@ -365,7 +365,7 @@ export default function SecurityPage() {
             content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
             border-radius:3px 0 0 3px;
           }
-          .cert-chip:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-2px);}
+          .cert-chip:hover{background:rgba(var(--ink),.07);border-color:rgba(var(--ink),.18);transform:translateY(-2px);}
         `}</style>
 
         {/* ── HERO ── */}
@@ -428,7 +428,7 @@ export default function SecurityPage() {
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"6px 16px", borderRadius:24,
                 background:"rgba(52,211,153,.1)", border:"1.5px solid rgba(52,211,153,.28)",
-                fontSize:11, fontWeight:700, color:"#6ee7b7",
+                fontSize:11, fontWeight:700, color:"var(--tx-6ee7b7, #6ee7b7)",
                 letterSpacing:".09em", textTransform:"uppercase",
                 transform:heroVisible?"translateY(0)":"translateY(16px)",
                 transition:"transform .5s ease .1s",
@@ -441,21 +441,21 @@ export default function SecurityPage() {
             <h1 style={{
               fontFamily:"'Lora',serif",
               fontSize:"clamp(36px,5.5vw,62px)",
-              fontWeight:700, color:"white",
+              fontWeight:700, color:"var(--ink-solid, white)",
               letterSpacing:"-2px", lineHeight:1.08, marginBottom:18,
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(20px)",
               transition:"all .6s ease .15s",
             }}>
               Security built in,
               <span style={{ display:"block", fontStyle:"italic",
-                background:"linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd)",
+                background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd))",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                 not bolted on.
               </span>
             </h1>
 
             <p style={{
-              fontSize:17, color:"rgba(255,255,255,.42)", lineHeight:1.8,
+              fontSize:17, color:"rgba(var(--ink),var(--ta-42, .42))", lineHeight:1.8,
               maxWidth:620, margin:"0 auto 16px",
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .6s ease .22s",
@@ -471,7 +471,7 @@ export default function SecurityPage() {
               opacity:heroVisible?1:0, transition:"opacity .5s ease .26s",
             }}>
               <span style={{ fontSize:14 }}>📌</span>
-              <span style={{ fontSize:12.5, color:"rgba(251,191,36,.8)", fontWeight:500 }}>
+              <span style={{ fontSize:12.5, color:"rgba(var(--txr-fbbf24, 251,191,36),var(--ta-80, .8))", fontWeight:500 }}>
                 We show what&apos;s live today and what&apos;s planned — no false claims.
               </span>
             </div>
@@ -490,20 +490,20 @@ export default function SecurityPage() {
                   }}/>
                   <div style={{
                     width:36, height:36, borderRadius:10, flexShrink:0,
-                    background:`rgba(0,0,0,.25)`, border:`1px solid ${c.border}`,
+                    background: "var(--mk-inset, rgba(0,0,0,.25))", border:`1px solid ${c.border}`,
                     display:"flex", alignItems:"center", justifyContent:"center",
                     fontSize:18,
                   }}>
                     {c.icon}
                   </div>
                   <div style={{ textAlign:"left" }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.9)", lineHeight:1.2 }}>{c.label}</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.9)", lineHeight:1.2 }}>{c.label}</div>
                     <div style={{ fontSize:11, color: c.color, fontWeight:600, marginTop:2, opacity:.8 }}>{c.sub}</div>
                   </div>
                   <div style={{ marginLeft:"auto", paddingLeft:8 }}>
                     <div style={{
                       width:18, height:18, borderRadius:"50%",
-                      background:`${c.color}20`, border:`1px solid ${c.border}`,
+                      background:`color-mix(in srgb, ${c.color} 12.5%, transparent)`, border:`1px solid ${c.border}`,
                       display:"flex", alignItems:"center", justifyContent:"center",
                     }}>
                       <svg width="8" height="8" viewBox="0 0 12 10" fill="none">
@@ -537,13 +537,13 @@ export default function SecurityPage() {
               <Link href="/support" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 24px", borderRadius:13,
-                border:"1.5px solid rgba(255,255,255,.12)",
-                background:"rgba(255,255,255,.04)",
-                color:"rgba(255,255,255,.65)", fontWeight:600, fontSize:14,
+                border:"1.5px solid rgba(var(--ink),.12)",
+                background:"rgba(var(--ink),.04)",
+                color:"rgba(var(--ink),var(--ta-65, .65))", fontWeight:600, fontSize:14,
                 textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
               }}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.28)";e.currentTarget.style.color="white";}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.12)";e.currentTarget.style.color="rgba(255,255,255,.65)";}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(var(--ink),.28)";e.currentTarget.style.color="var(--ink-solid, white)";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(var(--ink),.12)";e.currentTarget.style.color="rgba(var(--ink),var(--ta-65, .65))";}}
               >
                 Talk to Security Team
               </Link>
@@ -553,9 +553,9 @@ export default function SecurityPage() {
 
         {/* ── STATS STRIP ── */}
         <div style={{
-          borderTop:"1px solid rgba(255,255,255,.05)",
-          borderBottom:"1px solid rgba(255,255,255,.05)",
-          background:"rgba(255,255,255,.02)",
+          borderTop:"1px solid rgba(var(--ink),.05)",
+          borderBottom:"1px solid rgba(var(--ink),.05)",
+          background:"rgba(var(--ink),.02)",
         }}>
           <div ref={statsRef} className="stats-grid" style={{
             maxWidth:1000, margin:"0 auto", padding:"32px 24px",
@@ -566,27 +566,27 @@ export default function SecurityPage() {
             {STATS.map(({val,label,color},i) => (
               <div key={label} style={{
                 padding:"0 24px", textAlign:"center",
-                borderRight: i<3 ? "1px solid rgba(255,255,255,.06)" : "none",
+                borderRight: i<3 ? "1px solid rgba(var(--ink),.06)" : "none",
               }}>
                 <div style={{ fontFamily:"'Lora',serif", fontSize:26, fontWeight:700, color, letterSpacing:"-.5px" }}>{val}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.28)", fontWeight:500, marginTop:4 }}>{label}</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:500, marginTop:4 }}>{label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* ── SCROLLING TICKER ── */}
-        <div style={{ overflow:"hidden", padding:"12px 0", background:"rgba(255,255,255,.015)", position:"relative" }}>
-          <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(90deg,#080c1e,transparent)", zIndex:2, pointerEvents:"none" }}/>
-          <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(270deg,#080c1e,transparent)", zIndex:2, pointerEvents:"none" }}/>
+        <div style={{ overflow:"hidden", padding:"12px 0", background:"rgba(var(--ink),.015)", position:"relative" }}>
+          <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(90deg,var(--dk-080c1e, #080c1e),transparent)", zIndex:2, pointerEvents:"none" }}/>
+          <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(270deg,var(--dk-080c1e, #080c1e),transparent)", zIndex:2, pointerEvents:"none" }}/>
           <div style={{ display:"flex", animation:"ticker 28s linear infinite", width:"max-content" }}>
             {[...Array(2)].map((_,ri) =>
               ["256-bit Encryption","Role-Based Access","Audit Trails","99.9% Uptime","Daily Backups","Tax Authority Compliance","Global Regions","Zero Data Selling","DDoS Protection","WAF Enabled"].map(t=>(
                 <div key={`${ri}-${t}`} style={{
                   padding:"0 24px",
-                  borderRight:"1px solid rgba(255,255,255,.05)",
+                  borderRight:"1px solid rgba(var(--ink),.05)",
                   fontSize:11.5, fontWeight:700,
-                  color:"rgba(255,255,255,.2)",
+                  color:"rgba(var(--ink),var(--ta-20, .2))",
                   letterSpacing:".07em", textTransform:"uppercase", whiteSpace:"nowrap",
                   display:"flex", alignItems:"center", gap:8,
                 }}>
@@ -602,7 +602,7 @@ export default function SecurityPage() {
         {PILLARS.map((p,i) => <PillarSection key={p.id} p={p} index={i}/>)}
 
         {/* ── INCIDENT RESPONSE ── */}
-        <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(255,255,255,.05)" }}>
+        <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(var(--ink),.05)" }}>
           <div style={{ maxWidth:760, margin:"0 auto", textAlign:"center" }}>
             <div style={{
               borderRadius:24, padding:"48px 40px",
@@ -613,10 +613,10 @@ export default function SecurityPage() {
               <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
                 background:"linear-gradient(90deg,transparent,rgba(248,113,113,.4),transparent)" }}/>
               <div style={{ fontSize:40, marginBottom:20 }}>🚨</div>
-              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,30px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.2, marginBottom:12 }}>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,30px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.5px", lineHeight:1.2, marginBottom:12 }}>
                 Security Incident Response
               </h2>
-              <p style={{ fontSize:14.5, color:"rgba(255,255,255,.42)", lineHeight:1.8, marginBottom:0 }}>
+              <p style={{ fontSize:14.5, color:"rgba(var(--ink),var(--ta-42, .42))", lineHeight:1.8, marginBottom:0 }}>
                 In the event of a confirmed security incident affecting customer data, FinovaOS will take reasonable steps to investigate, contain, and notify affected parties in a timely manner. We maintain internal procedures to respond to and recover from security events, and will communicate transparently with customers when appropriate.
               </p>
             </div>
@@ -624,29 +624,29 @@ export default function SecurityPage() {
         </section>
 
         {/* ── RESPONSIBLE DISCLOSURE ── */}
-        <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(255,255,255,.05)" }}>
+        <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(var(--ink),.05)" }}>
           <div style={{ maxWidth:760, margin:"0 auto", textAlign:"center" }}>
             <div style={{
               borderRadius:24, padding:"48px 40px",
-              background:"rgba(255,255,255,.03)",
-              border:"1.5px solid rgba(255,255,255,.08)",
+              background:"rgba(var(--ink),.03)",
+              border:"1.5px solid rgba(var(--ink),.08)",
               backdropFilter:"blur(20px)",
               position:"relative", overflow:"hidden",
             }}>
               <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
                 background:"linear-gradient(90deg,transparent,rgba(129,140,248,.5),transparent)" }}/>
               <div style={{ fontSize:40, marginBottom:20 }}>🤝</div>
-              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,30px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.2, marginBottom:12 }}>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,30px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.5px", lineHeight:1.2, marginBottom:12 }}>
                 Responsible Disclosure
               </h2>
-              <p style={{ fontSize:14.5, color:"rgba(255,255,255,.42)", lineHeight:1.8, marginBottom:24 }}>
+              <p style={{ fontSize:14.5, color:"rgba(var(--ink),var(--ta-42, .42))", lineHeight:1.8, marginBottom:24 }}>
                 We take all security reports seriously. If you&apos;ve discovered a vulnerability in FinovaOS, please report it directly to our security team. We commit to acknowledging your report within 48 hours and resolving critical issues within 14 days.
               </p>
               <a href="mailto:support@finovaos.app" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 24px", borderRadius:12,
                 background:"rgba(129,140,248,.12)", border:"1.5px solid rgba(129,140,248,.3)",
-                color:"#a5b4fc", fontWeight:700, fontSize:14,
+                color:"var(--tx-a5b4fc, #a5b4fc)", fontWeight:700, fontSize:14,
                 textDecoration:"none", transition:"all .25s",
               }}
                 onMouseEnter={e=>{e.currentTarget.style.background="rgba(129,140,248,.2)";e.currentTarget.style.borderColor="rgba(129,140,248,.5)";}}
@@ -662,7 +662,7 @@ export default function SecurityPage() {
         <section style={{ padding:"40px 24px 80px", maxWidth:1100, margin:"0 auto" }}>
           <div ref={ctaRef} style={{
             borderRadius:28, overflow:"hidden", position:"relative",
-            background:"linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%)",
+            background:"var(--mk-card-indigo, linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%))",
             padding:"64px 48px", textAlign:"center",
             boxShadow:"0 32px 80px rgba(99,102,241,.35)",
             border:"1px solid rgba(165,180,252,.2)",
@@ -681,7 +681,7 @@ export default function SecurityPage() {
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"6px 16px", borderRadius:24,
                 background:"rgba(52,211,153,.12)", border:"1.5px solid rgba(52,211,153,.3)",
-                fontSize:11, fontWeight:800, color:"#6ee7b7",
+                fontSize:11, fontWeight:800, color:"var(--tx-6ee7b7, #6ee7b7)",
                 letterSpacing:".09em", textTransform:"uppercase", marginBottom:20,
                 animation:"floatBadge 3s ease-in-out infinite",
               }}>
@@ -689,16 +689,16 @@ export default function SecurityPage() {
               </div>
               <h2 style={{
                 fontFamily:"'Lora',serif", fontSize:"clamp(28px,4.5vw,48px)",
-                fontWeight:700, color:"white", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14,
+                fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14,
               }}>
                 Secure accounting,
                 <span style={{ display:"block", fontStyle:"italic",
-                  background:"linear-gradient(135deg,#a5b4fc,#818cf8)",
+                  background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8))",
                   WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                   peace of mind.
                 </span>
               </h2>
-              <p style={{ fontSize:15.5, color:"rgba(255,255,255,.45)", marginBottom:36, maxWidth:460, margin:"0 auto 36px", lineHeight:1.8 }}>
+              <p style={{ fontSize:15.5, color:"rgba(var(--ink),var(--ta-45, .45))", marginBottom:36, maxWidth:460, margin:"0 auto 36px", lineHeight:1.8 }}>
                 Flexible plans. Full platform access. Built-in security from day one.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
@@ -716,13 +716,13 @@ export default function SecurityPage() {
                 </Link>
                 <Link href="/support" style={{
                   padding:"13px 28px", borderRadius:14,
-                  border:"1.5px solid rgba(255,255,255,.2)",
-                  background:"rgba(255,255,255,.06)",
-                  color:"rgba(255,255,255,.75)", fontWeight:700, fontSize:15,
+                  border:"1.5px solid rgba(var(--ink),.2)",
+                  background:"rgba(var(--ink),.06)",
+                  color:"rgba(var(--ink),.75)", fontWeight:700, fontSize:15,
                   textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, transition:"all .25s",
                 }}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.4)";e.currentTarget.style.color="white";}}
-                  onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.2)";e.currentTarget.style.color="rgba(255,255,255,.75)";}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(var(--ink),.4)";e.currentTarget.style.color="var(--ink-solid, white)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(var(--ink),.2)";e.currentTarget.style.color="rgba(var(--ink),.75)";}}
                 >
                   Talk to Sales
                 </Link>
@@ -733,14 +733,14 @@ export default function SecurityPage() {
 
         {/* Footer links */}
         <div style={{ paddingBottom:48, display:"flex", flexDirection:"column", alignItems:"center", gap:32 }}>
-          <Link href="/trust" style={{ fontSize:13, fontWeight:700, color:"#34d399", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6 }}>
+          <Link href="/trust" style={{ fontSize:13, fontWeight:700, color:"var(--tx-34d399, #34d399)", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6 }}>
             🛡️ View our full Trust & Compliance center →
           </Link>
           <div style={{ display:"flex", justifyContent:"center", gap:28, flexWrap:"wrap" }}>
             {["Privacy Policy","Terms of Use","Features","Pricing","Help Center"].map(t=>(
-              <a key={t} href="#" style={{ fontSize:12, color:"rgba(255,255,255,.2)", textDecoration:"none", fontWeight:500, transition:"color .2s" }}
-                onMouseEnter={e=>(e.currentTarget.style.color="rgba(255,255,255,.6)")}
-                onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.2)")}>
+              <a key={t} href="#" style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-20, .2))", textDecoration:"none", fontWeight:500, transition:"color .2s" }}
+                onMouseEnter={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-60, .6))")}
+                onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-20, .2))")}>
                 {t}
               </a>
             ))}

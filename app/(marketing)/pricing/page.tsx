@@ -25,7 +25,7 @@ const PLANS = [
     name: "Starter",
     monthly: 49,
     yearly: 39,
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     border: "rgba(129,140,248,.32)",
     gradient: "linear-gradient(135deg,#6366f1,#4f46e5)",
     tagline: "For small businesses getting started",
@@ -35,7 +35,7 @@ const PLANS = [
     name: "Professional",
     monthly: 99,
     yearly: 79,
-    color: "#a5b4fc",
+    color: "var(--tx-a5b4fc, #a5b4fc)",
     border: "rgba(165,180,252,.45)",
     gradient: "linear-gradient(135deg,#818cf8,#6366f1)",
     tagline: "Most popular for growing businesses",
@@ -46,7 +46,7 @@ const PLANS = [
     name: "Enterprise",
     monthly: 249,
     yearly: 199,
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     border: "rgba(52,211,153,.35)",
     gradient: "linear-gradient(135deg,#059669,#34d399)",
     tagline: "Full power for large organizations",
@@ -54,10 +54,10 @@ const PLANS = [
 ];
 
 const MODULE_CATEGORIES = [
-  { id: "core",         label: "Core",         icon: "⚡", color: "#818cf8" },
-  { id: "finance",      label: "Finance",      icon: "💰", color: "#34d399" },
-  { id: "operations",   label: "Operations",   icon: "⚙️", color: "#38bdf8" },
-  { id: "integrations", label: "Integrations", icon: "🔗", color: "#f97316" },
+  { id: "core",         label: "Core",         icon: "⚡", color: "var(--tx-818cf8, #818cf8)" },
+  { id: "finance",      label: "Finance",      icon: "💰", color: "var(--tx-34d399, #34d399)" },
+  { id: "operations",   label: "Operations",   icon: "⚙️", color: "var(--tx-38bdf8, #38bdf8)" },
+  { id: "integrations", label: "Integrations", icon: "🔗", color: "var(--tx-f97316, #f97316)" },
 ];
 
 // Modules that are a finished product on their own. The picker uses this to
@@ -68,12 +68,12 @@ const STANDALONE_IDS = new Set<string>(STANDALONE_MODULE_IDS);
 // Single-app pitches — what the account actually looks like when this is the
 // only module on it. Ordered by how often people ask for it on its own.
 const STANDALONE_APPS = [
-  { id: "hr_payroll",          label: "Payroll & HR",     icon: "👨‍💼", color: "#f472b6", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
-  { id: "crm",                 label: "CRM",              icon: "👥",   color: "#a5b4fc", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
-  { id: "inventory",           label: "Inventory",        icon: "📦",   color: "#38bdf8", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
-  { id: "accounting",          label: "Accounting",       icon: "📒",   color: "#818cf8", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
-  { id: "trading",             label: "Trading Desk",     icon: "🔄",   color: "#fbbf24", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
-  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "🏦",   color: "#34d399", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
+  { id: "hr_payroll",          label: "Payroll & HR",     icon: "👨‍💼", color: "var(--tx-f472b6, #f472b6)", points: ["Employees & attendance", "Monthly salary run + payslips", "Advance salary & loans"] },
+  { id: "crm",                 label: "CRM",              icon: "👥",   color: "var(--tx-a5b4fc, #a5b4fc)", points: ["Contacts & companies", "Sales pipeline & leads", "Interaction history"] },
+  { id: "inventory",           label: "Inventory",        icon: "📦",   color: "var(--tx-38bdf8, #38bdf8)", points: ["Stock in / stock out", "GRN & barcode scanning", "Low-stock alerts"] },
+  { id: "accounting",          label: "Accounting",       icon: "📒",   color: "var(--tx-818cf8, #818cf8)", points: ["Invoices & vouchers", "Ledger & trial balance", "P&L and balance sheet"] },
+  { id: "trading",             label: "Trading Desk",     icon: "🔄",   color: "var(--tx-fbbf24, #fbbf24)", points: ["Order desk & procurement", "Dispatch board", "Outstandings & conversions"] },
+  { id: "bank_reconciliation", label: "Bank & Payments",  icon: "🏦",   color: "var(--tx-34d399, #34d399)", points: ["Statement import", "Discrepancy flagging", "Receipts & payment vouchers"] },
 ];
 
 const DEFAULT_PUBLIC_PRICING: PlanPricing = {
@@ -281,11 +281,11 @@ const FAQS = [
 ];
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
-const PLAN_COLORS = ["#818cf8", "#a5b4fc", "#34d399"];
+const PLAN_COLORS = ["var(--tx-818cf8, #818cf8)", "var(--tx-a5b4fc, #a5b4fc)", "var(--tx-34d399, #34d399)"];
 
 function Check({ color }: { color: string }) {
   return (
-    <div style={{ width: 20, height: 20, borderRadius: "50%", background: `${color}18`, border: `1px solid ${color}38`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
+    <div style={{ width: 20, height: 20, borderRadius: "50%", background: `color-mix(in srgb, ${color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 22%, transparent)`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
       <svg width="10" height="10" viewBox="0 0 12 10" fill="none">
         <path d="M1 5.5L4.5 9 11 1" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -294,7 +294,7 @@ function Check({ color }: { color: string }) {
 }
 
 function Cross() {
-  return <div style={{ width: 16, height: 2, background: "rgba(255,255,255,.18)", borderRadius: 1, margin: "0 auto" }} />;
+  return <div style={{ width: 16, height: 2, background: "rgba(var(--ink),.18)", borderRadius: 1, margin: "0 auto" }} />;
 }
 
 function Val({ v, color }: { v: Val; color: string }) {
@@ -307,20 +307,20 @@ const USE_CASES = [
   {
     icon: "👤", label: "Solo / Freelancer",
     desc: "1-2 people, simple invoicing & expenses",
-    recommended: "Starter", plan: "starter", color: "#818cf8",
+    recommended: "Starter", plan: "starter", color: "var(--tx-818cf8, #818cf8)",
     highlights: ["Unlimited invoices", "Ledger & P&L", "Basic reports", "Email support"],
   },
   {
     icon: "🏢", label: "Small Team",
     desc: "3-20 employees, need payroll & CRM",
-    recommended: "Professional", plan: "professional", color: "#a5b4fc",
+    recommended: "Professional", plan: "professional", color: "var(--tx-a5b4fc, #a5b4fc)",
     highlights: ["Everything in Starter", "HR & Payroll", "Inventory", "CRM + Pipeline"],
     popular: true,
   },
   {
     icon: "🌐", label: "Multi-Branch / Enterprise",
     desc: "Multiple locations, advanced reports & API",
-    recommended: "Enterprise", plan: "enterprise", color: "#34d399",
+    recommended: "Enterprise", plan: "enterprise", color: "var(--tx-34d399, #34d399)",
     highlights: ["Everything in Pro", "Multi-branch", "API access", "Priority support"],
   },
 ];
@@ -331,37 +331,37 @@ function UseCaseWizard() {
   // Runtime gate, so Launch Now opens this without a redeploy.
   const signupsOpen = useSignupsOpen();
   return (
-    <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 20, padding: "28px 28px 24px", marginBottom: 48 }}>
+    <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 20, padding: "28px 28px 24px", marginBottom: 48 }}>
       <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>NOT SURE WHICH PLAN? TELL US ABOUT YOUR BUSINESS</div>
+        <div style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", fontWeight: 600 }}>NOT SURE WHICH PLAN? TELL US ABOUT YOUR BUSINESS</div>
       </div>
       <div className="uc-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: chosen ? 20 : 0 }}>
         {USE_CASES.map(u => (
           <button key={u.plan} className="uc-btn" onClick={() => setSelected(selected === u.plan ? null : u.plan)}
-            style={{ padding: "16px 14px", borderRadius: 14, border: `1.5px solid ${selected === u.plan ? u.color + "66" : "rgba(255,255,255,.08)"}`, background: selected === u.plan ? `${u.color}10` : "rgba(255,255,255,.02)", cursor: "pointer", textAlign: "left", transition: "all .2s", position: "relative" }}>
+            style={{ padding: "16px 14px", borderRadius: 14, border: `1.5px solid ${selected === u.plan ? `color-mix(in srgb, ${u.color} 40%, transparent)` : "rgba(var(--ink),.08)"}`, background: selected === u.plan ? `color-mix(in srgb, ${u.color} 6.3%, transparent)` : "rgba(var(--ink),.02)", cursor: "pointer", textAlign: "left", transition: "all .2s", position: "relative" }}>
             {u.popular && <div style={{ position: "absolute", top: -10, right: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 20 }}>MOST POPULAR</div>}
             <div style={{ fontSize: 24, marginBottom: 8 }}>{u.icon}</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: selected === u.plan ? u.color : "#e2e8f0", marginBottom: 4 }}>{u.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: selected === u.plan ? u.color : "var(--tx-e2e8f0, #e2e8f0)", marginBottom: 4 }}>{u.label}</div>
             <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>{u.desc}</div>
           </button>
         ))}
       </div>
       {chosen && (
-        <div style={{ background: `${chosen.color}0d`, border: `1px solid ${chosen.color}33`, borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+        <div style={{ background: `color-mix(in srgb, ${chosen.color} 5.1%, transparent)`, border: `1px solid color-mix(in srgb, ${chosen.color} 20%, transparent)`, borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div>
             <div style={{ fontSize: 13, color: chosen.color, fontWeight: 700, marginBottom: 6 }}>✓ We recommend: {chosen.recommended} Plan</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {chosen.highlights.map(h => (
-                <span key={h} style={{ fontSize: 12, color: "#94a3b8", background: "rgba(255,255,255,.05)", padding: "3px 10px", borderRadius: 20 }}>{h}</span>
+                <span key={h} style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)", background: "rgba(var(--ink),.05)", padding: "3px 10px", borderRadius: 20 }}>{h}</span>
               ))}
             </div>
           </div>
           {signupsOpen ? (
-            <Link href={`/onboarding/signup/${chosen.plan}`} style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
+            <Link href={`/onboarding/signup/${chosen.plan}`} style={{ background: `linear-gradient(135deg,${chosen.color},color-mix(in srgb, ${chosen.color} 73.3%, transparent))`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
               Start with {chosen.recommended} →
             </Link>
           ) : (
-            <button type="button" disabled style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0, cursor: "not-allowed", opacity: 0.8, border: "none" }}>
+            <button type="button" disabled style={{ background: `linear-gradient(135deg,${chosen.color},color-mix(in srgb, ${chosen.color} 73.3%, transparent))`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0, cursor: "not-allowed", opacity: 0.8, border: "none" }}>
               Launching Soon
             </button>
           )}
@@ -598,12 +598,12 @@ export default function PricingPage() {
   const ff = "'Outfit','DM Sans',sans-serif";
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg,#080c1e 0%,#0c0f2e 35%,#080c1e 100%)", color: "white", fontFamily: ff }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 35%,var(--dk-080c1e, #080c1e) 100%)", color: "var(--ink-solid, white)", fontFamily: ff }}>
       <style>{`
         
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        select option{background:#0f1629;color:white}
-        .feat-row:hover{background:rgba(255,255,255,.03)}
+        select option{background:var(--dk-0f1629, #0f1629);color:var(--ink-solid, white)}
+        .feat-row:hover{background:rgba(var(--ink),.03)}
 
         @media(max-width:900px){
           .pg{grid-template-columns:1fr !important}
@@ -627,9 +627,9 @@ export default function PricingPage() {
           .ct .ct-cta>div:first-child{
             position:sticky !important;
             left:0 !important;
-            background:#0c0f2e !important;
+            background:var(--dk-0c0f2e, #0c0f2e) !important;
             z-index:2 !important;
-            border-right:1px solid rgba(255,255,255,.08) !important;
+            border-right:1px solid rgba(var(--ink),.08) !important;
           }
         }
 
@@ -665,25 +665,25 @@ export default function PricingPage() {
 
         {/* ── HERO ─────────────────────────────────────────── */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 999, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 12, fontWeight: 800, letterSpacing: ".04em", marginBottom: 22 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 999, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", color: "var(--tx-a5b4fc, #a5b4fc)", fontSize: 12, fontWeight: 800, letterSpacing: ".04em", marginBottom: 22 }}>
             Localized Pricing
           </div>
           <h1 style={{ fontSize: "clamp(34px,5vw,58px)", fontWeight: 900, lineHeight: 1.08, letterSpacing: "-.03em", marginBottom: 16 }}>
             Pricing that adapts to<br />
-            <span style={{ background: "linear-gradient(135deg,#818cf8,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your region</span>
+            <span style={{ background: "linear-gradient(135deg,var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your region</span>
           </h1>
-          <p style={{ maxWidth: 640, margin: "0 auto", color: "rgba(255,255,255,.48)", fontSize: 17, lineHeight: 1.65 }}>
+          <p style={{ maxWidth: 640, margin: "0 auto", color: "rgba(var(--ink),var(--ta-48, .48))", fontSize: 17, lineHeight: 1.65 }}>
             {/* Was "PKR, INR, AED, and more" — we only ever bill in PKR or USD,
                 so naming currencies we do not support promised too much. */}
-            Prices are shown in the currency you will be billed in. <strong style={{ color: "rgba(255,255,255,.7)" }}>No hidden fees. Cancel anytime.</strong>
+            Prices are shown in the currency you will be billed in. <strong style={{ color: "rgba(var(--ink),var(--ta-70, .7))" }}>No hidden fees. Cancel anytime.</strong>
           </p>
         </div>
 
         {/* ── BILLING TOGGLE + CURRENCY ─────────────────────── */}
         <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
-          <div style={{ display: "inline-flex", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: 4 }}>
+          <div style={{ display: "inline-flex", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 12, padding: 4 }}>
             {(["monthly", "yearly"] as const).map(cycle => (
-              <button key={cycle} onClick={() => setBilling(cycle)} style={{ padding: "10px 24px", border: "none", borderRadius: 9, background: billing === cycle ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "transparent", color: billing === cycle ? "white" : "rgba(255,255,255,.45)", cursor: "pointer", fontSize: 13, fontWeight: 800, fontFamily: ff }}>
+              <button key={cycle} onClick={() => setBilling(cycle)} style={{ padding: "10px 24px", border: "none", borderRadius: 9, background: billing === cycle ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "transparent", color: billing === cycle ? "white" : "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", fontSize: 13, fontWeight: 800, fontFamily: ff }}>
                 {cycle === "monthly" ? "Monthly" : "Yearly  · Save 20%"}
               </button>
             ))}
@@ -720,29 +720,29 @@ export default function PricingPage() {
             const introAmount = Math.round((useAdminPkr ? pkrAmount : regularPrice) * 0.5);
             const displayIntro = useAdminPkr ? `₨${introAmount.toLocaleString("en-PK")}` : formatPrice(introAmount);
             return (
-              <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
+              <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(var(--ink),.03))" : "rgba(var(--ink),.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
                 <div style={{ padding: "28px 26px" }}>
-                  {plan.featured && <div style={{ display: "inline-flex", marginBottom: 12, padding: "4px 10px", borderRadius: 999, background: "rgba(251,191,36,.12)", color: "#fbbf24", fontSize: 10, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase" }}>Most Popular</div>}
+                  {plan.featured && <div style={{ display: "inline-flex", marginBottom: 12, padding: "4px 10px", borderRadius: 999, background: "rgba(251,191,36,.12)", color: "var(--tx-fbbf24, #fbbf24)", fontSize: 10, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase" }}>Most Popular</div>}
                   <div style={{ fontSize: 22, fontWeight: 900, marginBottom: 6 }}>{plan.name}</div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.5, minHeight: 40 }}>{plan.tagline}</div>
+                  <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.5, minHeight: 40 }}>{plan.tagline}</div>
                   <div style={{ margin: "24px 0" }}>
                     {billing === "yearly" ? (
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>{displayMonthly}</span>
-                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.38)", fontSize: 10, fontWeight: 800, color: "#4ade80" }}>SAVE 20%</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", textDecoration: "line-through" }}>{displayMonthly}</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.38)", fontSize: 10, fontWeight: 800, color: "var(--tx-4ade80, #4ade80)" }}>SAVE 20%</span>
                       </div>
                     ) : (
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>{displayRegular}</span>
-                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.2)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>50% OFF × 3 months</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", textDecoration: "line-through" }}>{displayRegular}</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.2)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "var(--tx-fb923c, #fb923c)" }}>50% OFF × 3 months</span>
                       </div>
                     )}
                     <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
                       <span style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{billing === "yearly" ? displayRegular : displayIntro}</span>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.42)" }}>/mo</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),var(--ta-42, .42))" }}>/mo</span>
                     </div>
-                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.45)", marginTop: 8 }}>
+                    <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 8 }}>
                       {billing === "yearly" ? "Billed annually — 20% off the monthly price" : "First 3 months discounted, then full monthly billing — or switch to yearly and save 20%"}
                     </div>
                   </div>
@@ -758,10 +758,10 @@ export default function PricingPage() {
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {(planHighlights[plan.slug] ?? DEFAULT_HIGHLIGHTS[plan.slug as keyof typeof DEFAULT_HIGHLIGHTS] ?? []).map((f: string, idx: number) => (
                       <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 16, height: 16, borderRadius: "50%", background: `${plan.color}18`, border: `1px solid ${plan.color}38`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <div style={{ width: 16, height: 16, borderRadius: "50%", background: `color-mix(in srgb, ${plan.color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${plan.color} 22%, transparent)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <svg width="8" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke={plan.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </div>
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,.72)" }}>
+                        <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-72, .72))" }}>
                           {idx === 0
                             ? (plan.slug === "starter"
                               ? usersLabel(planLimits.starter) + " users"
@@ -783,14 +783,14 @@ export default function PricingPage() {
         <div style={{ marginBottom: 80 }}>
           {currency === "PKR" ? (
             /* ── PKR: Safepay ── */
-            <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
+            <div style={{ borderRadius: 20, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.07)", padding: "28px 32px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Secure Checkout</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>256-bit SSL · PCI DSS compliant · No card data stored on our servers</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>256-bit SSL · PCI DSS compliant · No card data stored on our servers</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   {/* Visa */}
@@ -798,32 +798,32 @@ export default function PricingPage() {
                     <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.5px", fontStyle: "italic" }}>VISA</span>
                   </div>
                   {/* Mastercard */}
-                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#EB001B", opacity: .9 }} />
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),.8)", marginLeft: 6 }}>Mastercard</span>
                   </div>
                   {/* 1Link */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.85)" }}>1Link</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.8)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(var(--ink),.85)" }}>1Link</span>
                   </div>
                 </div>
               </div>
-              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>All banks supported via 1Link network · HBL · UBL · Meezan · MCB · Faysal · Allied · and more</span>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(var(--ink),.05)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>All banks supported via 1Link network · HBL · UBL · Meezan · MCB · Faysal · Allied · and more</span>
               </div>
             </div>
           ) : (
             /* ── International: LemonSqueezy ── */
-            <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
+            <div style={{ borderRadius: 20, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.07)", padding: "28px 32px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Secure Checkout</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Merchant of Record · We handle tax, compliance & billing globally · 256-bit SSL</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>Merchant of Record · We handle tax, compliance & billing globally · 256-bit SSL</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   {/* Visa */}
@@ -831,29 +831,29 @@ export default function PricingPage() {
                     <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.5px", fontStyle: "italic" }}>VISA</span>
                   </div>
                   {/* Mastercard */}
-                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#EB001B", opacity: .9 }} />
                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),.8)", marginLeft: 6 }}>Mastercard</span>
                   </div>
                   {/* Amex */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#2E77BC", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <span style={{ fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: ".5px" }}>AMEX</span>
+                    <span style={{ fontSize: 12, fontWeight: 900, color: "var(--ink-solid, #fff)", letterSpacing: ".5px" }}>AMEX</span>
                   </div>
                   {/* Apple Pay */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "var(--dk-000000, #000)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16.5 6.5c-.9 1-2.2 1.7-3.5 1.6-.2-1.3.4-2.7 1.2-3.6.9-1 2.4-1.7 3.6-1.8.1 1.3-.4 2.7-1.3 3.8zM19.8 17c-.5 1.1-.7 1.6-1.4 2.6-.9 1.4-2.2 3.1-3.8 3.1-1.4 0-1.8-.9-3.7-.9s-2.4.9-3.7.9c-1.6 0-2.8-1.5-3.7-2.9C1.6 17.1.9 13.6 2.2 11c.7-1.4 2-2.3 3.4-2.3 1.3 0 2.1.9 3.2.9 1.1 0 1.7-.9 3.3-.9 1.1 0 2.4.6 3.2 1.7-2.8 1.6-2.3 5.6.5 6.6z"/></svg>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Pay</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>Pay</span>
                   </div>
                   {/* Google Pay */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
-                    <span style={{ fontSize: 13, fontWeight: 900, color: "#4285F4" }}>G</span>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.85)" }}>Pay</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "var(--tx-4285f4, #4285F4)" }}>G</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(var(--ink),.85)" }}>Pay</span>
                   </div>
                 </div>
               </div>
-              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued automatically</span>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(var(--ink),.05)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued automatically</span>
               </div>
             </div>
           )}
@@ -864,13 +864,13 @@ export default function PricingPage() {
         {false && (
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700, marginBottom: 16 }}>
               ⚡ Power Add-On
             </div>
             <h2 style={{ fontSize: "clamp(24px,3.5vw,36px)", fontWeight: 900, letterSpacing: "-.02em", marginBottom: 10 }}>
               Add Business Automation to any plan
             </h2>
-            <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
+            <p style={{ color: "rgba(var(--ink),var(--ta-42, .42))", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
               Flat {getAddonDisplayPrice(79, 69)}/month on top of whatever you already pay — Starter, Professional, Enterprise, or a custom package.
             </p>
           </div>
@@ -882,23 +882,23 @@ export default function PricingPage() {
 
                 {/* Left: Price + CTA */}
                 <div>
-                  <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 6 }}>AUTOMATION ADD-ON</div>
+                  <div style={{ fontSize: 13, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700, marginBottom: 6 }}>AUTOMATION ADD-ON</div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{getAddonDisplayPrice(79, 69)}</span>
-                    <span style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>/month</span>
+                    <span style={{ fontSize: 52, fontWeight: 900, color: "var(--ink-solid, #fff)", letterSpacing: "-.03em" }}>{getAddonDisplayPrice(79, 69)}</span>
+                    <span style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-40, .4))" }}>/month</span>
                   </div>
                   {/* The old line here repeated the same number the big price
                       already shows. Say what the cycle actually costs instead. */}
                   {billing === "yearly" ? (
-                    <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8, fontWeight: 700 }}>
+                    <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", marginBottom: 8, fontWeight: 700 }}>
                       Billed annually — save {getAddonYearlySaving(10)}/year vs monthly
                     </div>
                   ) : (
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 8 }}>
                       Billed monthly — pay yearly and it drops to {isPKUser && pkrAddonPricing ? `₨${pkrAddonPricing.yearly.toLocaleString("en-PK")}` : formatPrice(69)}/mo
                     </div>
                   )}
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
+                  <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 28 }}>
                     Add to any plan · Cancel anytime · No hidden fees
                   </div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -920,8 +920,8 @@ export default function PricingPage() {
                       </button>
                     )}
                     <Link href="/automation" style={{
-                      padding: "12px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,.15)",
-                      color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 14, fontWeight: 600,
+                      padding: "12px 20px", borderRadius: 12, border: "1px solid rgba(var(--ink),.15)",
+                      color: "rgba(var(--ink),var(--ta-70, .7))", textDecoration: "none", fontSize: 14, fontWeight: 600,
                     }}>
                       See full details
                     </Link>
@@ -937,11 +937,11 @@ export default function PricingPage() {
                     { icon: "🔗", label: "Zapier / Make", sub: "5,000+ app connects" },
                     { icon: "📈", label: "Google Sheets Sync", sub: "1-click export" },
                   ].map(f => (
-                    <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
+                    <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)" }}>
                       <span style={{ fontSize: 18, flexShrink: 0 }}>{f.icon}</span>
                       <div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{f.label}</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)" }}>{f.sub}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{f.label}</div>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-38, .38))" }}>{f.sub}</div>
                       </div>
                     </div>
                   ))}
@@ -949,12 +949,12 @@ export default function PricingPage() {
               </div>
 
               {/* Value comparison bar */}
-              <div className="val-bar" style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>These tools cost separately:</span>
+              <div className="val-bar" style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(var(--ink),.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>These tools cost separately:</span>
                 {["AR reminder tools $40", "Reorder alert add-ons $30", "Reporting tools $60", "Zapier $49", "Sheet sync $30"].map(t => (
-                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
+                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-fca5a5, #fca5a5)" }}>{t}</span>
                 ))}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {getAddonDisplayPrice(79, 69)}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>= {formatPrice(438)}+/mo vs our {getAddonDisplayPrice(79, 69)}</span>
               </div>
             </div>
           </div>
@@ -965,22 +965,22 @@ export default function PricingPage() {
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 12 }}>Compare all features</h2>
-            <p style={{ color: "rgba(255,255,255,.4)", fontSize: 15 }}>Everything side by side — no surprises</p>
+            <p style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 15 }}>Everything side by side — no surprises</p>
           </div>
 
           {/* Sticky header row */}
-          <div className="ct" style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, overflow: "hidden" }}>
+          <div className="ct" style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, overflow: "hidden" }}>
           <div className="ct-inner">
             {/* Plan header */}
-            <div className="ct-sticky" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.08)", position: "sticky", top: 0, background: "#0c0f2e", zIndex: 10 }}>
-              <div style={{ padding: "20px 24px", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".06em" }}>Features</div>
+            <div className="ct-sticky" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(var(--ink),.08)", position: "sticky", top: 0, background: "var(--dk-0c0f2e, #0c0f2e)", zIndex: 10 }}>
+              <div style={{ padding: "20px 24px", fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase", letterSpacing: ".06em" }}>Features</div>
               {PLANS.map((plan, pi) => (
-                <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+                <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(var(--ink),.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
-                    {getPlanPrice(plan.slug as "starter" | "professional" | "enterprise")}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
+                  <div style={{ fontSize: 14, color: "rgba(var(--ink),.9)", fontWeight: 800 }}>
+                    {getPlanPrice(plan.slug as "starter" | "professional" | "enterprise")}<span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-50, .5))" }}>/mo</span>
                   </div>
-                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
+                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
               ))}
             </div>
@@ -992,12 +992,12 @@ export default function PricingPage() {
                 <button
                   className="ct-cat"
                   onClick={() => toggleCat(cat.id)}
-                  style={{ width: "100%", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "rgba(255,255,255,.025)", border: "none", borderTop: "1px solid rgba(255,255,255,.06)", cursor: "pointer", fontFamily: ff, color: "white", padding: 0 }}
+                  style={{ width: "100%", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "rgba(var(--ink),.025)", border: "none", borderTop: "1px solid rgba(var(--ink),.06)", cursor: "pointer", fontFamily: ff, color: "var(--ink-solid, white)", padding: 0 }}
                 >
                   <div style={{ padding: "14px 24px", display: "flex", alignItems: "center", gap: 10, gridColumn: "1 / -1" }}>
                     <span style={{ fontSize: 16 }}>{cat.icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.85)", letterSpacing: ".01em" }}>{cat.title}</span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(var(--ink),.85)", letterSpacing: ".01em" }}>{cat.title}</span>
+                    <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
                   </div>
                 </button>
 
@@ -1006,20 +1006,20 @@ export default function PricingPage() {
                   <div
                     key={feat.name}
                     className="feat-row"
-                    style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.04)", transition: "background .15s" }}
+                    style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(var(--ink),.04)", transition: "background .15s" }}
                   >
-                    <div style={{ padding: "13px 24px 13px 44px", fontSize: 13, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ padding: "13px 24px 13px 44px", fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))", display: "flex", alignItems: "center", gap: 8 }}>
                       {feat.name}
                     </div>
                     {feat.name === "Users"
                       ? ([planLimits.starter, planLimits.professional, planLimits.enterprise] as (number | null)[]).map((lim, pi) => (
-                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(var(--ink),.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: PLAN_COLORS[pi] }}>{usersLabel(lim)} users</span>
                           </div>
                         ))
                       : feat.name === "Branches"
                       ? ([branchLimits.starter, branchLimits.professional, branchLimits.enterprise] as (number | null)[]).map((lim, pi) => (
-                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(var(--ink),.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                             <span style={{ fontSize: 13, fontWeight: 700, color: PLAN_COLORS[pi] }}>{lim === null ? "Unlimited" : lim === 1 ? "1 branch" : `Up to ${lim}`}</span>
                           </div>
                         ))
@@ -1028,7 +1028,7 @@ export default function PricingPage() {
                           feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro,
                           feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise,
                         ] as Val[]).map((v, pi) => (
-                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(var(--ink),.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                             <Val v={v} color={PLAN_COLORS[pi]} />
                           </div>
                         ))
@@ -1039,10 +1039,10 @@ export default function PricingPage() {
             ))}
 
             {/* Bottom CTA row */}
-            <div className="ct-cta" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.015)" }}>
-              <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
+            <div className="ct-cta" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.015)" }}>
+              <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-30, .3))" }}>Ready to start?</div>
               {PLANS.map((plan) => (
-                <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+                <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(var(--ink),.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   {signupsOpen ? (
                     <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
                       Get {plan.name}
@@ -1063,11 +1063,11 @@ export default function PricingPage() {
         <div id="custom" style={{ marginBottom: 80 }}>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(249,115,22,.1)", border: "1px solid rgba(249,115,22,.25)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#f97316", fontWeight: 700, marginBottom: 16 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(249,115,22,.1)", border: "1px solid rgba(249,115,22,.25)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "var(--tx-f97316, #f97316)", fontWeight: 700, marginBottom: 16 }}>
               🧩 Custom Plan
             </div>
             <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 10 }}>Pay only for modules you need</h2>
-            <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
+            <p style={{ color: "rgba(var(--ink),var(--ta-42, .42))", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
               Pick the exact features your business needs. No bloat, no unused modules — and if you only need one, buy just that one.
             </p>
           </div>
@@ -1075,10 +1075,10 @@ export default function PricingPage() {
           {/* ── STANDALONE APPS — one module, on its own ─────── */}
           <div style={{ marginBottom: 36 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase" }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", letterSpacing: ".08em", textTransform: "uppercase" }}>
                 🎯 Run just one
               </span>
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.42)" }}>
+              <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
                 These modules work on their own — no full accounting setup required.
               </span>
             </div>
@@ -1094,25 +1094,25 @@ export default function PricingPage() {
                     onClick={() => selectOnlyModule(app.id)}
                     style={{
                       textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
-                      fontFamily: ff, color: "white", transition: "all .2s",
-                      border: `1.5px solid ${active ? app.color + "80" : "rgba(255,255,255,.07)"}`,
+                      fontFamily: ff, color: "var(--ink-solid, white)", transition: "all .2s",
+                      border: `1.5px solid ${active ? `color-mix(in srgb, ${app.color} 50.2%, transparent)` : "rgba(var(--ink),.07)"}`,
                       background: active
-                        ? `linear-gradient(160deg,${app.color}1f,rgba(255,255,255,.02))`
-                        : "rgba(255,255,255,.025)",
+                        ? `linear-gradient(160deg,color-mix(in srgb, ${app.color} 12.2%, transparent),rgba(var(--ink),.02))`
+                        : "rgba(var(--ink),.025)",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 22, lineHeight: 1 }}>{app.icon}</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "white" }}>{app.label}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "var(--ink-solid, white)" }}>{app.label}</span>
                       </div>
-                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `${app.color}18`, border: `1px solid ${app.color}33`, whiteSpace: "nowrap" }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `color-mix(in srgb, ${app.color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${app.color} 20%, transparent)`, whiteSpace: "nowrap" }}>
                         STANDALONE
                       </span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
                       {app.points.map(p => (
-                        <div key={p} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: "rgba(255,255,255,.45)" }}>
+                        <div key={p} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11.5, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
                           <svg width="9" height="9" viewBox="0 0 12 10" fill="none" style={{ flexShrink: 0 }}>
                             <path d="M1 5.5L4.5 9 11 1" stroke={app.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
@@ -1120,14 +1120,14 @@ export default function PricingPage() {
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, paddingTop: 11, borderTop: "1px solid rgba(var(--ink),.06)" }}>
                       {/* Same base price the picker below shows — the yearly
                           discount is applied once, in the estimate total. */}
                       <span style={{ fontSize: 17, fontWeight: 900, color: app.color, letterSpacing: "-.02em" }}>
                         {formatPrice(mod.price)}
-                        <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                        <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(var(--ink),var(--ta-30, .3))" }}>/mo</span>
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(255,255,255,.4)" }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(var(--ink),var(--ta-40, .4))" }}>
                         {active ? "✓ Selected" : "Pick this only →"}
                       </span>
                     </div>
@@ -1136,36 +1136,36 @@ export default function PricingPage() {
               })}
             </div>
 
-            <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.32)" }}>
-              Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "#a78bfa", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
+            <div style={{ marginTop: 12, fontSize: 12, color: "rgba(var(--ink),var(--ta-32, .32))" }}>
+              Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "var(--tx-a78bfa, #a78bfa)", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
             </div>
 
             {/* Extra Users / Extra Branches — sits right under the presets so
                 it is visible without scrolling into the a-la-carte builder;
                 it used to live in its own box after the whole module list. */}
-            <div className="cp-addon-strip" style={{ marginTop: 20, padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+            <div className="cp-addon-strip" style={{ marginTop: 20, padding: "16px 18px", borderRadius: 14, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
               {[
-                { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
-                { key: "branches", label: "Extra Branches", icon: "🏢", color: "#38bdf8", val: extraBranches, set: setExtraBranches },
+                { key: "users",    label: "Extra Users",    icon: "👥", color: "var(--tx-a5b4fc, #a5b4fc)", val: extraUsers,    set: setExtraUsers },
+                { key: "branches", label: "Extra Branches", icon: "🏢", color: "var(--tx-38bdf8, #38bdf8)", val: extraBranches, set: setExtraBranches },
               ].map(addon => (
                 <div key={addon.key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)" }}>{addon.icon} {addon.label}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>+{formatPrice(seatRate)}/each/mo</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{addon.icon} {addon.label}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>+{formatPrice(seatRate)}/each/mo</div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,.09)", overflow: "hidden" }}>
-                    <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
+                  <div style={{ display: "flex", alignItems: "center", background: "rgba(var(--ink),.05)", borderRadius: 10, border: "1px solid rgba(var(--ink),.09)", overflow: "hidden" }}>
+                    <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
                     <input type="number" min="0" value={addon.val} onChange={e => addon.set(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: 40, background: "none", border: "none", color: addon.color, fontSize: 15, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: ff }} />
-                    <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
+                    <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div style={{ height: 1, background: "rgba(255,255,255,.06)", marginBottom: 32 }} />
+          <div style={{ height: 1, background: "rgba(var(--ink),.06)", marginBottom: 32 }} />
 
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 18, textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", marginBottom: 18, textAlign: "center" }}>
             …or build your own package — tick anything below and the estimate updates live.
           </div>
 
@@ -1177,7 +1177,7 @@ export default function PricingPage() {
                 if (!catMods.length) return null;
                 return (
                   <div key={cat.id} style={{ marginBottom: 22 }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
                       <span style={{ color: cat.color }}>{cat.icon}</span>{cat.label}
                     </div>
                     <div className="mod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
@@ -1186,33 +1186,33 @@ export default function PricingPage() {
                         return (
                           <button key={module.id} onClick={() => toggleModule(module.id)} style={{
                             textAlign: "left", padding: "16px 18px", borderRadius: 14,
-                            border: `1.5px solid ${sel ? "rgba(249,115,22,.5)" : "rgba(255,255,255,.07)"}`,
-                            background: sel ? "rgba(249,115,22,.07)" : "rgba(255,255,255,.025)",
-                            color: "white", cursor: "pointer", fontFamily: ff, transition: "all .2s",
+                            border: `1.5px solid ${sel ? "rgba(249,115,22,.5)" : "rgba(var(--ink),.07)"}`,
+                            background: sel ? "rgba(249,115,22,.07)" : "rgba(var(--ink),.025)",
+                            color: "var(--ink-solid, white)", cursor: "pointer", fontFamily: ff, transition: "all .2s",
                           }}>
                             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 7 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                                 <span style={{ fontSize: 20, lineHeight: 1 }}>{module.icon}</span>
-                                <span style={{ fontSize: 13, fontWeight: 800, color: sel ? "#fb923c" : "white" }}>{module.name}</span>
+                                <span style={{ fontSize: 13, fontWeight: 800, color: sel ? "var(--tx-fb923c, #fb923c)" : "var(--ink-solid, white)" }}>{module.name}</span>
                               </div>
-                              <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: sel ? "#f97316" : "transparent", border: sel ? "none" : "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: sel ? "#f97316" : "transparent", border: sel ? "none" : "1.5px solid rgba(var(--ink),.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                 {sel && <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                               </div>
                             </div>
-                            <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
+                            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                              <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
-                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                              <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "var(--tx-f97316, #f97316)" : "rgba(var(--ink),var(--ta-45, .45))" }}>
+                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(var(--ink),var(--ta-30, .3))" }}>/mo</span>
                               </div>
                               {/* Says whether ticking only this box is already a
                                   working subscription, or whether it needs a
                                   module underneath it. */}
                               {isStandalone(module.id) ? (
-                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "#34d399", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
+                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "var(--tx-34d399, #34d399)", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
                                   RUNS ALONE
                                 </span>
                               ) : (
-                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "rgba(255,255,255,.35)", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)" }}>
+                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "rgba(var(--ink),var(--ta-35, .35))", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)" }}>
                                   ADD-ON
                                 </span>
                               )}
@@ -1230,9 +1230,9 @@ export default function PricingPage() {
             <div className="cp-sidebar" style={{ width: 320, flexShrink: 0, position: "sticky", top: 24 }}>
               <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "22px 20px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 14 }}>
-                  <span style={{ fontSize: 10, fontWeight: 800, color: "#f97316", letterSpacing: ".06em", textTransform: "uppercase" }}>Your Estimate</span>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: "var(--tx-f97316, #f97316)", letterSpacing: ".06em", textTransform: "uppercase" }}>Your Estimate</span>
                   {standaloneOnly && (
-                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "#34d399", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "var(--tx-34d399, #34d399)", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
                       SINGLE APP
                     </span>
                   )}
@@ -1240,13 +1240,13 @@ export default function PricingPage() {
 
                 {/* Modules breakdown */}
                 {selectedModules.length === 0 ? (
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", marginBottom: 14, fontStyle: "italic" }}>No modules selected yet</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", marginBottom: 14, fontStyle: "italic" }}>No modules selected yet</div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                     {customPlanData.modules.filter((m: any) => selectedModules.includes(m.id)).map((m: any) => (
                       <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>{m.icon} {m.name}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatPrice(m.price)}</span>
+                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-55, .55))" }}>{m.icon} {m.name}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.78)" }}>{formatPrice(m.price)}</span>
                       </div>
                     ))}
                   </div>
@@ -1254,17 +1254,17 @@ export default function PricingPage() {
 
                 {/* Add-ons breakdown */}
                 {(extraUsers > 0 || extraBranches > 0) && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.07)" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(var(--ink),.07)" }}>
                     {extraUsers > 0 && (
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>👥 {extraUsers} user{extraUsers > 1 ? "s" : ""} × {formatPrice(seatRate)}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>{formatPrice(extraUsers * seatRate)}</span>
+                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>👥 {extraUsers} user{extraUsers > 1 ? "s" : ""} × {formatPrice(seatRate)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{formatPrice(extraUsers * seatRate)}</span>
                       </div>
                     )}
                     {extraBranches > 0 && (
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>🏢 {extraBranches} branch{extraBranches > 1 ? "es" : ""} × {formatPrice(seatRate)}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#38bdf8" }}>{formatPrice(extraBranches * seatRate)}</span>
+                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>🏢 {extraBranches} branch{extraBranches > 1 ? "es" : ""} × {formatPrice(seatRate)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-38bdf8, #38bdf8)" }}>{formatPrice(extraBranches * seatRate)}</span>
                       </div>
                     )}
                   </div>
@@ -1273,31 +1273,31 @@ export default function PricingPage() {
                 {/* Total */}
                 <div style={{ borderTop: "1px solid rgba(249,115,22,.25)", paddingTop: 14, marginBottom: 16 }}>
                   {billing === "yearly" && customMonthly > 0 && (
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
                       <span>Subtotal</span><span>{formatPrice(customMonthly)}/mo</span>
                     </div>
                   )}
                   {billing === "yearly" && (
-                    <div style={{ fontSize: 11, color: "#34d399", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+                    <div style={{ fontSize: 11, color: "var(--tx-34d399, #34d399)", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
                       <span>Yearly −{yearlyDiscount}%</span>
                       <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
                     </div>
                   )}
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 4 }}>
                     {billing === "yearly" ? "Per month, billed annually" : "Per month"}
                   </div>
-                  <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
+                  <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "var(--tx-f97316, #f97316)" : "rgba(var(--ink),var(--ta-20, .2))", lineHeight: 1, letterSpacing: "-1.5px" }}>
                     {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
                   </div>
                   {billing === "yearly" && customMonthly > 0 && (
-                    <div style={{ fontSize: 11, color: "#34d399", marginTop: 6, fontWeight: 700 }}>
+                    <div style={{ fontSize: 11, color: "var(--tx-34d399, #34d399)", marginTop: 6, fontWeight: 700 }}>
                       Save {formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
                     </div>
                   )}
                 </div>
 
                 {needsCoreModule && (
-                  <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", fontSize: 11.5, color: "#fbbf24", lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", fontSize: 11.5, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.5 }}>
                     Add one module marked <strong>Runs alone</strong> — the ones you picked layer on top of another module.
                   </div>
                 )}
@@ -1307,10 +1307,10 @@ export default function PricingPage() {
                     href={selectedModules.length && !needsCoreModule ? buildCustomHref() : "#custom"}
                     style={{
                       display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
+                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(var(--ink),.06)",
                       color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
                       opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
-                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
+                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(var(--ink),.1)",
                     }}
                   >
                     {!selectedModules.length ? "Select modules above" : needsCoreModule ? "Pick a module that runs alone" : standaloneOnly ? "Continue with this app →" : "Continue →"}
@@ -1321,17 +1321,17 @@ export default function PricingPage() {
                     disabled
                     style={{
                       display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
+                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(var(--ink),.06)",
                       color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
                       opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
-                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(255,255,255,.1)",
+                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(var(--ink),.1)",
                       cursor: "not-allowed",
                     }}
                   >
                     Launching Soon
                   </button>
                 )}
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-22, .22))", textAlign: "center", marginTop: 10 }}>
                   You&apos;ll confirm everything before payment
                 </div>
               </div>
@@ -1346,20 +1346,20 @@ export default function PricingPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {FAQS.map((faq, idx) => (
-              <div key={faq.q} style={{ borderRadius: 16, border: `1px solid ${openFaq === idx ? "rgba(129,140,248,.35)" : "rgba(255,255,255,.08)"}`, background: openFaq === idx ? "rgba(99,102,241,.08)" : "rgba(255,255,255,.02)" }}>
-                <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: "18px 20px", color: "white", fontSize: 14, fontWeight: 800, fontFamily: ff, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div key={faq.q} style={{ borderRadius: 16, border: `1px solid ${openFaq === idx ? "rgba(129,140,248,.35)" : "rgba(var(--ink),.08)"}`, background: openFaq === idx ? "rgba(99,102,241,.08)" : "rgba(var(--ink),.02)" }}>
+                <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: "18px 20px", color: "var(--ink-solid, white)", fontSize: 14, fontWeight: 800, fontFamily: ff, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   {faq.q}
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)", transform: openFaq === idx ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▼</span>
+                  <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", transform: openFaq === idx ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▼</span>
                 </button>
-                {openFaq === idx && <div style={{ padding: "0 20px 18px", color: "rgba(255,255,255,.5)", fontSize: 14, lineHeight: 1.65 }}>{faq.a}</div>}
+                {openFaq === idx && <div style={{ padding: "0 20px 18px", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 14, lineHeight: 1.65 }}>{faq.a}</div>}
               </div>
             ))}
           </div>
         </div>
 
-        <div style={{ textAlign: "center", color: "rgba(255,255,255,.36)", fontSize: 13 }}>
+        <div style={{ textAlign: "center", color: "rgba(var(--ink),var(--ta-36, .36))", fontSize: 13 }}>
           Already subscribed?{" "}
-          <Link href={`${appUrl}/auth`} style={{ color: "#a5b4fc", textDecoration: "none", fontWeight: 700 }}>Sign in to your account</Link>
+          <Link href={`${appUrl}/auth`} style={{ color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none", fontWeight: 700 }}>Sign in to your account</Link>
         </div>
       </div>
     </div>

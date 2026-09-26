@@ -243,29 +243,14 @@ export default function CTASection() {
           </Link>
         </div>
 
-        {/* Social proof */}
+        {/* Checkout reassurance. Avatars, stars and "Trusted by growing
+            businesses" used to sit here: invented, so removed. */}
         <div style={{
           display: "flex", justifyContent: "center", alignItems: "center",
           gap: 20, flexWrap: "wrap", marginBottom: 52,
           opacity: vis ? 1 : 0,
           transition: "opacity .6s ease .34s",
         }}>
-          <div style={{ display: "flex" }}>
-            {["#6366f1","#8b5cf6","#06b6d4","#10b981","#f59e0b"].map((c, i) => (
-              <div key={i} style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${c},${c}88)`, border: "2.5px solid var(--dkb-06091a, #06091a)", marginLeft: i === 0 ? 0 : -9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "white", zIndex: 5 - i, position: "relative" }}>
-                {["T","A","R","F","B"][i]}
-              </div>
-            ))}
-          </div>
-          <div>
-            <div style={{ display: "flex", gap: 2 }}>
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>Trusted by growing businesses</div>
-          </div>
-          <div style={{ width: 1, height: 26, background: "rgba(var(--ink),.1)" }}/>
           <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500 }}>Secure checkout</div>
           <div style={{ width: 1, height: 26, background: "rgba(var(--ink),.1)" }}/>
           <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500 }}>Cancel anytime</div>

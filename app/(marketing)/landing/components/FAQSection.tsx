@@ -225,8 +225,8 @@ function FAQItem({ faq, open, onToggle, i, vis }: {
       onClick={onToggle}
       style={{
         borderRadius: 14, overflow: "hidden",
-        border: `1px solid ${open ? faq.color + "40" : "rgba(var(--ink),.07)"}`,
-        background: open ? `${faq.color}08` : "rgba(var(--ink),.03)",
+        border: `1px solid ${open ? `color-mix(in srgb, ${faq.color} 25.1%, transparent)` : "rgba(var(--ink),.07)"}`,
+        background: open ? `color-mix(in srgb, ${faq.color} 3.1%, transparent)` : "rgba(var(--ink),.03)",
         cursor: "pointer",
         opacity: vis ? 1 : 0,
         transform: vis ? "translateY(0)" : "translateY(12px)",
@@ -242,14 +242,14 @@ function FAQItem({ faq, open, onToggle, i, vis }: {
             transition: "background .2s",
             boxShadow: open ? `0 0 8px ${faq.color}` : "none",
           }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: open ? "white" : "rgba(var(--ink),.75)", lineHeight: 1.4, transition: "color .2s" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: open ? "var(--ink-solid, white)" : "rgba(var(--ink),.75)", lineHeight: 1.4, transition: "color .2s" }}>
             {faq.q}
           </span>
         </div>
         <div style={{
           width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
-          background: open ? `${faq.color}20` : "rgba(var(--ink),.06)",
-          border: `1px solid ${open ? faq.color + "40" : "rgba(var(--ink),.1)"}`,
+          background: open ? `color-mix(in srgb, ${faq.color} 12.5%, transparent)` : "rgba(var(--ink),.06)",
+          border: `1px solid ${open ? `color-mix(in srgb, ${faq.color} 25.1%, transparent)` : "rgba(var(--ink),.1)"}`,
           display: "flex", alignItems: "center", justifyContent: "center",
           transition: "all .25s",
         }}>
@@ -344,7 +344,7 @@ export default function FAQSection() {
               display:"inline-flex", alignItems:"center", gap:6,
               padding:"7px 14px", borderRadius:24, fontSize:12, fontWeight:600, cursor:"pointer",
               background: cat===c.id ? "rgba(99,102,241,.22)" : "rgba(var(--ink),.04)",
-              color: cat===c.id ? "#a5b4fc" : "rgba(var(--ink),var(--ta-45, .45))",
+              color: cat===c.id ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-45, .45))",
               border: `1px solid ${cat===c.id ? "rgba(99,102,241,.4)" : "rgba(var(--ink),.08)"}`,
               transition:"all .2s", fontFamily:"inherit",
             }}>

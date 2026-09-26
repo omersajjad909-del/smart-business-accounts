@@ -670,16 +670,16 @@ const PLAN_ROWS: Record<string, { feature:string; starter:string|boolean; pro:st
   ],
 };
 
-const PHASE_COLORS: Record<number,string> = { 1:"#34d399", 2:"#818cf8", 3:"#fbbf24", 4:"#94a3b8" };
+const PHASE_COLORS: Record<number,string> = { 1:"var(--tx-34d399, #34d399)", 2:"var(--tx-818cf8, #818cf8)", 3:"var(--tx-fbbf24, #fbbf24)", 4:"var(--tx-94a3b8, #94a3b8)" };
 
 function key<T>(id: string, category: string, table: Record<string, T>): T {
   return table[id] ?? table[category] ?? table.default;
 }
 
 function Cell({ val }: { val: string|boolean }) {
-  if (val===true)  return <span style={{ color:"#34d399", fontSize:16, fontWeight:700 }}>✓</span>;
-  if (val===false) return <span style={{ color:"rgba(255,255,255,.15)", fontSize:16 }}>—</span>;
-  return <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.75)" }}>{val as string}</span>;
+  if (val===true)  return <span style={{ color:"var(--tx-34d399, #34d399)", fontSize:16, fontWeight:700 }}>✓</span>;
+  if (val===false) return <span style={{ color:"rgba(var(--ink),var(--ta-15, .15))", fontSize:16 }}>—</span>;
+  return <span style={{ fontSize:12, fontWeight:700, color:"rgba(var(--ink),.75)" }}>{val as string}</span>;
 }
 
 export default function IndustryPageClient({
@@ -731,13 +731,13 @@ export default function IndustryPageClient({
   const planRows  = key(type.id, type.category, PLAN_ROWS);
 
   const PLANS = [
-    { key:"starter",    name:"Starter",      price:prices.starter,    color:"#818cf8", gradient:"linear-gradient(135deg,#6366f1,#4f46e5)" },
-    { key:"pro",        name:"Professional", price:prices.pro,        color:"#a5b4fc", gradient:"linear-gradient(135deg,#818cf8,#6366f1)", featured:true },
-    { key:"enterprise", name:"Enterprise",   price:prices.enterprise, color:"#34d399", gradient:"linear-gradient(135deg,#059669,#34d399)" },
+    { key:"starter",    name:"Starter",      price:prices.starter,    color:"var(--tx-818cf8, #818cf8)", gradient:"linear-gradient(135deg,#6366f1,#4f46e5)" },
+    { key:"pro",        name:"Professional", price:prices.pro,        color:"var(--tx-a5b4fc, #a5b4fc)", gradient:"linear-gradient(135deg,#818cf8,#6366f1)", featured:true },
+    { key:"enterprise", name:"Enterprise",   price:prices.enterprise, color:"var(--tx-34d399, #34d399)", gradient:"linear-gradient(135deg,#059669,#34d399)" },
   ];
 
   return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#060918 0%,#080c22 60%,#0a0f2a 100%)", fontFamily:ff, color:"white" }}>
+    <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,var(--dk-060918, #060918) 0%,var(--dk-080c22, #080c22) 60%,var(--dk-0a0f2a, #0a0f2a) 100%)", fontFamily:ff, color:"var(--ink-solid, white)" }}>
       <style>{`
 
         *,*::before,*::after{box-sizing:border-box}
@@ -758,14 +758,14 @@ export default function IndustryPageClient({
       {/* ── Topbar ── */}
       <div style={{ padding:"18px 24px", maxWidth:1160, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <button onClick={()=>router.back()} style={{
-          display:"flex", alignItems:"center", gap:8, background:"none", border:"1px solid rgba(255,255,255,.1)",
-          borderRadius:10, padding:"7px 16px", color:"rgba(255,255,255,.5)", fontSize:12,
+          display:"flex", alignItems:"center", gap:8, background:"none", border:"1px solid rgba(var(--ink),.1)",
+          borderRadius:10, padding:"7px 16px", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:12,
           fontWeight:600, cursor:"pointer", fontFamily:ff, transition:"all .2s",
         }}
-          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.25)";e.currentTarget.style.color="rgba(255,255,255,.8)";}}
-          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.1)";e.currentTarget.style.color="rgba(255,255,255,.5)";}}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(var(--ink),.25)";e.currentTarget.style.color="rgba(var(--ink),.8)";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(var(--ink),.1)";e.currentTarget.style.color="rgba(var(--ink),var(--ta-50, .5))";}}
         >← Back</button>
-        <Link href="/solutions" style={{ fontSize:12, color:"rgba(255,255,255,.35)", textDecoration:"none", fontWeight:600 }}>All Industries →</Link>
+        <Link href="/solutions" style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", textDecoration:"none", fontWeight:600 }}>All Industries →</Link>
       </div>
 
       {/* ── HERO ── */}
@@ -778,7 +778,7 @@ export default function IndustryPageClient({
             borderRadius:24, fontSize:12, fontWeight:800, letterSpacing:".05em",
             background: type.isLive ? "rgba(52,211,153,.14)" : "rgba(251,191,36,.12)",
             border:`1px solid ${type.isLive ? "rgba(52,211,153,.4)" : "rgba(251,191,36,.4)"}`,
-            color: type.isLive ? "#34d399" : "#fbbf24",
+            color: type.isLive ? "var(--tx-34d399, #34d399)" : "var(--tx-fbbf24, #fbbf24)",
           }}>
             {type.isLive ? "🟢 Live Now" : `⏳ Phase ${type.phase} — Coming Soon`}
           </span>
@@ -786,11 +786,11 @@ export default function IndustryPageClient({
 
         <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(34px,5.5vw,62px)", fontWeight:700, letterSpacing:"-2px", lineHeight:1.08, margin:"0 0 16px" }}>
           FinovaOS for{" "}
-          <span style={{ fontStyle:"italic", background:`linear-gradient(135deg,${phaseColor},#6366f1)`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+          <span style={{ fontStyle:"italic", background:`linear-gradient(135deg,${phaseColor},var(--tx-6366f1, #6366f1))`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
             {type.label}
           </span>
         </h1>
-        <p style={{ fontSize:18, color:"rgba(255,255,255,.45)", maxWidth:580, margin:"0 auto 40px", lineHeight:1.75 }}>
+        <p style={{ fontSize:18, color:"rgba(var(--ink),var(--ta-45, .45))", maxWidth:580, margin:"0 auto 40px", lineHeight:1.75 }}>
           {type.description}
         </p>
 
@@ -807,27 +807,27 @@ export default function IndustryPageClient({
               Get Started — {type.label} →
             </Link>
             <Link href="/pricing" style={{
-              padding:"14px 32px", borderRadius:14, background:"rgba(255,255,255,.06)",
-              border:"1px solid rgba(255,255,255,.14)", color:"rgba(255,255,255,.75)",
+              padding:"14px 32px", borderRadius:14, background:"rgba(var(--ink),.06)",
+              border:"1px solid rgba(var(--ink),.14)", color:"rgba(var(--ink),.75)",
               fontWeight:700, fontSize:15, textDecoration:"none", transition:"all .25s",
             }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,.1)";e.currentTarget.style.color="white";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.06)";e.currentTarget.style.color="rgba(255,255,255,.75)";}}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),.1)";e.currentTarget.style.color="var(--ink-solid, white)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(var(--ink),.06)";e.currentTarget.style.color="rgba(var(--ink),.75)";}}
             >View Pricing</Link>
           </div>
         ) : (
           <div style={{ maxWidth:460, margin:"0 auto" }}>
             {notified ? (
-              <div style={{ padding:"20px 28px", borderRadius:16, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontWeight:700, fontSize:15 }}>
+              <div style={{ padding:"20px 28px", borderRadius:16, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.3)", color:"var(--tx-34d399, #34d399)", fontWeight:700, fontSize:15 }}>
                 ✅ You&apos;re on the list! We&apos;ll email you when {type.label} goes live.
               </div>
             ) : (
-              <div style={{ padding:"28px 32px", borderRadius:20, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)" }}>
-                <p style={{ fontSize:14, color:"rgba(255,255,255,.5)", marginBottom:16, fontWeight:600 }}>🔔 Get notified when {type.label} launches</p>
+              <div style={{ padding:"28px 32px", borderRadius:20, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.1)" }}>
+                <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:16, fontWeight:600 }}>🔔 Get notified when {type.label} launches</p>
                 <div style={{ display:"flex", gap:10 }}>
                   <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com"
                     onKeyDown={e=>e.key==="Enter"&&joinWaitlist()}
-                    style={{ flex:1, padding:"12px 16px", borderRadius:10, background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.12)", color:"white", fontSize:14, outline:"none", fontFamily:ff }}
+                    style={{ flex:1, padding:"12px 16px", borderRadius:10, background:"rgba(var(--ink),.07)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", fontSize:14, outline:"none", fontFamily:ff }}
                   />
                   <button onClick={joinWaitlist} disabled={sending} style={{
                     padding:"12px 20px", borderRadius:10, background:"linear-gradient(135deg,#6366f1,#4f46e5)",
@@ -841,12 +841,12 @@ export default function IndustryPageClient({
       </div>
 
       {/* ── STATS BAR ── */}
-      <div style={{ borderTop:"1px solid rgba(255,255,255,.06)", borderBottom:"1px solid rgba(255,255,255,.06)", background:"rgba(255,255,255,.02)", padding:"36px 24px" }}>
+      <div style={{ borderTop:"1px solid rgba(var(--ink),.06)", borderBottom:"1px solid rgba(var(--ink),.06)", background:"rgba(var(--ink),.02)", padding:"36px 24px" }}>
         <div className="stat-grid" style={{ maxWidth:900, margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:0 }}>
           {(stats as {val:string;label:string}[]).map((s,i) => (
-            <div key={i} style={{ textAlign:"center", padding:"0 24px", borderRight: i<2?"1px solid rgba(255,255,255,.06)":undefined }}>
+            <div key={i} style={{ textAlign:"center", padding:"0 24px", borderRight: i<2?"1px solid rgba(var(--ink),.06)":undefined }}>
               <div style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,42px)", fontWeight:700, color:phaseColor, letterSpacing:"-1px" }}>{s.val}</div>
-              <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500, marginTop:4 }}>{s.label}</div>
+              <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:500, marginTop:4 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -855,13 +855,13 @@ export default function IndustryPageClient({
       {/* ── THE PROBLEM ── */}
       <div style={{ maxWidth:1000, margin:"0 auto", padding:"80px 24px 0" }}>
         <div style={{ textAlign:"center", marginBottom:40 }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:20, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.25)", fontSize:11, fontWeight:700, color:"#f87171", letterSpacing:".08em", marginBottom:18 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:20, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.25)", fontSize:11, fontWeight:700, color:"var(--tx-f87171, #f87171)", letterSpacing:".08em", marginBottom:18 }}>
             ⚠️ THE PROBLEM
           </div>
           <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, letterSpacing:"-1px", margin:"0 0 10px" }}>
             What breaks without a proper system
           </h2>
-          <p style={{ fontSize:15, color:"rgba(255,255,255,.38)", maxWidth:480, margin:"0 auto" }}>
+          <p style={{ fontSize:15, color:"rgba(var(--ink),var(--ta-38, .38))", maxWidth:480, margin:"0 auto" }}>
             These are the exact pain points {type.label} businesses face before switching to FinovaOS.
           </p>
         </div>
@@ -869,7 +869,7 @@ export default function IndustryPageClient({
           {(painPts as {icon:string;text:string}[]).map((p,i) => (
             <div key={i} style={{ padding:"22px 20px", borderRadius:16, background:"rgba(239,68,68,.04)", border:"1px solid rgba(239,68,68,.14)", display:"flex", flexDirection:"column", gap:12 }}>
               <div style={{ fontSize:28 }}>{p.icon}</div>
-              <p style={{ fontSize:13.5, color:"rgba(255,255,255,.55)", lineHeight:1.7, margin:0 }}>{p.text}</p>
+              <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-55, .55))", lineHeight:1.7, margin:0 }}>{p.text}</p>
             </div>
           ))}
         </div>
@@ -878,7 +878,7 @@ export default function IndustryPageClient({
       {/* ── WORKFLOW ── */}
       <div style={{ maxWidth:1100, margin:"0 auto", padding:"80px 24px 0" }}>
         <div style={{ textAlign:"center", marginBottom:40 }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:20, background:`${phaseColor}14`, border:`1px solid ${phaseColor}35`, fontSize:11, fontWeight:700, color:phaseColor, letterSpacing:".08em", marginBottom:18 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"5px 14px", borderRadius:20, background:`color-mix(in srgb, ${phaseColor} 7.8%, transparent)`, border:`1px solid color-mix(in srgb, ${phaseColor} 20.8%, transparent)`, fontSize:11, fontWeight:700, color:phaseColor, letterSpacing:".08em", marginBottom:18 }}>
             ⚡ HOW IT WORKS
           </div>
           <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, letterSpacing:"-1px", margin:0 }}>
@@ -891,11 +891,11 @@ export default function IndustryPageClient({
               <div style={{
                 display:"flex", flexDirection:"column", alignItems:"center", gap:8,
                 padding:"16px 20px", borderRadius:14,
-                background:`${phaseColor}10`, border:`1px solid ${phaseColor}30`,
+                background:`color-mix(in srgb, ${phaseColor} 6.3%, transparent)`, border:`1px solid color-mix(in srgb, ${phaseColor} 18.8%, transparent)`,
                 minWidth:120, textAlign:"center",
               }}>
                 <div style={{ width:28, height:28, borderRadius:"50%", background:phaseColor, color:"#0f172a", fontWeight:900, fontSize:13, display:"flex", alignItems:"center", justifyContent:"center" }}>{i+1}</div>
-                <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.8)", lineHeight:1.35 }}>{step}</div>
+                <div style={{ fontSize:12, fontWeight:700, color:"rgba(var(--ink),.8)", lineHeight:1.35 }}>{step}</div>
               </div>
               {i < (workflow as string[]).length-1 && (
                 <div className="wf-arrow" style={{ color:phaseColor, fontSize:18, opacity:.5, margin:"0 4px", flexShrink:0 }}>→</div>
@@ -911,19 +911,19 @@ export default function IndustryPageClient({
           <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(24px,3.5vw,38px)", fontWeight:700, letterSpacing:"-1px", margin:"0 0 12px" }}>
             Everything your {type.label} business needs
           </h2>
-          <p style={{ fontSize:15, color:"rgba(255,255,255,.4)", maxWidth:480, margin:"0 auto" }}>
+          <p style={{ fontSize:15, color:"rgba(var(--ink),var(--ta-40, .4))", maxWidth:480, margin:"0 auto" }}>
             Pre-configured for your industry — get started in minutes, not days.
           </p>
         </div>
         <div className="feat-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:14 }}>
           {(features as {icon:string;title:string;desc:string}[]).map((f,i) => (
-            <div key={i} style={{ padding:"22px 20px", borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", transition:"all .25s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,.06)";e.currentTarget.style.borderColor=`${phaseColor}40`;e.currentTarget.style.transform="translateY(-3px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.03)";e.currentTarget.style.borderColor="rgba(255,255,255,.08)";e.currentTarget.style.transform="translateY(0)";}}
+            <div key={i} style={{ padding:"22px 20px", borderRadius:18, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.08)", transition:"all .25s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),.06)";e.currentTarget.style.borderColor=`color-mix(in srgb, ${phaseColor} 25.1%, transparent)`;e.currentTarget.style.transform="translateY(-3px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(var(--ink),.03)";e.currentTarget.style.borderColor="rgba(var(--ink),.08)";e.currentTarget.style.transform="translateY(0)";}}
             >
               <div style={{ fontSize:26, marginBottom:12 }}>{f.icon}</div>
-              <div style={{ fontSize:14, fontWeight:800, color:"white", marginBottom:7, lineHeight:1.3 }}>{f.title}</div>
-              <div style={{ fontSize:12.5, color:"rgba(255,255,255,.42)", lineHeight:1.65 }}>{f.desc}</div>
+              <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:7, lineHeight:1.3 }}>{f.title}</div>
+              <div style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-42, .42))", lineHeight:1.65 }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -934,51 +934,51 @@ export default function IndustryPageClient({
         <h2 style={{ textAlign:"center", fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, letterSpacing:"-1px", marginBottom:10 }}>
           Which plan suits your {type.label} business?
         </h2>
-        <p style={{ textAlign:"center", color:"rgba(255,255,255,.4)", fontSize:15, marginBottom:40 }}>
+        <p style={{ textAlign:"center", color:"rgba(var(--ink),var(--ta-40, .4))", fontSize:15, marginBottom:40 }}>
           All plans include core accounting. Higher plans unlock more {type.label.toLowerCase()} features.
         </p>
 
-        <div style={{ borderRadius:20, overflow:"hidden", border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
+        <div style={{ borderRadius:20, overflow:"hidden", border:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.02)" }}>
           {/* Headers */}
-          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
-            <div style={{ padding:"20px 24px", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em" }}>Feature</div>
+          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.02)" }}>
+            <div style={{ padding:"20px 24px", fontSize:11, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".06em" }}>Feature</div>
             {PLANS.map(p => (
-              <div key={p.key} style={{ padding:"20px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
-                {p.featured && <div style={{ fontSize:9, fontWeight:800, color:"#fbbf24", letterSpacing:".08em", marginBottom:4 }}>POPULAR</div>}
+              <div key={p.key} style={{ padding:"20px 16px", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
+                {p.featured && <div style={{ fontSize:9, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", letterSpacing:".08em", marginBottom:4 }}>POPULAR</div>}
                 <div style={{ fontSize:12, fontWeight:900, color:p.color, marginBottom:4 }}>{p.name}</div>
-                <div style={{ fontSize:16, fontWeight:800, color:"white" }}>{fmtPrice(p.price)}<span style={{ fontSize:10, color:"rgba(255,255,255,.4)", fontWeight:500 }}>/mo</span></div>
+                <div style={{ fontSize:16, fontWeight:800, color:"var(--ink-solid, white)" }}>{fmtPrice(p.price)}<span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:500 }}>/mo</span></div>
               </div>
             ))}
           </div>
           {/* Rows */}
           {(planRows as any[]).map((row:any,i:number) => (
-            <div key={i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.04)", background:i%2?"rgba(255,255,255,.01)":"transparent" }}>
-              <div style={{ padding:"13px 24px", fontSize:13, color:"rgba(255,255,255,.6)" }}>{row.feature}</div>
+            <div key={i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(var(--ink),.04)", background:i%2?"rgba(var(--ink),.01)":"transparent" }}>
+              <div style={{ padding:"13px 24px", fontSize:13, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{row.feature}</div>
               {(["starter","pro","enterprise"] as const).map(k => (
-                <div key={k} style={{ padding:"13px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.04)", background:k==="pro"?"rgba(99,102,241,.03)":"transparent" }}>
+                <div key={k} style={{ padding:"13px 16px", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.04)", background:k==="pro"?"rgba(99,102,241,.03)":"transparent" }}>
                   <Cell val={row[k]} />
                 </div>
               ))}
             </div>
           ))}
           {/* CTA row */}
-          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", background:"rgba(255,255,255,.02)", borderTop:"1px solid rgba(255,255,255,.08)" }}>
-            <div style={{ padding:"20px 24px", fontSize:12, color:"rgba(255,255,255,.28)" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", background:"rgba(var(--ink),.02)", borderTop:"1px solid rgba(var(--ink),.08)" }}>
+            <div style={{ padding:"20px 24px", fontSize:12, color:"rgba(var(--ink),var(--ta-28, .28))" }}>
               {type.isLive ? "🔥 50% off — first 3 months" : "⏳ Launching soon — join the waitlist"}
             </div>
             {PLANS.map(p => (
-              <div key={p.key} style={{ padding:"14px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
+              <div key={p.key} style={{ padding:"14px", textAlign:"center", borderLeft:"1px solid rgba(var(--ink),.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
                 {type.isLive ? (
                   <Link href={`/onboarding/signup/${p.key==="pro"?"professional":p.key}?businessType=${type.id}`} style={{
                     display:"block", padding:"10px 0", borderRadius:10,
-                    background:p.featured?p.gradient:"rgba(255,255,255,.07)",
-                    border:p.featured?"none":`1px solid ${p.color}30`,
+                    background:p.featured?p.gradient:"rgba(var(--ink),.07)",
+                    border:p.featured?"none":`1px solid color-mix(in srgb, ${p.color} 18.8%, transparent)`,
                     color:"white", fontWeight:700, fontSize:12, textDecoration:"none",
                   }}>Get {p.name}</Link>
                 ) : (
                   <div style={{
                     padding:"10px 0", borderRadius:10, fontSize:12, fontWeight:600,
-                    color:"rgba(255,255,255,.25)", border:"1px solid rgba(255,255,255,.08)",
+                    color:"rgba(var(--ink),var(--ta-25, .25))", border:"1px solid rgba(var(--ink),.08)",
                     textAlign:"center",
                   }}>Coming Soon</div>
                 )}
@@ -987,7 +987,7 @@ export default function IndustryPageClient({
           </div>
         </div>
         <div style={{ textAlign:"center", marginTop:14 }}>
-          <Link href="/pricing" style={{ fontSize:13, color:"#818cf8", textDecoration:"none", fontWeight:600 }}>View full pricing details →</Link>
+          <Link href="/pricing" style={{ fontSize:13, color:"var(--tx-818cf8, #818cf8)", textDecoration:"none", fontWeight:600 }}>View full pricing details →</Link>
         </div>
       </div>
 
@@ -996,22 +996,22 @@ export default function IndustryPageClient({
         <h2 style={{ textAlign:"center", fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,32px)", fontWeight:700, letterSpacing:"-1px", marginBottom:10 }}>
           Common questions
         </h2>
-        <p style={{ textAlign:"center", color:"rgba(255,255,255,.38)", fontSize:14, marginBottom:40 }}>
+        <p style={{ textAlign:"center", color:"rgba(var(--ink),var(--ta-38, .38))", fontSize:14, marginBottom:40 }}>
           Everything {type.label} owners ask before switching.
         </p>
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {(faqs as {q:string;a:string}[]).map((faq,i) => (
-            <div key={i} style={{ borderRadius:14, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)", overflow:"hidden" }}>
+            <div key={i} style={{ borderRadius:14, border:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.02)", overflow:"hidden" }}>
               <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{
                 width:"100%", padding:"18px 20px", background:"none", border:"none",
-                color:"white", fontFamily:ff, fontSize:14, fontWeight:700, textAlign:"left",
+                color:"var(--ink-solid, white)", fontFamily:ff, fontSize:14, fontWeight:700, textAlign:"left",
                 cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12,
               }}>
                 <span>{faq.q}</span>
                 <span style={{ color:phaseColor, fontSize:18, flexShrink:0, transition:"transform .2s", transform:openFaq===i?"rotate(45deg)":"rotate(0)" }}>+</span>
               </button>
               {openFaq===i && (
-                <div style={{ padding:"0 20px 18px", fontSize:13.5, color:"rgba(255,255,255,.52)", lineHeight:1.75, borderTop:"1px solid rgba(255,255,255,.06)" }}>
+                <div style={{ padding:"0 20px 18px", fontSize:13.5, color:"rgba(var(--ink),var(--ta-52, .52))", lineHeight:1.75, borderTop:"1px solid rgba(var(--ink),.06)" }}>
                   <div style={{ paddingTop:14 }}>{faq.a}</div>
                 </div>
               )}
@@ -1022,14 +1022,14 @@ export default function IndustryPageClient({
 
       {/* ── FINAL CTA ── */}
       <div style={{ maxWidth:800, margin:"80px auto", padding:"0 24px" }}>
-        <div style={{ borderRadius:24, padding:"60px 40px", textAlign:"center", background:`linear-gradient(135deg,${phaseColor}12,rgba(99,102,241,.06))`, border:`1px solid ${phaseColor}25`, position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:`radial-gradient(circle,${phaseColor}18,transparent 70%)`, top:-100, right:-80, pointerEvents:"none" }}/>
+        <div style={{ borderRadius:24, padding:"60px 40px", textAlign:"center", background:`linear-gradient(135deg,color-mix(in srgb, ${phaseColor} 7.1%, transparent),rgba(99,102,241,.06))`, border:`1px solid color-mix(in srgb, ${phaseColor} 14.5%, transparent)`, position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:`radial-gradient(circle,color-mix(in srgb, ${phaseColor} 9.4%, transparent),transparent 70%)`, top:-100, right:-80, pointerEvents:"none" }}/>
           <div style={{ position:"relative" }}>
             <div style={{ fontSize:52, marginBottom:18 }}>{type.icon}</div>
             <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3.5vw,36px)", fontWeight:700, letterSpacing:"-1px", marginBottom:12 }}>
               Ready to transform your {type.label} business?
             </h3>
-            <p style={{ color:"rgba(255,255,255,.45)", fontSize:15, marginBottom:36, lineHeight:1.75, maxWidth:500, margin:"0 auto 36px" }}>
+            <p style={{ color:"rgba(var(--ink),var(--ta-45, .45))", fontSize:15, marginBottom:36, lineHeight:1.75, maxWidth:500, margin:"0 auto 36px" }}>
               Join businesses already running on FinovaOS. Set up in under 30 minutes and start managing your operations from day one.
             </p>
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", marginBottom:24 }}>
@@ -1038,12 +1038,12 @@ export default function IndustryPageClient({
                   <Link href={`/onboarding/choose-plan?businessType=${type.id}`} style={{ padding:"14px 36px", borderRadius:13, background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", fontWeight:800, fontSize:15, textDecoration:"none", boxShadow:"0 6px 24px rgba(99,102,241,.4)" }}>
                     Get Started →
                   </Link>
-                  <Link href="/contact" style={{ padding:"14px 28px", borderRadius:13, background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.14)", color:"rgba(255,255,255,.75)", fontWeight:700, fontSize:15, textDecoration:"none" }}>
+                  <Link href="/contact" style={{ padding:"14px 28px", borderRadius:13, background:"rgba(var(--ink),.07)", border:"1px solid rgba(var(--ink),.14)", color:"rgba(var(--ink),.75)", fontWeight:700, fontSize:15, textDecoration:"none" }}>
                     Talk to Sales
                   </Link>
                 </>
               ) : (
-                <Link href="/solutions" style={{ padding:"14px 36px", borderRadius:13, background:`${phaseColor}18`, border:`1px solid ${phaseColor}40`, color:phaseColor, fontWeight:700, fontSize:15, textDecoration:"none" }}>
+                <Link href="/solutions" style={{ padding:"14px 36px", borderRadius:13, background:`color-mix(in srgb, ${phaseColor} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${phaseColor} 25.1%, transparent)`, color:phaseColor, fontWeight:700, fontSize:15, textDecoration:"none" }}>
                   Browse live industries →
                 </Link>
               )}
@@ -1051,7 +1051,7 @@ export default function IndustryPageClient({
             {/* Trust signals */}
             <div style={{ display:"flex", justifyContent:"center", gap:24, flexWrap:"wrap" }}>
               {["✓ 10-min setup","✓ 14-day money-back","✓ Cancel anytime","✓ Dedicated support"].map(t => (
-                <span key={t} style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{t}</span>
+                <span key={t} style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:600 }}>{t}</span>
               ))}
             </div>
           </div>
@@ -1059,12 +1059,12 @@ export default function IndustryPageClient({
       </div>
 
       {/* ── Footer nav ── */}
-      <div style={{ borderTop:"1px solid rgba(255,255,255,.05)", padding:"28px 24px", textAlign:"center" }}>
+      <div style={{ borderTop:"1px solid rgba(var(--ink),.05)", padding:"28px 24px", textAlign:"center" }}>
         <div style={{ display:"flex", gap:24, justifyContent:"center", flexWrap:"wrap" }}>
           {[{href:"/",label:"Home"},{href:"/solutions",label:"All Industries"},{href:"/features",label:"Features"},{href:"/pricing",label:"Pricing"},{href:"/contact",label:"Contact"}].map(l => (
-            <Link key={l.href} href={l.href} style={{ color:"rgba(255,255,255,.3)", fontSize:12, fontWeight:600, textDecoration:"none", transition:"color .2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.color="rgba(255,255,255,.7)";}}
-              onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.3)";}}
+            <Link key={l.href} href={l.href} style={{ color:"rgba(var(--ink),var(--ta-30, .3))", fontSize:12, fontWeight:600, textDecoration:"none", transition:"color .2s" }}
+              onMouseEnter={e=>{e.currentTarget.style.color="rgba(var(--ink),var(--ta-70, .7))";}}
+              onMouseLeave={e=>{e.currentTarget.style.color="rgba(var(--ink),var(--ta-30, .3))";}}
             >{l.label}</Link>
           ))}
         </div>

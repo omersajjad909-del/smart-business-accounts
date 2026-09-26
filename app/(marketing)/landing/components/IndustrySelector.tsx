@@ -20,10 +20,10 @@ const PHASE_META: Record<number, { label: string; color: string; bg: string }> =
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Commerce: "#6366f1", Services: "#a78bfa", Healthcare: "#f472b6",
-  Education: "#34d399", Hospitality: "#fb923c", Production: "#fbbf24",
-  Logistics: "#60a5fa", Technology: "#38bdf8", Agriculture: "#4ade80",
-  Finance: "#f59e0b", Corporate: "#818cf8", General: "#94a3b8",
+  Commerce: "#6366f1", Services: "var(--tx-a78bfa, #a78bfa)", Healthcare: "var(--tx-f472b6, #f472b6)",
+  Education: "var(--tx-34d399, #34d399)", Hospitality: "var(--tx-fb923c, #fb923c)", Production: "var(--tx-fbbf24, #fbbf24)",
+  Logistics: "var(--tx-60a5fa, #60a5fa)", Technology: "var(--tx-38bdf8, #38bdf8)", Agriculture: "var(--tx-4ade80, #4ade80)",
+  Finance: "var(--tx-f59e0b, #f59e0b)", Corporate: "var(--tx-818cf8, #818cf8)", General: "var(--tx-94a3b8, #94a3b8)",
 };
 
 function useInView(threshold = 0.08) {
@@ -41,8 +41,8 @@ function useInView(threshold = 0.08) {
 
 function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
   const [hov, setHov] = useState(false);
-  const catColor = CATEGORY_COLORS[t.category] ?? "#818cf8";
-  const liveColor = "#34d399";
+  const catColor = CATEGORY_COLORS[t.category] ?? "var(--tx-818cf8, #818cf8)";
+  const liveColor = "var(--tx-34d399, #34d399)";
 
   return (
     <div
@@ -53,7 +53,7 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
         background: hov
           ? "rgba(var(--ink),.07)"
           : t.isLive ? "rgba(52,211,153,.03)" : "rgba(var(--ink),.03)",
-        border: `1px solid ${hov ? catColor + "50" : t.isLive ? "rgba(52,211,153,.18)" : "rgba(var(--ink),.08)"}`,
+        border: `1px solid ${hov ? `color-mix(in srgb, ${catColor} 31.4%, transparent)` : t.isLive ? "rgba(52,211,153,.18)" : "rgba(var(--ink),.08)"}`,
         display: "flex", flexDirection: "column", gap: 12,
         opacity: vis ? 1 : 0,
         transform: vis ? "translateY(0)" : "translateY(22px)",
@@ -64,7 +64,7 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
     >
       {/* Top accent */}
       {t.isLive && (
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,${liveColor}60,transparent)` }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,color-mix(in srgb, ${liveColor} 37.6%, transparent),transparent)` }} />
       )}
 
       {/* Header row */}
@@ -74,8 +74,8 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
           padding: "3px 9px", borderRadius: 20, fontSize: 10, fontWeight: 800,
           letterSpacing: ".05em",
           background: t.isLive ? "rgba(52,211,153,.15)" : PHASE_META[t.phase].bg,
-          color: t.isLive ? "#34d399" : PHASE_META[t.phase].color,
-          border: `1px solid ${t.isLive ? "rgba(52,211,153,.35)" : PHASE_META[t.phase].color + "40"}`,
+          color: t.isLive ? "var(--tx-34d399, #34d399)" : PHASE_META[t.phase].color,
+          border: `1px solid ${t.isLive ? "rgba(52,211,153,.35)" : `color-mix(in srgb, ${PHASE_META[t.phase].color} 25.1%, transparent)`}`,
         }}>
           {t.isLive ? "🟢 Live" : PHASE_META[t.phase].label}
         </span>
@@ -90,9 +90,9 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
       {/* Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
         <span style={{
-          fontSize: 10, fontWeight: 700, color: CATEGORY_COLORS[t.category] ?? "#818cf8",
+          fontSize: 10, fontWeight: 700, color: CATEGORY_COLORS[t.category] ?? "var(--tx-818cf8, #818cf8)",
           background: (CATEGORY_COLORS[t.category] ?? "#818cf8") + "15",
-          padding: "2px 8px", borderRadius: 10, border: `1px solid ${(CATEGORY_COLORS[t.category] ?? "#818cf8")}30`,
+          padding: "2px 8px", borderRadius: 10, border: `1px solid color-mix(in srgb, ${(CATEGORY_COLORS[t.category] ?? "#818cf8")} 18.8%, transparent)`,
         }}>
           {t.category}
         </span>
@@ -199,7 +199,7 @@ export default function IndustrySelector() {
                   fontFamily:ff, border:"1px solid",
                   borderColor: active ? (meta?.color ?? "#6366f1") : "rgba(var(--ink),.1)",
                   background: active ? ((meta?.bg ?? "rgba(99,102,241,.2)")) : "rgba(var(--ink),.04)",
-                  color: active ? (meta?.color ?? "#a5b4fc") : "rgba(var(--ink),var(--ta-35, .35))",
+                  color: active ? (meta?.color ?? "var(--tx-a5b4fc, #a5b4fc)") : "rgba(var(--ink),var(--ta-35, .35))",
                   transition:"all .2s",
                 }}>
                   {p === null ? "All" : PHASE_META[p].label}
@@ -221,7 +221,7 @@ export default function IndustrySelector() {
               cursor:"pointer", fontFamily:ff, border:"1px solid", transition:"all .2s",
               borderColor: filter===f.k ? "#6366f1" : "rgba(var(--ink),.1)",
               background:  filter===f.k ? "rgba(99,102,241,.18)" : "rgba(var(--ink),.04)",
-              color:       filter===f.k ? "#a5b4fc" : "rgba(var(--ink),var(--ta-40, .4))",
+              color:       filter===f.k ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-40, .4))",
             }}>
               {f.label}
             </button>

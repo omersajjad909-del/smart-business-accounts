@@ -83,7 +83,7 @@ export default function TrustedBy() {
               }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: `${c.color}22`, border: `1px solid ${c.color}44`,
+                  background: `color-mix(in srgb, ${c.color} 13.3%, transparent)`, border: `1px solid color-mix(in srgb, ${c.color} 26.7%, transparent)`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 15,
                 }}>

@@ -14,7 +14,7 @@ const CONTACT_METHODS = [
     detail: "Available Mon–Fri, 9am–6pm GMT",
     action: "Start Chat",
     href: "#chat",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.15)",
     border: "rgba(129,140,248,.25)",
   },
@@ -25,7 +25,7 @@ const CONTACT_METHODS = [
     detail: "hello@finovaos.app",
     action: "Send Email",
     href: "mailto:hello@finovaos.app",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.12)",
     border: "rgba(52,211,153,.25)",
   },
@@ -36,7 +36,7 @@ const CONTACT_METHODS = [
     detail: "Free personalised walkthrough",
     action: "Schedule Demo",
     href: "/demo",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     glow: "rgba(56,189,248,.12)",
     border: "rgba(56,189,248,.25)",
   },
@@ -47,7 +47,7 @@ const CONTACT_METHODS = [
     detail: "Usually replies within 1 hour",
     action: "Message Now",
     href: "https://wa.me/923047653693",
-    color: "#22c55e",
+    color: "var(--tx-22c55e, #22c55e)",
     glow: "rgba(34,197,94,.12)",
     border: "rgba(34,197,94,.25)",
   },
@@ -104,7 +104,7 @@ function SectionLabel({ text }: { text: string }) {
   return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:14 }}>
       <div style={{ height:1, width:32, background:"rgba(99,102,241,.4)" }}/>
-      <span style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".12em", textTransform:"uppercase" }}>{text}</span>
+      <span style={{ fontSize:11, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".12em", textTransform:"uppercase" }}>{text}</span>
       <div style={{ height:1, width:32, background:"rgba(99,102,241,.4)" }}/>
     </div>
   );
@@ -119,9 +119,9 @@ function FloatingInput({
   const [focused, setFocused] = useState(false);
   const hasVal = value.length > 0;
   const base: React.CSSProperties = {
-    width:"100%", background:"rgba(255,255,255,.05)",
-    border:`1.5px solid ${focused?"rgba(99,102,241,.6)":hasVal?"rgba(99,102,241,.3)":"rgba(255,255,255,.1)"}`,
-    borderRadius:12, color:"white", fontSize:14, outline:"none",
+    width:"100%", background:"rgba(var(--ink),.05)",
+    border:`1.5px solid ${focused?"rgba(99,102,241,.6)":hasVal?"rgba(99,102,241,.3)":"rgba(var(--ink),.1)"}`,
+    borderRadius:12, color:"var(--ink-solid, white)", fontSize:14, outline:"none",
     transition:"border-color .2s", boxSizing:"border-box" as const,
     padding: textarea ? "18px 16px 10px" : "22px 16px 8px",
     resize: textarea ? "vertical" as const : undefined,
@@ -135,7 +135,7 @@ function FloatingInput({
         top: focused||hasVal ? 8 : textarea ? 18 : "50%",
         transform: focused||hasVal ? "none" : textarea ? "none" : "translateY(-50%)",
         fontSize: focused||hasVal ? 10 : 13,
-        color: focused ? "#818cf8" : "rgba(255,255,255,.35)",
+        color: focused ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-35, .35))",
         fontWeight: focused||hasVal ? 700 : 500,
         transition:"all .2s", pointerEvents:"none",
         letterSpacing: focused||hasVal ? ".05em" : 0,
@@ -201,8 +201,8 @@ export default function ContactPage() {
   return (
     <main style={{
       minHeight:"100vh",
-      background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)",
-      color:"white",
+      background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)",
+      color:"var(--ink-solid, white)",
       fontFamily:"'DM Sans','Outfit',system-ui,sans-serif",
       overflowX:"hidden",
     }}>
@@ -220,7 +220,7 @@ export default function ContactPage() {
             transition:"opacity .5s ease, transform .5s ease",
           }}>
             <div style={{ width:6, height:6, borderRadius:"50%", background:"#34d399", animation:"blink 2s ease infinite" }}/>
-            <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.7)", letterSpacing:".06em" }}>GET IN TOUCH</span>
+            <span style={{ fontSize:12, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))", letterSpacing:".06em" }}>GET IN TOUCH</span>
           </div>
 
           <h1 style={{
@@ -231,13 +231,13 @@ export default function ContactPage() {
             transition:"opacity .6s ease .1s, transform .6s ease .1s",
           }}>
             We&apos;d love to
-            <span style={{ display:"block", background:"linear-gradient(90deg,#818cf8,#c4b5fd,#38bdf8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+            <span style={{ display:"block", background:"linear-gradient(90deg,var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd),var(--tx-38bdf8, #38bdf8))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               hear from you
             </span>
           </h1>
 
           <p style={{
-            fontSize:"clamp(15px,2vw,18px)", color:"rgba(255,255,255,.5)", lineHeight:1.75,
+            fontSize:"clamp(15px,2vw,18px)", color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.75,
             maxWidth:480, margin:"0 auto",
             opacity:heroVis?1:0, transform:heroVis?"translateY(0)":"translateY(16px)",
             transition:"opacity .6s ease .2s, transform .6s ease .2s",
@@ -254,7 +254,7 @@ export default function ContactPage() {
             {CONTACT_METHODS.map(m=>(
               <a key={m.title} href={m.href}
                 style={{ textDecoration:"none", display:"block",
-                  background:`linear-gradient(135deg,${m.glow},rgba(255,255,255,.02))`,
+                  background:`linear-gradient(135deg,${m.glow},rgba(var(--ink),.02))`,
                   borderRadius:18, border:`1px solid ${m.border}`,
                   padding:"24px 22px", transition:"transform .2s, box-shadow .2s", cursor:"pointer",
                 }}
@@ -262,8 +262,8 @@ export default function ContactPage() {
                 onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.transform="translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow="none"; }}
               >
                 <div style={{ fontSize:28, marginBottom:12 }}>{m.icon}</div>
-                <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:4 }}>{m.title}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginBottom:8, lineHeight:1.5 }}>{m.desc}</div>
+                <div style={{ fontSize:15, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:4 }}>{m.title}</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:8, lineHeight:1.5 }}>{m.desc}</div>
                 <div style={{ fontSize:12, fontWeight:600, color:m.color, marginBottom:14 }}>{m.detail}</div>
                 <div style={{ fontSize:12, fontWeight:700, color:m.color, display:"flex", alignItems:"center", gap:4 }}>
                   {m.action} <span>→</span>
@@ -280,21 +280,21 @@ export default function ContactPage() {
           <div className="contact-main" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr", gap:24, alignItems:"start" }}>
 
             {/* Form */}
-            <div style={{ background:"rgba(255,255,255,.03)", borderRadius:22, border:"1px solid rgba(255,255,255,.07)", padding:"36px 32px" }}>
+            <div style={{ background:"rgba(var(--ink),.03)", borderRadius:22, border:"1px solid rgba(var(--ink),.07)", padding:"36px 32px" }}>
               <div style={{ marginBottom:28 }}>
-                <div style={{ fontSize:20, fontWeight:800, color:"white", marginBottom:6 }}>Send us a message</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)" }}>We will get back to you within 24 hours.</div>
+                <div style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:6 }}>Send us a message</div>
+                <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-35, .35))" }}>We will get back to you within 24 hours.</div>
               </div>
 
               {sent ? (
                 <div style={{ padding:"40px 24px", textAlign:"center" }}>
                   <div style={{ fontSize:48, marginBottom:16 }}>✅</div>
-                  <div style={{ fontSize:18, fontWeight:800, color:"white", marginBottom:8 }}>Message sent!</div>
-                  <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", lineHeight:1.6 }}>
+                  <div style={{ fontSize:18, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:8 }}>Message sent!</div>
+                  <div style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.6 }}>
                     Thank you for reaching out. Our team will get back to you within 24 hours.
                   </div>
                   <button onClick={()=>setSent(false)}
-                    style={{ marginTop:24, padding:"10px 24px", borderRadius:10, background:"rgba(99,102,241,.2)", border:"1px solid rgba(99,102,241,.3)", color:"#818cf8", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                    style={{ marginTop:24, padding:"10px 24px", borderRadius:10, background:"rgba(99,102,241,.2)", border:"1px solid rgba(99,102,241,.3)", color:"var(--tx-818cf8, #818cf8)", fontSize:13, fontWeight:700, cursor:"pointer" }}>
                     Send another message
                   </button>
                 </div>
@@ -302,7 +302,7 @@ export default function ContactPage() {
                 <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
                   {/* Subject selector */}
                   <div>
-                    <label style={{ fontSize:10, fontWeight:800, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".07em", display:"block", marginBottom:8 }}>
+                    <label style={{ fontSize:10, fontWeight:800, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".07em", display:"block", marginBottom:8 }}>
                       What&apos;s this about? *
                     </label>
                     <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
@@ -317,9 +317,9 @@ export default function ContactPage() {
                         <div key={s.value} onClick={()=>setForm(p=>({...p,subject:s.value}))}
                           style={{
                             padding:"6px 14px", borderRadius:20, cursor:"pointer", fontSize:12, fontWeight:700,
-                            background:form.subject===s.value?"rgba(99,102,241,.2)":"rgba(255,255,255,.04)",
-                            border:`1px solid ${form.subject===s.value?"rgba(99,102,241,.5)":"rgba(255,255,255,.08)"}`,
-                            color:form.subject===s.value?"#818cf8":"rgba(255,255,255,.4)",
+                            background:form.subject===s.value?"rgba(99,102,241,.2)":"rgba(var(--ink),.04)",
+                            border:`1px solid ${form.subject===s.value?"rgba(99,102,241,.5)":"rgba(var(--ink),.08)"}`,
+                            color:form.subject===s.value?"var(--tx-818cf8, #818cf8)":"rgba(var(--ink),var(--ta-40, .4))",
                             transition:"all .15s",
                           }}>
                           {s.label}
@@ -344,7 +344,7 @@ export default function ContactPage() {
                   <FloatingInput label="Message" value={form.message} onChange={f("message")} textarea required placeholder="Tell us how we can help..."/>
 
                   {error && (
-                    <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", color:"#f87171", fontSize:12, fontWeight:600 }}>
+                    <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", color:"var(--tx-f87171, #f87171)", fontSize:12, fontWeight:600 }}>
                       {error}
                     </div>
                   )}
@@ -360,7 +360,7 @@ export default function ContactPage() {
                     {sending ? "Sending..." : "Send Message →"}
                   </button>
 
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.2)", textAlign:"center" }}>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-20, .2))", textAlign:"center" }}>
                     🔒 Your data is safe. We never share or sell it.
                   </div>
                 </div>
@@ -369,34 +369,34 @@ export default function ContactPage() {
 
             {/* Departments */}
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.5)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:4 }}>
+              <div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),var(--ta-50, .5))", textTransform:"uppercase", letterSpacing:".06em", marginBottom:4 }}>
                 Contact by Department
               </div>
               {DEPARTMENTS.map(d=>(
                 <a key={d.label} href={`mailto:${d.email}`}
-                  style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:14, padding:"14px 18px", borderRadius:14, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", transition:"all .15s" }}
+                  style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:14, padding:"14px 18px", borderRadius:14, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", transition:"all .15s" }}
                   onMouseEnter={e=>{ (e.currentTarget as HTMLElement).style.background="rgba(99,102,241,.08)"; (e.currentTarget as HTMLElement).style.borderColor="rgba(99,102,241,.25)"; }}
-                  onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.background="rgba(255,255,255,.03)"; (e.currentTarget as HTMLElement).style.borderColor="rgba(255,255,255,.07)"; }}
+                  onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.background="rgba(var(--ink),.03)"; (e.currentTarget as HTMLElement).style.borderColor="rgba(var(--ink),.07)"; }}
                 >
                   <span style={{ fontSize:20, width:28, textAlign:"center", flexShrink:0 }}>{d.icon}</span>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:"white" }}>{d.label}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:1 }}>{d.desc}</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{d.label}</div>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:1 }}>{d.desc}</div>
                   </div>
-                  <div style={{ fontSize:11, color:"#818cf8", fontWeight:600, flexShrink:0 }}>↗</div>
+                  <div style={{ fontSize:11, color:"var(--tx-818cf8, #818cf8)", fontWeight:600, flexShrink:0 }}>↗</div>
                 </a>
               ))}
 
               {/* Response time */}
               <div style={{ marginTop:6, padding:"16px 18px", borderRadius:14, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#34d399", marginBottom:8 }}>⏱ Response Times</div>
+                <div style={{ fontSize:12, fontWeight:700, color:"var(--tx-34d399, #34d399)", marginBottom:8 }}>⏱ Response Times</div>
                 {[
-                  { plan:"Enterprise", time:"< 1 hour", color:"#34d399" },
-                  { plan:"Pro",        time:"< 4 hours", color:"#818cf8" },
-                  { plan:"Starter",    time:"< 24 hours", color:"#fbbf24" },
+                  { plan:"Enterprise", time:"< 1 hour", color:"var(--tx-34d399, #34d399)" },
+                  { plan:"Pro",        time:"< 4 hours", color:"var(--tx-818cf8, #818cf8)" },
+                  { plan:"Starter",    time:"< 24 hours", color:"var(--tx-fbbf24, #fbbf24)" },
                 ].map(r=>(
                   <div key={r.plan} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>{r.plan}</span>
+                    <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>{r.plan}</span>
                     <span style={{ fontSize:12, fontWeight:700, color:r.color }}>{r.time}</span>
                   </div>
                 ))}
@@ -418,23 +418,23 @@ export default function ContactPage() {
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:20 }}>
             {OFFICES.map(o=>(
               <div key={o.city} style={{
-                background:"rgba(255,255,255,.03)", borderRadius:18,
-                border:"1px solid rgba(255,255,255,.07)",
+                background:"rgba(var(--ink),.03)", borderRadius:18,
+                border:"1px solid rgba(var(--ink),.07)",
                 padding:"28px 24px", position:"relative", overflow:"hidden",
                 transition:"transform .2s, border-color .2s",
               }}
-                onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.borderColor=`${o.color}55`; }}
-                onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.borderColor="rgba(255,255,255,.07)"; }}
+                onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.borderColor=`color-mix(in srgb, ${o.color} 33.3%, transparent)`; }}
+                onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.borderColor="rgba(var(--ink),.07)"; }}
               >
                 {/* Top color bar */}
                 <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:o.color, borderRadius:"18px 18px 0 0" }}/>
 
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
                   <div>
-                    <div style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>{o.city}</div>
-                    <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{o.country}</div>
+                    <div style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", fontFamily:"Lora,serif" }}>{o.city}</div>
+                    <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", marginTop:2 }}>{o.country}</div>
                   </div>
-                  <span style={{ padding:"4px 10px", borderRadius:20, background:`${o.color}20`, color:o.color, fontSize:10, fontWeight:800, letterSpacing:".04em" }}>
+                  <span style={{ padding:"4px 10px", borderRadius:20, background:`color-mix(in srgb, ${o.color} 12.5%, transparent)`, color:o.color, fontSize:10, fontWeight:800, letterSpacing:".04em" }}>
                     {o.type}
                   </span>
                 </div>
@@ -442,7 +442,7 @@ export default function ContactPage() {
                 <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                   <div style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
                     <span style={{ fontSize:14, marginTop:1, flexShrink:0 }}>📍</span>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", lineHeight:1.6 }}>{o.address}</span>
+                    <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.6 }}>{o.address}</span>
                   </div>
                   <a href={`tel:${o.phone}`} style={{ display:"flex", gap:10, alignItems:"center", textDecoration:"none" }}
                     onMouseEnter={e=>(e.currentTarget.style.opacity=".8")}
@@ -471,23 +471,23 @@ export default function ContactPage() {
             <h2 style={{ fontSize:"clamp(24px,3.5vw,38px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 12px" }}>
               Common questions
             </h2>
-            <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", margin:0 }}>
+            <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", margin:0 }}>
               Can&apos;t find what you&apos;re looking for?{" "}
-              <Link href="/help" style={{ color:"#818cf8", fontWeight:700, textDecoration:"none" }}>Browse the Help Centre →</Link>
+              <Link href="/help" style={{ color:"var(--tx-818cf8, #818cf8)", fontWeight:700, textDecoration:"none" }}>Browse the Help Centre →</Link>
             </p>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
             {FAQS.map((faq, i)=>(
               <div key={i}
-                style={{ background:"rgba(255,255,255,.03)", borderRadius:14, border:`1px solid ${openFaq===i?"rgba(99,102,241,.3)":"rgba(255,255,255,.07)"}`, overflow:"hidden", transition:"border-color .2s" }}>
+                style={{ background:"rgba(var(--ink),.03)", borderRadius:14, border:`1px solid ${openFaq===i?"rgba(99,102,241,.3)":"rgba(var(--ink),.07)"}`, overflow:"hidden", transition:"border-color .2s" }}>
                 <button onClick={()=>setOpenFaq(openFaq===i?null:i)}
                   style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 20px", background:"none", border:"none", cursor:"pointer", textAlign:"left", gap:12 }}>
-                  <span style={{ fontSize:14, fontWeight:700, color:"white", lineHeight:1.4 }}>{faq.q}</span>
-                  <span style={{ fontSize:18, color:"#818cf8", flexShrink:0, transition:"transform .2s", transform:openFaq===i?"rotate(45deg)":"rotate(0)" }}>+</span>
+                  <span style={{ fontSize:14, fontWeight:700, color:"var(--ink-solid, white)", lineHeight:1.4 }}>{faq.q}</span>
+                  <span style={{ fontSize:18, color:"var(--tx-818cf8, #818cf8)", flexShrink:0, transition:"transform .2s", transform:openFaq===i?"rotate(45deg)":"rotate(0)" }}>+</span>
                 </button>
                 {openFaq===i && (
                   <div style={{ padding:"0 20px 18px" }}>
-                    <div style={{ fontSize:14, color:"rgba(255,255,255,.5)", lineHeight:1.75 }}>{faq.a}</div>
+                    <div style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.75 }}>{faq.a}</div>
                   </div>
                 )}
               </div>
@@ -506,14 +506,14 @@ export default function ContactPage() {
               <h2 style={{ fontSize:"clamp(22px,3vw,32px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 12px" }}>
                 Still have questions?
               </h2>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:"0 auto 28px", maxWidth:420 }}>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.7, margin:"0 auto 28px", maxWidth:420 }}>
                 Our team is genuinely happy to help. No bots, no runarounds — just real people who care about your business.
               </p>
               <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
                 <Link href="/help" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", boxShadow:"0 4px 20px rgba(79,70,229,.4)" }}>
                   Help Centre
                 </Link>
-                <a href="mailto:hello@finovaos.app" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", textDecoration:"none" }}>
+                <a href="mailto:hello@finovaos.app" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"rgba(var(--ink),.08)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.8)", textDecoration:"none" }}>
                   Email Us Directly
                 </a>
               </div>

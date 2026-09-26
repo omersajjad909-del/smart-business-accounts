@@ -31,7 +31,7 @@ function Sparkline({ d, color }: { d: number[]; color: string }) {
   const W = 80, H = 32, max = Math.max(...d), min = Math.min(...d);
   const pts = d.map((v, i) => `${(i / (d.length - 1)) * W},${H - ((v - min) / (max - min + 1)) * H}`).join(" ");
   const area = `M${pts.split(" ").join(" L")} L${W},${H} L0,${H} Z`;
-  const id = `sp${color.replace("#", "")}`;
+  const id = `sp${color.replace(/[^0-9a-zA-Z]/g, "")}`;
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none">
       <defs>
@@ -380,7 +380,7 @@ export default function Hero() {
                   background:"rgba(var(--ink),.025)",
                 }}>
                   <div style={{ display:"flex", gap:6 }}>
-                    {["#f87171","#fbbf24","#34d399"].map((c,i) => (
+                    {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i) => (
                       <div key={i} style={{ width:9, height:9, borderRadius:"50%", background:c, opacity:.7 }}/>
                     ))}
                   </div>
@@ -431,9 +431,9 @@ export default function Hero() {
 
                     {/* Revenue */}
                     <div style={{ borderRadius:14, padding:"14px 16px", background:"rgba(16,185,129,.07)", border:"1px solid rgba(16,185,129,.18)" }}>
-                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(var(--txr-34d399, 52,211,153),.6)", letterSpacing:".07em", marginBottom:6 }}>REVENUE</div>
+                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(var(--txr-34d399, 52,211,153),var(--ta-60, .6))", letterSpacing:".07em", marginBottom:6 }}>REVENUE</div>
                       <div style={{ fontSize:24, fontWeight:800, color:"var(--ink-solid, #fff)", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(rev)}</div>
-                      <Sparkline d={[48,62,50,75,60,85,76,95,82,110,94,120]} color="#10b981"/>
+                      <Sparkline d={[48,62,50,75,60,85,76,95,82,110,94,120]} color="var(--tx-10b981, #10b981)"/>
                       <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:8 }}>
                         <span style={{ fontSize:10.5, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>↑ 22%</span>
                         <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-28, .28))" }}>vs last month</span>
@@ -442,9 +442,9 @@ export default function Hero() {
 
                     {/* Net Profit */}
                     <div style={{ borderRadius:14, padding:"14px 16px", background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)" }}>
-                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(var(--txr-a5b4fc, 165,180,252),.6)", letterSpacing:".07em", marginBottom:6 }}>NET PROFIT</div>
+                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(var(--txr-a5b4fc, 165,180,252),var(--ta-60, .6))", letterSpacing:".07em", marginBottom:6 }}>NET PROFIT</div>
                       <div style={{ fontSize:24, fontWeight:800, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(prof)}</div>
-                      <Sparkline d={[28,40,32,50,42,60,54,70,62,80,72,90]} color="#818cf8"/>
+                      <Sparkline d={[28,40,32,50,42,60,54,70,62,80,72,90]} color="var(--tx-818cf8, #818cf8)"/>
                       <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:8 }}>
                         <span style={{ fontSize:10.5, fontWeight:700, color:"var(--tx-818cf8, #818cf8)" }}>63%</span>
                         <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-28, .28))" }}>profit margin</span>
@@ -488,7 +488,7 @@ export default function Hero() {
                           <span style={{
                             fontSize:10, fontWeight:700, color:inv.color,
                             padding:"2px 8px", borderRadius:20,
-                            background:`${inv.color}18`, border:`1px solid ${inv.color}30`,
+                            background:`color-mix(in srgb, ${inv.color} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${inv.color} 18.8%, transparent)`,
                           }}>{inv.status}</span>
                         </div>
                       </div>

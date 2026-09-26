@@ -76,35 +76,35 @@ const SECTIONS = [
 
 export default function AUPPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,#04061a 0%,#080c2a 60%,#04061a 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "#e2e8f0" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-080c2a, #080c2a) 60%,var(--dk-04061a, #04061a) 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--tx-e2e8f0, #e2e8f0)" }}>
       <div style={{ padding: "20px 32px" }}>
         <Link href="/" style={{ color: "#64748b", textDecoration: "none", fontSize: 14 }}>← Back to FinovaOS</Link>
       </div>
 
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px 100px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ display: "inline-block", background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.3)", color: "#818cf8", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ display: "inline-block", background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.3)", color: "var(--tx-818cf8, #818cf8)", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
             Legal
           </div>
           <h1 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, margin: "0 0 12px" }}>Acceptable Use Policy</h1>
           <p style={{ color: "#64748b", fontSize: 14 }}>Last updated: {LAST_UPDATED} · Governs how FinovaOS may and may not be used</p>
         </div>
 
-        <div style={{ background: "rgba(129,140,248,.06)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: "16px 20px", marginBottom: 40, fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>
+        <div style={{ background: "rgba(129,140,248,.06)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: "16px 20px", marginBottom: 40, fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>
           This Acceptable Use Policy ("AUP") sets out the rules for using FinovaOS products and services. It applies to all customers, users, and anyone who accesses FinovaOS. Violations may result in suspension or termination of your account. By using FinovaOS, you agree to comply with this policy.
         </div>
 
         <div style={{ display: "grid", gap: 24 }}>
           {SECTIONS.map((sec, i) => (
-            <div key={i} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 28 }}>
+            <div key={i} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 28 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 10 }}>
                 <span>{sec.icon}</span> {sec.title}
               </h2>
               <div style={{ display: "grid", gap: 16 }}>
                 {sec.content.map((item, j) => (
                   <div key={j}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 6 }}>{item.sub}</div>
-                    <div style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>{item.body}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", marginBottom: 6 }}>{item.sub}</div>
+                    <div style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>{item.body}</div>
                   </div>
                 ))}
               </div>
@@ -113,14 +113,14 @@ export default function AUPPage() {
         </div>
 
         <div style={{ marginTop: 40, padding: "20px 24px", background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 14 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fca5a5", marginBottom: 6 }}>Questions or Reports?</div>
-          <div style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>
-            To report a suspected AUP violation, contact <a href="mailto:abuse@finovaos.app" style={{ color: "#818cf8" }}>abuse@finovaos.app</a>.
-            For general legal questions, contact <a href="mailto:legal@finovaos.app" style={{ color: "#818cf8" }}>legal@finovaos.app</a>.
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-fca5a5, #fca5a5)", marginBottom: 6 }}>Questions or Reports?</div>
+          <div style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>
+            To report a suspected AUP violation, contact <a href="mailto:abuse@finovaos.app" style={{ color: "var(--tx-818cf8, #818cf8)" }}>abuse@finovaos.app</a>.
+            For general legal questions, contact <a href="mailto:legal@finovaos.app" style={{ color: "var(--tx-818cf8, #818cf8)" }}>legal@finovaos.app</a>.
           </div>
         </div>
 
-        <div style={{ marginTop: 32, borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 32, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ marginTop: 32, borderTop: "1px solid rgba(var(--ink),.06)", paddingTop: 32, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
           {[
             { label: "Privacy Policy", href: "/legal/privacy" },
             { label: "Terms of Service", href: "/legal/terms" },

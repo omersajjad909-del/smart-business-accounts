@@ -431,14 +431,14 @@ export default function SolutionSection() {
                       width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 17,
-                      background: hovPain === index ? `${pain.color}18` : `${pain.color}0d`,
-                      border: `1px solid ${hovPain === index ? pain.color + "40" : pain.color + "1a"}`,
+                      background: hovPain === index ? `color-mix(in srgb, ${pain.color} 9.4%, transparent)` : `color-mix(in srgb, ${pain.color} 5.1%, transparent)`,
+                      border: `1px solid ${hovPain === index ? `color-mix(in srgb, ${pain.color} 25.1%, transparent)` : `color-mix(in srgb, ${pain.color} 10.2%, transparent)`}`,
                       transition: "background .15s, border .15s",
                     }}
                   >
                     {pain.icon}
                   </div>
-                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "#fff" : "rgba(var(--ink),.75)", lineHeight: 1.45, transition: "color .15s" }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "var(--ink-solid, white)" : "rgba(var(--ink),.75)", lineHeight: 1.45, transition: "color .15s" }}>
                     {pain.solution}
                   </span>
                 </div>
@@ -583,8 +583,8 @@ export default function SolutionSection() {
                       gap: 14,
                       padding: "16px 18px",
                       borderRadius: 18,
-                      border: `1px solid ${isActive ? `${industry.color}55` : "rgba(var(--ink),.08)"}`,
-                      background: isActive ? `${industry.color}12` : "rgba(var(--ink),.03)",
+                      border: `1px solid ${isActive ? `color-mix(in srgb, ${industry.color} 33.3%, transparent)` : "rgba(var(--ink),.08)"}`,
+                      background: isActive ? `color-mix(in srgb, ${industry.color} 7.1%, transparent)` : "rgba(var(--ink),.03)",
                       textAlign: "left",
                       cursor: "pointer",
                       transition: `all .22s ease ${index * 20}ms`,
@@ -599,15 +599,15 @@ export default function SolutionSection() {
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: 22,
-                        background: isActive ? `${industry.color}18` : "rgba(var(--ink),.05)",
-                        border: `1px solid ${isActive ? `${industry.color}40` : "rgba(var(--ink),.08)"}`,
+                        background: isActive ? `color-mix(in srgb, ${industry.color} 9.4%, transparent)` : "rgba(var(--ink),.05)",
+                        border: `1px solid ${isActive ? `color-mix(in srgb, ${industry.color} 25.1%, transparent)` : "rgba(var(--ink),.08)"}`,
                         flexShrink: 0,
                       }}
                     >
                       {industry.icon}
                     </div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: isActive ? "white" : "rgba(var(--ink),.78)" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: isActive ? "var(--ink-solid, white)" : "rgba(var(--ink),.78)" }}>
                         {industry.label}
                       </div>
                       <div
@@ -632,8 +632,8 @@ export default function SolutionSection() {
                 borderRadius: 24,
                 padding: "28px 28px 26px",
                 background: "linear-gradient(180deg, rgba(var(--ink),.05), rgba(var(--ink),.025))",
-                border: `1.5px solid ${selectedIndustry.color}30`,
-                boxShadow: `0 20px 60px ${selectedIndustry.color}12`,
+                border: `1.5px solid color-mix(in srgb, ${selectedIndustry.color} 18.8%, transparent)`,
+                boxShadow: `0 20px 60px color-mix(in srgb, ${selectedIndustry.color} 7.1%, transparent)`,
                 opacity: indVis ? 1 : 0,
                 transform: indVis ? "translateY(0)" : "translateY(12px)",
                 transition: "all .5s ease .28s",
@@ -657,8 +657,8 @@ export default function SolutionSection() {
                       gap: 8,
                       padding: "6px 14px",
                       borderRadius: 999,
-                      background: `${selectedIndustry.color}12`,
-                      border: `1px solid ${selectedIndustry.color}35`,
+                      background: `color-mix(in srgb, ${selectedIndustry.color} 7.1%, transparent)`,
+                      border: `1px solid color-mix(in srgb, ${selectedIndustry.color} 20.8%, transparent)`,
                       color: selectedIndustry.color,
                       fontSize: 12,
                       fontWeight: 700,
@@ -692,8 +692,8 @@ export default function SolutionSection() {
                     gap: 8,
                     padding: "11px 18px",
                     borderRadius: 12,
-                    background: `${selectedIndustry.color}14`,
-                    border: `1px solid ${selectedIndustry.color}35`,
+                    background: `color-mix(in srgb, ${selectedIndustry.color} 7.8%, transparent)`,
+                    border: `1px solid color-mix(in srgb, ${selectedIndustry.color} 20.8%, transparent)`,
                     color: selectedIndustry.color,
                     fontWeight: 700,
                     fontSize: 13.5,
@@ -738,8 +738,8 @@ export default function SolutionSection() {
                           fontSize: 12.5,
                           fontWeight: 700,
                           color: "rgba(var(--ink),.86)",
-                          background: `${selectedIndustry.color}10`,
-                          border: `1px solid ${selectedIndustry.color}25`,
+                          background: `color-mix(in srgb, ${selectedIndustry.color} 6.3%, transparent)`,
+                          border: `1px solid color-mix(in srgb, ${selectedIndustry.color} 14.5%, transparent)`,
                         }}
                       >
                         {module}
@@ -778,8 +778,8 @@ export default function SolutionSection() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            background: `${selectedIndustry.color}14`,
-                            border: `1px solid ${selectedIndustry.color}30`,
+                            background: `color-mix(in srgb, ${selectedIndustry.color} 7.8%, transparent)`,
+                            border: `1px solid color-mix(in srgb, ${selectedIndustry.color} 18.8%, transparent)`,
                             color: selectedIndustry.color,
                             fontSize: 11,
                             fontWeight: 800,

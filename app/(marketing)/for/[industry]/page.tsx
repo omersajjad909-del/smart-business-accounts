@@ -23,13 +23,13 @@ export default async function IndustryPage({
   if (!type) {
     return (
       <div style={{
-        minHeight:"100vh", background:"#080c1e", display:"flex", flexDirection:"column",
-        alignItems:"center", justifyContent:"center", gap:16, color:"white",
+        minHeight:"100vh", background:"var(--dk-080c1e, #080c1e)", display:"flex", flexDirection:"column",
+        alignItems:"center", justifyContent:"center", gap:16, color:"var(--ink-solid, white)",
         fontFamily:"'Outfit','DM Sans',sans-serif", textAlign:"center", padding:24,
       }}>
         <div style={{ fontSize:48 }}>🔍</div>
         <h1 style={{ fontSize:24, fontWeight:700 }}>Industry not found</h1>
-        <p style={{ color:"rgba(255,255,255,.5)", maxWidth:400 }}>
+        <p style={{ color:"rgba(var(--ink),var(--ta-50, .5))", maxWidth:400 }}>
           We couldn&apos;t find that business type. Browse all supported industries instead.
         </p>
         <Link href="/solutions" style={{

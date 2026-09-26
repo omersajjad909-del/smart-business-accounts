@@ -28,7 +28,7 @@ type Testimonial = {
 // checkable (a buyer Googles the company and finds nothing) and in several
 // markets they count as deceptive advertising.
 
-const COLORS = ["#818cf8","#34d399","#fbbf24","#f87171","#a78bfa","#06b6d4"];
+const COLORS = ["var(--tx-818cf8, #818cf8)","var(--tx-34d399, #34d399)","var(--tx-fbbf24, #fbbf24)","var(--tx-f87171, #f87171)","var(--tx-a78bfa, #a78bfa)","var(--tx-06b6d4, #06b6d4)"];
 
 export function TestimonialCard({ t, i, vis }: { t: Testimonial; i: number; vis: boolean }) {
   const [hov, setHov] = useState(false);
@@ -42,13 +42,13 @@ export function TestimonialCard({ t, i, vis }: { t: Testimonial; i: number; vis:
       style={{
         borderRadius:18, padding:"24px 22px",
         background: hov ? "rgba(var(--ink),.07)" : "rgba(var(--ink),.04)",
-        border:`1px solid ${hov ? color+"45" : "rgba(var(--ink),.07)"}`,
+        border:`1px solid ${hov ? `color-mix(in srgb, ${color} 27.1%, transparent)` : "rgba(var(--ink),.07)"}`,
         display:"flex", flexDirection:"column", gap:16,
         cursor:"default",
         opacity: vis ? 1 : 0,
         transform: vis ? "translateY(0)" : "translateY(20px)",
         transition:`opacity .5s ease ${i*90}ms, transform .5s ease ${i*90}ms, background .25s, border .25s, box-shadow .25s`,
-        boxShadow: hov ? `0 16px 40px ${color}18` : "none",
+        boxShadow: hov ? `0 16px 40px color-mix(in srgb, ${color} 9.4%, transparent)` : "none",
         position:"relative", overflow:"hidden",
       }}
     >
@@ -57,7 +57,7 @@ export function TestimonialCard({ t, i, vis }: { t: Testimonial; i: number; vis:
       )}
       <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1, background:`linear-gradient(90deg,transparent,${color},transparent)`, opacity:hov?1:0, transition:"opacity .3s" }}/>
 
-      <div style={{ fontSize:28, lineHeight:1, color:`${color}60` }}>"</div>
+      <div style={{ fontSize:28, lineHeight:1, color:`color-mix(in srgb, ${color} 37.6%, transparent)` }}>"</div>
 
       <div style={{ display:"flex", gap:2 }}>
         {[1,2,3,4,5].map(n => (
@@ -72,13 +72,13 @@ export function TestimonialCard({ t, i, vis }: { t: Testimonial; i: number; vis:
       </p>
 
       {t.planUsed && (
-        <div style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"3px 10px", borderRadius:20, alignSelf:"flex-start", background:`${color}12`, border:`1px solid ${color}25`, fontSize:10, fontWeight:700, color }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"3px 10px", borderRadius:20, alignSelf:"flex-start", background:`color-mix(in srgb, ${color} 7.1%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 14.5%, transparent)`, fontSize:10, fontWeight:700, color }}>
           {t.planUsed} Plan
         </div>
       )}
 
       <div style={{ display:"flex", alignItems:"center", gap:12, borderTop:"1px solid rgba(var(--ink),.06)", paddingTop:14 }}>
-        <div style={{ width:38, height:38, borderRadius:"50%", flexShrink:0, background:`linear-gradient(135deg,${color},${color}99)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white" }}>
+        <div style={{ width:38, height:38, borderRadius:"50%", flexShrink:0, background:`linear-gradient(135deg,${color},color-mix(in srgb, ${color} 60%, transparent))`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white" }}>
           {initials}
         </div>
         <div>
@@ -190,7 +190,7 @@ export default function TestimonialsSection() {
             transform: vis ? "translateY(0)" : "translateY(20px)",
             transition:"opacity .6s ease, transform .6s ease",
           }}>
-            <div style={{ fontSize:30, lineHeight:1, color:"rgba(var(--txr-818cf8, 129,140,248),.45)", marginBottom:12 }}>&ldquo;</div>
+            <div style={{ fontSize:30, lineHeight:1, color:"rgba(var(--txr-818cf8, 129,140,248),var(--ta-45, .45))", marginBottom:12 }}>&ldquo;</div>
             <p style={{ fontSize:15.5, lineHeight:1.85, color:"rgba(var(--ink),var(--ta-72, .72))", margin:0 }}>
               FinovaOS opened to customers in August 2026. It was built from a real business
               problem, and it is early — so you will not find borrowed logos or five-star

@@ -32,15 +32,15 @@ function SubscribeBanner() {
   return (
     <div style={{
       marginTop:48, borderRadius:20, padding:"28px 32px",
-      background:"linear-gradient(135deg,rgba(45,43,107,.8),rgba(30,27,85,.8))",
+      background:"var(--mk-card-indigo, linear-gradient(135deg,rgba(45,43,107,.8),rgba(30,27,85,.8)))",
       border:"1px solid rgba(165,180,252,.2)",
       backdropFilter:"blur(20px)",
       boxShadow:"0 16px 48px rgba(99,102,241,.2)",
     }}>
-      <div style={{ fontSize:13.5, fontWeight:700, color:"white", marginBottom:4 }}>
+      <div style={{ fontSize:13.5, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:4 }}>
         📬 Subscribe to status updates
       </div>
-      <div style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", marginBottom:20 }}>
+      <div style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:20 }}>
         Get notified by email when incidents occur or are resolved.
       </div>
 
@@ -49,7 +49,7 @@ function SubscribeBanner() {
           display:"inline-flex", alignItems:"center", gap:8,
           padding:"10px 18px", borderRadius:11,
           background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.3)",
-          fontSize:13, color:"#34d399", fontWeight:600,
+          fontSize:13, color:"var(--tx-34d399, #34d399)", fontWeight:600,
         }}>
           {state === "already"
             ? "✓ You're already subscribed."
@@ -66,9 +66,9 @@ function SubscribeBanner() {
             style={{
               flex:1, minWidth:220,
               padding:"10px 16px", borderRadius:11,
-              background:"rgba(255,255,255,.07)",
-              border:"1px solid rgba(255,255,255,.15)",
-              color:"white", fontSize:13,
+              background:"rgba(var(--ink),.07)",
+              border:"1px solid rgba(var(--ink),.15)",
+              color:"var(--ink-solid, white)", fontSize:13,
               outline:"none", fontFamily:"inherit",
             }}
           />
@@ -89,7 +89,7 @@ function SubscribeBanner() {
             {state === "loading" ? "Sending…" : "Subscribe →"}
           </button>
           {state === "error" && (
-            <div style={{ width:"100%", fontSize:12, color:"#f87171", marginTop:4 }}>
+            <div style={{ width:"100%", fontSize:12, color:"var(--tx-f87171, #f87171)", marginTop:4 }}>
               Something went wrong. Try again.
             </div>
           )}
@@ -113,10 +113,10 @@ const INCIDENTS: {
 
 /* ─── Helpers ─── */
 const STATUS_META: Record<Status, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  operational: { label:"Operational", color:"#34d399", bg:"rgba(52,211,153,.1)", border:"rgba(52,211,153,.3)", dot:"#34d399" },
-  degraded:    { label:"Degraded",    color:"#fbbf24", bg:"rgba(251,191,36,.1)", border:"rgba(251,191,36,.3)", dot:"#fbbf24" },
-  outage:      { label:"Outage",      color:"#f87171", bg:"rgba(248,113,113,.1)", border:"rgba(248,113,113,.3)", dot:"#f87171" },
-  maintenance: { label:"Maintenance", color:"#818cf8", bg:"rgba(129,140,248,.1)", border:"rgba(129,140,248,.3)", dot:"#818cf8" },
+  operational: { label:"Operational", color:"var(--tx-34d399, #34d399)", bg:"rgba(52,211,153,.1)", border:"rgba(52,211,153,.3)", dot:"#34d399" },
+  degraded:    { label:"Degraded",    color:"var(--tx-fbbf24, #fbbf24)", bg:"rgba(251,191,36,.1)", border:"rgba(251,191,36,.3)", dot:"#fbbf24" },
+  outage:      { label:"Outage",      color:"var(--tx-f87171, #f87171)", bg:"rgba(248,113,113,.1)", border:"rgba(248,113,113,.3)", dot:"#f87171" },
+  maintenance: { label:"Maintenance", color:"var(--tx-818cf8, #818cf8)", bg:"rgba(129,140,248,.1)", border:"rgba(129,140,248,.3)", dot:"#818cf8" },
 };
 
 function useVisible(threshold = 0.1) {
@@ -154,34 +154,34 @@ function ServiceRow({ svc, index }: { svc: ServiceData; index: number }) {
       style={{
         display:"flex", alignItems:"center", gap:16,
         padding:"16px 20px", borderRadius:14,
-        background: hov ? "rgba(255,255,255,.055)" : "rgba(255,255,255,.025)",
-        border:`1px solid ${hov ? "rgba(255,255,255,.14)" : "rgba(255,255,255,.07)"}`,
+        background: hov ? "rgba(var(--ink),.055)" : "rgba(var(--ink),.025)",
+        border:`1px solid ${hov ? "rgba(var(--ink),.14)" : "rgba(var(--ink),.07)"}`,
         transition:"all .25s",
         animationDelay:`${index * 50}ms`,
       }}>
       <div style={{
         width:42, height:42, borderRadius:11, flexShrink:0,
-        background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.09)",
+        background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.09)",
         display:"flex", alignItems:"center", justifyContent:"center", fontSize:20,
       }}>
         {svc.icon}
       </div>
 
       <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ fontSize:13.5, fontWeight:700, color:"rgba(255,255,255,.88)" }}>{svc.name}</div>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", marginTop:2 }}>{svc.desc}</div>
+        <div style={{ fontSize:13.5, fontWeight:700, color:"rgba(var(--ink),.88)" }}>{svc.name}</div>
+        <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:2 }}>{svc.desc}</div>
       </div>
 
       {/* Latency */}
       <div style={{ textAlign:"right", flexShrink:0, display:"flex", flexDirection:"column", alignItems:"flex-end" }}>
-        <div style={{ fontSize:11, color:"rgba(255,255,255,.25)", marginBottom:2 }}>Latency</div>
-        <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.55)" }}>{svc.latency}</div>
+        <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", marginBottom:2 }}>Latency</div>
+        <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),var(--ta-55, .55))" }}>{svc.latency}</div>
       </div>
 
       {/* Uptime */}
       <div style={{ textAlign:"right", flexShrink:0, display:"flex", flexDirection:"column", alignItems:"flex-end" }}>
-        <div style={{ fontSize:11, color:"rgba(255,255,255,.25)", marginBottom:2 }}>30d Uptime</div>
-        <div style={{ fontSize:13, fontWeight:700, color:"#34d399" }}>{svc.uptime}</div>
+        <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", marginBottom:2 }}>30d Uptime</div>
+        <div style={{ fontSize:13, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>{svc.uptime}</div>
       </div>
 
       {/* Status badge */}
@@ -242,8 +242,8 @@ export default function StatusPage() {
     <>
       <div style={{
         minHeight:"100vh",
-        background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)",
-        color:"white", fontFamily:"'Outfit','DM Sans',sans-serif",
+        background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 30%,var(--dk-080c1e, #080c1e) 100%)",
+        color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif",
       }}>
         <style>{`
           
@@ -276,7 +276,7 @@ export default function StatusPage() {
               marginBottom:24, padding:"12px 20px", borderRadius:12,
               background: confirmed === "true" ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)",
               border: `1px solid ${confirmed === "true" ? "rgba(52,211,153,.3)" : "rgba(248,113,113,.3)"}`,
-              color: confirmed === "true" ? "#34d399" : "#f87171",
+              color: confirmed === "true" ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)",
               fontSize:13, fontWeight:600, textAlign:"center",
             }}>
               {confirmed === "true"
@@ -292,11 +292,11 @@ export default function StatusPage() {
               display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginBottom:28,
               opacity:heroVisible?1:0, transition:"opacity .5s ease",
             }}>
-              <Link href="/" style={{ fontSize:12, color:"rgba(255,255,255,.28)", textDecoration:"none", fontWeight:500 }}
-                onMouseEnter={e=>(e.currentTarget.style.color="rgba(255,255,255,.6)")}
-                onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.28)")}>Home</Link>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              <span style={{ fontSize:12, color:"rgba(255,255,255,.4)", fontWeight:500 }}>System Status</span>
+              <Link href="/" style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-28, .28))", textDecoration:"none", fontWeight:500 }}
+                onMouseEnter={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-60, .6))")}
+                onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-28, .28))")}>Home</Link>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:500 }}>System Status</span>
             </div>
 
             {/* Big status orb */}
@@ -324,7 +324,7 @@ export default function StatusPage() {
                     display:"inline-flex", alignItems:"center", gap:8,
                     padding:"6px 18px", borderRadius:24,
                     background:"rgba(52,211,153,.1)", border:"1.5px solid rgba(52,211,153,.3)",
-                    fontSize:12, fontWeight:700, color:"#34d399",
+                    fontSize:12, fontWeight:700, color:"var(--tx-34d399, #34d399)",
                     letterSpacing:".08em", textTransform:"uppercase", marginBottom:18,
                   }}>
                     <span style={{ width:7, height:7, borderRadius:"50%", background:"#34d399", animation:"blink 2s ease infinite" }}/>
@@ -333,24 +333,24 @@ export default function StatusPage() {
                   <h1 style={{
                     fontFamily:"'Lora',serif",
                     fontSize:"clamp(30px,4vw,46px)",
-                    fontWeight:700, color:"white",
+                    fontWeight:700, color:"var(--ink-solid, white)",
                     letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:12,
                   }}>
                     Everything is running
                     <span style={{ display:"block", fontStyle:"italic",
-                      background:"linear-gradient(135deg,#6ee7b7,#34d399)",
+                      background:"linear-gradient(135deg,var(--tx-6ee7b7, #6ee7b7),var(--tx-34d399, #34d399))",
                       WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                       smoothly.
                     </span>
                   </h1>
                 </>
               ) : (
-                <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,44px)", fontWeight:700, color:"white", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:12 }}>
+                <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,44px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:12 }}>
                   Some services affected
                 </h1>
               )}
 
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.38)", lineHeight:1.7, marginBottom:6 }}>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-38, .38))", lineHeight:1.7, marginBottom:6 }}>
                 Last checked: <LiveClock/> · Auto-refreshes every 60 seconds
               </p>
             </div>
@@ -365,7 +365,7 @@ export default function StatusPage() {
               display:"flex", alignItems:"center", justifyContent:"space-between",
               marginBottom:20, flexWrap:"wrap", gap:10,
             }}>
-              <h2 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"white", letterSpacing:"-.4px", margin:0 }}>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.4px", margin:0 }}>
                 Service Status
               </h2>
               <div style={{ display:"flex", gap:16 }}>
@@ -374,7 +374,7 @@ export default function StatusPage() {
                   return (
                     <div key={s} style={{ display:"flex", alignItems:"center", gap:6 }}>
                       <span style={{ width:7, height:7, borderRadius:"50%", background:m.dot, flexShrink:0 }}/>
-                      <span style={{ fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:500 }}>{m.label}</span>
+                      <span style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:500 }}>{m.label}</span>
                     </div>
                   );
                 })}
@@ -384,7 +384,7 @@ export default function StatusPage() {
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               {loading ? (
                 [1,2,3,4,5,6,7,8].map(i => (
-                  <div key={i} style={{ height:74, borderRadius:14, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", animation:"pulse 1.5s ease infinite" }}/>
+                  <div key={i} style={{ height:74, borderRadius:14, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", animation:"pulse 1.5s ease infinite" }}/>
                 ))
               ) : (
                 services.map((svc, i) => <ServiceRow key={svc.id} svc={svc} index={i}/>)
@@ -400,25 +400,25 @@ export default function StatusPage() {
           }}>
             <div style={{
               borderRadius:20, padding:"28px 28px",
-              background:"rgba(255,255,255,.03)",
-              border:"1px solid rgba(255,255,255,.08)",
+              background:"rgba(var(--ink),.03)",
+              border:"1px solid rgba(var(--ink),.08)",
               backdropFilter:"blur(16px)",
               position:"relative", overflow:"hidden",
             }}>
               <div style={{ position:"absolute", top:0, left:"15%", right:"15%", height:1,
                 background:"linear-gradient(90deg,transparent,rgba(52,211,153,.4),transparent)" }}/>
 
-              <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", marginBottom:6 }}>
+              <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:6 }}>
                 Platform Uptime — Last 6 Months
               </h3>
-              <p style={{ fontSize:12.5, color:"rgba(255,255,255,.3)", marginBottom:28 }}>
-                Overall average: <strong style={{ color:"#34d399" }}>99.97%</strong>
+              <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:28 }}>
+                Overall average: <strong style={{ color:"var(--tx-34d399, #34d399)" }}>99.97%</strong>
               </p>
 
               <div style={{ display:"flex", gap:10, alignItems:"flex-end" }}>
                 {uptimeMonths.map(({ month, pct }) => {
                   const h = Math.round(((pct - 99.8) / 0.2) * 60 + 20);
-                  const color = pct === 100 ? "#34d399" : pct > 99.9 ? "#818cf8" : "#fbbf24";
+                  const color = pct === 100 ? "var(--tx-34d399, #34d399)" : pct > 99.9 ? "var(--tx-818cf8, #818cf8)" : "var(--tx-fbbf24, #fbbf24)";
                   return (
                     <div key={month} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:8 }}>
                       <div style={{ fontSize:11, fontWeight:700, color }}>
@@ -426,20 +426,20 @@ export default function StatusPage() {
                       </div>
                       <div style={{
                         width:"100%", borderRadius:6,
-                        background:`${color}18`, border:`1px solid ${color}30`,
+                        background:`color-mix(in srgb, ${color} 9.4%, transparent)`, border:`1px solid color-mix(in srgb, ${color} 18.8%, transparent)`,
                         height:`${h}px`,
                         position:"relative", overflow:"hidden",
                         transition:"height .6s ease",
                       }}>
                         <div style={{
                           position:"absolute", bottom:0, left:0, right:0,
-                          background:`linear-gradient(to top, ${color}, ${color}88)`,
+                          background:`linear-gradient(to top, ${color}, color-mix(in srgb, ${color} 53.3%, transparent))`,
                           height: uptimeVisible ? "100%" : "0%",
                           transition:"height .8s ease .3s",
                           borderRadius:5,
                         }}/>
                       </div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{month}</div>
+                      <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:600 }}>{month}</div>
                     </div>
                   );
                 })}
@@ -453,7 +453,7 @@ export default function StatusPage() {
             opacity:histVisible?1:0, transform:histVisible?"translateY(0)":"translateY(20px)",
             transition:"all .65s ease .15s",
           }}>
-            <h2 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"white", letterSpacing:"-.4px", marginBottom:20 }}>
+            <h2 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.4px", marginBottom:20 }}>
               Incident History
             </h2>
 
@@ -461,7 +461,7 @@ export default function StatusPage() {
               <div style={{ padding:"32px", textAlign:"center", borderRadius:16,
                 background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.2)" }}>
                 <div style={{ fontSize:28, marginBottom:10 }}>🎉</div>
-                <div style={{ fontSize:14, color:"rgba(255,255,255,.5)" }}>No incidents in the past 90 days.</div>
+                <div style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-50, .5))" }}>No incidents in the past 90 days.</div>
               </div>
             ) : (
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -470,8 +470,8 @@ export default function StatusPage() {
                   return (
                     <div key={i} style={{
                       borderRadius:16, overflow:"hidden",
-                      background:"rgba(255,255,255,.03)",
-                      border:"1px solid rgba(255,255,255,.08)",
+                      background:"rgba(var(--ink),.03)",
+                      border:"1px solid rgba(var(--ink),.08)",
                       transition:"border-color .25s",
                     }}>
                       <button onClick={() => setExpandedInc(isOpen ? null : i)} style={{
@@ -484,20 +484,20 @@ export default function StatusPage() {
                           background: inc.severity === "resolved" ? "#34d399" : "#f87171",
                         }}/>
                         <div style={{ flex:1 }}>
-                          <div style={{ fontSize:13.5, fontWeight:700, color:"rgba(255,255,255,.82)" }}>{inc.title}</div>
-                          <div style={{ fontSize:11.5, color:"rgba(255,255,255,.3)", marginTop:2 }}>{inc.date}</div>
+                          <div style={{ fontSize:13.5, fontWeight:700, color:"rgba(var(--ink),.82)" }}>{inc.title}</div>
+                          <div style={{ fontSize:11.5, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:2 }}>{inc.date}</div>
                         </div>
                         <div style={{
                           padding:"3px 10px", borderRadius:14,
                           background: inc.severity === "resolved" ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)",
                           border: `1px solid ${inc.severity === "resolved" ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}`,
                           fontSize:10.5, fontWeight:700,
-                          color: inc.severity === "resolved" ? "#34d399" : "#f87171",
+                          color: inc.severity === "resolved" ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)",
                           letterSpacing:".06em", textTransform:"uppercase", flexShrink:0,
                         }}>
                           {inc.severity}
                         </div>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2"
                           style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0)", transition:"transform .3s", flexShrink:0 }}>
                           <polyline points="6 9 12 15 18 9"/>
                         </svg>
@@ -507,7 +507,7 @@ export default function StatusPage() {
                         <div style={{
                           padding:"0 20px 20px 42px",
                           animation:"incExpand .3s ease both",
-                          borderTop:"1px solid rgba(255,255,255,.06)",
+                          borderTop:"1px solid rgba(var(--ink),.06)",
                           paddingTop:16,
                         }}>
                           {inc.updates.map((u, ui) => (
@@ -515,14 +515,14 @@ export default function StatusPage() {
                               display:"flex", gap:12, marginBottom:12, alignItems:"flex-start",
                             }}>
                               <div style={{
-                                fontSize:10.5, fontWeight:700, color:"rgba(255,255,255,.3)",
+                                fontSize:10.5, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))",
                                 minWidth:70, paddingTop:2, letterSpacing:".04em",
                               }}>
                                 {u.time}
                               </div>
                               <div style={{
-                                flex:1, fontSize:13, color:"rgba(255,255,255,.55)",
-                                lineHeight:1.7, borderLeft:"2px solid rgba(255,255,255,.08)",
+                                flex:1, fontSize:13, color:"rgba(var(--ink),var(--ta-55, .55))",
+                                lineHeight:1.7, borderLeft:"2px solid rgba(var(--ink),.08)",
                                 paddingLeft:12,
                               }}>
                                 {u.text}
@@ -536,7 +536,7 @@ export default function StatusPage() {
                 })}
 
                 <div style={{ textAlign:"center", marginTop:8 }}>
-                  <span style={{ fontSize:12, color:"rgba(255,255,255,.25)", fontWeight:500 }}>
+                  <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-25, .25))", fontWeight:500 }}>
                     No incidents in the 60 days prior. 🎉
                   </span>
                 </div>
@@ -550,9 +550,9 @@ export default function StatusPage() {
           {/* Footer links */}
           <div style={{ marginTop:48, display:"flex", justifyContent:"center", gap:24, flexWrap:"wrap" }}>
             {[["Home","/"],["Features","/features"],["Security","/security"],["Privacy","/legal/privacy"],["Terms","/legal/terms"],["Support","/support"]].map(([label, href]) => (
-              <Link key={label} href={href} style={{ fontSize:12, color:"rgba(255,255,255,.2)", textDecoration:"none", fontWeight:500, transition:"color .2s" }}
-                onMouseEnter={e=>(e.currentTarget.style.color="rgba(255,255,255,.6)")}
-                onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.2)")}>
+              <Link key={label} href={href} style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-20, .2))", textDecoration:"none", fontWeight:500, transition:"color .2s" }}
+                onMouseEnter={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-60, .6))")}
+                onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-20, .2))")}>
                 {label}
               </Link>
             ))}

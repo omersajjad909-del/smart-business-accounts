@@ -7,8 +7,8 @@ const SITEMAP = [
   {
     id: "main",
     icon: "🏠",
-    color: "#818cf8",
-    dim: "rgba(129,140,248,.08)",
+    color: "var(--tx-818cf8, #818cf8)",
+    dim: "rgba(var(--txr-818cf8, 129,140,248),.08)",
     border: "rgba(129,140,248,.28)",
     title: "Main Pages",
     links: [
@@ -27,8 +27,8 @@ const SITEMAP = [
   {
     id: "auth",
     icon: "🔐",
-    color: "#34d399",
-    dim: "rgba(52,211,153,.08)",
+    color: "var(--tx-34d399, #34d399)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.08)",
     border: "rgba(52,211,153,.28)",
     title: "Auth & Onboarding",
     links: [
@@ -43,8 +43,8 @@ const SITEMAP = [
   {
     id: "dashboard",
     icon: "📊",
-    color: "#fbbf24",
-    dim: "rgba(251,191,36,.08)",
+    color: "var(--tx-fbbf24, #fbbf24)",
+    dim: "rgba(var(--txr-fbbf24, 251,191,36),.08)",
     border: "rgba(251,191,36,.28)",
     title: "Dashboard & Reports",
     links: [
@@ -59,8 +59,8 @@ const SITEMAP = [
   {
     id: "sales",
     icon: "🧾",
-    color: "#f87171",
-    dim: "rgba(248,113,113,.08)",
+    color: "var(--tx-f87171, #f87171)",
+    dim: "rgba(var(--txr-f87171, 248,113,113),.08)",
     border: "rgba(248,113,113,.28)",
     title: "Sales & Customers",
     links: [
@@ -74,8 +74,8 @@ const SITEMAP = [
   {
     id: "banking",
     icon: "🏦",
-    color: "#a78bfa",
-    dim: "rgba(167,139,250,.08)",
+    color: "var(--tx-a78bfa, #a78bfa)",
+    dim: "rgba(var(--txr-a78bfa, 167,139,250),.08)",
     border: "rgba(167,139,250,.28)",
     title: "Banking & Payments",
     links: [
@@ -89,8 +89,8 @@ const SITEMAP = [
   {
     id: "legal",
     icon: "📋",
-    color: "#06b6d4",
-    dim: "rgba(6,182,212,.08)",
+    color: "var(--tx-06b6d4, #06b6d4)",
+    dim: "rgba(var(--txr-06b6d4, 6,182,212),.08)",
     border: "rgba(6,182,212,.28)",
     title: "Legal & Support",
     links: [
@@ -147,7 +147,7 @@ function SitemapGroup({ group, index }: { group: typeof SITEMAP[0]; index: numbe
           </div>
           <h2 style={{
             fontFamily:"'Lora',serif", fontSize:17, fontWeight:700,
-            color:"white", letterSpacing:"-.3px", margin:0,
+            color:"var(--ink-solid, white)", letterSpacing:"-.3px", margin:0,
           }}>
             {group.title}
           </h2>
@@ -163,25 +163,25 @@ function SitemapGroup({ group, index }: { group: typeof SITEMAP[0]; index: numbe
             style={{
               display:"flex", alignItems:"center", gap:12,
               padding:"11px 14px", borderRadius:11,
-              background: hovered === i ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.025)",
-              border:`1px solid ${hovered === i ? group.border : "rgba(255,255,255,.06)"}`,
+              background: hovered === i ? "rgba(var(--ink),.06)" : "rgba(var(--ink),.025)",
+              border:`1px solid ${hovered === i ? group.border : "rgba(var(--ink),.06)"}`,
               textDecoration:"none", transition:"all .22s",
               transform: hovered === i ? "translateX(4px)" : "translateX(0)",
             }}>
             <div style={{
               width:6, height:6, borderRadius:"50%", flexShrink:0,
-              background: hovered === i ? group.color : "rgba(255,255,255,.15)",
+              background: hovered === i ? group.color : "rgba(var(--ink),.15)",
               transition:"background .22s",
               boxShadow: hovered === i ? `0 0 8px ${group.color}` : "none",
             }}/>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:13, fontWeight:700, color: hovered === i ? "white" : "rgba(255,255,255,.75)", transition:"color .22s" }}>
+              <div style={{ fontSize:13, fontWeight:700, color: hovered === i ? "var(--ink-solid, white)" : "rgba(var(--ink),.75)", transition:"color .22s" }}>
                 {link.label}
               </div>
-              <div style={{ fontSize:11.5, color:"rgba(255,255,255,.28)", marginTop:1 }}>{link.desc}</div>
+              <div style={{ fontSize:11.5, color:"rgba(var(--ink),var(--ta-28, .28))", marginTop:1 }}>{link.desc}</div>
             </div>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-              stroke={hovered === i ? group.color : "rgba(255,255,255,.18)"}
+              stroke={hovered === i ? group.color : "rgba(var(--ink),.18)"}
               strokeWidth="2.5" style={{ transition:"stroke .22s", flexShrink:0 }}>
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
             </svg>
@@ -205,8 +205,8 @@ export default function AllPagesPage() {
 
       <div style={{
         minHeight:"100vh",
-        background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)",
-        color:"white", fontFamily:"'Outfit','DM Sans',sans-serif",
+        background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 30%,var(--dk-080c1e, #080c1e) 100%)",
+        color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif",
       }}>
         <style>{`
           
@@ -234,11 +234,11 @@ export default function AllPagesPage() {
               display:"flex", alignItems:"center", gap:6, marginBottom:24,
               opacity:heroVisible?1:0, transition:"opacity .5s ease",
             }}>
-              <Link href="/" style={{ fontSize:12, color:"rgba(255,255,255,.28)", textDecoration:"none", fontWeight:500 }}
-                onMouseEnter={e=>(e.currentTarget.style.color="rgba(255,255,255,.6)")}
-                onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.28)")}>Home</Link>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              <span style={{ fontSize:12, color:"rgba(255,255,255,.4)", fontWeight:500 }}>Sitemap</span>
+              <Link href="/" style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-28, .28))", textDecoration:"none", fontWeight:500 }}
+                onMouseEnter={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-60, .6))")}
+                onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-28, .28))")}>Home</Link>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:500 }}>Sitemap</span>
             </div>
 
             <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", flexWrap:"wrap", gap:20 }}>
@@ -247,7 +247,7 @@ export default function AllPagesPage() {
                   display:"inline-flex", alignItems:"center", gap:7,
                   padding:"5px 14px", borderRadius:22,
                   background:"rgba(99,102,241,.1)", border:"1.5px solid rgba(99,102,241,.28)",
-                  fontSize:10.5, fontWeight:700, color:"#a5b4fc",
+                  fontSize:10.5, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)",
                   letterSpacing:".09em", textTransform:"uppercase", marginBottom:16,
                   opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(12px)",
                   transition:"all .5s ease .06s",
@@ -259,14 +259,14 @@ export default function AllPagesPage() {
                 <h1 style={{
                   fontFamily:"'Lora',serif",
                   fontSize:"clamp(30px,4vw,48px)",
-                  fontWeight:700, color:"white",
+                  fontWeight:700, color:"var(--ink-solid, white)",
                   letterSpacing:"-1.5px", lineHeight:1.1,
                   opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
                   transition:"all .6s ease .1s",
                 }}>
                   Sitemap
                   <span style={{ display:"block", fontStyle:"italic",
-                    background:"linear-gradient(135deg,#a5b4fc,#818cf8)",
+                    background:"linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8))",
                     WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
                     fontSize:"50%" }}>
                     Every page, at a glance.

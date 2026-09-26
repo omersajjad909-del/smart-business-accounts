@@ -6,7 +6,7 @@ import { useState } from "react";
  * waitlist (see lib/comingSoonWaitlist.ts / app/api/admin/waitlist) so the
  * people who asked can be emailed in one shot when the page goes live.
  */
-export default function ComingSoonSubscribe({ list, accent = "#818cf8", dark = true }: { list: "careers" | "affiliate"; accent?: string; dark?: boolean }) {
+export default function ComingSoonSubscribe({ list, accent = "var(--tx-818cf8, #818cf8)", dark = true }: { list: "careers" | "affiliate"; accent?: string; dark?: boolean }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -37,7 +37,7 @@ export default function ComingSoonSubscribe({ list, accent = "#818cf8", dark = t
 
   if (status === "done") {
     return (
-      <div style={{ padding: "14px 18px", borderRadius: 12, background: `${accent}15`, border: `1px solid ${accent}40`, color: dark ? "white" : "var(--text-primary, #0f172a)", fontSize: 13, maxWidth: 420, margin: "0 auto" }}>
+      <div style={{ padding: "14px 18px", borderRadius: 12, background: `color-mix(in srgb, ${accent} 8.2%, transparent)`, border: `1px solid color-mix(in srgb, ${accent} 25.1%, transparent)`, color: dark ? "white" : "var(--text-primary, #0f172a)", fontSize: 13, maxWidth: 420, margin: "0 auto" }}>
         ✅ {message}
       </div>
     );

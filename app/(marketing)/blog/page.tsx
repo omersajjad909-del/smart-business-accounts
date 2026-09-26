@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { SEO_ARTICLES } from "./seo-articles";
 
 const CATEGORIES = [
-  { id: "all",        label: "All",            color: "#818cf8", bg: "#818cf820" },
-  { id: "accounting", label: "Accounting",     color: "#38bdf8", bg: "#38bdf820" },
-  { id: "guides",     label: "How-to Guides",  color: "#34d399", bg: "#34d39920" },
-  { id: "business",   label: "Business",       color: "#fbbf24", bg: "#fbbf2420" },
-  { id: "product",    label: "Product",        color: "#818cf8", bg: "#818cf820" },
-  { id: "fintech",    label: "Fintech",        color: "#c4b5fd", bg: "#c4b5fd20" },
+  { id: "all",        label: "All",            color: "var(--tx-818cf8, #818cf8)", bg: "#818cf820" },
+  { id: "accounting", label: "Accounting",     color: "var(--tx-38bdf8, #38bdf8)", bg: "#38bdf820" },
+  { id: "guides",     label: "How-to Guides",  color: "var(--tx-34d399, #34d399)", bg: "#34d39920" },
+  { id: "business",   label: "Business",       color: "var(--tx-fbbf24, #fbbf24)", bg: "#fbbf2420" },
+  { id: "product",    label: "Product",        color: "var(--tx-818cf8, #818cf8)", bg: "#818cf820" },
+  { id: "fintech",    label: "Fintech",        color: "var(--tx-c4b5fd, #c4b5fd)", bg: "#c4b5fd20" },
 ];
 
 const FEATURED = {
@@ -39,26 +39,26 @@ const SEO_POSTS = Object.values(SEO_ARTICLES).map(a => ({
 }));
 
 const LEGACY_POSTS = [
-  { slug: "1", title: "How to Create and Send Professional Invoices with FinovaOS", excerpt: "From custom templates to automatic payment reminders — get paid faster using FinovaOS's invoicing module.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 8, 2026", readTime: "5 min", color: "#34d399", icon: "📄" },
-  { slug: "2", title: "FinovaOS HR & Payroll: A Practical Setup Guide", excerpt: "Set up employees, salary components, allowances, and deductions — with support for custom statutory rules per country.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 6, 2026", readTime: "7 min", color: "#fbbf24", icon: "👥" },
-  { slug: "3", title: "Using FinovaOS CRM to Convert More Leads into Paying Customers", excerpt: "Connect your customer relationships directly to your financial data — close deals faster.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 5, 2026", readTime: "5 min", color: "#818cf8", icon: "🎯" },
-  { slug: "4", title: "FinovaOS Inventory: Track Stock, Purchases, and Sales", excerpt: "Track stock levels, purchase orders, and sales movements in one place — with reports and low-stock alerts to keep you in control.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 3, 2026", readTime: "6 min", color: "#38bdf8", icon: "📦" },
-  { slug: "5", title: "Tax Compliance with FinovaOS: A Practical Guide for 2026", excerpt: "How to configure sales tax, VAT, and withholding rules in FinovaOS — and generate the reports your accountant actually needs.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Mar 1, 2026", readTime: "8 min", color: "#c4b5fd", icon: "📊" },
-  { slug: "6", title: "Multi-Branch Accounting: One Dashboard, Every Location", excerpt: "Manage New York, London, and Dubai from one FinovaOS account. Consolidated reports in one click.", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Feb 27, 2026", readTime: "6 min", color: "#f9a8d4", icon: "🌍" },
-  { slug: "7", title: "How to Use FinovaOS's Quotation Module to Close Deals Faster", excerpt: "Create professional quotes in minutes and convert them to invoices with one click — no re-entry.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Feb 25, 2026", readTime: "5 min", color: "#38bdf8", icon: "⚡" },
-  { slug: "8", title: "FinovaOS Custom Plans: Build Your Perfect Accounting Package", excerpt: "Pay only for the modules you use. Accounting, CRM, HR, Inventory — pick and choose.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Feb 22, 2026", readTime: "4 min", color: "#c4b5fd", icon: "🧩" },
-  { slug: "9", title: "FinovaOS Reports: Every Financial Report Your Business Needs", excerpt: "P&L, Balance Sheet, Aging, Tax reports — all in one place, jurisdiction-ready for global businesses.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Feb 20, 2026", readTime: "6 min", color: "#fbbf24", icon: "📈" },
-  { slug: "10", title: "Pakistan SME Accounting Software Guide 2026: What to Look For", excerpt: "FBR compliance, Urdu support, PKR multi-currency, WhatsApp invoicing — here's what Pakistan businesses actually need from accounting software.", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Jun 10, 2026", readTime: "9 min", color: "#34d399", icon: "🇵🇰" },
-  { slug: "11", title: "FBR Tax Filing for Small Businesses in Pakistan: Step-by-Step 2026", excerpt: "Sales Tax, Income Tax, WHT — complete guide to FBR compliance for traders, wholesalers and manufacturers using FinovaOS.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Jun 8, 2026", readTime: "10 min", color: "#f87171", icon: "🧾" },
-  { slug: "12", title: "Best Accounting Software for Pakistani Traders & Wholesalers", excerpt: "FinovaOS vs Xero vs Zoho vs local solutions — which is actually best for Pakistan-based trading and wholesale businesses?", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Jun 5, 2026", readTime: "8 min", color: "#818cf8", icon: "⚖️" },
-  { slug: "13", title: "How to Automate Payroll for 10-100 Employees in Pakistan", excerpt: "EOBI, PESSI, income tax deductions — FinovaOS calculates everything automatically so you don't need a separate payroll accountant.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Jun 3, 2026", readTime: "7 min", color: "#fbbf24", icon: "👨‍💼" },
-  { slug: "14", title: "Inventory Management for Pakistani Pharmacies: Batch, Expiry & DRAP", excerpt: "How pharmacy owners use FinovaOS to track batch numbers, expiry dates, and stay DRAP-compliant without manual registers.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Jun 1, 2026", readTime: "6 min", color: "#06b6d4", icon: "💊" },
-  { slug: "15", title: "Cloud Accounting vs Desktop Software for SMEs in 2026", excerpt: "Why Pakistani businesses are switching from Peachtree, QuickBooks Desktop and manual Excel to cloud-based accounting — and what to watch out for.", category: "fintech", categoryLabel: "Fintech", author: "FinovaOS Team", date: "May 28, 2026", readTime: "7 min", color: "#c4b5fd", icon: "☁️" },
+  { slug: "1", title: "How to Create and Send Professional Invoices with FinovaOS", excerpt: "From custom templates to automatic payment reminders — get paid faster using FinovaOS's invoicing module.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 8, 2026", readTime: "5 min", color: "var(--tx-34d399, #34d399)", icon: "📄" },
+  { slug: "2", title: "FinovaOS HR & Payroll: A Practical Setup Guide", excerpt: "Set up employees, salary components, allowances, and deductions — with support for custom statutory rules per country.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 6, 2026", readTime: "7 min", color: "var(--tx-fbbf24, #fbbf24)", icon: "👥" },
+  { slug: "3", title: "Using FinovaOS CRM to Convert More Leads into Paying Customers", excerpt: "Connect your customer relationships directly to your financial data — close deals faster.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 5, 2026", readTime: "5 min", color: "var(--tx-818cf8, #818cf8)", icon: "🎯" },
+  { slug: "4", title: "FinovaOS Inventory: Track Stock, Purchases, and Sales", excerpt: "Track stock levels, purchase orders, and sales movements in one place — with reports and low-stock alerts to keep you in control.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 3, 2026", readTime: "6 min", color: "var(--tx-38bdf8, #38bdf8)", icon: "📦" },
+  { slug: "5", title: "Tax Compliance with FinovaOS: A Practical Guide for 2026", excerpt: "How to configure sales tax, VAT, and withholding rules in FinovaOS — and generate the reports your accountant actually needs.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Mar 1, 2026", readTime: "8 min", color: "var(--tx-c4b5fd, #c4b5fd)", icon: "📊" },
+  { slug: "6", title: "Multi-Branch Accounting: One Dashboard, Every Location", excerpt: "Manage New York, London, and Dubai from one FinovaOS account. Consolidated reports in one click.", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Feb 27, 2026", readTime: "6 min", color: "var(--tx-f9a8d4, #f9a8d4)", icon: "🌍" },
+  { slug: "7", title: "How to Use FinovaOS's Quotation Module to Close Deals Faster", excerpt: "Create professional quotes in minutes and convert them to invoices with one click — no re-entry.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Feb 25, 2026", readTime: "5 min", color: "var(--tx-38bdf8, #38bdf8)", icon: "⚡" },
+  { slug: "8", title: "FinovaOS Custom Plans: Build Your Perfect Accounting Package", excerpt: "Pay only for the modules you use. Accounting, CRM, HR, Inventory — pick and choose.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Feb 22, 2026", readTime: "4 min", color: "var(--tx-c4b5fd, #c4b5fd)", icon: "🧩" },
+  { slug: "9", title: "FinovaOS Reports: Every Financial Report Your Business Needs", excerpt: "P&L, Balance Sheet, Aging, Tax reports — all in one place, jurisdiction-ready for global businesses.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Feb 20, 2026", readTime: "6 min", color: "var(--tx-fbbf24, #fbbf24)", icon: "📈" },
+  { slug: "10", title: "Pakistan SME Accounting Software Guide 2026: What to Look For", excerpt: "FBR compliance, Urdu support, PKR multi-currency, WhatsApp invoicing — here's what Pakistan businesses actually need from accounting software.", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Jun 10, 2026", readTime: "9 min", color: "var(--tx-34d399, #34d399)", icon: "🇵🇰" },
+  { slug: "11", title: "FBR Tax Filing for Small Businesses in Pakistan: Step-by-Step 2026", excerpt: "Sales Tax, Income Tax, WHT — complete guide to FBR compliance for traders, wholesalers and manufacturers using FinovaOS.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Jun 8, 2026", readTime: "10 min", color: "var(--tx-f87171, #f87171)", icon: "🧾" },
+  { slug: "12", title: "Best Accounting Software for Pakistani Traders & Wholesalers", excerpt: "FinovaOS vs Xero vs Zoho vs local solutions — which is actually best for Pakistan-based trading and wholesale businesses?", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Jun 5, 2026", readTime: "8 min", color: "var(--tx-818cf8, #818cf8)", icon: "⚖️" },
+  { slug: "13", title: "How to Automate Payroll for 10-100 Employees in Pakistan", excerpt: "EOBI, PESSI, income tax deductions — FinovaOS calculates everything automatically so you don't need a separate payroll accountant.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Jun 3, 2026", readTime: "7 min", color: "var(--tx-fbbf24, #fbbf24)", icon: "👨‍💼" },
+  { slug: "14", title: "Inventory Management for Pakistani Pharmacies: Batch, Expiry & DRAP", excerpt: "How pharmacy owners use FinovaOS to track batch numbers, expiry dates, and stay DRAP-compliant without manual registers.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Jun 1, 2026", readTime: "6 min", color: "var(--tx-06b6d4, #06b6d4)", icon: "💊" },
+  { slug: "15", title: "Cloud Accounting vs Desktop Software for SMEs in 2026", excerpt: "Why Pakistani businesses are switching from Peachtree, QuickBooks Desktop and manual Excel to cloud-based accounting — and what to watch out for.", category: "fintech", categoryLabel: "Fintech", author: "FinovaOS Team", date: "May 28, 2026", readTime: "7 min", color: "var(--tx-c4b5fd, #c4b5fd)", icon: "☁️" },
 ];
 
 const POSTS = [...SEO_POSTS, ...LEGACY_POSTS];
 
-const catColor = (id: string) => CATEGORIES.find(c => c.id === id)?.color || "#818cf8";
+const catColor = (id: string) => CATEGORIES.find(c => c.id === id)?.color || "var(--tx-818cf8, #818cf8)";
 const catBg    = (id: string) => CATEGORIES.find(c => c.id === id)?.bg    || "#818cf820";
 
 export default function BlogPage() {
@@ -74,17 +74,17 @@ export default function BlogPage() {
   );
 
   return (
-    <main style={{ minHeight: "100vh", background: "#06071a", color: "white", fontFamily: "'DM Sans',system-ui,sans-serif", overflowX: "hidden" }}>
+    <main style={{ minHeight: "100vh", background: "var(--dk-06071a, #06071a)", color: "var(--ink-solid, white)", fontFamily: "'DM Sans',system-ui,sans-serif", overflowX: "hidden" }}>
       <style>{`
         
         * { box-sizing: border-box; }
-        .blog-card { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); border-radius: 20px; overflow: hidden; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+        .blog-card { background: rgba(var(--ink),.035); border: 1px solid rgba(var(--ink),.07); border-radius: 20px; overflow: hidden; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
         .blog-card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
         .cat-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: .05em; }
         .filter-btn { padding: 8px 18px; border-radius: 24px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid transparent; transition: all .18s ease; }
-        .newsletter-input { flex: 1; padding: 13px 16px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: white; font-size: 13px; outline: none; transition: border-color .2s; }
+        .newsletter-input { flex: 1; padding: 13px 16px; border-radius: 12px; background: rgba(var(--ink),.06); border: 1px solid rgba(var(--ink),.1); color:var(--ink-solid, white); font-size: 13px; outline: none; transition: border-color .2s; }
         .newsletter-input:focus { border-color: rgba(99,102,241,.5); }
-        ::placeholder { color: rgba(255,255,255,.25); }
+        ::placeholder { color:rgba(var(--ink),var(--ta-25, .25)); }
         @media(max-width:700px){.blog-featured{grid-template-columns:1fr !important; min-height:auto !important;}}
       `}</style>
 
@@ -96,17 +96,17 @@ export default function BlogPage() {
         <div style={{ maxWidth: 620, margin: "0 auto", position: "relative", zIndex: 1, opacity: mounted ? 1 : 0, transform: mounted ? "none" : "translateY(20px)", transition: "opacity .6s ease, transform .6s ease" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px 5px 8px", borderRadius: 24, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", marginBottom: 24 }}>
             <span style={{ width: 20, height: 20, borderRadius: "50%", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10 }}>✦</span>
-            <span style={{ fontSize: 11, fontWeight: 800, color: "#818cf8", letterSpacing: ".08em" }}>FINOVA BLOG</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)", letterSpacing: ".08em" }}>FINOVA BLOG</span>
           </div>
 
           <h1 style={{ fontSize: "clamp(32px,5vw,54px)", fontWeight: 900, letterSpacing: "-.03em", lineHeight: 1.1, fontFamily: "Lora,serif", margin: "0 0 16px" }}>
             Ideas that help your
-            <span style={{ display: "block", backgroundImage: "linear-gradient(90deg,#818cf8 0%,#c4b5fd 50%,#38bdf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ display: "block", backgroundImage: "linear-gradient(90deg,var(--tx-818cf8, #818cf8) 0%,var(--tx-c4b5fd, #c4b5fd) 50%,var(--tx-38bdf8, #38bdf8) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               business grow
             </span>
           </h1>
 
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,.45)", lineHeight: 1.8, maxWidth: 440, margin: "0 auto 32px" }}>
+          <p style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.8, maxWidth: 440, margin: "0 auto 32px" }}>
             Accounting tips, product updates, fintech trends, and real stories from businesses worldwide.
           </p>
 
@@ -116,7 +116,7 @@ export default function BlogPage() {
             <input
               value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search articles..."
-              style={{ width: "100%", padding: "13px 18px 13px 40px", borderRadius: 14, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }}
+              style={{ width: "100%", padding: "13px 18px 13px 40px", borderRadius: 14, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none" }}
             />
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function BlogPage() {
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,.45)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-5px)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,.2)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
             {/* Left: image area */}
-            <div style={{ background: "linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4338ca 100%)", position: "relative", overflow: "hidden", minHeight: 260 }}>
+            <div style={{ background: "var(--mk-card-indigo, linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4338ca 100%))", position: "relative", overflow: "hidden", minHeight: 260 }}>
               <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 70% 30%,rgba(129,140,248,.3) 0%,transparent 60%), radial-gradient(circle at 20% 80%,rgba(196,181,253,.15) 0%,transparent 50%)" }} />
               {/* Decorative grid lines */}
               <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: .08 }} xmlns="http://www.w3.org/2000/svg">
@@ -140,27 +140,27 @@ export default function BlogPage() {
                 <span style={{ fontSize: 72, filter: "drop-shadow(0 0 30px rgba(129,140,248,.5))" }}>📊</span>
               </div>
               {/* Featured badge */}
-              <div style={{ position: "absolute", top: 20, left: 20, padding: "5px 12px", borderRadius: 20, background: "rgba(255,255,255,.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.2)", fontSize: 10, fontWeight: 800, color: "white", letterSpacing: ".06em" }}>★ FEATURED</div>
+              <div style={{ position: "absolute", top: 20, left: 20, padding: "5px 12px", borderRadius: 20, background: "rgba(var(--ink),.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(var(--ink),.2)", fontSize: 10, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: ".06em" }}>★ FEATURED</div>
             </div>
 
             {/* Right: content */}
             <div style={{ padding: "36px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 14 }}>
-              <span className="cat-pill" style={{ color: "#818cf8", background: "#818cf820", alignSelf: "flex-start" }}>
+              <span className="cat-pill" style={{ color: "var(--tx-818cf8, #818cf8)", background: "#818cf820", alignSelf: "flex-start" }}>
                 {FEATURED.categoryLabel.toUpperCase()}
               </span>
-              <h2 style={{ fontSize: "clamp(18px,2.2vw,26px)", fontWeight: 800, color: "white", letterSpacing: "-.02em", lineHeight: 1.3, margin: 0, fontFamily: "Lora,serif" }}>
+              <h2 style={{ fontSize: "clamp(18px,2.2vw,26px)", fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.02em", lineHeight: 1.3, margin: 0, fontFamily: "Lora,serif" }}>
                 {FEATURED.title}
               </h2>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.75, margin: 0 }}>
+              <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.75, margin: 0 }}>
                 {FEATURED.excerpt}
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 6 }}>
                 <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#4f46e5,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: "white", flexShrink: 0 }}>FO</div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{FEATURED.author}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{FEATURED.date} · {FEATURED.readTime}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.85)" }}>{FEATURED.author}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{FEATURED.date} · {FEATURED.readTime}</div>
                 </div>
-                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#818cf8" }}>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>
                   Read more <span>→</span>
                 </div>
               </div>
@@ -172,19 +172,19 @@ export default function BlogPage() {
       {/* ── Category Filters ─────────────────────────────── */}
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px 28px" }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", letterSpacing: ".06em", marginRight: 4 }}>FILTER</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-25, .25))", letterSpacing: ".06em", marginRight: 4 }}>FILTER</span>
           {CATEGORIES.map(c => (
             <button key={c.id} onClick={() => setActive(c.id)} className="filter-btn"
               style={{
-                background: active === c.id ? c.bg : "rgba(255,255,255,.04)",
-                color: active === c.id ? c.color : "rgba(255,255,255,.35)",
-                borderColor: active === c.id ? `${c.color}40` : "rgba(255,255,255,.06)",
+                background: active === c.id ? c.bg : "rgba(var(--ink),.04)",
+                color: active === c.id ? c.color : "rgba(var(--ink),var(--ta-35, .35))",
+                borderColor: active === c.id ? `color-mix(in srgb, ${c.color} 25.1%, transparent)` : "rgba(var(--ink),.06)",
               }}>
               {c.label}
             </button>
           ))}
           {search && (
-            <button onClick={() => setSearch("")} className="filter-btn" style={{ background: "rgba(239,68,68,.1)", color: "#f87171", borderColor: "rgba(239,68,68,.2)", marginLeft: "auto" }}>
+            <button onClick={() => setSearch("")} className="filter-btn" style={{ background: "rgba(239,68,68,.1)", color: "var(--tx-f87171, #f87171)", borderColor: "rgba(239,68,68,.2)", marginLeft: "auto" }}>
               ✕ Clear search
             </button>
           )}
@@ -196,22 +196,22 @@ export default function BlogPage() {
         {filtered.length === 0 ? (
           <div style={{ padding: "80px 0", textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>🔍</div>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,.25)" }}>No articles match your search.</p>
+            <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-25, .25))" }}>No articles match your search.</p>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 22 }}>
             {filtered.map(p => (
               <Link key={p.slug} href={`/blog/${p.slug}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column" }}>
                 <article className="blog-card" style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${catColor(p.category)}45`; (e.currentTarget as HTMLElement).style.boxShadow = `0 20px 60px rgba(0,0,0,.4), 0 0 0 1px ${catColor(p.category)}20`; (e.currentTarget as HTMLElement).style.transform = "translateY(-5px)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,.07)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `color-mix(in srgb, ${catColor(p.category)} 27.1%, transparent)`; (e.currentTarget as HTMLElement).style.boxShadow = `0 20px 60px rgba(0,0,0,.4), 0 0 0 1px color-mix(in srgb, ${catColor(p.category)} 12.5%, transparent)`; (e.currentTarget as HTMLElement).style.transform = "translateY(-5px)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(var(--ink),.07)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
 
                   {/* Card image area */}
-                  <div style={{ height: 130, background: `linear-gradient(135deg,${p.color}18 0%,${p.color}08 100%)`, position: "relative", overflow: "hidden", borderBottom: `1px solid ${p.color}15` }}>
-                    <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle at 80% 20%,${p.color}25 0%,transparent 55%)` }} />
-                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to top,rgba(6,7,26,.9),transparent)" }} />
+                  <div style={{ height: 130, background: `linear-gradient(135deg,color-mix(in srgb, ${p.color} 9.4%, transparent) 0%,color-mix(in srgb, ${p.color} 3.1%, transparent) 100%)`, position: "relative", overflow: "hidden", borderBottom: `1px solid color-mix(in srgb, ${p.color} 8.2%, transparent)` }}>
+                    <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle at 80% 20%,color-mix(in srgb, ${p.color} 14.5%, transparent) 0%,transparent 55%)` }} />
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to top,rgba(var(--dkr-06071a, 6,7,26),0.9),transparent)" }} />
                     <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 44, filter: `drop-shadow(0 0 16px ${p.color}60)` }}>{p.icon}</span>
+                      <span style={{ fontSize: 44, filter: `drop-shadow(0 0 16px color-mix(in srgb, ${p.color} 37.6%, transparent))` }}>{p.icon}</span>
                     </div>
                   </div>
 
@@ -221,19 +221,19 @@ export default function BlogPage() {
                       <span className="cat-pill" style={{ color: catColor(p.category), background: catBg(p.category) }}>
                         {p.categoryLabel.toUpperCase()}
                       </span>
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.2)", marginLeft: "auto" }}>{p.readTime}</span>
+                      <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-20, .2))", marginLeft: "auto" }}>{p.readTime}</span>
                     </div>
 
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,.92)", lineHeight: 1.5, margin: 0, fontFamily: "Lora,serif", flex: 1 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 700, color: "rgba(var(--ink),.92)", lineHeight: 1.5, margin: 0, fontFamily: "Lora,serif", flex: 1 }}>
                       {p.title}
                     </h3>
 
-                    <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", lineHeight: 1.7, margin: 0 }}>
+                    <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-35, .35))", lineHeight: 1.7, margin: 0 }}>
                       {p.excerpt}
                     </p>
 
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.05)", marginTop: "auto" }}>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.25)", fontWeight: 600 }}>{p.date}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(var(--ink),.05)", marginTop: "auto" }}>
+                      <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-25, .25))", fontWeight: 600 }}>{p.date}</span>
                       <span style={{ fontSize: 12, color: catColor(p.category), fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
                         Read <span style={{ transition: "transform .2s" }}>→</span>
                       </span>
@@ -254,10 +254,10 @@ export default function BlogPage() {
 
           <div style={{ position: "relative", zIndex: 1, padding: "48px 40px", textAlign: "center" }}>
             <div style={{ width: 52, height: 52, borderRadius: 16, background: "linear-gradient(135deg,#4f46e5,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 20px" }}>📬</div>
-            <h3 style={{ fontSize: 24, fontWeight: 800, color: "white", fontFamily: "Lora,serif", margin: "0 0 10px" }}>
+            <h3 style={{ fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)", fontFamily: "Lora,serif", margin: "0 0 10px" }}>
               Stay ahead of the curve
             </h3>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,.4)", margin: "0 auto 28px", maxWidth: 380, lineHeight: 1.75 }}>
+            <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-40, .4))", margin: "0 auto 28px", maxWidth: 380, lineHeight: 1.75 }}>
               Weekly digest — best articles, product updates, and tips. No spam, ever. Unsubscribe anytime.
             </p>
             <div style={{ display: "flex", gap: 10, maxWidth: 440, margin: "0 auto" }}>
@@ -266,7 +266,7 @@ export default function BlogPage() {
                 Subscribe →
               </button>
             </div>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,.2)", marginTop: 14 }}>
+            <p style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-20, .2))", marginTop: 14 }}>
               Unsubscribe anytime · No spam, ever.
             </p>
           </div>

@@ -117,7 +117,7 @@ function LinkColumn({
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-        <div style={{ width: 3, height: 14, borderRadius: 2, background: `linear-gradient(180deg, ${color}, ${color}cc)` }}/>
+        <div style={{ width: 3, height: 14, borderRadius: 2, background: `linear-gradient(180deg, ${color}, color-mix(in srgb, ${color} 80%, transparent))` }}/>
         <span style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: ".12em", textTransform: "uppercase" }}>{title}</span>
       </div>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
@@ -187,7 +187,7 @@ export default function Footer() {
         .ft-social:hover {
           background: rgba(99,102,241,.18);
           border-color: rgba(99,102,241,.4);
-          color: #a5b4fc;
+          color: var(--tx-a5b4fc, #a5b4fc);
           transform: translateY(-2px);
           box-shadow: 0 6px 16px rgba(99,102,241,.2);
         }
@@ -243,7 +243,7 @@ export default function Footer() {
         {/* Top headline strip */}
         <div className="ft-top-strip" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 34, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)" }}>
-            <Zap size={12} color="#818cf8"/>
+            <Zap size={12} color="var(--tx-818cf8, #818cf8)"/>
             <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", letterSpacing: ".08em", textTransform: "uppercase" }}>Business OS</span>
           </div>
           <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-25, .25))" }}>— All-in-one platform for modern businesses</span>
@@ -288,10 +288,10 @@ export default function Footer() {
 
           </div>
 
-          <LinkColumn title="Product"   color="#818cf8" links={PRODUCT_LINKS} />
-          <LinkColumn title="Solutions" color="#34d399" links={SOLUTIONS_LINKS} />
-          <LinkColumn title="Company"   color="#fbbf24" links={COMPANY_LINKS} />
-          <LinkColumn title="Legal"     color="#f472b6" links={LEGAL_LINKS} />
+          <LinkColumn title="Product"   color="var(--tx-818cf8, #818cf8)" links={PRODUCT_LINKS} />
+          <LinkColumn title="Solutions" color="var(--tx-34d399, #34d399)" links={SOLUTIONS_LINKS} />
+          <LinkColumn title="Company"   color="var(--tx-fbbf24, #fbbf24)" links={COMPANY_LINKS} />
+          <LinkColumn title="Legal"     color="var(--tx-f472b6, #f472b6)" links={LEGAL_LINKS} />
 
         </div>
 
@@ -334,7 +334,7 @@ export default function Footer() {
   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
     <div style={{ width: 16, height: 1, background: "rgba(var(--ink),.1)", borderRadius: 1 }} />
     <p style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-15, .15))", margin: 0 }}>
-      <span style={{ color: "rgba(var(--txr-34d399, 52,211,153),.55)", fontWeight: 600 }}>PSEB</span>{" "}
+      <span style={{ color: "rgba(var(--txr-34d399, 52,211,153),var(--ta-55, .55))", fontWeight: 600 }}>PSEB</span>{" "}
       Registered IT Exporter{" · "}
       <span style={{ color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>FBR</span>{" "}
       Registered

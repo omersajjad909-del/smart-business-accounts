@@ -25,7 +25,7 @@ const CATEGORIES: Category[] = [
   {
     title: "Payments",
     blurb: "Take money the way your customers already pay.",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     items: [
       { name: "Safepay", desc: "Card and wallet payments for Pakistani customers, settled in PKR.", icon: "💳", status: "live" },
       { name: "LemonSqueezy", desc: "International card payments and subscription billing.", icon: "🍋", status: "live" },
@@ -36,7 +36,7 @@ const CATEGORIES: Category[] = [
   {
     title: "Banking",
     blurb: "Get the statement in without typing it in.",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     items: [
       { name: "Statement Import", desc: "Import CSV and Excel bank statements and match them to vouchers.", icon: "📄", status: "live" },
       { name: "Smart Reconciliation", desc: "Suggested matches between statement lines and your ledger, with a confidence score.", icon: "🧮", status: "live" },
@@ -46,7 +46,7 @@ const CATEGORIES: Category[] = [
   {
     title: "Messaging",
     blurb: "Invoices and reminders where people actually read them.",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     items: [
       { name: "WhatsApp", desc: "Send invoices, statements, and payment reminders straight to a customer's WhatsApp.", icon: "💬", status: "live" },
       { name: "Email (SMTP)", desc: "Transactional email for invoices, receipts, and alerts from your own domain.", icon: "✉️", status: "live" },
@@ -56,7 +56,7 @@ const CATEGORIES: Category[] = [
   {
     title: "Identity & Access",
     blurb: "Sign in the way your organisation already does.",
-    color: "#60a5fa",
+    color: "var(--tx-60a5fa, #60a5fa)",
     items: [
       { name: "Google Sign-In", desc: "One-click sign-in with a Google Workspace or Gmail account.", icon: "🔵", status: "live" },
       { name: "SAML / OIDC SSO", desc: "Single sign-on against your own identity provider, configurable per company.", icon: "🔐", status: "live" },
@@ -66,7 +66,7 @@ const CATEGORIES: Category[] = [
   {
     title: "Compliance & Tax",
     blurb: "The paperwork regulators expect, generated for you.",
-    color: "#f472b6",
+    color: "var(--tx-f472b6, #f472b6)",
     items: [
       { name: "FBR Sales Tax", desc: "FBR-ready sales tax invoices and the supporting registers.", icon: "🧾", status: "live" },
       { name: "Withholding Tax", desc: "Configurable withholding rules applied at voucher level.", icon: "📌", status: "live" },
@@ -76,7 +76,7 @@ const CATEGORIES: Category[] = [
   {
     title: "Developer",
     blurb: "Build on top of your own data.",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     items: [
       { name: "REST API", desc: "Programmatic access to customers, items, invoices, and vouchers.", icon: "⚙️", status: "live" },
       { name: "API Keys", desc: "Scoped keys per integration, revocable at any time.", icon: "🗝️", status: "live" },
@@ -85,7 +85,7 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-const BORDER = "rgba(255,255,255,.08)";
+const BORDER = "rgba(var(--ink),.08)";
 
 export default function IntegrationsPage() {
   const [filter, setFilter] = useState<"all" | Status>("all");
@@ -98,10 +98,10 @@ export default function IntegrationsPage() {
 
   return (
     <main style={{
-      background: "linear-gradient(180deg,#060919 0%,#0a0e24 40%,#060919 100%)",
+      background: "linear-gradient(180deg,var(--dk-060919, #060919) 0%,var(--dk-0a0e24, #0a0e24) 40%,var(--dk-060919, #060919) 100%)",
       minHeight: "100vh",
       fontFamily: "'Outfit','DM Sans',system-ui,sans-serif",
-      color: "white",
+      color: "var(--ink-solid, white)",
     }}>
       {/* Hero */}
       <section style={{ maxWidth: 1000, margin: "0 auto", padding: "110px 24px 40px", textAlign: "center" }}>
@@ -110,20 +110,20 @@ export default function IntegrationsPage() {
           borderRadius: 100, background: "rgba(52,211,153,.1)",
           border: "1px solid rgba(52,211,153,.2)", marginBottom: 22,
         }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", letterSpacing: ".08em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)", letterSpacing: ".08em", textTransform: "uppercase" }}>
             {liveCount} live integrations
           </span>
         </div>
         <h1 style={{ fontSize: "clamp(30px,5vw,46px)", fontWeight: 800, margin: "0 0 16px", lineHeight: 1.15, letterSpacing: "-.02em" }}>
           Connects to what you already use
         </h1>
-        <p style={{ fontSize: 16, color: "rgba(255,255,255,.45)", lineHeight: 1.75, margin: "0 auto 28px", maxWidth: 620 }}>
+        <p style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.75, margin: "0 auto 28px", maxWidth: 620 }}>
           Payments, banking, messaging, identity, and tax — wired into the same
           ledger, so nothing has to be re-entered by hand.
         </p>
 
         {/* Filter */}
-        <div style={{ display: "inline-flex", gap: 6, padding: 5, borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${BORDER}` }}>
+        <div style={{ display: "inline-flex", gap: 6, padding: 5, borderRadius: 12, background: "rgba(var(--ink),.04)", border: `1px solid ${BORDER}` }}>
           {([
             { id: "all",     label: "All" },
             { id: "live",    label: "Available now" },
@@ -136,7 +136,7 @@ export default function IntegrationsPage() {
                 padding: "8px 16px", borderRadius: 9, border: "none", cursor: "pointer",
                 fontFamily: "inherit", fontSize: 13, fontWeight: 600,
                 background: filter === opt.id ? "rgba(99,102,241,.22)" : "transparent",
-                color: filter === opt.id ? "#a5b4fc" : "rgba(255,255,255,.45)",
+                color: filter === opt.id ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-45, .45))",
                 transition: "all .18s",
               }}
             >
@@ -155,13 +155,13 @@ export default function IntegrationsPage() {
                 <div style={{ width: 3, height: 15, borderRadius: 2, background: cat.color }}/>
                 <h2 style={{ fontSize: 17, fontWeight: 700, margin: 0, color: cat.color, letterSpacing: "-.01em" }}>{cat.title}</h2>
               </div>
-              <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.34)", margin: 0, paddingLeft: 13 }}>{cat.blurb}</p>
+              <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-34, .34))", margin: 0, paddingLeft: 13 }}>{cat.blurb}</p>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(270px,1fr))", gap: 12 }}>
               {cat.items.map((item) => (
                 <div key={item.name} style={{
-                  background: "rgba(255,255,255,.03)",
+                  background: "rgba(var(--ink),.03)",
                   border: `1px solid ${BORDER}`,
                   borderRadius: 14, padding: "18px 18px 16px",
                   display: "flex", flexDirection: "column", gap: 8,
@@ -171,15 +171,15 @@ export default function IntegrationsPage() {
                     <span style={{
                       fontSize: 9.5, fontWeight: 800, letterSpacing: ".07em", textTransform: "uppercase",
                       padding: "3px 8px", borderRadius: 100, whiteSpace: "nowrap",
-                      background: item.status === "live" ? "rgba(52,211,153,.12)" : "rgba(255,255,255,.05)",
-                      color: item.status === "live" ? "#34d399" : "rgba(255,255,255,.32)",
+                      background: item.status === "live" ? "rgba(52,211,153,.12)" : "rgba(var(--ink),.05)",
+                      color: item.status === "live" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-32, .32))",
                       border: `1px solid ${item.status === "live" ? "rgba(52,211,153,.25)" : BORDER}`,
                     }}>
                       {item.status === "live" ? "Available" : "Planned"}
                     </span>
                   </div>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "white" }}>{item.name}</div>
-                  <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.4)", margin: 0, lineHeight: 1.7 }}>{item.desc}</p>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--ink-solid, white)" }}>{item.name}</div>
+                  <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0, lineHeight: 1.7 }}>{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -195,7 +195,7 @@ export default function IntegrationsPage() {
           border: "1px solid rgba(99,102,241,.22)",
         }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px" }}>Need something that isn&apos;t listed?</h2>
-          <p style={{ fontSize: 14.5, color: "rgba(255,255,255,.45)", margin: "0 0 24px", lineHeight: 1.7 }}>
+          <p style={{ fontSize: 14.5, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 24px", lineHeight: 1.7 }}>
             The REST API and webhooks cover most cases. Tell us what you need to
             connect and we will point you at the right approach.
           </p>
@@ -207,8 +207,8 @@ export default function IntegrationsPage() {
             }}>Read the API Docs →</Link>
             <Link href="/contact" style={{
               padding: "12px 24px", borderRadius: 11, textDecoration: "none",
-              background: "rgba(255,255,255,.05)", border: `1px solid ${BORDER}`,
-              color: "rgba(255,255,255,.75)", fontSize: 14, fontWeight: 600,
+              background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`,
+              color: "rgba(var(--ink),.75)", fontSize: 14, fontWeight: 600,
             }}>Talk to Us</Link>
           </div>
         </div>

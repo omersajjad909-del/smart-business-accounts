@@ -72,30 +72,30 @@ const PROCESSORS: Processor[] = [
 
 export default function SubProcessorsPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,#04061a 0%,#080c2a 60%,#04061a 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "#e2e8f0" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-080c2a, #080c2a) 60%,var(--dk-04061a, #04061a) 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--tx-e2e8f0, #e2e8f0)" }}>
       <div style={{ padding: "20px 32px" }}>
         <Link href="/" style={{ color: "#64748b", textDecoration: "none", fontSize: 14 }}>← Back to FinovaOS</Link>
       </div>
 
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "48px 24px 100px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ display: "inline-block", background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.3)", color: "#818cf8", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ display: "inline-block", background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.3)", color: "var(--tx-818cf8, #818cf8)", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
             Legal
           </div>
           <h1 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, margin: "0 0 12px" }}>Sub-processors</h1>
           <p style={{ color: "#64748b", fontSize: 14 }}>Last updated: {LAST_UPDATED} · Third-party services that process customer data on behalf of FinovaOS</p>
         </div>
 
-        <div style={{ background: "rgba(129,140,248,.06)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: "16px 20px", marginBottom: 40, fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>
+        <div style={{ background: "rgba(129,140,248,.06)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 14, padding: "16px 20px", marginBottom: 40, fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>
           This page lists all sub-processors currently engaged by FinovaOS to deliver the platform. Each provider is bound by a Data Processing Agreement (or equivalent contractual safeguard) requiring them to process personal data only on our documented instructions and to maintain security measures aligned with our Privacy Policy. We update this list whenever a sub-processor is added or replaced.
         </div>
 
         <div style={{ display: "grid", gap: 20 }}>
           {PROCESSORS.map((p, i) => (
-            <div key={i} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 24 }}>
+            <div key={i} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
-                <h2 style={{ fontSize: 17, fontWeight: 700, margin: 0, color: "#e2e8f0" }}>{p.name}</h2>
-                <a href={p.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#818cf8", textDecoration: "none", background: "rgba(129,140,248,.1)", padding: "4px 12px", borderRadius: 12 }}>Privacy Policy ↗</a>
+                <h2 style={{ fontSize: 17, fontWeight: 700, margin: 0, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{p.name}</h2>
+                <a href={p.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "var(--tx-818cf8, #818cf8)", textDecoration: "none", background: "rgba(129,140,248,.1)", padding: "4px 12px", borderRadius: 12 }}>Privacy Policy ↗</a>
               </div>
 
               <div style={{ display: "grid", gap: 12 }}>
@@ -107,14 +107,14 @@ export default function SubProcessorsPage() {
           ))}
         </div>
 
-        <div style={{ marginTop: 40, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "20px 24px" }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 12px", color: "#e2e8f0" }}>How we notify you of changes</h3>
-          <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.7, margin: 0 }}>
-            We will update this page whenever we add or replace a sub-processor. Enterprise customers may subscribe to sub-processor notifications by emailing <a href="mailto:legal@finovaos.app" style={{ color: "#818cf8" }}>legal@finovaos.app</a>. You will be notified at least 30 days before a new sub-processor begins processing customer data, giving you time to object if needed.
+        <div style={{ marginTop: 40, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 14, padding: "20px 24px" }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 12px", color: "var(--tx-e2e8f0, #e2e8f0)" }}>How we notify you of changes</h3>
+          <p style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7, margin: 0 }}>
+            We will update this page whenever we add or replace a sub-processor. Enterprise customers may subscribe to sub-processor notifications by emailing <a href="mailto:legal@finovaos.app" style={{ color: "var(--tx-818cf8, #818cf8)" }}>legal@finovaos.app</a>. You will be notified at least 30 days before a new sub-processor begins processing customer data, giving you time to object if needed.
           </p>
         </div>
 
-        <div style={{ marginTop: 40, borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 32, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ marginTop: 40, borderTop: "1px solid rgba(var(--ink),.06)", paddingTop: 32, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
           {[
             { label: "Privacy Policy", href: "/legal/privacy" },
             { label: "Data Processing Agreement", href: "/legal/dpa" },
@@ -126,7 +126,7 @@ export default function SubProcessorsPage() {
         </div>
 
         <p style={{ marginTop: 24, textAlign: "center", fontSize: 13, color: "#475569" }}>
-          Questions about our sub-processors? Contact <a href="mailto:legal@finovaos.app" style={{ color: "#818cf8" }}>legal@finovaos.app</a>
+          Questions about our sub-processors? Contact <a href="mailto:legal@finovaos.app" style={{ color: "var(--tx-818cf8, #818cf8)" }}>legal@finovaos.app</a>
         </p>
       </div>
     </div>
@@ -136,8 +136,8 @@ export default function SubProcessorsPage() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 12, alignItems: "start" }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</div>
-      <div style={{ fontSize: 13.5, color: "#94a3b8", lineHeight: 1.6 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textTransform: "uppercase", letterSpacing: ".04em" }}>{label}</div>
+      <div style={{ fontSize: 13.5, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6 }}>{value}</div>
     </div>
   );
 }

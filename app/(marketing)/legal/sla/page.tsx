@@ -58,35 +58,35 @@ const SECTIONS = [
 
 export default function SLAPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,#04061a 0%,#080c2a 60%,#04061a 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "#e2e8f0" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-080c2a, #080c2a) 60%,var(--dk-04061a, #04061a) 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--tx-e2e8f0, #e2e8f0)" }}>
       <div style={{ padding: "20px 32px" }}>
         <Link href="/" style={{ color: "#64748b", textDecoration: "none", fontSize: 14 }}>← Back to FinovaOS</Link>
       </div>
 
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px 100px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ display: "inline-block", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ display: "inline-block", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "var(--tx-34d399, #34d399)", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
             Legal
           </div>
           <h1 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, margin: "0 0 12px" }}>Service Level Agreement</h1>
           <p style={{ color: "#64748b", fontSize: 14 }}>Last updated: {LAST_UPDATED} · Applies to all paid FinovaOS plans</p>
         </div>
 
-        <div style={{ background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 14, padding: "16px 20px", marginBottom: 40, fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>
+        <div style={{ background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 14, padding: "16px 20px", marginBottom: 40, fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>
           This Service Level Agreement ("SLA") is incorporated into and forms part of the FinovaOS Terms of Service. It defines the service standards, uptime commitments, and support response times that FinovaOS ("we", "us") commits to providing to customers on paid plans.
         </div>
 
         <div style={{ display: "grid", gap: 24 }}>
           {SECTIONS.map((sec, i) => (
-            <div key={i} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 28 }}>
+            <div key={i} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 28 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 10 }}>
                 <span>{sec.icon}</span> {sec.title}
               </h2>
               <div style={{ display: "grid", gap: 16 }}>
                 {sec.content.map((item, j) => (
                   <div key={j}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 6 }}>{item.sub}</div>
-                    <div style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>{item.body}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", marginBottom: 6 }}>{item.sub}</div>
+                    <div style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7 }}>{item.body}</div>
                   </div>
                 ))}
               </div>
@@ -94,7 +94,7 @@ export default function SLAPage() {
           ))}
         </div>
 
-        <div style={{ marginTop: 40, borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 32, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ marginTop: 40, borderTop: "1px solid rgba(var(--ink),.06)", paddingTop: 32, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
           {[
             { label: "Privacy Policy", href: "/legal/privacy" },
             { label: "Terms of Service", href: "/legal/terms" },
@@ -107,7 +107,7 @@ export default function SLAPage() {
         </div>
 
         <p style={{ marginTop: 24, textAlign: "center", fontSize: 13, color: "#475569" }}>
-          Questions about this SLA? Email us at <a href="mailto:legal@finovaos.app" style={{ color: "#818cf8" }}>legal@finovaos.app</a>
+          Questions about this SLA? Email us at <a href="mailto:legal@finovaos.app" style={{ color: "var(--tx-818cf8, #818cf8)" }}>legal@finovaos.app</a>
         </p>
       </div>
     </div>

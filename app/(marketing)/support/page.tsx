@@ -11,9 +11,9 @@ const CHANNELS = [
     href: `https://mail.google.com/mail/?view=cm&to=${SUPPORT_EMAIL}&su=Support+Request`,
     display: SUPPORT_EMAIL,
     note: "Reply within 24 hours (faster on Pro & Enterprise)",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.22)",
-    dim: "rgba(129,140,248,.08)",
+    dim: "rgba(var(--txr-818cf8, 129,140,248),.08)",
     icon: "📧",
     action: "Send Email",
     external: true,
@@ -24,9 +24,9 @@ const CHANNELS = [
     href: "#chat",
     display: "Mon–Fri, 9am–6pm UTC",
     note: "Average wait under 2 minutes",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.22)",
-    dim: "rgba(52,211,153,.08)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.08)",
     icon: "💬",
     action: "Start Chat",
     external: false,
@@ -37,9 +37,9 @@ const CHANNELS = [
     href: "/support/ticket",
     display: "For complex issues",
     note: "Get a reference number and updates",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     glow: "rgba(245,158,11,.22)",
-    dim: "rgba(245,158,11,.08)",
+    dim: "rgba(var(--txr-f59e0b, 245,158,11),.08)",
     icon: "🎫",
     action: "Open Ticket",
     external: false,
@@ -50,9 +50,9 @@ const CHANNELS = [
     href: "/help",
     display: "Guides, FAQs & walkthroughs",
     note: "Videos, walkthroughs, and how-tos",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     glow: "rgba(6,182,212,.22)",
-    dim: "rgba(6,182,212,.08)",
+    dim: "rgba(var(--txr-06b6d4, 6,182,212),.08)",
     icon: "📚",
     action: "Browse Docs",
     external: false,
@@ -65,7 +65,7 @@ const CATEGORIES = [
     label: "Getting Started",
     desc: "First setup, company profile, onboarding walkthrough, and initial configuration.",
     count: "Browse →",
-    color: "#6366f1",
+    color: "var(--tx-6366f1, #6366f1)",
     href: "/help/getting-started",
   },
   {
@@ -73,7 +73,7 @@ const CATEGORIES = [
     label: "Billing & Plans",
     desc: "Subscription management, plan upgrades, invoices, payment methods, and refunds.",
     count: "Browse →",
-    color: "#10b981",
+    color: "var(--tx-10b981, #10b981)",
     href: "/pricing",
   },
   {
@@ -81,7 +81,7 @@ const CATEGORIES = [
     label: "Technical Issues",
     desc: "Error messages, performance, login issues, and platform troubleshooting steps.",
     count: "Browse →",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     href: "/support/ticket",
   },
   {
@@ -89,7 +89,7 @@ const CATEGORIES = [
     label: "Integrations & Imports",
     desc: "Bank connections, data import from Excel/CSV, third-party integrations, and APIs.",
     count: "Browse →",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     href: "/help/bank-reconciliation",
   },
   {
@@ -97,7 +97,7 @@ const CATEGORIES = [
     label: "Security & Data",
     desc: "Encryption, backup policy, user permissions, compliance practices, and access logs.",
     count: "Browse →",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     href: "/trust",
   },
   {
@@ -105,7 +105,7 @@ const CATEGORIES = [
     label: "Feature Requests",
     desc: "Submit ideas and suggestions for new features. Our team reviews every request.",
     count: "Submit request →",
-    color: "#f87171",
+    color: "var(--tx-f87171, #f87171)",
     href: "/support/ticket",
   },
 ] as const;
@@ -186,9 +186,9 @@ const FAQS: { q: string; a: string; cat: string }[] = [
 ];
 
 const SLA = [
-  { plan: "Starter", color: "#818cf8", email: "24 hrs", chat: "Business hours", ticket: "48 hrs", onboarding: "Self-serve docs", manager: "—", phone: "—" },
-  { plan: "Professional", color: "#34d399", email: "4 hrs", chat: "Priority queue", ticket: "8 hrs", onboarding: "1 onboarding call", manager: "Shared", phone: "—" },
-  { plan: "Enterprise", color: "#f59e0b", email: "1 hr", chat: "Dedicated agent", ticket: "2 hrs", onboarding: "Full onboarding", manager: "Dedicated", phone: "✓" },
+  { plan: "Starter", color: "var(--tx-818cf8, #818cf8)", email: "24 hrs", chat: "Business hours", ticket: "48 hrs", onboarding: "Self-serve docs", manager: "—", phone: "—" },
+  { plan: "Professional", color: "var(--tx-34d399, #34d399)", email: "4 hrs", chat: "Priority queue", ticket: "8 hrs", onboarding: "1 onboarding call", manager: "Shared", phone: "—" },
+  { plan: "Enterprise", color: "var(--tx-f59e0b, #f59e0b)", email: "1 hr", chat: "Dedicated agent", ticket: "2 hrs", onboarding: "Full onboarding", manager: "Dedicated", phone: "✓" },
 ];
 
 const SLA_ROWS = [
@@ -222,14 +222,14 @@ function CardInner({ c }: { c: typeof CHANNELS[number] }) {
       <div style={{ position: "absolute", top: -40, right: -40, width: 130, height: 130, borderRadius: "50%",
         background: `radial-gradient(circle,${c.glow},transparent 70%)`, opacity: .4, pointerEvents: "none" }} />
       <div style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 20,
-        background: c.dim, border: `1px solid ${c.color}28`,
+        background: c.dim, border: `1px solid color-mix(in srgb, ${c.color} 15.7%, transparent)`,
         fontSize: 9.5, fontWeight: 700, color: c.color, letterSpacing: ".08em", marginBottom: 16, width: "fit-content" }}>
         {c.tag.toUpperCase()}
       </div>
       <div style={{ fontSize: 30, marginBottom: 14, lineHeight: 1 }}>{c.icon}</div>
-      <div style={{ fontFamily: "'Lora',serif", fontSize: 17, fontWeight: 700, color: "rgba(255,255,255,.92)", marginBottom: 6 }}>{c.label}</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.52)", marginBottom: 4 }}>{c.display}</div>
-      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.28)", fontWeight: 500, marginBottom: 18, lineHeight: 1.55, flex: 1 }}>{c.note}</div>
+      <div style={{ fontFamily: "'Lora',serif", fontSize: 17, fontWeight: 700, color: "rgba(var(--ink),.92)", marginBottom: 6 }}>{c.label}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(var(--ink),var(--ta-52, .52))", marginBottom: 4 }}>{c.display}</div>
+      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500, marginBottom: 18, lineHeight: 1.55, flex: 1 }}>{c.note}</div>
       <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 700, color: c.color, marginTop: "auto" }}>
         {c.action}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -240,8 +240,8 @@ function CardInner({ c }: { c: typeof CHANNELS[number] }) {
 
 const CARD_BASE: React.CSSProperties = {
   borderRadius: 20, padding: "24px 22px",
-  background: "rgba(255,255,255,.04)",
-  border: "1.5px solid rgba(255,255,255,.08)",
+  background: "rgba(var(--ink),.04)",
+  border: "1.5px solid rgba(var(--ink),.08)",
   backdropFilter: "blur(16px)",
   position: "relative", overflow: "hidden",
   boxShadow: "0 4px 24px rgba(0,0,0,.2)",
@@ -262,9 +262,9 @@ export default function SupportPage() {
   const filteredFaqs = activeCat === "All" ? FAQS : FAQS.filter(f => f.cat === activeCat);
 
   const cardHover = (el: HTMLElement, c: typeof CHANNELS[number], on: boolean) => {
-    el.style.border = on ? `1.5px solid ${c.color}50` : "1.5px solid rgba(255,255,255,.08)";
-    el.style.background = on ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.04)";
-    el.style.boxShadow = on ? `0 20px 50px ${c.glow},0 0 0 1px ${c.color}22` : "0 4px 24px rgba(0,0,0,.2)";
+    el.style.border = on ? `1.5px solid color-mix(in srgb, ${c.color} 31.4%, transparent)` : "1.5px solid rgba(var(--ink),.08)";
+    el.style.background = on ? "rgba(var(--ink),.06)" : "rgba(var(--ink),.04)";
+    el.style.boxShadow = on ? `0 20px 50px ${c.glow},0 0 0 1px color-mix(in srgb, ${c.color} 13.3%, transparent)` : "0 4px 24px rgba(0,0,0,.2)";
     el.style.transform = on ? "translateY(-5px)" : "translateY(0)";
   };
 
@@ -288,17 +288,17 @@ export default function SupportPage() {
         .faq-btn{width:100%;background:none;border:none;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:inherit;font-weight:600;font-size:14.5px;text-align:left;gap:16px;}
         .faq-answer{animation:faqIn .2s ease both;}
 
-        .filter-btn{background:none;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:7px 15px;font-size:12px;font-weight:600;color:rgba(255,255,255,.38);font-family:inherit;cursor:pointer;transition:all .2s;white-space:nowrap;}
-        .filter-btn:hover{border-color:rgba(255,255,255,.26);color:rgba(255,255,255,.68);}
-        .filter-btn.on{border-color:rgba(99,102,241,.5);color:#a5b4fc;background:rgba(99,102,241,.1);}
+        .filter-btn{background:none;border:1px solid rgba(var(--ink),.1);border-radius:20px;padding:7px 15px;font-size:12px;font-weight:600;color:rgba(var(--ink),var(--ta-38, .38));font-family:inherit;cursor:pointer;transition:all .2s;white-space:nowrap;}
+        .filter-btn:hover{border-color:rgba(var(--ink),.26);color:rgba(var(--ink),var(--ta-68, .68));}
+        .filter-btn.on{border-color:rgba(99,102,241,.5);color:var(--tx-a5b4fc, #a5b4fc);background:rgba(99,102,241,.1);}
 
         .ql{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;text-decoration:none;margin-bottom:2px;transition:background .2s;}
-        .ql:hover{background:rgba(255,255,255,.06);}
+        .ql:hover{background:rgba(var(--ink),.06);}
 
         .sp-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;font-weight:700;font-size:14px;font-family:inherit;text-decoration:none;border:none;cursor:pointer;box-shadow:0 4px 22px rgba(99,102,241,.4);transition:all .25s;}
         .sp-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,.55);}
-        .sp-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:12px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.62);font-weight:600;font-size:14px;font-family:inherit;text-decoration:none;transition:all .25s;}
-        .sp-ghost:hover{border-color:rgba(255,255,255,.28);color:white;background:rgba(255,255,255,.08);}
+        .sp-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:12px;border:1.5px solid rgba(var(--ink),.12);background:rgba(var(--ink),.04);color:rgba(var(--ink),var(--ta-62, .62));font-weight:600;font-size:14px;font-family:inherit;text-decoration:none;transition:all .25s;}
+        .sp-ghost:hover{border-color:rgba(var(--ink),.28);color:var(--ink-solid, white);background:rgba(var(--ink),.08);}
 
         @media(max-width:900px){
           .ch-grid{grid-template-columns:repeat(2,1fr)!important;}
@@ -314,10 +314,10 @@ export default function SupportPage() {
       `}</style>
 
       <main style={{
-        background: "linear-gradient(160deg,#05071a 0%,#0a0e2a 45%,#07091e 100%)",
+        background: "linear-gradient(160deg,var(--dk-05071a, #05071a) 0%,var(--dk-0a0e2a, #0a0e2a) 45%,var(--dk-07091e, #07091e) 100%)",
         minHeight: "100vh",
         fontFamily: "'Outfit',sans-serif",
-        color: "white",
+        color: "var(--ink-solid, white)",
         position: "relative",
         overflow: "hidden",
       }}>
@@ -349,11 +349,11 @@ export default function SupportPage() {
 
               {/* Breadcrumb */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 24 }}>
-                <Link href="/" style={{ fontSize: 12, color: "rgba(255,255,255,.3)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.6)")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.3)")}>Home</Link>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>Support Center</span>
+                <Link href="/" style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-60, .6))")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-30, .3))")}>Home</Link>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", fontWeight: 500 }}>Support Center</span>
               </div>
 
               {/* Status link — used to be a static "99.98% uptime" badge that
@@ -366,35 +366,35 @@ export default function SupportPage() {
                 onMouseEnter={e => (e.currentTarget.style.background = "rgba(16,185,129,.12)")}
                 onMouseLeave={e => (e.currentTarget.style.background = "rgba(16,185,129,.07)")}>
                 <div className="live-dot" />
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#10b981", letterSpacing: ".06em" }}>CHECK LIVE STATUS</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-10b981, #10b981)", letterSpacing: ".06em" }}>CHECK LIVE STATUS</span>
               </Link>
 
               <h1 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(36px,5vw,62px)",
-                fontWeight: 700, color: "white", lineHeight: 1.08, letterSpacing: "-1.8px", marginBottom: 18 }}>
+                fontWeight: 700, color: "var(--ink-solid, white)", lineHeight: 1.08, letterSpacing: "-1.8px", marginBottom: 18 }}>
                 How can we{" "}
-                <span style={{ background: "linear-gradient(135deg,#818cf8 0%,#6366f1 50%,#a78bfa 100%)",
+                <span style={{ background: "linear-gradient(135deg,var(--tx-818cf8, #818cf8) 0%,var(--tx-6366f1, #6366f1) 50%,var(--tx-a78bfa, #a78bfa) 100%)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   help you today?
                 </span>
               </h1>
-              <p style={{ fontSize: 17, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 500, margin: "0 auto 38px" }}>
+              <p style={{ fontSize: 17, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.8, maxWidth: 500, margin: "0 auto 38px" }}>
                 Get answers fast, reach our team directly, or browse the knowledge base — we&apos;re with you at every step.
               </p>
 
               {/* Search bar */}
               <div style={{ maxWidth: 560, margin: "0 auto" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px",
-                  borderRadius: 16, background: "rgba(255,255,255,.05)", border: "1.5px solid rgba(255,255,255,.1)",
+                  borderRadius: 16, background: "rgba(var(--ink),.05)", border: "1.5px solid rgba(var(--ink),.1)",
                   backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,.25)" }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.28)" strokeWidth="2" strokeLinecap="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.28)" strokeWidth="2" strokeLinecap="round">
                     <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
-                  <span style={{ fontSize: 14.5, color: "rgba(255,255,255,.26)", fontWeight: 500, flex: 1, textAlign: "left" }}>
+                  <span style={{ fontSize: 14.5, color: "rgba(var(--ink),var(--ta-26, .26))", fontWeight: 500, flex: 1, textAlign: "left" }}>
                     Search articles, guides, or topics…
                   </span>
                   <div style={{ padding: "6px 12px", borderRadius: 8,
                     background: "rgba(99,102,241,.18)", border: "1px solid rgba(99,102,241,.35)",
-                    fontSize: 11, fontWeight: 700, color: "#a5b4fc", flexShrink: 0 }}>
+                    fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", flexShrink: 0 }}>
                     ⌘K
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function SupportPage() {
 
               <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px", borderRadius: 24,
                 background: "rgba(99,102,241,.1)", border: "1.5px solid rgba(99,102,241,.28)",
-                fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".09em", marginBottom: 24 }}>
+                fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".09em", marginBottom: 24 }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366f1", animation: "blink 2s ease infinite" }} />
                 GET IN TOUCH
               </div>
@@ -459,19 +459,19 @@ export default function SupportPage() {
                 <div>
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px", borderRadius: 24,
                     background: "rgba(251,191,36,.1)", border: "1.5px solid rgba(251,191,36,.28)",
-                    fontSize: 11, fontWeight: 700, color: "#fbbf24", letterSpacing: ".09em", marginBottom: 12 }}>
+                    fontSize: 11, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", letterSpacing: ".09em", marginBottom: 12 }}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24" }} />
                     BROWSE BY TOPIC
                   </div>
                   <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700,
-                    color: "white", letterSpacing: "-.5px" }}>
+                    color: "var(--ink-solid, white)", letterSpacing: "-.5px" }}>
                     Find what you need
                   </h2>
                 </div>
                 <Link href="/help" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600,
-                  color: "rgba(255,255,255,.38)", textDecoration: "none", transition: "color .2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.7)")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.38)")}>
+                  color: "rgba(var(--ink),var(--ta-38, .38))", textDecoration: "none", transition: "color .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-70, .7))")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-38, .38))")}>
                   Browse all help articles
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </Link>
@@ -481,22 +481,22 @@ export default function SupportPage() {
                 {CATEGORIES.map((cat) => (
                   <Link key={cat.label} href={cat.href} className="cat-tile"
                     style={{ borderRadius: 18, padding: "22px", textDecoration: "none",
-                      background: "rgba(255,255,255,.04)", border: "1.5px solid rgba(255,255,255,.07)",
+                      background: "rgba(var(--ink),.04)", border: "1.5px solid rgba(var(--ink),.07)",
                       display: "block", position: "relative", overflow: "hidden" }}
                     onMouseEnter={e => {
-                      (e.currentTarget as HTMLElement).style.background = `${cat.color}0d`;
-                      (e.currentTarget as HTMLElement).style.border = `1.5px solid ${cat.color}38`;
+                      (e.currentTarget as HTMLElement).style.background = `color-mix(in srgb, ${cat.color} 5.1%, transparent)`;
+                      (e.currentTarget as HTMLElement).style.border = `1.5px solid color-mix(in srgb, ${cat.color} 22%, transparent)`;
                     }}
                     onMouseLeave={e => {
-                      (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.04)";
-                      (e.currentTarget as HTMLElement).style.border = "1.5px solid rgba(255,255,255,.07)";
+                      (e.currentTarget as HTMLElement).style.background = "rgba(var(--ink),.04)";
+                      (e.currentTarget as HTMLElement).style.border = "1.5px solid rgba(var(--ink),.07)";
                     }}
                   >
                     <div style={{ position: "absolute", top: -28, right: -28, width: 100, height: 100, borderRadius: "50%",
-                      background: `radial-gradient(circle,${cat.color}1a,transparent 70%)`, pointerEvents: "none" }} />
+                      background: `radial-gradient(circle,color-mix(in srgb, ${cat.color} 10.2%, transparent),transparent 70%)`, pointerEvents: "none" }} />
                     <div style={{ fontSize: 28, marginBottom: 12, lineHeight: 1 }}>{cat.icon}</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,.9)", marginBottom: 8 }}>{cat.label}</div>
-                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.38)", lineHeight: 1.65, marginBottom: 14 }}>{cat.desc}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(var(--ink),.9)", marginBottom: 8 }}>{cat.label}</div>
+                    <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.65, marginBottom: 14 }}>{cat.desc}</div>
                     <div style={{ fontSize: 11, fontWeight: 700, color: cat.color, letterSpacing: ".04em" }}>{cat.count}</div>
                   </Link>
                 ))}
@@ -516,12 +516,12 @@ export default function SupportPage() {
               <div>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px", borderRadius: 24,
                   background: "rgba(129,140,248,.1)", border: "1.5px solid rgba(129,140,248,.28)",
-                  fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".09em", marginBottom: 14 }}>
+                  fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".09em", marginBottom: 14 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#818cf8" }} />
                   FREQUENTLY ASKED
                 </div>
                 <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700,
-                  color: "white", letterSpacing: "-.5px", marginBottom: 20 }}>
+                  color: "var(--ink-solid, white)", letterSpacing: "-.5px", marginBottom: 20 }}>
                   Common Questions
                 </h2>
 
@@ -539,19 +539,19 @@ export default function SupportPage() {
                   {filteredFaqs.map((faq, i) => (
                     <div key={i} style={{
                       borderRadius: 14, overflow: "hidden",
-                      background: openFaq === i ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.04)",
-                      border: `1.5px solid ${openFaq === i ? "rgba(99,102,241,.38)" : "rgba(255,255,255,.07)"}`,
+                      background: openFaq === i ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.04)",
+                      border: `1.5px solid ${openFaq === i ? "rgba(99,102,241,.38)" : "rgba(var(--ink),.07)"}`,
                       transition: "all .28s",
                     }}>
                       <button className="faq-btn" onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                        style={{ color: openFaq === i ? "#c7d2fe" : "rgba(255,255,255,.7)" }}>
+                        style={{ color: openFaq === i ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),var(--ta-70, .7))" }}>
                         <span>{faq.q}</span>
                         <div style={{
                           width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
-                          background: openFaq === i ? "rgba(99,102,241,.28)" : "rgba(255,255,255,.06)",
-                          border: `1px solid ${openFaq === i ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.1)"}`,
+                          background: openFaq === i ? "rgba(99,102,241,.28)" : "rgba(var(--ink),.06)",
+                          border: `1px solid ${openFaq === i ? "rgba(99,102,241,.5)" : "rgba(var(--ink),.1)"}`,
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          color: openFaq === i ? "#a5b4fc" : "rgba(255,255,255,.32)",
+                          color: openFaq === i ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-32, .32))",
                           fontSize: 18, lineHeight: 1,
                           transform: openFaq === i ? "rotate(45deg)" : "rotate(0)",
                           transition: "all .28s",
@@ -560,8 +560,8 @@ export default function SupportPage() {
                       {openFaq === i && (
                         <div className="faq-answer" style={{
                           padding: "4px 22px 18px",
-                          fontSize: 13.5, color: "rgba(255,255,255,.46)", lineHeight: 1.8,
-                          borderTop: "1px solid rgba(255,255,255,.05)",
+                          fontSize: 13.5, color: "rgba(var(--ink),var(--ta-46, .46))", lineHeight: 1.8,
+                          borderTop: "1px solid rgba(var(--ink),.05)",
                         }}>
                           {faq.a}
                         </div>
@@ -569,7 +569,7 @@ export default function SupportPage() {
                     </div>
                   ))}
                   {filteredFaqs.length === 0 && (
-                    <div style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,.22)", fontSize: 14 }}>
+                    <div style={{ padding: "40px 0", textAlign: "center", color: "rgba(var(--ink),var(--ta-22, .22))", fontSize: 14 }}>
                       No FAQs in this category yet.
                     </div>
                   )}
@@ -583,23 +583,23 @@ export default function SupportPage() {
                 <div style={{ borderRadius: 20, padding: "22px", ...CARD_BASE, gap: 0 }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2,
                     background: "linear-gradient(90deg,transparent,#6366f1,transparent)" }} />
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-28, .28))", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 16 }}>
                     Response Times by Plan
                   </div>
                   {SLA.map((t, i, arr) => (
                     <div key={t.plan} style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
-                      padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                      padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(var(--ink),.05)" : "none" }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: t.color }}>{t.plan}</span>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)" }}>Email: {t.email}</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 1 }}>Ticket: {t.ticket}</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),var(--ta-65, .65))" }}>Email: {t.email}</div>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 1 }}>Ticket: {t.ticket}</div>
                       </div>
                     </div>
                   ))}
                   <Link href="/pricing" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 16, paddingTop: 14,
-                    borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 12, fontWeight: 700, color: "#a5b4fc", textDecoration: "none" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "#a5b4fc")}>
+                    borderTop: "1px solid rgba(var(--ink),.05)", fontSize: 12, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "var(--ink-solid, white)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "var(--tx-a5b4fc, #a5b4fc)")}>
                     Compare plans for full SLA details →
                   </Link>
                 </div>
@@ -615,10 +615,10 @@ export default function SupportPage() {
                   onMouseEnter={e => (e.currentTarget.style.background = "rgba(16,185,129,.1)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "rgba(16,185,129,.05)")}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".09em", textTransform: "uppercase" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-28, .28))", letterSpacing: ".09em", textTransform: "uppercase" }}>
                       Platform Status
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, fontWeight: 700, color: "#10b981" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, fontWeight: 700, color: "var(--tx-10b981, #10b981)" }}>
                       <div className="live-dot" style={{ width: 6, height: 6 }} />
                       View live status →
                     </div>
@@ -627,7 +627,7 @@ export default function SupportPage() {
 
                 {/* Quick links */}
                 <div style={{ borderRadius: 20, padding: "22px", ...CARD_BASE, gap: 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-28, .28))", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 14 }}>
                     Helpful Resources
                   </div>
                   {[
@@ -638,9 +638,9 @@ export default function SupportPage() {
                   ].map(({ label, icon, href }) => (
                     <Link key={label} href={href} className="ql">
                       <span style={{ fontSize: 15, lineHeight: 1, flexShrink: 0 }}>{icon}</span>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.52)", fontWeight: 500 }}>{label}</span>
+                      <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-52, .52))", fontWeight: 500 }}>{label}</span>
                       <svg style={{ marginLeft: "auto", flexShrink: 0 }} width="11" height="11" viewBox="0 0 24 24"
-                        fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2.5">
+                        fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2.5">
                         <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                       </svg>
                     </Link>
@@ -662,31 +662,31 @@ export default function SupportPage() {
                 <div>
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px", borderRadius: 24,
                     background: "rgba(167,139,250,.1)", border: "1.5px solid rgba(167,139,250,.28)",
-                    fontSize: 11, fontWeight: 700, color: "#c4b5fd", letterSpacing: ".09em", marginBottom: 12 }}>
+                    fontSize: 11, fontWeight: 700, color: "var(--tx-c4b5fd, #c4b5fd)", letterSpacing: ".09em", marginBottom: 12 }}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#a78bfa" }} />
                     SUPPORT PLAN COMPARISON
                   </div>
                   <h2 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700,
-                    color: "white", letterSpacing: "-.5px" }}>
+                    color: "var(--ink-solid, white)", letterSpacing: "-.5px" }}>
                     Every plan includes support — higher tiers get faster responses.
                   </h2>
                 </div>
                 <Link href="/pricing" style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px",
                   borderRadius: 10, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.28)",
-                  color: "#a5b4fc", textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0, transition: "all .2s" }}
+                  color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0, transition: "all .2s" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.2)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "rgba(99,102,241,.1)")}>
                   View pricing →
                 </Link>
               </div>
 
-              <div style={{ borderRadius: 18, overflow: "hidden", border: "1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ borderRadius: 18, overflow: "hidden", border: "1px solid rgba(var(--ink),.07)" }}>
                 {/* Header row */}
                 <div className="sla-grid" style={{ display: "grid", gridTemplateColumns: "1.4fr repeat(3,1fr)",
-                  background: "rgba(255,255,255,.03)", borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+                  background: "rgba(var(--ink),.03)", borderBottom: "1px solid rgba(var(--ink),.07)" }}>
                   <div style={{ padding: "16px 22px" }} />
                   {SLA.map(t => (
-                    <div key={t.plan} style={{ padding: "16px 16px", borderLeft: "1px solid rgba(255,255,255,.05)" }}>
+                    <div key={t.plan} style={{ padding: "16px 16px", borderLeft: "1px solid rgba(var(--ink),.05)" }}>
                       <div style={{ fontSize: 11, fontWeight: 800, color: t.color, letterSpacing: ".07em", marginBottom: 2 }}>
                         {t.plan.toUpperCase()}
                       </div>
@@ -696,17 +696,17 @@ export default function SupportPage() {
 
                 {SLA_ROWS.map((row, i, arr) => (
                   <div key={row.key} className="sla-grid" style={{ display: "grid", gridTemplateColumns: "1.4fr repeat(3,1fr)",
-                    borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,.05)" : "none",
-                    background: i % 2 === 0 ? "rgba(255,255,255,.02)" : "transparent" }}>
-                    <div style={{ padding: "14px 22px", fontSize: 13.5, color: "rgba(255,255,255,.5)", fontWeight: 500 }}>
+                    borderBottom: i < arr.length - 1 ? "1px solid rgba(var(--ink),.05)" : "none",
+                    background: i % 2 === 0 ? "rgba(var(--ink),.02)" : "transparent" }}>
+                    <div style={{ padding: "14px 22px", fontSize: 13.5, color: "rgba(var(--ink),var(--ta-50, .5))", fontWeight: 500 }}>
                       {row.label}
                     </div>
                     {SLA.map(t => {
                       const val = t[row.key];
                       return (
                         <div key={t.plan} style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600,
-                          color: val === "—" ? "rgba(255,255,255,.16)" : "rgba(255,255,255,.75)",
-                          borderLeft: "1px solid rgba(255,255,255,.04)" }}>
+                          color: val === "—" ? "rgba(var(--ink),var(--ta-16, .16))" : "rgba(var(--ink),.75)",
+                          borderLeft: "1px solid rgba(var(--ink),.04)" }}>
                           {val}
                         </div>
                       );
@@ -716,10 +716,10 @@ export default function SupportPage() {
 
                 {/* Footer row */}
                 <div className="sla-grid" style={{ display: "grid", gridTemplateColumns: "1.4fr repeat(3,1fr)",
-                  background: "rgba(255,255,255,.025)", borderTop: "1px solid rgba(255,255,255,.07)" }}>
+                  background: "rgba(var(--ink),.025)", borderTop: "1px solid rgba(var(--ink),.07)" }}>
                   <div />
                   {SLA.map(t => (
-                    <div key={t.plan} style={{ padding: "14px 16px", borderLeft: "1px solid rgba(255,255,255,.04)" }}>
+                    <div key={t.plan} style={{ padding: "14px 16px", borderLeft: "1px solid rgba(var(--ink),.04)" }}>
                       <Link href="/pricing" style={{ display: "inline-flex", alignItems: "center", gap: 5,
                         fontSize: 12, fontWeight: 700, color: t.color, textDecoration: "none", opacity: .85 }}
                         onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
@@ -754,19 +754,19 @@ export default function SupportPage() {
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 12px",
                   borderRadius: 20, marginBottom: 14,
                   background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.25)",
-                  fontSize: 10.5, fontWeight: 700, color: "#fbbf24", letterSpacing: ".07em" }}>
+                  fontSize: 10.5, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", letterSpacing: ".07em" }}>
                   STILL NEED HELP?
                 </div>
                 <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(20px,2.5vw,28px)",
-                  fontWeight: 700, color: "white", letterSpacing: "-.4px", marginBottom: 10 }}>
+                  fontWeight: 700, color: "var(--ink-solid, white)", letterSpacing: "-.4px", marginBottom: 10 }}>
                   Can&apos;t find what you&apos;re looking for?
                 </h3>
-                <p style={{ fontSize: 14.5, color: "rgba(255,255,255,.4)", maxWidth: 460, lineHeight: 1.7 }}>
+                <p style={{ fontSize: 14.5, color: "rgba(var(--ink),var(--ta-40, .4))", maxWidth: 460, lineHeight: 1.7 }}>
                   Our support team is here to help with setup, technical issues, billing questions, and custom requirements.
                 </p>
                 <div style={{ display: "flex", gap: 20, flexWrap: "wrap", marginTop: 18 }}>
                   {["Submit a ticket", "Technical support", "Billing help", "Onboarding call"].map(t => (
-                    <div key={t} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "rgba(255,255,255,.35)", fontWeight: 500 }}>
+                    <div key={t} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 500 }}>
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <circle cx="7" cy="7" r="7" fill="rgba(99,102,241,.22)" />
                         <path d="M4 7l2.5 2.5L10 4.5" stroke="#a5b4fc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

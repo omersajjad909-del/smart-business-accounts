@@ -28,7 +28,7 @@ const SECTIONS = [
   {
     id: "getting-started",
     icon: "🚀",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.12)",
     border: "rgba(129,140,248,.25)",
     title: "Getting Started",
@@ -45,7 +45,7 @@ const SECTIONS = [
   {
     id: "accounting",
     icon: "📒",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.12)",
     border: "rgba(52,211,153,.25)",
     title: "Accounting & Ledger",
@@ -62,7 +62,7 @@ const SECTIONS = [
   {
     id: "invoicing",
     icon: "🧾",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.12)",
     border: "rgba(251,191,36,.25)",
     title: "Invoicing & Sales",
@@ -79,7 +79,7 @@ const SECTIONS = [
   {
     id: "inventory",
     icon: "📦",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     glow: "rgba(6,182,212,.12)",
     border: "rgba(6,182,212,.25)",
     title: "Inventory & Stock",
@@ -96,7 +96,7 @@ const SECTIONS = [
   {
     id: "banking",
     icon: "🏦",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.12)",
     border: "rgba(167,139,250,.25)",
     title: "Banking & Reconciliation",
@@ -113,7 +113,7 @@ const SECTIONS = [
   {
     id: "hr-payroll",
     icon: "👥",
-    color: "#f87171",
+    color: "var(--tx-f87171, #f87171)",
     glow: "rgba(248,113,113,.12)",
     border: "rgba(248,113,113,.25)",
     title: "HR & Payroll",
@@ -130,7 +130,7 @@ const SECTIONS = [
   {
     id: "multi-branch",
     icon: "🏢",
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
     glow: "rgba(249,115,22,.12)",
     border: "rgba(249,115,22,.25)",
     title: "Multi-Branch & Companies",
@@ -147,7 +147,7 @@ const SECTIONS = [
   {
     id: "api",
     icon: "⚙️",
-    color: "#6366f1",
+    color: "var(--tx-6366f1, #6366f1)",
     glow: "rgba(99,102,241,.12)",
     border: "rgba(99,102,241,.25)",
     title: "API & Integrations",
@@ -164,11 +164,11 @@ const SECTIONS = [
 ];
 
 const QUICK_LINKS = [
-  { icon: "🚀", label: "Quick Start",     sub: "Up and running in 5 min",    href: "/help/create-account",  color: "#818cf8" },
-  { icon: "📖", label: "Help Center",     sub: "50+ guides & tutorials",      href: "/help",                 color: "#34d399" },
-  { icon: "⚙️", label: "API Reference",   sub: "Endpoints & authentication",   href: "/developers/api",       color: "#6366f1" },
-  { icon: "🔄", label: "Changelog",       sub: "Latest updates & releases",    href: "/changelog",            color: "#fbbf24" },
-  { icon: "💬", label: "Support",         sub: "Live chat & tickets",          href: "/support",              color: "#a78bfa" },
+  { icon: "🚀", label: "Quick Start",     sub: "Up and running in 5 min",    href: "/help/create-account",  color: "var(--tx-818cf8, #818cf8)" },
+  { icon: "📖", label: "Help Center",     sub: "50+ guides & tutorials",      href: "/help",                 color: "var(--tx-34d399, #34d399)" },
+  { icon: "⚙️", label: "API Reference",   sub: "Endpoints & authentication",   href: "/developers/api",       color: "var(--tx-6366f1, #6366f1)" },
+  { icon: "🔄", label: "Changelog",       sub: "Latest updates & releases",    href: "/changelog",            color: "var(--tx-fbbf24, #fbbf24)" },
+  { icon: "💬", label: "Support",         sub: "Live chat & tickets",          href: "/support",              color: "var(--tx-a78bfa, #a78bfa)" },
 ];
 
 const SEARCH_INDEX = SECTIONS.flatMap(s =>
@@ -184,8 +184,8 @@ function SectionCard({ s, i }: { s: typeof SECTIONS[0]; i: number }) {
   return (
     <div ref={ref} style={{
       borderRadius: 20, overflow: "hidden",
-      background: "rgba(255,255,255,.025)",
-      border: "1.5px solid rgba(255,255,255,.07)",
+      background: "rgba(var(--ink),.025)",
+      border: "1.5px solid rgba(var(--ink),.07)",
       opacity: vis ? 1 : 0,
       transform: vis ? "translateY(0)" : "translateY(24px)",
       transition: `all .6s cubic-bezier(.22,1,.36,1) ${i * 60}ms`,
@@ -202,8 +202,8 @@ function SectionCard({ s, i }: { s: typeof SECTIONS[0]; i: number }) {
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
           }}>{s.icon}</div>
           <div style={{ flex: 1 }}>
-            <h3 style={{ fontFamily: "'Lora',serif", fontSize: 16, fontWeight: 700, color: "white", margin: "0 0 3px" }}>{s.title}</h3>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,.33)", margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
+            <h3 style={{ fontFamily: "'Lora',serif", fontSize: 16, fontWeight: 700, color: "var(--ink-solid, white)", margin: "0 0 3px" }}>{s.title}</h3>
+            <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-33, .33))", margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
           </div>
         </div>
 
@@ -220,12 +220,12 @@ function SectionCard({ s, i }: { s: typeof SECTIONS[0]; i: number }) {
                 textDecoration: "none", transition: "all .18s",
               }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                stroke={hov === li ? s.color : "rgba(255,255,255,.2)"} strokeWidth="2.5"
+                stroke={hov === li ? s.color : "rgba(var(--ink),.2)"} strokeWidth="2.5"
                 style={{ flexShrink: 0, transition: "stroke .18s" }}>
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
               </svg>
-              <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: hov === li ? "white" : "rgba(255,255,255,.58)", transition: "color .18s" }}>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: hov === li ? "var(--ink-solid, white)" : "rgba(var(--ink),var(--ta-58, .58))", transition: "color .18s" }}>
                 {lk.label}
               </span>
               {lk.badge && (
@@ -236,7 +236,7 @@ function SectionCard({ s, i }: { s: typeof SECTIONS[0]; i: number }) {
                 }}>{lk.badge}</span>
               )}
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none"
-                stroke={hov === li ? s.color : "rgba(255,255,255,.15)"} strokeWidth="2.5"
+                stroke={hov === li ? s.color : "rgba(var(--ink),.15)"} strokeWidth="2.5"
                 style={{ flexShrink: 0, transition: "stroke .18s" }}>
                 <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
               </svg>
@@ -248,14 +248,14 @@ function SectionCard({ s, i }: { s: typeof SECTIONS[0]; i: number }) {
       <Link href={HELP_CATEGORY_IDS.has(s.id) ? `/help#${s.id}` : s.id === "api" ? "/developers/api" : "/help"} style={{
         display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
         padding: "11px", width: "100%",
-        borderTop: "1px solid rgba(255,255,255,.05)",
-        background: "rgba(255,255,255,.015)",
+        borderTop: "1px solid rgba(var(--ink),.05)",
+        background: "rgba(var(--ink),.015)",
         fontSize: 11.5, fontWeight: 700, color: s.color, textDecoration: "none",
         transition: "background .2s",
         letterSpacing: ".03em",
       }}
         onMouseEnter={e => (e.currentTarget.style.background = s.glow)}
-        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.015)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "rgba(var(--ink),.015)")}
       >
         All {s.title} docs
         <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -286,8 +286,8 @@ export default function DocsPage() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(180deg,#07091c 0%,#080c22 40%,#06091a 100%)",
-      color: "white", fontFamily: "'Outfit',sans-serif",
+      background: "linear-gradient(180deg,var(--dk-07091c, #07091c) 0%,var(--dk-080c22, #080c22) 40%,var(--dk-06091a, #06091a) 100%)",
+      color: "var(--ink-solid, white)", fontFamily: "'Outfit',sans-serif",
     }}>
       <style>{`
         
@@ -295,7 +295,7 @@ export default function DocsPage() {
         @keyframes orbDrift{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-60%)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
         code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
-        input::placeholder{color:rgba(255,255,255,.22);}
+        input::placeholder{color:rgba(var(--ink),var(--ta-22, .22));}
       `}</style>
 
       {/* Background */}
@@ -312,11 +312,11 @@ export default function DocsPage() {
 
           {/* Breadcrumb */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 28, opacity: heroVis ? 1 : 0, transition: "opacity .5s" }}>
-            <Link href="/" style={{ fontSize: 12, color: "rgba(255,255,255,.25)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.6)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.25)")}>Home</Link>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.18)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)", fontWeight: 500 }}>Documentation</span>
+            <Link href="/" style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-25, .25))", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-60, .6))")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-25, .25))")}>Home</Link>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.18)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 500 }}>Documentation</span>
           </div>
 
           {/* Badge */}
@@ -324,7 +324,7 @@ export default function DocsPage() {
             display: "inline-flex", alignItems: "center", gap: 7,
             padding: "5px 16px", borderRadius: 100, marginBottom: 22,
             background: "rgba(99,102,241,.1)", border: "1.5px solid rgba(99,102,241,.28)",
-            fontSize: 10.5, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".09em",
+            fontSize: 10.5, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".09em",
             opacity: heroVis ? 1 : 0, transition: "all .5s ease .1s",
             transform: heroVis ? "translateY(0)" : "translateY(12px)",
           }}>
@@ -337,20 +337,20 @@ export default function DocsPage() {
             fontFamily: "'Lora',serif",
             fontSize: "clamp(32px,5vw,58px)",
             fontWeight: 700, lineHeight: 1.1,
-            letterSpacing: "-2px", color: "white",
+            letterSpacing: "-2px", color: "var(--ink-solid, white)",
             marginBottom: 16,
             opacity: heroVis ? 1 : 0,
             transform: heroVis ? "translateY(0)" : "translateY(18px)",
             transition: "all .6s ease .15s",
           }}>
             Everything you need<br/>
-            <span style={{ fontStyle: "italic", background: "linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ fontStyle: "italic", background: "linear-gradient(135deg,var(--tx-a5b4fc, #a5b4fc),var(--tx-818cf8, #818cf8),var(--tx-c4b5fd, #c4b5fd))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               to master FinovaOS.
             </span>
           </h1>
 
           <p style={{
-            fontSize: 16, color: "rgba(255,255,255,.4)",
+            fontSize: 16, color: "rgba(var(--ink),var(--ta-40, .4))",
             lineHeight: 1.8, maxWidth: 500, margin: "0 auto 36px",
             opacity: heroVis ? 1 : 0,
             transform: heroVis ? "translateY(0)" : "translateY(14px)",
@@ -366,7 +366,7 @@ export default function DocsPage() {
             transition: "opacity .6s ease .3s",
           }}>
             <div style={{ position: "absolute", left: 18, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={focused ? "#818cf8" : "rgba(255,255,255,.28)"} strokeWidth="2.2" style={{ transition: "stroke .2s" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={focused ? "#818cf8" : "rgba(var(--ink),.28)"} strokeWidth="2.2" style={{ transition: "stroke .2s" }}>
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
             </div>
@@ -378,55 +378,55 @@ export default function DocsPage() {
               placeholder="Search documentation…"
               style={{
                 width: "100%", padding: "16px 52px 16px 48px", borderRadius: 16,
-                border: `2px solid ${focused ? "rgba(129,140,248,.55)" : "rgba(255,255,255,.1)"}`,
-                background: focused ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.04)",
+                border: `2px solid ${focused ? "rgba(129,140,248,.55)" : "rgba(var(--ink),.1)"}`,
+                background: focused ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.04)",
                 color: "white", fontSize: 15, fontFamily: "inherit", outline: "none",
                 boxShadow: focused ? "0 0 0 4px rgba(99,102,241,.1)" : "none",
                 transition: "all .25s",
               }}
             />
             {search && (
-              <button onClick={() => setSearch("")} style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.28)", fontSize: 16, padding: 4, transition: "color .2s", fontFamily: "inherit" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.28)")}>✕</button>
+              <button onClick={() => setSearch("")} style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "rgba(var(--ink),var(--ta-28, .28))", fontSize: 16, padding: 4, transition: "color .2s", fontFamily: "inherit" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--ink-solid, white)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-28, .28))")}>✕</button>
             )}
 
             {/* Search results */}
             {results.length > 0 && (
-              <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0, borderRadius: 14, background: "rgba(7,9,28,.97)", border: "1.5px solid rgba(129,140,248,.28)", backdropFilter: "blur(20px)", boxShadow: "0 20px 60px rgba(0,0,0,.7)", overflow: "hidden", zIndex: 50, textAlign: "left" }}>
-                <div style={{ padding: "8px 14px 4px", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".08em", textTransform: "uppercase" }}>
+              <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0, borderRadius: 14, background: "rgba(var(--dkr-07091c, 7,9,28),0.97)", border: "1.5px solid rgba(129,140,248,.28)", backdropFilter: "blur(20px)", boxShadow: "0 20px 60px rgba(0,0,0,.7)", overflow: "hidden", zIndex: 50, textAlign: "left" }}>
+                <div style={{ padding: "8px 14px 4px", fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),var(--ta-28, .28))", letterSpacing: ".08em", textTransform: "uppercase" }}>
                   {results.length} result{results.length !== 1 ? "s" : ""}
                 </div>
                 {results.slice(0, 8).map((r, i) => (
                   <Link key={i} href={r.href}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,.05)", textDecoration: "none", transition: "background .15s" }}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderTop: "1px solid rgba(var(--ink),.05)", textDecoration: "none", transition: "background .15s" }}
                     onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.08)")}
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     onClick={() => setSearch("")}
                   >
                     <span style={{ fontSize: 14, flexShrink: 0 }}>{r.icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", marginTop: 1 }}>{r.section}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(var(--ink),.8)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", marginTop: 1 }}>{r.section}</div>
                     </div>
-                    {r.badge && <span style={{ fontSize: 9, fontWeight: 700, color: r.color, letterSpacing: ".06em", textTransform: "uppercase", padding: "2px 7px", borderRadius: 6, background: `${r.color}18`, border: `1px solid ${r.color}30`, flexShrink: 0 }}>{r.badge}</span>}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                    {r.badge && <span style={{ fontSize: 9, fontWeight: 700, color: r.color, letterSpacing: ".06em", textTransform: "uppercase", padding: "2px 7px", borderRadius: 6, background: `color-mix(in srgb, ${r.color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${r.color} 18.8%, transparent)`, flexShrink: 0 }}>{r.badge}</span>}
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2.5" style={{ flexShrink: 0 }}>
                       <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                     </svg>
                   </Link>
                 ))}
                 {results.length > 8 && (
-                  <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 12, color: "rgba(255,255,255,.3)", textAlign: "center" }}>
+                  <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(var(--ink),.05)", fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))", textAlign: "center" }}>
                     +{results.length - 8} more results
                   </div>
                 )}
               </div>
             )}
             {search.trim().length > 1 && results.length === 0 && (
-              <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0, borderRadius: 14, background: "rgba(7,9,28,.97)", border: "1.5px solid rgba(255,255,255,.08)", padding: "24px", textAlign: "center", zIndex: 50 }}>
+              <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0, borderRadius: 14, background: "rgba(var(--dkr-07091c, 7,9,28),0.97)", border: "1.5px solid rgba(var(--ink),.08)", padding: "24px", textAlign: "center", zIndex: 50 }}>
                 <div style={{ fontSize: 22, marginBottom: 6 }}>🔍</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>No results for "<strong style={{ color: "white" }}>{search}</strong>"</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.22)", marginTop: 4 }}>Try different keywords</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>No results for "<strong style={{ color: "var(--ink-solid, white)" }}>{search}</strong>"</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-22, .22))", marginTop: 4 }}>Try different keywords</div>
               </div>
             )}
           </div>
@@ -442,24 +442,24 @@ export default function DocsPage() {
             <Link key={i} href={q.href} style={{
               display: "flex", alignItems: "center", gap: 12,
               padding: "14px 16px", borderRadius: 14,
-              background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+              background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
               textDecoration: "none", transition: "all .22s",
             }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = `${q.color}10`;
-                e.currentTarget.style.borderColor = `${q.color}30`;
+                e.currentTarget.style.background = `color-mix(in srgb, ${q.color} 6.3%, transparent)`;
+                e.currentTarget.style.borderColor = `color-mix(in srgb, ${q.color} 18.8%, transparent)`;
                 e.currentTarget.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = "rgba(255,255,255,.03)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,.07)";
+                e.currentTarget.style.background = "rgba(var(--ink),.03)";
+                e.currentTarget.style.borderColor = "rgba(var(--ink),.07)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
               <span style={{ fontSize: 20, flexShrink: 0 }}>{q.icon}</span>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)", marginBottom: 2 }}>{q.label}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.sub}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.8)", marginBottom: 2 }}>{q.label}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{q.sub}</div>
               </div>
             </Link>
           ))}
@@ -467,11 +467,11 @@ export default function DocsPage() {
 
         {/* ── Section Heading ── */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
-          <h2 style={{ fontFamily: "'Lora',serif", fontSize: 22, fontWeight: 700, color: "white", margin: 0 }}>
+          <h2 style={{ fontFamily: "'Lora',serif", fontSize: 22, fontWeight: 700, color: "var(--ink-solid, white)", margin: 0 }}>
             Browse by Module
           </h2>
-          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.06)" }}/>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)", fontWeight: 500 }}>{SECTIONS.length} sections</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(var(--ink),.06)" }}/>
+          <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-25, .25))", fontWeight: 500 }}>{SECTIONS.length} sections</span>
         </div>
 
         {/* ── Section Grid ── */}
@@ -482,7 +482,7 @@ export default function DocsPage() {
         {/* ── API Banner ── */}
         <div style={{
           borderRadius: 22,
-          background: "linear-gradient(135deg,rgba(30,27,85,.85),rgba(45,43,107,.85))",
+          background: "var(--mk-card-indigo, linear-gradient(135deg,rgba(30,27,85,.85),rgba(45,43,107,.85)))",
           border: "1.5px solid rgba(99,102,241,.22)",
           padding: "36px 44px",
           display: "grid", gridTemplateColumns: "1fr auto",
@@ -493,13 +493,13 @@ export default function DocsPage() {
           <div style={{ position: "absolute", right: -40, top: "50%", transform: "translateY(-50%)", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,.14),transparent 70%)", pointerEvents: "none" }}/>
 
           <div style={{ position: "relative" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 100, marginBottom: 12, background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.35)", fontSize: 10, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 100, marginBottom: 12, background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.35)", fontSize: 10, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>
               ⚙️ DEVELOPER API
             </div>
-            <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "white", letterSpacing: "-.4px", marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "var(--ink-solid, white)", letterSpacing: "-.4px", marginBottom: 8 }}>
               Build on top of FinovaOS
             </h3>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,.42)", margin: 0, maxWidth: 480, lineHeight: 1.7 }}>
+            <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0, maxWidth: 480, lineHeight: 1.7 }}>
               Use our REST API to sync data, automate workflows, and connect FinovaOS with your existing systems. Company-scoped API keys — no OAuth complexity.
             </p>
             <div style={{ display: "flex", gap: 20, marginTop: 16, flexWrap: "wrap" }}>
@@ -510,8 +510,8 @@ export default function DocsPage() {
                 { label: "Versioning",  val: "v1" },
               ].map(({ label, val }) => (
                 <div key={label}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", marginBottom: 2 }}>{label}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#a5b4fc" }}>{val}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", marginBottom: 2 }}>{label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{val}</div>
                 </div>
               ))}
             </div>
@@ -534,13 +534,13 @@ export default function DocsPage() {
             <Link href="/dashboard/integrations" style={{
               display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7,
               padding: "12px 22px", borderRadius: 12,
-              border: "1.5px solid rgba(255,255,255,.12)",
-              background: "rgba(255,255,255,.04)",
-              color: "rgba(255,255,255,.6)", fontWeight: 600, fontSize: 13, textDecoration: "none",
+              border: "1.5px solid rgba(var(--ink),.12)",
+              background: "rgba(var(--ink),.04)",
+              color: "rgba(var(--ink),var(--ta-60, .6))", fontWeight: 600, fontSize: 13, textDecoration: "none",
               transition: "all .22s", whiteSpace: "nowrap",
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.08)"; e.currentTarget.style.color = "white"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.04)"; e.currentTarget.style.color = "rgba(255,255,255,.6)"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--ink),.08)"; e.currentTarget.style.color = "var(--ink-solid, white)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--ink),.04)"; e.currentTarget.style.color = "rgba(var(--ink),var(--ta-60, .6))"; }}
             >
               Generate API Key
             </Link>
@@ -550,16 +550,16 @@ export default function DocsPage() {
         {/* ── Support Banner ── */}
         <div style={{
           borderRadius: 18, padding: "28px 36px",
-          background: "rgba(255,255,255,.025)",
-          border: "1px solid rgba(255,255,255,.07)",
+          background: "rgba(var(--ink),.025)",
+          border: "1px solid rgba(var(--ink),.07)",
           display: "flex", alignItems: "center",
           justifyContent: "space-between", gap: 24, flexWrap: "wrap",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(52,211,153,.1)", border: "1.5px solid rgba(52,211,153,.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>💬</div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,.85)", marginBottom: 3 }}>Can't find what you're looking for?</div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>Our support team typically responds within 24 hours.</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(var(--ink),.85)", marginBottom: 3 }}>Can't find what you're looking for?</div>
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-35, .35))" }}>Our support team typically responds within 24 hours.</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -569,9 +569,9 @@ export default function DocsPage() {
             >
               Open a Ticket →
             </Link>
-            <Link href="/help" style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 11, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.6)", fontWeight: 600, fontSize: 13, textDecoration: "none", transition: "all .22s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.08)"; e.currentTarget.style.color = "white"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.04)"; e.currentTarget.style.color = "rgba(255,255,255,.6)"; }}
+            <Link href="/help" style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 11, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-60, .6))", fontWeight: 600, fontSize: 13, textDecoration: "none", transition: "all .22s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(var(--ink),.08)"; e.currentTarget.style.color = "var(--ink-solid, white)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(var(--ink),.04)"; e.currentTarget.style.color = "rgba(var(--ink),var(--ta-60, .6))"; }}
             >
               Browse Help Center
             </Link>

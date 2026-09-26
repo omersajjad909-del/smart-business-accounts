@@ -5,10 +5,10 @@ import { AFFILIATE_PROGRAM_LIVE } from "@/lib/affiliateProgram";
 import ComingSoonSubscribe from "@/components/ComingSoonSubscribe";
 
 const TIERS = [
-  { name:"Starter",    referrals:"1–5",   commission:"20%", monthly:"$200", color:"#818cf8", glow:"rgba(129,140,248,.15)", icon:"🌱" },
-  { name:"Growth",     referrals:"6–20",  commission:"25%", monthly:"$750", color:"#34d399", glow:"rgba(52,211,153,.12)",  icon:"🚀", popular:true },
-  { name:"Pro",        referrals:"21–50", commission:"30%", monthly:"$2,400", color:"#fbbf24", glow:"rgba(251,191,36,.12)", icon:"⭐" },
-  { name:"Elite",      referrals:"50+",   commission:"35%", monthly:"Custom", color:"#c4b5fd", glow:"rgba(196,181,253,.12)",icon:"💎" },
+  { name:"Starter",    referrals:"1–5",   commission:"20%", monthly:"$200", color:"var(--tx-818cf8, #818cf8)", glow:"rgba(129,140,248,.15)", icon:"🌱" },
+  { name:"Growth",     referrals:"6–20",  commission:"25%", monthly:"$750", color:"var(--tx-34d399, #34d399)", glow:"rgba(52,211,153,.12)",  icon:"🚀", popular:true },
+  { name:"Pro",        referrals:"21–50", commission:"30%", monthly:"$2,400", color:"var(--tx-fbbf24, #fbbf24)", glow:"rgba(251,191,36,.12)", icon:"⭐" },
+  { name:"Elite",      referrals:"50+",   commission:"35%", monthly:"Custom", color:"var(--tx-c4b5fd, #c4b5fd)", glow:"rgba(196,181,253,.12)",icon:"💎" },
 ];
 
 const HOW_IT_WORKS = [
@@ -57,7 +57,7 @@ function ComingSoon() {
     <main style={{ fontFamily: ff, minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(64px,12vw,120px) clamp(20px,5vw,32px)", textAlign: "center" }}>
       <div style={{ maxWidth: 620 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 100, background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", marginBottom: 28 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>COMING SOON</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>COMING SOON</span>
         </div>
         <h1 style={{ fontSize: "clamp(32px,6vw,56px)", fontWeight: 900, letterSpacing: "-2px", lineHeight: 1.05, margin: "0 0 20px", color: "var(--text-primary)" }}>
           Our affiliate program isn&apos;t open yet
@@ -71,7 +71,7 @@ function ComingSoon() {
           We&apos;d rather open late than take your traffic and get your payout wrong.
         </p>
         <div style={{ marginBottom: 28 }}>
-          <ComingSoonSubscribe list="affiliate" accent="#f59e0b" dark={false} />
+          <ComingSoonSubscribe list="affiliate" accent="var(--tx-f59e0b, #f59e0b)" dark={false} />
         </div>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/pricing" style={{ padding: "14px 30px", borderRadius: 12, textDecoration: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontWeight: 800, fontSize: 15 }}>
@@ -113,27 +113,27 @@ function AffiliateProgramPage() {
   }
 
   return (
-    <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)", color:"white", fontFamily:"'DM Sans','Outfit',system-ui,sans-serif", overflowX:"hidden" }}>
+    <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)", color:"var(--ink-solid, white)", fontFamily:"'DM Sans','Outfit',system-ui,sans-serif", overflowX:"hidden" }}>
 
       {/* Hero */}
       <Section style={{ padding:"120px 24px 70px", textAlign:"center", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-100, left:"50%", transform:"translateX(-50%)", width:650, height:650, borderRadius:"50%", background:"radial-gradient(circle,rgba(251,191,36,.12) 0%,transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ maxWidth:680, margin:"0 auto", position:"relative", zIndex:1 }}>
           <div style={{ display:"inline-flex", gap:8, padding:"6px 18px", borderRadius:24, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.3)", marginBottom:22, opacity:heroVis?1:0, transition:"all .5s" }}>
-            <span style={{ fontSize:12, fontWeight:800, color:"#fbbf24", letterSpacing:".06em" }}>💰 EARN UP TO 35% COMMISSION</span>
+            <span style={{ fontSize:12, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", letterSpacing:".06em" }}>💰 EARN UP TO 35% COMMISSION</span>
           </div>
           <h1 style={{ fontSize:"clamp(36px,6vw,62px)", fontWeight:900, letterSpacing:"-.03em", lineHeight:1.1, fontFamily:"Lora,serif", margin:"0 0 20px", opacity:heroVis?1:0, transition:"all .6s ease .1s" }}>
             Refer businesses.<br/>
-            <span style={{ background:"linear-gradient(90deg,#fbbf24,#f59e0b)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Earn real money.</span>
+            <span style={{ background:"linear-gradient(90deg,var(--tx-fbbf24, #fbbf24),var(--tx-f59e0b, #f59e0b))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Earn real money.</span>
           </h1>
-          <p style={{ fontSize:"clamp(15px,2vw,18px)", color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
+          <p style={{ fontSize:"clamp(15px,2vw,18px)", color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
             Earn monthly recurring commissions by recommending FinovaOS to businesses you know.
           </p>
           <div style={{ display:"flex", gap:28, justifyContent:"center", flexWrap:"wrap", marginBottom:36, opacity:heroVis?1:0, transition:"all .6s ease .25s" }}>
             {[["20–35%","Recurring commission"],["$0","Cost to join"],["Monthly","Payout schedule"],["Open","Affiliate program"]].map(([val,label])=>(
               <div key={label} style={{ textAlign:"center" }}>
-                <div style={{ fontSize:24, fontWeight:900, color:"#fbbf24", fontFamily:"Lora,serif" }}>{val}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:3 }}>{label}</div>
+                <div style={{ fontSize:24, fontWeight:900, color:"var(--tx-fbbf24, #fbbf24)", fontFamily:"Lora,serif" }}>{val}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", marginTop:3 }}>{label}</div>
               </div>
             ))}
           </div>
@@ -147,16 +147,16 @@ function AffiliateProgramPage() {
       <Section>
         <div style={{ maxWidth:960, margin:"0 auto", padding:"0 24px 80px" }}>
           <div style={{ textAlign:"center", marginBottom:44 }}>
-            <div style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".12em", textTransform:"uppercase", marginBottom:10 }}>HOW IT WORKS</div>
+            <div style={{ fontSize:11, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".12em", textTransform:"uppercase", marginBottom:10 }}>HOW IT WORKS</div>
             <h2 style={{ fontSize:"clamp(24px,3.5vw,36px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>Simple as 1, 2, 3, 4</h2>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:16 }}>
             {HOW_IT_WORKS.map(h=>(
-              <div key={h.step} style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"24px 20px" }}>
-                <div style={{ fontSize:10, fontWeight:800, color:"rgba(99,102,241,.6)", letterSpacing:".1em", marginBottom:12 }}>STEP {h.step}</div>
+              <div key={h.step} style={{ background:"rgba(var(--ink),.03)", borderRadius:16, border:"1px solid rgba(var(--ink),.07)", padding:"24px 20px" }}>
+                <div style={{ fontSize:10, fontWeight:800, color:"rgba(var(--txr-6366f1, 99,102,241),var(--ta-60, .6))", letterSpacing:".1em", marginBottom:12 }}>STEP {h.step}</div>
                 <div style={{ fontSize:28, marginBottom:12 }}>{h.icon}</div>
-                <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:8 }}>{h.title}</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.65 }}>{h.desc}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:8 }}>{h.title}</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.65 }}>{h.desc}</div>
               </div>
             ))}
           </div>
@@ -167,20 +167,20 @@ function AffiliateProgramPage() {
       <Section>
         <div style={{ maxWidth:1060, margin:"0 auto", padding:"0 24px 80px" }}>
           <div style={{ textAlign:"center", marginBottom:44 }}>
-            <div style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".12em", textTransform:"uppercase", marginBottom:10 }}>COMMISSION TIERS</div>
+            <div style={{ fontSize:11, fontWeight:800, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".12em", textTransform:"uppercase", marginBottom:10 }}>COMMISSION TIERS</div>
             <h2 style={{ fontSize:"clamp(24px,3.5vw,36px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>Earn more as you refer more</h2>
           </div>
           <div className="aff-4col" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
             {TIERS.map(t=>(
-              <div key={t.name} style={{ background:`linear-gradient(135deg,${t.glow},rgba(255,255,255,.02))`, borderRadius:18, border:`1.5px solid ${t.popular?"rgba(52,211,153,.4)":"rgba(255,255,255,.07)"}`, padding:"26px 20px", textAlign:"center", position:"relative" }}>
+              <div key={t.name} style={{ background:`linear-gradient(135deg,${t.glow},rgba(var(--ink),.02))`, borderRadius:18, border:`1.5px solid ${t.popular?"rgba(52,211,153,.4)":"rgba(var(--ink),.07)"}`, padding:"26px 20px", textAlign:"center", position:"relative" }}>
                 {t.popular && <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", padding:"3px 14px", borderRadius:20, background:"#34d399", color:"#000", fontSize:10, fontWeight:800, whiteSpace:"nowrap" }}>MOST POPULAR</div>}
                 <div style={{ fontSize:28, marginBottom:10 }}>{t.icon}</div>
-                <div style={{ fontSize:16, fontWeight:800, color:"white", marginBottom:4 }}>{t.name}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginBottom:16 }}>{t.referrals} active referrals</div>
+                <div style={{ fontSize:16, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:4 }}>{t.name}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginBottom:16 }}>{t.referrals} active referrals</div>
                 <div style={{ fontSize:36, fontWeight:900, color:t.color, fontFamily:"Lora,serif", lineHeight:1 }}>{t.commission}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", margin:"4px 0 16px" }}>recurring commission</div>
-                <div style={{ padding:"10px", borderRadius:10, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Avg monthly earnings</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", margin:"4px 0 16px" }}>recurring commission</div>
+                <div style={{ padding:"10px", borderRadius:10, background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)" }}>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))" }}>Avg monthly earnings</div>
                   <div style={{ fontSize:16, fontWeight:800, color:t.color, marginTop:3 }}>{t.monthly}/mo</div>
                 </div>
               </div>
@@ -192,42 +192,42 @@ function AffiliateProgramPage() {
       {/* Calculator */}
       <Section>
         <div style={{ maxWidth:680, margin:"0 auto", padding:"0 24px 80px" }}>
-          <div style={{ background:"rgba(255,255,255,.03)", borderRadius:22, border:"1px solid rgba(255,255,255,.07)", padding:"36px 32px" }}>
+          <div style={{ background:"rgba(var(--ink),.03)", borderRadius:22, border:"1px solid rgba(var(--ink),.07)", padding:"36px 32px" }}>
             <div style={{ textAlign:"center", marginBottom:28 }}>
-              <div style={{ fontSize:11, fontWeight:800, color:"#fbbf24", letterSpacing:".1em", textTransform:"uppercase", marginBottom:8 }}>EARNINGS CALCULATOR</div>
-              <h3 style={{ fontSize:22, fontWeight:800, color:"white", fontFamily:"Lora,serif", margin:0 }}>How much could you earn?</h3>
+              <div style={{ fontSize:11, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:8 }}>EARNINGS CALCULATOR</div>
+              <h3 style={{ fontSize:22, fontWeight:800, color:"var(--ink-solid, white)", fontFamily:"Lora,serif", margin:0 }}>How much could you earn?</h3>
             </div>
 
             <div style={{ marginBottom:22 }}>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <label style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.6)" }}>Referrals per month</label>
-                <span style={{ fontSize:14, fontWeight:800, color:"#fbbf24" }}>{refs}</span>
+                <label style={{ fontSize:13, fontWeight:600, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Referrals per month</label>
+                <span style={{ fontSize:14, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)" }}>{refs}</span>
               </div>
-              <input type="range" min="1" max="100" value={refs} onChange={e=>setRefs(Number(e.target.value))} style={{ width:"100%", accentColor:"#fbbf24" }}/>
+              <input type="range" min="1" max="100" value={refs} onChange={e=>setRefs(Number(e.target.value))} style={{ width:"100%", accentColor:"var(--tx-fbbf24, #fbbf24)" }}/>
             </div>
 
             <div style={{ marginBottom:28 }}>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <label style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.6)" }}>Avg plan value ($/mo)</label>
-                <span style={{ fontSize:14, fontWeight:800, color:"#fbbf24" }}>${plan}</span>
+                <label style={{ fontSize:13, fontWeight:600, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Avg plan value ($/mo)</label>
+                <span style={{ fontSize:14, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)" }}>${plan}</span>
               </div>
-              <input type="range" min="49" max="249" step="10" value={plan} onChange={e=>setPlan(Number(e.target.value))} style={{ width:"100%", accentColor:"#fbbf24" }}/>
-              <div style={{ display:"flex", justifyContent:"space-between", marginTop:4, fontSize:10, color:"rgba(255,255,255,.25)" }}>
+              <input type="range" min="49" max="249" step="10" value={plan} onChange={e=>setPlan(Number(e.target.value))} style={{ width:"100%", accentColor:"var(--tx-fbbf24, #fbbf24)" }}/>
+              <div style={{ display:"flex", justifyContent:"space-between", marginTop:4, fontSize:10, color:"rgba(var(--ink),var(--ta-25, .25))" }}>
                 <span>Starter $49</span><span>Pro $99</span><span>Enterprise $249</span>
               </div>
             </div>
 
             <div className="aff-2col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
               <div style={{ padding:"20px", borderRadius:14, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.25)", textAlign:"center" }}>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginBottom:6 }}>Monthly earnings</div>
-                <div style={{ fontSize:32, fontWeight:900, color:"#fbbf24", fontFamily:"Lora,serif" }}>${monthly.toLocaleString()}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:6 }}>Monthly earnings</div>
+                <div style={{ fontSize:32, fontWeight:900, color:"var(--tx-fbbf24, #fbbf24)", fontFamily:"Lora,serif" }}>${monthly.toLocaleString()}</div>
               </div>
               <div style={{ padding:"20px", borderRadius:14, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)", textAlign:"center" }}>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginBottom:6 }}>Annual earnings</div>
-                <div style={{ fontSize:32, fontWeight:900, color:"#34d399", fontFamily:"Lora,serif" }}>${yearly.toLocaleString()}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:6 }}>Annual earnings</div>
+                <div style={{ fontSize:32, fontWeight:900, color:"var(--tx-34d399, #34d399)", fontFamily:"Lora,serif" }}>${yearly.toLocaleString()}</div>
               </div>
             </div>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,.25)", textAlign:"center", marginTop:12 }}>Based on 25% commission rate. Actual earnings may vary.</div>
+            <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", textAlign:"center", marginTop:12 }}>Based on 25% commission rate. Actual earnings may vary.</div>
           </div>
         </div>
       </Section>
@@ -235,18 +235,18 @@ function AffiliateProgramPage() {
       {/* Apply form */}
       <Section>
         <div id="apply" style={{ maxWidth:600, margin:"0 auto", padding:"0 24px 120px" }}>
-          <div style={{ background:"rgba(255,255,255,.03)", borderRadius:22, border:"1px solid rgba(255,255,255,.07)", padding:"36px 32px" }}>
+          <div style={{ background:"rgba(var(--ink),.03)", borderRadius:22, border:"1px solid rgba(var(--ink),.07)", padding:"36px 32px" }}>
             {submitted ? (
               <div style={{ textAlign:"center", padding:"20px 0" }}>
                 <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
-                <div style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif", marginBottom:10 }}>Application received!</div>
-                <div style={{ fontSize:14, color:"rgba(255,255,255,.5)", lineHeight:1.7 }}>We review applications within 2 business days and will email you your affiliate link and dashboard access.</div>
+                <div style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", fontFamily:"Lora,serif", marginBottom:10 }}>Application received!</div>
+                <div style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.7 }}>We review applications within 2 business days and will email you your affiliate link and dashboard access.</div>
               </div>
             ) : (
               <>
                 <div style={{ textAlign:"center", marginBottom:28 }}>
-                  <div style={{ fontSize:11, fontWeight:800, color:"#fbbf24", letterSpacing:".1em", textTransform:"uppercase", marginBottom:8 }}>JOIN THE PROGRAM</div>
-                  <h3 style={{ fontSize:22, fontWeight:800, color:"white", fontFamily:"Lora,serif", margin:0 }}>Apply to become an affiliate</h3>
+                  <div style={{ fontSize:11, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:8 }}>JOIN THE PROGRAM</div>
+                  <h3 style={{ fontSize:22, fontWeight:800, color:"var(--ink-solid, white)", fontFamily:"Lora,serif", margin:0 }}>Apply to become an affiliate</h3>
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                   {[
@@ -255,15 +255,15 @@ function AffiliateProgramPage() {
                     {label:"Website / Social",key:"website",type:"text",  ph:"https://yoursite.com"},
                   ].map(field=>(
                     <div key={field.key}>
-                      <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>{field.label}</label>
+                      <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>{field.label}</label>
                       <input type={field.type} value={(form as any)[field.key]} onChange={e=>setForm(p=>({...p,[field.key]:e.target.value}))} placeholder={field.ph}
-                        style={{ width:"100%", padding:"11px 14px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"white", fontSize:13, outline:"none", boxSizing:"border-box" as any }}/>
+                        style={{ width:"100%", padding:"11px 14px", borderRadius:10, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", fontSize:13, outline:"none", boxSizing:"border-box" as any }}/>
                     </div>
                   ))}
                   <div>
-                    <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>Your Audience</label>
+                    <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>Your Audience</label>
                     <select value={form.audience} onChange={e=>setForm(p=>({...p,audience:e.target.value}))}
-                      style={{ width:"100%", padding:"11px 14px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:form.audience?"white":"rgba(255,255,255,.55)", fontSize:13, outline:"none", boxSizing:"border-box" as any }}>
+                      style={{ width:"100%", padding:"11px 14px", borderRadius:10, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.12)", color:form.audience? "var(--ink-solid, white)" :"rgba(var(--ink),var(--ta-55, .55))", fontSize:13, outline:"none", boxSizing:"border-box" as any }}>
                       <option value="" style={{ color:"#0f172a", background:"#ffffff" }}>Select your audience...</option>
                       {["Accounting professionals","Business consultants","Content creators / bloggers","Social media influencers","Entrepreneurs / founders","Other"].map(o=>(
                         <option key={o} value={o} style={{ color:"#0f172a", background:"#ffffff" }}>{o}</option>
@@ -274,7 +274,7 @@ function AffiliateProgramPage() {
                     style={{ padding:"14px", borderRadius:11, background:(!form.name||!form.email)?"rgba(251,191,36,.2)":"linear-gradient(135deg,#d97706,#f59e0b)", border:"none", color:"#000", fontSize:14, fontWeight:800, cursor:"pointer" }}>
                     Apply Now — It's Free →
                   </button>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.25)", textAlign:"center" }}>Applications reviewed within 2 business days</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", textAlign:"center" }}>Applications reviewed within 2 business days</div>
                 </div>
               </>
             )}

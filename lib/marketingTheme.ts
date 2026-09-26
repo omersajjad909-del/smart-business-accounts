@@ -1,16 +1,17 @@
 /**
- * Marketing pages that have a designed light theme.
+ * Marketing pages that stay dark even when the visitor has picked light.
  *
- * The marketing site was written for a dark page. A page joins this list once
- * its components go through scripts/theme-codemod.cjs and get a light-mode
- * pass by eye. Every other marketing page stays dark even when the visitor has
- * picked light (MarketingThemeScope wraps it in `.mk-force-dark`), and the
- * navbar hides the theme toggle there, since it would change nothing visible.
+ * The marketing site was written for a dark page; scripts/theme-codemod.cjs
+ * moved its colours onto theme variables and every page now has a light pass.
+ * A page that turns out not to work in light can be listed here as a stopgap:
+ * MarketingThemeScope wraps it in `.mk-force-dark`, which puts every theme
+ * variable back to its dark value, and the navbar hides the theme toggle there.
+ * Entries match the path and everything under it.
  */
-const LIGHT_READY_PATHS = new Set(["/", "/landing"]);
+const DARK_ONLY_PATHS: string[] = [];
 
 export function isLightReadyPath(pathname: string | null | undefined): boolean {
-  if (!pathname) return false;
+  if (!pathname) return true;
   const p = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  return LIGHT_READY_PATHS.has(p);
+  return !DARK_ONLY_PATHS.some((d) => p === d || p.startsWith(d + "/"));
 }

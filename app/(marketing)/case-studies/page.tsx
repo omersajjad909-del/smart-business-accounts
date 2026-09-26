@@ -23,7 +23,7 @@ const CASES = [
     ],
     quote: "FinovaOS ne mera month-end close 5 din se ghatakr 4 ghante mein kar diya. Aur ab payments miss nahi hote — system khud reminder bhejta hai.",
     tag: "Trading",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
   },
   {
     id: "lahore-distributor",
@@ -45,7 +45,7 @@ const CASES = [
     ],
     quote: "5 branches ko ek jagah manage karna ab possible hai. Pehle har branch ka alag Excel tha — ab ek dashboard pe sab dikhta hai real-time mein.",
     tag: "Distribution",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
   },
   {
     id: "faisalabad-manufacturer",
@@ -67,7 +67,7 @@ const CASES = [
     ],
     quote: "80 logon ki payroll pehle 4 ghante lagti thi. Ab 8 minute mein complete ho jati hai. Salary slip automatically generate hoti hai — koi error nahi.",
     tag: "Manufacturing",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
   },
   {
     id: "dubai-importer",
@@ -89,7 +89,7 @@ const CASES = [
     ],
     quote: "Multi-currency management used to be a nightmare. FinovaOS handles USD, AED, and PKR automatically with live rates. Bank reconciliation went from 3 days to 2 hours.",
     tag: "Import/Export",
-    color: "#10b981",
+    color: "var(--tx-10b981, #10b981)",
   },
   {
     id: "islamabad-services",
@@ -111,7 +111,7 @@ const CASES = [
     ],
     quote: "Payments jo pehle 45 din mein aati thi, ab 18 din mein aa jati hain. Automatic WhatsApp reminders game changer hain — client khud notice karta hai.",
     tag: "Services",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
   },
   {
     id: "retail-chain",
@@ -133,7 +133,7 @@ const CASES = [
     ],
     quote: "Pehle pta hi nahi chalta tha ke koi item khatam ho gaya hai. Ab system alert deta hai 3 din pehle. Wastage 8% se 2% aa gayi — akele isi se bohot farak para.",
     tag: "Retail",
-    color: "#f43f5e",
+    color: "var(--tx-f43f5e, #f43f5e)",
   },
 ];
 
@@ -165,7 +165,7 @@ export default function CaseStudiesPage() {
   const filtered = filter === "All" ? CASES : CASES.filter(c => c.tag === filter);
 
   const s = {
-    page: { minHeight: "100vh", background: "linear-gradient(160deg,#04061a 0%,#080c2a 50%,#04061a 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "#e2e8f0" } as React.CSSProperties,
+    page: { minHeight: "100vh", background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-080c2a, #080c2a) 50%,var(--dk-04061a, #04061a) 100%)", fontFamily: "'Outfit','Inter',sans-serif", color: "var(--tx-e2e8f0, #e2e8f0)" } as React.CSSProperties,
     hero: { padding: "100px 24px 60px", textAlign: "center" as const, maxWidth: 720, margin: "0 auto" },
   };
 
@@ -180,13 +180,13 @@ export default function CaseStudiesPage() {
 
       {/* Hero */}
       <div style={s.hero}>
-        <div style={{ display: "inline-block", background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.3)", color: "#818cf8", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
+        <div style={{ display: "inline-block", background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.3)", color: "var(--tx-818cf8, #818cf8)", padding: "5px 16px", borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
           Customer Stories
         </div>
         <h1 style={{ fontSize: "clamp(32px,5vw,52px)", fontWeight: 800, margin: "0 0 16px", lineHeight: 1.15 }}>
-          Real businesses.<br /><span style={{ background: "linear-gradient(135deg,#818cf8,#34d399)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Real results.</span>
+          Real businesses.<br /><span style={{ background: "linear-gradient(135deg,var(--tx-818cf8, #818cf8),var(--tx-34d399, #34d399))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Real results.</span>
         </h1>
-        <p style={{ fontSize: 18, color: "#94a3b8", margin: "0 0 32px", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 18, color: "var(--tx-94a3b8, #94a3b8)", margin: "0 0 32px", lineHeight: 1.6 }}>
           See how businesses across Pakistan and beyond transformed their operations with FinovaOS.
         </p>
 
@@ -200,7 +200,7 @@ export default function CaseStudiesPage() {
             { val: "GST · VAT · WHT", label: "Tax Support" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 32, fontWeight: 800, color: "#818cf8" }}>{s.val}</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "var(--tx-818cf8, #818cf8)" }}>{s.val}</div>
               <div style={{ fontSize: 13, color: "#64748b" }}>{s.label}</div>
             </div>
           ))}
@@ -210,7 +210,7 @@ export default function CaseStudiesPage() {
         <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
           {tags.map(t => (
             <button key={t} onClick={() => setFilter(t)}
-              style={{ padding: "6px 18px", borderRadius: 20, border: `1px solid ${filter === t ? "rgba(129,140,248,.5)" : "rgba(255,255,255,.1)"}`, background: filter === t ? "rgba(129,140,248,.15)" : "transparent", color: filter === t ? "#818cf8" : "#64748b", cursor: "pointer", fontSize: 13, fontWeight: 600, transition: "all .2s" }}>
+              style={{ padding: "6px 18px", borderRadius: 20, border: `1px solid ${filter === t ? "rgba(129,140,248,.5)" : "rgba(var(--ink),.1)"}`, background: filter === t ? "rgba(129,140,248,.15)" : "transparent", color: filter === t ? "var(--tx-818cf8, #818cf8)" : "#64748b", cursor: "pointer", fontSize: 13, fontWeight: 600, transition: "all .2s" }}>
               {t}
             </button>
           ))}
@@ -224,7 +224,7 @@ export default function CaseStudiesPage() {
             <FadeIn key={c.id} delay={i * 0.08}>
               <div
                 onClick={() => setActive(active === c.id ? null : c.id)}
-                style={{ background: "rgba(255,255,255,.04)", border: `1px solid ${active === c.id ? c.color + "55" : "rgba(255,255,255,.08)"}`, borderRadius: 20, padding: 28, cursor: "pointer", transition: "all .3s", boxShadow: active === c.id ? `0 0 32px ${c.color}18` : "none" }}
+                style={{ background: "rgba(var(--ink),.04)", border: `1px solid ${active === c.id ? `color-mix(in srgb, ${c.color} 33.3%, transparent)` : "rgba(var(--ink),.08)"}`, borderRadius: 20, padding: 28, cursor: "pointer", transition: "all .3s", boxShadow: active === c.id ? `0 0 32px color-mix(in srgb, ${c.color} 9.4%, transparent)` : "none" }}
               >
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
@@ -235,17 +235,17 @@ export default function CaseStudiesPage() {
                     <div style={{ fontWeight: 700, fontSize: 16 }}>{c.name}</div>
                     <div style={{ fontSize: 13, color: "#64748b" }}>{c.flag} {c.city} · {c.industry}</div>
                   </div>
-                  <span style={{ marginLeft: "auto", background: `${c.color}18`, border: `1px solid ${c.color}44`, color: c.color, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{c.tag}</span>
+                  <span style={{ marginLeft: "auto", background: `color-mix(in srgb, ${c.color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${c.color} 26.7%, transparent)`, color: c.color, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{c.tag}</span>
                 </div>
 
                 {/* Results grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
                   {c.results.map(r => (
-                    <div key={r.metric} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "12px 14px" }}>
+                    <div key={r.metric} style={{ background: "rgba(var(--ink),.03)", borderRadius: 12, padding: "12px 14px" }}>
                       <div style={{ fontSize: 18, marginBottom: 4 }}>{r.icon}</div>
                       <div style={{ fontSize: 10, color: "#64748b", marginBottom: 4 }}>{r.metric}</div>
                       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <span style={{ fontSize: 11, color: "#f87171", textDecoration: "line-through" }}>{r.before}</span>
+                        <span style={{ fontSize: 11, color: "var(--tx-f87171, #f87171)", textDecoration: "line-through" }}>{r.before}</span>
                         <span style={{ fontSize: 10, color: "#64748b" }}>→</span>
                         <span style={{ fontSize: 13, fontWeight: 700, color: c.color }}>{r.after}</span>
                       </div>
@@ -254,21 +254,21 @@ export default function CaseStudiesPage() {
                 </div>
 
                 {/* Quote */}
-                <div style={{ borderLeft: `3px solid ${c.color}`, paddingLeft: 14, color: "#94a3b8", fontSize: 13, lineHeight: 1.6, fontStyle: "italic" }}>
+                <div style={{ borderLeft: `3px solid ${c.color}`, paddingLeft: 14, color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, lineHeight: 1.6, fontStyle: "italic" }}>
                   "{c.quote}"
                 </div>
                 <div style={{ marginTop: 10, fontSize: 12, color: "#64748b" }}>— {c.owner}, {c.role}</div>
 
                 {/* Expand for challenge/solution */}
                 {active === c.id && (
-                  <div style={{ marginTop: 20, borderTop: "1px solid rgba(255,255,255,.08)", paddingTop: 20, display: "grid", gap: 14 }}>
+                  <div style={{ marginTop: 20, borderTop: "1px solid rgba(var(--ink),.08)", paddingTop: 20, display: "grid", gap: 14 }}>
                     <div>
                       <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: ".05em" }}>The Challenge</div>
-                      <div style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.6 }}>{c.challenge}</div>
+                      <div style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6 }}>{c.challenge}</div>
                     </div>
                     <div>
                       <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: ".05em" }}>The Solution</div>
-                      <div style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.6 }}>{c.solution}</div>
+                      <div style={{ fontSize: 14, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6 }}>{c.solution}</div>
                     </div>
                   </div>
                 )}
@@ -283,14 +283,14 @@ export default function CaseStudiesPage() {
       </div>
 
       {/* CTA */}
-      <div style={{ textAlign: "center", padding: "60px 24px 100px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+      <div style={{ textAlign: "center", padding: "60px 24px 100px", borderTop: "1px solid rgba(var(--ink),.06)" }}>
         <h2 style={{ fontSize: 32, fontWeight: 700, margin: "0 0 12px" }}>Ready to write your success story?</h2>
         <p style={{ color: "#64748b", marginBottom: 28, fontSize: 16 }}>Start on FinovaOS with launch pricing locked in.</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/onboarding/choose-plan" style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "13px 28px", borderRadius: 12, fontWeight: 700, textDecoration: "none", fontSize: 15 }}>
             Get Started →
           </Link>
-          <Link href="/roi-calculator" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#e2e8f0", padding: "13px 28px", borderRadius: 12, fontWeight: 600, textDecoration: "none", fontSize: 15 }}>
+          <Link href="/roi-calculator" style={{ background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-e2e8f0, #e2e8f0)", padding: "13px 28px", borderRadius: 12, fontWeight: 600, textDecoration: "none", fontSize: 15 }}>
             Calculate Your ROI
           </Link>
         </div>

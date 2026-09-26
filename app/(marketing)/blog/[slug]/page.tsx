@@ -8,7 +8,7 @@ import { SEO_ARTICLES } from "../seo-articles";
 const LOCAL_POSTS: Record<string, any> = {
   "bank-reconciliation-guide": {
     title: "The Complete Guide to Bank Reconciliation for SMEs in 2025",
-    category: "accounting", categoryLabel: "Accounting Tips", color: "#818cf8",
+    category: "accounting", categoryLabel: "Accounting Tips", color: "var(--tx-818cf8, #818cf8)",
     author: "FinovaOS Team", authorRole: "Finance Experts", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#4f46e5,#7c3aed)",
     date: "March 10, 2025", readTime: "8 min read",
@@ -52,7 +52,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "1": {
     title: "How to Create and Send Professional Invoices with FinovaOS",
-    category: "guides", categoryLabel: "How-to Guides", color: "#34d399",
+    category: "guides", categoryLabel: "How-to Guides", color: "var(--tx-34d399, #34d399)",
     author: "FinovaOS Team", authorRole: "Product Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#059669,#34d399)",
     date: "March 8, 2025", readTime: "5 min read",
@@ -80,7 +80,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "2": {
     title: "FinovaOS HR & Payroll: Complete Setup Guide for Your Business",
-    category: "guides", categoryLabel: "How-to Guides", color: "#fbbf24",
+    category: "guides", categoryLabel: "How-to Guides", color: "var(--tx-fbbf24, #fbbf24)",
     author: "FinovaOS Team", authorRole: "HR Module Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#b45309,#f59e0b)",
     date: "March 6, 2025", readTime: "7 min read",
@@ -109,7 +109,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "3": {
     title: "Using FinovaOS CRM to Convert More Leads into Paying Customers",
-    category: "product", categoryLabel: "Product Features", color: "#818cf8",
+    category: "product", categoryLabel: "Product Features", color: "var(--tx-818cf8, #818cf8)",
     author: "FinovaOS Team", authorRole: "Product Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#4f46e5,#7c3aed)",
     date: "March 5, 2025", readTime: "5 min read",
@@ -136,7 +136,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "4": {
     title: "FinovaOS Inventory Management: Track Stock, Purchases, and Sales in Real Time",
-    category: "product", categoryLabel: "Product Features", color: "#38bdf8",
+    category: "product", categoryLabel: "Product Features", color: "var(--tx-38bdf8, #38bdf8)",
     author: "FinovaOS Team", authorRole: "Product Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#0891b2,#06b6d4)",
     date: "March 3, 2025", readTime: "6 min read",
@@ -163,7 +163,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "5": {
     title: "Tax Filing with FinovaOS: A Complete Guide for 2025",
-    category: "accounting", categoryLabel: "Accounting Tips", color: "#c4b5fd",
+    category: "accounting", categoryLabel: "Accounting Tips", color: "var(--tx-c4b5fd, #c4b5fd)",
     author: "FinovaOS Team", authorRole: "Finance Experts", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#7c3aed,#a78bfa)",
     date: "March 1, 2025", readTime: "8 min read",
@@ -190,7 +190,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "6": {
     title: "Multi-Branch Accounting with FinovaOS: One Dashboard, Every Location",
-    category: "business", categoryLabel: "Business Growth", color: "#f9a8d4",
+    category: "business", categoryLabel: "Business Growth", color: "var(--tx-f9a8d4, #f9a8d4)",
     author: "FinovaOS Team", authorRole: "Enterprise Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#be185d,#ec4899)",
     date: "February 27, 2025", readTime: "6 min read",
@@ -217,7 +217,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "7": {
     title: "How to Use FinovaOS's Quotation Module to Close Deals Faster",
-    category: "guides", categoryLabel: "How-to Guides", color: "#38bdf8",
+    category: "guides", categoryLabel: "How-to Guides", color: "var(--tx-38bdf8, #38bdf8)",
     author: "FinovaOS Team", authorRole: "Product Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#0891b2,#06b6d4)",
     date: "February 25, 2025", readTime: "5 min read",
@@ -244,7 +244,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "8": {
     title: "FinovaOS Custom Plans: Build Your Perfect Accounting Package",
-    category: "product", categoryLabel: "Product Features", color: "#c4b5fd",
+    category: "product", categoryLabel: "Product Features", color: "var(--tx-c4b5fd, #c4b5fd)",
     author: "FinovaOS Team", authorRole: "Product Team", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#7c3aed,#c4b5fd)",
     date: "February 22, 2025", readTime: "4 min read",
@@ -280,7 +280,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "9": {
     title: "FinovaOS Reports: Every Financial Report Your Business Needs",
-    category: "accounting", categoryLabel: "Accounting Tips", color: "#fbbf24",
+    category: "accounting", categoryLabel: "Accounting Tips", color: "var(--tx-fbbf24, #fbbf24)",
     author: "FinovaOS Team", authorRole: "Finance Experts", authorAvatar: "FT",
     authorGradient: "linear-gradient(135deg,#b45309,#f59e0b)",
     date: "February 20, 2025", readTime: "6 min read",
@@ -323,7 +323,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "10": {
     title: "Pakistan SME Accounting Software Guide 2026: What to Look For",
-    category: "business", categoryLabel: "Business Growth", color: "#34d399",
+    category: "business", categoryLabel: "Business Growth", color: "var(--tx-34d399, #34d399)",
     author: "FinovaOS Team", authorRole: "Pakistan Market Experts", authorAvatar: "FO",
     authorGradient: "linear-gradient(135deg,#059669,#34d399)",
     date: "June 10, 2026", readTime: "9 min read",
@@ -352,7 +352,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "11": {
     title: "FBR Tax Filing for Small Businesses in Pakistan: Step-by-Step 2026",
-    category: "accounting", categoryLabel: "Accounting Tips", color: "#f87171",
+    category: "accounting", categoryLabel: "Accounting Tips", color: "var(--tx-f87171, #f87171)",
     author: "FinovaOS Team", authorRole: "Tax & Compliance Experts", authorAvatar: "FO",
     authorGradient: "linear-gradient(135deg,#dc2626,#f87171)",
     date: "June 8, 2026", readTime: "10 min read",
@@ -381,7 +381,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "12": {
     title: "Best Accounting Software for Pakistani Traders & Wholesalers",
-    category: "business", categoryLabel: "Business Growth", color: "#818cf8",
+    category: "business", categoryLabel: "Business Growth", color: "var(--tx-818cf8, #818cf8)",
     author: "FinovaOS Team", authorRole: "Product Comparisons", authorAvatar: "FO",
     authorGradient: "linear-gradient(135deg,#4f46e5,#818cf8)",
     date: "June 5, 2026", readTime: "8 min read",
@@ -411,7 +411,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "13": {
     title: "How to Automate Payroll for 10-100 Employees in Pakistan",
-    category: "guides", categoryLabel: "How-to Guides", color: "#fbbf24",
+    category: "guides", categoryLabel: "How-to Guides", color: "var(--tx-fbbf24, #fbbf24)",
     author: "FinovaOS Team", authorRole: "HR & Payroll Experts", authorAvatar: "FO",
     authorGradient: "linear-gradient(135deg,#d97706,#fbbf24)",
     date: "June 3, 2026", readTime: "7 min read",
@@ -440,7 +440,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "14": {
     title: "Inventory Management for Pakistani Pharmacies: Batch, Expiry & DRAP",
-    category: "product", categoryLabel: "Product Features", color: "#06b6d4",
+    category: "product", categoryLabel: "Product Features", color: "var(--tx-06b6d4, #06b6d4)",
     author: "FinovaOS Team", authorRole: "Healthcare Industry Team", authorAvatar: "FO",
     authorGradient: "linear-gradient(135deg,#0891b2,#06b6d4)",
     date: "June 1, 2026", readTime: "6 min read",
@@ -467,7 +467,7 @@ const LOCAL_POSTS: Record<string, any> = {
 
   "15": {
     title: "Cloud Accounting vs Desktop Software for SMEs in 2026",
-    category: "fintech", categoryLabel: "Fintech", color: "#c4b5fd",
+    category: "fintech", categoryLabel: "Fintech", color: "var(--tx-c4b5fd, #c4b5fd)",
     author: "FinovaOS Team", authorRole: "Technology Analysts", authorAvatar: "FO",
     authorGradient: "linear-gradient(135deg,#7c3aed,#a78bfa)",
     date: "May 28, 2026", readTime: "7 min read",
@@ -540,11 +540,11 @@ export default function BlogDetailPage() {
 
   if (!post) {
     return (
-      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e,#0c0f2e)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e),var(--dk-0c0f2e, #0c0f2e))", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans',system-ui,sans-serif" }}>
         <div style={{ textAlign:"center" }}>
           <div style={{ fontSize:48, marginBottom:16 }}>📄</div>
-          <div style={{ fontSize:20, fontWeight:700, color:"white", marginBottom:12 }}>Article not found</div>
-          <Link href="/blog" style={{ color:"#818cf8", textDecoration:"none", fontWeight:600, fontSize:14 }}>← Back to Blog</Link>
+          <div style={{ fontSize:20, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:12 }}>Article not found</div>
+          <Link href="/blog" style={{ color:"var(--tx-818cf8, #818cf8)", textDecoration:"none", fontWeight:600, fontSize:14 }}>← Back to Blog</Link>
         </div>
       </main>
     );
@@ -559,8 +559,8 @@ export default function BlogDetailPage() {
   return (
     <main style={{
       minHeight:"100vh",
-      background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)",
-      color:"white",
+      background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)",
+      color:"var(--ink-solid, white)",
       fontFamily:"'DM Sans','Outfit',system-ui,sans-serif",
       overflowX:"hidden",
     }}>
@@ -571,16 +571,16 @@ export default function BlogDetailPage() {
 
       {/* Hero */}
       <section style={{ padding:"100px 24px 48px", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", top:-80, left:"50%", transform:"translateX(-50%)", width:500, height:500, borderRadius:"50%", background:`radial-gradient(circle,${post.color}18 0%,transparent 70%)`, pointerEvents:"none" }}/>
+        <div style={{ position:"absolute", top:-80, left:"50%", transform:"translateX(-50%)", width:500, height:500, borderRadius:"50%", background:`radial-gradient(circle,color-mix(in srgb, ${post.color} 9.4%, transparent) 0%,transparent 70%)`, pointerEvents:"none" }}/>
         <div style={{ maxWidth:760, margin:"0 auto", position:"relative", zIndex:1,
           opacity:heroVis?1:0, transform:heroVis?"translateY(0)":"translateY(20px)",
           transition:"opacity .6s ease, transform .6s ease" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:22, fontSize:13 }}>
-            <Link href="/blog" style={{ color:"rgba(255,255,255,.4)", textDecoration:"none", fontWeight:600 }}>Blog</Link>
-            <span style={{ color:"rgba(255,255,255,.2)" }}>›</span>
+            <Link href="/blog" style={{ color:"rgba(var(--ink),var(--ta-40, .4))", textDecoration:"none", fontWeight:600 }}>Blog</Link>
+            <span style={{ color:"rgba(var(--ink),var(--ta-20, .2))" }}>›</span>
             <span style={{ color:post.color, fontWeight:700 }}>{post.categoryLabel}</span>
           </div>
-          <div style={{ display:"inline-flex", padding:"4px 14px", borderRadius:24, background:`${post.color}20`, border:`1px solid ${post.color}40`, marginBottom:18 }}>
+          <div style={{ display:"inline-flex", padding:"4px 14px", borderRadius:24, background:`color-mix(in srgb, ${post.color} 12.5%, transparent)`, border:`1px solid color-mix(in srgb, ${post.color} 25.1%, transparent)`, marginBottom:18 }}>
             <span style={{ fontSize:11, fontWeight:800, color:post.color, letterSpacing:".06em" }}>{post.categoryLabel.toUpperCase()}</span>
           </div>
           <h1 style={{ fontSize:"clamp(26px,5vw,46px)", fontWeight:900, letterSpacing:"-.03em", lineHeight:1.15, fontFamily:"Lora,serif", margin:"0 0 22px" }}>
@@ -590,14 +590,14 @@ export default function BlogDetailPage() {
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ width:38, height:38, borderRadius:10, background:post.authorGradient, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:"white" }}>{post.authorAvatar}</div>
               <div>
-                <div style={{ fontSize:13, fontWeight:700, color:"white" }}>{post.author}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{post.authorRole}</div>
+                <div style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{post.author}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))" }}>{post.authorRole}</div>
               </div>
             </div>
-            <div style={{ width:1, height:24, background:"rgba(255,255,255,.1)" }}/>
-            <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>📅 {post.date}</span>
-            <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>⏱ {post.readTime}</span>
-            <button onClick={copyLink} style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.6)", fontSize:12, fontWeight:600, cursor:"pointer" }}>
+            <div style={{ width:1, height:24, background:"rgba(var(--ink),.1)" }}/>
+            <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>📅 {post.date}</span>
+            <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>⏱ {post.readTime}</span>
+            <button onClick={copyLink} style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:6, padding:"6px 14px", borderRadius:20, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", color:"rgba(var(--ink),var(--ta-60, .6))", fontSize:12, fontWeight:600, cursor:"pointer" }}>
               {copied ? "✓ Copied!" : "🔗 Share"}
             </button>
           </div>
@@ -608,24 +608,24 @@ export default function BlogDetailPage() {
       <div style={{ maxWidth:760, margin:"0 auto", padding:"0 24px 60px" }}>
         {post.content.map((block: any, i: number) => {
           if (block.type === "intro") return (
-            <p key={i} style={{ fontSize:18, color:"rgba(255,255,255,.7)", lineHeight:1.85, margin:"0 0 32px", fontWeight:500, borderLeft:`3px solid ${post.color}`, paddingLeft:20 }}>
+            <p key={i} style={{ fontSize:18, color:"rgba(var(--ink),var(--ta-70, .7))", lineHeight:1.85, margin:"0 0 32px", fontWeight:500, borderLeft:`3px solid ${post.color}`, paddingLeft:20 }}>
               {block.text}
             </p>
           );
           if (block.type === "h2") return (
-            <h2 key={i} style={{ fontSize:"clamp(18px,3vw,24px)", fontWeight:800, color:"white", letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"40px 0 14px" }}>
+            <h2 key={i} style={{ fontSize:"clamp(18px,3vw,24px)", fontWeight:800, color:"var(--ink-solid, white)", letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"40px 0 14px" }}>
               {block.text}
             </h2>
           );
           if (block.type === "p") return (
-            <p key={i} style={{ fontSize:16, color:"rgba(255,255,255,.6)", lineHeight:1.85, margin:"0 0 20px" }}>
+            <p key={i} style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.85, margin:"0 0 20px" }}>
               {block.text}
             </p>
           );
           if (block.type === "list") return (
             <ul key={i} style={{ margin:"0 0 24px", paddingLeft:0, listStyle:"none" }}>
               {block.items.map((item: string, j: number) => (
-                <li key={j} style={{ display:"flex", gap:12, alignItems:"flex-start", marginBottom:10, fontSize:15, color:"rgba(255,255,255,.6)", lineHeight:1.65 }}>
+                <li key={j} style={{ display:"flex", gap:12, alignItems:"flex-start", marginBottom:10, fontSize:15, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.65 }}>
                   <span style={{ color:post.color, fontWeight:800, flexShrink:0, marginTop:2 }}>✓</span>
                   {item}
                 </li>
@@ -636,16 +636,16 @@ export default function BlogDetailPage() {
             <ol key={i} style={{ margin:"0 0 24px", paddingLeft:0, listStyle:"none" }}>
               {block.items.map((item: string, j: number) => (
                 <li key={j} style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:12 }}>
-                  <span style={{ width:28, height:28, borderRadius:8, background:`${post.color}20`, border:`1px solid ${post.color}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:post.color, flexShrink:0 }}>{j+1}</span>
-                  <span style={{ fontSize:15, color:"rgba(255,255,255,.6)", lineHeight:1.65, paddingTop:4 }}>{item}</span>
+                  <span style={{ width:28, height:28, borderRadius:8, background:`color-mix(in srgb, ${post.color} 12.5%, transparent)`, border:`1px solid color-mix(in srgb, ${post.color} 25.1%, transparent)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:post.color, flexShrink:0 }}>{j+1}</span>
+                  <span style={{ fontSize:15, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.65, paddingTop:4 }}>{item}</span>
                 </li>
               ))}
             </ol>
           );
           if (block.type === "quote") return (
-            <div key={i} style={{ margin:"32px 0", padding:"24px 28px", borderRadius:16, background:`${post.color}10`, border:`1px solid ${post.color}30` }}>
+            <div key={i} style={{ margin:"32px 0", padding:"24px 28px", borderRadius:16, background:`color-mix(in srgb, ${post.color} 6.3%, transparent)`, border:`1px solid color-mix(in srgb, ${post.color} 18.8%, transparent)` }}>
               <div style={{ fontSize:40, color:post.color, lineHeight:1, marginBottom:10, opacity:.6 }}>&quot;</div>
-              <p style={{ fontSize:16, color:"rgba(255,255,255,.75)", lineHeight:1.75, margin:"0 0 14px", fontStyle:"italic" }}>{block.text}</p>
+              <p style={{ fontSize:16, color:"rgba(var(--ink),.75)", lineHeight:1.75, margin:"0 0 14px", fontStyle:"italic" }}>{block.text}</p>
               <div style={{ fontSize:13, color:post.color, fontWeight:700 }}>— {block.author}</div>
             </div>
           );
@@ -653,42 +653,42 @@ export default function BlogDetailPage() {
           // article. This is the passage answer engines lift, so it is marked up
           // as a self-contained block rather than folded into the intro prose.
           if (block.type === "answer") return (
-            <div key={i} style={{ margin:"0 0 34px", padding:"26px 28px", borderRadius:18, background:`${post.color}12`, border:`1px solid ${post.color}35` }}>
+            <div key={i} style={{ margin:"0 0 34px", padding:"26px 28px", borderRadius:18, background:`color-mix(in srgb, ${post.color} 7.1%, transparent)`, border:`1px solid color-mix(in srgb, ${post.color} 20.8%, transparent)` }}>
               <div style={{ fontSize:11, fontWeight:800, letterSpacing:".09em", color:post.color, marginBottom:12 }}>THE SHORT ANSWER</div>
-              <p style={{ fontSize:16.5, color:"rgba(255,255,255,.82)", lineHeight:1.8, margin:0, fontWeight:500 }}>{block.text}</p>
+              <p style={{ fontSize:16.5, color:"rgba(var(--ink),.82)", lineHeight:1.8, margin:0, fontWeight:500 }}>{block.text}</p>
             </div>
           );
           if (block.type === "h3") return (
-            <h3 key={i} style={{ fontSize:"clamp(16px,2.4vw,19px)", fontWeight:800, color:"rgba(255,255,255,.92)", letterSpacing:"-.01em", margin:"30px 0 10px" }}>
+            <h3 key={i} style={{ fontSize:"clamp(16px,2.4vw,19px)", fontWeight:800, color:"rgba(var(--ink),.92)", letterSpacing:"-.01em", margin:"30px 0 10px" }}>
               {block.href ? (
-                <a href={block.href} target="_blank" rel="noopener noreferrer" style={{ color:"inherit", textDecoration:"underline", textDecorationColor:"rgba(255,255,255,.25)", textUnderlineOffset:4 }}>
+                <a href={block.href} target="_blank" rel="noopener noreferrer" style={{ color:"inherit", textDecoration:"underline", textDecorationColor:"rgba(var(--ink),.25)", textUnderlineOffset:4 }}>
                   {block.text} ↗
                 </a>
               ) : block.text}
             </h3>
           );
           if (block.type === "note") return (
-            <div key={i} style={{ margin:"28px 0", padding:"18px 22px", borderRadius:14, background:"rgba(255,255,255,.04)", borderLeft:"3px solid rgba(255,255,255,.22)" }}>
-              <p style={{ fontSize:14.5, color:"rgba(255,255,255,.55)", lineHeight:1.75, margin:0 }}>{block.text}</p>
+            <div key={i} style={{ margin:"28px 0", padding:"18px 22px", borderRadius:14, background:"rgba(var(--ink),.04)", borderLeft:"3px solid rgba(var(--ink),.22)" }}>
+              <p style={{ fontSize:14.5, color:"rgba(var(--ink),var(--ta-55, .55))", lineHeight:1.75, margin:0 }}>{block.text}</p>
             </div>
           );
           if (block.type === "table") return (
             <figure key={i} style={{ margin:"28px 0" }}>
               {/* Wide tables scroll inside their own container so the page body never does. */}
-              <div style={{ overflowX:"auto", borderRadius:14, border:"1px solid rgba(255,255,255,.09)" }}>
+              <div style={{ overflowX:"auto", borderRadius:14, border:"1px solid rgba(var(--ink),.09)" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse", minWidth:520, fontSize:13.5 }}>
                   <thead>
                     <tr>
                       {block.headers.map((h: string, hi: number) => (
-                        <th key={hi} style={{ textAlign:"left", padding:"12px 14px", background:`${post.color}14`, color:post.color, fontWeight:800, fontSize:11.5, letterSpacing:".05em", textTransform:"uppercase", borderBottom:`1px solid ${post.color}30`, whiteSpace:"nowrap" }}>{h}</th>
+                        <th key={hi} style={{ textAlign:"left", padding:"12px 14px", background:`color-mix(in srgb, ${post.color} 7.8%, transparent)`, color:post.color, fontWeight:800, fontSize:11.5, letterSpacing:".05em", textTransform:"uppercase", borderBottom:`1px solid color-mix(in srgb, ${post.color} 18.8%, transparent)`, whiteSpace:"nowrap" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {block.rows.map((row: string[], ri: number) => (
-                      <tr key={ri} style={{ background: ri % 2 ? "rgba(255,255,255,.02)" : "transparent" }}>
+                      <tr key={ri} style={{ background: ri % 2 ? "rgba(var(--ink),.02)" : "transparent" }}>
                         {row.map((cell: string, ci: number) => (
-                          <td key={ci} style={{ padding:"12px 14px", color: ci === 0 ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.58)", fontWeight: ci === 0 ? 700 : 400, lineHeight:1.6, borderBottom:"1px solid rgba(255,255,255,.05)", verticalAlign:"top" }}>{cell}</td>
+                          <td key={ci} style={{ padding:"12px 14px", color: ci === 0 ? "rgba(var(--ink),.85)" : "rgba(var(--ink),var(--ta-58, .58))", fontWeight: ci === 0 ? 700 : 400, lineHeight:1.6, borderBottom:"1px solid rgba(var(--ink),.05)", verticalAlign:"top" }}>{cell}</td>
                         ))}
                       </tr>
                     ))}
@@ -696,7 +696,7 @@ export default function BlogDetailPage() {
                 </table>
               </div>
               {block.caption && (
-                <figcaption style={{ fontSize:12, color:"rgba(255,255,255,.32)", marginTop:9, fontStyle:"italic" }}>{block.caption}</figcaption>
+                <figcaption style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-32, .32))", marginTop:9, fontStyle:"italic" }}>{block.caption}</figcaption>
               )}
             </figure>
           );
@@ -704,13 +704,13 @@ export default function BlogDetailPage() {
           // wording here identical to what is emitted there.
           if (block.type === "faq") return (
             <section key={i} style={{ margin:"44px 0 0" }}>
-              <h2 style={{ fontSize:"clamp(18px,3vw,24px)", fontWeight:800, color:"white", letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 18px" }}>
+              <h2 style={{ fontSize:"clamp(18px,3vw,24px)", fontWeight:800, color:"var(--ink-solid, white)", letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 18px" }}>
                 Frequently asked questions
               </h2>
               {block.items.map((f: { q: string; a: string }, fi: number) => (
-                <div key={fi} style={{ padding:"18px 0", borderTop:"1px solid rgba(255,255,255,.07)" }}>
-                  <h3 style={{ fontSize:15.5, fontWeight:800, color:"rgba(255,255,255,.9)", margin:"0 0 9px", lineHeight:1.45 }}>{f.q}</h3>
-                  <p style={{ fontSize:15, color:"rgba(255,255,255,.58)", lineHeight:1.8, margin:0 }}>{f.a}</p>
+                <div key={fi} style={{ padding:"18px 0", borderTop:"1px solid rgba(var(--ink),.07)" }}>
+                  <h3 style={{ fontSize:15.5, fontWeight:800, color:"rgba(var(--ink),.9)", margin:"0 0 9px", lineHeight:1.45 }}>{f.q}</h3>
+                  <p style={{ fontSize:15, color:"rgba(var(--ink),var(--ta-58, .58))", lineHeight:1.8, margin:0 }}>{f.a}</p>
                 </div>
               ))}
             </section>
@@ -720,14 +720,14 @@ export default function BlogDetailPage() {
 
         {/* CTA */}
         <div style={{ marginTop:48, padding:"36px 32px", borderRadius:20, background:"linear-gradient(135deg,rgba(79,70,229,.2),rgba(124,58,237,.1))", border:"1px solid rgba(99,102,241,.3)", textAlign:"center" }}>
-          <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.5)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:10 }}>READY TO START?</div>
-          <h3 style={{ fontSize:22, fontWeight:800, color:"white", fontFamily:"Lora,serif", margin:"0 0 10px" }}>Start using FinovaOS today</h3>
-          <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 auto 22px", maxWidth:380 }}>Full platform access with expert support and priority response times.</p>
+          <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),var(--ta-50, .5))", textTransform:"uppercase", letterSpacing:".06em", marginBottom:10 }}>READY TO START?</div>
+          <h3 style={{ fontSize:22, fontWeight:800, color:"var(--ink-solid, white)", fontFamily:"Lora,serif", margin:"0 0 10px" }}>Start using FinovaOS today</h3>
+          <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", margin:"0 auto 22px", maxWidth:380 }}>Full platform access with expert support and priority response times.</p>
           <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
             <Link href="/signup" style={{ padding:"12px 28px", borderRadius:11, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", fontWeight:800, fontSize:13, textDecoration:"none" }}>
               Get Started →
             </Link>
-            <Link href="/demo" style={{ padding:"12px 28px", borderRadius:11, background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", fontWeight:700, fontSize:13, textDecoration:"none" }}>
+            <Link href="/demo" style={{ padding:"12px 28px", borderRadius:11, background:"rgba(var(--ink),.08)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.8)", fontWeight:700, fontSize:13, textDecoration:"none" }}>
               Book a Demo
             </Link>
           </div>
@@ -737,15 +737,15 @@ export default function BlogDetailPage() {
       {/* Related */}
       {related.length > 0 && (
         <div style={{ maxWidth:760, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:20 }}>Related Articles</div>
+          <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", textTransform:"uppercase", letterSpacing:".08em", marginBottom:20 }}>Related Articles</div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:16 }}>
             {related.map((r: any) => (
-              <Link key={r.slug} href={`/blog/${r.slug}`} style={{ textDecoration:"none", display:"block", background:"rgba(255,255,255,.03)", borderRadius:14, border:"1px solid rgba(255,255,255,.07)", padding:"18px 16px", transition:"all .15s" }}
+              <Link key={r.slug} href={`/blog/${r.slug}`} style={{ textDecoration:"none", display:"block", background:"rgba(var(--ink),.03)", borderRadius:14, border:"1px solid rgba(var(--ink),.07)", padding:"18px 16px", transition:"all .15s" }}
                 onMouseEnter={e=>{ (e.currentTarget as HTMLElement).style.background="rgba(99,102,241,.08)"; (e.currentTarget as HTMLElement).style.borderColor="rgba(99,102,241,.25)"; }}
-                onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.background="rgba(255,255,255,.03)"; (e.currentTarget as HTMLElement).style.borderColor="rgba(255,255,255,.07)"; }}>
+                onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.background="rgba(var(--ink),.03)"; (e.currentTarget as HTMLElement).style.borderColor="rgba(var(--ink),.07)"; }}>
                 <div style={{ height:3, borderRadius:2, background:r.color, marginBottom:12 }}/>
-                <div style={{ fontSize:13, fontWeight:700, color:"white", lineHeight:1.4, marginBottom:8 }}>{r.title}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>{r.readTime}</div>
+                <div style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)", lineHeight:1.4, marginBottom:8 }}>{r.title}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{r.readTime}</div>
               </Link>
             ))}
           </div>

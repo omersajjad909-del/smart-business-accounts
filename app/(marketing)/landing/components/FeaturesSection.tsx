@@ -44,7 +44,7 @@ function PLVisual({ vis }: { vis: boolean }) {
     }}>
       {/* Window bar */}
       <div style={{ padding:"11px 16px", borderBottom:"1px solid rgba(var(--ink),.06)", background:"rgba(var(--ink),.03)", display:"flex", alignItems:"center", gap:8 }}>
-        {["#f87171","#fbbf24","#34d399"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
+        {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
         <span style={{flex:1,textAlign:"center",fontSize:10,color:"rgba(var(--ink),var(--ta-25, .25))",letterSpacing:".04em"}}>P&L Statement · Live</span>
         <span style={{fontSize:10,color:"var(--tx-34d399, #34d399)",fontWeight:600}}>● Live</span>
       </div>
@@ -90,12 +90,12 @@ function InvoiceVisual({ vis }: { vis: boolean }) {
       boxShadow: "0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(52,211,153,.1)",
     }}>
       <div style={{ padding:"11px 16px", borderBottom:"1px solid rgba(var(--ink),.06)", background:"rgba(var(--ink),.03)", display:"flex", alignItems:"center", gap:8 }}>
-        {["#f87171","#fbbf24","#34d399"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
+        {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
         <span style={{flex:1,textAlign:"center",fontSize:10,color:"rgba(var(--ink),var(--ta-25, .25))"}}>Invoices · All clients</span>
       </div>
       {/* Summary pills */}
       <div style={{ padding:"14px 16px 10px", display:"flex", gap:8 }}>
-        {[{label:"Total",val:"$30,250",c:"#818cf8"},{label:"Paid",val:"$17,600",c:"#34d399"},{label:"Pending",val:"$8,750",c:"#fbbf24"},{label:"Overdue",val:"$3,900",c:"#f87171"}].map(s=>(
+        {[{label:"Total",val:"$30,250",c:"var(--tx-818cf8, #818cf8)"},{label:"Paid",val:"$17,600",c:"var(--tx-34d399, #34d399)"},{label:"Pending",val:"$8,750",c:"var(--tx-fbbf24, #fbbf24)"},{label:"Overdue",val:"$3,900",c:"var(--tx-f87171, #f87171)"}].map(s=>(
           <div key={s.label} style={{flex:1,borderRadius:10,padding:"8px 6px",background:"rgba(var(--ink),.04)",border:"1px solid rgba(var(--ink),.07)",textAlign:"center"}}>
             <div style={{fontSize:11,fontWeight:800,color:s.c}}>{s.val}</div>
             <div style={{fontSize:9,color:"rgba(var(--ink),var(--ta-30, .3))",marginTop:2}}>{s.label}</div>
@@ -116,7 +116,7 @@ function InvoiceVisual({ vis }: { vis: boolean }) {
               <div style={{fontSize:11,fontWeight:700,color:"rgba(var(--ink),.8)"}}>{inv.id} · {inv.client}</div>
               <div style={{fontSize:10,color:"rgba(var(--ink),var(--ta-30, .3))",marginTop:1}}>{inv.amount}</div>
             </div>
-            <div style={{padding:"3px 10px",borderRadius:20,background:`${inv.color}18`,border:`1px solid ${inv.color}35`,fontSize:10,fontWeight:700,color:inv.color}}>
+            <div style={{padding:"3px 10px",borderRadius:20,background:`color-mix(in srgb, ${inv.color} 9.4%, transparent)`,border:`1px solid color-mix(in srgb, ${inv.color} 20.8%, transparent)`,fontSize:10,fontWeight:700,color:inv.color}}>
               {inv.status}
             </div>
           </div>
@@ -141,7 +141,7 @@ function InventoryVisual({ vis }: { vis: boolean }) {
       boxShadow:"0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(251,191,36,.1)",
     }}>
       <div style={{padding:"11px 16px",borderBottom:"1px solid rgba(var(--ink),.06)",background:"rgba(var(--ink),.03)",display:"flex",alignItems:"center",gap:8}}>
-        {["#f87171","#fbbf24","#34d399"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
+        {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
         <span style={{flex:1,textAlign:"center",fontSize:10,color:"rgba(var(--ink),var(--ta-25, .25))"}}>Inventory · Main Warehouse</span>
         <span style={{fontSize:10,color:"var(--tx-f87171, #f87171)",fontWeight:600}}>⚠ 2 low stock</span>
       </div>
@@ -193,7 +193,7 @@ function BranchVisual({ vis }: { vis: boolean }) {
       boxShadow:"0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(6,182,212,.1)",
     }}>
       <div style={{padding:"11px 16px",borderBottom:"1px solid rgba(var(--ink),.06)",background:"rgba(var(--ink),.03)",display:"flex",alignItems:"center",gap:8}}>
-        {["#f87171","#fbbf24","#34d399"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
+        {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:c,opacity:.7}}/>)}
         <span style={{flex:1,textAlign:"center",fontSize:10,color:"rgba(var(--ink),var(--ta-25, .25))"}}>Branch Overview · All Companies</span>
       </div>
       {/* Consolidated total */}
@@ -238,11 +238,11 @@ function BranchVisual({ vis }: { vis: boolean }) {
 /* ── Feature 5 visual: AI Intelligence ── */
 function AIVisual({ vis }: { vis: boolean }) {
   const items = [
-    { icon: "📈", label: "Revenue up 18% vs last month", color: "var(--tx-10b981, #10b981)", badge: "Insight", badgeColor: "#10b981" },
-    { icon: "🚨", label: "3 overdue invoices — $14,200 at risk", color: "var(--tx-f87171, #f87171)", badge: "Alert", badgeColor: "#f87171" },
-    { icon: "🌐", label: "Add solar panels — high demand in Q2", color: "var(--tx-a78bfa, #a78bfa)", badge: "Market", badgeColor: "#a78bfa" },
-    { icon: "🎯", label: "Collect overdue payments today", color: "var(--tx-fbbf24, #fbbf24)", badge: "Action", badgeColor: "#fbbf24" },
-    { icon: "📊", label: "30-day forecast: $285k revenue projected", color: "var(--tx-38bdf8, #38bdf8)", badge: "Forecast", badgeColor: "#38bdf8" },
+    { icon: "📈", label: "Revenue up 18% vs last month", color: "var(--tx-10b981, #10b981)", badge: "Insight", badgeColor: "var(--tx-10b981, #10b981)" },
+    { icon: "🚨", label: "3 overdue invoices — $14,200 at risk", color: "var(--tx-f87171, #f87171)", badge: "Alert", badgeColor: "var(--tx-f87171, #f87171)" },
+    { icon: "🌐", label: "Add solar panels — high demand in Q2", color: "var(--tx-a78bfa, #a78bfa)", badge: "Market", badgeColor: "var(--tx-a78bfa, #a78bfa)" },
+    { icon: "🎯", label: "Collect overdue payments today", color: "var(--tx-fbbf24, #fbbf24)", badge: "Action", badgeColor: "var(--tx-fbbf24, #fbbf24)" },
+    { icon: "📊", label: "30-day forecast: $285k revenue projected", color: "var(--tx-38bdf8, #38bdf8)", badge: "Forecast", badgeColor: "var(--tx-38bdf8, #38bdf8)" },
   ];
   return (
     <div style={{
@@ -251,7 +251,7 @@ function AIVisual({ vis }: { vis: boolean }) {
       boxShadow: "0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(167,139,250,.12)",
     }}>
       <div style={{ padding: "11px 16px", borderBottom: "1px solid rgba(var(--ink),.06)", background: "rgba(var(--ink),.03)", display: "flex", alignItems: "center", gap: 8 }}>
-        {["#f87171","#fbbf24","#34d399"].map((c,i) => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: .7 }} />)}
+        {["var(--tx-f87171, #f87171)","var(--tx-fbbf24, #fbbf24)","var(--tx-34d399, #34d399)"].map((c,i) => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: .7 }} />)}
         <span style={{ flex: 1, textAlign: "center", fontSize: 10, color: "rgba(var(--ink),var(--ta-25, .25))", letterSpacing: ".04em" }}>FinovaOS AI — Intelligence Center</span>
         <span style={{ fontSize: 10, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 600 }}>● AI Active</span>
       </div>
@@ -272,7 +272,7 @@ function AIVisual({ vis }: { vis: boolean }) {
             <div key={i} style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "9px 12px", borderRadius: 10,
-              background: "rgba(var(--ink),.03)", border: `1px solid ${item.badgeColor}18`,
+              background: "rgba(var(--ink),.03)", border: `1px solid color-mix(in srgb, ${item.badgeColor} 9.4%, transparent)`,
               opacity: vis ? 1 : 0,
               transform: vis ? "translateX(0)" : "translateX(16px)",
               transition: `all .4s ease ${i * 80}ms`,
@@ -281,7 +281,7 @@ function AIVisual({ vis }: { vis: boolean }) {
               <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-70, .7))", flex: 1, lineHeight: 1.4 }}>{item.label}</span>
               <span style={{
                 fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 20, flexShrink: 0,
-                background: `${item.badgeColor}18`, color: item.badgeColor, border: `1px solid ${item.badgeColor}30`,
+                background: `color-mix(in srgb, ${item.badgeColor} 9.4%, transparent)`, color: item.badgeColor, border: `1px solid color-mix(in srgb, ${item.badgeColor} 18.8%, transparent)`,
               }}>{item.badge}</span>
             </div>
           ))}
@@ -353,7 +353,7 @@ function FeatureRow({ f, i }: { f: typeof FEATURES[0]; i: number }) {
       <div style={{
         display:"inline-flex", alignItems:"center", gap:7,
         padding:"5px 13px", borderRadius:100, marginBottom:18,
-        background:`${f.color}14`, border:`1.5px solid ${f.color}30`,
+        background:`color-mix(in srgb, ${f.color} 7.8%, transparent)`, border:`1.5px solid color-mix(in srgb, ${f.color} 18.8%, transparent)`,
         fontSize:11, fontWeight:700, color:f.color, letterSpacing:".08em",
       }}>
         {f.tag}
@@ -370,7 +370,7 @@ function FeatureRow({ f, i }: { f: typeof FEATURES[0]; i: number }) {
       <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:32}}>
         {f.bullets.map((b,bi)=>(
           <div key={bi} style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:18,height:18,borderRadius:6,background:`${f.color}18`,border:`1px solid ${f.color}35`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <div style={{width:18,height:18,borderRadius:6,background:`color-mix(in srgb, ${f.color} 9.4%, transparent)`,border:`1px solid color-mix(in srgb, ${f.color} 20.8%, transparent)`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
               <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
                 <polyline points="2 6 5 9 10 3" stroke={f.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -383,11 +383,11 @@ function FeatureRow({ f, i }: { f: typeof FEATURES[0]; i: number }) {
         display:"inline-flex", alignItems:"center", gap:8,
         fontSize:14, fontWeight:700, color:f.color,
         textDecoration:"none",
-        borderBottom:`1.5px solid ${f.color}40`,
+        borderBottom:`1.5px solid color-mix(in srgb, ${f.color} 25.1%, transparent)`,
         paddingBottom:2, transition:"all .2s",
       }}
         onMouseEnter={e=>{e.currentTarget.style.borderColor=f.color; e.currentTarget.style.gap="12px";}}
-        onMouseLeave={e=>{e.currentTarget.style.borderColor=`${f.color}40`; e.currentTarget.style.gap="8px";}}
+        onMouseLeave={e=>{e.currentTarget.style.borderColor=`color-mix(in srgb, ${f.color} 25.1%, transparent)`; e.currentTarget.style.gap="8px";}}
       >
         Explore this feature
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

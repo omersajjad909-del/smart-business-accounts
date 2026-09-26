@@ -22,7 +22,7 @@ const FEATURES = [
   {
     icon: "🔔",
     title: "Overdue Invoice Reminders",
-    color: "#22c55e",
+    color: "var(--tx-22c55e, #22c55e)",
     glow: "rgba(34,197,94,.15)",
     border: "rgba(34,197,94,.25)",
     tagline: "Never chase a late payment by hand again",
@@ -40,7 +40,7 @@ const FEATURES = [
   {
     icon: "📦",
     title: "Low Stock Reorder Alerts",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     glow: "rgba(56,189,248,.15)",
     border: "rgba(56,189,248,.25)",
     tagline: "Know the moment stock runs low — not after it's gone",
@@ -58,7 +58,7 @@ const FEATURES = [
   {
     icon: "📊",
     title: "Scheduled Financial Reports",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.15)",
     border: "rgba(167,139,250,.25)",
     tagline: "Your P&L in your inbox — without asking anyone",
@@ -76,7 +76,7 @@ const FEATURES = [
   {
     icon: "✅",
     title: "Approval Workflow Automation",
-    color: "#fb923c",
+    color: "var(--tx-fb923c, #fb923c)",
     glow: "rgba(251,146,60,.15)",
     border: "rgba(251,146,60,.25)",
     tagline: "Spending controls that enforce themselves",
@@ -94,7 +94,7 @@ const FEATURES = [
   {
     icon: "🗄️",
     title: "Automated Backups",
-    color: "#f472b6",
+    color: "var(--tx-f472b6, #f472b6)",
     glow: "rgba(244,114,182,.15)",
     border: "rgba(244,114,182,.25)",
     tagline: "Your business data, backed up without thinking about it",
@@ -112,7 +112,7 @@ const FEATURES = [
   {
     icon: "🔗",
     title: "Zapier / Make Webhooks",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.15)",
     border: "rgba(52,211,153,.25)",
     tagline: "Connect FinovaOS to 5,000+ business apps — no code needed",
@@ -130,7 +130,7 @@ const FEATURES = [
   {
     icon: "📈",
     title: "Google Sheets Sync",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.15)",
     border: "rgba(251,191,36,.25)",
     tagline: "Your operational data in Google Sheets — always current",
@@ -172,7 +172,7 @@ export default function AutomationLandingPage() {
   const [heroRef, heroVis] = useInView();
 
   return (
-    <div style={{ fontFamily: F, background: "#050812", color: "#e2e8f0", overflowX: "hidden" }}>
+    <div style={{ fontFamily: F, background: "var(--dk-050812, #050812)", color: "var(--tx-e2e8f0, #e2e8f0)", overflowX: "hidden" }}>
 
       {/* ── HERO ── */}
       <div ref={heroRef} style={{
@@ -182,23 +182,23 @@ export default function AutomationLandingPage() {
         position: "relative", overflow: "hidden",
       }}>
         {/* Grid bg */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px)", backgroundSize: "50px 50px", zIndex: 0 }} />
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(var(--ink),.03) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--ink),.03) 1px, transparent 1px)", backgroundSize: "50px 50px", zIndex: 0 }} />
 
         <div style={{ position: "relative", zIndex: 1, maxWidth: 820 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.15)", border: "1px solid rgba(124,58,237,.3)", borderRadius: 100, padding: "6px 16px", fontSize: 13, color: "#a78bfa", marginBottom: 28, fontWeight: 600 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.15)", border: "1px solid rgba(124,58,237,.3)", borderRadius: 100, padding: "6px 16px", fontSize: 13, color: "var(--tx-a78bfa, #a78bfa)", marginBottom: 28, fontWeight: 600 }}>
             ⚡ Add-On · $79/month · Works with any plan
           </div>
 
           <h1 style={{ fontSize: "clamp(2.2rem, 5vw, 3.8rem)", fontWeight: 900, margin: "0 0 20px", lineHeight: 1.15 }}>
-            <span style={{ background: "linear-gradient(135deg,#a78bfa,#38bdf8,#34d399)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ background: "linear-gradient(135deg,var(--tx-a78bfa, #a78bfa),var(--tx-38bdf8, #38bdf8),var(--tx-34d399, #34d399))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Business Automation
             </span>
             <br />
-            <span style={{ color: "#fff" }}>that runs your operations</span>
+            <span style={{ color: "var(--ink-solid, #fff)" }}>that runs your operations</span>
           </h1>
 
-          <p style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", color: "rgba(255,255,255,.6)", maxWidth: 620, margin: "0 auto 36px", lineHeight: 1.7 }}>
-            Overdue invoice reminders, low-stock alerts, scheduled reports, approval workflows, automated backups, and business-app integrations — all for <strong style={{ color: "#fff" }}>$79/month</strong>.
+          <p style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", color: "rgba(var(--ink),var(--ta-60, .6))", maxWidth: 620, margin: "0 auto 36px", lineHeight: 1.7 }}>
+            Overdue invoice reminders, low-stock alerts, scheduled reports, approval workflows, automated backups, and business-app integrations — all for <strong style={{ color: "var(--ink-solid, #fff)" }}>$79/month</strong>.
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -210,9 +210,9 @@ export default function AutomationLandingPage() {
               Get Started →
             </Link>
             <Link href="/pricing" style={{
-              padding: "14px 28px", borderRadius: 12, border: "1px solid rgba(255,255,255,.15)",
-              color: "rgba(255,255,255,.8)", textDecoration: "none", fontSize: 15, fontWeight: 600,
-              background: "rgba(255,255,255,.04)",
+              padding: "14px 28px", borderRadius: 12, border: "1px solid rgba(var(--ink),.15)",
+              color: "rgba(var(--ink),.8)", textDecoration: "none", fontSize: 15, fontWeight: 600,
+              background: "rgba(var(--ink),.04)",
             }}>
               View All Plans
             </Link>
@@ -221,7 +221,7 @@ export default function AutomationLandingPage() {
           {/* Mini feature pills */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginTop: 40 }}>
             {["🔔 Invoice Reminders", "📦 Low Stock Alerts", "📊 Scheduled Reports", "✅ Approval Workflows", "🗄️ Auto Backups", "🔗 Webhooks", "📈 Sheets Sync"].map(f => (
-              <span key={f} style={{ padding: "5px 14px", borderRadius: 100, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", fontSize: 13, color: "rgba(255,255,255,.65)" }}>{f}</span>
+              <span key={f} style={{ padding: "5px 14px", borderRadius: 100, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", fontSize: 13, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{f}</span>
             ))}
           </div>
         </div>
@@ -233,17 +233,17 @@ export default function AutomationLandingPage() {
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 800, margin: "0 0 12px" }}>
             Buying all these tools separately costs much more
           </h2>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>
-            You would pay <strong style={{ color: "#f87171" }}>$150-$1,100/month</strong> for equivalent tools combined -<br />
-            or just <strong style={{ color: "#34d399" }}>$79/month</strong> with FinovaOS Automation.
+          <p style={{ color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 15 }}>
+            You would pay <strong style={{ color: "var(--tx-f87171, #f87171)" }}>$150-$1,100/month</strong> for equivalent tools combined -<br />
+            or just <strong style={{ color: "var(--tx-34d399, #34d399)" }}>$79/month</strong> with FinovaOS Automation.
           </p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           {COMPARE_TOOLS.map((t, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px", borderRadius: 12, background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.15)" }}>
-              <span style={{ fontSize: 14, color: "rgba(255,255,255,.65)" }}>{t.tool}</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#f87171", whiteSpace: "nowrap" }}>{t.price}</span>
+              <span style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{t.tool}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-f87171, #f87171)", whiteSpace: "nowrap" }}>{t.price}</span>
             </div>
           ))}
         </div>
@@ -252,9 +252,9 @@ export default function AutomationLandingPage() {
         <div style={{ textAlign: "center", margin: "30px 0 20px", fontSize: 28 }}>↓</div>
 
         <div style={{ padding: "24px 32px", borderRadius: 16, background: "linear-gradient(135deg,rgba(34,197,94,.1),rgba(52,211,153,.05))", border: "2px solid rgba(34,197,94,.3)", textAlign: "center" }}>
-          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 600, marginBottom: 8 }}>FinovaOS Automation Add-On</div>
-          <div style={{ fontSize: "2rem", fontWeight: 900, color: "#34d399" }}>$79 <span style={{ fontSize: "1rem", color: "rgba(255,255,255,.5)", fontWeight: 400 }}>/month</span></div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginTop: 4 }}>All 7 features. One price. Cancel anytime.</div>
+          <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 600, marginBottom: 8 }}>FinovaOS Automation Add-On</div>
+          <div style={{ fontSize: "2rem", fontWeight: 900, color: "var(--tx-34d399, #34d399)" }}>$79 <span style={{ fontSize: "1rem", color: "rgba(var(--ink),var(--ta-50, .5))", fontWeight: 400 }}>/month</span></div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginTop: 4 }}>All 7 features. One price. Cancel anytime.</div>
         </div>
       </div>
 
@@ -264,7 +264,7 @@ export default function AutomationLandingPage() {
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 800, margin: "0 0 12px" }}>
             Detailed breakdown of every feature
           </h2>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>So you can confidently evaluate how much value this add-on delivers.</p>
+          <p style={{ color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 15 }}>So you can confidently evaluate how much value this add-on delivers.</p>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -280,7 +280,7 @@ export default function AutomationLandingPage() {
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 10px" }}>
             What is included in $79/month
           </h2>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>No hidden fees. No per-action charges. One flat rate.</p>
+          <p style={{ color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 15 }}>No hidden fees. No per-action charges. One flat rate.</p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -296,9 +296,9 @@ export default function AutomationLandingPage() {
             { icon: "📞", text: "Priority support for add-on issues" },
             { icon: "🔄", text: "Cancel anytime, no lock-in" },
           ].map((item, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 16px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
               <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.5 }}>{item.text}</span>
+              <span style={{ fontSize: 13, color: "rgba(var(--ink),.75)", lineHeight: 1.5 }}>{item.text}</span>
             </div>
           ))}
         </div>
@@ -308,17 +308,17 @@ export default function AutomationLandingPage() {
       <div style={{ padding: "20px 24px 80px", maxWidth: 700, margin: "0 auto" }}>
         <h2 style={{ textAlign: "center", fontSize: "clamp(1.4rem, 2.5vw, 2rem)", fontWeight: 800, marginBottom: 36 }}>Frequently Asked Questions</h2>
         {FAQS.map((faq, i) => (
-          <div key={i} style={{ marginBottom: 12, borderRadius: 12, border: "1px solid rgba(255,255,255,.08)", overflow: "hidden" }}>
+          <div key={i} style={{ marginBottom: 12, borderRadius: 12, border: "1px solid rgba(var(--ink),.08)", overflow: "hidden" }}>
             <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{
               width: "100%", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center",
-              background: openFaq === i ? "rgba(124,58,237,.1)" : "rgba(255,255,255,.03)",
-              border: "none", cursor: "pointer", color: "#e2e8f0", fontSize: 14, fontWeight: 600, fontFamily: F, textAlign: "left",
+              background: openFaq === i ? "rgba(124,58,237,.1)" : "rgba(var(--ink),.03)",
+              border: "none", cursor: "pointer", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 14, fontWeight: 600, fontFamily: F, textAlign: "left",
             }}>
               {faq.q}
-              <span style={{ fontSize: 18, color: "rgba(255,255,255,.4)", flexShrink: 0, marginLeft: 16 }}>{openFaq === i ? "−" : "+"}</span>
+              <span style={{ fontSize: 18, color: "rgba(var(--ink),var(--ta-40, .4))", flexShrink: 0, marginLeft: 16 }}>{openFaq === i ? "−" : "+"}</span>
             </button>
             {openFaq === i && (
-              <div style={{ padding: "14px 20px 18px", fontSize: 14, color: "rgba(255,255,255,.6)", lineHeight: 1.7, background: "rgba(124,58,237,.06)" }}>
+              <div style={{ padding: "14px 20px 18px", fontSize: 14, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.7, background: "rgba(124,58,237,.06)" }}>
                 {faq.a}
               </div>
             )}
@@ -331,7 +331,7 @@ export default function AutomationLandingPage() {
         <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)", fontWeight: 900, margin: "0 0 16px" }}>
           Ready to run your business on autopilot?
         </h2>
-        <p style={{ color: "rgba(255,255,255,.5)", fontSize: 16, marginBottom: 36 }}>
+        <p style={{ color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 16, marginBottom: 36 }}>
           No hidden fees. Cancel anytime. Full access to all automation features.
         </p>
         <Link href="/get-started" style={{
@@ -342,7 +342,7 @@ export default function AutomationLandingPage() {
         }}>
           Add to My Plan — $79/month
         </Link>
-        <div style={{ marginTop: 20, fontSize: 13, color: "rgba(255,255,255,.35)" }}>
+        <div style={{ marginTop: 20, fontSize: 13, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
           Requires an active FinovaOS plan · Works with Starter, Professional, and Enterprise
         </div>
       </div>
@@ -361,7 +361,7 @@ function FeatureCard({ feature: f, index }: { feature: typeof FEATURES[0]; index
       display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0,
       borderRadius: 20, overflow: "hidden",
       border: `1px solid ${f.border}`,
-      background: "rgba(255,255,255,.02)",
+      background: "rgba(var(--ink),.02)",
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(20px)",
       transition: "opacity .5s, transform .5s",
     }}>
@@ -369,11 +369,11 @@ function FeatureCard({ feature: f, index }: { feature: typeof FEATURES[0]; index
       <div style={{ padding: "36px 36px", order: isEven ? 0 : 1 }}>
         <div style={{ fontSize: 36, marginBottom: 12 }}>{f.icon}</div>
         <h3 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 8px", color: f.color }}>{f.title}</h3>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,.45)", margin: "0 0 16px", fontStyle: "italic" }}>{f.tagline}</p>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,.65)", lineHeight: 1.7, margin: "0 0 20px" }}>{f.description}</p>
+        <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 16px", fontStyle: "italic" }}>{f.tagline}</p>
+        <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-65, .65))", lineHeight: 1.7, margin: "0 0 20px" }}>{f.description}</p>
         <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
           {f.bullets.map((b, i) => (
-            <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(255,255,255,.7)" }}>
+            <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>
               <span style={{ color: f.color, flexShrink: 0, marginTop: 1 }}>✓</span> {b}
             </li>
           ))}
@@ -382,12 +382,12 @@ function FeatureCard({ feature: f, index }: { feature: typeof FEATURES[0]; index
 
       {/* Right: ROI box */}
       <div style={{ padding: "36px 32px", background: `${f.glow}`, display: "flex", flexDirection: "column", justifyContent: "center", gap: 20, order: isEven ? 1 : 0 }}>
-        <div style={{ padding: "20px", borderRadius: 14, background: "rgba(0,0,0,.3)", border: `1px solid ${f.border}` }}>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em" }}>Why it pays for itself</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.7)", lineHeight: 1.6 }}>{f.roi}</div>
+        <div style={{ padding: "20px", borderRadius: 14, background: "var(--mk-inset, rgba(0,0,0,.3))", border: `1px solid ${f.border}` }}>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em" }}>Why it pays for itself</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))", lineHeight: 1.6 }}>{f.roi}</div>
         </div>
-        <div style={{ padding: "20px", borderRadius: 14, background: "rgba(0,0,0,.3)", border: `1px solid ${f.border}` }}>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em" }}>What it replaces</div>
+        <div style={{ padding: "20px", borderRadius: 14, background: "var(--mk-inset, rgba(0,0,0,.3))", border: `1px solid ${f.border}` }}>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 8, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em" }}>What it replaces</div>
           <div style={{ fontSize: 13, color: f.color, fontWeight: 600, lineHeight: 1.6 }}>{f.value}</div>
         </div>
       </div>
