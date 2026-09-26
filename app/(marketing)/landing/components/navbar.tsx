@@ -412,7 +412,7 @@ export default function Navbar() {
 
             {/* Logo */}
             <Link href="/" style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none" }}>
-              <img src="/icon1.png" alt="FinovaOS" width={34} height={34} style={{ width:34, height:34, objectFit:"contain", flexShrink:0 }}/>
+              <img src="/finova-mark.png" alt="FinovaOS" width={36} height={36} style={{ width:36, height:36, objectFit:"contain", flexShrink:0 }}/>
               <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"#eef3ff", letterSpacing:"-.2px" }}>FinovaOS</span>
             </Link>
 

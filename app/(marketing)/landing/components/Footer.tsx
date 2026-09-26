@@ -259,7 +259,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="ft-brand">
             <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", marginBottom: 20 }}>
-              <img src="/nav-logo.png" alt="FinovaOS" width={100} height={100} style={{ objectFit: "contain", flexShrink: 0 }}/>
+              <img src="/finova-mark.png" alt="FinovaOS" width={56} height={56} style={{ width: 56, height: 56, objectFit: "contain", flexShrink: 0 }}/>
               <div>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 700, color: "white", letterSpacing: "-.2px", lineHeight: 1.1 }}>
                   FinovaOS
