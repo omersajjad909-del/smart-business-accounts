@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatFromUSD } from "@/lib/currency-client";
-import { STANDALONE_MODULE_IDS } from "@/lib/customPlanPricing";
 import { useSignupsOpen } from "@/hooks/useSignupsOpen";
 
 type BillingCycle = "monthly" | "yearly";
@@ -53,18 +52,6 @@ const PLANS = [
   },
 ];
 
-const MODULE_CATEGORIES = [
-  { id: "core",         label: "Core",         icon: "⚡", color: "var(--tx-818cf8, #818cf8)" },
-  { id: "finance",      label: "Finance",      icon: "💰", color: "var(--tx-34d399, #34d399)" },
-  { id: "operations",   label: "Operations",   icon: "⚙️", color: "var(--tx-38bdf8, #38bdf8)" },
-  { id: "integrations", label: "Integrations", icon: "🔗", color: "var(--tx-f97316, #f97316)" },
-];
-
-// Modules that are a finished product on their own. The picker uses this to
-// tell a buyer whether a single tick is already a usable subscription, or
-// whether the module only layers on top of something else.
-const STANDALONE_IDS = new Set<string>(STANDALONE_MODULE_IDS);
-
 // Single-app pitches — what the account actually looks like when this is the
 // only module on it. Ordered by how often people ask for it on its own.
 const STANDALONE_APPS = [
@@ -86,10 +73,6 @@ const DEFAULT_PLAN_LIMITS: Record<string, number | null> = {
   starter: 3,
   professional: 10,
   enterprise: 25,
-};
-const DEFAULT_SEAT_PRICING = {
-  monthly: 7,
-  yearly: 6,
 };
 
 // ── FEATURE COMPARISON DATA ──────────────────────────────────────────────────
@@ -381,9 +364,6 @@ export default function PricingPage() {
   const [currency, setCurrency] = useState<string>("USD");
   const [country, setCountry] = useState<string>("US");
   const [rates, setRates] = useState<Record<string, number> | null>(null);
-  const [selectedModules, setSelectedModules] = useState<string[]>(["accounting", "inventory"]);
-  const [extraUsers, setExtraUsers] = useState(0);
-  const [extraBranches, setExtraBranches] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
@@ -407,7 +387,6 @@ export default function PricingPage() {
   // the initial state's "pro" key made that read undefined, showing a live
   // "Up to undefined" in the Branches comparison row.
   const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, professional: 3, enterprise: 10 });
-  const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
   const [planHighlights, setPlanHighlights] = useState<Record<string, string[]>>(DEFAULT_HIGHLIGHTS);
   const [customPlanData, setCustomPlanData] = useState<{ basePrice: number; yearlyDiscount: number; modules: any[] }>({
     basePrice: 0, yearlyDiscount: 20,
@@ -482,12 +461,6 @@ export default function PricingPage() {
               enterprise: d.branchLimits?.enterprise ?? 10,
             });
           }
-          if (d?.seatPricing) {
-            setSeatPricing({
-              monthly: Number(d.seatPricing?.monthly ?? DEFAULT_SEAT_PRICING.monthly),
-              yearly: Math.round(Number(d.seatPricing?.yearly ?? (DEFAULT_SEAT_PRICING.yearly * 12)) / 12),
-            });
-          }
           if (d?.customPlan) {
             setCustomPlanData(prev => ({
               basePrice: d.customPlan.basePrice ?? prev.basePrice,
@@ -528,19 +501,6 @@ export default function PricingPage() {
   // display could drift away from what checkout charges. Currency is now
   // resolved once, from the IP, and nothing may override it.
 
-  const yearlyDiscount = customPlanData.yearlyDiscount ?? 20;
-  const seatRate = billing === "yearly" ? seatPricing.yearly : seatPricing.monthly;
-  const customModuleTotal = useMemo(() =>
-    customPlanData.modules
-      .filter((m: any) => selectedModules.includes(m.id))
-      .reduce((s: number, m: any) => s + Number(m.price), 0),
-    [selectedModules, customPlanData]
-  );
-  const customMonthly = useMemo(() =>
-    customModuleTotal + extraUsers * seatRate + extraBranches * seatRate,
-    [customModuleTotal, extraUsers, extraBranches, seatRate]
-  );
-  const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency);
 
   // When country is PK and admin has set PKR prices, use those directly
@@ -574,24 +534,7 @@ export default function PricingPage() {
   };
 
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
-  const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
-  const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-  // Single-app buy: clear everything else so the estimate shows exactly what
-  // that one module costs, and drop the seat/branch add-ons that only make
-  // sense on a bigger package.
-  const selectOnlyModule = (id: string) => {
-    setSelectedModules([id]);
-    setExtraUsers(0);
-    setExtraBranches(0);
-    if (typeof document !== "undefined") {
-      document.getElementById("custom")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-  const isStandalone = (id: string) => STANDALONE_IDS.has(id);
-  const standaloneOnly = selectedModules.length === 1 && isStandalone(selectedModules[0]);
-  // A package of only layer-on modules cannot run — flag it instead of letting
-  // someone check out into an empty app.
-  const needsCoreModule = selectedModules.length > 0 && !selectedModules.some(isStandalone);
+  const buildSingleHref = (id: string) => `/onboarding/choose-plan?plan=custom&modules=${id}&extraUsers=0&extraBranches=0&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const usersLabel = (v: number | null | undefined) => (v === null || v === undefined ? "Unlimited" : `Up to ${v}`);
 
@@ -604,6 +547,7 @@ export default function PricingPage() {
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         select option{background:var(--dk-0f1629, #0f1629);color:var(--ink-solid, white)}
         .feat-row:hover{background:rgba(var(--ink),.03)}
+        .sa-card:hover{transform:translateY(-3px);border-color:rgba(99,102,241,.4) !important;box-shadow:0 10px 30px rgba(99,102,241,.14)}
 
         @media(max-width:900px){
           .pg{grid-template-columns:1fr !important}
@@ -1087,24 +1031,24 @@ export default function PricingPage() {
               {STANDALONE_APPS.map(app => {
                 const mod = customPlanData.modules.find((m: any) => m.id === app.id);
                 if (!mod) return null;
-                const active = selectedModules.length === 1 && selectedModules[0] === app.id;
                 return (
-                  <button
+                  <Link
                     key={app.id}
-                    onClick={() => selectOnlyModule(app.id)}
+                    className="sa-card"
+                    href={signupsOpen ? buildSingleHref(app.id) : "#custom"}
+                    aria-disabled={!signupsOpen}
                     style={{
+                      display: "block", textDecoration: "none",
                       textAlign: "left", padding: "18px 18px 16px", borderRadius: 16, cursor: "pointer",
                       fontFamily: ff, color: "var(--ink-solid, white)", transition: "all .2s",
-                      border: `1.5px solid ${active ? `color-mix(in srgb, ${app.color} 50.2%, transparent)` : "rgba(var(--ink),.07)"}`,
-                      background: active
-                        ? `linear-gradient(160deg,color-mix(in srgb, ${app.color} 12.2%, transparent),rgba(var(--ink),.02))`
-                        : "rgba(var(--ink),.025)",
+                      border: "1.5px solid rgba(var(--ink),.07)",
+                      background: "rgba(var(--ink),.025)",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 22, lineHeight: 1 }}>{app.icon}</span>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: active ? app.color : "var(--ink-solid, white)" }}>{app.label}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "var(--ink-solid, white)" }}>{app.label}</span>
                       </div>
                       <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", padding: "3px 7px", borderRadius: 5, color: app.color, background: `color-mix(in srgb, ${app.color} 9.4%, transparent)`, border: `1px solid color-mix(in srgb, ${app.color} 20%, transparent)`, whiteSpace: "nowrap" }}>
                         STANDALONE
@@ -1127,11 +1071,11 @@ export default function PricingPage() {
                         {formatPrice(mod.price)}
                         <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(var(--ink),var(--ta-30, .3))" }}>/mo</span>
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: active ? app.color : "rgba(var(--ink),var(--ta-40, .4))" }}>
-                        {active ? "✓ Selected" : "Pick this only →"}
+                      <span style={{ fontSize: 11, fontWeight: 700, color: app.color }}>
+                        {signupsOpen ? "Get this app →" : "Launching soon"}
                       </span>
                     </div>
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -1140,202 +1084,6 @@ export default function PricingPage() {
               Need only the automation tools? <Link href="/onboarding/choose-plan?addon=automation" style={{ color: "var(--tx-a78bfa, #a78bfa)", textDecoration: "none", fontWeight: 700 }}>Business Automation is sold separately →</Link>
             </div>
 
-            {/* Extra Users / Extra Branches — sits right under the presets so
-                it is visible without scrolling into the a-la-carte builder;
-                it used to live in its own box after the whole module list. */}
-            <div className="cp-addon-strip" style={{ marginTop: 20, padding: "16px 18px", borderRadius: 14, background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
-              {[
-                { key: "users",    label: "Extra Users",    icon: "👥", color: "var(--tx-a5b4fc, #a5b4fc)", val: extraUsers,    set: setExtraUsers },
-                { key: "branches", label: "Extra Branches", icon: "🏢", color: "var(--tx-38bdf8, #38bdf8)", val: extraBranches, set: setExtraBranches },
-              ].map(addon => (
-                <div key={addon.key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{addon.icon} {addon.label}</div>
-                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>+{formatPrice(seatRate)}/each/mo</div>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", background: "rgba(var(--ink),.05)", borderRadius: 10, border: "1px solid rgba(var(--ink),.09)", overflow: "hidden" }}>
-                    <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
-                    <input type="number" min="0" value={addon.val} onChange={e => addon.set(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: 40, background: "none", border: "none", color: addon.color, fontSize: 15, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: ff }} />
-                    <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "7px 13px", background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ height: 1, background: "rgba(var(--ink),.06)", marginBottom: 32 }} />
-
-          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", marginBottom: 18, textAlign: "center" }}>
-            …or build your own package — tick anything below and the estimate updates live.
-          </div>
-
-          <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
-            {/* Left — Module picker + add-ons */}
-            <div style={{ flex: "1 1 560px", minWidth: 0 }}>
-              {MODULE_CATEGORIES.map(cat => {
-                const catMods = customPlanData.modules.filter((m: any) => m.category === cat.id);
-                if (!catMods.length) return null;
-                return (
-                  <div key={cat.id} style={{ marginBottom: 22 }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ color: cat.color }}>{cat.icon}</span>{cat.label}
-                    </div>
-                    <div className="mod-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                      {catMods.map((module: any) => {
-                        const sel = selectedModules.includes(module.id);
-                        return (
-                          <button key={module.id} onClick={() => toggleModule(module.id)} style={{
-                            textAlign: "left", padding: "16px 18px", borderRadius: 14,
-                            border: `1.5px solid ${sel ? "rgba(249,115,22,.5)" : "rgba(var(--ink),.07)"}`,
-                            background: sel ? "rgba(249,115,22,.07)" : "rgba(var(--ink),.025)",
-                            color: "var(--ink-solid, white)", cursor: "pointer", fontFamily: ff, transition: "all .2s",
-                          }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 7 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                                <span style={{ fontSize: 20, lineHeight: 1 }}>{module.icon}</span>
-                                <span style={{ fontSize: 13, fontWeight: 800, color: sel ? "var(--tx-fb923c, #fb923c)" : "var(--ink-solid, white)" }}>{module.name}</span>
-                              </div>
-                              <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: sel ? "#f97316" : "transparent", border: sel ? "none" : "1.5px solid rgba(var(--ink),.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                {sel && <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                              </div>
-                            </div>
-                            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                              <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "var(--tx-f97316, #f97316)" : "rgba(var(--ink),var(--ta-45, .45))" }}>
-                                +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(var(--ink),var(--ta-30, .3))" }}>/mo</span>
-                              </div>
-                              {/* Says whether ticking only this box is already a
-                                  working subscription, or whether it needs a
-                                  module underneath it. */}
-                              {isStandalone(module.id) ? (
-                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "var(--tx-34d399, #34d399)", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
-                                  RUNS ALONE
-                                </span>
-                              ) : (
-                                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "rgba(var(--ink),var(--ta-35, .35))", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)" }}>
-                                  ADD-ON
-                                </span>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Right — Price summary */}
-            <div className="cp-sidebar" style={{ width: 320, flexShrink: 0, position: "sticky", top: 24 }}>
-              <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "22px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 14 }}>
-                  <span style={{ fontSize: 10, fontWeight: 800, color: "var(--tx-f97316, #f97316)", letterSpacing: ".06em", textTransform: "uppercase" }}>Your Estimate</span>
-                  {standaloneOnly && (
-                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".05em", padding: "3px 7px", borderRadius: 5, color: "var(--tx-34d399, #34d399)", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)" }}>
-                      SINGLE APP
-                    </span>
-                  )}
-                </div>
-
-                {/* Modules breakdown */}
-                {selectedModules.length === 0 ? (
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", marginBottom: 14, fontStyle: "italic" }}>No modules selected yet</div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-                    {customPlanData.modules.filter((m: any) => selectedModules.includes(m.id)).map((m: any) => (
-                      <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-55, .55))" }}>{m.icon} {m.name}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.78)" }}>{formatPrice(m.price)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add-ons breakdown */}
-                {(extraUsers > 0 || extraBranches > 0) && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(var(--ink),.07)" }}>
-                    {extraUsers > 0 && (
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>👥 {extraUsers} user{extraUsers > 1 ? "s" : ""} × {formatPrice(seatRate)}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{formatPrice(extraUsers * seatRate)}</span>
-                      </div>
-                    )}
-                    {extraBranches > 0 && (
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>🏢 {extraBranches} branch{extraBranches > 1 ? "es" : ""} × {formatPrice(seatRate)}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-38bdf8, #38bdf8)" }}>{formatPrice(extraBranches * seatRate)}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Total */}
-                <div style={{ borderTop: "1px solid rgba(249,115,22,.25)", paddingTop: 14, marginBottom: 16 }}>
-                  {billing === "yearly" && customMonthly > 0 && (
-                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
-                      <span>Subtotal</span><span>{formatPrice(customMonthly)}/mo</span>
-                    </div>
-                  )}
-                  {billing === "yearly" && (
-                    <div style={{ fontSize: 11, color: "var(--tx-34d399, #34d399)", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
-                      <span>Yearly −{yearlyDiscount}%</span>
-                      <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
-                    </div>
-                  )}
-                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 4 }}>
-                    {billing === "yearly" ? "Per month, billed annually" : "Per month"}
-                  </div>
-                  <div style={{ fontSize: 42, fontWeight: 900, color: customMonthly > 0 ? "var(--tx-f97316, #f97316)" : "rgba(var(--ink),var(--ta-20, .2))", lineHeight: 1, letterSpacing: "-1.5px" }}>
-                    {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
-                  </div>
-                  {billing === "yearly" && customMonthly > 0 && (
-                    <div style={{ fontSize: 11, color: "var(--tx-34d399, #34d399)", marginTop: 6, fontWeight: 700 }}>
-                      Save {formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
-                    </div>
-                  )}
-                </div>
-
-                {needsCoreModule && (
-                  <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.22)", fontSize: 11.5, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.5 }}>
-                    Add one module marked <strong>Runs alone</strong> — the ones you picked layer on top of another module.
-                  </div>
-                )}
-
-                {signupsOpen ? (
-                  <Link
-                    href={selectedModules.length && !needsCoreModule ? buildCustomHref() : "#custom"}
-                    style={{
-                      display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(var(--ink),.06)",
-                      color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                      opacity: selectedModules.length && !needsCoreModule ? 1 : 0.5,
-                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(var(--ink),.1)",
-                    }}
-                  >
-                    {!selectedModules.length ? "Select modules above" : needsCoreModule ? "Pick a module that runs alone" : standaloneOnly ? "Continue with this app →" : "Continue →"}
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    style={{
-                      display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderRadius: 12,
-                      background: selectedModules.length && !needsCoreModule ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(var(--ink),.06)",
-                      color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
-                      opacity: selectedModules.length && !needsCoreModule ? 0.85 : 0.5,
-                      border: selectedModules.length && !needsCoreModule ? "none" : "1px solid rgba(var(--ink),.1)",
-                      cursor: "not-allowed",
-                    }}
-                  >
-                    Launching Soon
-                  </button>
-                )}
-                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-22, .22))", textAlign: "center", marginTop: 10 }}>
-                  You&apos;ll confirm everything before payment
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
