@@ -94,21 +94,21 @@ export default function GeoPrecisionPrompt() {
         width: 320,
         borderRadius: 18,
         border: "1px solid rgba(56,189,248,.22)",
-        background: "rgba(8,13,29,.94)",
+        background: "rgba(var(--dkr-080d1d, 8,13,29),0.94)",
         boxShadow: "0 20px 56px rgba(0,0,0,.42)",
         backdropFilter: "blur(16px)",
         padding: 16,
-        color: "white",
+        color: "var(--ink-solid, white)",
         fontFamily: "'Outfit','Inter',sans-serif",
       }}
     >
-      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase", color: "#7dd3fc" }}>
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--tx-7dd3fc, #7dd3fc)" }}>
         Precise Geo
       </div>
       <div style={{ marginTop: 8, fontSize: 17, fontWeight: 800 }}>
         Improve location accuracy
       </div>
-      <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,.66)" }}>
+      <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.7, color: "rgba(var(--ink),var(--ta-66, .66))" }}>
         Allow location once to place exact visitor pins on the admin geo map. If you skip, FinovaOS will still use privacy-safe country fallback.
       </div>
       <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
@@ -136,8 +136,8 @@ export default function GeoPrecisionPrompt() {
             borderRadius: 12,
             padding: "10px 14px",
             background: "transparent",
-            border: "1px solid rgba(255,255,255,.12)",
-            color: "rgba(255,255,255,.72)",
+            border: "1px solid rgba(var(--ink),.12)",
+            color: "rgba(var(--ink),var(--ta-72, .72))",
             fontWeight: 700,
             cursor: "pointer",
           }}

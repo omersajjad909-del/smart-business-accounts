@@ -8,7 +8,7 @@ import { Menu, X } from "lucide-react"
 const FEATURES_COLS = [
   {
     heading: "Accounting",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     links: [
       { label: "Ledger & Trial Balance",  href: "/features/accounting" },
       { label: "Profit & Loss",           href: "/features/accounting" },
@@ -19,7 +19,7 @@ const FEATURES_COLS = [
   },
   {
     heading: "Sales & Inventory",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     links: [
       { label: "Sales Invoices",         href: "/features/invoicing" },
       { label: "Quotations",             href: "/features/invoicing" },
@@ -30,7 +30,7 @@ const FEATURES_COLS = [
   },
   {
     heading: "Banking & Payments",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     links: [
       { label: "Bank Reconciliation",    href: "/features/bank-reconciliation" },
       { label: "Payment Receipts",       href: "/features/invoicing" },
@@ -41,7 +41,7 @@ const FEATURES_COLS = [
   },
   {
     heading: "AI Intelligence",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     links: [
       { label: "AI Financial Insights",   href: "/features" },
       { label: "Ask AI (Chat)",           href: "/demo" },
@@ -60,7 +60,7 @@ const FEATURES_CARDS = [
     desc: "Send invoices and get paid faster with smart automation.",
     cta: "Try Invoicing",
     href: "/features/invoicing",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.18)",
     border: "rgba(129,140,248,.28)",
   },
@@ -70,7 +70,7 @@ const FEATURES_CARDS = [
     desc: "Ask your finances anything. Get alerts, forecasts & market insights — all powered by your real data.",
     cta: "Try AI Now",
     href: "/demo",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.18)",
     border: "rgba(167,139,250,.28)",
   },
@@ -80,7 +80,7 @@ const FEATURES_CARDS = [
 const SOLUTIONS_COLS = [
   {
     heading: "By Industry",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     links: [
       { label: "Trading",                href: "/solutions?industry=trading",    icon: "🛒" },
       { label: "Distribution & FMCG",    href: "/solutions?industry=distribution",icon: "🚚" },
@@ -94,7 +94,7 @@ const SOLUTIONS_COLS = [
   },
   {
     heading: "By Business Size",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     links: [
       { label: "Startups & Freelancers", href: "/pricing?plan=starter",    icon: "🌱" },
       { label: "Small Businesses",       href: "/pricing?plan=starter",    icon: "🏢" },
@@ -105,7 +105,7 @@ const SOLUTIONS_COLS = [
   },
   {
     heading: "Popular Use Cases",
-    color: "#f87171",
+    color: "var(--tx-f87171, #f87171)",
     links: [
       { label: "Multi-currency Accounting", href: "/features/accounting", icon: "💱" },
       { label: "Global Tax Compliance",     href: "/features/accounting", icon: "📋" },
@@ -123,7 +123,7 @@ const SOLUTIONS_CARDS = [
     desc: "Multi-currency, multi-branch support for growing businesses on one platform.",
     cta: "Explore Global",
     href: "/solutions",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     glow: "rgba(167,139,250,.18)",
     border: "rgba(167,139,250,.28)",
     stats: [
@@ -137,7 +137,7 @@ const SOLUTIONS_CARDS = [
     desc: "Import your data, invite your team, start in minutes — not days.",
     cta: "Get Started",
     href: "/pricing",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.14)",
     border: "rgba(251,191,36,.25)",
     stats: [
@@ -164,7 +164,7 @@ const SHARED_CSS = `
 
   .fn-link {
     position:relative; font-size:13.5px; font-weight:600;
-    color:rgba(255,255,255,.65); text-decoration:none;
+    color:rgba(var(--ink),.65); text-decoration:none;
     padding:6px 0; font-family:'Outfit',sans-serif; letter-spacing:.01em;
     transition:color .2s;
   }
@@ -179,7 +179,7 @@ const SHARED_CSS = `
 
   .fn-feat {
     position:relative; font-size:13.5px; font-weight:600;
-    color:rgba(255,255,255,.65); background:none; border:none; cursor:pointer;
+    color:rgba(var(--ink),.65); background:none; border:none; cursor:pointer;
     padding:6px 0; font-family:'Outfit',sans-serif; letter-spacing:.01em;
     display:flex; align-items:center; gap:5px; transition:color .2s;
   }
@@ -193,7 +193,7 @@ const SHARED_CSS = `
   .fn-feat:hover::after,.fn-feat.open::after { width:100%; }
 
   .fn-ml {
-    font-size:13px; font-weight:500; color:rgba(255,255,255,.45);
+    font-size:13px; font-weight:500; color:rgba(var(--ink),.45);
     text-decoration:none; padding:4px 0;
     display:flex; align-items:center; gap:7px;
     font-family:'Outfit',sans-serif; transition:all .2s;
@@ -201,16 +201,16 @@ const SHARED_CSS = `
   .fn-ml:hover { color:#fff; padding-left:4px; }
 
   .fn-hc {
-    border-radius:14px; padding:14px; border:1.5px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.03);
+    border-radius:14px; padding:14px; border:1.5px solid rgba(var(--ink),.08);
+    background:rgba(var(--ink),.03);
     transition:all .25s; cursor:pointer; text-decoration:none; display:block;
   }
-  .fn-hc:hover { background:rgba(255,255,255,.06); transform:translateY(-2px); }
+  .fn-hc:hover { background:rgba(var(--ink),.06); transform:translateY(-2px); }
 
   .fn-mob {
     display:block; font-size:15px; font-weight:600;
-    color:rgba(255,255,255,.65); text-decoration:none;
-    padding:12px 0; border-bottom:1px solid rgba(255,255,255,.07);
+    color:rgba(var(--ink),.65); text-decoration:none;
+    padding:12px 0; border-bottom:1px solid rgba(var(--ink),.07);
     transition:color .2s; font-family:'Outfit',sans-serif;
   }
   .fn-mob:hover { color:#fff; }
@@ -297,11 +297,11 @@ function MegaPanel({
                   <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background:`${card.color}15`, border:`1px solid ${card.color}25`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15 }}>
                     {card.emoji}
                   </div>
-                  <span style={{ fontSize:12.5, fontWeight:700, color:"rgba(255,255,255,.85)", lineHeight:1.3 }}>
+                  <span style={{ fontSize:12.5, fontWeight:700, color:"rgba(var(--ink),.85)", lineHeight:1.3 }}>
                     {card.title}
                   </span>
                 </div>
-                <p style={{ fontSize:11.5, color:"rgba(255,255,255,.35)", lineHeight:1.6, margin:"0 0 8px" }}>
+                <p style={{ fontSize:11.5, color:"rgba(var(--ink),var(--ta-35, .35))", lineHeight:1.6, margin:"0 0 8px" }}>
                   {card.desc}
                 </p>
                 {/* Stats row if present */}
@@ -310,7 +310,7 @@ function MegaPanel({
                     {card.stats.map((s: any) => (
                       <div key={s.label}>
                         <div style={{ fontSize:13, fontWeight:800, color:card.color, fontFamily:"'Lora',serif" }}>{s.val}</div>
-                        <div style={{ fontSize:10, color:"rgba(255,255,255,.28)", fontWeight:500 }}>{s.label}</div>
+                        <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:500 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -328,12 +328,12 @@ function MegaPanel({
       </div>
 
       {/* Footer bar */}
-      <div style={{ borderTop:"1px solid rgba(255,255,255,.06)", background:"rgba(255,255,255,.018)", padding:"11px 24px" }}>
+      <div style={{ borderTop:"1px solid rgba(var(--ink),.06)", background:"rgba(var(--ink),.018)", padding:"11px 24px" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <span style={{ fontSize:12.5, color:"rgba(255,255,255,.28)", fontWeight:500 }}>{footerText}</span>
+          <span style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:500 }}>{footerText}</span>
           <Link href={footerHref} onClick={onClose}
             style={{ display:"flex", alignItems:"center", gap:5, fontSize:12.5, fontWeight:700, color:accentColor, textDecoration:"none", transition:"color .2s" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#c4b5fd")}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--tx-c4b5fd, #c4b5fd)")}
             onMouseLeave={e => (e.currentTarget.style.color = accentColor)}>
             {footerLink}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -397,9 +397,9 @@ export default function Navbar() {
 
       <nav style={{
         position:"relative", zIndex:50, width:"100%",
-        background: "rgba(8,12,30,.9)",
+        background: "rgba(var(--dkr-080c1e, 8,12,30),0.9)",
         backdropFilter:"blur(22px)",
-        borderBottom:"1px solid rgba(255,255,255,.08)",
+        borderBottom:"1px solid rgba(var(--ink),.08)",
         transition:"all .3s ease",
         boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,.25)" : "none",
         fontFamily:"'Outfit',sans-serif",
@@ -413,7 +413,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none" }}>
               <img src="/finova-mark.png" alt="FinovaOS" width={36} height={36} style={{ width:36, height:36, objectFit:"contain", flexShrink:0 }}/>
-              <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"#eef3ff", letterSpacing:"-.2px" }}>FinovaOS</span>
+              <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--tx-eef3ff, #eef3ff)", letterSpacing:"-.2px" }}>FinovaOS</span>
             </Link>
 
             {/* Center nav links */}
@@ -454,11 +454,11 @@ export default function Navbar() {
               <Link href={`${APP_URL}/auth`}
                 style={{
                   display:"flex", alignItems:"center", gap:6,
-                  fontSize:13, fontWeight:600, color:"rgba(255,255,255,.5)",
+                  fontSize:13, fontWeight:600, color:"rgba(var(--ink),var(--ta-50, .5))",
                   textDecoration:"none", transition:"color .2s", letterSpacing:"-.01em",
                 }}
-                onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.5)")}>
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--ink-solid, white)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-50, .5))")}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
                 </svg>
@@ -475,9 +475,9 @@ export default function Navbar() {
 
             {/* Hamburger */}
             <button className="fn-ham" onClick={() => setMobileOpen(v => !v)}
-              style={{ background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", borderRadius:10, padding:8, cursor:"pointer", color:"white", alignItems:"center", justifyContent:"center", transition:"background .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.11)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.06)")}>
+              style={{ background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", borderRadius:10, padding:8, cursor:"pointer", color:"var(--ink-solid, white)", alignItems:"center", justifyContent:"center", transition:"background .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.11)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "rgba(var(--ink),.06)")}>
               {mobileOpen ? <X size={20}/> : <Menu size={20}/>}
             </button>
           </div>
@@ -490,9 +490,9 @@ export default function Navbar() {
             onMouseLeave={closeMega}
             style={{
               position:"absolute", left:0, right:0, top:"100%",
-              background:"rgba(7,10,27,.97)", backdropFilter:"blur(28px)",
-              borderTop:"1px solid rgba(255,255,255,.07)",
-              borderBottom:"1px solid rgba(255,255,255,.07)",
+              background:"rgba(var(--dkr-070a1b, 7,10,27),0.97)", backdropFilter:"blur(28px)",
+              borderTop:"1px solid rgba(var(--ink),.07)",
+              borderBottom:"1px solid rgba(var(--ink),.07)",
               boxShadow:"0 28px 72px rgba(0,0,0,.65)",
               animation:"megaIn .2s ease both", zIndex:40,
             }}>
@@ -534,7 +534,7 @@ export default function Navbar() {
 
         {/* ── Mobile Menu ── */}
         {mobileOpen && (
-          <div style={{ background:"rgba(7,10,27,.98)", backdropFilter:"blur(24px)", borderTop:"1px solid rgba(255,255,255,.07)", padding:"18px 24px 28px", animation:"mobileIn .22s ease both" }}>
+          <div style={{ background:"rgba(var(--dkr-070a1b, 7,10,27),0.98)", backdropFilter:"blur(24px)", borderTop:"1px solid rgba(var(--ink),.07)", padding:"18px 24px 28px", animation:"mobileIn .22s ease both" }}>
             <div style={{ display:"flex", flexDirection:"column" }}>
               <Link href="/features"  className="fn-mob" onClick={() => setMobileOpen(false)}>Features</Link>
               <Link href="/solutions" className="fn-mob" onClick={() => setMobileOpen(false)}>Solutions</Link>
@@ -542,8 +542,8 @@ export default function Navbar() {
                 <Link key={label} href={href} className="fn-mob" onClick={() => setMobileOpen(false)}>{label}</Link>
               ))}
             </div>
-            <div style={{ marginTop:20, paddingTop:20, borderTop:"1px solid rgba(255,255,255,.07)", display:"flex", flexDirection:"column", gap:11 }}>
-              <Link href={`${APP_URL}/auth`} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"12px 16px", borderRadius:12, background:"rgba(255,255,255,.05)", border:"1.5px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", fontFamily:"'Outfit',sans-serif" }}>
+            <div style={{ marginTop:20, paddingTop:20, borderTop:"1px solid rgba(var(--ink),.07)", display:"flex", flexDirection:"column", gap:11 }}>
+              <Link href={`${APP_URL}/auth`} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"12px 16px", borderRadius:12, background:"rgba(var(--ink),.05)", border:"1.5px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),.8)", fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", fontFamily:"'Outfit',sans-serif" }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
                 Sign In to Dashboard
               </Link>

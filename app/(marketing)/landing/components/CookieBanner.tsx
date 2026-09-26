@@ -46,10 +46,10 @@ const CATEGORIES: Array<{
   },
 ];
 
-const panel = "rgba(9,13,30,.96)";
-const line = "rgba(255,255,255,.09)";
-const soft = "rgba(255,255,255,.67)";
-const dim = "rgba(255,255,255,.42)";
+const panel = "rgba(var(--dkr-090d1e, 9,13,30),0.96)";
+const line = "rgba(var(--ink),.09)";
+const soft = "rgba(var(--ink),var(--ta-67, .67))";
+const dim = "rgba(var(--ink),var(--ta-42, .42))";
 
 function Toggle({
   checked,
@@ -70,8 +70,8 @@ function Toggle({
         width: 54,
         height: 30,
         borderRadius: 999,
-        background: checked ? "linear-gradient(135deg,#2563eb,#4f46e5)" : "rgba(255,255,255,.11)",
-        border: checked ? "1px solid rgba(99,102,241,.45)" : "1px solid rgba(255,255,255,.08)",
+        background: checked ? "linear-gradient(135deg,#2563eb,#4f46e5)" : "rgba(var(--ink),.11)",
+        border: checked ? "1px solid rgba(99,102,241,.45)" : "1px solid rgba(var(--ink),.08)",
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.72 : 1,
         transition: "all .2s ease",
@@ -168,7 +168,7 @@ export default function CookieBanner() {
           to { opacity: 1; transform: translateY(0); }
         }
         .cookie-scroll::-webkit-scrollbar { width: 10px; }
-        .cookie-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.13); border-radius: 999px; }
+        .cookie-scroll::-webkit-scrollbar-thumb { background: rgba(var(--ink),.13); border-radius: 999px; }
       `}</style>
 
       {showBanner && !showModal && (
@@ -208,12 +208,12 @@ export default function CookieBanner() {
               <span style={{ fontSize: 20 }}>🍪</span>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "white" }}>Cookie Preferences</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink-solid, white)" }}>Cookie Preferences</div>
               <p style={{ margin: "8px 0 0", fontSize: 13.5, color: soft, lineHeight: 1.7 }}>
                 We use cookies to keep FinovaOS secure, remember your preferences, measure site usage, and improve the product. You can accept all, reject non-essential cookies, or customise your consent.
               </p>
               <div style={{ marginTop: 10, fontSize: 12, color: dim }}>
-                Current preference: <strong style={{ color: "white" }}>{summary}</strong>
+                Current preference: <strong style={{ color: "var(--ink-solid, white)" }}>{summary}</strong>
               </div>
             </div>
           </div>
@@ -245,9 +245,9 @@ export default function CookieBanner() {
                 minWidth: 130,
                 padding: "11px 16px",
                 borderRadius: 14,
-                background: "rgba(255,255,255,.04)",
+                background: "rgba(var(--ink),.04)",
                 border: `1px solid ${line}`,
-                color: "rgba(255,255,255,.82)",
+                color: "rgba(var(--ink),.82)",
                 fontWeight: 700,
                 cursor: "pointer",
               }}
@@ -262,7 +262,7 @@ export default function CookieBanner() {
                 borderRadius: 14,
                 background: "transparent",
                 border: `1px solid ${line}`,
-                color: "rgba(255,255,255,.7)",
+                color: "rgba(var(--ink),var(--ta-70, .7))",
                 fontWeight: 700,
                 cursor: "pointer",
               }}
@@ -279,7 +279,7 @@ export default function CookieBanner() {
             position: "fixed",
             inset: 0,
             zIndex: 99999,
-            background: "rgba(2,6,23,.62)",
+            background: "rgba(var(--dkr-020617, 2,6,23),0.62)",
             backdropFilter: "blur(14px)",
             display: "flex",
             alignItems: "center",
@@ -293,7 +293,7 @@ export default function CookieBanner() {
               width: "min(1060px, 100%)",
               maxHeight: "88vh",
               overflow: "hidden",
-              background: "linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)), #fff",
+              background: "linear-gradient(180deg, rgba(var(--ink),.02), rgba(var(--ink),.01)), #fff",
               borderRadius: 24,
               boxShadow: "0 40px 100px rgba(0,0,0,.28)",
               display: "grid",
@@ -303,16 +303,16 @@ export default function CookieBanner() {
             <div
               style={{
                 padding: 28,
-                background: "linear-gradient(180deg,#0f172a,#101938)",
-                color: "white",
-                borderRight: "1px solid rgba(255,255,255,.08)",
+                background: "linear-gradient(180deg,var(--dk-0f172a, #0f172a),var(--dk-101938, #101938))",
+                color: "var(--ink-solid, white)",
+                borderRight: "1px solid rgba(var(--ink),.08)",
               }}
             >
-              <div style={{ fontSize: 12, color: "#93c5fd", textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>
+              <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>
                 Cookie Control
               </div>
               <div style={{ marginTop: 10, fontSize: 28, lineHeight: 1.05, fontWeight: 900 }}>Customise Consent Preferences</div>
-              <div style={{ marginTop: 14, fontSize: 14, color: "rgba(255,255,255,.72)", lineHeight: 1.8 }}>
+              <div style={{ marginTop: 14, fontSize: 14, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.8 }}>
                 Choose which cookie categories FinovaOS may use. Necessary cookies always stay active because they support login, security, and consent storage.
               </div>
 
@@ -326,8 +326,8 @@ export default function CookieBanner() {
                       textAlign: "left",
                       padding: "13px 14px",
                       borderRadius: 16,
-                      border: "1px solid rgba(255,255,255,.08)",
-                      background: expanded[category.key] ? "rgba(94,162,255,.16)" : "rgba(255,255,255,.03)",
+                      border: "1px solid rgba(var(--ink),.08)",
+                      background: expanded[category.key] ? "rgba(94,162,255,.16)" : "rgba(var(--ink),.03)",
                       color: "white",
                       fontWeight: 700,
                       cursor: "pointer",
@@ -338,9 +338,9 @@ export default function CookieBanner() {
                 ))}
               </div>
 
-              <div style={{ marginTop: 28, paddingTop: 18, borderTop: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.56)", lineHeight: 1.75 }}>
+              <div style={{ marginTop: 28, paddingTop: 18, borderTop: "1px solid rgba(var(--ink),.08)", fontSize: 12, color: "rgba(var(--ink),var(--ta-56, .56))", lineHeight: 1.75 }}>
                 Detailed cookie information is also available in our{" "}
-                <Link href="/legal/privacy" style={{ color: "#bfdbfe", textDecoration: "none", fontWeight: 700 }}>
+                <Link href="/legal/privacy" style={{ color: "var(--tx-bfdbfe, #bfdbfe)", textDecoration: "none", fontWeight: 700 }}>
                   Privacy Policy
                 </Link>
                 .
@@ -370,7 +370,7 @@ export default function CookieBanner() {
                   style={{
                     border: "none",
                     background: "transparent",
-                    color: "#94a3b8",
+                    color: "var(--tx-94a3b8, #94a3b8)",
                     fontSize: 28,
                     lineHeight: 1,
                     cursor: "pointer",
@@ -420,7 +420,7 @@ export default function CookieBanner() {
                             <span style={{ fontSize: 16, color: "#334155" }}>{isOpen ? "▾" : "▸"}</span>
                             <span style={{ fontSize: 18, fontWeight: 800, color: "#111827" }}>{category.label}</span>
                             {category.locked ? (
-                              <span style={{ fontSize: 12, fontWeight: 800, color: "#16a34a" }}>Always Active</span>
+                              <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-16a34a, #16a34a)" }}>Always Active</span>
                             ) : null}
                           </div>
                         </button>

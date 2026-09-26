@@ -38,7 +38,7 @@ const PLANS = [
     name: "Starter",
     slug: "starter",
     tagline: "For small businesses getting started",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.2)",
     featured: false,
     features: [
@@ -60,7 +60,7 @@ const PLANS = [
     name: "Professional",
     slug: "professional",
     tagline: "Most popular for growing SMEs",
-    color: "#a5b4fc",
+    color: "var(--tx-a5b4fc, #a5b4fc)",
     glow: "rgba(165,180,252,.28)",
     featured: true,
     features: [
@@ -82,7 +82,7 @@ const PLANS = [
     name: "Enterprise",
     slug: "enterprise",
     tagline: "Full power for large organizations",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.2)",
     featured: false,
     features: [
@@ -104,7 +104,7 @@ const PLANS = [
     name: "Custom",
     slug: "custom",
     tagline: "Pay only for the modules you need",
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
     glow: "rgba(249,115,22,.2)",
     featured: false,
     features: [
@@ -143,9 +143,9 @@ function Check({ color }: { color: string }) {
 
 function Cross() {
   return (
-    <div style={{ width:18, height:18, borderRadius:6, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+    <div style={{ width:18, height:18, borderRadius:6, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
       <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-        <path d="M2 2l6 6M8 2L2 8" stroke="rgba(255,255,255,.18)" strokeWidth="1.6" strokeLinecap="round"/>
+        <path d="M2 2l6 6M8 2L2 8" stroke="rgba(var(--ink),.18)" strokeWidth="1.6" strokeLinecap="round"/>
       </svg>
     </div>
   );
@@ -196,8 +196,8 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
         borderRadius: 22, padding: "28px 24px",
         background: plan.featured
           ? `linear-gradient(160deg, rgba(99,102,241,.14), rgba(79,70,229,.08))`
-          : hov ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.03)",
-        border: `1.5px solid ${plan.featured ? plan.color + "60" : hov ? plan.color + "40" : "rgba(255,255,255,.08)"}`,
+          : hov ? "rgba(var(--ink),.06)" : "rgba(var(--ink),.03)",
+        border: `1.5px solid ${plan.featured ? plan.color + "60" : hov ? plan.color + "40" : "rgba(var(--ink),.08)"}`,
         display: "flex", flexDirection: "column",
         position: "relative", overflow: "hidden",
         boxShadow: plan.featured
@@ -226,16 +226,16 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
         {plan.name}
       </div>
 
-      <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:22, lineHeight:1.5 }}>{plan.tagline}</p>
+      <p style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:22, lineHeight:1.5 }}>{plan.tagline}</p>
 
       {/* Price */}
       <div style={{ marginBottom:8 }}>
         {isCustom ? (
           <>
-            <div style={{ fontSize:38, fontWeight:900, color:"white", letterSpacing:"-1.5px", lineHeight:1, fontFamily:"'Lora',serif", marginBottom:6 }}>
+            <div style={{ fontSize:38, fontWeight:900, color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1, fontFamily:"'Lora',serif", marginBottom:6 }}>
               Your price
             </div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:6 }}>
+            <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:6 }}>
               Based on modules you select
             </div>
           </>
@@ -243,23 +243,23 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
           <>
             {/* Original price + 50% off badge — small row */}
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-              <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>{fmt(normalUSD, pkrNormal)}/mo</span>
+              <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-35, .35))", textDecoration:"line-through" }}>{fmt(normalUSD, pkrNormal)}/mo</span>
               <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
                 50% OFF × 3 months
               </span>
             </div>
             {/* Discounted price — big */}
             <div style={{ display:"flex", alignItems:"baseline", gap:3, marginBottom:6 }}>
-              <span style={{ fontSize:15, fontWeight:700, color:"rgba(255,255,255,.6)" }}>{rawPkr ? "Rs" : sym}</span>
-              <span style={{ fontSize:52, fontWeight:900, color:"white", letterSpacing:"-2px", lineHeight:1, fontFamily:"'Lora',serif" }}>
+              <span style={{ fontSize:15, fontWeight:700, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{rawPkr ? "Rs" : sym}</span>
+              <span style={{ fontSize:52, fontWeight:900, color:"var(--ink-solid, white)", letterSpacing:"-2px", lineHeight:1, fontFamily:"'Lora',serif" }}>
                 {rawPkr
                   ? Math.round(pkrFirst3).toLocaleString("en-PK")
                   : formatFromUSD(first3USD, currency).replace(/[^0-9.,]/g, "")}
               </span>
-              <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>/mo</span>
+              <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:500 }}>/mo</span>
             </div>
             {/* Sub note */}
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>
+            <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>
               {billing === "yearly" && raw
                 ? `Billed annually ${fmt(raw.yearly, rawPkr?.yearly)}/yr — saves ${fmt((normalUSD * 12) - raw.yearly, rawPkr ? (pkrNormal * 12) - rawPkr.yearly : undefined)}/yr`
                 : "First 3 months discounted, then full monthly billing"}
@@ -298,7 +298,7 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
         {isCustom ? plan.features.map((f, fi) => (
           <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
             {f.yes ? <Check color={plan.color}/> : <Cross/>}
-            <span style={{ fontSize:13, color: f.yes ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.28)", fontWeight: f.yes ? 500 : 400 }}>
+            <span style={{ fontSize:13, color: f.yes ? "rgba(var(--ink),var(--ta-70, .7))" : "rgba(var(--ink),var(--ta-28, .28))", fontWeight: f.yes ? 500 : 400 }}>
               {f.text}
             </span>
           </div>
@@ -310,7 +310,7 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
             return (
               <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <Check color={plan.color}/>
-                <span style={{ fontSize:13, color:"rgba(255,255,255,.7)", fontWeight:500 }}>
+                <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-70, .7))", fontWeight:500 }}>
                   {displayText}
                 </span>
               </div>
@@ -375,7 +375,7 @@ export default function PricingSection() {
 
   return (
     <section style={{
-      background:"linear-gradient(180deg,#070a1e 0%,#080c22 50%,#0a0d28 100%)",
+      background:"linear-gradient(180deg,var(--dk-070a1e, #070a1e) 0%,var(--dk-080c22, #080c22) 50%,var(--dk-0a0d28, #0a0d28) 100%)",
       padding:"100px 24px",
       fontFamily:"'Outfit',sans-serif",
       position:"relative", overflow:"hidden",
@@ -407,32 +407,32 @@ export default function PricingSection() {
         }}>
           <div style={{ display:"inline-flex",alignItems:"center",gap:8, padding:"6px 16px",borderRadius:100,marginBottom:20, background:"rgba(251,191,36,.1)",border:"1.5px solid rgba(251,191,36,.22)" }}>
             <span style={{fontSize:14}}>🏷️</span>
-            <span style={{fontSize:11,fontWeight:700,color:"#fbbf24",letterSpacing:".08em"}}>LIMITED TIME OFFER</span>
+            <span style={{fontSize:11,fontWeight:700,color:"var(--tx-fbbf24, #fbbf24)",letterSpacing:".08em"}}>LIMITED TIME OFFER</span>
           </div>
-          <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4vw,50px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:16 }}>
             Simple, transparent{" "}
             <span style={{background:"linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
               pricing
             </span>
           </h2>
-          <p style={{fontSize:16,color:"rgba(255,255,255,.4)",lineHeight:1.8,maxWidth:480,margin:"0 auto 32px"}}>
+          <p style={{fontSize:16,color:"rgba(var(--ink),var(--ta-40, .4))",lineHeight:1.8,maxWidth:480,margin:"0 auto 32px"}}>
             50% off for your first 3 months. No hidden fees. Cancel anytime.
           </p>
 
           {/* Monthly / Yearly toggle + Currency selector row */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, flexWrap:"wrap" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:0, borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", padding:4 }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:0, borderRadius:12, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", padding:4 }}>
               {(["monthly","yearly"] as const).map(b => (
                 <button key={b} onClick={() => setBilling(b)} style={{
                   padding:"8px 22px", borderRadius:9, fontSize:13, fontWeight:700, cursor:"pointer",
                   background: billing===b ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "transparent",
-                  color: billing===b ? "white" : "rgba(255,255,255,.45)",
+                  color: billing===b ? "white" : "rgba(var(--ink),var(--ta-45, .45))",
                   border:"none", transition:"all .25s", fontFamily:"inherit",
                   boxShadow: billing===b ? "0 4px 12px rgba(99,102,241,.4)" : "none",
                 }}>
                   {b === "monthly" ? "Monthly" : "Yearly"}
                   {b === "yearly" && (
-                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "#fbbf24" : "rgba(251,191,36,.5)", background:"rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
+                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--txr-fbbf24, 251,191,36),.5)", background:"rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
                       −20%
                     </span>
                   )}
@@ -462,24 +462,24 @@ export default function PricingSection() {
         }}>
           <div style={{
             borderRadius:22, padding:"32px 36px",
-            background:"linear-gradient(135deg,rgba(249,115,22,.08),rgba(255,255,255,.03))",
+            background:"linear-gradient(135deg,rgba(249,115,22,.08),rgba(var(--ink),.03))",
             border:"1.5px solid rgba(249,115,22,.25)",
             display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:24,
             boxShadow:"0 16px 48px rgba(249,115,22,.08)",
           }}>
             <div>
-              <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"4px 12px", borderRadius:20, marginBottom:12, background:"rgba(249,115,22,.12)", border:"1px solid rgba(249,115,22,.25)", fontSize:11, fontWeight:700, color:"#f97316" }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"4px 12px", borderRadius:20, marginBottom:12, background:"rgba(249,115,22,.12)", border:"1px solid rgba(249,115,22,.25)", fontSize:11, fontWeight:700, color:"var(--tx-f97316, #f97316)" }}>
                 Custom Plan
               </div>
-              <h3 style={{ fontSize:24, fontWeight:900, color:"white", letterSpacing:"-.5px", marginBottom:8, lineHeight:1.2 }}>
+              <h3 style={{ fontSize:24, fontWeight:900, color:"var(--ink-solid, white)", letterSpacing:"-.5px", marginBottom:8, lineHeight:1.2 }}>
                 Pay only for what you need
               </h3>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.6, maxWidth:520, margin:0 }}>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.6, maxWidth:520, margin:0 }}>
                 Pick modules individually — Accounting, Invoicing, HR, CRM, Inventory and more. No unused features, no bloated pricing.
               </p>
               <div style={{ display:"flex", gap:16, marginTop:16, flexWrap:"wrap" }}>
                 {["Per-module pricing","Flexible user count","Custom contract","Dedicated manager"].map(t => (
-                  <div key={t} style={{ display:"flex", alignItems:"center", gap:6, fontSize:12, color:"rgba(255,255,255,.5)", fontWeight:500 }}>
+                  <div key={t} style={{ display:"flex", alignItems:"center", gap:6, fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", fontWeight:500 }}>
                     <div style={{ width:6, height:6, borderRadius:"50%", background:"#f97316" }}/>
                     {t}
                   </div>
@@ -488,11 +488,11 @@ export default function PricingSection() {
             </div>
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
               <div style={{ textAlign:"center", marginBottom:4 }}>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:2 }}>Starting from</div>
-                <div style={{ fontSize:36, fontWeight:900, color:"#f97316", letterSpacing:"-1.5px", lineHeight:1 }}>
+                <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-35, .35))", marginBottom:2 }}>Starting from</div>
+                <div style={{ fontSize:36, fontWeight:900, color:"var(--tx-f97316, #f97316)", letterSpacing:"-1.5px", lineHeight:1 }}>
                   {CURRENCY_SYMBOL[currency] || currency}{formatFromUSD(15, currency).replace(/[^0-9.,]/g,"")}
                 </div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>/module/mo</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))" }}>/module/mo</div>
               </div>
               <Link href="/pricing#custom" style={{
                 display:"flex", alignItems:"center", gap:8,
@@ -523,7 +523,7 @@ export default function PricingSection() {
             { icon:"💬", text:"Priority support" },
             { icon:"🚀", text:"Setup in minutes" },
           ].map(t => (
-            <div key={t.text} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12, color:"rgba(255,255,255,.35)", fontWeight:500 }}>
+            <div key={t.text} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:500 }}>
               <span>{t.icon}</span>
               <span>{t.text}</span>
             </div>
@@ -535,11 +535,11 @@ export default function PricingSection() {
           marginTop:48, textAlign:"center",
           opacity:vis?1:0, transition:"opacity .6s ease .5s",
         }}>
-          <p style={{fontSize:13,color:"rgba(255,255,255,.3)",marginBottom:10}}>
+          <p style={{fontSize:13,color:"rgba(var(--ink),var(--ta-30, .3))",marginBottom:10}}>
             Need a custom plan? We build packages around your exact modules and team size.
           </p>
           <Link href="/pricing" style={{
-            fontSize:13,fontWeight:700,color:"#818cf8",
+            fontSize:13,fontWeight:700,color:"var(--tx-818cf8, #818cf8)",
             textDecoration:"none",borderBottom:"1px solid rgba(129,140,248,.3)",paddingBottom:1,
           }}>
             View full pricing & compare all features →

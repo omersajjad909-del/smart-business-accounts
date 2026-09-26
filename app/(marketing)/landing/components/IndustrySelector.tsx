@@ -13,10 +13,10 @@ interface BizType {
 }
 
 const PHASE_META: Record<number, { label: string; color: string; bg: string }> = {
-  1: { label: "Live Now",   color: "#34d399", bg: "rgba(52,211,153,.15)"  },
-  2: { label: "Phase 2",    color: "#818cf8", bg: "rgba(129,140,248,.12)" },
-  3: { label: "Phase 3",    color: "#fbbf24", bg: "rgba(251,191,36,.12)"  },
-  4: { label: "Phase 4",    color: "#f87171", bg: "rgba(248,113,113,.12)" },
+  1: { label: "Live Now",   color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.15)"  },
+  2: { label: "Phase 2",    color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,.12)" },
+  3: { label: "Phase 3",    color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)"  },
+  4: { label: "Phase 4",    color: "var(--tx-f87171, #f87171)", bg: "rgba(248,113,113,.12)" },
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -51,9 +51,9 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
       style={{
         borderRadius: 18, padding: "22px 20px",
         background: hov
-          ? "rgba(255,255,255,.07)"
-          : t.isLive ? "rgba(52,211,153,.03)" : "rgba(255,255,255,.03)",
-        border: `1px solid ${hov ? catColor + "50" : t.isLive ? "rgba(52,211,153,.18)" : "rgba(255,255,255,.08)"}`,
+          ? "rgba(var(--ink),.07)"
+          : t.isLive ? "rgba(52,211,153,.03)" : "rgba(var(--ink),.03)",
+        border: `1px solid ${hov ? catColor + "50" : t.isLive ? "rgba(52,211,153,.18)" : "rgba(var(--ink),.08)"}`,
         display: "flex", flexDirection: "column", gap: 12,
         opacity: vis ? 1 : 0,
         transform: vis ? "translateY(0)" : "translateY(22px)",
@@ -83,8 +83,8 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
 
       {/* Body */}
       <div>
-        <div style={{ fontSize: 14, fontWeight: 800, color: "white", marginBottom: 5, lineHeight: 1.2 }}>{t.label}</div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.55 }}>{t.description}</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink-solid, white)", marginBottom: 5, lineHeight: 1.2 }}>{t.label}</div>
+        <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.55 }}>{t.description}</div>
       </div>
 
       {/* Footer */}
@@ -98,7 +98,7 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
         </span>
         {t.isLive ? (
           <Link href={`/for/${t.id}`} style={{
-            fontSize: 12, fontWeight: 700, color: "#34d399",
+            fontSize: 12, fontWeight: 700, color: "var(--tx-34d399, #34d399)",
             textDecoration: "none", display: "flex", alignItems: "center", gap: 3,
             transition: "gap .15s",
           }}
@@ -109,7 +109,7 @@ function IndustryCard({ t, i, vis }: { t: BizType; i: number; vis: boolean }) {
           </Link>
         ) : (
           <Link href={`/for/${t.id}`} style={{
-            fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.3)",
+            fontSize: 11, fontWeight: 600, color: "rgba(var(--ink),var(--ta-30, .3))",
             textDecoration: "none",
           }}>
             Notify me
@@ -151,7 +151,7 @@ export default function IndustrySelector() {
   return (
     <section style={{
       padding: "96px 24px",
-      background: "linear-gradient(180deg,#080c22 0%,#0a0f2a 100%)",
+      background: "linear-gradient(180deg,var(--dk-080c22, #080c22) 0%,var(--dk-0a0f2a, #0a0f2a) 100%)",
       fontFamily: ff, position: "relative", overflow: "hidden",
     }}>
       <style>{`
@@ -172,17 +172,17 @@ export default function IndustrySelector() {
         <div style={{ textAlign: "center", marginBottom: 48, opacity: vis?1:0, transform: vis?"translateY(0)":"translateY(24px)", transition: "all .65s cubic-bezier(.22,1,.36,1)" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:100, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", marginBottom:20 }}>
             <span>🌐</span>
-            <span style={{ fontSize:11, fontWeight:700, color:"#818cf8", letterSpacing:".08em" }}>
+            <span style={{ fontSize:11, fontWeight:700, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".08em" }}>
               {types.length > 0 ? `${types.length} BUSINESS TYPES` : "MULTI-INDUSTRY PLATFORM"}
             </span>
           </div>
-          <h2 style={{ fontSize:"clamp(28px,4vw,46px)", fontWeight:900, color:"white", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:14, margin:"0 0 14px" }}>
+          <h2 style={{ fontSize:"clamp(28px,4vw,46px)", fontWeight:900, color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:14, margin:"0 0 14px" }}>
             Built for{" "}
             <span style={{ background:"linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               every business
             </span>
           </h2>
-          <p style={{ fontSize:16, color:"rgba(255,255,255,.42)", lineHeight:1.7, maxWidth:520, margin:"14px auto 0" }}>
+          <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-42, .42))", lineHeight:1.7, maxWidth:520, margin:"14px auto 0" }}>
             From trading companies to schools, hospitals to restaurants — FinovaOS ships with a pre-configured setup for your exact industry.
           </p>
         </div>
@@ -197,9 +197,9 @@ export default function IndustrySelector() {
                 <button key={String(p)} onClick={() => setPhaseFilter(p)} style={{
                   padding:"6px 15px", borderRadius:20, fontSize:11, fontWeight:700, cursor:"pointer",
                   fontFamily:ff, border:"1px solid",
-                  borderColor: active ? (meta?.color ?? "#6366f1") : "rgba(255,255,255,.1)",
-                  background: active ? ((meta?.bg ?? "rgba(99,102,241,.2)")) : "rgba(255,255,255,.04)",
-                  color: active ? (meta?.color ?? "#a5b4fc") : "rgba(255,255,255,.35)",
+                  borderColor: active ? (meta?.color ?? "#6366f1") : "rgba(var(--ink),.1)",
+                  background: active ? ((meta?.bg ?? "rgba(99,102,241,.2)")) : "rgba(var(--ink),.04)",
+                  color: active ? (meta?.color ?? "#a5b4fc") : "rgba(var(--ink),var(--ta-35, .35))",
                   transition:"all .2s",
                 }}>
                   {p === null ? "All" : PHASE_META[p].label}
@@ -219,9 +219,9 @@ export default function IndustrySelector() {
             <button key={f.k} onClick={() => setFilter(f.k as any)} style={{
               padding:"8px 18px", borderRadius:20, fontSize:12, fontWeight:700,
               cursor:"pointer", fontFamily:ff, border:"1px solid", transition:"all .2s",
-              borderColor: filter===f.k ? "#6366f1" : "rgba(255,255,255,.1)",
-              background:  filter===f.k ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
-              color:       filter===f.k ? "#a5b4fc" : "rgba(255,255,255,.4)",
+              borderColor: filter===f.k ? "#6366f1" : "rgba(var(--ink),.1)",
+              background:  filter===f.k ? "rgba(99,102,241,.18)" : "rgba(var(--ink),.04)",
+              color:       filter===f.k ? "#a5b4fc" : "rgba(var(--ink),var(--ta-40, .4))",
             }}>
               {f.label}
             </button>
@@ -230,9 +230,9 @@ export default function IndustrySelector() {
 
         {/* ── Grid ── */}
         {types.length === 0 ? (
-          <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(255,255,255,.2)", fontSize:14 }}>Loading industries…</div>
+          <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(var(--ink),var(--ta-20, .2))", fontSize:14 }}>Loading industries…</div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(255,255,255,.2)", fontSize:14 }}>No industries found for this filter.</div>
+          <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(var(--ink),var(--ta-20, .2))", fontSize:14 }}>No industries found for this filter.</div>
         ) : (
           <>
             <div className="ind-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:28 }}>
@@ -243,12 +243,12 @@ export default function IndustrySelector() {
             {filtered.length > 12 && (
               <div style={{ textAlign:"center", marginBottom:32 }}>
                 <button onClick={() => setShowAll(v => !v)} style={{
-                  padding:"10px 24px", borderRadius:12, border:"1px solid rgba(255,255,255,.12)",
-                  background:"rgba(255,255,255,.05)", color:"rgba(255,255,255,.55)", fontSize:13,
+                  padding:"10px 24px", borderRadius:12, border:"1px solid rgba(var(--ink),.12)",
+                  background:"rgba(var(--ink),.05)", color:"rgba(var(--ink),var(--ta-55, .55))", fontSize:13,
                   fontWeight:700, cursor:"pointer", fontFamily:ff, transition:"all .2s",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.09)"; e.currentTarget.style.color="white"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.05)"; e.currentTarget.style.color="rgba(255,255,255,.55)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background="rgba(var(--ink),.09)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background="rgba(var(--ink),.05)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))"; }}
                 >
                   {showAll ? "Show less ↑" : `Show all ${filtered.length} industries ↓`}
                 </button>
@@ -259,7 +259,7 @@ export default function IndustrySelector() {
 
         {/* ── Footer CTA ── */}
         <div style={{ textAlign:"center", opacity:vis?1:0, transition:"opacity .8s ease .3s" }}>
-          <div style={{ fontSize:13, color:"rgba(255,255,255,.3)", marginBottom:16 }}>
+          <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:16 }}>
             Can&apos;t find your industry? We&apos;re adding more every phase.
           </div>
           <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
@@ -267,7 +267,7 @@ export default function IndustrySelector() {
               display:"inline-flex", alignItems:"center", gap:8,
               padding:"12px 26px", borderRadius:12, textDecoration:"none",
               background:"rgba(99,102,241,.12)", border:"1px solid rgba(99,102,241,.3)",
-              color:"#a5b4fc", fontWeight:700, fontSize:13,
+              color:"var(--tx-a5b4fc, #a5b4fc)", fontWeight:700, fontSize:13,
             }}>
               Browse all {types.length} industries →
             </Link>

@@ -131,10 +131,10 @@ function renderText(text: string): React.ReactNode[] {
       const inner = t.slice(2).replace(/\*\*(.*?)\*\*/g, "|||$1|||");
       return (
         <span key={i} style={{ display: "flex", gap: 7, padding: "1px 0", alignItems: "flex-start" }}>
-          <span style={{ color: "#818cf8", flexShrink: 0, fontSize: 13 }}>•</span>
-          <span style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }}>
+          <span style={{ color: "var(--tx-818cf8, #818cf8)", flexShrink: 0, fontSize: 13 }}>•</span>
+          <span style={{ color: "rgba(var(--ink),.88)", fontSize: 13.5, lineHeight: 1.75 }}>
             {inner.split("|||").map((p, j) => j % 2 === 1
-              ? <strong key={j} style={{ color: "white" }}>{p}</strong> : p)}
+              ? <strong key={j} style={{ color: "var(--ink-solid, white)" }}>{p}</strong> : p)}
           </span>
         </span>
       );
@@ -146,9 +146,9 @@ function renderText(text: string): React.ReactNode[] {
       return (
         <span key={i} style={{ display: "flex", gap: 8, padding: "2px 0", alignItems: "flex-start" }}>
           <span style={{ minWidth: 20, height: 20, borderRadius: "50%", background: "rgba(99,102,241,.4)", color: "#c7d2fe", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>{num[1]}</span>
-          <span style={{ color: "rgba(255,255,255,.88)", fontSize: 13.5, lineHeight: 1.75 }}>
+          <span style={{ color: "rgba(var(--ink),.88)", fontSize: 13.5, lineHeight: 1.75 }}>
             {inner.split("|||").map((p, j) => j % 2 === 1
-              ? <strong key={j} style={{ color: "white" }}>{p}</strong> : p)}
+              ? <strong key={j} style={{ color: "var(--ink-solid, white)" }}>{p}</strong> : p)}
           </span>
         </span>
       );
@@ -156,8 +156,8 @@ function renderText(text: string): React.ReactNode[] {
 
     const parts = t.replace(/\*\*(.*?)\*\*/g, "|||$1|||").split("|||");
     return (
-      <span key={i} dir="auto" style={{ display: "block", color: "rgba(255,255,255,.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>
-        {parts.map((p, j) => j % 2 === 1 ? <strong key={j} style={{ color: "white" }}>{p}</strong> : p)}
+      <span key={i} dir="auto" style={{ display: "block", color: "rgba(var(--ink),.85)", fontSize: 13.5, lineHeight: 1.8, margin: "1px 0" }}>
+        {parts.map((p, j) => j % 2 === 1 ? <strong key={j} style={{ color: "var(--ink-solid, white)" }}>{p}</strong> : p)}
       </span>
     );
   });
@@ -376,7 +376,7 @@ export default function ChatWidget() {
         .cw-d2   { animation: dotBounce 1.2s ease infinite .18s; }
         .cw-d3   { animation: dotBounce 1.2s ease infinite .36s; }
         .cw-input:focus { outline: none; }
-        .cw-input::placeholder { color: rgba(255,255,255,.22); }
+        .cw-input::placeholder { color: rgba(var(--ink),.22); }
         .cw-chip { transition: all .18s; cursor: pointer; }
         .cw-chip:hover { background: rgba(129,140,248,.28) !important; border-color: rgba(129,140,248,.65) !important; color: white !important; transform: translateY(-1px); }
         ::-webkit-scrollbar { width: 3px; }
@@ -393,7 +393,7 @@ export default function ChatWidget() {
         style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
           width: 58, height: 58, borderRadius: "50%", border: "none", cursor: "pointer",
-          background: open ? "rgba(255,255,255,.1)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
+          background: open ? "rgba(var(--ink),.1)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
           boxShadow: open ? "0 4px 16px rgba(0,0,0,.4)" : "0 8px 32px rgba(99,102,241,.55)",
           display: "flex", alignItems: "center", justifyContent: "center",
           transition: "all .3s cubic-bezier(.34,1.56,.64,1)",
@@ -401,7 +401,7 @@ export default function ChatWidget() {
         }}
       >
         {unread > 0 && !open && (
-          <div style={{ position: "absolute", top: -3, right: -3, minWidth: 20, height: 20, borderRadius: 10, background: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "white", border: "2.5px solid #080c1e", padding: "0 4px" }}>
+          <div style={{ position: "absolute", top: -3, right: -3, minWidth: 20, height: 20, borderRadius: 10, background: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "white", border: "2.5px solid var(--dkb-080c1e, #080c1e)", padding: "0 4px" }}>
             {unread}
           </div>
         )}
@@ -418,28 +418,28 @@ export default function ChatWidget() {
           width: 390, maxWidth: "calc(100vw - 32px)",
           height: 600, maxHeight: "calc(100vh - 120px)",
           borderRadius: 22, overflow: "hidden",
-          background: "rgba(6,9,24,.98)",
+          background: "rgba(var(--dkr-060918, 6,9,24),0.98)",
           border: "1.5px solid rgba(99,102,241,.28)",
-          boxShadow: "0 32px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(99,102,241,.08), inset 0 1px 0 rgba(255,255,255,.04)",
+          boxShadow: "0 32px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(99,102,241,.08), inset 0 1px 0 rgba(var(--ink),.04)",
           display: "flex", flexDirection: "column",
           animation: "widgetIn .28s cubic-bezier(.22,1,.36,1) both",
           fontFamily: "'Outfit', sans-serif",
         }}>
 
           {/* Header */}
-          <div style={{ padding: "14px 18px 13px", background: "linear-gradient(135deg,rgba(40,38,110,.95),rgba(25,22,80,.95))", borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
+          <div style={{ padding: "14px 18px 13px", background: "linear-gradient(135deg,rgba(40,38,110,.95),rgba(25,22,80,.95))", borderBottom: "1px solid rgba(var(--ink),.07)", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#4f46e5,#818cf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0, boxShadow: "0 4px 12px rgba(99,102,241,.4)" }}>🤖</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "white", letterSpacing: "-.2px" }}>FinovaOS Support</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.2px" }}>FinovaOS Support</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: agentReplied ? "#34d399" : escalated ? "#f59e0b" : "#6366f1", animation: "shimmer 2s ease infinite" }} />
-                  <span style={{ fontSize: 11, color: agentReplied ? "#34d399" : escalated ? "#fbbf24" : "#818cf8", fontWeight: 600 }}>
+                  <span style={{ fontSize: 11, color: agentReplied ? "var(--tx-34d399, #34d399)" : escalated ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-818cf8, #818cf8)", fontWeight: 600 }}>
                     {agentReplied ? "Agent • Online" : escalated ? "Connecting to agent…" : "AI Assistant • Online"}
                   </span>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 9, cursor: "pointer", color: "rgba(255,255,255,.5)", padding: "6px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <button onClick={() => setOpen(false)} style={{ background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 9, cursor: "pointer", color: "rgba(var(--ink),var(--ta-50, .5))", padding: "6px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -461,18 +461,18 @@ export default function ChatWidget() {
                         maxWidth: "82%",
                         padding: msg.sender === "customer" ? "10px 14px" : "11px 14px 10px",
                         borderRadius: msg.sender === "customer" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                        background: msg.sender === "customer" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : msg.sender === "agent" ? "rgba(5,150,105,.12)" : "rgba(255,255,255,.055)",
-                        border: msg.sender === "customer" ? "none" : msg.sender === "agent" ? "1px solid rgba(52,211,153,.2)" : "1px solid rgba(255,255,255,.07)",
+                        background: msg.sender === "customer" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : msg.sender === "agent" ? "rgba(5,150,105,.12)" : "rgba(var(--ink),.055)",
+                        border: msg.sender === "customer" ? "none" : msg.sender === "agent" ? "1px solid rgba(52,211,153,.2)" : "1px solid rgba(var(--ink),.07)",
                         boxShadow: msg.sender === "customer" ? "0 4px 16px rgba(99,102,241,.3)" : "0 2px 8px rgba(0,0,0,.12)",
                       }}>
                         {msg.sender === "customer"
-                          ? <span style={{ fontSize: 13.5, color: "rgba(255,255,255,.92)", lineHeight: 1.75 }}>{msg.text}</span>
+                          ? <span style={{ fontSize: 13.5, color: "rgba(var(--ink),.92)", lineHeight: 1.75 }}>{msg.text}</span>
                           : renderText(msg.text)
                         }
                         {msg.sender === "agent" && (
-                          <div style={{ fontSize: 9.5, color: "#34d399", marginBottom: 4, fontWeight: 700 }}>Support Agent</div>
+                          <div style={{ fontSize: 9.5, color: "var(--tx-34d399, #34d399)", marginBottom: 4, fontWeight: 700 }}>Support Agent</div>
                         )}
-                        <div style={{ fontSize: 9.5, color: "rgba(255,255,255,.22)", marginTop: 5, textAlign: msg.sender === "customer" ? "right" : "left" }}>
+                        <div style={{ fontSize: 9.5, color: "rgba(var(--ink),var(--ta-22, .22))", marginTop: 5, textAlign: msg.sender === "customer" ? "right" : "left" }}>
                           {new Date(msg.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
@@ -482,7 +482,7 @@ export default function ChatWidget() {
                       <div style={{ marginTop: 8, marginLeft: 36, display: "flex", flexWrap: "wrap", gap: 6 }}>
                         {msg.chips.map(c => (
                           <button key={c} className="cw-chip" onClick={() => sendMessage(c)}
-                            style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(129,140,248,.3)", background: "rgba(129,140,248,.1)", color: "rgba(200,205,255,.85)", fontSize: 11.5, fontWeight: 600, fontFamily: "inherit" }}>
+                            style={{ padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(129,140,248,.3)", background: "rgba(129,140,248,.1)", color: "rgba(var(--txr-c8cdff, 200,205,255),.85)", fontSize: 11.5, fontWeight: 600, fontFamily: "inherit" }}>
                             {c}
                           </button>
                         ))}
@@ -494,7 +494,7 @@ export default function ChatWidget() {
                 {typing && (
                   <div className="cw-msg" style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
                     <div style={{ width: 28, height: 28, borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>🤖</div>
-                    <div style={{ padding: "12px 16px", borderRadius: "16px 16px 16px 4px", background: "rgba(255,255,255,.055)", border: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 5, alignItems: "center" }}>
+                    <div style={{ padding: "12px 16px", borderRadius: "16px 16px 16px 4px", background: "rgba(var(--ink),.055)", border: "1px solid rgba(var(--ink),.06)", display: "flex", gap: 5, alignItems: "center" }}>
                       <div className="cw-d1" style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(129,140,248,.8)" }} />
                       <div className="cw-d2" style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(129,140,248,.8)" }} />
                       <div className="cw-d3" style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(129,140,248,.8)" }} />
@@ -508,17 +508,17 @@ export default function ChatWidget() {
               {!escalated && (
                 <div style={{ padding: "0 14px 6px", flexShrink: 0 }}>
                   <button onClick={() => sendMessage("human agent")}
-                    style={{ width: "100%", padding: "8px", borderRadius: 10, background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", color: "#34d399", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
+                    style={{ width: "100%", padding: "8px", borderRadius: 10, background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", color: "var(--tx-34d399, #34d399)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
                     👤 Talk to a human agent
                   </button>
                 </div>
               )}
 
               {/* Input */}
-              <div style={{ padding: "8px 14px 14px", flexShrink: 0, borderTop: "1px solid rgba(255,255,255,.05)" }}>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", background: "rgba(255,255,255,.05)", borderRadius: 14, border: "1.5px solid rgba(255,255,255,.07)", padding: "7px 8px 7px 14px" }}
+              <div style={{ padding: "8px 14px 14px", flexShrink: 0, borderTop: "1px solid rgba(var(--ink),.05)" }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", background: "rgba(var(--ink),.05)", borderRadius: 14, border: "1.5px solid rgba(var(--ink),.07)", padding: "7px 8px 7px 14px" }}
                   onFocusCapture={e => (e.currentTarget.style.borderColor = "rgba(129,140,248,.45)")}
-                  onBlurCapture={e  => (e.currentTarget.style.borderColor = "rgba(255,255,255,.07)")}>
+                  onBlurCapture={e  => (e.currentTarget.style.borderColor = "rgba(var(--ink),.07)")}>
                   <input
                     ref={inputRef}
                     className="cw-input"
@@ -527,16 +527,16 @@ export default function ChatWidget() {
                     onKeyDown={handleKey}
                     disabled={escalated && !agentReplied}
                     placeholder={agentReplied ? "Reply to agent..." : escalated ? "Waiting for agent..." : "Ask anything about FinovaOS..."}
-                    style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 14, fontFamily: "inherit", padding: "3px 0" }}
+                    style={{ flex: 1, background: "none", border: "none", color: "var(--ink-solid, white)", fontSize: 14, fontFamily: "inherit", padding: "3px 0" }}
                   />
                   <button onClick={() => sendMessage()} disabled={!inputVal.trim() || typing || (escalated && !agentReplied)}
-                    style={{ width: 36, height: 36, borderRadius: 10, border: "none", cursor: inputVal.trim() && !typing ? "pointer" : "default", background: inputVal.trim() && !typing ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .2s" }}>
+                    style={{ width: 36, height: 36, borderRadius: 10, border: "none", cursor: inputVal.trim() && !typing ? "pointer" : "default", background: inputVal.trim() && !typing ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.04)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .2s" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" opacity={inputVal.trim() && !typing ? 1 : 0.25}>
                       <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
                   </button>
                 </div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.13)", textAlign: "center", marginTop: 7 }}>Powered by FinovaOS AI • Available 24/7</div>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-13, .13))", textAlign: "center", marginTop: 7 }}>Powered by FinovaOS AI • Available 24/7</div>
               </div>
             </>
           )}

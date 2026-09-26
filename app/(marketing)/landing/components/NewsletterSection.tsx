@@ -33,12 +33,12 @@ export default function NewsletterSection() {
 
   return (
     <section style={{
-      background: "linear-gradient(180deg,#070a1e 0%,#060818 100%)",
+      background: "linear-gradient(180deg,var(--dk-070a1e, #070a1e) 0%,var(--dk-060818, #060818) 100%)",
       padding: "90px 24px",
       fontFamily: "'Outfit',sans-serif",
       position: "relative",
       overflow: "hidden",
-      borderTop: "1px solid rgba(255,255,255,.06)",
+      borderTop: "1px solid rgba(var(--ink),.06)",
     }}>
       <style>{`
         
@@ -62,7 +62,7 @@ export default function NewsletterSection() {
           border-color:rgba(99,102,241,.25) !important;
         }
         .nl-stat:hover{
-          background:rgba(255,255,255,.06) !important;
+          background:rgba(var(--ink),.06) !important;
         }
 
         @media(max-width:860px){
@@ -106,7 +106,7 @@ export default function NewsletterSection() {
                   <rect x="2" y="4" width="20" height="16" rx="2"/>
                   <polyline points="2,4 12,13 22,4"/>
                 </svg>
-                <span style={{ fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".08em" }}>NEWSLETTER</span>
+                <span style={{ fontSize:11, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".08em" }}>NEWSLETTER</span>
               </div>
             </div>
 
@@ -115,7 +115,7 @@ export default function NewsletterSection() {
               fontFamily:"'Outfit',sans-serif",
               fontSize:"clamp(28px,3.5vw,44px)",
               fontWeight:900, lineHeight:1.12,
-              letterSpacing:"-1.5px", color:"white",
+              letterSpacing:"-1.5px", color:"var(--ink-solid, white)",
               marginBottom:16, marginTop:0,
             }}>
               Stay ahead with{" "}
@@ -128,7 +128,7 @@ export default function NewsletterSection() {
             </h2>
 
             <p style={{
-              fontSize:16, color:"rgba(255,255,255,.45)",
+              fontSize:16, color:"rgba(var(--ink),var(--ta-45, .45))",
               lineHeight:1.8, marginBottom:32, marginTop:0,
               maxWidth:420,
             }}>
@@ -142,27 +142,27 @@ export default function NewsletterSection() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                   </svg>
-                ), label:"Feature releases & product updates", color:"#34d399" },
+                ), label:"Feature releases & product updates", color:"var(--tx-34d399, #34d399)" },
                 { icon: (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                   </svg>
-                ), label:"Exclusive offers & early access deals", color:"#fbbf24" },
+                ), label:"Exclusive offers & early access deals", color:"var(--tx-fbbf24, #fbbf24)" },
                 { icon: (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                   </svg>
-                ), label:"Weekly tips for trading businesses", color:"#818cf8" },
+                ), label:"Weekly tips for trading businesses", color:"var(--tx-818cf8, #818cf8)" },
                 { icon: (
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
-                ), label:"AI insights & finance guides", color:"#a78bfa" },
+                ), label:"AI insights & finance guides", color:"var(--tx-a78bfa, #a78bfa)" },
               ].map(({ icon, label, color }, i) => (
                 <div key={i} className="nl-benefit" style={{
                   display:"inline-flex", alignItems:"center", gap:12,
                   padding:"10px 14px", borderRadius:11,
-                  background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)",
+                  background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)",
                   transition:"all .2s", cursor:"default",
                 }}>
                   <div style={{
@@ -172,7 +172,7 @@ export default function NewsletterSection() {
                   }}>
                     {icon}
                   </div>
-                  <span style={{ fontSize:13, color:"rgba(255,255,255,.6)", fontWeight:500 }}>{label}</span>
+                  <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-60, .6))", fontWeight:500 }}>{label}</span>
                 </div>
               ))}
             </div>
@@ -184,10 +184,10 @@ export default function NewsletterSection() {
             {/* Card */}
             <div style={{
               borderRadius:24,
-              background:"rgba(255,255,255,.03)",
-              border:"1px solid rgba(255,255,255,.09)",
+              background:"rgba(var(--ink),.03)",
+              border:"1px solid rgba(var(--ink),.09)",
               backdropFilter:"blur(24px)",
-              boxShadow:"0 32px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(99,102,241,.08), inset 0 1px 0 rgba(255,255,255,.05)",
+              boxShadow:"0 32px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(99,102,241,.08), inset 0 1px 0 rgba(var(--ink),.05)",
               padding:"36px 32px",
               animation:"nl-float 7s ease-in-out infinite",
               position:"relative",
@@ -218,10 +218,10 @@ export default function NewsletterSection() {
                 }}/>
               </div>
 
-              <div style={{ fontSize:22, fontWeight:800, color:"white", letterSpacing:"-0.5px", marginBottom:8, lineHeight:1.2 }}>
+              <div style={{ fontSize:22, fontWeight:800, color:"var(--ink-solid, white)", letterSpacing:"-0.5px", marginBottom:8, lineHeight:1.2 }}>
                 Get product updates &amp; growth tips
               </div>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", lineHeight:1.7, marginBottom:28, marginTop:0 }}>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.7, marginBottom:28, marginTop:0 }}>
                 Get product updates and growth tips delivered weekly. Unsubscribe anytime.
               </p>
 
@@ -241,8 +241,8 @@ export default function NewsletterSection() {
                     </svg>
                   </div>
                   <div>
-                    <div style={{ fontSize:15, fontWeight:700, color:"#34d399" }}>You are subscribed!</div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.45)", marginTop:3 }}>
+                    <div style={{ fontSize:15, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>You are subscribed!</div>
+                    <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-45, .45))", marginTop:3 }}>
                       Check your inbox — first update is on its way.
                     </div>
                   </div>
@@ -255,7 +255,7 @@ export default function NewsletterSection() {
                       position:"absolute", left:14, top:"50%", transform:"translateY(-50%)",
                       pointerEvents:"none",
                     }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="2" y="4" width="20" height="16" rx="2"/>
                         <polyline points="2,4 12,13 22,4"/>
                       </svg>
@@ -271,9 +271,9 @@ export default function NewsletterSection() {
                         width:"100%",
                         padding:"14px 16px 14px 42px",
                         borderRadius:12,
-                        border:"1.5px solid rgba(255,255,255,.1)",
-                        background:"rgba(255,255,255,.04)",
-                        color:"white",
+                        border:"1.5px solid rgba(var(--ink),.1)",
+                        background:"rgba(var(--ink),.04)",
+                        color:"var(--ink-solid, white)",
                         fontFamily:"'Outfit',sans-serif",
                         fontSize:14,
                         outline:"none",
@@ -323,15 +323,15 @@ export default function NewsletterSection() {
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5">
                         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                       </svg>
-                      <p style={{ margin:0, fontSize:13, color:"#f87171" }}>{error}</p>
+                      <p style={{ margin:0, fontSize:13, color:"var(--tx-f87171, #f87171)" }}>{error}</p>
                     </div>
                   )}
 
                   <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:14 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.2)" strokeWidth="2">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                     </svg>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.22)" }}>No spam. Unsubscribe anytime. Your data is safe.</span>
+                    <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-22, .22))" }}>No spam. Unsubscribe anytime. Your data is safe.</span>
                   </div>
                 </div>
               )}
@@ -340,7 +340,7 @@ export default function NewsletterSection() {
               <div className="nl-stats-row" style={{
                 display:"flex", gap:0,
                 marginTop:28,
-                borderTop:"1px solid rgba(255,255,255,.07)",
+                borderTop:"1px solid rgba(var(--ink),.07)",
                 paddingTop:24,
               }}>
                 {[
@@ -348,28 +348,28 @@ export default function NewsletterSection() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
-                  ), val:"Growing", label:"Subscribers", color:"#818cf8" },
+                  ), val:"Growing", label:"Subscribers", color:"var(--tx-818cf8, #818cf8)" },
                   { icon: (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="2" y="4" width="20" height="16" rx="2"/>
                       <polyline points="2,4 12,13 22,4"/>
                     </svg>
-                  ), val:"Weekly", label:"Delivery", color:"#34d399" },
+                  ), val:"Weekly", label:"Delivery", color:"var(--tx-34d399, #34d399)" },
                   { icon: (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                  ), val:"Zero", label:"Spam", color:"#fbbf24" },
+                  ), val:"Zero", label:"Spam", color:"var(--tx-fbbf24, #fbbf24)" },
                 ].map(({ icon, val, label, color }, i) => (
                   <div key={label} className="nl-stat" style={{
                     flex:1, textAlign:"center",
                     padding:"10px 8px", borderRadius:10,
                     transition:"background .2s", cursor:"default",
-                    borderRight: i < 2 ? "1px solid rgba(255,255,255,.06)" : "none",
+                    borderRight: i < 2 ? "1px solid rgba(var(--ink),.06)" : "none",
                   }}>
                     <div style={{ display:"flex", justifyContent:"center", marginBottom:5 }}>{icon}</div>
                     <div style={{ fontSize:17, fontWeight:800, color, letterSpacing:"-0.3px" }}>{val}</div>
-                    <div style={{ fontSize:10, color:"rgba(255,255,255,.3)", fontWeight:600, marginTop:2 }}>{label}</div>
+                    <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:600, marginTop:2 }}>{label}</div>
                   </div>
                 ))}
               </div>
@@ -382,7 +382,7 @@ export default function NewsletterSection() {
                   <div key={i} style={{
                     width:24, height:24, borderRadius:"50%",
                     background:`linear-gradient(135deg,${c},${c}88)`,
-                    border:"2px solid #060818",
+                    border:"2px solid var(--dkb-060818, #060818)",
                     marginLeft: i === 0 ? 0 : -7,
                     display:"flex", alignItems:"center", justifyContent:"center",
                     fontSize:9, fontWeight:800, color:"white",
@@ -399,7 +399,7 @@ export default function NewsletterSection() {
                   </svg>
                 ))}
               </div>
-              <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>
+              <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))" }}>
                 Trusted by growing businesses worldwide
               </span>
             </div>

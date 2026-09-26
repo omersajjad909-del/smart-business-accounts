@@ -153,7 +153,7 @@ export default function Footer() {
 
   return (
     <footer style={{
-      background: "linear-gradient(180deg, #0a0e24 0%, #060919 60%, #040714 100%)",
+      background: "linear-gradient(180deg, var(--dk-0a0e24, #0a0e24) 0%, var(--dk-060919, #060919) 60%, var(--dk-040714, #040714) 100%)",
       fontFamily: "'Outfit', 'DM Sans', sans-serif",
       position: "relative",
       overflow: "hidden",
@@ -168,19 +168,19 @@ export default function Footer() {
 
         .ft-link {
           font-size: 13px; font-weight: 400;
-          color: rgba(255,255,255,.35); text-decoration: none;
+          color: rgba(var(--ink),.35); text-decoration: none;
           transition: color .2s, padding-left .2s;
           display: flex; align-items: center; gap: 8px;
           padding: 4px 0; line-height: 1.4;
         }
-        .ft-link:hover { color: rgba(255,255,255,.85); padding-left: 4px; }
+        .ft-link:hover { color: rgba(var(--ink),.85); padding-left: 4px; }
 
         .ft-social {
           width: 36px; height: 36px; border-radius: 10px;
-          background: rgba(255,255,255,.04);
-          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(var(--ink),.04);
+          border: 1px solid rgba(var(--ink),.08);
           display: flex; align-items: center; justify-content: center;
-          color: rgba(255,255,255,.4);
+          color: rgba(var(--ink),.4);
           transition: all .22s; cursor: pointer; text-decoration: none;
           flex-shrink: 0;
         }
@@ -194,10 +194,10 @@ export default function Footer() {
 
         .ft-bot-link {
           font-size: 11.5px; font-weight: 500;
-          color: rgba(255,255,255,.22); text-decoration: none;
+          color: rgba(var(--ink),.22); text-decoration: none;
           transition: color .18s; white-space: nowrap;
         }
-        .ft-bot-link:hover { color: rgba(255,255,255,.6); }
+        .ft-bot-link:hover { color: rgba(var(--ink),.6); }
 
         /* Five columns only fit on a wide screen; below that the brand block
            takes a full row and the four link columns wrap under it. */
@@ -244,9 +244,9 @@ export default function Footer() {
         <div className="ft-top-strip" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 34, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)" }}>
             <Zap size={12} color="#818cf8"/>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".08em", textTransform: "uppercase" }}>Business OS</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", letterSpacing: ".08em", textTransform: "uppercase" }}>Business OS</span>
           </div>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.25)" }}>— All-in-one platform for modern businesses</span>
+          <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-25, .25))" }}>— All-in-one platform for modern businesses</span>
         </div>
 
         {/* Brand + four link columns. The brand column used to carry a stats
@@ -261,16 +261,16 @@ export default function Footer() {
             <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", marginBottom: 20 }}>
               <img src="/finova-mark.png" alt="FinovaOS" width={56} height={56} style={{ width: 56, height: 56, objectFit: "contain", flexShrink: 0 }}/>
               <div>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 700, color: "white", letterSpacing: "-.2px", lineHeight: 1.1 }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 700, color: "var(--ink-solid, white)", letterSpacing: "-.2px", lineHeight: 1.1 }}>
                   FinovaOS
                 </div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.28)", fontWeight: 500, letterSpacing: ".04em", marginTop: 1 }}>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500, letterSpacing: ".04em", marginTop: 1 }}>
                   by Finova Forge
                 </div>
               </div>
             </Link>
 
-            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.36)", lineHeight: 1.85, marginBottom: 28, maxWidth: 310 }}>
+            <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-36, .36))", lineHeight: 1.85, marginBottom: 28, maxWidth: 310 }}>
               Invoicing, inventory, accounting, payroll, and more — unified in one platform built for businesses of every size. FinovaOS (also written Finova OS) is built and run by Finova Forge.
             </p>
 
@@ -296,7 +296,7 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div style={{ height: 1, background: "linear-gradient(90deg,transparent,rgba(255,255,255,.07) 0%,rgba(255,255,255,.07) 100%,transparent)", marginBottom: 22, width: "100%" }}/>
+        <div style={{ height: 1, background: "linear-gradient(90deg,transparent,rgba(var(--ink),.07) 0%,rgba(var(--ink),.07) 100%,transparent)", marginBottom: 22, width: "100%" }}/>
 
         {/* Bottom bar */}
         <div className="ft-bottom-inner" style={{
@@ -305,9 +305,9 @@ export default function Footer() {
         }}>
           {/* Left */}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-  <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.22)", margin: 0 }}>
+  <p style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-22, .22))", margin: 0 }}>
     © {new Date().getFullYear()}{" "}
-    <span style={{ color: "rgba(255,255,255,.4)", fontWeight: 700 }}>
+    <span style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 700 }}>
       Finova Forge
     </span>. All rights reserved.
   </p>
@@ -317,26 +317,26 @@ export default function Footer() {
       style={{
         width: 16,
         height: 1,
-        background: "rgba(255,255,255,.1)",
+        background: "rgba(var(--ink),.1)",
         borderRadius: 1,
       }}
     />
-    <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.15)", margin: 0 }}>
-      <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 600 }}>
+    <p style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-15, .15))", margin: 0 }}>
+      <span style={{ color: "rgba(var(--ink),var(--ta-32, .32))", fontWeight: 600 }}>
         FinovaOS™
       </span>{" "}
       is a product of{" "}
-      <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 600 }}>
+      <span style={{ color: "rgba(var(--ink),var(--ta-32, .32))", fontWeight: 600 }}>
         Finova Forge
       </span>
     </p>
   </div>
   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-    <div style={{ width: 16, height: 1, background: "rgba(255,255,255,.1)", borderRadius: 1 }} />
-    <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.15)", margin: 0 }}>
-      <span style={{ color: "rgba(52,211,153,.55)", fontWeight: 600 }}>PSEB</span>{" "}
+    <div style={{ width: 16, height: 1, background: "rgba(var(--ink),.1)", borderRadius: 1 }} />
+    <p style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-15, .15))", margin: 0 }}>
+      <span style={{ color: "rgba(var(--txr-34d399, 52,211,153),.55)", fontWeight: 600 }}>PSEB</span>{" "}
       Registered IT Exporter{" · "}
-      <span style={{ color: "rgba(255,255,255,.28)", fontWeight: 600 }}>FBR</span>{" "}
+      <span style={{ color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>FBR</span>{" "}
       Registered
     </p>
   </div>
@@ -352,7 +352,7 @@ export default function Footer() {
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "block", animation: "ft-blink 2.8s ease infinite", flexShrink: 0 }}/>
-            <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.2)", fontWeight: 500 }}>All systems operational</span>
+            <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-20, .2))", fontWeight: 500 }}>All systems operational</span>
           </div>
         </div>
 

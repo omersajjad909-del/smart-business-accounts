@@ -68,10 +68,10 @@ function CountUp({ to, prefix = "", suffix = "", duration = 1800, start }: { to:
    signed SLA to point at yet. What is left is countable: 9 module groups and
    67 features in ModulesSection, 6 live industries in SolutionSection. */
 const STATS = [
-  { to: 9,  suffix: "",     label: "Modules",         color: "#818cf8" },
-  { to: 60, suffix: "+",    label: "Features",        color: "#34d399" },
-  { to: 6,  suffix: "",     label: "Industries Live", color: "#fbbf24" },
-  { to: 2,  prefix: "< ", suffix: " min", label: "Setup Time", color: "#f87171" },
+  { to: 9,  suffix: "",     label: "Modules",         color: "var(--tx-818cf8, #818cf8)" },
+  { to: 60, suffix: "+",    label: "Features",        color: "var(--tx-34d399, #34d399)" },
+  { to: 6,  suffix: "",     label: "Industries Live", color: "var(--tx-fbbf24, #fbbf24)" },
+  { to: 2,  prefix: "< ", suffix: " min", label: "Setup Time", color: "var(--tx-f87171, #f87171)" },
 ];
 
 const INCLUDES = [
@@ -108,7 +108,7 @@ export default function CTASection() {
 
   return (
     <section ref={ref} style={{
-      background: "linear-gradient(180deg, #070a1e 0%, #080c22 50%, #06091a 100%)",
+      background: "linear-gradient(180deg, var(--dk-070a1e, #070a1e) 0%, var(--dk-080c22, #080c22) 50%, var(--dk-06091a, #06091a) 100%)",
       padding: "100px 24px 80px",
       fontFamily: "'Outfit', sans-serif",
       position: "relative",
@@ -148,15 +148,15 @@ export default function CTASection() {
         .cta-ghost{
           display:inline-flex;align-items:center;gap:8px;
           padding:16px 32px;border-radius:14px;
-          border:1.5px solid rgba(255,255,255,.14);
-          background:rgba(255,255,255,.05);
+          border:1.5px solid rgba(var(--ink),.14);
+          background:rgba(var(--ink),.05);
           font-family:inherit;font-size:15px;font-weight:600;
-          color:rgba(255,255,255,.65);cursor:pointer;text-decoration:none;
+          color:rgba(var(--ink),.65);cursor:pointer;text-decoration:none;
           transition:all .25s;
         }
         .cta-ghost:hover{
-          border-color:rgba(255,255,255,.3);
-          background:rgba(255,255,255,.09);
+          border-color:rgba(var(--ink),.3);
+          background:rgba(var(--ink),.09);
           color:white;transform:translateY(-2px);
         }
       `}</style>
@@ -184,7 +184,7 @@ export default function CTASection() {
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "7px 20px", borderRadius: 100, marginBottom: 32,
           background: "rgba(239,68,68,.1)", border: "1.5px solid rgba(239,68,68,.28)",
-          fontSize: 11, fontWeight: 800, color: "#f87171", letterSpacing: ".1em",
+          fontSize: 11, fontWeight: 800, color: "var(--tx-f87171, #f87171)", letterSpacing: ".1em",
           opacity: vis ? 1 : 0,
           transform: vis ? "translateY(0)" : "translateY(16px)",
           transition: "all .5s ease",
@@ -198,7 +198,7 @@ export default function CTASection() {
           fontFamily: "'Lora', serif",
           fontSize: "clamp(34px, 5.5vw, 64px)",
           fontWeight: 700, lineHeight: 1.08,
-          letterSpacing: "-2.5px", color: "white",
+          letterSpacing: "-2.5px", color: "var(--ink-solid, white)",
           marginBottom: 20,
           opacity: vis ? 1 : 0,
           transform: vis ? "translateY(0)" : "translateY(22px)",
@@ -212,7 +212,7 @@ export default function CTASection() {
 
         {/* Sub */}
         <p style={{
-          fontSize: 17, color: "rgba(255,255,255,.42)",
+          fontSize: 17, color: "rgba(var(--ink),var(--ta-42, .42))",
           lineHeight: 1.85, maxWidth: 540, margin: "0 auto 44px",
           opacity: vis ? 1 : 0,
           transform: vis ? "translateY(0)" : "translateY(18px)",
@@ -252,7 +252,7 @@ export default function CTASection() {
         }}>
           <div style={{ display: "flex" }}>
             {["#6366f1","#8b5cf6","#06b6d4","#10b981","#f59e0b"].map((c, i) => (
-              <div key={i} style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${c},${c}88)`, border: "2.5px solid #06091a", marginLeft: i === 0 ? 0 : -9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "white", zIndex: 5 - i, position: "relative" }}>
+              <div key={i} style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${c},${c}88)`, border: "2.5px solid var(--dkb-06091a, #06091a)", marginLeft: i === 0 ? 0 : -9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "white", zIndex: 5 - i, position: "relative" }}>
                 {["T","A","R","F","B"][i]}
               </div>
             ))}
@@ -263,28 +263,28 @@ export default function CTASection() {
                 <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>Trusted by growing businesses</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>Trusted by growing businesses</div>
           </div>
-          <div style={{ width: 1, height: 26, background: "rgba(255,255,255,.1)" }}/>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 500 }}>Secure checkout</div>
-          <div style={{ width: 1, height: 26, background: "rgba(255,255,255,.1)" }}/>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 500 }}>Cancel anytime</div>
+          <div style={{ width: 1, height: 26, background: "rgba(var(--ink),.1)" }}/>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500 }}>Secure checkout</div>
+          <div style={{ width: 1, height: 26, background: "rgba(var(--ink),.1)" }}/>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500 }}>Cancel anytime</div>
         </div>
 
         {/* Stats bar */}
         <div className="cta-stats" style={{
           display: "inline-flex", borderRadius: 20,
-          background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+          background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
           overflow: "hidden", marginBottom: 56,
           opacity: vis ? 1 : 0,
           transition: "opacity .6s ease .42s",
         }}>
           {STATS.map(({ to, prefix, suffix, label, color }, i) => (
-            <div key={label} style={{ padding: "20px 30px", borderRight: i < STATS.length - 1 ? "1px solid rgba(255,255,255,.06)" : "none", textAlign: "center", minWidth: 110 }}>
+            <div key={label} style={{ padding: "20px 30px", borderRight: i < STATS.length - 1 ? "1px solid rgba(var(--ink),.06)" : "none", textAlign: "center", minWidth: 110 }}>
               <div style={{ fontFamily: "'Lora',serif", fontSize: 24, fontWeight: 700, color, letterSpacing: "-.3px" }}>
                 <CountUp to={to} prefix={prefix} suffix={suffix} start={vis} duration={1600 + i * 200}/>
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 500, marginTop: 3 }}>{label}</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 500, marginTop: 3 }}>{label}</div>
             </div>
           ))}
         </div>
@@ -296,7 +296,7 @@ export default function CTASection() {
         opacity: vis ? 1 : 0, transition: "opacity .6s ease .5s",
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>
             ✅ EVERYTHING INCLUDED — NO ADD-ONS
           </div>
         </div>
@@ -306,8 +306,8 @@ export default function CTASection() {
             <div key={label} style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "11px 16px", borderRadius: 12,
-              background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)",
-              fontSize: 13, color: "rgba(255,255,255,.6)", fontWeight: 500,
+              background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)",
+              fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))", fontWeight: 500,
             }}>
               <span style={{ fontSize: 16 }}>{icon}</span>
               {label}
@@ -325,7 +325,7 @@ export default function CTASection() {
         transition: "opacity .6s ease .55s",
       }}>
         {TRUST.map(({ icon, label }) => (
-          <div key={label} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 16px", borderRadius: 100, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.42)", fontWeight: 500 }}>
+          <div key={label} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 16px", borderRadius: 100, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)", fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", fontWeight: 500 }}>
             <span style={{ fontSize: 13 }}>{icon}</span>
             {label}
           </div>

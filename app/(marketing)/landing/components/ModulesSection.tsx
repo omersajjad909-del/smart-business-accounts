@@ -20,7 +20,7 @@ const CATEGORIES = [
   {
     label: "Core Accounting",
     icon: "📒",
-    color: "#818cf8",
+    color: "var(--tx-818cf8, #818cf8)",
     modules: [
       "Chart of Accounts",
       "Journal Vouchers (JV)",
@@ -33,7 +33,7 @@ const CATEGORIES = [
   {
     label: "Invoicing & Billing",
     icon: "🧾",
-    color: "#34d399",
+    color: "var(--tx-34d399, #34d399)",
     modules: [
       "Sales Invoices",
       "Purchase Invoices",
@@ -46,7 +46,7 @@ const CATEGORIES = [
   {
     label: "Inventory",
     icon: "📦",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
     modules: [
       "Multi-Warehouse Stock",
       "GRN (Goods Receipt)",
@@ -60,7 +60,7 @@ const CATEGORIES = [
   {
     label: "Banking & Payments",
     icon: "🏦",
-    color: "#06b6d4",
+    color: "var(--tx-06b6d4, #06b6d4)",
     modules: [
       "Bank Reconciliation",
       "Payment Receipts",
@@ -73,7 +73,7 @@ const CATEGORIES = [
   {
     label: "HR & Payroll",
     icon: "👥",
-    color: "#a78bfa",
+    color: "var(--tx-a78bfa, #a78bfa)",
     modules: [
       "Employee Management",
       "Attendance Tracking",
@@ -86,7 +86,7 @@ const CATEGORIES = [
   {
     label: "CRM & Sales",
     icon: "🎯",
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
     modules: [
       "Contacts & Parties",
       "Opportunities Pipeline",
@@ -99,7 +99,7 @@ const CATEGORIES = [
   {
     label: "Reports & Analytics",
     icon: "📊",
-    color: "#ec4899",
+    color: "var(--tx-ec4899, #ec4899)",
     modules: [
       "Profit & Loss",
       "Balance Sheet",
@@ -113,7 +113,7 @@ const CATEGORIES = [
   {
     label: "Multi-Branch & Scale",
     icon: "🌍",
-    color: "#10b981",
+    color: "var(--tx-10b981, #10b981)",
     modules: [
       "Unlimited Branches",
       "Multi-Company Login",
@@ -126,7 +126,7 @@ const CATEGORIES = [
   {
     label: "AI Intelligence",
     icon: "🤖",
-    color: "#8b5cf6",
+    color: "var(--tx-8b5cf6, #8b5cf6)",
     modules: [
       "Business Health Score",
       "Ask AI (Natural Language)",
@@ -146,7 +146,7 @@ export default function ModulesSection() {
 
   return (
     <section style={{
-      background: "linear-gradient(180deg,#080c22 0%,#060818 100%)",
+      background: "linear-gradient(180deg,var(--dk-080c22, #080c22) 0%,var(--dk-060818, #060818) 100%)",
       padding: "100px 24px",
       fontFamily: "'Outfit',sans-serif",
       position: "relative", overflow: "hidden",
@@ -178,12 +178,12 @@ export default function ModulesSection() {
             background: "rgba(99,102,241,.1)", border: "1.5px solid rgba(99,102,241,.22)",
           }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366f1", display: "inline-block" }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>EVERYTHING INCLUDED</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>EVERYTHING INCLUDED</span>
           </div>
           <h2 style={{
             fontFamily: "'Lora',serif",
             fontSize: "clamp(28px,4vw,48px)",
-            fontWeight: 700, color: "white",
+            fontWeight: 700, color: "var(--ink-solid, white)",
             letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 16,
           }}>
             60+ features. One platform.{" "}
@@ -191,7 +191,7 @@ export default function ModulesSection() {
               Zero add-ons.
             </span>
           </h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 520, margin: "0 auto" }}>
+          <p style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.8, maxWidth: 520, margin: "0 auto" }}>
             Unlike competitors that charge extra for each module, FinovaOS gives you everything — accounting, inventory, HR, CRM, banking, AI intelligence, and reports — all in one subscription.
           </p>
         </div>
@@ -212,7 +212,7 @@ export default function ModulesSection() {
           marginTop: 60, textAlign: "center",
           opacity: hVis ? 1 : 0, transition: "opacity .6s ease .4s",
         }}>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", marginBottom: 20 }}>
+          <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 20 }}>
             Need something specific? All modules are available on every plan.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -228,9 +228,9 @@ export default function ModulesSection() {
             <Link href="/features" style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "12px 22px", borderRadius: 12,
-              border: "1.5px solid rgba(255,255,255,.12)",
-              background: "rgba(255,255,255,.04)",
-              color: "rgba(255,255,255,.7)", fontWeight: 600, fontSize: 14, textDecoration: "none",
+              border: "1.5px solid rgba(var(--ink),.12)",
+              background: "rgba(var(--ink),.04)",
+              color: "rgba(var(--ink),var(--ta-70, .7))", fontWeight: 600, fontSize: 14, textDecoration: "none",
             }}>
               Explore Features
             </Link>
@@ -255,8 +255,8 @@ function ModuleCard({
       onClick={() => setActive(isOpen ? null : cat.label)}
       style={{
         borderRadius: 16, padding: "20px 22px",
-        background: isOpen ? `${cat.color}0d` : "rgba(255,255,255,.03)",
-        border: `1.5px solid ${isOpen ? cat.color + "40" : "rgba(255,255,255,.07)"}`,
+        background: isOpen ? `${cat.color}0d` : "rgba(var(--ink),.03)",
+        border: `1.5px solid ${isOpen ? cat.color + "40" : "rgba(var(--ink),.07)"}`,
         cursor: "pointer", transition: "all .25s",
         opacity: hVis ? 1 : 0,
         transform: hVis ? "translateY(0)" : "translateY(20px)",
@@ -272,14 +272,14 @@ function ModuleCard({
           {cat.icon}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{cat.label}</div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>{cat.modules.length} features</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)" }}>{cat.label}</div>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 1 }}>{cat.modules.length} features</div>
         </div>
         <div style={{
           width: 20, height: 20, borderRadius: "50%",
-          background: "rgba(255,255,255,.06)",
+          background: "rgba(var(--ink),.06)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 12, color: "rgba(255,255,255,.4)", flexShrink: 0,
+          fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", flexShrink: 0,
           transform: isOpen ? "rotate(180deg)" : "none", transition: "transform .25s",
         }}>
           ↓
@@ -292,8 +292,8 @@ function ModuleCard({
             <div key={m} style={{
               display: "flex", alignItems: "center", gap: 8,
               padding: "5px 0",
-              borderBottom: "1px solid rgba(255,255,255,.04)",
-              fontSize: 13, color: "rgba(255,255,255,.65)",
+              borderBottom: "1px solid rgba(var(--ink),.04)",
+              fontSize: 13, color: "rgba(var(--ink),var(--ta-65, .65))",
             }}>
               <span style={{ color: cat.color, fontSize: 10 }}>✓</span>
               {m}

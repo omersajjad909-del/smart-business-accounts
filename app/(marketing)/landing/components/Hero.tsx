@@ -64,7 +64,7 @@ export default function Hero() {
   return (
     <section ref={sectionRef} style={{
       minHeight: "100vh",
-      background: "linear-gradient(160deg,#04061a 0%,#07091f 50%,#0a0620 100%)",
+      background: "linear-gradient(160deg,var(--dk-04061a, #04061a) 0%,var(--dk-07091f, #07091f) 50%,var(--dk-0a0620, #0a0620) 100%)",
       position: "relative", overflow: "hidden",
       fontFamily: "'Outfit',sans-serif",
       display: "flex", flexDirection: "column",
@@ -101,23 +101,23 @@ export default function Hero() {
           background:linear-gradient(135deg,#6366f1 0%,#5b21b6 100%);
           color:#fff; font-family:inherit; font-size:15px; font-weight:700;
           border:none; cursor:pointer; text-decoration:none; letter-spacing:.01em;
-          box-shadow:0 4px 20px rgba(99,102,241,.45), inset 0 1px 0 rgba(255,255,255,.12);
+          box-shadow:0 4px 20px rgba(99,102,241,.45), inset 0 1px 0 rgba(var(--ink),.12);
           transition:all .22s;
         }
-        .cta-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(99,102,241,.55), inset 0 1px 0 rgba(255,255,255,.15); }
+        .cta-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(99,102,241,.55), inset 0 1px 0 rgba(var(--ink),.15); }
 
         .cta-ghost {
           display:inline-flex; align-items:center; gap:8px;
           padding:14px 24px; border-radius:14px;
-          border:1.5px solid rgba(255,255,255,.1);
-          color:rgba(255,255,255,.65); background:rgba(255,255,255,.04);
+          border:1.5px solid rgba(var(--ink),.1);
+          color:rgba(var(--ink),.65); background:rgba(var(--ink),.04);
           font-family:inherit; font-size:14px; font-weight:600;
           cursor:pointer; text-decoration:none; transition:all .22s;
           backdrop-filter:blur(8px);
         }
-        .cta-ghost:hover { border-color:rgba(255,255,255,.22); background:rgba(255,255,255,.08); color:#fff; transform:translateY(-1px); }
+        .cta-ghost:hover { border-color:rgba(var(--ink),.22); background:rgba(var(--ink),.08); color:#fff; transform:translateY(-1px); }
 
-        .stat-pill:hover { background:rgba(255,255,255,.06) !important; transform:translateY(-1px); }
+        .stat-pill:hover { background:rgba(var(--ink),.06) !important; transform:translateY(-1px); }
         .stat-pill { transition:all .2s; }
 
         .feature-tag:hover { border-color:rgba(99,102,241,.5) !important; background:rgba(99,102,241,.12) !important; }
@@ -178,7 +178,7 @@ export default function Hero() {
                     width:8, height:8, borderRadius:"50%", background:"#10b981",
                     animation:"pulse2 2s infinite", display:"inline-block", flexShrink:0,
                   }}/>
-                  <span style={{ fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".07em" }}>
+                  <span style={{ fontSize:11, fontWeight:700, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:".07em" }}>
                     FINOVAOS — AI CLOUD ACCOUNTING FOR SMEs
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export default function Hero() {
               <h1 className="h2" style={{
                 fontSize:"clamp(38px,4vw,60px)", fontWeight:900,
                 lineHeight:1.06, letterSpacing:"-2px",
-                color:"#fff", marginBottom:22,
+                color:"var(--ink-solid, #fff)", marginBottom:22,
               }}>
                 Run Your Business with FinovaOS.{" "}
                 <span style={{
@@ -204,10 +204,10 @@ export default function Hero() {
               {/* Subheadline */}
               <p className="h3" style={{
                 fontSize:16, lineHeight:1.78,
-                color:"rgba(255,255,255,.48)", marginBottom:32,
+                color:"rgba(var(--ink),var(--ta-48, .48))", marginBottom:32,
                 maxWidth:430,
               }}>
-                <strong style={{ color:"rgba(255,255,255,.72)", fontWeight:700 }}>FinovaOS</strong> is AI-powered cloud accounting software for modern SMEs — invoicing, inventory, HR &amp; payroll, bank reconciliation, and CRM in one platform, with AI that monitors your numbers and tells you what to do next.
+                <strong style={{ color:"rgba(var(--ink),var(--ta-72, .72))", fontWeight:700 }}>FinovaOS</strong> is AI-powered cloud accounting software for modern SMEs — invoicing, inventory, HR &amp; payroll, bank reconciliation, and CRM in one platform, with AI that monitors your numbers and tells you what to do next.
               </p>
 
               {/* Outcome benefits */}
@@ -224,7 +224,7 @@ export default function Hero() {
                     background:"rgba(99,102,241,.07)", border:"1px solid rgba(99,102,241,.15)",
                   }}>
                     <span style={{ fontSize:16, flexShrink:0 }}>{b.icon}</span>
-                    <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.7)", lineHeight:1.35 }}>{b.text}</span>
+                    <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-70, .7))", lineHeight:1.35 }}>{b.text}</span>
                   </div>
                 ))}
               </div>
@@ -236,9 +236,9 @@ export default function Hero() {
                   "Customer Statements","Built-in AI","Double-Entry Accounting",
                 ].map(f => (
                   <span key={f} className="feature-tag" style={{
-                    fontSize:11.5, fontWeight:600, color:"rgba(255,255,255,.45)",
+                    fontSize:11.5, fontWeight:600, color:"rgba(var(--ink),var(--ta-45, .45))",
                     padding:"5px 12px", borderRadius:100,
-                    background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)",
+                    background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.08)",
                     cursor:"default",
                   }}>
                     {f}
@@ -283,7 +283,7 @@ export default function Hero() {
               {/* "No credit card required" is gone — there is no free trial to
                   start without one, so the line promised something checkout
                   cannot honour. */}
-              <p style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", marginBottom:32, fontWeight:500 }}>
+              <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:32, fontWeight:500 }}>
                 Priority early access · Launch pricing locked in
               </p>
 
@@ -292,11 +292,11 @@ export default function Hero() {
                   could check would contradict them. Only claims the product
                   actually backs are left. */}
               <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>14-day money-back guarantee</span>
-                <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
-                <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>Cancel anytime</span>
-                <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
-                <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>No setup fee</span>
+                <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>14-day money-back guarantee</span>
+                <span style={{ width:1, height:16, background:"rgba(var(--ink),.1)", display:"inline-block" }}/>
+                <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>Cancel anytime</span>
+                <span style={{ width:1, height:16, background:"rgba(var(--ink),.1)", display:"inline-block" }}/>
+                <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>No setup fee</span>
               </div>
 
             </div>
@@ -312,7 +312,7 @@ export default function Hero() {
                 <div style={{
                   display:"flex", alignItems:"center", gap:10,
                   padding:"10px 14px", borderRadius:13,
-                  background:"rgba(8,10,28,.92)", border:"1px solid rgba(255,255,255,.1)",
+                  background:"rgba(var(--dkr-080a1c, 8,10,28),0.92)", border:"1px solid rgba(var(--ink),.1)",
                   backdropFilter:"blur(16px)", boxShadow:"0 12px 32px rgba(0,0,0,.4)",
                   whiteSpace:"nowrap",
                 }}>
@@ -327,8 +327,8 @@ export default function Hero() {
                     </svg>
                   </div>
                   <div>
-                    <div style={{ fontSize:11.5, fontWeight:700, color:"#fff" }}>AI Insight: Revenue up 22% MoM</div>
-                    <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>FinovaOS AI • Health score 91/100</div>
+                    <div style={{ fontSize:11.5, fontWeight:700, color:"var(--ink-solid, #fff)" }}>AI Insight: Revenue up 22% MoM</div>
+                    <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:1 }}>FinovaOS AI • Health score 91/100</div>
                   </div>
                 </div>
               </div>
@@ -341,7 +341,7 @@ export default function Hero() {
                 <div style={{
                   display:"flex", alignItems:"center", gap:10,
                   padding:"10px 14px", borderRadius:13,
-                  background:"rgba(8,10,28,.92)", border:"1px solid rgba(16,185,129,.2)",
+                  background:"rgba(var(--dkr-080a1c, 8,10,28),0.92)", border:"1px solid rgba(16,185,129,.2)",
                   backdropFilter:"blur(16px)", boxShadow:"0 12px 32px rgba(0,0,0,.4)",
                   whiteSpace:"nowrap",
                 }}>
@@ -357,8 +357,8 @@ export default function Hero() {
                     </svg>
                   </div>
                   <div>
-                    <div style={{ fontSize:11.5, fontWeight:700, color:"#34d399" }}>Payment received • $18,400</div>
-                    <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>Al-Falah Trading • just now</div>
+                    <div style={{ fontSize:11.5, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>Payment received • $18,400</div>
+                    <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:1 }}>Al-Falah Trading • just now</div>
                   </div>
                 </div>
               </div>
@@ -366,9 +366,9 @@ export default function Hero() {
               {/* Main product card */}
               <div style={{
                 borderRadius:22,
-                background:"rgba(8,10,26,.9)", border:"1px solid rgba(255,255,255,.08)",
+                background:"rgba(var(--dkr-080a1a, 8,10,26),0.9)", border:"1px solid rgba(var(--ink),.08)",
                 backdropFilter:"blur(24px)",
-                boxShadow:"0 48px 120px rgba(0,0,0,.65), 0 0 0 1px rgba(99,102,241,.1), inset 0 1px 0 rgba(255,255,255,.05)",
+                boxShadow:"0 48px 120px rgba(0,0,0,.65), 0 0 0 1px rgba(99,102,241,.1), inset 0 1px 0 rgba(var(--ink),.05)",
                 animation:"floatY 9s ease-in-out infinite",
                 overflow:"hidden",
               }}>
@@ -376,8 +376,8 @@ export default function Hero() {
                 {/* Window chrome */}
                 <div style={{
                   padding:"12px 18px", display:"flex", alignItems:"center", gap:10,
-                  borderBottom:"1px solid rgba(255,255,255,.06)",
-                  background:"rgba(255,255,255,.025)",
+                  borderBottom:"1px solid rgba(var(--ink),.06)",
+                  background:"rgba(var(--ink),.025)",
                 }}>
                   <div style={{ display:"flex", gap:6 }}>
                     {["#f87171","#fbbf24","#34d399"].map((c,i) => (
@@ -388,12 +388,12 @@ export default function Hero() {
                     <div style={{
                       display:"flex", alignItems:"center", gap:7,
                       padding:"4px 14px", borderRadius:8,
-                      background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.07)",
+                      background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.07)",
                     }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--ink),.35)" strokeWidth="2">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                       </svg>
-                      <span style={{ fontSize:10.5, color:"rgba(255,255,255,.3)", fontWeight:500 }}>finovaos.app/dashboard</span>
+                      <span style={{ fontSize:10.5, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:500 }}>finovaos.app/dashboard</span>
                     </div>
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:5 }}>
@@ -401,7 +401,7 @@ export default function Hero() {
                       width:7, height:7, borderRadius:"50%", background:"#10b981",
                       animation:"pulse2 2.5s infinite",
                     }}/>
-                    <span style={{ fontSize:10, color:"#10b981", fontWeight:700 }}>Live</span>
+                    <span style={{ fontSize:10, color:"var(--tx-10b981, #10b981)", fontWeight:700 }}>Live</span>
                   </div>
                 </div>
 
@@ -410,16 +410,16 @@ export default function Hero() {
                   {/* Header */}
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                     <div>
-                      <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.9)" }}>Business Dashboard</div>
-                      <div style={{ fontSize:10.5, color:"rgba(255,255,255,.3)", marginTop:2 }}>March 2026 • All warehouses</div>
+                      <div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),.9)" }}>Business Dashboard</div>
+                      <div style={{ fontSize:10.5, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:2 }}>March 2026 • All warehouses</div>
                     </div>
                     <div style={{ display:"flex", gap:5 }}>
                       {["Week","Month","Year"].map((l,i) => (
                         <div key={l} style={{
                           padding:"3px 10px", borderRadius:7, fontSize:10.5, fontWeight:600,
-                          background: i===1 ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-                          color: i===1 ? "#a5b4fc" : "rgba(255,255,255,.28)",
-                          border:`1px solid ${i===1 ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.06)"}`,
+                          background: i===1 ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+                          color: i===1 ? "#a5b4fc" : "rgba(var(--ink),var(--ta-28, .28))",
+                          border:`1px solid ${i===1 ? "rgba(99,102,241,.4)" : "rgba(var(--ink),.06)"}`,
                           cursor:"default",
                         }}>{l}</div>
                       ))}
@@ -431,46 +431,46 @@ export default function Hero() {
 
                     {/* Revenue */}
                     <div style={{ borderRadius:14, padding:"14px 16px", background:"rgba(16,185,129,.07)", border:"1px solid rgba(16,185,129,.18)" }}>
-                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(52,211,153,.6)", letterSpacing:".07em", marginBottom:6 }}>REVENUE</div>
-                      <div style={{ fontSize:24, fontWeight:800, color:"#fff", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(rev)}</div>
+                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(var(--txr-34d399, 52,211,153),.6)", letterSpacing:".07em", marginBottom:6 }}>REVENUE</div>
+                      <div style={{ fontSize:24, fontWeight:800, color:"var(--ink-solid, #fff)", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(rev)}</div>
                       <Sparkline d={[48,62,50,75,60,85,76,95,82,110,94,120]} color="#10b981"/>
                       <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:8 }}>
-                        <span style={{ fontSize:10.5, fontWeight:700, color:"#34d399" }}>↑ 22%</span>
-                        <span style={{ fontSize:10, color:"rgba(255,255,255,.28)" }}>vs last month</span>
+                        <span style={{ fontSize:10.5, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>↑ 22%</span>
+                        <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-28, .28))" }}>vs last month</span>
                       </div>
                     </div>
 
                     {/* Net Profit */}
                     <div style={{ borderRadius:14, padding:"14px 16px", background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)" }}>
-                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(165,180,252,.6)", letterSpacing:".07em", marginBottom:6 }}>NET PROFIT</div>
-                      <div style={{ fontSize:24, fontWeight:800, color:"#a5b4fc", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(prof)}</div>
+                      <div style={{ fontSize:9.5, fontWeight:700, color:"rgba(var(--txr-a5b4fc, 165,180,252),.6)", letterSpacing:".07em", marginBottom:6 }}>NET PROFIT</div>
+                      <div style={{ fontSize:24, fontWeight:800, color:"var(--tx-a5b4fc, #a5b4fc)", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(prof)}</div>
                       <Sparkline d={[28,40,32,50,42,60,54,70,62,80,72,90]} color="#818cf8"/>
                       <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:8 }}>
-                        <span style={{ fontSize:10.5, fontWeight:700, color:"#818cf8" }}>63%</span>
-                        <span style={{ fontSize:10, color:"rgba(255,255,255,.28)" }}>profit margin</span>
+                        <span style={{ fontSize:10.5, fontWeight:700, color:"var(--tx-818cf8, #818cf8)" }}>63%</span>
+                        <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-28, .28))" }}>profit margin</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Recent invoices mini list */}
-                  <div style={{ borderRadius:14, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden" }}>
-                    <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                      <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.5)" }}>Recent Invoices</span>
-                      <span style={{ fontSize:10, color:"#818cf8", fontWeight:600, cursor:"default" }}>{"View all ->"}</span>
+                  <div style={{ borderRadius:14, border:"1px solid rgba(var(--ink),.07)", overflow:"hidden" }}>
+                    <div style={{ padding:"10px 14px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <span style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),var(--ta-50, .5))" }}>Recent Invoices</span>
+                      <span style={{ fontSize:10, color:"var(--tx-818cf8, #818cf8)", fontWeight:600, cursor:"default" }}>{"View all ->"}</span>
                     </div>
                     {[
                       /* Sample data for the product preview. Deliberately
                          generic — these used to carry the same company names
                          the fake testimonials used, which made both look real. */
-                      { name:"Customer A — Trading", amount:"$12,400", status:"Paid",    color:"#34d399" },
-                      { name:"Customer B — Retail",  amount:"$8,750",  status:"Pending", color:"#fbbf24" },
-                      { name:"Customer C — Wholesale", amount:"$21,100", status:"Paid",  color:"#34d399" },
+                      { name:"Customer A — Trading", amount:"$12,400", status:"Paid",    color:"var(--tx-34d399, #34d399)" },
+                      { name:"Customer B — Retail",  amount:"$8,750",  status:"Pending", color:"var(--tx-fbbf24, #fbbf24)" },
+                      { name:"Customer C — Wholesale", amount:"$21,100", status:"Paid",  color:"var(--tx-34d399, #34d399)" },
                     ].map((inv,i) => (
                       <div key={i} style={{
                         display:"flex", alignItems:"center", justifyContent:"space-between",
                         padding:"9px 14px",
-                        borderBottom: i < 2 ? "1px solid rgba(255,255,255,.04)" : "none",
-                        background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)",
+                        borderBottom: i < 2 ? "1px solid rgba(var(--ink),.04)" : "none",
+                        background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),.015)",
                       }}>
                         <div style={{ display:"flex", alignItems:"center", gap:9 }}>
                           <div style={{
@@ -481,10 +481,10 @@ export default function Hero() {
                           }}>
                             {inv.name[0]}
                           </div>
-                          <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.7)" }}>{inv.name}</span>
+                          <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{inv.name}</span>
                         </div>
                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                          <span style={{ fontSize:12, fontWeight:700, color:"#fff" }}>{inv.amount}</span>
+                          <span style={{ fontSize:12, fontWeight:700, color:"var(--ink-solid, #fff)" }}>{inv.amount}</span>
                           <span style={{
                             fontSize:10, fontWeight:700, color:inv.color,
                             padding:"2px 8px", borderRadius:20,
@@ -504,11 +504,11 @@ export default function Hero() {
                     ] as { icon: React.ReactNode; iconBg: string; iconBorder: string; label: string; val: string }[]).map(s => (
                       <div key={s.label} style={{
                         borderRadius:10, padding:"10px 8px", textAlign:"center",
-                        background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)",
+                        background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)",
                       }}>
                         <div style={{ width:26, height:26, borderRadius:7, margin:"0 auto 5px", background:s.iconBg, border:`1px solid ${s.iconBorder}`, display:"flex", alignItems:"center", justifyContent:"center" }}>{s.icon}</div>
-                        <div style={{ fontSize:12, fontWeight:800, color:"rgba(255,255,255,.85)" }}>{s.val}</div>
-                        <div style={{ fontSize:9.5, color:"rgba(255,255,255,.28)", marginTop:1, fontWeight:500 }}>{s.label}</div>
+                        <div style={{ fontSize:12, fontWeight:800, color:"rgba(var(--ink),.85)" }}>{s.val}</div>
+                        <div style={{ fontSize:9.5, color:"rgba(var(--ink),var(--ta-28, .28))", marginTop:1, fontWeight:500 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -526,7 +526,7 @@ export default function Hero() {
       </div>
 
       {/* ── Stats bar ── */}
-      <div style={{ position:"relative", zIndex:1, borderTop:"1px solid rgba(255,255,255,.06)" }}>
+      <div style={{ position:"relative", zIndex:1, borderTop:"1px solid rgba(var(--ink),.06)" }}>
         <div style={{ maxWidth:1220, margin:"0 auto", padding:"32px 28px" }}>
           <div className="hero-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1 }}>
             {[
@@ -538,18 +538,18 @@ export default function Hero() {
                  The count and the list are read off FOCUSED_INDUSTRIES rather
                  than typed here, because a hard-coded number drifted from it
                  the moment the list changed. */
-              { n:String(FOCUSED_INDUSTRIES.length), l:"Business Types", desc:INDUSTRY_SUMMARY, color:"#818cf8" },
-              { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"#34d399" },
-              { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"#fbbf24" },
-              { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"#60a5fa" },
+              { n:String(FOCUSED_INDUSTRIES.length), l:"Business Types", desc:INDUSTRY_SUMMARY, color:"var(--tx-818cf8, #818cf8)" },
+              { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"var(--tx-34d399, #34d399)" },
+              { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"var(--tx-fbbf24, #fbbf24)" },
+              { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"var(--tx-60a5fa, #60a5fa)" },
             ].map((s, i) => (
               <div key={s.l} className="stat-pill" style={{
                 padding:"20px 28px", cursor:"default",
-                borderRight: i < 3 ? "1px solid rgba(255,255,255,.05)" : "none",
+                borderRight: i < 3 ? "1px solid rgba(var(--ink),.05)" : "none",
               }}>
                 <div style={{ fontSize:28, fontWeight:900, color:s.color, letterSpacing:"-1px", marginBottom:4 }}>{s.n}</div>
-                <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.7)", marginBottom:2 }}>{s.l}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,.28)", fontWeight:500 }}>{s.desc}</div>
+                <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))", marginBottom:2 }}>{s.l}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:500 }}>{s.desc}</div>
               </div>
             ))}
           </div>

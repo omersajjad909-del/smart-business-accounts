@@ -29,37 +29,37 @@ const PAINS = [
     problem: "Month-end takes a week",
     solution: "Books close in hours with auto-reconciliation.",
     icon: "📓",
-    color: "#f87171",
+    color: "var(--tx-f87171, #f87171)",
   },
   {
     problem: "Spreadsheets are full of mistakes",
     solution: "A structured accounting engine keeps every entry aligned.",
     icon: "📊",
-    color: "#fbbf24",
+    color: "var(--tx-fbbf24, #fbbf24)",
   },
   {
     problem: "Cash flow is impossible to track",
     solution: "Live dashboards update with every sale, purchase, and payment.",
     icon: "💸",
-    color: "#f97316",
+    color: "var(--tx-f97316, #f97316)",
   },
   {
     problem: "Stock never matches invoices",
     solution: "Inventory moves with real transactions in real time.",
     icon: "📦",
-    color: "#fb7185",
+    color: "var(--tx-fb7185, #fb7185)",
   },
   {
     problem: "Payroll and teams run manually",
     solution: "Attendance, payroll, and finance stay connected in one place.",
     icon: "👥",
-    color: "#c084fc",
+    color: "var(--tx-c084fc, #c084fc)",
   },
   {
     problem: "Branch performance is unclear",
     solution: "See business-wide and branch-wise control from a single workspace.",
     icon: "🏢",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
   },
 ] as const;
 
@@ -75,7 +75,7 @@ export const FOCUSED_INDUSTRIES = [
     slug: "retail",
     /** Compact name for the hero's Business Types caption. */
     short: "retail",
-    color: "#ec4899",
+    color: "var(--tx-ec4899, #ec4899)",
     audience: "For marts, stores, and growing multi-branch retail businesses.",
     desc: "FinovaOS helps retail teams sell faster, track stock branch-wise, run promotions, manage customer loyalty, and print receipts in the right format.",
     modules: ["POS Terminal", "Product Catalog", "Stock Transfer", "Branch Reports"],
@@ -87,7 +87,7 @@ export const FOCUSED_INDUSTRIES = [
     slug: "trading",
     /** Compact name for the hero's Business Types caption. */
     short: "trading",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     audience: "For wholesalers and trading businesses handling procurement and dispatch.",
     desc: "Run quotations, convert orders, manage procurement, control inventory, and follow outstanding balances from one trading-focused desk.",
     modules: ["Order Desk", "Procurement", "Dispatch Board", "Outstandings"],
@@ -99,7 +99,7 @@ export const FOCUSED_INDUSTRIES = [
     slug: "distribution",
     /** Compact name for the hero's Business Types caption. */
     short: "distribution",
-    color: "#8b5cf6",
+    color: "var(--tx-8b5cf6, #8b5cf6)",
     audience: "For route-based distributors delivering into the market every day.",
     desc: "Coordinate warehouse, routes, stock-on-van, deliveries, and collections with a workflow built for market coverage and route discipline.",
     modules: ["Routes", "Delivery Tracking", "Stock On Van", "Collections"],
@@ -111,7 +111,7 @@ export const FOCUSED_INDUSTRIES = [
     slug: "trade",
     /** Compact name for the hero's Business Types caption. */
     short: "import/export",
-    color: "#14b8a6",
+    color: "var(--tx-14b8a6, #14b8a6)",
     audience: "For importers, exporters, and international trading companies.",
     desc: "Prepare commercial documents, track shipments, manage LC and TT activity, and keep trade costing and rebate visibility under control.",
     modules: ["Commercial Invoice", "Packing List", "Shipments", "LC / TT"],
@@ -123,7 +123,7 @@ export const FOCUSED_INDUSTRIES = [
     slug: "manufacturing",
     /** Compact name for the hero's Business Types caption. */
     short: "manufacturing",
-    color: "#f59e0b",
+    color: "var(--tx-f59e0b, #f59e0b)",
     audience: "For production businesses converting raw materials into finished goods.",
     desc: "Manage BOMs, production orders, work orders, finished goods, and quality processes with a manufacturing-ready operating flow.",
     modules: ["Bill of Materials", "Production Orders", "Work Orders", "Quality Control"],
@@ -135,7 +135,7 @@ export const FOCUSED_INDUSTRIES = [
     slug: "travel",
     /** Compact name for the hero's Business Types caption. */
     short: "travel",
-    color: "#38bdf8",
+    color: "var(--tx-38bdf8, #38bdf8)",
     audience: "For travel agencies and visa consultants managing passenger files and service billing.",
     desc: "Track airline tickets, PNRs, travel dates, visa cases, quotations, and customer follow-up from one travel operations desk.",
     modules: ["Airline Tickets", "Visa Cases", "Quotations", "Sales Invoice"],
@@ -200,7 +200,7 @@ export default function SolutionSection() {
     <section
       className="sol-section"
       style={{
-        background: "linear-gradient(180deg,#080c22 0%,#0a0d28 60%,#070a1e 100%)",
+        background: "linear-gradient(180deg,var(--dk-080c22, #080c22) 0%,var(--dk-0a0d28, #0a0d28) 60%,var(--dk-070a1e, #070a1e) 100%)",
         padding: "100px 24px",
         fontFamily: "'Outfit', sans-serif",
         position: "relative",
@@ -310,7 +310,7 @@ export default function SolutionSection() {
                   animation: "blink 2s ease infinite",
                 }}
               />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#f87171", letterSpacing: ".08em" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-f87171, #f87171)", letterSpacing: ".08em" }}>
                 THE PROBLEM
               </span>
             </div>
@@ -319,7 +319,7 @@ export default function SolutionSection() {
                 fontFamily: "'Lora',serif",
                 fontSize: "clamp(30px,4vw,50px)",
                 fontWeight: 700,
-                color: "white",
+                color: "var(--ink-solid, white)",
                 letterSpacing: "-1.5px",
                 lineHeight: 1.1,
                 marginBottom: 16,
@@ -327,7 +327,7 @@ export default function SolutionSection() {
             >
               Sound familiar?
             </h2>
-            <p style={{ fontSize: 16, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 500, margin: "0 auto" }}>
+            <p style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.8, maxWidth: 500, margin: "0 auto" }}>
               These are the operating problems growing businesses hit first. FinovaOS is designed to remove them.
             </p>
           </div>
@@ -338,7 +338,7 @@ export default function SolutionSection() {
               marginBottom: 100,
               borderRadius: 22,
               overflow: "hidden",
-              border: "1px solid rgba(255,255,255,.07)",
+              border: "1px solid rgba(var(--ink),.07)",
               opacity: painVis ? 1 : 0,
               transform: painVis ? "translateY(0)" : "translateY(24px)",
               transition: "opacity .6s ease .1s, transform .6s ease .1s",
@@ -348,12 +348,12 @@ export default function SolutionSection() {
             <div className="cmp-header">
               <div className="cmp-hdr-left" style={{ padding: "18px 28px", background: "rgba(248,113,113,.07)", borderBottom: "1px solid rgba(248,113,113,.1)", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(248,113,113,.15)", border: "1px solid rgba(248,113,113,.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✕</div>
-                <span style={{ fontSize: 12, fontWeight: 800, color: "#f87171", letterSpacing: ".09em" }}>WITHOUT FINOVA</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-f87171, #f87171)", letterSpacing: ".09em" }}>WITHOUT FINOVA</span>
               </div>
-              <div className="cmp-arrow" style={{ background: "rgba(255,255,255,.03)", borderBottom: "1px solid rgba(255,255,255,.07)", borderLeft: "1px solid rgba(255,255,255,.06)", borderRight: "1px solid rgba(255,255,255,.06)" }} />
+              <div className="cmp-arrow" style={{ background: "rgba(var(--ink),.03)", borderBottom: "1px solid rgba(var(--ink),.07)", borderLeft: "1px solid rgba(var(--ink),.06)", borderRight: "1px solid rgba(var(--ink),.06)" }} />
               <div className="cmp-hdr-right" style={{ padding: "18px 28px", background: "rgba(99,102,241,.07)", borderBottom: "1px solid rgba(99,102,241,.14)", borderLeft: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✓</div>
-                <span style={{ fontSize: 12, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".09em" }}>WITH FINOVA</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".09em" }}>WITH FINOVA</span>
               </div>
             </div>
 
@@ -365,7 +365,7 @@ export default function SolutionSection() {
                 onMouseEnter={() => setHovPain(index)}
                 onMouseLeave={() => setHovPain(null)}
                 style={{
-                  borderBottom: index < PAINS.length - 1 ? "1px solid rgba(255,255,255,.04)" : "none",
+                  borderBottom: index < PAINS.length - 1 ? "1px solid rgba(var(--ink),.04)" : "none",
                   transition: "background .15s",
                 }}
               >
@@ -386,13 +386,13 @@ export default function SolutionSection() {
                     style={{
                       width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 10, fontWeight: 800, color: "#f87171",
+                      fontSize: 10, fontWeight: 800, color: "var(--tx-f87171, #f87171)",
                       background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.18)",
                     }}
                   >
                     {index + 1}
                   </div>
-                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "rgba(255,255,255,.65)" : "rgba(255,255,255,.42)", lineHeight: 1.45, transition: "color .15s" }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "rgba(var(--ink),var(--ta-65, .65))" : "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.45, transition: "color .15s" }}>
                     {pain.problem}
                   </span>
                 </div>
@@ -402,13 +402,13 @@ export default function SolutionSection() {
                   className="cmp-arrow"
                   style={{
                     alignItems: "center", justifyContent: "center",
-                    borderLeft: "1px solid rgba(255,255,255,.05)",
+                    borderLeft: "1px solid rgba(var(--ink),.05)",
                     borderRight: "1px solid rgba(99,102,241,.08)",
-                    background: hovPain === index ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.015)",
+                    background: hovPain === index ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.015)",
                     transition: "background .15s",
                   }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hovPain === index ? pain.color : "rgba(255,255,255,.2)"} strokeWidth="2.5" style={{ transition: "stroke .15s" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hovPain === index ? pain.color : "rgba(var(--ink),.2)"} strokeWidth="2.5" style={{ transition: "stroke .15s" }}>
                     <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                   </svg>
                 </div>
@@ -438,7 +438,7 @@ export default function SolutionSection() {
                   >
                     {pain.icon}
                   </div>
-                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "#fff" : "rgba(255,255,255,.75)", lineHeight: 1.45, transition: "color .15s" }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "#fff" : "rgba(var(--ink),.75)", lineHeight: 1.45, transition: "color .15s" }}>
                     {pain.solution}
                   </span>
                 </div>
@@ -479,7 +479,7 @@ export default function SolutionSection() {
                   animation: "blink 2s ease infinite",
                 }}
               />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".08em" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>
                 FOCUSED INDUSTRIES
               </span>
             </div>
@@ -488,7 +488,7 @@ export default function SolutionSection() {
                 fontFamily: "'Lora',serif",
                 fontSize: "clamp(28px,3.5vw,46px)",
                 fontWeight: 700,
-                color: "white",
+                color: "var(--ink-solid, white)",
                 letterSpacing: "-1.2px",
                 lineHeight: 1.1,
                 marginBottom: 16,
@@ -505,7 +505,7 @@ export default function SolutionSection() {
                 these core business models.
               </span>
             </h2>
-            <p style={{ fontSize: 15.5, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 560, margin: "0 auto" }}>
+            <p style={{ fontSize: 15.5, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.8, maxWidth: 560, margin: "0 auto" }}>
               Instead of listing dozens of industries here, we are targeting the business types that need strong operations,
               stock, finance, and execution workflows from day one.
             </p>
@@ -523,9 +523,9 @@ export default function SolutionSection() {
             }}
           >
             {[
-              { value: String(visibleIndustries.length).padStart(2, "0"), label: "Focused Businesses now", color: "#818cf8" },
-              { value: "4-8", label: "Core Modules Each", color: "#34d399" },
-              { value: "100%", label: "Workflow Guided", color: "#fbbf24" },
+              { value: String(visibleIndustries.length).padStart(2, "0"), label: "Focused Businesses now", color: "var(--tx-818cf8, #818cf8)" },
+              { value: "4-8", label: "Core Modules Each", color: "var(--tx-34d399, #34d399)" },
+              { value: "100%", label: "Workflow Guided", color: "var(--tx-fbbf24, #fbbf24)" },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -533,14 +533,14 @@ export default function SolutionSection() {
                   textAlign: "center",
                   padding: "14px 28px",
                   borderRadius: 14,
-                  background: "rgba(255,255,255,.03)",
-                  border: "1px solid rgba(255,255,255,.07)",
+                  background: "rgba(var(--ink),.03)",
+                  border: "1px solid rgba(var(--ink),.07)",
                 }}
               >
                 <div style={{ fontSize: 26, fontWeight: 900, color: stat.color, lineHeight: 1, letterSpacing: "-1px" }}>
                   {stat.value}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", fontWeight: 600, marginTop: 4, letterSpacing: ".04em" }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 600, marginTop: 4, letterSpacing: ".04em" }}>
                   {stat.label}
                 </div>
               </div>
@@ -583,8 +583,8 @@ export default function SolutionSection() {
                       gap: 14,
                       padding: "16px 18px",
                       borderRadius: 18,
-                      border: `1px solid ${isActive ? `${industry.color}55` : "rgba(255,255,255,.08)"}`,
-                      background: isActive ? `${industry.color}12` : "rgba(255,255,255,.03)",
+                      border: `1px solid ${isActive ? `${industry.color}55` : "rgba(var(--ink),.08)"}`,
+                      background: isActive ? `${industry.color}12` : "rgba(var(--ink),.03)",
                       textAlign: "left",
                       cursor: "pointer",
                       transition: `all .22s ease ${index * 20}ms`,
@@ -599,22 +599,22 @@ export default function SolutionSection() {
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: 22,
-                        background: isActive ? `${industry.color}18` : "rgba(255,255,255,.05)",
-                        border: `1px solid ${isActive ? `${industry.color}40` : "rgba(255,255,255,.08)"}`,
+                        background: isActive ? `${industry.color}18` : "rgba(var(--ink),.05)",
+                        border: `1px solid ${isActive ? `${industry.color}40` : "rgba(var(--ink),.08)"}`,
                         flexShrink: 0,
                       }}
                     >
                       {industry.icon}
                     </div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: isActive ? "white" : "rgba(255,255,255,.78)" }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: isActive ? "white" : "rgba(var(--ink),.78)" }}>
                         {industry.label}
                       </div>
                       <div
                         style={{
                           fontSize: 12.5,
                           lineHeight: 1.5,
-                          color: isActive ? "rgba(255,255,255,.72)" : "rgba(255,255,255,.42)",
+                          color: isActive ? "rgba(var(--ink),var(--ta-72, .72))" : "rgba(var(--ink),var(--ta-42, .42))",
                           marginTop: 4,
                         }}
                       >
@@ -631,7 +631,7 @@ export default function SolutionSection() {
               style={{
                 borderRadius: 24,
                 padding: "28px 28px 26px",
-                background: "linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025))",
+                background: "linear-gradient(180deg, rgba(var(--ink),.05), rgba(var(--ink),.025))",
                 border: `1.5px solid ${selectedIndustry.color}30`,
                 boxShadow: `0 20px 60px ${selectedIndustry.color}12`,
                 opacity: indVis ? 1 : 0,
@@ -673,13 +673,13 @@ export default function SolutionSection() {
                       fontFamily: "'Lora',serif",
                       fontSize: "clamp(24px,3vw,34px)",
                       lineHeight: 1.08,
-                      color: "white",
+                      color: "var(--ink-solid, white)",
                       marginBottom: 12,
                     }}
                   >
                     {selectedIndustry.label}
                   </h3>
-                  <p style={{ fontSize: 15.5, lineHeight: 1.8, color: "rgba(255,255,255,.54)", maxWidth: 620 }}>
+                  <p style={{ fontSize: 15.5, lineHeight: 1.8, color: "rgba(var(--ink),var(--ta-54, .54))", maxWidth: 620 }}>
                     {selectedIndustry.desc}
                   </p>
                 </div>
@@ -713,8 +713,8 @@ export default function SolutionSection() {
                   style={{
                     borderRadius: 18,
                     padding: "20px 20px 18px",
-                    background: "rgba(255,255,255,.03)",
-                    border: "1px solid rgba(255,255,255,.08)",
+                    background: "rgba(var(--ink),.03)",
+                    border: "1px solid rgba(var(--ink),.08)",
                   }}
                 >
                   <div
@@ -737,7 +737,7 @@ export default function SolutionSection() {
                           borderRadius: 999,
                           fontSize: 12.5,
                           fontWeight: 700,
-                          color: "rgba(255,255,255,.86)",
+                          color: "rgba(var(--ink),.86)",
                           background: `${selectedIndustry.color}10`,
                           border: `1px solid ${selectedIndustry.color}25`,
                         }}
@@ -752,8 +752,8 @@ export default function SolutionSection() {
                   style={{
                     borderRadius: 18,
                     padding: "20px 20px 18px",
-                    background: "rgba(255,255,255,.03)",
-                    border: "1px solid rgba(255,255,255,.08)",
+                    background: "rgba(var(--ink),.03)",
+                    border: "1px solid rgba(var(--ink),.08)",
                   }}
                 >
                   <div
@@ -788,7 +788,7 @@ export default function SolutionSection() {
                         >
                           {index + 1}
                         </div>
-                        <div style={{ fontSize: 13.5, fontWeight: 600, color: "rgba(255,255,255,.78)" }}>{step}</div>
+                        <div style={{ fontSize: 13.5, fontWeight: 600, color: "rgba(var(--ink),.78)" }}>{step}</div>
                       </div>
                     ))}
                   </div>
@@ -798,9 +798,9 @@ export default function SolutionSection() {
           </div>
 
           <div style={{ textAlign: "center", marginBottom: 80 }}>
-            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.28)", marginBottom: 20, lineHeight: 1.7 }}>
+            <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-28, .28))", marginBottom: 20, lineHeight: 1.7 }}>
               Need a different industry setup later?{" "}
-              <Link href="/contact?subject=custom-industry" style={{ color: "#818cf8", textDecoration: "none", fontWeight: 600 }}>
+              <Link href="/contact?subject=custom-industry" style={{ color: "var(--tx-818cf8, #818cf8)", textDecoration: "none", fontWeight: 600 }}>
                 Request a custom setup
               </Link>{" "}
               and we&apos;ll extend it with the same FinovaOS structure.
@@ -817,7 +817,7 @@ export default function SolutionSection() {
                 border: "1px solid rgba(99,102,241,.25)",
                 fontSize: 13.5,
                 fontWeight: 700,
-                color: "#a5b4fc",
+                color: "var(--tx-a5b4fc, #a5b4fc)",
                 textDecoration: "none",
               }}
             >
@@ -872,15 +872,15 @@ export default function SolutionSection() {
                 border: "1px solid rgba(251,191,36,.25)",
                 fontSize: 11,
                 fontWeight: 700,
-                color: "#fbbf24",
+                color: "var(--tx-fbbf24, #fbbf24)",
               }}
             >
               LIMITED OFFER - 50% OFF FIRST 3 MONTHS
             </div>
-            <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "white", letterSpacing: "-.4px", marginBottom: 6 }}>
+            <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "var(--ink-solid, white)", letterSpacing: "-.4px", marginBottom: 6 }}>
               Stop patching. Start running.
             </h3>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,.4)", margin: 0 }}>
+            <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
               One platform for traders, retailers, distributors, manufacturers, and import-export teams.
             </p>
           </div>
@@ -911,9 +911,9 @@ export default function SolutionSection() {
                 gap: 8,
                 padding: "12px 22px",
                 borderRadius: 12,
-                border: "1.5px solid rgba(255,255,255,.12)",
-                background: "rgba(255,255,255,.04)",
-                color: "rgba(255,255,255,.7)",
+                border: "1.5px solid rgba(var(--ink),.12)",
+                background: "rgba(var(--ink),.04)",
+                color: "rgba(var(--ink),var(--ta-70, .7))",
                 fontWeight: 600,
                 fontSize: 14,
                 textDecoration: "none",

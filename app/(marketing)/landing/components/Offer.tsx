@@ -37,7 +37,7 @@ export default function Offer() {
         borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 800,
         color: "#fbbf24", letterSpacing: ".06em",
       }}>Launch Offer</span>
-      <span className="offer-text" style={{ color: "rgba(255,255,255,.85)" }}>
+      <span className="offer-text" style={{ color: "rgba(var(--ink),.85)" }}>
         50% Off — First 3 Months. Limited Time.
       </span>
 
@@ -63,14 +63,14 @@ export default function Offer() {
       <button onClick={() => setClosed(true)} style={{
         position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
         background: "none", border: "none", cursor: "pointer",
-        color: "rgba(255,255,255,.5)", fontSize: 16, lineHeight: 1,
+        color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 16, lineHeight: 1,
         // 44x44 touch target (was ~24x24) — the glyph itself stays the same
         // visual size, only the tappable area around it grows.
         width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center",
         transition: "color .2s",
       }}
-        onMouseEnter={e => (e.currentTarget.style.color = "white")}
-        onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.5)")}
+        onMouseEnter={e => (e.currentTarget.style.color = "var(--ink-solid, white)")}
+        onMouseLeave={e => (e.currentTarget.style.color = "rgba(var(--ink),var(--ta-50, .5))")}
         aria-label="Close offer banner"
       >✕</button>
     </div>

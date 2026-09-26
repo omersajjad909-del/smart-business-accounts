@@ -74,8 +74,8 @@ function InvoiceDemo({ step }: { step: number }) {
       {/* Top bar */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
         <div>
-          <div style={{ fontSize:14, fontWeight:800, color:"white", marginBottom:2 }}>New Sales Invoice</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>Sales → Create Invoice</div>
+          <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:2 }}>New Sales Invoice</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Sales → Create Invoice</div>
         </div>
         <div style={{ display:"flex", gap:8, alignItems:"center" }}>
           {step >= 11 && (
@@ -89,26 +89,26 @@ function InvoiceDemo({ step }: { step: number }) {
 
       {/* Customer field */}
       <div style={{ marginBottom:8 }}>
-        <div style={{ fontSize:10, color:"rgba(255,255,255,.3)", fontWeight:600, marginBottom:4, textTransform:"uppercase", letterSpacing:".06em" }}>Customer</div>
+        <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:600, marginBottom:4, textTransform:"uppercase", letterSpacing:".06em" }}>Customer</div>
         <div style={{
           padding:"9px 12px", borderRadius:8,
-          border:`1.5px solid ${step === 2 ? "rgba(129,140,248,.5)" : step >= 3 ? "rgba(52,211,153,.3)" : "rgba(255,255,255,.08)"}`,
-          background:"rgba(255,255,255,.03)", fontSize:12, fontWeight:600,
-          color: step >= 3 ? "white" : "rgba(255,255,255,.6)",
+          border:`1.5px solid ${step === 2 ? "rgba(129,140,248,.5)" : step >= 3 ? "rgba(52,211,153,.3)" : "rgba(var(--ink),.08)"}`,
+          background:"rgba(var(--ink),.03)", fontSize:12, fontWeight:600,
+          color: step >= 3 ? "white" : "rgba(var(--ink),var(--ta-60, .6))",
           transition:"all .3s",
         }}>
-          {step >= 3 ? "Al-Raza Traders" : step === 2 ? <>{customer}<Cursor /></> : <span style={{ color:"rgba(255,255,255,.2)" }}>Select customer…</span>}
+          {step >= 3 ? "Al-Raza Traders" : step === 2 ? <>{customer}<Cursor /></> : <span style={{ color:"rgba(var(--ink),var(--ta-20, .2))" }}>Select customer…</span>}
         </div>
         {step === 3 && (
-          <div style={{ background:"rgba(10,13,40,.98)", border:"1px solid rgba(99,102,241,.3)", borderRadius:8, marginTop:2, padding:"6px 0", animation:"slideIn .2s ease both" }}>
+          <div style={{ background:"rgba(var(--dkr-0a0d28, 10,13,40),0.98)", border:"1px solid rgba(99,102,241,.3)", borderRadius:8, marginTop:2, padding:"6px 0", animation:"slideIn .2s ease both" }}>
             {["Al-Raza Traders — Lahore","Al-Raza Electronics"].map((s,i) => (
-              <div key={i} style={{ padding:"7px 12px", fontSize:11, color: i===0?"#a5b4fc":"rgba(255,255,255,.4)", background: i===0?"rgba(99,102,241,.1)":"transparent", cursor:"pointer" }}>{s}</div>
+              <div key={i} style={{ padding:"7px 12px", fontSize:11, color: i===0?"#a5b4fc":"rgba(var(--ink),var(--ta-40, .4))", background: i===0?"rgba(99,102,241,.1)":"transparent", cursor:"pointer" }}>{s}</div>
             ))}
           </div>
         )}
         {step >= 4 && (
-          <div style={{ marginTop:4, padding:"6px 10px", borderRadius:6, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.05)", fontSize:10, color:"rgba(255,255,255,.35)", animation:"slideIn .3s ease both" }}>
-            📍 Lahore, Punjab &nbsp;·&nbsp; Outstanding: <span style={{ color:"#fbbf24" }}>Rs. 12,500</span> &nbsp;·&nbsp; Last order: 18 days ago
+          <div style={{ marginTop:4, padding:"6px 10px", borderRadius:6, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.05)", fontSize:10, color:"rgba(var(--ink),var(--ta-35, .35))", animation:"slideIn .3s ease both" }}>
+            📍 Lahore, Punjab &nbsp;·&nbsp; Outstanding: <span style={{ color:"var(--tx-fbbf24, #fbbf24)" }}>Rs. 12,500</span> &nbsp;·&nbsp; Last order: 18 days ago
           </div>
         )}
       </div>
@@ -117,9 +117,9 @@ function InvoiceDemo({ step }: { step: number }) {
       {step >= 4 && (
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:8, animation:"slideIn .35s ease both" }}>
           {[["Invoice #","INV-2026-0342"],["Date","30-06-2026"],["Due Date","14-07-2026"]].map(([l,v]) => (
-            <div key={l} style={{ padding:"7px 10px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)" }}>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginBottom:3 }}>{l}</div>
-              <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.75)" }}>{v}</div>
+            <div key={l} style={{ padding:"7px 10px", borderRadius:7, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)" }}>
+              <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:3 }}>{l}</div>
+              <div style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),.75)" }}>{v}</div>
             </div>
           ))}
         </div>
@@ -130,27 +130,27 @@ function InvoiceDemo({ step }: { step: number }) {
         <div style={{ flex:1, animation:"slideIn .35s ease both" }}>
           <div style={{ display:"grid", gridTemplateColumns:"3fr 1fr 1fr 1fr", gap:0, marginBottom:4 }}>
             {["Item / Description","Qty","Unit Price","Total"].map(h => (
-              <div key={h} style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.25)", padding:"4px 8px", textTransform:"uppercase", letterSpacing:".05em" }}>{h}</div>
+              <div key={h} style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-25, .25))", padding:"4px 8px", textTransform:"uppercase", letterSpacing:".05em" }}>{h}</div>
             ))}
           </div>
           {items.filter(it => it.show).map((item, i) => (
             <div key={i} style={{
               display:"grid", gridTemplateColumns:"3fr 1fr 1fr 1fr",
               padding:"8px", borderRadius:7, marginBottom:3,
-              background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)",
+              background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)",
               animation:"slideIn .3s ease both",
             }}>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,.75)", fontWeight:500 }}>
+              <div style={{ fontSize:11, color:"rgba(var(--ink),.75)", fontWeight:500 }}>
                 {item.name}{(step === 5 && i===0) || (step === 7 && i===1) || (step === 9 && i===2) ? <Cursor /> : null}
               </div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,.5)", textAlign:"center" }}>{item.qty}</div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,.5)", textAlign:"center" }}>{item.unit}</div>
-              <div style={{ fontSize:12, fontWeight:700, color:"#818cf8", textAlign:"right" }}>{item.total}</div>
+              <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-50, .5))", textAlign:"center" }}>{item.qty}</div>
+              <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-50, .5))", textAlign:"center" }}>{item.unit}</div>
+              <div style={{ fontSize:12, fontWeight:700, color:"var(--tx-818cf8, #818cf8)", textAlign:"right" }}>{item.total}</div>
             </div>
           ))}
           {step >= 6 && step < 9 && (
-            <div style={{ display:"grid", gridTemplateColumns:"3fr 1fr 1fr 1fr", padding:"8px", borderRadius:7, border:"1px dashed rgba(255,255,255,.08)", opacity:.5 }}>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,.2)" }}>+ Add another item…</div>
+            <div style={{ display:"grid", gridTemplateColumns:"3fr 1fr 1fr 1fr", padding:"8px", borderRadius:7, border:"1px dashed rgba(var(--ink),.08)", opacity:.5 }}>
+              <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-20, .2))" }}>+ Add another item…</div>
             </div>
           )}
         </div>
@@ -158,15 +158,15 @@ function InvoiceDemo({ step }: { step: number }) {
 
       {/* Totals */}
       {step >= 10 && (
-        <div style={{ borderTop:"1px solid rgba(255,255,255,.07)", paddingTop:10, marginTop:6, animation:"slideIn .35s ease both" }}>
+        <div style={{ borderTop:"1px solid rgba(var(--ink),.07)", paddingTop:10, marginTop:6, animation:"slideIn .35s ease both" }}>
           {[["Subtotal",subtotal],["Tax / GST",tax]].map(([l,v]) => (
-            <div key={l} style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:"rgba(255,255,255,.4)", padding:"3px 0" }}>
+            <div key={l} style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", padding:"3px 0" }}>
               <span>{l}</span><span>{v}</span>
             </div>
           ))}
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:6, padding:"10px 14px", borderRadius:10, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)" }}>
-            <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.8)" }}>Total</span>
-            <span style={{ fontSize:17, fontWeight:900, color:"#818cf8" }}>{total}</span>
+            <span style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.8)" }}>Total</span>
+            <span style={{ fontSize:17, fontWeight:900, color:"var(--tx-818cf8, #818cf8)" }}>{total}</span>
           </div>
         </div>
       )}
@@ -177,14 +177,14 @@ function InvoiceDemo({ step }: { step: number }) {
           <div style={{ flex:1, padding:"9px", borderRadius:9, background:"linear-gradient(135deg,#6366f1,#4f46e5)", textAlign:"center", fontSize:12, fontWeight:700, color:"white" }}>
             {sent ? "✓ Invoice Sent via WhatsApp" : "Send Invoice"}
           </div>
-          <div style={{ padding:"9px 14px", borderRadius:9, border:"1px solid rgba(255,255,255,.1)", fontSize:12, fontWeight:600, color:"rgba(255,255,255,.5)", textAlign:"center" }}>PDF</div>
+          <div style={{ padding:"9px 14px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-50, .5))", textAlign:"center" }}>PDF</div>
         </div>
       )}
 
       {step >= 13 && (
         <div style={{ marginTop:8, padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.3)", display:"flex", alignItems:"center", gap:10, animation:"slideIn .35s ease both" }}>
           <div style={{ width:8, height:8, borderRadius:"50%", background:"#34d399", flexShrink:0 }}/>
-          <span style={{ fontSize:12, color:"rgba(255,255,255,.6)" }}>Invoice delivered to Al-Raza Traders · Payment link included</span>
+          <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-60, .6))" }}>Invoice delivered to Al-Raza Traders · Payment link included</span>
         </div>
       )}
     </div>
@@ -211,11 +211,11 @@ function DashboardDemo({ step }: { step: number }) {
     <div style={{ flex:1, padding:"14px 18px", display:"flex", flexDirection:"column", gap:10, overflow:"hidden" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
-          <div style={{ fontSize:14, fontWeight:800, color:"white" }}>Business Dashboard</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>June 2026 · Last updated just now</div>
+          <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)" }}>Business Dashboard</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>June 2026 · Last updated just now</div>
         </div>
         {step >= 10 && (
-          <div style={{ padding:"5px 12px", borderRadius:20, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", fontSize:11, fontWeight:700, color:"#34d399", animation:"slideIn .3s ease both" }}>
+          <div style={{ padding:"5px 12px", borderRadius:20, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", fontSize:11, fontWeight:700, color:"var(--tx-34d399, #34d399)", animation:"slideIn .3s ease both" }}>
             🔴 Live
           </div>
         )}
@@ -230,30 +230,30 @@ function DashboardDemo({ step }: { step: number }) {
         ].map((kpi, i) => (
           <div key={kpi.l} style={{
             padding:"12px", borderRadius:10,
-            background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)",
+            background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.07)",
             opacity: step >= 2 ? 1 : 0,
             transform: step >= 2 ? "translateY(0)" : "translateY(12px)",
             transition:`all .45s ease ${i*0.1}s`,
           }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-              <span style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>{kpi.l}</span>
+              <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{kpi.l}</span>
               <span style={{ fontSize:14 }}>{kpi.i}</span>
             </div>
             <div style={{ fontSize:16, fontWeight:900, color:kpi.c }}>{kpi.v}</div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,.25)", marginTop:3 }}>↑ 12% vs last month</div>
+            <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-25, .25))", marginTop:3 }}>↑ 12% vs last month</div>
           </div>
         ))}
       </div>
 
       {/* Chart */}
       <div style={{
-        borderRadius:10, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.05)",
+        borderRadius:10, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.05)",
         padding:"10px 12px",
         opacity: step >= 4 ? 1 : 0, transition:"opacity .5s ease",
       }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)" }}>Monthly Revenue (Jan – Dec)</span>
-          <span style={{ fontSize:10, color:"#818cf8", fontWeight:600 }}>▲ Rs. 2.48L peak</span>
+          <span style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Monthly Revenue (Jan – Dec)</span>
+          <span style={{ fontSize:10, color:"var(--tx-818cf8, #818cf8)", fontWeight:600 }}>▲ Rs. 2.48L peak</span>
         </div>
         <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:52 }}>
           {bars.map((h,i) => (
@@ -270,7 +270,7 @@ function DashboardDemo({ step }: { step: number }) {
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
           {["Jan","Mar","May","Jul","Sep","Dec"].map(m => (
-            <span key={m} style={{ fontSize:8, color:"rgba(255,255,255,.2)" }}>{m}</span>
+            <span key={m} style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-20, .2))" }}>{m}</span>
           ))}
         </div>
       </div>
@@ -278,12 +278,12 @@ function DashboardDemo({ step }: { step: number }) {
       {/* Transactions */}
       {step >= 6 && (
         <div style={{ animation:"slideIn .35s ease both" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", marginBottom:6, textTransform:"uppercase", letterSpacing:".06em" }}>Recent Activity</div>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6, textTransform:"uppercase", letterSpacing:".06em" }}>Recent Activity</div>
           {txns.slice(0, Math.min(txns.length, step - 5)).map((tx,i) => (
             <div key={i} style={{
               display:"flex", justifyContent:"space-between", alignItems:"center",
               padding:"8px 10px", borderRadius:8, marginBottom:3,
-              background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.04)",
+              background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.04)",
               animation:"slideIn .3s ease both",
             }}>
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
@@ -291,19 +291,19 @@ function DashboardDemo({ step }: { step: number }) {
                   {tx.type==="receipt" ? "↓" : "↑"}
                 </div>
                 <div>
-                  <div style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.7)" }}>{tx.party}</div>
-                  <div style={{ fontSize:9, color:"rgba(255,255,255,.25)" }}>{tx.time}</div>
+                  <div style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{tx.party}</div>
+                  <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-25, .25))" }}>{tx.time}</div>
                 </div>
               </div>
-              <div style={{ fontSize:12, fontWeight:700, color: tx.type==="receipt" ? "#34d399" : "#f97316" }}>{tx.amount}</div>
+              <div style={{ fontSize:12, fontWeight:700, color: tx.type==="receipt" ? "var(--tx-34d399, #34d399)" : "var(--tx-f97316, #f97316)" }}>{tx.amount}</div>
             </div>
           ))}
         </div>
       )}
 
       {step >= 11 && (
-        <div style={{ padding:"9px 12px", borderRadius:9, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.25)", fontSize:11, color:"rgba(255,255,255,.55)", animation:"slideIn .3s ease both" }}>
-          ⚠️ <strong style={{ color:"#fbbf24" }}>3 invoices overdue</strong> — Rs. 2,35,000 outstanding · <span style={{ color:"#fbbf24", fontWeight:600 }}>Send reminders →</span>
+        <div style={{ padding:"9px 12px", borderRadius:9, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.25)", fontSize:11, color:"rgba(var(--ink),var(--ta-55, .55))", animation:"slideIn .3s ease both" }}>
+          ⚠️ <strong style={{ color:"var(--tx-fbbf24, #fbbf24)" }}>3 invoices overdue</strong> — Rs. 2,35,000 outstanding · <span style={{ color:"var(--tx-fbbf24, #fbbf24)", fontWeight:600 }}>Send reminders →</span>
         </div>
       )}
     </div>
@@ -331,8 +331,8 @@ function PayrollDemo({ step }: { step: number }) {
     <div style={{ flex:1, padding:"14px 18px", display:"flex", flexDirection:"column", gap:8, overflow:"hidden" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
-          <div style={{ fontSize:14, fontWeight:800, color:"white" }}>Payroll Processing</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>June 2026 · 5 employees</div>
+          <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)" }}>Payroll Processing</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>June 2026 · 5 employees</div>
         </div>
         {step >= 13 && (
           <Badge text="✓ All Disbursed" color="#34d399" bg="rgba(52,211,153,.12)" border="rgba(52,211,153,.3)" />
@@ -347,8 +347,8 @@ function PayrollDemo({ step }: { step: number }) {
             { l:"Deductions",  v:"Rs. 3,330",    c:"#f87171" },
             { l:"Net Payable", v:`Rs. ${(total/100).toFixed(0) !== "0" ? (total/1000).toFixed(1)+"K" : "—"}`, c:"#34d399" },
           ].map(s => (
-            <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", textAlign:"center" }}>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginBottom:4 }}>{s.l}</div>
+            <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", textAlign:"center" }}>
+              <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:4 }}>{s.l}</div>
               <div style={{ fontSize:13, fontWeight:800, color:s.c }}>{s.v}</div>
             </div>
           ))}
@@ -363,8 +363,8 @@ function PayrollDemo({ step }: { step: number }) {
           <div key={i} style={{
             display:"flex", alignItems:"center", gap:10,
             padding:"8px 12px", borderRadius:9,
-            background: paid ? "rgba(52,211,153,.05)" : "rgba(255,255,255,.03)",
-            border:`1px solid ${paid ? "rgba(52,211,153,.2)" : "rgba(255,255,255,.05)"}`,
+            background: paid ? "rgba(52,211,153,.05)" : "rgba(var(--ink),.03)",
+            border:`1px solid ${paid ? "rgba(52,211,153,.2)" : "rgba(var(--ink),.05)"}`,
             opacity: shown ? 1 : 0,
             transform: shown ? "translateX(0)" : "translateX(-10px)",
             transition:`all .4s ease`,
@@ -373,18 +373,18 @@ function PayrollDemo({ step }: { step: number }) {
               {emp.avatar}
             </div>
             <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.8)" }}>{emp.name}</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,.3)" }}>{emp.role}</div>
+              <div style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),.8)" }}>{emp.name}</div>
+              <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{emp.role}</div>
             </div>
             {step >= 5 && (
-              <div style={{ textAlign:"right", fontSize:10, color:"rgba(255,255,255,.4)" }}>
+              <div style={{ textAlign:"right", fontSize:10, color:"rgba(var(--ink),var(--ta-40, .4))" }}>
                 <div>Gross: {emp.gross}</div>
                 <div>EOBI: {emp.eobi}</div>
               </div>
             )}
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontSize:12, fontWeight:800, color: paid ? "#34d399" : "rgba(255,255,255,.6)" }}>{emp.net}</div>
-              {paid && <div style={{ fontSize:9, color:"#34d399", fontWeight:700 }}>✓ PAID</div>}
+              <div style={{ fontSize:12, fontWeight:800, color: paid ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-60, .6))" }}>{emp.net}</div>
+              {paid && <div style={{ fontSize:9, color:"var(--tx-34d399, #34d399)", fontWeight:700 }}>✓ PAID</div>}
             </div>
           </div>
         );
@@ -405,8 +405,8 @@ function PayrollDemo({ step }: { step: number }) {
 
       {step >= 13 && (
         <div style={{ padding:"9px 12px", borderRadius:9, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.25)", display:"flex", justifyContent:"space-between", alignItems:"center", animation:"slideIn .3s ease both" }}>
-          <span style={{ fontSize:11, color:"rgba(255,255,255,.55)" }}>📄 Bank transfer file ready · 5 payslips sent via email</span>
-          <span style={{ fontSize:11, fontWeight:700, color:"#34d399" }}>Download →</span>
+          <span style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-55, .55))" }}>📄 Bank transfer file ready · 5 payslips sent via email</span>
+          <span style={{ fontSize:11, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>Download →</span>
         </div>
       )}
     </div>
@@ -429,8 +429,8 @@ function InventoryDemo({ step }: { step: number }) {
     <div style={{ flex:1, padding:"14px 18px", display:"flex", flexDirection:"column", gap:8, overflow:"hidden" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
-          <div style={{ fontSize:14, fontWeight:800, color:"white" }}>Inventory Overview</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>Pharmacy Stock · Real-time</div>
+          <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)" }}>Inventory Overview</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Pharmacy Stock · Real-time</div>
         </div>
         <div style={{ display:"flex", gap:6 }}>
           {step >= 4 && <Badge text="2 Low Stock" color="#f87171" bg="rgba(248,113,113,.1)" border="rgba(248,113,113,.25)" />}
@@ -442,8 +442,8 @@ function InventoryDemo({ step }: { step: number }) {
       {step >= 2 && (
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6, animation:"slideIn .35s ease both" }}>
           {[{ l:"Total SKUs", v:"128", c:"#818cf8" },{ l:"In Stock", v:"126", c:"#34d399" },{ l:"Low Stock", v:"2", c:"#f87171" },{ l:"Expiring", v:"1", c:"#fbbf24" }].map(s => (
-            <div key={s.l} style={{ padding:"7px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", textAlign:"center" }}>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginBottom:3 }}>{s.l}</div>
+            <div key={s.l} style={{ padding:"7px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", textAlign:"center" }}>
+              <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:3 }}>{s.l}</div>
               <div style={{ fontSize:15, fontWeight:800, color:s.c }}>{s.v}</div>
             </div>
           ))}
@@ -458,8 +458,8 @@ function InventoryDemo({ step }: { step: number }) {
         return (
           <div key={i} style={{
             padding:"9px 12px", borderRadius:9,
-            background: pulseAlert ? "rgba(239,68,68,.06)" : "rgba(255,255,255,.03)",
-            border:`1px solid ${pulseAlert ? "rgba(239,68,68,.3)" : "rgba(255,255,255,.05)"}`,
+            background: pulseAlert ? "rgba(239,68,68,.06)" : "rgba(var(--ink),.03)",
+            border:`1px solid ${pulseAlert ? "rgba(239,68,68,.3)" : "rgba(var(--ink),.05)"}`,
             opacity: shown ? 1 : 0,
             transform: shown ? "translateY(0)" : "translateY(8px)",
             transition:"all .4s ease",
@@ -467,20 +467,20 @@ function InventoryDemo({ step }: { step: number }) {
           }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:5 }}>
               <div>
-                <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.82)" }}>{item.name}</div>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,.3)" }}>Batch: {item.batch} · Exp: {item.exp}</div>
+                <div style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),.82)" }}>{item.name}</div>
+                <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Batch: {item.batch} · Exp: {item.exp}</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:13, fontWeight:800, color:item.c }}>{item.stock.toLocaleString()} units</div>
-                {item.alert && step >= 4 && <div style={{ fontSize:9, fontWeight:700, color:"#ef4444", animation:"blink 1.5s ease infinite" }}>⚠ REORDER</div>}
+                {item.alert && step >= 4 && <div style={{ fontSize:9, fontWeight:700, color:"var(--tx-ef4444, #ef4444)", animation:"blink 1.5s ease infinite" }}>⚠ REORDER</div>}
               </div>
             </div>
             {step >= 6 && (
               <div>
-                <div style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(255,255,255,.2)", marginBottom:3 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(var(--ink),var(--ta-20, .2))", marginBottom:3 }}>
                   <span>0</span><span>Stock level: {Math.round(pct)}%</span><span>{item.max.toLocaleString()}</span>
                 </div>
-                <div style={{ height:4, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+                <div style={{ height:4, borderRadius:2, background:"rgba(var(--ink),.06)" }}>
                   <div style={{ height:"100%", borderRadius:2, background:item.c, width:`${pct}%`, transition:"width .8s ease" }}/>
                 </div>
               </div>
@@ -491,8 +491,8 @@ function InventoryDemo({ step }: { step: number }) {
 
       {step >= 9 && (
         <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.28)", animation:"slideIn .35s ease both" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#fbbf24", marginBottom:4 }}>🔔 Auto Reorder Suggestion</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.5)", marginBottom:6 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)", marginBottom:4 }}>🔔 Auto Reorder Suggestion</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:6 }}>
             Amoxicillin 250mg (48 units) + Cetirizine 10mg (22 units) below minimum threshold.
           </div>
           <div style={{ display:"flex", gap:8 }}>
@@ -504,7 +504,7 @@ function InventoryDemo({ step }: { step: number }) {
       )}
 
       {step >= 12 && (
-        <div style={{ padding:"8px 12px", borderRadius:9, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.25)", fontSize:11, color:"rgba(255,255,255,.55)", animation:"slideIn .3s ease both" }}>
+        <div style={{ padding:"8px 12px", borderRadius:9, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.25)", fontSize:11, color:"rgba(var(--ink),var(--ta-55, .55))", animation:"slideIn .3s ease both" }}>
           ✅ PO #2026-089 raised · Supplier notified · Expected delivery: 2 July 2026
         </div>
       )}
@@ -528,11 +528,11 @@ function AIDemo({ step }: { step: number }) {
   const anomalyN = useCountUp(3,    step >= 3, 800);
 
   const categories = [
-    { label:"Inventory", pct:38, color:"#818cf8" },
-    { label:"Payroll",   pct:28, color:"#34d399" },
-    { label:"Rent",      pct:14, color:"#fbbf24" },
-    { label:"Utilities", pct:10, color:"#f97316" },
-    { label:"Other",     pct:10, color:"#f87171" },
+    { label:"Inventory", pct:38, color:"var(--tx-818cf8, #818cf8)" },
+    { label:"Payroll",   pct:28, color:"var(--tx-34d399, #34d399)" },
+    { label:"Rent",      pct:14, color:"var(--tx-fbbf24, #fbbf24)" },
+    { label:"Utilities", pct:10, color:"var(--tx-f97316, #f97316)" },
+    { label:"Other",     pct:10, color:"var(--tx-f87171, #f87171)" },
   ];
 
   const forecastMonths = [
@@ -546,11 +546,11 @@ function AIDemo({ step }: { step: number }) {
       {/* Header */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
-          <div style={{ fontSize:14, fontWeight:800, color:"white" }}>AI Insights</div>
-          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>Powered by FinovaOS Intelligence · June 2026</div>
+          <div style={{ fontSize:14, fontWeight:800, color:"var(--ink-solid, white)" }}>AI Insights</div>
+          <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Powered by FinovaOS Intelligence · June 2026</div>
         </div>
         {step >= 2 && (
-          <div style={{ padding:"4px 10px", borderRadius:20, background:"rgba(167,139,250,.1)", border:"1px solid rgba(167,139,250,.3)", fontSize:10, fontWeight:700, color:"#a78bfa", animation:"slideIn .3s ease both" }}>
+          <div style={{ padding:"4px 10px", borderRadius:20, background:"rgba(167,139,250,.1)", border:"1px solid rgba(167,139,250,.3)", fontSize:10, fontWeight:700, color:"var(--tx-a78bfa, #a78bfa)", animation:"slideIn .3s ease both" }}>
             🤖 AI Active
           </div>
         )}
@@ -564,10 +564,10 @@ function AIDemo({ step }: { step: number }) {
             { l:"Anomalies Found",       v:step >= 3 ? String(anomalyN) : "—", c:"#f87171", i:"⚠️" },
             { l:"AI Accuracy",           v:"98.7%", c:"#34d399", i:"✓" },
           ].map(s => (
-            <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", textAlign:"center" }}>
+            <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.06)", textAlign:"center" }}>
               <div style={{ fontSize:14, marginBottom:4 }}>{s.i}</div>
               <div style={{ fontSize:15, fontWeight:800, color:s.c }}>{s.v}</div>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,.3)", marginTop:2, lineHeight:1.4 }}>{s.l}</div>
+              <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:2, lineHeight:1.4 }}>{s.l}</div>
             </div>
           ))}
         </div>
@@ -576,16 +576,16 @@ function AIDemo({ step }: { step: number }) {
       {/* Anomaly alert */}
       {step >= 4 && (
         <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.07)", border:"1px solid rgba(248,113,113,.3)", animation:"slideIn .35s ease both" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#f87171", marginBottom:5, display:"flex", alignItems:"center", gap:6 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"var(--tx-f87171, #f87171)", marginBottom:5, display:"flex", alignItems:"center", gap:6 }}>
             <span style={{ animation:"blink 1.5s ease infinite" }}>⚠️</span> Anomaly Detected
           </div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,.6)", lineHeight:1.6 }}>
+          <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.6 }}>
             {step === 4 ? <>{anomalyText}<Cursor color="#f87171"/></> : "Unusual expense: Rs. 45,000 to 'Unknown Vendor' on 22 June — flagged for review."}
           </div>
           {step >= 5 && (
             <div style={{ display:"flex", gap:8, marginTop:8 }}>
-              <div style={{ padding:"5px 12px", borderRadius:7, background:"rgba(248,113,113,.12)", border:"1px solid rgba(248,113,113,.25)", fontSize:10, fontWeight:700, color:"#f87171" }}>Review Transaction →</div>
-              <div style={{ padding:"5px 12px", borderRadius:7, border:"1px solid rgba(255,255,255,.08)", fontSize:10, fontWeight:600, color:"rgba(255,255,255,.3)" }}>Dismiss</div>
+              <div style={{ padding:"5px 12px", borderRadius:7, background:"rgba(248,113,113,.12)", border:"1px solid rgba(248,113,113,.25)", fontSize:10, fontWeight:700, color:"var(--tx-f87171, #f87171)" }}>Review Transaction →</div>
+              <div style={{ padding:"5px 12px", borderRadius:7, border:"1px solid rgba(var(--ink),.08)", fontSize:10, fontWeight:600, color:"rgba(var(--ink),var(--ta-30, .3))" }}>Dismiss</div>
             </div>
           )}
         </div>
@@ -593,8 +593,8 @@ function AIDemo({ step }: { step: number }) {
 
       {/* Cash flow forecast */}
       {step >= 6 && (
-        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)", animation:"slideIn .35s ease both" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>3-Month Cash Flow Forecast</div>
+        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)", animation:"slideIn .35s ease both" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>3-Month Cash Flow Forecast</div>
           <div style={{ display:"flex", gap:12, alignItems:"flex-end", height:60 }}>
             {forecastMonths.map((m, i) => (
               <div key={m.month} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
@@ -602,7 +602,7 @@ function AIDemo({ step }: { step: number }) {
                   <div style={{ flex:1, borderRadius:"3px 3px 0 0", background:"rgba(167,139,250,.55)", height: step >= 6 ? `${(m.rev/3.4)*100}%` : "0%", transition:`height .7s ease ${i*0.15}s`, minHeight:2 }}/>
                   <div style={{ flex:1, borderRadius:"3px 3px 0 0", background:"rgba(249,115,22,.45)", height: step >= 6 ? `${(m.exp/3.4)*100}%` : "0%", transition:`height .7s ease ${i*0.15+0.1}s`, minHeight:2 }}/>
                 </div>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>{m.month}</div>
+                <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{m.month}</div>
               </div>
             ))}
           </div>
@@ -610,7 +610,7 @@ function AIDemo({ step }: { step: number }) {
             {[{ c:"rgba(167,139,250,.6)", l:"Revenue (predicted)" }, { c:"rgba(249,115,22,.5)", l:"Expenses" }].map(k => (
               <div key={k.l} style={{ display:"flex", alignItems:"center", gap:5 }}>
                 <div style={{ width:8, height:8, borderRadius:2, background:k.c }}/>
-                <span style={{ fontSize:9, color:"rgba(255,255,255,.3)" }}>{k.l}</span>
+                <span style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-30, .3))" }}>{k.l}</span>
               </div>
             ))}
           </div>
@@ -619,13 +619,13 @@ function AIDemo({ step }: { step: number }) {
 
       {/* Expense categories */}
       {step >= 7 && (
-        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)", animation:"slideIn .35s ease both" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>Auto-Categorised Expenses</div>
+        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)", animation:"slideIn .35s ease both" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>Auto-Categorised Expenses</div>
           <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
             {categories.slice(0, Math.max(0, step - 6)).map(cat => (
               <div key={cat.label} style={{ display:"flex", alignItems:"center", gap:8, animation:"slideIn .3s ease both" }}>
-                <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", width:54, textAlign:"right", flexShrink:0 }}>{cat.label}</div>
-                <div style={{ flex:1, height:6, borderRadius:3, background:"rgba(255,255,255,.05)", overflow:"hidden" }}>
+                <div style={{ fontSize:9, color:"rgba(var(--ink),var(--ta-40, .4))", width:54, textAlign:"right", flexShrink:0 }}>{cat.label}</div>
+                <div style={{ flex:1, height:6, borderRadius:3, background:"rgba(var(--ink),.05)", overflow:"hidden" }}>
                   <div style={{ height:"100%", borderRadius:3, background:cat.color, width:`${cat.pct}%`, transition:"width .8s ease" }}/>
                 </div>
                 <div style={{ fontSize:9, fontWeight:700, color:cat.color, width:26, flexShrink:0 }}>{cat.pct}%</div>
@@ -638,10 +638,10 @@ function AIDemo({ step }: { step: number }) {
       {/* AI summary */}
       {step >= 9 && (
         <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(167,139,250,.06)", border:"1px solid rgba(167,139,250,.22)", animation:"slideIn .35s ease both" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"#a78bfa", marginBottom:6, display:"flex", alignItems:"center", gap:5 }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"var(--tx-a78bfa, #a78bfa)", marginBottom:6, display:"flex", alignItems:"center", gap:5 }}>
             🤖 AI Financial Summary
           </div>
-          <p style={{ fontSize:11, color:"rgba(255,255,255,.62)", margin:0, lineHeight:1.75 }}>
+          <p style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-62, .62))", margin:0, lineHeight:1.75 }}>
             {summaryText}
             {summaryText.length < 225 && <Cursor color="#a78bfa"/>}
           </p>
@@ -651,13 +651,13 @@ function AIDemo({ step }: { step: number }) {
       {/* Smart suggestions */}
       {step >= 12 && (
         <div style={{ padding:"9px 12px", borderRadius:9, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.25)", animation:"slideIn .3s ease both" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"#34d399", marginBottom:5 }}>✅ Smart Action Suggestions</div>
+          <div style={{ fontSize:10, fontWeight:700, color:"var(--tx-34d399, #34d399)", marginBottom:5 }}>✅ Smart Action Suggestions</div>
           {[
             "Send WhatsApp reminders to 3 overdue clients — Rs. 2,35,000 at risk",
             "Flag Rs. 45,000 unknown expense — request receipt from team",
           ].map((s, i) => (
-            <div key={i} style={{ fontSize:10, color:"rgba(255,255,255,.5)", marginBottom:3, display:"flex", gap:6, lineHeight:1.5 }}>
-              <span style={{ color:"#34d399", flexShrink:0 }}>→</span>{s}
+            <div key={i} style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:3, display:"flex", gap:6, lineHeight:1.5 }}>
+              <span style={{ color:"var(--tx-34d399, #34d399)", flexShrink:0 }}>→</span>{s}
             </div>
           ))}
         </div>
@@ -670,7 +670,7 @@ function AIDemo({ step }: { step: number }) {
    TABS CONFIG
 ════════════════════════════════════════ */
 const TABS = [
-  { id: "invoice",   label: "Sales Invoice", icon: "📄", color: "#818cf8",
+  { id: "invoice",   label: "Sales Invoice", icon: "📄", color: "var(--tx-818cf8, #818cf8)",
     desc: "Create & send invoices in 30 seconds",
     steps: [
       "Opening Sales module…","Entering customer name…","Selecting Al-Raza Traders",
@@ -679,7 +679,7 @@ const TABS = [
       "Calculating totals…","Sending invoice via WhatsApp…","Invoice delivered ✓",
     ],
   },
-  { id: "dashboard", label: "Dashboard",     icon: "📊", color: "#34d399",
+  { id: "dashboard", label: "Dashboard",     icon: "📊", color: "var(--tx-34d399, #34d399)",
     desc: "Real-time P&L, cash flow & KPIs",
     steps: [
       "Loading dashboard…","Fetching today's data…","Revenue & balance updated",
@@ -688,7 +688,7 @@ const TABS = [
       "Checking receivables…","Overdue alerts detected","Dashboard fully loaded ✓",
     ],
   },
-  { id: "payroll",   label: "Payroll",       icon: "👥", color: "#fbbf24",
+  { id: "payroll",   label: "Payroll",       icon: "👥", color: "var(--tx-fbbf24, #fbbf24)",
     desc: "Process full payroll in one click",
     steps: [
       "Opening Payroll module…","Calculating gross salaries…","Loading employees…",
@@ -698,7 +698,7 @@ const TABS = [
       "Payslips sent · Bank file ready ✓",
     ],
   },
-  { id: "inventory", label: "Inventory",     icon: "📦", color: "#f97316",
+  { id: "inventory", label: "Inventory",     icon: "📦", color: "var(--tx-f97316, #f97316)",
     desc: "Track stock, expiry & reorder alerts",
     steps: [
       "Loading inventory…","Fetching stock data…","5 items loaded",
@@ -708,7 +708,7 @@ const TABS = [
       "All done ✓",
     ],
   },
-  { id: "ai", label: "AI Insights", icon: "🤖", color: "#a78bfa",
+  { id: "ai", label: "AI Insights", icon: "🤖", color: "var(--tx-a78bfa, #a78bfa)",
     desc: "Anomaly detection, forecasts & AI summaries",
     steps: [
       "Opening AI Insights…","Analysing 1,847 transactions…","Scanning for anomalies…",
@@ -808,7 +808,7 @@ export default function VideoDemo() {
 
   return (
     <section style={{
-      background:"linear-gradient(180deg,#080c22 0%,#0a0d28 100%)",
+      background:"linear-gradient(180deg,var(--dk-080c22, #080c22) 0%,var(--dk-0a0d28, #0a0d28) 100%)",
       padding:"100px 24px",
       fontFamily:"'Outfit',sans-serif",
       position:"relative", overflow:"hidden",
@@ -821,8 +821,8 @@ export default function VideoDemo() {
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
         @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 8px 32px rgba(99,102,241,.6),0 0 0 14px rgba(99,102,241,.15)}50%{transform:scale(1.06);box-shadow:0 12px 40px rgba(99,102,241,.7),0 0 0 20px rgba(99,102,241,.08)}}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .demo-tab:hover{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.12)!important;}
-        .demo-tab-active{border-color:var(--tc)!important;background:rgba(255,255,255,.06)!important;}
+        .demo-tab:hover{background:rgba(var(--ink),.07)!important;border-color:rgba(var(--ink),.12)!important;}
+        .demo-tab-active{border-color:var(--tc)!important;background:rgba(var(--ink),.06)!important;}
         @media(max-width:900px){.demo-layout{flex-direction:column!important;}.demo-tabs{width:100%!important;}.demo-mock-sidebar{display:none!important;}}
       `}</style>
 
@@ -840,15 +840,15 @@ export default function VideoDemo() {
         <div style={{ textAlign:"center", marginBottom:56 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:100, marginBottom:20, background:"rgba(129,140,248,.1)", border:"1.5px solid rgba(129,140,248,.22)" }}>
             <span style={{ fontSize:14 }}>▶</span>
-            <span style={{ fontSize:11, fontWeight:700, color:"#818cf8", letterSpacing:".08em" }}>INTERACTIVE DEMO</span>
+            <span style={{ fontSize:11, fontWeight:700, color:"var(--tx-818cf8, #818cf8)", letterSpacing:".08em" }}>INTERACTIVE DEMO</span>
           </div>
-          <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,52px)", fontWeight:700, color:"white", letterSpacing:"-2px", lineHeight:1.08, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,52px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-2px", lineHeight:1.08, marginBottom:16 }}>
             See FinovaOS in{" "}
             <span style={{ background:"linear-gradient(135deg,#818cf8,#6366f1)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               action
             </span>
           </h2>
-          <p style={{ fontSize:16, color:"rgba(255,255,255,.45)", maxWidth:540, margin:"0 auto" }}>
+          <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-45, .45))", maxWidth:540, margin:"0 auto" }}>
             Click play on any feature below — watch real workflows animated step-by-step, exactly as your team would use it.
           </p>
         </div>
@@ -864,14 +864,14 @@ export default function VideoDemo() {
                 onClick={() => { setActiveTab(t.id); setPlaying(false); }}
                 style={{
                   "--tc": t.color,
-                  padding:"14px 16px", borderRadius:14, border:"1.5px solid rgba(255,255,255,.06)",
-                  background: activeTab === t.id ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.03)",
+                  padding:"14px 16px", borderRadius:14, border:"1.5px solid rgba(var(--ink),.06)",
+                  background: activeTab === t.id ? "rgba(var(--ink),.06)" : "rgba(var(--ink),.03)",
                   cursor:"pointer", textAlign:"left", fontFamily:"inherit", transition:"all .2s",
                 } as React.CSSProperties}
               >
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:5 }}>
                   <span style={{ fontSize:20 }}>{t.icon}</span>
-                  <span style={{ fontSize:13, fontWeight:700, color: activeTab === t.id ? t.color : "rgba(255,255,255,.6)" }}>{t.label}</span>
+                  <span style={{ fontSize:13, fontWeight:700, color: activeTab === t.id ? t.color : "rgba(var(--ink),var(--ta-60, .6))" }}>{t.label}</span>
                   {activeTab === t.id && playing && !done && (
                     <svg width="12" height="12" viewBox="0 0 24 24" style={{ marginLeft:"auto", animation:"spin 1s linear infinite", flexShrink:0 }}>
                       <circle cx="12" cy="12" r="9" stroke={t.color} strokeWidth="2.5" fill="none" strokeDasharray="40" strokeDashoffset="10"/>
@@ -879,19 +879,19 @@ export default function VideoDemo() {
                   )}
                   {activeTab === t.id && done && <span style={{ marginLeft:"auto", fontSize:12 }}>✓</span>}
                 </div>
-                <p style={{ fontSize:11, color:"rgba(255,255,255,.3)", margin:0, lineHeight:1.5 }}>{t.desc}</p>
+                <p style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", margin:0, lineHeight:1.5 }}>{t.desc}</p>
               </button>
             ))}
 
             {/* Step log below tabs on desktop */}
             {playing && (
-              <div style={{ marginTop:8, padding:"14px 16px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
-                <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>Steps</div>
+              <div style={{ marginTop:8, padding:"14px 16px", borderRadius:14, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)" }}>
+                <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>Steps</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
                   {tab.steps.map((s, i) => (
                     <div key={i} style={{
                       display:"flex", alignItems:"center", gap:8, fontSize:10,
-                      color: i < step ? "#34d399" : i === step ? tab.color : "rgba(255,255,255,.2)",
+                      color: i < step ? "var(--tx-34d399, #34d399)" : i === step ? tab.color : "rgba(var(--ink),var(--ta-20, .2))",
                       fontWeight: i === step ? 700 : 400,
                       transition:"all .3s",
                     }}>
@@ -910,32 +910,32 @@ export default function VideoDemo() {
             {/* Mock browser chrome */}
             <div style={{
               borderRadius:16, overflow:"hidden",
-              border:"1.5px solid rgba(255,255,255,.08)",
+              border:"1.5px solid rgba(var(--ink),.08)",
               boxShadow:"0 32px 80px rgba(0,0,0,.5)",
             }}>
 
               {/* Browser bar */}
-              <div style={{ background:"rgba(14,18,44,.98)", padding:"10px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:10 }}>
+              <div style={{ background:"rgba(var(--dkr-0e122c, 14,18,44),0.98)", padding:"10px 16px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ display:"flex", gap:5 }}>
                   {["#f87171","#fbbf24","#34d399"].map((c,i) => (
                     <div key={i} style={{ width:10, height:10, borderRadius:"50%", background:c, opacity:.7 }}/>
                   ))}
                 </div>
-                <div style={{ flex:1, background:"rgba(255,255,255,.04)", borderRadius:6, padding:"5px 12px", fontSize:11, color:"rgba(255,255,255,.25)", fontWeight:500 }}>
+                <div style={{ flex:1, background:"rgba(var(--ink),.04)", borderRadius:6, padding:"5px 12px", fontSize:11, color:"rgba(var(--ink),var(--ta-25, .25))", fontWeight:500 }}>
                   🔒 app.finovaos.com/dashboard
                 </div>
-                <div style={{ fontSize:10, color:"rgba(255,255,255,.2)" }}>FinovaOS</div>
+                <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-20, .2))" }}>FinovaOS</div>
               </div>
 
               {/* App shell */}
-              <div style={{ display:"flex", background:"rgba(8,12,34,.99)", height:440 }}>
+              <div style={{ display:"flex", background:"rgba(var(--dkr-080c22, 8,12,34),0.99)", height:440 }}>
 
                 {/* App sidebar */}
-                <div className="demo-mock-sidebar" style={{ width:160, borderRight:"1px solid rgba(255,255,255,.05)", padding:"12px 8px", display:"flex", flexDirection:"column", gap:2, flexShrink:0 }}>
+                <div className="demo-mock-sidebar" style={{ width:160, borderRight:"1px solid rgba(var(--ink),.05)", padding:"12px 8px", display:"flex", flexDirection:"column", gap:2, flexShrink:0 }}>
                   {/* Logo */}
                   <div style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 8px", marginBottom:10 }}>
                     <div style={{ width:24, height:24, borderRadius:7, background:"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"white" }}>F</div>
-                    <span style={{ fontSize:12, fontWeight:800, color:"white" }}>FinovaOS</span>
+                    <span style={{ fontSize:12, fontWeight:800, color:"var(--ink-solid, white)" }}>FinovaOS</span>
                   </div>
                   {navItems.map(item => (
                     <div key={item.label} style={{
@@ -944,23 +944,23 @@ export default function VideoDemo() {
                       border: `1px solid ${item.label === activeNav ? "rgba(99,102,241,.25)" : "transparent"}`,
                     }}>
                       <span style={{ fontSize:13 }}>{item.icon}</span>
-                      <span style={{ fontSize:10, fontWeight: item.label === activeNav ? 700 : 500, color: item.label === activeNav ? tab.color : "rgba(255,255,255,.35)" }}>{item.label}</span>
+                      <span style={{ fontSize:10, fontWeight: item.label === activeNav ? 700 : 500, color: item.label === activeNav ? tab.color : "rgba(var(--ink),var(--ta-35, .35))" }}>{item.label}</span>
                     </div>
                   ))}
-                  <div style={{ marginTop:"auto", padding:"8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+                  <div style={{ marginTop:"auto", padding:"8px", borderRadius:8, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.05)" }}>
                     <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:800, color:"white", marginBottom:5 }}>U</div>
-                    <div style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.5)" }}>Demo User</div>
-                    <div style={{ fontSize:8, color:"rgba(255,255,255,.25)" }}>Enterprise Plan</div>
+                    <div style={{ fontSize:9, fontWeight:600, color:"rgba(var(--ink),var(--ta-50, .5))" }}>Demo User</div>
+                    <div style={{ fontSize:8, color:"rgba(var(--ink),var(--ta-25, .25))" }}>Enterprise Plan</div>
                   </div>
                 </div>
 
                 {/* Content area */}
                 <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   {/* Content header */}
-                  <div style={{ padding:"10px 16px", borderBottom:"1px solid rgba(255,255,255,.05)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div style={{ padding:"10px 16px", borderBottom:"1px solid rgba(var(--ink),.05)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                       <span style={{ fontSize:14 }}>{tab.icon}</span>
-                      <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.6)" }}>{tab.label}</span>
+                      <span style={{ fontSize:12, fontWeight:700, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{tab.label}</span>
                     </div>
                     {playing && (
                       <div style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 10px", borderRadius:20, background:`${tab.color}15`, border:`1px solid ${tab.color}30` }}>
@@ -986,11 +986,11 @@ export default function VideoDemo() {
                   </div>
 
                   {/* Bottom feature pills */}
-                  <div style={{ padding:"8px 16px", borderTop:"1px solid rgba(255,255,255,.04)", display:"flex", gap:10, flexWrap:"wrap", background:"rgba(8,12,34,.9)" }}>
+                  <div style={{ padding:"8px 16px", borderTop:"1px solid rgba(var(--ink),.04)", display:"flex", gap:10, flexWrap:"wrap", background:"rgba(var(--dkr-080c22, 8,12,34),0.9)" }}>
                     {FEATURES_BY_TAB[activeTab].map((f,i) => (
                       <div key={i} style={{ display:"flex", alignItems:"center", gap:5 }}>
                         <div style={{ width:5, height:5, borderRadius:"50%", background:tab.color }}/>
-                        <span style={{ fontSize:10, color:"rgba(255,255,255,.4)", fontWeight:600 }}>{f}</span>
+                        <span style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:600 }}>{f}</span>
                       </div>
                     ))}
                   </div>
@@ -998,7 +998,7 @@ export default function VideoDemo() {
               </div>
 
               {/* Progress bar */}
-              <div style={{ height:3, background:"rgba(255,255,255,.04)" }}>
+              <div style={{ height:3, background:"rgba(var(--ink),.04)" }}>
                 <div style={{
                   height:"100%", background:`linear-gradient(90deg,${tab.color},${tab.color}88)`,
                   width: playing ? `${(step / maxSteps) * 100}%` : "0%",
@@ -1030,12 +1030,12 @@ export default function VideoDemo() {
                   <button onClick={replay} style={{
                     display:"flex", alignItems:"center", gap:8,
                     padding:"12px 28px", borderRadius:12,
-                    border:"1.5px solid rgba(255,255,255,.15)", background:"rgba(255,255,255,.06)",
-                    color:"white", fontWeight:700, fontSize:14,
+                    border:"1.5px solid rgba(var(--ink),.15)", background:"rgba(var(--ink),.06)",
+                    color:"var(--ink-solid, white)", fontWeight:700, fontSize:14,
                     cursor:"pointer", fontFamily:"inherit", transition:"all .2s",
                   }}
-                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,.1)";}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.06)";}}
+                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),.1)";}}
+                    onMouseLeave={e=>{e.currentTarget.style.background="rgba(var(--ink),.06)";}}
                   >↺ Replay</button>
                   <a href="/onboarding/signup/starter" style={{
                     display:"flex", alignItems:"center", gap:8,
@@ -1048,7 +1048,7 @@ export default function VideoDemo() {
                   </a>
                 </>
               ) : (
-                <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 28px", borderRadius:12, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.5)", fontSize:14 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 28px", borderRadius:12, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:14 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" style={{ animation:"spin .8s linear infinite" }}>
                     <circle cx="12" cy="12" r="9" stroke={tab.color} strokeWidth="2.5" fill="none" strokeDasharray="40" strokeDashoffset="10"/>
                   </svg>
@@ -1062,22 +1062,22 @@ export default function VideoDemo() {
               <a href="/contact" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 24px", borderRadius:11, fontSize:13, fontWeight:700,
-                border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)",
-                color:"rgba(255,255,255,.6)", textDecoration:"none", transition:"all .25s",
+                border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)",
+                color:"rgba(var(--ink),var(--ta-60, .6))", textDecoration:"none", transition:"all .25s",
               }}
-                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.24)"; e.currentTarget.style.color="white"; }}
-                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.1)"; e.currentTarget.style.color="rgba(255,255,255,.6)"; }}
+                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.24)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-60, .6))"; }}
               >
                 📅 Book a Live Demo
               </a>
               <a href="/pricing" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 24px", borderRadius:11, fontSize:13, fontWeight:700,
-                border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)",
-                color:"rgba(255,255,255,.6)", textDecoration:"none", transition:"all .25s",
+                border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)",
+                color:"rgba(var(--ink),var(--ta-60, .6))", textDecoration:"none", transition:"all .25s",
               }}
-                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.24)"; e.currentTarget.style.color="white"; }}
-                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(255,255,255,.1)"; e.currentTarget.style.color="rgba(255,255,255,.6)"; }}
+                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.24)"; e.currentTarget.style.color="var(--ink-solid, white)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; e.currentTarget.style.color="rgba(var(--ink),var(--ta-60, .6))"; }}
               >
                 💳 View Pricing
               </a>

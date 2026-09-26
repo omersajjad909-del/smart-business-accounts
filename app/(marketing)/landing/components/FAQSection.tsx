@@ -31,183 +31,183 @@ const CATEGORIES = [
 const FAQS = [
   // ── Accounting ──
   {
-    cat: "accounting", color: "#818cf8",
+    cat: "accounting", color: "var(--tx-818cf8, #818cf8)",
     q: "Is FinovaOS a true double-entry accounting system?",
     a: "Yes. Every transaction in FinovaOS posts both a debit and a credit automatically. Your general ledger, trial balance, P&L, and balance sheet are always in sync — no manual journal entries needed for routine transactions.",
   },
   {
-    cat: "accounting", color: "#818cf8",
+    cat: "accounting", color: "var(--tx-818cf8, #818cf8)",
     q: "Can I manage my chart of accounts?",
     a: "Absolutely. FinovaOS auto-generates a chart of accounts based on your industry when you sign up. You can add, rename, or restructure accounts at any time. Full support for assets, liabilities, equity, income, and expense accounts.",
   },
   {
-    cat: "accounting", color: "#818cf8",
+    cat: "accounting", color: "var(--tx-818cf8, #818cf8)",
     q: "Can I lock accounting periods?",
     a: "Yes. Once a period is closed, you can lock it to prevent any backdated changes. This is critical for audit integrity. Admins can reopen a period if corrections are needed — with a full audit trail of who changed what.",
   },
   {
-    cat: "accounting", color: "#818cf8",
+    cat: "accounting", color: "var(--tx-818cf8, #818cf8)",
     q: "What reports does FinovaOS generate?",
     a: "P&L statement, balance sheet, trial balance, cash flow statement, ageing reports (receivables & payables), tax summaries, ledger reports, and custom date-range reports. All exportable as PDF or Excel instantly.",
   },
 
   // ── Invoicing ──
   {
-    cat: "invoicing", color: "#34d399",
+    cat: "invoicing", color: "var(--tx-34d399, #34d399)",
     q: "Can I create both sales and purchase invoices?",
     a: "Yes. FinovaOS covers the full billing cycle — sales invoices, purchase invoices, credit notes, debit notes, and advance payments. Every invoice automatically updates your ledger and inventory.",
   },
   {
-    cat: "invoicing", color: "#34d399",
+    cat: "invoicing", color: "var(--tx-34d399, #34d399)",
     q: "How does payment tracking work?",
     a: "Record full or partial payments against any invoice. FinovaOS automatically calculates outstanding balances, tracks payment history, and generates ageing reports so you always know who owes you and for how long.",
   },
   {
-    cat: "invoicing", color: "#34d399",
+    cat: "invoicing", color: "var(--tx-34d399, #34d399)",
     q: "Can I generate PDF invoices and send them to clients?",
     a: "Yes. Generate a professional PDF invoice in one click. You can download it, print it, or email it directly to your customer from within FinovaOS. Custom invoice templates are available on Pro and Enterprise plans.",
   },
 
   // ── Inventory ──
   {
-    cat: "inventory", color: "#fbbf24",
+    cat: "inventory", color: "var(--tx-fbbf24, #fbbf24)",
     q: "Does inventory sync with invoices automatically?",
     a: "Yes — this is core to how FinovaOS works. When you create a sales invoice, stock is deducted immediately. When you post a goods received note (GRN), stock is added. No manual stock adjustments needed for routine transactions.",
   },
   {
-    cat: "inventory", color: "#fbbf24",
+    cat: "inventory", color: "var(--tx-fbbf24, #fbbf24)",
     q: "Can I manage multiple warehouses?",
     a: "Yes. Define unlimited warehouses or storage locations. Transfer stock between them with full documentation. Reports show stock levels per warehouse or consolidated across all locations.",
   },
   {
-    cat: "inventory", color: "#fbbf24",
+    cat: "inventory", color: "var(--tx-fbbf24, #fbbf24)",
     q: "Which inventory valuation methods are supported?",
     a: "FinovaOS supports FIFO (First In First Out), LIFO (Last In First Out), and Weighted Average Cost. The method affects your COGS calculation and is applied automatically to every sale.",
   },
   {
-    cat: "inventory", color: "#fbbf24",
+    cat: "inventory", color: "var(--tx-fbbf24, #fbbf24)",
     q: "How do low stock alerts work?",
     a: "Set a reorder level for each product. When stock falls at or below that level, FinovaOS flags it on your dashboard and inventory reports. You can action a purchase order directly from the alert.",
   },
 
   // ── HR & Payroll ──
   {
-    cat: "hr", color: "#a78bfa",
+    cat: "hr", color: "var(--tx-a78bfa, #a78bfa)",
     q: "Does FinovaOS handle salary processing?",
     a: "Yes. Define employee salaries, allowances, and deductions. Run monthly payroll in one click — FinovaOS calculates net pay, generates payslips, and automatically posts the payroll entry to your accounting ledger.",
   },
   {
-    cat: "hr", color: "#a78bfa",
+    cat: "hr", color: "var(--tx-a78bfa, #a78bfa)",
     q: "How is attendance tracked?",
     a: "Mark attendance daily (present, absent, late, half-day) manually or via bulk import. Attendance records feed into payroll automatically — late arrivals and absences deduct accordingly based on your policy.",
   },
   {
-    cat: "hr", color: "#a78bfa",
+    cat: "hr", color: "var(--tx-a78bfa, #a78bfa)",
     q: "Can employees apply for leave through FinovaOS?",
     a: "Yes. Employees can log leave requests which managers approve or reject. Leave balances (annual, sick, casual) are tracked automatically and deducted from payroll when leaves are taken.",
   },
 
   // ── Multi-Branch ──
   {
-    cat: "branches", color: "#06b6d4",
+    cat: "branches", color: "var(--tx-06b6d4, #06b6d4)",
     q: "Can I manage multiple companies from one login?",
     a: "Yes — this is one of FinovaOS's core strengths. Add unlimited companies and branches under one account. Switch between them instantly without logging out. Each company's data is fully isolated.",
   },
   {
-    cat: "branches", color: "#06b6d4",
+    cat: "branches", color: "var(--tx-06b6d4, #06b6d4)",
     q: "Can I see consolidated reports across all branches?",
     a: "Yes. FinovaOS generates consolidated P&L, balance sheets, and cash flow across all your companies or branches. You can also drill into individual branch performance at any time.",
   },
   {
-    cat: "branches", color: "#06b6d4",
+    cat: "branches", color: "var(--tx-06b6d4, #06b6d4)",
     q: "Can users have different roles in different companies?",
     a: "Absolutely. A user can be an Admin in Company A, a read-only Accountant in Company B, and have no access to Company C. Role and permission assignment is per company.",
   },
 
   // ── Bank & Payments ──
   {
-    cat: "banking", color: "#60a5fa",
+    cat: "banking", color: "var(--tx-60a5fa, #60a5fa)",
     q: "How does bank reconciliation work in FinovaOS?",
     a: "Import your bank statement (CSV or Excel). FinovaOS auto-matches transactions against your ledger entries by amount, date, and reference. Unmatched items are highlighted for your review. Mark the period reconciled when done.",
   },
   {
-    cat: "banking", color: "#60a5fa",
+    cat: "banking", color: "var(--tx-60a5fa, #60a5fa)",
     q: "Can I manage multiple bank accounts?",
     a: "Yes. Add unlimited bank accounts in any currency. Each account has its own ledger, statement history, and reconciliation record. Switch between accounts from the bank reconciliation module.",
   },
   {
-    cat: "banking", color: "#60a5fa",
+    cat: "banking", color: "var(--tx-60a5fa, #60a5fa)",
     q: "Does FinovaOS support multi-currency transactions?",
     a: "Yes. Transact in any of 150+ currencies. Set exchange rates manually or let FinovaOS fetch live rates. Realized and unrealized forex gains and losses are calculated automatically and posted to your ledger.",
   },
 
   // ── Plans & Billing ──
   {
-    cat: "billing", color: "#f97316",
+    cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "What does the 50% discount cover?",
     a: "Your first 3 months are 50% off the regular plan price — on any plan (Starter, Pro, or Enterprise). After 3 months, standard pricing applies. No contracts. Cancel anytime before month 4 if you change your mind.",
   },
   {
-    cat: "billing", color: "#f97316",
+    cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "What's the difference between monthly and yearly billing?",
     a: "Monthly billing charges you each month at the standard rate. Yearly billing gives you an additional 20% discount on top — you pay for 12 months upfront but save significantly. The 50% first-3-months offer applies to both billing cycles.",
   },
   {
-    cat: "billing", color: "#f97316",
+    cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "Can I upgrade or downgrade my plan?",
     a: "Yes, at any time. Upgrades take effect immediately. Downgrades apply from your next billing date. If you upgrade mid-cycle, you're only charged the prorated difference.",
   },
   {
-    cat: "billing", color: "#f97316",
+    cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "What happens to my data if I cancel?",
     a: "Your data stays accessible for 30 days after cancellation so you can export everything. After 30 days, it is securely deleted. We never hold your data hostage — export to Excel or PDF at any time, even while subscribed.",
   },
 
   // ── AI Intelligence ──
   {
-    cat: "ai", color: "#8b5cf6",
+    cat: "ai", color: "var(--tx-8b5cf6, #8b5cf6)",
     q: "What is AI Intelligence in FinovaOS?",
     a: "AI Intelligence is a built-in module that analyses your financial data and surfaces actionable insights — automatically. It includes a Business Health Score, smart alerts, expense categorization, budget variance analysis, duplicate transaction detection, and more. No extra setup required.",
   },
   {
-    cat: "ai", color: "#8b5cf6",
+    cat: "ai", color: "var(--tx-8b5cf6, #8b5cf6)",
     q: "What is the Business Health Score?",
     a: "The Business Health Score is a real-time 0–100 score that measures your company's financial fitness based on liquidity, profitability, cash flow, and debt ratios. It updates every time you post a transaction, giving you an instant pulse on your business.",
   },
   {
-    cat: "ai", color: "#8b5cf6",
+    cat: "ai", color: "var(--tx-8b5cf6, #8b5cf6)",
     q: "Can I ask FinovaOS questions in plain English?",
     a: "Yes. The Ask AI feature lets you type questions like \"What was my profit last month?\" or \"Which customer owes me the most?\" — and get instant answers from your live financial data. No need to build reports manually.",
   },
   {
-    cat: "ai", color: "#8b5cf6",
+    cat: "ai", color: "var(--tx-8b5cf6, #8b5cf6)",
     q: "How does expense auto-categorization work?",
     a: "When you record expenses, AI analyses the vendor name, description, and amount and suggests the correct expense category. Over time it learns your patterns, reducing manual input significantly.",
   },
   {
-    cat: "ai", color: "#8b5cf6",
+    cat: "ai", color: "var(--tx-8b5cf6, #8b5cf6)",
     q: "What does the duplicate detection catch?",
     a: "AI scans your transactions for entries that are suspiciously similar in amount, date, vendor, and account — and flags them before they distort your books. This is especially useful when importing bank statements or bulk data.",
   },
   {
-    cat: "ai", color: "#8b5cf6",
+    cat: "ai", color: "var(--tx-8b5cf6, #8b5cf6)",
     q: "Is AI Intelligence included in all plans?",
     a: "Core AI features (Health Score, Ask AI, smart alerts) are available on all plans. Advanced AI modules (Customer Profitability, Financial Ratios, Budget Variance Analysis) are available on Pro and Enterprise plans.",
   },
 
   // ── Security ──
   {
-    cat: "security", color: "#10b981",
+    cat: "security", color: "var(--tx-10b981, #10b981)",
     q: "Is my financial data secure?",
     a: "Yes. All data is encrypted in transit (TLS 1.3) and at rest (AES-256). Each company's data is fully isolated — no cross-company data leakage is possible by design. We perform regular security reviews as the platform scales.",
   },
   {
-    cat: "security", color: "#10b981",
+    cat: "security", color: "var(--tx-10b981, #10b981)",
     q: "Who can see my company's data?",
     a: "Only users you invite to your company, with the roles you assign. Even FinovaOS support staff cannot access your financial data without your explicit permission. Full audit logs record every action taken by every user.",
   },
   {
-    cat: "security", color: "#10b981",
+    cat: "security", color: "var(--tx-10b981, #10b981)",
     q: "Are there audit logs?",
     a: "Yes. Every create, edit, and delete action is logged with the user's name, timestamp, and the exact change made. Audit logs cannot be edited or deleted — they are your permanent record of who did what and when.",
   },
@@ -225,8 +225,8 @@ function FAQItem({ faq, open, onToggle, i, vis }: {
       onClick={onToggle}
       style={{
         borderRadius: 14, overflow: "hidden",
-        border: `1px solid ${open ? faq.color + "40" : "rgba(255,255,255,.07)"}`,
-        background: open ? `${faq.color}08` : "rgba(255,255,255,.03)",
+        border: `1px solid ${open ? faq.color + "40" : "rgba(var(--ink),.07)"}`,
+        background: open ? `${faq.color}08` : "rgba(var(--ink),.03)",
         cursor: "pointer",
         opacity: vis ? 1 : 0,
         transform: vis ? "translateY(0)" : "translateY(12px)",
@@ -238,22 +238,22 @@ function FAQItem({ faq, open, onToggle, i, vis }: {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
             width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
-            background: open ? faq.color : "rgba(255,255,255,.2)",
+            background: open ? faq.color : "rgba(var(--ink),.2)",
             transition: "background .2s",
             boxShadow: open ? `0 0 8px ${faq.color}` : "none",
           }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: open ? "white" : "rgba(255,255,255,.75)", lineHeight: 1.4, transition: "color .2s" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: open ? "white" : "rgba(var(--ink),.75)", lineHeight: 1.4, transition: "color .2s" }}>
             {faq.q}
           </span>
         </div>
         <div style={{
           width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
-          background: open ? `${faq.color}20` : "rgba(255,255,255,.06)",
-          border: `1px solid ${open ? faq.color + "40" : "rgba(255,255,255,.1)"}`,
+          background: open ? `${faq.color}20` : "rgba(var(--ink),.06)",
+          border: `1px solid ${open ? faq.color + "40" : "rgba(var(--ink),.1)"}`,
           display: "flex", alignItems: "center", justifyContent: "center",
           transition: "all .25s",
         }}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={open ? faq.color : "rgba(255,255,255,.4)"} strokeWidth="2.5"
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={open ? faq.color : "rgba(var(--ink),.4)"} strokeWidth="2.5"
             style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .25s" }}>
             <polyline points="6 9 12 15 18 9"/>
           </svg>
@@ -267,7 +267,7 @@ function FAQItem({ faq, open, onToggle, i, vis }: {
         transition: "max-height .35s cubic-bezier(.22,1,.36,1)",
       }}>
         <p style={{
-          fontSize: 13.5, color: "rgba(255,255,255,.5)",
+          fontSize: 13.5, color: "rgba(var(--ink),var(--ta-50, .5))",
           lineHeight: 1.8, margin: 0,
           padding: "0 18px 18px 34px",
         }}>
@@ -290,7 +290,7 @@ export default function FAQSection() {
 
   return (
     <section style={{
-      background: "linear-gradient(180deg,#0a0d28 0%,#080c22 60%,#070a1e 100%)",
+      background: "linear-gradient(180deg,var(--dk-0a0d28, #0a0d28) 0%,var(--dk-080c22, #080c22) 60%,var(--dk-070a1e, #070a1e) 100%)",
       padding: "100px 24px",
       fontFamily: "'Outfit', sans-serif",
       position: "relative", overflow: "hidden",
@@ -320,15 +320,15 @@ export default function FAQSection() {
         }}>
           <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 16px",borderRadius:100,marginBottom:20,background:"rgba(99,102,241,.1)",border:"1.5px solid rgba(99,102,241,.22)"}}>
             <span style={{width:6,height:6,borderRadius:"50%",background:"#6366f1",display:"inline-block",animation:"blink 2s ease infinite"}}/>
-            <span style={{fontSize:11,fontWeight:700,color:"#a5b4fc",letterSpacing:".08em"}}>FREQUENTLY ASKED</span>
+            <span style={{fontSize:11,fontWeight:700,color:"var(--tx-a5b4fc, #a5b4fc)",letterSpacing:".08em"}}>FREQUENTLY ASKED</span>
           </div>
-          <h2 style={{fontFamily:"'Lora',serif",fontSize:"clamp(30px,4vw,50px)",fontWeight:700,color:"white",letterSpacing:"-1.5px",lineHeight:1.1,marginBottom:14}}>
+          <h2 style={{fontFamily:"'Lora',serif",fontSize:"clamp(30px,4vw,50px)",fontWeight:700,color:"var(--ink-solid, white)",letterSpacing:"-1.5px",lineHeight:1.1,marginBottom:14}}>
             Got questions?{" "}
             <span style={{background:"linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
               We've got answers.
             </span>
           </h2>
-          <p style={{fontSize:15,color:"rgba(255,255,255,.4)",lineHeight:1.8,maxWidth:480,margin:"0 auto"}}>
+          <p style={{fontSize:15,color:"rgba(var(--ink),var(--ta-40, .4))",lineHeight:1.8,maxWidth:480,margin:"0 auto"}}>
             Everything you need to know about FinovaOS — from accounting to payroll to security.
           </p>
         </div>
@@ -343,9 +343,9 @@ export default function FAQSection() {
             <button key={c.id} onClick={() => setCat(c.id)} style={{
               display:"inline-flex", alignItems:"center", gap:6,
               padding:"7px 14px", borderRadius:24, fontSize:12, fontWeight:600, cursor:"pointer",
-              background: cat===c.id ? "rgba(99,102,241,.22)" : "rgba(255,255,255,.04)",
-              color: cat===c.id ? "#a5b4fc" : "rgba(255,255,255,.45)",
-              border: `1px solid ${cat===c.id ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.08)"}`,
+              background: cat===c.id ? "rgba(99,102,241,.22)" : "rgba(var(--ink),.04)",
+              color: cat===c.id ? "#a5b4fc" : "rgba(var(--ink),var(--ta-45, .45))",
+              border: `1px solid ${cat===c.id ? "rgba(99,102,241,.4)" : "rgba(var(--ink),.08)"}`,
               transition:"all .2s", fontFamily:"inherit",
             }}>
               <span>{c.icon}</span>
@@ -376,7 +376,7 @@ export default function FAQSection() {
           textAlign:"center",
           opacity:vis?1:0, transition:"opacity .6s ease .5s",
         }}>
-          <p style={{fontSize:14,color:"rgba(255,255,255,.35)",marginBottom:16}}>
+          <p style={{fontSize:14,color:"rgba(var(--ink),var(--ta-35, .35))",marginBottom:16}}>
             Still have questions? Our team is happy to help.
           </p>
           <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
@@ -392,9 +392,9 @@ export default function FAQSection() {
             <a href="/docs" style={{
               display:"inline-flex",alignItems:"center",gap:8,
               padding:"10px 22px",borderRadius:11,fontSize:13,fontWeight:600,
-              border:"1.5px solid rgba(255,255,255,.12)",
-              background:"rgba(255,255,255,.04)",
-              color:"rgba(255,255,255,.65)",textDecoration:"none",
+              border:"1.5px solid rgba(var(--ink),.12)",
+              background:"rgba(var(--ink),.04)",
+              color:"rgba(var(--ink),var(--ta-65, .65))",textDecoration:"none",
             }}>
               📖 Browse Documentation
             </a>
