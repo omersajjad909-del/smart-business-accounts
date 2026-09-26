@@ -461,8 +461,6 @@ export default function Navbar() {
             {/* Desktop right */}
             <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:14 }}>
 
-              <ThemeToggle />
-
               <Link href={`${APP_URL}/auth`}
                 style={{
                   display:"flex", alignItems:"center", gap:6,
@@ -483,6 +481,8 @@ export default function Navbar() {
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
               </Link>
+
+              <ThemeToggle />
             </div>
 
             {/* Hamburger */}
