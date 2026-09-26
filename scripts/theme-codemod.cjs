@@ -232,6 +232,21 @@ function transformFile(file) {
 
       if (key === "color" || key === "WebkitTextFillColor") next = boostInkAlpha(next);
 
+      // Hover handlers: e.currentTarget.style.color = "white". Same rule as a
+      // style object — repaint unless this handler also sets a coloured background.
+      if (key === "color" && !prop.parent && ts.isStringLiteral(node)) {
+        const v = rawText.trim().toLowerCase();
+        let fn = node.parent;
+        while (fn && !ts.isFunctionLike(fn)) fn = fn.parent;
+        const body = fn ? fn.getText(sf) : "";
+        const bgs = [...body.matchAll(/style\.background(?:Color)?\s*=\s*["'`]([^"'`]*)["'`]/g)].map((m) => m[1]);
+        const dynamicBg = /style\.background(?:Color)?\s*=\s*[^"'`\s]/.test(body);
+        if (!dynamicBg && bgs.every(backgroundIsNeutral)) {
+          if (v === "#fff" || v === "#ffffff" || v === "white") next = `var(--ink-solid, ${rawText})`;
+          else next = rewriteTextColour(next);
+        }
+      }
+
       if ((key === "color" || key === "WebkitTextFillColor") && prop.parent && ts.isObjectLiteralExpression(prop.parent)) {
         // Text on a coloured button or badge keeps its colour; only text sitting
         // on a (formerly dark) neutral surface is repainted.

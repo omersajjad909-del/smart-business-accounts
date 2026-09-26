@@ -746,7 +746,7 @@ export default function SignupByPlanPage() {
             background:"rgba(var(--ink),.04)",
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
-            onMouseEnter={e=>{e.currentTarget.style.color="white";e.currentTarget.style.borderColor="rgba(var(--ink),.25)";}}
+            onMouseEnter={e=>{e.currentTarget.style.color="var(--ink-solid, white)";e.currentTarget.style.borderColor="rgba(var(--ink),.25)";}}
             onMouseLeave={e=>{e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))";e.currentTarget.style.borderColor="rgba(var(--ink),.1)";}}
           >
             Back
@@ -1175,7 +1175,7 @@ export default function SignupByPlanPage() {
                       background:"none", border:"none", cursor:"pointer",
                       color:"rgba(var(--ink),var(--ta-30, .3))", fontSize:16, transition:"color .2s",
                     }}
-                      onMouseEnter={e=>(e.currentTarget.style.color="#818cf8")}
+                      onMouseEnter={e=>(e.currentTarget.style.color="var(--tx-818cf8, #818cf8)")}
                       onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-30, .3))")}
                     >
                       {showPass ? "Hide" : "Show"}

@@ -3264,7 +3264,7 @@ export default function DashboardLayout({
                     ].map(item => (
                       <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
                         style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(var(--ink),var(--ta-65, 0.65))",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
-                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),0.06)";e.currentTarget.style.color="white";}}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),0.06)";e.currentTarget.style.color="var(--ink-solid, white)";}}
                         onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(var(--ink),var(--ta-65, 0.65))";}}>
                         <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
                         {item.label}

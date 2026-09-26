@@ -334,7 +334,7 @@ export default function OnboardingPlanFeatures() {
             border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)",
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
-            onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
+            onMouseEnter={e=>{ e.currentTarget.style.color="var(--ink-solid, white)"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
             onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
           >
             ← Back
@@ -482,7 +482,7 @@ export default function OnboardingPlanFeatures() {
                 color:"rgba(var(--ink),var(--ta-55, .55))", fontSize:14, fontWeight:600,
                 cursor:"pointer", fontFamily:"inherit", transition:"all .2s",
               }}
-                onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
+                onMouseEnter={e=>{ e.currentTarget.style.color="var(--ink-solid, white)"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
                 onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
               >
                 Skip for now — View Dashboard

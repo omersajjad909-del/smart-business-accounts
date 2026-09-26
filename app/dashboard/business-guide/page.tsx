@@ -750,7 +750,7 @@ export default function BusinessGuidePage() {
                   background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)",
                   fontSize: 12.5, fontWeight: 600, color: "rgba(var(--ink),var(--ta-70, .7))", transition: "all .2s",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "#a5b4fc"; e.currentTarget.style.borderColor = "rgba(99,102,241,.25)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "var(--tx-a5b4fc, #a5b4fc)"; e.currentTarget.style.borderColor = "rgba(99,102,241,.25)"; }}
                   onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),var(--ta-70, .7))"; e.currentTarget.style.borderColor = "rgba(var(--ink),.06)"; }}
                 >
                   {r.label}
