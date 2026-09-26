@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
 import { formatCompanyNo, billingCustomerIdLabel } from "@/lib/companyRef";
+import CompanyEngagement, { activityLabel } from "./CompanyEngagement";
 
 type Company = {
   id: string; companyNo?: number | null; name: string; country: string | null; baseCurrency: string | null;
@@ -294,7 +295,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                     <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#6366f1", marginTop: 4, flexShrink: 0 }} />
                     <div>
-                      <div style={{ fontSize: 12, color: "#cbd5e1", fontFamily: "monospace" }}>{a.action}</div>
+                      <div style={{ fontSize: 12, color: "#cbd5e1" }}>{activityLabel(a.action)}</div>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{timeAgo(a.createdAt)}</div>
                     </div>
                   </div>
@@ -304,6 +305,13 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
       </div>
+
+      <CompanyEngagement
+        companyRef={id}
+        adminHeaders={adminHdrs}
+        lastLogin={lastLogin}
+        recipients={users.map(u => ({ id: u.id, name: u.name, email: u.email }))}
+      />
     </div>
   );
 }

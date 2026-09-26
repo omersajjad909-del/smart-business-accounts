@@ -160,6 +160,33 @@ export async function GET(req: NextRequest) {
       lastMonthRevenue = byMonth[ym(lastMonthStart)] || 0;
     }
 
+    // ── Revenue in rupees ─────────────────────────────────────────────────
+    // Safepay and bank-transfer (manual) payments settle in PKR and never pass
+    // through Lemon Squeezy, so the card above cannot see them. They are read
+    // from the invoice ledger instead, net of refunds, and kept as a separate
+    // figure — adding rupees to dollars would make both numbers meaningless.
+    // Test charges and companies excluded from every other metric (demo and
+    // internal-test workspaces, deleted companies) are left out here too.
+    const countedCompanyIds = companies.map((c) => c.id);
+    const pkrInvoices = await prisma.platformInvoice
+      .findMany({
+        where: {
+          currency: "PKR",
+          testMode: false,
+          status: { notIn: ["VOID", "OPEN"] },
+          companyId: { in: countedCompanyIds },
+          issuedAt: { gte: lastMonthStart },
+        },
+        select: { total: true, refundedAmount: true, issuedAt: true },
+      })
+      .catch(() => [] as { total: number; refundedAmount: number; issuedAt: Date }[]);
+    const netPkr = (from: Date, to?: Date) =>
+      pkrInvoices
+        .filter((i) => i.issuedAt >= from && (!to || i.issuedAt <= to))
+        .reduce((sum, i) => sum + Math.max(0, (Number(i.total) || 0) - (Number(i.refundedAmount) || 0)), 0);
+    const monthlyRevenuePkr = netPkr(thisMonthStart);
+    const lastMonthRevenuePkr = netPkr(lastMonthStart, lastMonthEnd);
+
     // ── Growth: companies (this month vs last month) ───────────────────────
     const thisMonthCompanies = companies.filter((c) => c.createdAt >= thisMonthStart).length;
     const lastMonthCompanies = companies.filter(
@@ -191,6 +218,7 @@ export async function GET(req: NextRequest) {
       users: growthPct(thisMonthUsers, lastMonthUsers),
       subscriptions: growthPct(thisMonthActivations, lastMonthActivations),
       revenue: growthPct(monthlyRevenue, lastMonthRevenue),
+      revenuePkr: growthPct(monthlyRevenuePkr, lastMonthRevenuePkr),
     };
 
     // ── 7-day overview chart ──────────────────────────────────────────────
@@ -315,7 +343,7 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json({
-      cards: { totalCompanies, totalUsers, activeSubscriptions, monthlyRevenue },
+      cards: { totalCompanies, totalUsers, activeSubscriptions, monthlyRevenue, monthlyRevenuePkr },
       growth,
       overview: dayBuckets.map((b) => ({
         label: b.label,

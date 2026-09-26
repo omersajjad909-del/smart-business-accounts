@@ -9,12 +9,14 @@ type DashboardPayload = {
     totalUsers: number;
     activeSubscriptions: number;
     monthlyRevenue: number;
+    monthlyRevenuePkr: number;
   };
   growth: {
     companies: number;
     users: number;
     subscriptions: number;
     revenue: number;
+    revenuePkr: number;
   };
   overview: {
     label: string;
@@ -98,7 +100,8 @@ export default function AdminDashboardPage() {
     { title: "Total Companies",      value: formatNumber(data?.cards.totalCompanies),      tone: "purple", growth: data?.growth.companies,     icon: "building", series: data?.overview.map((r) => r.newCompanies) || [] },
     { title: "Total Users",          value: formatNumber(data?.cards.totalUsers),           tone: "blue",   growth: data?.growth.users,         icon: "users",    series: data?.overview.map((r) => r.newUsers) || [] },
     { title: "Active Subscriptions", value: formatNumber(data?.cards.activeSubscriptions),  tone: "green",  growth: data?.growth.subscriptions, icon: "layers",   series: data?.overview.map((r) => r.activeSubscriptions) || [] },
-    { title: "Monthly Revenue",      value: formatCurrency(data?.cards.monthlyRevenue),     tone: "orange", growth: data?.growth.revenue,       icon: "chart",    series: data?.overview.map((r) => r.activeSubscriptions) || [] },
+    { title: "Monthly Revenue (USD)", value: formatCurrency(data?.cards.monthlyRevenue),    tone: "orange", growth: data?.growth.revenue,       icon: "chart",    series: data?.overview.map((r) => r.activeSubscriptions) || [] },
+    { title: "Monthly Revenue (PKR)", value: formatPkr(data?.cards.monthlyRevenuePkr),      tone: "green",  growth: data?.growth.revenuePkr,    icon: "chart",    series: data?.overview.map((r) => r.activeSubscriptions) || [] },
   ];
 
   const dateRange = getDateRange();
@@ -360,6 +363,10 @@ function formatCurrency(v?: number) {
   if (v === undefined) return "—";
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
 }
+function formatPkr(v?: number) {
+  if (v === undefined) return "—";
+  return `₨${Math.round(v).toLocaleString("en-PK")}`;
+}
 function formatDate(v?: string | null) {
   if (!v) return "N/A";
   return new Date(v).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -527,7 +534,10 @@ const dashboardStyles = `
 
 /* ── Stats ─────────────────────────────────────────────────────── */
 .stats-grid{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;
+}
+@media (max-width: 1400px){
+  .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
 }
 .stat-card{padding:16px 18px;}
 .stat-row{display:flex;align-items:flex-start;gap:13px;}

@@ -61,7 +61,7 @@ function n(val: number | null | undefined): string {
 }
 
 /** Wraps email content in a consistent branded layout */
-function emailBase({
+export function emailBase({
   companyName,
   badgeText,
   badgeColor = "#6366f1",
@@ -794,6 +794,7 @@ export async function sendEmail(options: {
   text?: string;
   attachments?: Array<{ filename: string; content: string | Buffer }>;
   companyId?: string;
+  replyTo?: string;
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const toStr = Array.isArray(options.to) ? options.to.join(', ') : options.to;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
@@ -810,6 +811,7 @@ export async function sendEmail(options: {
         subject: options.subject,
         html: options.html,
         ...(options.text ? { text: options.text } : {}),
+        ...(options.replyTo ? { replyTo: options.replyTo } : {}),
         // Attachments were accepted by this function's signature but only ever
         // forwarded on the SMTP path below, so every platform email — the ones
         // with no companyId, which is exactly the invoice receipts — silently
@@ -860,6 +862,7 @@ export async function sendEmail(options: {
       subject: options.subject,
       html: options.html,
       ...(options.text ? { text: options.text } : {}),
+      ...(options.replyTo ? { replyTo: options.replyTo } : {}),
       attachments: options.attachments,
       headers: { 'List-Unsubscribe': `<https://finovaos.app/unsubscribe>` },
     });
