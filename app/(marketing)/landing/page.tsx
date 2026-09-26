@@ -109,14 +109,9 @@ const JSON_LD = {
       "url": BASE,
       "name": "FinovaOS",
       "publisher": { "@id": `${BASE}/#org` },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": `${BASE}/blog?q={search_term_string}`,
-        },
-        "query-input": "required name=search_term_string",
-      },
+      // No SearchAction: there's no working /search or /blog?q= page behind it
+      // (see the same note in app/layout.tsx). GSC was crawling the promised
+      // urlTemplate literally and flagging it 404 until this was removed.
     },
     {
       "@type": "FAQPage",

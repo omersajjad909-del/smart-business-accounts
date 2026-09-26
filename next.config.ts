@@ -67,6 +67,13 @@ const nextConfig: NextConfig = {
         // right, so Google kept it clustered against /forge/home as a duplicate.
         permanent: true,
       },
+      // Old /for/:industry slugs from before the IND_BIZ_KEY remap in
+      // solutions/page.tsx. Nothing links to these anymore, but Google still
+      // has them queued from the earlier crawl — GSC flagged them as 404s.
+      { source: "/for/saas", destination: "/for/saas_company", permanent: true },
+      { source: "/for/repair", destination: "/for/mobile_repair", permanent: true },
+      { source: "/for/import", destination: "/for/import_company", permanent: true },
+      { source: "/features/ai", destination: "/features", permanent: true },
     ];
   },
   async headers() {
