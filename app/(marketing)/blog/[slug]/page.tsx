@@ -518,7 +518,7 @@ const ALL_POSTS: Record<string, any> = { ...SHARED_POSTS, ...LOCAL_POSTS, ...SEO
 const RELATED_BY_CATEGORY: Record<string, string[]> = {
   accounting: ["bank-reconciliation-guide","5","9","11"],
   guides:     ["1","2","7","13","manage-sales-inventory-accounting-one-system"],
-  business:   ["best-business-management-software-small-business","best-odoo-alternatives","best-quickbooks-alternatives","best-all-in-one-business-management-software","accounting-crm-inventory-software-small-business","business-management-software-wholesale","business-management-software-distributors","6","8","10","12"],
+  business:   ["should-you-combine-inventory-and-accounting","best-business-management-software-small-business","best-odoo-alternatives","best-quickbooks-alternatives","best-all-in-one-business-management-software","accounting-crm-inventory-software-small-business","business-management-software-wholesale","business-management-software-distributors","6","8","10","12"],
   product:    ["3","4","8","14"],
   fintech:    ["5","9","15"],
 };
