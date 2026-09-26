@@ -178,7 +178,7 @@ export default function IndustrySelector() {
           </div>
           <h2 style={{ fontSize:"clamp(28px,4vw,46px)", fontWeight:900, color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:14, margin:"0 0 14px" }}>
             Built for{" "}
-            <span style={{ background:"linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+            <span style={{ background:"var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               every business
             </span>
           </h2>

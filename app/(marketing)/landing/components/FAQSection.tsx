@@ -324,7 +324,7 @@ export default function FAQSection() {
           </div>
           <h2 style={{fontFamily:"'Lora',serif",fontSize:"clamp(30px,4vw,50px)",fontWeight:700,color:"var(--ink-solid, white)",letterSpacing:"-1.5px",lineHeight:1.1,marginBottom:14}}>
             Got questions?{" "}
-            <span style={{background:"linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+            <span style={{background:"var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
               We've got answers.
             </span>
           </h2>

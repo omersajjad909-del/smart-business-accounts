@@ -278,8 +278,8 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
         padding:"13px 20px", borderRadius:12, marginBottom:24,
         background: plan.featured
           ? `linear-gradient(135deg,${plan.color},#6366f1)`
-          : `rgba(${plan.featured?"99,102,241":"255,255,255"},.08)`,
-        color: "white", fontWeight:700, fontSize:14, textDecoration:"none",
+          : "rgba(var(--ink),.08)",
+        color: plan.featured ? "white" : "var(--ink-solid, white)", fontWeight:700, fontSize:14, textDecoration:"none",
         border: plan.featured ? "none" : `1.5px solid ${plan.color}35`,
         boxShadow: plan.featured ? `0 6px 20px ${plan.glow}` : "none",
         transition:"all .25s",
@@ -411,7 +411,7 @@ export default function PricingSection() {
           </div>
           <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(30px,4vw,50px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1.5px", lineHeight:1.1, marginBottom:16 }}>
             Simple, transparent{" "}
-            <span style={{background:"linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+            <span style={{background:"var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
               pricing
             </span>
           </h2>

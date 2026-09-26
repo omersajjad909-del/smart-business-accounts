@@ -5,6 +5,7 @@ import Offer from "./landing/components/Offer";
 import Footer from "./landing/components/Footer";
 import ChatWidget from "./landing/components/ChatWidget";
 import GeoPrecisionPrompt from "./landing/components/GeoPrecisionPrompt";
+import MarketingThemeScope from "./landing/components/MarketingThemeScope";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -95,7 +96,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mkt-page flex min-h-dvh flex-col bg-[#060919]">
+    <MarketingThemeScope className="mkt-page flex min-h-dvh flex-col">
       <style>{`
         @media(max-width:640px){
           .mkt-page [style*="130px 24px"]{padding-top:60px !important;padding-bottom:28px !important;}
@@ -126,6 +127,6 @@ export default function MarketingLayout({
       <Footer />
       <ChatWidget />
       <GeoPrecisionPrompt />
-    </div>
+    </MarketingThemeScope>
   );
 }

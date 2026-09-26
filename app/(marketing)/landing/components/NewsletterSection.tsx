@@ -120,7 +120,7 @@ export default function NewsletterSection() {
             }}>
               Stay ahead with{" "}
               <span style={{
-                background:"linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
+                background:"var(--mk-grad-brand-alt, linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa))",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
               }}>
                 FinovaOS updates

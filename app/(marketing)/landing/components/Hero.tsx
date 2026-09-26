@@ -192,7 +192,7 @@ export default function Hero() {
               }}>
                 Run Your Business with FinovaOS.{" "}
                 <span style={{
-                  background:"linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
+                  background:"var(--mk-grad-brand-alt, linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa))",
                   backgroundSize:"200% auto",
                   WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
                   animation:"gradShift 4s ease infinite",
@@ -418,7 +418,7 @@ export default function Hero() {
                         <div key={l} style={{
                           padding:"3px 10px", borderRadius:7, fontSize:10.5, fontWeight:600,
                           background: i===1 ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
-                          color: i===1 ? "#a5b4fc" : "rgba(var(--ink),var(--ta-28, .28))",
+                          color: i===1 ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-28, .28))",
                           border:`1px solid ${i===1 ? "rgba(99,102,241,.4)" : "rgba(var(--ink),.06)"}`,
                           cursor:"default",
                         }}>{l}</div>
@@ -477,7 +477,7 @@ export default function Hero() {
                             width:28, height:28, borderRadius:8,
                             background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.2)",
                             display:"flex", alignItems:"center", justifyContent:"center",
-                            fontSize:11, fontWeight:800, color:"#a5b4fc", flexShrink:0,
+                            fontSize:11, fontWeight:800, color:"var(--tx-a5b4fc, #a5b4fc)", flexShrink:0,
                           }}>
                             {inv.name[0]}
                           </div>

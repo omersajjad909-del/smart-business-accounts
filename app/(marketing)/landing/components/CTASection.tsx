@@ -205,7 +205,7 @@ export default function CTASection() {
           transition: "all .6s ease .1s",
         }}>
           Your business deserves better<br/>
-          <span style={{ fontStyle: "italic", background: "linear-gradient(135deg,#a5b4fc 0%,#818cf8 40%,#c4b5fd 80%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <span style={{ fontStyle: "italic", background: "var(--mk-grad-soft, linear-gradient(135deg,#a5b4fc 0%,#818cf8 40%,#c4b5fd 80%))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             than spreadsheets.
           </span>
         </h2>

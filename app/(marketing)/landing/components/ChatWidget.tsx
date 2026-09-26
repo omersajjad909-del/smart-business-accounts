@@ -376,7 +376,7 @@ export default function ChatWidget() {
         .cw-d2   { animation: dotBounce 1.2s ease infinite .18s; }
         .cw-d3   { animation: dotBounce 1.2s ease infinite .36s; }
         .cw-input:focus { outline: none; }
-        .cw-input::placeholder { color: rgba(var(--ink),.22); }
+        .cw-input::placeholder { color: rgba(var(--ink),var(--ta-22, .22)); }
         .cw-chip { transition: all .18s; cursor: pointer; }
         .cw-chip:hover { background: rgba(129,140,248,.28) !important; border-color: rgba(129,140,248,.65) !important; color: white !important; transform: translateY(-1px); }
         ::-webkit-scrollbar { width: 3px; }

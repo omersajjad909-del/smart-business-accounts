@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
+import ThemeToggle from "./ThemeToggle"
 
 /* ─── Features Mega Data ─── */
 const FEATURES_COLS = [
@@ -193,7 +194,7 @@ const SHARED_CSS = `
   .fn-feat:hover::after,.fn-feat.open::after { width:100%; }
 
   .fn-ml {
-    font-size:13px; font-weight:500; color:rgba(var(--ink),.45);
+    font-size:13px; font-weight:500; color:rgba(var(--ink),var(--ta-45, .45));
     text-decoration:none; padding:4px 0;
     display:flex; align-items:center; gap:7px;
     font-family:'Outfit',sans-serif; transition:all .2s;
@@ -225,6 +226,15 @@ const SHARED_CSS = `
     transition:all .25s; box-shadow:0 4px 16px rgba(99,102,241,.35);
   }
   .fn-cta:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(99,102,241,.52); }
+  .fn-theme {
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:36px; height:36px; border-radius:10px; cursor:pointer;
+    background:rgba(var(--ink),.05); border:1px solid rgba(var(--ink),.1);
+    color:rgba(var(--ink),.72); transition:all .2s;
+  }
+  .fn-theme:hover { background:rgba(99,102,241,.12); border-color:rgba(99,102,241,.35); color:var(--tx-a5b4fc, #a5b4fc); }
+  .fn-theme svg { transition:transform .35s ease; }
+  .fn-theme:hover svg { transform:rotate(18deg); }
 
   @media(max-width:767px) {
     .fn-desk { display:none !important; }
@@ -451,6 +461,8 @@ export default function Navbar() {
             {/* Desktop right */}
             <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:14 }}>
 
+              <ThemeToggle />
+
               <Link href={`${APP_URL}/auth`}
                 style={{
                   display:"flex", alignItems:"center", gap:6,
@@ -474,12 +486,15 @@ export default function Navbar() {
             </div>
 
             {/* Hamburger */}
-            <button className="fn-ham" onClick={() => setMobileOpen(v => !v)}
-              style={{ background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", borderRadius:10, padding:8, cursor:"pointer", color:"var(--ink-solid, white)", alignItems:"center", justifyContent:"center", transition:"background .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.11)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "rgba(var(--ink),.06)")}>
-              {mobileOpen ? <X size={20}/> : <Menu size={20}/>}
-            </button>
+            <div className="fn-ham" style={{ alignItems:"center", gap:8 }}>
+              <ThemeToggle />
+              <button onClick={() => setMobileOpen(v => !v)}
+                style={{ display:"flex", background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.1)", borderRadius:10, padding:8, cursor:"pointer", color:"var(--ink-solid, white)", alignItems:"center", justifyContent:"center", transition:"background .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.11)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "rgba(var(--ink),.06)")}>
+                {mobileOpen ? <X size={20}/> : <Menu size={20}/>}
+              </button>
+            </div>
           </div>
         </div>
 

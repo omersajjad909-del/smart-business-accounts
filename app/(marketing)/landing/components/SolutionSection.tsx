@@ -497,7 +497,7 @@ export default function SolutionSection() {
               FinovaOS is currently optimized for{" "}
               <span
                 style={{
-                  background: "linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)",
+                  background: "var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}

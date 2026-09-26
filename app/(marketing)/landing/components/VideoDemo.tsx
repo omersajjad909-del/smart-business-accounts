@@ -496,7 +496,7 @@ function InventoryDemo({ step }: { step: number }) {
             Amoxicillin 250mg (48 units) + Cetirizine 10mg (22 units) below minimum threshold.
           </div>
           <div style={{ display:"flex", gap:8 }}>
-            <div style={{ padding:"6px 14px", borderRadius:8, background:"rgba(251,191,36,.15)", border:"1px solid rgba(251,191,36,.3)", fontSize:11, fontWeight:700, color:"#fbbf24" }}>
+            <div style={{ padding:"6px 14px", borderRadius:8, background:"rgba(251,191,36,.15)", border:"1px solid rgba(251,191,36,.3)", fontSize:11, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)" }}>
               Create Purchase Order →
             </div>
           </div>
@@ -844,7 +844,7 @@ export default function VideoDemo() {
           </div>
           <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4vw,52px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-2px", lineHeight:1.08, marginBottom:16 }}>
             See FinovaOS in{" "}
-            <span style={{ background:"linear-gradient(135deg,#818cf8,#6366f1)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+            <span style={{ background:"var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
               action
             </span>
           </h2>

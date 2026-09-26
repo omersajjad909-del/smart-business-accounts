@@ -168,7 +168,7 @@ export default function Footer() {
 
         .ft-link {
           font-size: 13px; font-weight: 400;
-          color: rgba(var(--ink),.35); text-decoration: none;
+          color: rgba(var(--ink),var(--ta-35, .35)); text-decoration: none;
           transition: color .2s, padding-left .2s;
           display: flex; align-items: center; gap: 8px;
           padding: 4px 0; line-height: 1.4;
@@ -180,7 +180,7 @@ export default function Footer() {
           background: rgba(var(--ink),.04);
           border: 1px solid rgba(var(--ink),.08);
           display: flex; align-items: center; justify-content: center;
-          color: rgba(var(--ink),.4);
+          color: rgba(var(--ink),var(--ta-40, .4));
           transition: all .22s; cursor: pointer; text-decoration: none;
           flex-shrink: 0;
         }
@@ -194,7 +194,7 @@ export default function Footer() {
 
         .ft-bot-link {
           font-size: 11.5px; font-weight: 500;
-          color: rgba(var(--ink),.22); text-decoration: none;
+          color: rgba(var(--ink),var(--ta-22, .22)); text-decoration: none;
           transition: color .18s; white-space: nowrap;
         }
         .ft-bot-link:hover { color: rgba(var(--ink),.6); }

@@ -153,14 +153,14 @@ export default function TestimonialsSection() {
             {total > 0 ? (
               <>
                 Trusted by businesses{" "}
-                <span style={{background:"linear-gradient(135deg,#fbbf24,#f97316)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+                <span style={{background:"var(--mk-grad-warm, linear-gradient(135deg,#fbbf24,#f97316))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
                   worldwide
                 </span>
               </>
             ) : (
               <>
                 No borrowed reviews.{" "}
-                <span style={{background:"linear-gradient(135deg,#fbbf24,#f97316)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
+                <span style={{background:"var(--mk-grad-warm, linear-gradient(135deg,#fbbf24,#f97316))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
                   Just the product.
                 </span>
               </>
@@ -199,7 +199,7 @@ export default function TestimonialsSection() {
               demo, not on testimonials.
             </p>
             <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:22, paddingTop:18, borderTop:"1px solid rgba(var(--ink),.07)" }}>
-              <div style={{ width:38, height:38, borderRadius:"50%", flexShrink:0, background:"linear-gradient(135deg,#818cf8,#6366f1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white" }}>
+              <div style={{ width:38, height:38, borderRadius:"50%", flexShrink:0, background:"var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white" }}>
                 US
               </div>
               <div style={{ textAlign:"left" }}>
@@ -233,7 +233,7 @@ export default function TestimonialsSection() {
                 padding:"13px 30px", borderRadius:12, fontSize:14, fontWeight:700,
                 border:"1.5px solid rgba(251,191,36,.3)",
                 background:"linear-gradient(135deg,rgba(251,191,36,.16),rgba(249,115,22,.12))",
-                color:"#fbbf24", textDecoration:"none", transition:"all .25s",
+                color:"var(--tx-fbbf24, #fbbf24)", textDecoration:"none", transition:"all .25s",
               }}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(251,191,36,.55)";}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(251,191,36,.3)";}}

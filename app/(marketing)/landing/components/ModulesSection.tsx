@@ -187,7 +187,7 @@ export default function ModulesSection() {
             letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 16,
           }}>
             60+ features. One platform.{" "}
-            <span style={{ background: "linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ background: "var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Zero add-ons.
             </span>
           </h2>

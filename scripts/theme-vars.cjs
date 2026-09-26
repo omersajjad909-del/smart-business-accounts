@@ -59,7 +59,12 @@ function forWhite(h) {
   // Chroma, not HSL saturation: #f1f5f9 has s≈0.4 but is plainly grey.
   const chroma = (Math.max(...rgb0) - Math.min(...rgb0)) / 255;
   if (chroma < 0.12) { l = Math.min(0.42, Math.max(0.1, 1 - l)); s = Math.min(s, 0.2); }
-  else { l = Math.min(l, 0.45); s = Math.min(s, 0.65); } // deep shades are less saturated
+  else {
+    // Yellow darkened far enough to read on white turns olive; amber is the
+    // colour the eye still reads as "gold" at that lightness.
+    if (hh > 0.1 && hh < 0.17) { hh = 0.085; s = Math.max(s, 0.8); }
+    l = Math.min(l, 0.45); s = Math.min(s, hh === 0.085 ? 0.85 : 0.65); // deep shades are less saturated
+  }
   let rgb = fromHsl([hh, s, l]);
   while (1.05 / (lum(rgb) + 0.05) < 4.5 && l > 0.05) { l -= 0.01; rgb = fromHsl([hh, s, l]); }
   return rgb;
@@ -83,6 +88,11 @@ const body = [
   // Text alpha: .3 of near-black on white is ~2:1. Lift every faint alpha into
   // readable range while keeping the ordering (fainter stays fainter).
   rows(names.ta, (n) => `--ta-${n}: ${Math.min(1, 0.5 + (+n / 100) * 0.7).toFixed(2)};`),
+  "}",
+  // Marketing pages without a light design (lib/marketingTheme.ts): `initial`
+  // makes each var() fall back to the dark colour written in the source.
+  ".mk-force-dark {",
+  rows(Object.entries(names).flatMap(([k, set]) => [...set].map((n) => `${k}-${n}`)), (n) => `--${n}: initial;`),
   "}",
 ].filter(Boolean).join("\n");
 
