@@ -3,7 +3,7 @@
 import toast from "react-hot-toast";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 import { AI_TOOL_META, type AiToolId } from "@/lib/dashboardFeatureRegistry";
@@ -36,7 +36,7 @@ interface ScanResult {
 }
 
 // ── Invoice Gen types
-interface InvoiceGenItem { description: string; qty: number; unitPrice: number; taxRate: number; amount: number }
+interface InvoiceGenItem { description: string; qty: number; unitPrice: number; taxRate: number; amount: number; itemId?: string }
 interface InvoiceDraft {
   customerName: string; customerId: string | null; invoiceNo: string;
   date: string; dueDate: string;
@@ -635,6 +635,27 @@ export default function AICommandCenter() {
   // Invoice Gen state
   const [invoiceGenPrompt, setInvoiceGenPrompt] = useState("");
   const [invoiceDraft, setInvoiceDraft] = useState<InvoiceDraft | null>(null);
+  const router = useRouter();
+
+  // There is no /dashboard/sales-invoice/new — that link was a 404. The
+  // invoice screen already takes a prefilled draft through sessionStorage (it
+  // is how a sales order becomes an invoice), so the AI draft goes the same
+  // way. Its invoice number is left out on purpose: the screen issues the
+  // next free number itself, and the AI's guess may already be taken.
+  function openDraftInSalesInvoice(d: InvoiceDraft) {
+    const toIso = (v: string) => {
+      const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(v || "");
+      return m ? `${m[3]}-${m[2]}-${m[1]}` : v;
+    };
+    sessionStorage.setItem("draft_invoice_from_so", JSON.stringify({
+      customerId: d.customerId || "",
+      customerName: d.customerName,
+      date: toIso(d.date),
+      items: d.items.map((i) => ({ itemId: i.itemId || "", name: i.description, qty: i.qty, unitPrice: i.unitPrice })),
+      notes: d.notes || "",
+    }));
+    router.push("/dashboard/sales-invoice");
+  }
   const [invoiceGenLoading, setInvoiceGenLoading] = useState(false);
   const [invoiceGenError, setInvoiceGenError] = useState<string | null>(null);
 
@@ -3742,9 +3763,11 @@ export default function AICommandCenter() {
                   </div>
                 )}
 
-                <a
-                  href={`/dashboard/sales-invoice/new?customer=${encodeURIComponent(invoiceDraft.customerName)}&customerId=${invoiceDraft.customerId || ""}&total=${invoiceDraft.total}&invoiceNo=${encodeURIComponent(invoiceDraft.invoiceNo)}`}
+                <button
+                  type="button"
+                  onClick={() => openDraftInSalesInvoice(invoiceDraft)}
                   style={{
+                    width: "100%", border: "none", cursor: "pointer", fontFamily: "inherit",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                     marginTop: 18, padding: "12px 0", borderRadius: 11,
                     background: "linear-gradient(135deg,#10b981,#059669)",
@@ -3753,7 +3776,7 @@ export default function AICommandCenter() {
                   }}
                 >
                   🧾 Open in Sales Invoice →
-                </a>
+                </button>
               </div>
             )}
           </div>

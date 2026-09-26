@@ -177,6 +177,25 @@ Rules:
       }
     }
 
+    // Same for the lines: an item the company actually stocks carries its id,
+    // so the sales invoice opens with the item picked, not a blank search box.
+    if (Array.isArray(draft.items) && draft.items.length) {
+      const items = await prisma.itemNew.findMany({
+        where: { companyId, deletedAt: null },
+        select: { id: true, name: true },
+        take: 2000,
+      });
+      const norm = (v: string) => v.toLowerCase().replace(/\s+/g, " ").trim();
+      draft.items = (draft.items as Array<Record<string, unknown>>).map((line) => {
+        const desc = norm(String(line.description || ""));
+        if (!desc) return line;
+        const hit =
+          items.find((it) => norm(it.name) === desc) ??
+          items.find((it) => norm(it.name).includes(desc) || desc.includes(norm(it.name)));
+        return hit ? { ...line, itemId: hit.id, description: hit.name } : line;
+      });
+    }
+
     return NextResponse.json({ draft, generatedAt: new Date().toISOString() });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Unknown error";
