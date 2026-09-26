@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { signJwt, verifyJwt } from "@/lib/auth";
 import type { BusinessType } from "@/lib/businessModules";
+import { seedMinimalChart } from "@/lib/services/accountsSeed";
 import { currencyByCountry } from "@/lib/currency";
 import { prisma } from "@/lib/prisma";
 import {
@@ -64,6 +65,13 @@ async function promotePendingSignup(pendingId: string) {
     await tx.userCompany.create({
       data: { userId: user.id, companyId: company.id, isDefault: true },
     });
+
+    // Seed the chart the app posts to (CASH, AR-CUST, AP-SUP, SALES, …, each
+    // with its partyType). Until now it was only created lazily, when an ADMIN
+    // opened the full Chart of Accounts list — so a customer who went straight
+    // to invoices found no customer, supplier, cash or bank to choose from and
+    // could not record anything. Paying companies logged in for weeks this way.
+    await seedMinimalChart(tx, company.id);
 
     // The pending row is consumed inside the same transaction: if anything above
     // fails, the visitor still has a valid code to retry with.
