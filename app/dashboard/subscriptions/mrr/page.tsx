@@ -73,7 +73,7 @@ export default function MrrArrPage() {
                 </div>
               );
             })}
-            {subscribers.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No subscriber data yet.</div>}
+            {subscribers.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No subscriber data yet.</div>}
           </div>
         </div>
 

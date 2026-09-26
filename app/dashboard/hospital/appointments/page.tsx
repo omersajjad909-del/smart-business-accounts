@@ -84,7 +84,7 @@ export default function AppointmentsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Appointments</h1>
-          <p style={{ margin: "4px 0 0", color: "rgba(var(--ink),0.45)", fontSize: 14 }}>Today – {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+          <p style={{ margin: "4px 0 0", color: "rgba(var(--ink),var(--ta-45, 0.45))", fontSize: 14 }}>Today – {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
         </div>
         <button onClick={() => { setFormError(""); setShowModal(true); }}
           style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
@@ -102,7 +102,7 @@ export default function AppointmentsPage() {
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),0.5)", marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, 0.5))", marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -111,18 +111,18 @@ export default function AppointmentsPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
         {["all", "scheduled", "confirmed", "completed", "cancelled", "no_show"].map(s => (
           <button key={s} onClick={() => setFilterStatus(s)}
-            style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${filterStatus === s ? statusColors[s] || "#3b82f6" : border}`, background: filterStatus === s ? `${statusColors[s] || "#3b82f6"}18` : bg, color: filterStatus === s ? statusColors[s] || "#3b82f6" : "rgba(var(--ink),0.5)", cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 500 }}>
+            style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${filterStatus === s ? statusColors[s] || "#3b82f6" : border}`, background: filterStatus === s ? `${statusColors[s] || "#3b82f6"}18` : bg, color: filterStatus === s ? statusColors[s] || "#3b82f6" : "rgba(var(--ink),var(--ta-50, 0.5))", cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 500 }}>
             {s === "all" ? "All" : statusLabels[s] || s}
           </button>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       {/* Timeline */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.length === 0 && !loading && (
-          <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),0.25)" }}>No appointments found.</div>
+          <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-25, 0.25))" }}>No appointments found.</div>
         )}
         {filtered.map(appt => (
           <div key={appt.id} style={{ ...card, display: "flex", alignItems: "center", gap: 20, padding: isMobile ? "12px 10px" : "16px 20px" }}>
@@ -136,8 +136,8 @@ export default function AppointmentsPage() {
                 <span style={{ background: `${typeColors[appt.type]}22`, color: typeColors[appt.type], padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600 }}>{typeLabels[appt.type] || appt.type}</span>
                 <span style={{ background: `${statusColors[appt.status]}22`, color: statusColors[appt.status], padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600 }}>{statusLabels[appt.status]}</span>
               </div>
-              <div style={{ fontSize: 13, color: "rgba(var(--ink),0.5)" }}>{appt.doctor} &nbsp;·&nbsp; {appt.department}</div>
-              {appt.notes && <div style={{ fontSize: 12, color: "rgba(var(--ink),0.35)", marginTop: 4 }}>{appt.notes}</div>}
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, 0.5))" }}>{appt.doctor} &nbsp;·&nbsp; {appt.department}</div>
+              {appt.notes && <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, 0.35))", marginTop: 4 }}>{appt.notes}</div>}
             </div>
             <div style={{ color: "var(--tx-a78bfa, #a78bfa)", fontSize: 12, fontWeight: 600 }}>{appt.apptNo}</div>
             <div style={{ display: "flex", gap: 8 }}>
@@ -164,19 +164,19 @@ export default function AppointmentsPage() {
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 500, fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Book Appointment</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, 0.5))", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             {formError && <div style={{ marginBottom: "14px", padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Patient Name", "patient"], ["Date", "date"], ["Time", "time"]].map(([label, key]) => (
                 <div key={key}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>{label}</label>
                   <input type={key === "date" ? "date" : key === "time" ? "time" : "text"} value={String((form as Record<string,string>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
                     style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Doctor</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>Doctor</label>
                 <select value={form.doctor} onChange={e => setForm(f => ({ ...f, doctor: e.target.value }))}
                   style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   <option value="">Select Doctor</option>
@@ -184,7 +184,7 @@ export default function AppointmentsPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Department</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>Department</label>
                 <select value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))}
                   style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   <option value="">Select Department</option>
@@ -192,7 +192,7 @@ export default function AppointmentsPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Type</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>Type</label>
                 <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
                   style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontFamily: ff, fontSize: 14 }}>
                   <option value="consultation">Consultation</option>
@@ -201,14 +201,14 @@ export default function AppointmentsPage() {
                 </select>
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Notes</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>Notes</label>
                 <input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#3b82f6", border: "none", borderRadius: 8, color: "#fff", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Book Appointment</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),0.6)", fontFamily: ff, fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, 0.6))", fontFamily: ff, fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

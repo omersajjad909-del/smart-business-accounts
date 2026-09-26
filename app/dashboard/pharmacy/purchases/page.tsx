@@ -82,7 +82,7 @@ export default function PharmacyPurchasesPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
               </tr>
             ))}
-            {!loading && purchases.length === 0 && <tr><td colSpan={8} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No purchase entries yet.</td></tr>}
+            {!loading && purchases.length === 0 && <tr><td colSpan={8} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>No purchase entries yet.</td></tr>}
           </tbody>
         </table>
       </div>

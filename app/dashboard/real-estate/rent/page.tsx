@@ -57,22 +57,22 @@ export default function RentPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>💰 Rent Collection</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Track monthly rent payments</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>💰 Rent Collection</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Track monthly rent payments</p></div>
         <button onClick={() => { setFormError(""); setShowModal(true); }} style={{ padding: "10px 22px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#818cf8,#6366f1)", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Payment</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Records", val: payments.length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Collected", val: `Rs. ${collected.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }, { label: "Pending", val: `Rs. ${pending.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" }, { label: "Overdue", val: payments.filter(p => p.status === "overdue").length, color: "var(--tx-f59e0b, #f59e0b)" }].map(s => (
-          <div key={s.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={card}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead><tr>{["Tenant", "Property", "Month", "Amount", "Due Date", "Status", "Action"].map(h => (
-            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
+            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
           ))}</tr></thead>
           <tbody>
             {payments.map(p => (
@@ -81,7 +81,7 @@ export default function RentPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{p.property}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{p.month}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>Rs. {p.amount.toLocaleString()}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: "rgba(var(--ink),.5)" }}>{p.dueDate}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.dueDate}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <span style={{ display: "inline-block", background: p.status === "paid" ? "#34d39920" : p.status === "overdue" ? "#ef444420" : "#f59e0b20", color: p.status === "paid" ? "#34d399" : p.status === "overdue" ? "#ef4444" : "#f59e0b", borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>{p.status}</span>
                 </td>
@@ -90,7 +90,7 @@ export default function RentPage() {
                 </td>
               </tr>
             ))}
-            {!loading && payments.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No payments recorded yet.</td></tr>}
+            {!loading && payments.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No payments recorded yet.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -103,19 +103,19 @@ export default function RentPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Tenant Name", "tenant", "text"], ["Property", "property", "text"], ["Month (e.g. March 2026)", "month", "text"], ["Due Date", "dueDate", "date"]].map(([label, key, type]) => (
                 <div key={key}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
                     style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Amount (Rs.)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Amount (Rs.)</label>
                 <input type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "linear-gradient(135deg,#818cf8,#6366f1)", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Save</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

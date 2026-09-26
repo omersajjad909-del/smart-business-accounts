@@ -163,7 +163,7 @@ export default function DemoSessionTimer() {
           >
             <div style={{ fontSize: 34, marginBottom: 12 }}>🧹</div>
             <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 8 }}>Clear this workspace?</div>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", lineHeight: 1.7, marginBottom: 20 }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.7, marginBottom: 20 }}>
               Everything in this demo goes — the sample data and anything you have entered.
               You stay signed in on an empty workspace, with the time you have left unchanged.
               This cannot be undone.
@@ -219,7 +219,7 @@ export default function DemoSessionTimer() {
           >
             <div style={{ fontSize: 34, marginBottom: 12 }}>⚠️</div>
             <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 8 }}>End demo session?</div>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", lineHeight: 1.7, marginBottom: 20 }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.7, marginBottom: 20 }}>
               This will log you out and delete all data you created in this demo. This cannot be undone.
             </div>
             <div style={{ display: "flex", gap: 10 }}>

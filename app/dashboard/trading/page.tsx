@@ -147,7 +147,7 @@ export default function TradingOverviewPage() {
               <div key={entry.label} style={{ background: "rgba(var(--ink),.02)", border: `1px solid ${tradingBorder}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 14px" }}>
                 <div style={{ fontSize: 11, color: tradingMuted, marginBottom: 6 }}>{entry.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: entry.color }}>{entry.value}</div>
-                <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 6 }}>{entry.sub}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 6 }}>{entry.sub}</div>
               </div>
             ))}
           </div>
@@ -197,7 +197,7 @@ export default function TradingOverviewPage() {
               ))}
               {recentSales.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No sales invoices yet.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>No sales invoices yet.</td>
                 </tr>
               )}
             </tbody>
@@ -227,7 +227,7 @@ export default function TradingOverviewPage() {
               ))}
               {recentProcurement.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No purchase invoices yet.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>No purchase invoices yet.</td>
                 </tr>
               )}
             </tbody>

@@ -211,7 +211,7 @@ export default function StockOnVanPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Stock on Van</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
             Track van loading, sales movement, and returned quantity per route.
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function StockOnVanPage() {
           { label: "On-Van Balance", value: totalBalance, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -238,7 +238,7 @@ export default function StockOnVanPage() {
           <thead>
             <tr>
               {["Route", "Van", "Item", "Loaded", "Sold", "Returned", "Balance", "Date", "Actions"].map((header) => (
-                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
+                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
                   {header}
                 </th>
               ))}
@@ -267,7 +267,7 @@ export default function StockOnVanPage() {
             ))}
             {!stockRecords.loading && loads.length === 0 && (
               <tr>
-                <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>
+                <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                   No stock loading records yet.
                 </td>
               </tr>
@@ -283,41 +283,41 @@ export default function StockOnVanPage() {
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Route</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Route</label>
                 <select value={form.routeId} onChange={(event) => syncRoute(event.target.value)} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
                   <option value="">Select route</option>
                   {routes.map((route) => <option key={route.id} value={route.id}>{route.name} - {route.area}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Van</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Van</label>
                 <input type="text" value={form.van} onChange={(event) => setForm((prev) => ({ ...prev, van: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Item</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Item</label>
                 <select value={form.itemId} onChange={(event) => syncItem(event.target.value)} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
                   <option value="">Select item</option>
                   {items.map((item) => <option key={item.id} value={item.id}>{item.name} (Avail: {item.availableQty})</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Date</label>
                 <input type="date" value={form.date} onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Loaded Qty</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Loaded Qty</label>
                 <input type="number" min={0} value={form.loadQty} onChange={(event) => setForm((prev) => ({ ...prev, loadQty: Number(event.target.value) }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Sold Qty</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Sold Qty</label>
                 <input type="number" min={0} value={form.soldQty} onChange={(event) => setForm((prev) => ({ ...prev, soldQty: Number(event.target.value) }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Returned Qty</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Returned Qty</label>
                 <input type="number" min={0} value={form.returnedQty} onChange={(event) => setForm((prev) => ({ ...prev, returnedQty: Number(event.target.value) }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Loaded Value</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Loaded Value</label>
                 <input type="number" min={0} value={form.amount} onChange={(event) => setForm((prev) => ({ ...prev, amount: Number(event.target.value) }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
             </div>
@@ -325,7 +325,7 @@ export default function StockOnVanPage() {
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 {editingId ? "Update Load" : "Save Load"}
               </button>
-              <button onClick={closeModal} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${distributionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>
+              <button onClick={closeModal} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${distributionBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>

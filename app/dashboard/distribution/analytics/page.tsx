@@ -31,7 +31,7 @@ export default function DistributionAnalyticsPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: distributionFont, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Distribution Analytics</h1>
-        <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
           Monitor route productivity, delivery completion, stock movement, and recovery performance.
         </p>
       </div>
@@ -39,7 +39,7 @@ export default function DistributionAnalyticsPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {cards.map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -50,7 +50,7 @@ export default function DistributionAnalyticsPage() {
           <thead>
             <tr>
               {["Route", "Area", "Driver", "Deliveries", "Delivered", "Failed", "Loaded Qty", "Sold Qty", "Recovery", "Revenue", "Collected"].map((header) => (
-                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
+                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
                   {header}
                 </th>
               ))}
@@ -74,7 +74,7 @@ export default function DistributionAnalyticsPage() {
             ))}
             {data.routeMetrics.length === 0 && (
               <tr>
-                <td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>
+                <td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                   No route analytics available yet.
                 </td>
               </tr>

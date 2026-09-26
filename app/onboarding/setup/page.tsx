@@ -153,7 +153,7 @@ function SetupPageInner() {
           }}>
             {current.label}
           </h2>
-          <p style={{fontSize:13,color:"rgba(var(--ink),.4)",margin:"0 0 32px",lineHeight:1.6}}>
+          <p style={{fontSize:13,color:"rgba(var(--ink),var(--ta-40, .4))",margin:"0 0 32px",lineHeight:1.6}}>
             {current.sub}
           </p>
         </div>
@@ -169,7 +169,7 @@ function SetupPageInner() {
               boxShadow:"0 0 12px rgba(99,102,241,.6)",
             }}/>
           </div>
-          <div style={{fontSize:12,fontWeight:700,color:"rgba(var(--ink),.3)",textAlign:"right"}}>
+          <div style={{fontSize:12,fontWeight:700,color:"rgba(var(--ink),var(--ta-30, .3))",textAlign:"right"}}>
             {Math.round(progress)}%
           </div>
         </div>
@@ -220,8 +220,8 @@ function SetupPageInner() {
         </div>
 
         {businessType && (
-          <div style={{marginTop:16,fontSize:11,color:"rgba(var(--ink),.2)"}}>
-            Configured for: <span style={{color:"rgba(var(--ink),.45)",fontWeight:600}}>
+          <div style={{marginTop:16,fontSize:11,color:"rgba(var(--ink),var(--ta-20, .2))"}}>
+            Configured for: <span style={{color:"rgba(var(--ink),var(--ta-45, .45))",fontWeight:600}}>
               {businessType.replace(/_/g," ").replace(/\b\w/g,l=>l.toUpperCase())}
             </span>
           </div>

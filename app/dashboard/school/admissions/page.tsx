@@ -83,7 +83,7 @@ export default function SchoolAdmissionsPage() {
                 </td>
               </tr>
             ))}
-            {!loading && admissions.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No admissions yet.</td></tr>}
+            {!loading && admissions.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No admissions yet.</td></tr>}
           </tbody>
         </table>
       </div>

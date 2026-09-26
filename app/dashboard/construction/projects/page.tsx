@@ -141,13 +141,13 @@ export default function ConstructionProjectsPage() {
           { label: "Spent to Date", val: `Rs. ${totalSpent.toLocaleString()}`, color: "var(--tx-ef4444, #ef4444)" },
         ].map((s) => (
           <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {projects.map((project) => (
@@ -155,7 +155,7 @@ export default function ConstructionProjectsPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, gap: 16, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{project.name}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>{project.client} · {project.site || project.location} · {project.startDate} to {project.endDate}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{project.client} · {project.site || project.location} · {project.startDate} to {project.endDate}</div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <span style={{ display: "inline-block", background: `${STATUS_COLOR[project.status]}20`, color: STATUS_COLOR[project.status], borderRadius: 6, padding: "2px 10px", fontSize: 11, fontWeight: 600 }}>{project.status.replace("_", " ")}</span>
@@ -174,7 +174,7 @@ export default function ConstructionProjectsPage() {
               <div style={{ width: `${project.progress}%`, height: "100%", borderRadius: 4, background: STATUS_COLOR[project.status] }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-              <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)" }}>{project.progress}% complete</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{project.progress}% complete</div>
               {(project.status === "active" || project.status === "on_hold") && (
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => bumpProgress(project.id, 10)} style={{ padding: "5px 10px", borderRadius: 6, border: "1px solid rgba(var(--ink),.12)", background: "rgba(var(--ink),.05)", color: "var(--ink-solid, #fff)", fontSize: 11, cursor: "pointer" }}>+10%</button>
@@ -184,7 +184,7 @@ export default function ConstructionProjectsPage() {
             </div>
           </div>
         ))}
-        {!loading && projects.length === 0 && <div style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No projects yet.</div>}
+        {!loading && projects.length === 0 && <div style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No projects yet.</div>}
       </div>
 
       {showModal && (
@@ -194,26 +194,26 @@ export default function ConstructionProjectsPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Project Name", "name", "text", "span 2"], ["Client", "client", "text", ""], ["Location", "location", "text", ""], ["Start Date", "startDate", "date", ""], ["End Date", "endDate", "date", ""]].map(([label, key, type, col]) => (
                 <div key={key} style={{ gridColumn: col || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Assigned Site</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Assigned Site</label>
                 <select value={form.site} onChange={(e) => setForm((f) => ({ ...f, site: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   <option value="">Select site</option>
                   {sites.map((site) => <option key={site.id} value={site.name}>{site.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Budget (Rs.)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Budget (Rs.)</label>
                 <input type="number" value={form.budget} onChange={(e) => setForm((f) => ({ ...f, budget: Number(e.target.value) }))} style={{ width: "100%", background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Create Project</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

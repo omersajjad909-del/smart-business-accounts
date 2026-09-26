@@ -86,7 +86,7 @@ export default function PlanGate({ feature, requiredPlan, children }: Props) {
         <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)", margin: "0 0 10px" }}>
           {info.label} — Upgrade Required
         </h2>
-        <p style={{ fontSize: 14, color: "rgba(var(--ink),.45)", maxWidth: 380, lineHeight: 1.7, margin: "0 0 28px" }}>
+        <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))", maxWidth: 380, lineHeight: 1.7, margin: "0 0 28px" }}>
           This feature is available on the <strong style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>{info.plan}</strong> plan and above.
           Upgrade your subscription to unlock {info.label}.
         </p>
@@ -104,7 +104,7 @@ export default function PlanGate({ feature, requiredPlan, children }: Props) {
             display: "inline-flex", alignItems: "center",
             padding: "12px 20px", borderRadius: 10,
             border: "1.5px solid rgba(var(--ink),.1)",
-            color: "rgba(var(--ink),.6)", fontWeight: 600, fontSize: 14, textDecoration: "none",
+            color: "rgba(var(--ink),var(--ta-60, .6))", fontWeight: 600, fontSize: 14, textDecoration: "none",
           }}>
             Back to Dashboard
           </Link>

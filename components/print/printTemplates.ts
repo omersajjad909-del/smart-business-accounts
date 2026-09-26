@@ -55,10 +55,10 @@ const THEMES: Record<PrintTemplateId, PrintTheme> = {
   // nothing spent on decoration.
   classic: {
     id: "classic",
-    ink: "#111111", muted: "#555555", rule: "#111111",
+    ink: "#111111", muted: "#555555", rule: "var(--dkb-111111, #111111)",
     headBg: "#f2f2f2", headInk: "#111111",
     zebra: null,
-    band: "none", bandBg: "#111111", bandInk: "#ffffff",
+    band: "none", bandBg: "var(--dk-111111, #111111)", bandInk: "var(--ink-solid, #ffffff)",
     netFill: null, netInk: "#111111",
     radius: 0, titleAlign: "left", cellPad: "3px 5px", poweredChip: false,
   },
@@ -70,8 +70,8 @@ const THEMES: Record<PrintTemplateId, PrintTheme> = {
     ink: "#111111", muted: "#6b6b6b", rule: "#c9c9c9",
     headBg: "#ffffff", headInk: "#111111",
     zebra: null,
-    band: "none", bandBg: "#111111", bandInk: "#ffffff",
-    netFill: "#111111", netInk: "#ffffff",
+    band: "none", bandBg: "var(--dk-111111, #111111)", bandInk: "var(--ink-solid, #ffffff)",
+    netFill: "#111111", netInk: "var(--ink-solid, #ffffff)",
     radius: 6, titleAlign: "center", cellPad: "5px 6px", poweredChip: true,
   },
 
@@ -79,11 +79,11 @@ const THEMES: Record<PrintTemplateId, PrintTheme> = {
   // letterhead, reversed column headings, the total in a black bar.
   bold: {
     id: "bold",
-    ink: "#111111", muted: "#555555", rule: "#333333",
-    headBg: "#111111", headInk: "#ffffff",
+    ink: "#111111", muted: "#555555", rule: "var(--dkb-333333, #333333)",
+    headBg: "var(--dk-111111, #111111)", headInk: "var(--ink-solid, #ffffff)",
     zebra: null,
-    band: "solid", bandBg: "#111111", bandInk: "#ffffff",
-    netFill: "#111111", netInk: "#ffffff",
+    band: "solid", bandBg: "var(--dk-111111, #111111)", bandInk: "var(--ink-solid, #ffffff)",
+    netFill: "#111111", netInk: "var(--ink-solid, #ffffff)",
     radius: 2, titleAlign: "left", cellPad: "4px 6px", poweredChip: true,
   },
 
@@ -93,10 +93,10 @@ const THEMES: Record<PrintTemplateId, PrintTheme> = {
   modern: {
     id: "modern",
     ink: "#16203f", muted: "#5a678c", rule: "#dbe1ee",
-    headBg: "#1b2a63", headInk: "#ffffff",
+    headBg: "#1b2a63", headInk: "var(--ink-solid, #ffffff)",
     zebra: "#f5f7fc",
-    band: "solid", bandBg: "#1b2a63", bandInk: "#ffffff",
-    netFill: "#1b2a63", netInk: "#ffffff",
+    band: "solid", bandBg: "#1b2a63", bandInk: "var(--ink-solid, #ffffff)",
+    netFill: "#1b2a63", netInk: "var(--ink-solid, #ffffff)",
     radius: 10, titleAlign: "left", cellPad: "6px 7px", poweredChip: false,
   },
 };

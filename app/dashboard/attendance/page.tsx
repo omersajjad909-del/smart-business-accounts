@@ -18,12 +18,12 @@ interface AttendanceRecord {
 interface Employee { id: string; firstName: string; lastName: string; department: string; shiftStart?: string; shiftEnd?: string; }
 
 const SC: Record<string, { bg: string; text: string; border: string; label: string }> = {
-  PRESENT:  { bg: "rgba(52,211,153,.15)",  text: "#34d399", border: "rgba(52,211,153,.3)",  label: "Present"  },
-  ABSENT:   { bg: "rgba(248,113,113,.15)", text: "#f87171", border: "rgba(248,113,113,.3)", label: "Absent"   },
-  HOLIDAY:  { bg: "rgba(167,139,250,.15)", text: "#a78bfa", border: "rgba(167,139,250,.3)", label: "Holiday"  },
-  LEAVE:    { bg: "rgba(251,191,36,.15)",  text: "#fbbf24", border: "rgba(251,191,36,.3)",  label: "Leave"    },
-  HALF_DAY: { bg: "rgba(251,191,36,.15)",  text: "#fbbf24", border: "rgba(251,191,36,.3)",  label: "Half Day" },
-  LATE:     { bg: "rgba(99,102,241,.15)",  text: "#818cf8", border: "rgba(99,102,241,.3)",  label: "Late"     },
+  PRESENT:  { bg: "rgba(52,211,153,.15)",  text: "var(--tx-34d399, #34d399)", border: "rgba(52,211,153,.3)",  label: "Present"  },
+  ABSENT:   { bg: "rgba(248,113,113,.15)", text: "var(--tx-f87171, #f87171)", border: "rgba(248,113,113,.3)", label: "Absent"   },
+  HOLIDAY:  { bg: "rgba(167,139,250,.15)", text: "var(--tx-a78bfa, #a78bfa)", border: "rgba(167,139,250,.3)", label: "Holiday"  },
+  LEAVE:    { bg: "rgba(251,191,36,.15)",  text: "var(--tx-fbbf24, #fbbf24)", border: "rgba(251,191,36,.3)",  label: "Leave"    },
+  HALF_DAY: { bg: "rgba(251,191,36,.15)",  text: "var(--tx-fbbf24, #fbbf24)", border: "rgba(251,191,36,.3)",  label: "Half Day" },
+  LATE:     { bg: "rgba(99,102,241,.15)",  text: "var(--tx-818cf8, #818cf8)", border: "rgba(99,102,241,.3)",  label: "Late"     },
 };
 
 const DEPT_COLORS: Record<string, string> = {

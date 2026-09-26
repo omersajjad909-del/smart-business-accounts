@@ -44,17 +44,17 @@ export default function HousekeepingPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🧹 Housekeeping</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage housekeeping tasks</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🧹 Housekeeping</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage housekeeping tasks</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Task</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Tasks", val: tasks.length, color: "var(--tx-f97316, #f97316)" }, { label: "Pending", val: tasks.filter(t => t.status === "pending").length, color: "var(--tx-f59e0b, #f59e0b)" }, { label: "Completed Today", val: tasks.filter(t => t.status === "completed").length, color: "var(--tx-34d399, #34d399)" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {tasks.map(t => (
@@ -62,10 +62,10 @@ export default function HousekeepingPage() {
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 4 }}>
                 <span style={{ fontWeight: 700 }}>Room {t.room}</span>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>{t.task}</span>
+                <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{t.task}</span>
                 {t.priority === "urgent" && <span style={{ display: "inline-block", background: "rgba(239,68,68,.15)", color: "#ef4444", borderRadius: 4, padding: "1px 6px", fontSize: 10, fontWeight: 600 }}>URGENT</span>}
               </div>
-              <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>Assigned: {t.assignedTo} {t.notes && `· ${t.notes}`}</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Assigned: {t.assignedTo} {t.notes && `· ${t.notes}`}</div>
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <span style={{ display: "inline-block", background: `${STATUS_COLOR[t.status]}20`, color: STATUS_COLOR[t.status], borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{t.status.replace("_", " ")}</span>
@@ -78,7 +78,7 @@ export default function HousekeepingPage() {
             </div>
           </div>
         ))}
-        {!loading && tasks.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No housekeeping tasks.</div>}
+        {!loading && tasks.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No housekeeping tasks.</div>}
       </div>
 
       {showModal && (
@@ -87,34 +87,34 @@ export default function HousekeepingPage() {
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Task</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Room Number</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Room Number</label>
                 <input type="text" value={form.room} onChange={e => setForm(f => ({ ...f, room: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Task</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Task</label>
                 <select value={form.task} onChange={e => setForm(f => ({ ...f, task: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {["Cleaning", "Bed Change", "Restocking", "Deep Clean", "Maintenance Check"].map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Assigned To</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Assigned To</label>
                 <input type="text" value={form.assignedTo} onChange={e => setForm(f => ({ ...f, assignedTo: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Priority</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Priority</label>
                 <select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   <option value="normal">Normal</option><option value="urgent">Urgent</option>
                 </select>
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Notes</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Notes</label>
                 <input type="text" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Task</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

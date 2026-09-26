@@ -256,7 +256,7 @@ export default function DistributionCollectionsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Distribution Collections</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
             Record field recoveries and reconcile them into payment receipts when needed.
           </p>
         </div>
@@ -272,7 +272,7 @@ export default function DistributionCollectionsPage() {
           { label: "Reconciled", value: `Rs. ${settledAmount.toLocaleString()}`, color: "var(--tx-38bdf8, #38bdf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -283,7 +283,7 @@ export default function DistributionCollectionsPage() {
           <thead>
             <tr>
               {["Customer", "Route", "Invoice Ref", "Mode", "Amount", "Receipt", "Date", "Status", "Actions"].map((header) => (
-                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
+                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
                   {header}
                 </th>
               ))}
@@ -321,7 +321,7 @@ export default function DistributionCollectionsPage() {
             ))}
             {!collectionRecords.loading && collections.length === 0 && (
               <tr>
-                <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>
+                <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                   No distribution collections yet.
                 </td>
               </tr>
@@ -337,33 +337,33 @@ export default function DistributionCollectionsPage() {
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Customer</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Customer</label>
                 <select value={form.customerId} onChange={(event) => syncCustomer(event.target.value)} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
                   <option value="">Select customer</option>
                   {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Route</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Route</label>
                 <select value={form.routeId} onChange={(event) => syncRoute(event.target.value)} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
                   <option value="">Select route</option>
                   {routes.map((route) => <option key={route.id} value={route.id}>{route.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Invoice Ref</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Invoice Ref</label>
                 <input type="text" value={form.invoiceRef} onChange={(event) => setForm((prev) => ({ ...prev, invoiceRef: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Date</label>
                 <input type="date" value={form.date} onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Amount</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Amount</label>
                 <input type="number" min={0} value={form.amount} onChange={(event) => setForm((prev) => ({ ...prev, amount: Number(event.target.value) }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Payment Mode</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Payment Mode</label>
                 <select value={form.paymentMode} onChange={(event) => setForm((prev) => ({ ...prev, paymentMode: event.target.value as CollectionForm["paymentMode"] }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
                   <option value="CASH">Cash</option>
                   <option value="BANK_TRANSFER">Bank Transfer</option>
@@ -372,7 +372,7 @@ export default function DistributionCollectionsPage() {
               </div>
               {form.paymentMode !== "CASH" && (
                 <div>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Bank Account</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Bank Account</label>
                   <select value={form.bankAccountId} onChange={(event) => setForm((prev) => ({ ...prev, bankAccountId: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }}>
                     <option value="">Select bank</option>
                     {bankAccounts.map((account) => <option key={account.id} value={account.id}>{account.bankName} - {account.accountName}</option>)}
@@ -380,15 +380,15 @@ export default function DistributionCollectionsPage() {
                 </div>
               )}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Reference No</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Reference No</label>
                 <input type="text" value={form.referenceNo} onChange={(event) => setForm((prev) => ({ ...prev, referenceNo: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Narration</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Narration</label>
                 <input type="text" value={form.narration} onChange={(event) => setForm((prev) => ({ ...prev, narration: event.target.value }))} style={{ width: "100%", background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14 }} />
               </div>
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16, fontSize: 13, color: "rgba(var(--ink),.7)" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16, fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>
               <input type="checkbox" checked={posting} onChange={(event) => setPosting(event.target.checked)} />
               Post this collection into Payment Receipts for ledger impact
             </label>
@@ -396,7 +396,7 @@ export default function DistributionCollectionsPage() {
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 Save Collection
               </button>
-              <button onClick={closeModal} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${distributionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>
+              <button onClick={closeModal} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${distributionBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>

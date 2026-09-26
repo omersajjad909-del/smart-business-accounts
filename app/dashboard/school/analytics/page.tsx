@@ -66,7 +66,7 @@ export default function SchoolAnalyticsPage() {
                 <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(classMix).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No student records yet.</div>}
+            {Object.keys(classMix).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No student records yet.</div>}
           </div>
         </div>
 
@@ -96,7 +96,7 @@ export default function SchoolAnalyticsPage() {
                 <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>Rs. {amount.toLocaleString()}</span>
               </div>
             ))}
-            {Object.keys(feeByMonth).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No fee records yet.</div>}
+            {Object.keys(feeByMonth).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No fee records yet.</div>}
           </div>
         </div>
 
@@ -112,7 +112,7 @@ export default function SchoolAnalyticsPage() {
                 </div>
               );
             })}
-            {Object.keys(examByClass).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No exam records yet.</div>}
+            {Object.keys(examByClass).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No exam records yet.</div>}
           </div>
         </div>
       </div>

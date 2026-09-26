@@ -21,7 +21,7 @@ const PLANS = [
   {
     slug: "starter", name: "Starter", monthly: 49, featured: false,
     tagline: "For small businesses just getting started",
-    color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.22)", dim: "rgba(129,140,248,.08)", border: "rgba(129,140,248,.25)",
+    color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.22)", dim: "rgba(var(--txr-818cf8, 129,140,248),.08)", border: "rgba(129,140,248,.25)",
     gradientFrom: "#6366f1", gradientTo: "#4f46e5",
     features: [
       { text: "Up to 5 users", included: true },
@@ -40,7 +40,7 @@ const PLANS = [
   {
     slug: "professional", name: "Professional", monthly: 99, featured: true,
     tagline: "Most popular for growing businesses",
-    color: "var(--tx-a5b4fc, #a5b4fc)", glow: "rgba(165,180,252,.28)", dim: "rgba(165,180,252,.1)", border: "rgba(165,180,252,.5)",
+    color: "var(--tx-a5b4fc, #a5b4fc)", glow: "rgba(165,180,252,.28)", dim: "rgba(var(--txr-a5b4fc, 165,180,252),.1)", border: "rgba(165,180,252,.5)",
     gradientFrom: "#818cf8", gradientTo: "#6366f1",
     features: [
       { text: "Up to 20 users", included: true },
@@ -60,7 +60,7 @@ const PLANS = [
   {
     slug: "enterprise", name: "Enterprise", monthly: 249, featured: false,
     tagline: "Tailored for larger teams with more rollout support",
-    color: "var(--tx-c4b5fd, #c4b5fd)", glow: "rgba(196,181,253,.22)", dim: "rgba(196,181,253,.07)", border: "rgba(196,181,253,.22)",
+    color: "var(--tx-c4b5fd, #c4b5fd)", glow: "rgba(196,181,253,.22)", dim: "rgba(var(--txr-c4b5fd, 196,181,253),.07)", border: "rgba(196,181,253,.22)",
     gradientFrom: "#7c3aed", gradientTo: "#6d28d9",
     features: [
       { text: "Unlimited users", included: true },
@@ -274,13 +274,13 @@ export default function ChoosePlanPage() {
       <div style={{ background:"linear-gradient(160deg,var(--dk-06071a, #06071a) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)", minHeight:"100vh", padding:"48px 24px 80px", fontFamily:"'Outfit','DM Sans',sans-serif", color:"var(--ink-solid, #fff)", display:"flex", alignItems:"center", justifyContent:"center" }}>
         <div style={{ maxWidth:560, width:"100%" }}>
           {/* Back */}
-          <a href="/pricing" style={{ fontSize:13, color:"rgba(var(--ink),.4)", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginBottom:32 }}>← Back to Pricing</a>
+          <a href="/pricing" style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginBottom:32 }}>← Back to Pricing</a>
 
           {/* Badge */}
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(124,58,237,.12)", border:"1px solid rgba(124,58,237,.3)", borderRadius:100, padding:"5px 14px", fontSize:12, color:"var(--tx-a78bfa, #a78bfa)", fontWeight:700, marginBottom:20 }}>⚡ Power Add-On</div>
 
           <h1 style={{ fontSize:"clamp(26px,5vw,38px)", fontWeight:900, margin:"0 0 10px", letterSpacing:"-.02em" }}>AI Business Automation</h1>
-          <p style={{ color:"rgba(var(--ink),.45)", fontSize:15, marginBottom:36 }}>Add to your existing plan. 8 automation tools in one add-on.</p>
+          <p style={{ color:"rgba(var(--ink),var(--ta-45, .45))", fontSize:15, marginBottom:36 }}>Add to your existing plan. 8 automation tools in one add-on.</p>
 
           {/* Billing toggle */}
           <div style={{ display:"flex", gap:8, marginBottom:32 }}>
@@ -297,7 +297,7 @@ export default function ChoosePlanPage() {
             <div style={{ fontSize:13, color:"var(--tx-a78bfa, #a78bfa)", fontWeight:700, marginBottom:8 }}>AUTOMATION ADD-ON</div>
             <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:6 }}>
               <span style={{ fontSize:52, fontWeight:900, letterSpacing:"-.03em" }}>{price}</span>
-              <span style={{ fontSize:14, color:"rgba(var(--ink),.4)" }}>/month</span>
+              <span style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))" }}>/month</span>
             </div>
             {billing === "yearly" && <div style={{ fontSize:13, color:"var(--tx-34d399, #34d399)", marginBottom:20 }}>Billed yearly · No hidden fees</div>}
 
@@ -321,7 +321,7 @@ export default function ChoosePlanPage() {
                   <span style={{ fontSize:18 }}>✅</span>
                   <div>
                     <div style={{ fontSize:13, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>Logged in as {loggedInUser.email}</div>
-                    <div style={{ fontSize:12, color:"rgba(var(--ink),.4)" }}>Your existing plan and company info will be used</div>
+                    <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Your existing plan and company info will be used</div>
                   </div>
                 </div>
                 <a href={`/onboarding/payment/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ display:"block", textAlign:"center", padding:"14px 28px", borderRadius:12, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"#fff", textDecoration:"none", fontSize:15, fontWeight:800, boxShadow:"0 0 30px rgba(124,58,237,.4)" }}>
@@ -332,13 +332,13 @@ export default function ChoosePlanPage() {
               <div>
                 <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:10, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.2)", marginBottom:14 }}>
                   <span style={{ fontSize:18 }}>ℹ️</span>
-                  <div style={{ fontSize:13, color:"rgba(var(--ink),.55)" }}>Already have a plan? <strong style={{ color:"var(--tx-fbbf24, #fbbf24)" }}>Log in first</strong> — no need to re-enter your details.</div>
+                  <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-55, .55))" }}>Already have a plan? <strong style={{ color:"var(--tx-fbbf24, #fbbf24)" }}>Log in first</strong> — no need to re-enter your details.</div>
                 </div>
                 <div style={{ display:"flex", gap:10 }}>
                   <a href={`/login?next=/onboarding/choose-plan?addon=automation`} style={{ flex:1, display:"block", textAlign:"center", padding:"13px 20px", borderRadius:12, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"#fff", textDecoration:"none", fontSize:14, fontWeight:800, boxShadow:"0 0 30px rgba(124,58,237,.4)" }}>
                     Log In & Add →
                   </a>
-                  <a href={`/onboarding/signup/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ flex:1, display:"block", textAlign:"center", padding:"13px 20px", borderRadius:12, border:"1px solid rgba(var(--ink),.15)", color:"rgba(var(--ink),.7)", textDecoration:"none", fontSize:14, fontWeight:600 }}>
+                  <a href={`/onboarding/signup/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ flex:1, display:"block", textAlign:"center", padding:"13px 20px", borderRadius:12, border:"1px solid rgba(var(--ink),.15)", color:"rgba(var(--ink),var(--ta-70, .7))", textDecoration:"none", fontSize:14, fontWeight:600 }}>
                     New Account
                   </a>
                 </div>
@@ -346,7 +346,7 @@ export default function ChoosePlanPage() {
             )}
           </div>
 
-          <p style={{ fontSize:12, color:"rgba(var(--ink),.3)", textAlign:"center" }}>Add to any existing plan · Cancel anytime · Instant activation</p>
+          <p style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", textAlign:"center" }}>Add to any existing plan · Cancel anytime · Instant activation</p>
         </div>
       </div>
     );
@@ -382,7 +382,7 @@ export default function ChoosePlanPage() {
       {showCustom && (
         <div style={{ position:"fixed", inset:0, zIndex:1000, background:"rgba(var(--dkr-06071a, 6,7,26),0.95)", backdropFilter:"blur(20px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
           <div style={{ width:"100%", maxWidth:640, background:"rgba(var(--ink),.04)", border:"1.5px solid rgba(var(--ink),.1)", borderRadius:24, padding:"36px 40px", position:"relative", boxShadow:"0 32px 80px rgba(0,0,0,.5)", maxHeight:"90vh", overflowY:"auto" }}>
-            <button onClick={()=>setShowCustom(false)} style={{ position:"absolute", top:20, right:20, background:"none", border:"none", color:"rgba(var(--ink),.4)", cursor:"pointer", fontSize:24, lineHeight:1 }}>✕</button>
+            <button onClick={()=>setShowCustom(false)} style={{ position:"absolute", top:20, right:20, background:"none", border:"none", color:"rgba(var(--ink),var(--ta-40, .4))", cursor:"pointer", fontSize:24, lineHeight:1 }}>✕</button>
 
             <div style={{ marginBottom:28 }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:22, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", fontSize:11, fontWeight:800, color:"var(--tx-34d399, #34d399)", letterSpacing:".06em", textTransform:"uppercase", marginBottom:14 }}>
@@ -390,7 +390,7 @@ export default function ChoosePlanPage() {
                 Custom Plan Builder
               </div>
               <h2 style={{ fontFamily:"Lora,serif", fontSize:28, fontWeight:700, color:"var(--ink-solid, white)", margin:"0 0 8px" }}>Build Your Plan</h2>
-              <p style={{ fontSize:14, color:"rgba(var(--ink),.4)", margin:0 }}>Select modules you need. Price updates in real time.</p>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))", margin:0 }}>Select modules you need. Price updates in real time.</p>
             </div>
 
             {/* Module grid */}
@@ -405,7 +405,7 @@ export default function ChoosePlanPage() {
                     <span style={{ fontSize:20 }}>{mod.icon}</span>
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ fontSize:13, fontWeight:700, color:on?"var(--tx-34d399, #34d399)":"white", lineHeight:1.3 }}>{mod.name}</div>
-                      <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", marginTop:2 }}>{formatPrice(mod.price)}/mo</div>
+                      <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>{formatPrice(mod.price)}/mo</div>
                     </div>
                     <div style={{ width:18, height:18, borderRadius:"50%", background:on?"#34d399":"transparent", border:`1.5px solid ${on?"#34d399":"rgba(var(--ink),.2)"}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                       {on && <svg width="8" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
@@ -418,14 +418,14 @@ export default function ChoosePlanPage() {
             {/* Price + CTA */}
             <div style={{ borderTop:"1px solid rgba(var(--ink),.08)", paddingTop:24, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
               <div>
-                <div style={{ fontSize:11, fontWeight:800, color:"rgba(var(--ink),.3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:4 }}>
+                <div style={{ fontSize:11, fontWeight:800, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".08em", marginBottom:4 }}>
                   {selectedModules.length} module{selectedModules.length!==1?"s":""} · {billing==="yearly"?"Billed yearly (20% off)":"Monthly billing"}
                 </div>
                 <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
                   <span style={{ fontFamily:"Lora,serif", fontSize:40, fontWeight:700, color:"var(--tx-34d399, #34d399)", lineHeight:1 }}>
                     {formatPrice(billing==="yearly" ? Math.round(customPrice*0.8) : customPrice)}
                   </span>
-                  <span style={{ fontSize:13, color:"rgba(var(--ink),.4)", paddingBottom:6 }}>/mo</span>
+                  <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", paddingBottom:6 }}>/mo</span>
                 </div>
               </div>
               <button onClick={handleCustomContinue} disabled={selectedModules.length===0}
@@ -443,14 +443,14 @@ export default function ChoosePlanPage() {
         {/* Top nav */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:36, flexWrap:"wrap", gap:12,
           opacity:visible?1:0, transition:"opacity .5s ease" }}>
-          <Link href="/login" style={{ color:"rgba(var(--ink),.7)", fontWeight:600, fontSize:13, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8 }}>
+          <Link href="/login" style={{ color:"rgba(var(--ink),var(--ta-70, .7))", fontWeight:600, fontSize:13, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8 }}>
             <span style={{ fontSize:18 }}>←</span> Back to Login
           </Link>
           <div style={{ display:"flex", alignItems:"center", gap:14, flexWrap:"wrap", justifyContent:"flex-end" }}>
             <Link href="/pricing" style={{ fontSize:12, color:"var(--tx-a5b4fc, #a5b4fc)", fontWeight:700, textDecoration:"none" }}>
               View Full Pricing
             </Link>
-            <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", fontWeight:600 }}>Step 1 of 3 · Choose your plan</div>
+            <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:600 }}>Step 1 of 3 · Choose your plan</div>
           </div>
         </div>
 
@@ -470,7 +470,7 @@ export default function ChoosePlanPage() {
             </span>
           </h1>
 
-          <p style={{ fontSize:15, color:"rgba(var(--ink),.4)", maxWidth:500, margin:"0 auto 28px", lineHeight:1.8 }}>
+          <p style={{ fontSize:15, color:"rgba(var(--ink),var(--ta-40, .4))", maxWidth:500, margin:"0 auto 28px", lineHeight:1.8 }}>
             One price per company. No per-seat fees. No hidden fees.
           </p>
 
@@ -480,7 +480,7 @@ export default function ChoosePlanPage() {
               <button key={b} onClick={()=>setBilling(b)}
                 style={{ padding:"9px 24px", borderRadius:9, fontSize:13, fontWeight:600, fontFamily:"inherit", border:"none", cursor:"pointer", transition:"all .25s",
                   background:billing===b?"rgba(99,102,241,.8)":"transparent",
-                  color:billing===b?"white":"rgba(var(--ink),.45)",
+                  color:billing===b?"white":"rgba(var(--ink),var(--ta-45, .45))",
                   boxShadow:billing===b?"0 2px 12px rgba(99,102,241,.3)":"none",
                   display:"flex", alignItems:"center", gap:7 }}>
                 {b === "monthly" ? "Monthly" : "Yearly"}
@@ -534,7 +534,7 @@ export default function ChoosePlanPage() {
                       <span style={{ width:5,height:5,borderRadius:"50%",background:plan.color }}/>
                       {plan.name}
                     </div>
-                    <p style={{ fontSize:12.5, color:"rgba(var(--ink),.4)", margin:0 }}>{plan.tagline}</p>
+                    <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", margin:0 }}>{plan.tagline}</p>
                   </div>
 
                   {/* Price */}
@@ -543,7 +543,7 @@ export default function ChoosePlanPage() {
                       <div style={{ fontFamily:"Lora,serif", fontSize:50, fontWeight:700, color:"var(--ink-solid, white)", lineHeight:1, letterSpacing:"-2px" }}>
                         ${price}
                       </div>
-                      <div style={{ paddingBottom:8, fontSize:12, color:"rgba(var(--ink),.35)", fontWeight:600 }}>
+                      <div style={{ paddingBottom:8, fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:600 }}>
                         {billing === "monthly" ? "/mo" : "/yr"}
                       </div>
                     </div>
@@ -560,7 +560,7 @@ export default function ChoosePlanPage() {
                     {plan.features.map(f => (
                       <div key={f.text} style={{ display:"flex", alignItems:"center", gap:10 }}>
                         {f.included ? <CheckIcon color={plan.color}/> : <CrossIcon/>}
-                        <span style={{ fontSize:13, fontWeight:500, color:f.included?"rgba(var(--ink),.72)":"rgba(var(--ink),.25)", textDecoration:f.included?"none":"line-through" }}>
+                        <span style={{ fontSize:13, fontWeight:500, color:f.included?"rgba(var(--ink),var(--ta-72, .72))":"rgba(var(--ink),var(--ta-25, .25))", textDecoration:f.included?"none":"line-through" }}>
                           {f.text}
                         </span>
                       </div>
@@ -572,7 +572,7 @@ export default function ChoosePlanPage() {
                       return (
                         <div key={f} style={{ display:"flex", alignItems:"center", gap:10 }}>
                           {included ? <CheckIcon color={plan.color}/> : <CrossIcon/>}
-                          <span style={{ fontSize:13, fontWeight:500, color:included?"rgba(var(--ink),.72)":"rgba(var(--ink),.25)", textDecoration:included?"none":"line-through" }}>
+                          <span style={{ fontSize:13, fontWeight:500, color:included?"rgba(var(--ink),var(--ta-72, .72))":"rgba(var(--ink),var(--ta-25, .25))", textDecoration:included?"none":"line-through" }}>
                             {f}
                           </span>
                         </div>
@@ -627,7 +627,7 @@ export default function ChoosePlanPage() {
                   <span style={{ width:5,height:5,borderRadius:"50%",background:"#34d399",animation:"blink 2s ease infinite" }}/>
                   Custom
                 </div>
-                <p style={{ fontSize:12.5, color:"rgba(var(--ink),.4)", margin:0 }}>Pay only for what you need</p>
+                <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", margin:0 }}>Pay only for what you need</p>
               </div>
 
               {/* Dynamic price */}
@@ -655,7 +655,7 @@ export default function ChoosePlanPage() {
                 ].map(m => (
                   <div key={m.text} style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <div style={{ width:18, height:18, borderRadius:"50%", background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:10 }}>+</div>
-                    <span style={{ fontSize:13, fontWeight:500, color:"rgba(var(--ink),.65)" }}>{m.text}</span>
+                    <span style={{ fontSize:13, fontWeight:500, color:"rgba(var(--ink),var(--ta-65, .65))" }}>{m.text}</span>
                   </div>
                 ))}
               </div>
@@ -689,7 +689,7 @@ export default function ChoosePlanPage() {
             { icon:"⚡", label:"Setup in 10 minutes" },
             { icon:"🎯", label:"No hidden fees" },
           ].map(({ icon, label }) => (
-            <div key={label} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12.5, color:"rgba(var(--ink),.35)", fontWeight:500 }}>
+            <div key={label} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12.5, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:500 }}>
               <span style={{ fontSize:15 }}>{icon}</span>
               {label}
             </div>

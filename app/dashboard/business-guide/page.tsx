@@ -552,7 +552,7 @@ export default function BusinessGuidePage() {
             <h1 style={{ margin: "0 0 8px", fontSize: "clamp(24px,3vw,38px)", fontWeight: 800, letterSpacing: "-1px", lineHeight: 1.1 }}>
               {companyInfo?.name || "Your Company"}
             </h1>
-            <p style={{ margin: "0 0 20px", fontSize: 15, color: "rgba(var(--ink),.5)", lineHeight: 1.7, maxWidth: 540 }}>
+            <p style={{ margin: "0 0 20px", fontSize: 15, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.7, maxWidth: 540 }}>
               {businessMeta.description}. This guide walks you through your complete business workflow, key modules, and how to get the most out of FinovaOS for your {businessMeta.label.toLowerCase()} operations.
             </p>
 
@@ -561,12 +561,12 @@ export default function BusinessGuidePage() {
                 {companyInfo?.plan || "STARTER"} Plan
               </div>
               {companyInfo?.country && (
-                <div style={{ padding: "6px 14px", borderRadius: 100, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),.6)" }}>
+                <div style={{ padding: "6px 14px", borderRadius: 100, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                   📍 {companyInfo.country}
                 </div>
               )}
               {companyInfo?.baseCurrency && (
-                <div style={{ padding: "6px 14px", borderRadius: 100, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),.6)" }}>
+                <div style={{ padding: "6px 14px", borderRadius: 100, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                   💱 {companyInfo.baseCurrency}
                 </div>
               )}
@@ -583,7 +583,7 @@ export default function BusinessGuidePage() {
             ].map((s) => (
               <div key={s.label} style={{ background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "center" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
-                <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)", marginTop: 3, fontWeight: 600 }}>{s.label}</div>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 3, fontWeight: 600 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -604,7 +604,7 @@ export default function BusinessGuidePage() {
         <div style={{ animation: "fadeUp .4s ease", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* What FinovaOS does for this business */}
           <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".08em", marginBottom: 12 }}>WHAT FINOVA DOES FOR YOUR BUSINESS</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".08em", marginBottom: 12 }}>WHAT FINOVA DOES FOR YOUR BUSINESS</div>
             <h2 style={{ margin: "0 0 20px", fontSize: 22, fontWeight: 800 }}>Everything you need to run {businessMeta.label} operations</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16 }}>
               {[
@@ -618,7 +618,7 @@ export default function BusinessGuidePage() {
                 <div key={item.title} style={{ background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
                   <div style={{ fontSize: 24, marginBottom: 10 }}>{item.icon}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "var(--ink-solid, white)" }}>{item.title}</div>
-                  <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>{item.desc}</div>
+                  <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.7 }}>{item.desc}</div>
                 </div>
               ))}
             </div>
@@ -655,9 +655,9 @@ export default function BusinessGuidePage() {
       {activeTab === "workflow" && (
         <div style={{ animation: "fadeUp .4s ease" }}>
           <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".08em", marginBottom: 8 }}>STEP-BY-STEP BUSINESS WORKFLOW</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".08em", marginBottom: 8 }}>STEP-BY-STEP BUSINESS WORKFLOW</div>
             <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>How {businessMeta.label} businesses operate on FinovaOS</h2>
-            <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(var(--ink),.4)", lineHeight: 1.7 }}>
+            <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.7 }}>
               Follow this workflow every day to keep your books accurate, customers happy, and business growing.
             </p>
 
@@ -692,7 +692,7 @@ export default function BusinessGuidePage() {
                         whiteSpace: "nowrap",
                       }}>Open →</Link>
                     </div>
-                    <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.55)", lineHeight: 1.7 }}>{step.desc}</p>
+                    <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.7 }}>{step.desc}</p>
                   </div>
                 </div>
               ))}
@@ -705,9 +705,9 @@ export default function BusinessGuidePage() {
       {activeTab === "modules" && (
         <div style={{ animation: "fadeUp .4s ease" }}>
           <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".08em", marginBottom: 8 }}>YOUR AVAILABLE MODULES</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".08em", marginBottom: 8 }}>YOUR AVAILABLE MODULES</div>
             <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>Key features for {businessMeta.label} businesses</h2>
-            <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(var(--ink),.4)", lineHeight: 1.7 }}>
+            <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.7 }}>
               These are the core modules configured for your business type. Click any to open it directly.
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
@@ -719,7 +719,7 @@ export default function BusinessGuidePage() {
                   }}>
                     <div style={{ fontSize: 26, marginBottom: 12 }}>{mod.icon}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 6 }}>{mod.label}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", lineHeight: 1.6 }}>{mod.desc}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.6 }}>{mod.desc}</div>
                     <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--tx-6366f1, #6366f1)", fontWeight: 700 }}>
                       Open module
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -748,10 +748,10 @@ export default function BusinessGuidePage() {
                   display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
                   padding: "10px 14px", borderRadius: 10, textDecoration: "none",
                   background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)",
-                  fontSize: 12.5, fontWeight: 600, color: "rgba(var(--ink),.7)", transition: "all .2s",
+                  fontSize: 12.5, fontWeight: 600, color: "rgba(var(--ink),var(--ta-70, .7))", transition: "all .2s",
                 }}
                   onMouseEnter={e => { e.currentTarget.style.color = "#a5b4fc"; e.currentTarget.style.borderColor = "rgba(99,102,241,.25)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),.7)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.06)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),var(--ta-70, .7))"; e.currentTarget.style.borderColor = "rgba(var(--ink),.06)"; }}
                 >
                   {r.label}
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -775,7 +775,7 @@ export default function BusinessGuidePage() {
               <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(167,139,250,.2)", border: "1px solid rgba(167,139,250,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>🤖</div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>FinovaOS AI Intelligence</div>
-                <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
                   {enabledAiTools.length} AI-powered features analyzing your real business data 24/7
                 </div>
               </div>
@@ -791,7 +791,7 @@ export default function BusinessGuidePage() {
               ].map((s) => (
                 <div key={s.label} style={{ background: "rgba(var(--ink),.04)", borderRadius: 12, padding: "14px", textAlign: "center" }}>
                   <div style={{ fontSize: 24, fontWeight: 800, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{s.val}</div>
-                  <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)", marginTop: 3 }}>{s.label}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 3 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -807,7 +807,7 @@ export default function BusinessGuidePage() {
                   <div className="module-card" style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(167,139,250,.12)", borderRadius: 18, padding: isMobile ? "12px 11px" : "22px 24px", height: "100%" }}>
                     <div style={{ fontSize: 28, marginBottom: 12 }}>{meta.icon}</div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 8 }}>{meta.label}</div>
-                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", lineHeight: 1.7 }}>{meta.desc}</div>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.7 }}>{meta.desc}</div>
                     <div style={{ marginTop: 14, fontSize: 11, fontWeight: 700, color: "var(--tx-a78bfa, #a78bfa)", display: "flex", alignItems: "center", gap: 6 }}>
                       Explore
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -818,7 +818,7 @@ export default function BusinessGuidePage() {
             })}
           </div>
 
-          <div style={{ marginTop: 16, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)", fontSize: 12, color: "rgba(var(--ink),.4)", textAlign: "center" }}>
+          <div style={{ marginTop: 16, padding: isMobile ? "12px 10px" : "14px 20px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)", fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", textAlign: "center" }}>
             * 80% of AI features work without any external API credits — powered by your real business data and rule-based intelligence.
           </div>
         </div>
@@ -828,9 +828,9 @@ export default function BusinessGuidePage() {
       {activeTab === "start" && (
         <div style={{ animation: "fadeUp .4s ease" }}>
           <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, padding: isMobile ? "15px 14px" : "28px 30px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", letterSpacing: ".08em", marginBottom: 8 }}>GETTING STARTED CHECKLIST</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".08em", marginBottom: 8 }}>GETTING STARTED CHECKLIST</div>
             <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>Set up FinovaOS in 30 minutes</h2>
-            <p style={{ margin: "0 0 24px", fontSize: 14, color: "rgba(var(--ink),.4)", lineHeight: 1.7 }}>
+            <p style={{ margin: "0 0 24px", fontSize: 14, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.7 }}>
               Complete these steps to get your business fully operational on FinovaOS.
             </p>
 
@@ -838,7 +838,7 @@ export default function BusinessGuidePage() {
             <div style={{ marginBottom: 28 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>{completedTasks.length} of {checklist.length} completed</span>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>{Math.round((completedTasks.length / checklist.length) * 100)}%</span>
+                <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{Math.round((completedTasks.length / checklist.length) * 100)}%</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: "rgba(var(--ink),.08)", overflow: "hidden" }}>
                 <div style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#6366f1,#a78bfa)", width: `${(completedTasks.length / checklist.length) * 100}%`, transition: "width .5s ease" }} />
@@ -869,7 +869,7 @@ export default function BusinessGuidePage() {
                     <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon}</span>
 
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: done ? "rgba(var(--ink),.4)" : "white", textDecoration: done ? "line-through" : "none" }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: done ? "rgba(var(--ink),var(--ta-40, .4))" : "white", textDecoration: done ? "line-through" : "none" }}>
                         {item.task}
                       </div>
                     </div>
@@ -891,7 +891,7 @@ export default function BusinessGuidePage() {
               <div style={{ marginTop: 20, padding: isMobile ? "12px 11px" : "20px 24px", borderRadius: 14, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", textAlign: "center" }}>
                 <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-6ee7b7, #6ee7b7)" }}>Setup Complete!</div>
-                <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginTop: 4 }}>Your business is now fully configured. Head to the dashboard to get started.</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginTop: 4 }}>Your business is now fully configured. Head to the dashboard to get started.</div>
                 <Link prefetch={false} href="/dashboard" style={{ display: "inline-block", marginTop: 14, padding: "10px 24px", borderRadius: 10, background: "#10b981", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Go to Dashboard →</Link>
               </div>
             )}
@@ -911,7 +911,7 @@ export default function BusinessGuidePage() {
                 >
                   <div style={{ fontSize: 24, marginBottom: 10 }}>{r.icon}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 6 }}>{r.title}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", lineHeight: 1.6 }}>{r.desc}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.6 }}>{r.desc}</div>
                 </div>
               </Link>
             ))}

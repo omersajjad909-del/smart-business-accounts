@@ -18,27 +18,27 @@ const PLAN_META: Record<string, {
 }> = {
   starter: {
     name: "Starter", icon: "🌱", tagline: "Perfect for growing businesses",
-    color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.35)", dim: "rgba(129,140,248,.1)", border: "rgba(129,140,248,.3)",
+    color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.35)", dim: "rgba(var(--txr-818cf8, 129,140,248),.1)", border: "rgba(129,140,248,.3)",
     gradientFrom: "#6366f1", gradientTo: "#4f46e5",
   },
   pro: {
     name: "Professional", icon: "🚀", tagline: "For established teams that need more",
-    color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)", dim: "rgba(52,211,153,.1)", border: "rgba(52,211,153,.3)",
+    color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)", dim: "rgba(var(--txr-34d399, 52,211,153),.1)", border: "rgba(52,211,153,.3)",
     gradientFrom: "#10b981", gradientTo: "#059669",
   },
   professional: {
     name: "Professional", icon: "🚀", tagline: "For established teams that need more",
-    color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)", dim: "rgba(52,211,153,.1)", border: "rgba(52,211,153,.3)",
+    color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)", dim: "rgba(var(--txr-34d399, 52,211,153),.1)", border: "rgba(52,211,153,.3)",
     gradientFrom: "#10b981", gradientTo: "#059669",
   },
   enterprise: {
     name: "Enterprise", icon: "💎", tagline: "Tailored for complex organizations",
-    color: "var(--tx-fbbf24, #fbbf24)", glow: "rgba(251,191,36,.35)", dim: "rgba(251,191,36,.1)", border: "rgba(251,191,36,.3)",
+    color: "var(--tx-fbbf24, #fbbf24)", glow: "rgba(251,191,36,.35)", dim: "rgba(var(--txr-fbbf24, 251,191,36),.1)", border: "rgba(251,191,36,.3)",
     gradientFrom: "#f59e0b", gradientTo: "#d97706",
   },
   custom: {
     name: "Custom Plan", icon: "⚡", tagline: "Built exactly for your needs",
-    color: "var(--tx-38bdf8, #38bdf8)", glow: "rgba(56,189,248,.35)", dim: "rgba(56,189,248,.1)", border: "rgba(56,189,248,.3)",
+    color: "var(--tx-38bdf8, #38bdf8)", glow: "rgba(56,189,248,.35)", dim: "rgba(var(--txr-38bdf8, 56,189,248),.1)", border: "rgba(56,189,248,.3)",
     gradientFrom: "#0ea5e9", gradientTo: "#0284c7",
   },
 };
@@ -61,7 +61,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
         display:"flex", alignItems:"center", justifyContent:"center",
         fontSize:12, fontWeight:700, transition:"all .4s",
         background: done ? "#34d399" : active ? "#6366f1" : "rgba(var(--ink),.06)",
-        color: done||active ? "white" : "rgba(var(--ink),.25)",
+        color: done||active ? "white" : "rgba(var(--ink),var(--ta-25, .25))",
         border: active ? "2px solid rgba(129,140,248,.6)" : done ? "2px solid #34d399" : "2px solid rgba(var(--ink),.08)",
         boxShadow: active ? "0 0 16px rgba(99,102,241,.5)" : done ? "0 0 12px rgba(52,211,153,.4)" : "none",
         transform: active ? "scale(1.1)" : "scale(1)",
@@ -70,7 +70,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
       </div>
       <span style={{
         fontSize:9, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase",
-        color: active ? "var(--tx-a5b4fc, #a5b4fc)" : done ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),.22)",
+        color: active ? "var(--tx-a5b4fc, #a5b4fc)" : done ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),var(--ta-22, .22))",
       }}>
         {label}
       </span>
@@ -117,15 +117,15 @@ const PERM_CATALOG: Record<string, { label: string; icon: string; category: stri
 
 const CATEGORY_ORDER = ["Core","Accounting","Sales","Inventory","Reports","Banking","CRM","HR","System"];
 const CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string; dot: string }> = {
-  Core:       { bg:"rgba(99,102,241,.1)",  border:"rgba(99,102,241,.25)",  text:"#a5b4fc", dot:"#6366f1" },
-  Accounting: { bg:"rgba(52,211,153,.1)",  border:"rgba(52,211,153,.25)",  text:"#6ee7b7", dot:"#34d399" },
-  Sales:      { bg:"rgba(251,191,36,.1)",  border:"rgba(251,191,36,.25)",  text:"#fde68a", dot:"#fbbf24" },
-  Inventory:  { bg:"rgba(251,146,60,.1)",  border:"rgba(251,146,60,.25)",  text:"#fed7aa", dot:"#fb923c" },
-  Reports:    { bg:"rgba(56,189,248,.1)",  border:"rgba(56,189,248,.25)",  text:"#bae6fd", dot:"#38bdf8" },
-  Banking:    { bg:"rgba(167,139,250,.1)", border:"rgba(167,139,250,.25)", text:"#ddd6fe", dot:"#a78bfa" },
-  CRM:        { bg:"rgba(244,114,182,.1)", border:"rgba(244,114,182,.25)", text:"#fbcfe8", dot:"#f472b6" },
-  HR:         { bg:"rgba(74,222,128,.1)",  border:"rgba(74,222,128,.25)",  text:"#bbf7d0", dot:"#4ade80" },
-  System:     { bg:"rgba(148,163,184,.1)", border:"rgba(148,163,184,.25)", text:"#cbd5e1", dot:"#94a3b8" },
+  Core:       { bg:"rgba(99,102,241,.1)",  border:"rgba(99,102,241,.25)",  text:"var(--tx-a5b4fc, #a5b4fc)", dot:"#6366f1" },
+  Accounting: { bg:"rgba(52,211,153,.1)",  border:"rgba(52,211,153,.25)",  text:"var(--tx-6ee7b7, #6ee7b7)", dot:"#34d399" },
+  Sales:      { bg:"rgba(251,191,36,.1)",  border:"rgba(251,191,36,.25)",  text:"var(--tx-fde68a, #fde68a)", dot:"#fbbf24" },
+  Inventory:  { bg:"rgba(251,146,60,.1)",  border:"rgba(251,146,60,.25)",  text:"var(--tx-fed7aa, #fed7aa)", dot:"#fb923c" },
+  Reports:    { bg:"rgba(56,189,248,.1)",  border:"rgba(56,189,248,.25)",  text:"var(--tx-bae6fd, #bae6fd)", dot:"#38bdf8" },
+  Banking:    { bg:"rgba(167,139,250,.1)", border:"rgba(167,139,250,.25)", text:"var(--tx-ddd6fe, #ddd6fe)", dot:"#a78bfa" },
+  CRM:        { bg:"rgba(244,114,182,.1)", border:"rgba(244,114,182,.25)", text:"var(--tx-fbcfe8, #fbcfe8)", dot:"#f472b6" },
+  HR:         { bg:"rgba(74,222,128,.1)",  border:"rgba(74,222,128,.25)",  text:"var(--tx-bbf7d0, #bbf7d0)", dot:"#4ade80" },
+  System:     { bg:"rgba(148,163,184,.1)", border:"rgba(148,163,184,.25)", text:"var(--tx-cbd5e1, #cbd5e1)", dot:"#94a3b8" },
 };
 
 function PermissionsCard({ perms, meta }: { perms: string[]; meta: typeof PLAN_META[string] }) {
@@ -145,10 +145,10 @@ function PermissionsCard({ perms, meta }: { perms: string[]; meta: typeof PLAN_M
       {/* Header */}
       <div style={{ padding:"16px 22px", borderBottom:"1px solid rgba(var(--ink),.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div>
-          <div style={{ fontSize:12, fontWeight:800, color:"rgba(var(--ink),.7)", letterSpacing:".06em", textTransform:"uppercase" }}>
+          <div style={{ fontSize:12, fontWeight:800, color:"rgba(var(--ink),var(--ta-70, .7))", letterSpacing:".06em", textTransform:"uppercase" }}>
             Included Permissions
           </div>
-          <div style={{ fontSize:11, color:"rgba(var(--ink),.3)", marginTop:2 }}>
+          <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", marginTop:2 }}>
             {perms.length} permissions across {categories.length} modules
           </div>
         </div>
@@ -329,13 +329,13 @@ export default function OnboardingPlanFeatures() {
           </div>
 
           <button onClick={() => router.back()} style={{
-            fontSize:13, fontWeight:600, color:"rgba(var(--ink),.55)",
+            fontSize:13, fontWeight:600, color:"rgba(var(--ink),var(--ta-55, .55))",
             display:"flex", alignItems:"center", gap:4, padding:"7px 14px", borderRadius:9,
             border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)",
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
             onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
-            onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),.55)"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
           >
             ← Back
           </button>
@@ -354,7 +354,7 @@ export default function OnboardingPlanFeatures() {
           <h1 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(26px,4vw,40px)", fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-1px", lineHeight:1.1, margin:"0 0 8px" }}>
             Your <span style={{ color:meta.color }}>{meta.name}</span> plan is ready
           </h1>
-          <p style={{ fontSize:14, color:"rgba(var(--ink),.4)" }}>
+          <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-40, .4))" }}>
             Review your plan features and proceed to activate your workspace.
           </p>
         </div>
@@ -381,7 +381,7 @@ export default function OnboardingPlanFeatures() {
                   </div>
                   <div>
                     <div style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"var(--ink-solid, white)" }}>{meta.name}</div>
-                    <div style={{ fontSize:12, color:"rgba(var(--ink),.4)", marginTop:2 }}>{meta.tagline}</div>
+                    <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", marginTop:2 }}>{meta.tagline}</div>
                   </div>
                   <div style={{ marginLeft:"auto", padding:"4px 12px", borderRadius:20, background:meta.dim, border:`1px solid ${meta.border}`, fontSize:10, fontWeight:800, color:meta.color, letterSpacing:".08em", textTransform:"uppercase" }}>
                     Selected
@@ -390,7 +390,7 @@ export default function OnboardingPlanFeatures() {
 
                 {/* Feature list */}
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>Included Features</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>Included Features</div>
                   {displayRows.map(r => (
                     <div key={r.label} style={{
                       display:"flex", alignItems:"center", gap:12, padding:"10px 14px",
@@ -399,7 +399,7 @@ export default function OnboardingPlanFeatures() {
                       border: r.enabled ? `1px solid ${meta.color}25` : "1px solid rgba(var(--ink),.04)",
                     }}>
                       <span style={{ fontSize:16, opacity: r.enabled ? 1 : .3 }}>{FEATURE_ICONS[r.label] || "•"}</span>
-                      <span style={{ flex:1, fontSize:13, fontWeight:500, color: r.enabled ? "rgba(var(--ink),.85)" : "rgba(var(--ink),.25)", textDecoration: r.enabled ? "none" : "line-through" }}>
+                      <span style={{ flex:1, fontSize:13, fontWeight:500, color: r.enabled ? "rgba(var(--ink),.85)" : "rgba(var(--ink),var(--ta-25, .25))", textDecoration: r.enabled ? "none" : "line-through" }}>
                         {r.label}
                       </span>
                       <div style={{
@@ -443,7 +443,7 @@ export default function OnboardingPlanFeatures() {
               <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1, background:`linear-gradient(90deg,transparent,${meta.color}60,transparent)` }}/>
 
               <div style={{ marginBottom:24 }}>
-                <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.4)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>What happens next</div>
+                <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>What happens next</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                   {[
                     { icon:"✅", title:"Instant activation",  desc:"Click the button and your plan activates immediately" },
@@ -454,7 +454,7 @@ export default function OnboardingPlanFeatures() {
                       <div style={{ width:36, height:36, borderRadius:10, background:meta.dim, border:`1px solid ${meta.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>{s.icon}</div>
                       <div>
                         <div style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{s.title}</div>
-                        <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:2 }}>{s.desc}</div>
+                        <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>{s.desc}</div>
                       </div>
                     </div>
                   ))}
@@ -479,16 +479,16 @@ export default function OnboardingPlanFeatures() {
               <button onClick={() => router.replace("/dashboard")} style={{
                 width:"100%", padding:"13px 24px", borderRadius:13,
                 background:"rgba(var(--ink),.04)", border:"1.5px solid rgba(var(--ink),.1)",
-                color:"rgba(var(--ink),.55)", fontSize:14, fontWeight:600,
+                color:"rgba(var(--ink),var(--ta-55, .55))", fontSize:14, fontWeight:600,
                 cursor:"pointer", fontFamily:"inherit", transition:"all .2s",
               }}
                 onMouseEnter={e=>{ e.currentTarget.style.color="white"; e.currentTarget.style.borderColor="rgba(var(--ink),.25)"; }}
-                onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),.55)"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))"; e.currentTarget.style.borderColor="rgba(var(--ink),.1)"; }}
               >
                 Skip for now — View Dashboard
               </button>
 
-              <p style={{ marginTop:14, fontSize:11, color:"rgba(var(--ink),.22)", textAlign:"center", lineHeight:1.6 }}>
+              <p style={{ marginTop:14, fontSize:11, color:"rgba(var(--ink),var(--ta-22, .22))", textAlign:"center", lineHeight:1.6 }}>
                 Your plan activates immediately. Billing setup can be done later from dashboard.
               </p>
             </div>
@@ -502,7 +502,7 @@ export default function OnboardingPlanFeatures() {
                   { icon:"🔄", text:"Cancel anytime" },
                   { icon:"📞", text:"Enhanced support" },
                 ].map(b => (
-                  <div key={b.text} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.4)", fontWeight:500 }}>
+                  <div key={b.text} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", fontWeight:500 }}>
                     <span>{b.icon}</span><span>{b.text}</span>
                   </div>
                 ))}

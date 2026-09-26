@@ -102,7 +102,7 @@ export default function DistributionRoutesPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Distribution Routes</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
             Create route masters, assign drivers, and keep delivery planning organized.
           </p>
         </div>
@@ -121,7 +121,7 @@ export default function DistributionRoutesPage() {
           { label: "Planned Stops", value: totalStops, color: "var(--tx-818cf8, #818cf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -132,7 +132,7 @@ export default function DistributionRoutesPage() {
           <thead>
             <tr>
               {["Route", "Area", "Driver", "Vehicle", "Stops", "Status", "Actions"].map((header) => (
-                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
+                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
                   {header}
                 </th>
               ))}
@@ -176,7 +176,7 @@ export default function DistributionRoutesPage() {
             ))}
             {!loading && routes.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>
+                <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                   No distribution routes yet.
                 </td>
               </tr>
@@ -198,7 +198,7 @@ export default function DistributionRoutesPage() {
                 ["Vehicle / Van", "vehicle", "text", ""],
               ].map(([label, key, type, span]) => (
                 <div key={key} style={{ gridColumn: span || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   <input
                     type={type}
                     value={String((form as Record<string, unknown>)[key] ?? "")}
@@ -208,7 +208,7 @@ export default function DistributionRoutesPage() {
                 </div>
               ))}
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Planned Stops</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Planned Stops</label>
                 <input
                   type="number"
                   min={0}
@@ -222,7 +222,7 @@ export default function DistributionRoutesPage() {
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                 {editingId ? "Update Route" : "Save Route"}
               </button>
-              <button onClick={closeModal} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${distributionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>
+              <button onClick={closeModal} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${distributionBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>

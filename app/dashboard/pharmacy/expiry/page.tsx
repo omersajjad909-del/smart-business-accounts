@@ -72,7 +72,7 @@ export default function ExpiryTrackingPage() {
                 </td>
               </tr>
             ))}
-            {!loading && filtered.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No drugs in this category.</td></tr>}
+            {!loading && filtered.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No drugs in this category.</td></tr>}
           </tbody>
         </table>
       </div>

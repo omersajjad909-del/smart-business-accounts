@@ -34,26 +34,26 @@ export default function FoodProcessingAnalyticsPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Food Processing Analytics</h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
           Review recipe readiness, cost pressure, and production-facing yield visibility.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
         <div style={cardStyle}>
-          <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Recipes</div>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Recipes</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: foodProcessingAccent }}>{stats.recipes}</div>
         </div>
         <div style={cardStyle}>
-          <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Live Recipes</div>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Live Recipes</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{stats.live}</div>
         </div>
         <div style={cardStyle}>
-          <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Avg Unit Cost</div>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Avg Unit Cost</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>{stats.avgCost.toLocaleString()}</div>
         </div>
         <div style={cardStyle}>
-          <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Total Yield</div>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Total Yield</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-60a5fa, #60a5fa)" }}>{stats.totalYield.toLocaleString()}</div>
         </div>
       </div>
@@ -61,13 +61,13 @@ export default function FoodProcessingAnalyticsPage() {
       <div style={{ ...cardStyle, overflowX: "auto" }}>
         <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 14 }}>Recipe Summary</div>
         {recipeStore.loading ? (
-          <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>Loading recipes...</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Loading recipes...</div>
         ) : recipes.length ? (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
                 {["Recipe", "SKU", "Batch Yield", "Unit Cost", "Status"].map((head) => (
-                  <th key={head} style={{ textAlign: "left", padding: "0 0 10px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em" }}>
+                  <th key={head} style={{ textAlign: "left", padding: "0 0 10px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em" }}>
                     {head}
                   </th>
                 ))}
@@ -86,7 +86,7 @@ export default function FoodProcessingAnalyticsPage() {
             </tbody>
           </table>
         ) : (
-          <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>No recipes available yet.</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>No recipes available yet.</div>
         )}
       </div>
     </div>

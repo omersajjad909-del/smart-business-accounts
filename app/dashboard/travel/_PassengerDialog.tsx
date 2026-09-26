@@ -36,7 +36,7 @@ const cell: React.CSSProperties = {
 };
 const head: React.CSSProperties = {
   fontSize: 10.5, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase",
-  color: "rgba(var(--ink),.38)", paddingBottom: 4,
+  color: "rgba(var(--ink),var(--ta-38, .38))", paddingBottom: 4,
 };
 
 export function PassengerDialog({
@@ -101,7 +101,7 @@ export function PassengerDialog({
         <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>
           Passengers on {bookingLabel}
         </h2>
-        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", marginBottom: 18, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-42, .42))", marginBottom: 18, lineHeight: 1.6 }}>
           Everyone travelling on this PNR. The booking&rsquo;s value and supplier cost are added up from
           these rows, so they cannot drift apart. An infant travels on a lap and takes no seat.
         </div>
@@ -152,7 +152,7 @@ export function PassengerDialog({
                   something Enter should reach on the way past. */}
               <button tabIndex={-1} title="Remove passenger"
                 onClick={() => setRows((prev) => (prev.length === 1 ? [emptyPassenger("ADT")] : prev.filter((_, i) => i !== index)))}
-                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "7px 0" }}>×</button>
+                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", padding: "7px 0" }}>×</button>
             </div>
           ))}
         </div>
@@ -160,7 +160,7 @@ export function PassengerDialog({
         <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
           {(Object.keys(PAX_TYPE_LABELS) as PaxType[]).map((t) => (
             <button key={t} onClick={() => addRow(t)}
-              style={{ padding: "6px 13px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+              style={{ padding: "6px 13px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
               + {PAX_TYPE_LABELS[t]}
             </button>
           ))}
@@ -168,14 +168,14 @@ export function PassengerDialog({
 
         <div style={{ marginTop: 18, padding: "13px 15px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.22)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-            <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)" }}>
+            <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
               {describeParty(totals)} · {totals.seats} seat{totals.seats === 1 ? "" : "s"}
             </span>
             <span style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-38bdf8, #38bdf8)", fontFamily: "ui-monospace, monospace" }}>
               {totals.sale.toLocaleString()}
             </span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),.42)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
             <span>Fare {totals.fare.toLocaleString()} + tax {totals.tax.toLocaleString()}</span>
             <span>
               Cost {totals.cost.toLocaleString()} ·{" "}
@@ -208,7 +208,7 @@ export function PassengerDialog({
             {busy ? "Saving…" : `Save ${totals.count} passenger${totals.count === 1 ? "" : "s"}`}
           </button>
           <button onClick={onClose} disabled={busy}
-            style={{ padding: "11px 22px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "11px 22px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
             Cancel
           </button>
         </div>

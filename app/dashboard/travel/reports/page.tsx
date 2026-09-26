@@ -37,7 +37,7 @@ const TABS: { key: Tab; label: string; blurb: string }[] = [
 
 const th: React.CSSProperties = {
   textAlign: "left", padding: "9px 12px", fontSize: 10.5, fontWeight: 800,
-  letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(var(--ink),.38)",
+  letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-38, .38))",
   borderBottom: `1px solid ${border}`, whiteSpace: "nowrap",
 };
 const td: React.CSSProperties = {
@@ -171,7 +171,7 @@ export default function TravelReportsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 13px" : "24px 28px", fontFamily: ff, color: "var(--ink-solid, #fff)" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 5px" }}>Travel Reports</h1>
-      <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: "0 0 18px" }}>
+      <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: "0 0 18px" }}>
         {TABS.find((t) => t.key === tab)?.blurb}
       </p>
 
@@ -182,7 +182,7 @@ export default function TravelReportsPage() {
               padding: "8px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer",
               background: tab === t.key ? "rgba(56,189,248,.16)" : bg,
               border: `1px solid ${tab === t.key ? "rgba(56,189,248,.45)" : border}`,
-              color: tab === t.key ? accent : "rgba(var(--ink),.6)",
+              color: tab === t.key ? accent : "rgba(var(--ink),var(--ta-60, .6))",
             }}>
             {t.label}
           </button>
@@ -208,17 +208,17 @@ export default function TravelReportsPage() {
                 <tr key={p.id}>
                   <td style={td}>
                     <div style={{ fontWeight: 700 }}>{p.title}</div>
-                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                       {p.date || "no date"} · {p.seats.sold} of {p.seats.quota} seats
                     </div>
                   </td>
                   <td style={num}>{p.pax}</td>
                   <td style={num}>{p.revenue.toLocaleString()}</td>
-                  <td style={{ ...num, color: "rgba(var(--ink),.5)" }}>{p.cost.toLocaleString()}</td>
+                  <td style={{ ...num, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.cost.toLocaleString()}</td>
                   <td style={{ ...num, fontWeight: 700, color: p.margin >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)" }}>
                     {p.margin.toLocaleString()}
                   </td>
-                  <td style={{ ...num, color: "rgba(var(--ink),.5)" }}>{p.marginPercent}%</td>
+                  <td style={{ ...num, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.marginPercent}%</td>
                   <td style={num}>
                     {p.collected.toLocaleString()}
                     {p.revenue > p.collected && (
@@ -230,12 +230,12 @@ export default function TravelReportsPage() {
                 </tr>
               ))}
               {profit.length === 0 && (
-                <tr><td colSpan={7} style={{ ...td, textAlign: "center", color: "rgba(var(--ink),.3)", padding: 36 }}>No departures yet.</td></tr>
+                <tr><td colSpan={7} style={{ ...td, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", padding: 36 }}>No departures yet.</td></tr>
               )}
             </tbody>
           </table>
           {profit.length > 0 && (
-            <div style={{ padding: "11px 14px", fontSize: 11.5, color: "rgba(var(--ink),.35)", lineHeight: 1.6 }}>
+            <div style={{ padding: "11px 14px", fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", lineHeight: 1.6 }}>
               Taken from the bookings, not the rate card — what was actually sold after every price was argued
               down, rather than what the trip was hoped to sell at.
             </div>
@@ -248,11 +248,11 @@ export default function TravelReportsPage() {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 12, marginBottom: 16 }}>
             {buckets.map((b) => (
               <div key={b.key} style={{ background: bg, border: `1px solid ${b.key === "current" ? border : "rgba(239,68,68,.2)"}`, borderRadius: 14, padding: "14px 16px" }}>
-                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.45)", marginBottom: 5 }}>{b.label}</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: b.key === "current" ? "rgba(var(--ink),.75)" : b.total > 0 ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),.3)" }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 5 }}>{b.label}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: b.key === "current" ? "rgba(var(--ink),.75)" : b.total > 0 ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),var(--ta-30, .3))" }}>
                   {b.total.toLocaleString()}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{b.count} instalment{b.count === 1 ? "" : "s"}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{b.count} instalment{b.count === 1 ? "" : "s"}</div>
               </div>
             ))}
           </div>
@@ -271,16 +271,16 @@ export default function TravelReportsPage() {
                 {owing.map((l) => (
                   <tr key={l.id}>
                     <td style={{ ...td, fontWeight: 700 }}>{l.name}</td>
-                    <td style={{ ...td, color: "rgba(var(--ink),.5)" }}>{l.departure}</td>
+                    <td style={{ ...td, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{l.departure}</td>
                     <td style={td}>{l.due || "—"}</td>
-                    <td style={{ ...num, color: l.daysLate > 0 ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),.35)", fontWeight: l.daysLate > 0 ? 700 : 400 }}>
+                    <td style={{ ...num, color: l.daysLate > 0 ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),var(--ta-35, .35))", fontWeight: l.daysLate > 0 ? 700 : 400 }}>
                       {l.daysLate > 0 ? `${l.daysLate}d` : "—"}
                     </td>
                     <td style={{ ...num, fontWeight: 700 }}>{l.amount.toLocaleString()}</td>
                   </tr>
                 ))}
                 {owing.length === 0 && (
-                  <tr><td colSpan={5} style={{ ...td, textAlign: "center", color: "rgba(var(--ink),.3)", padding: 36 }}>Nothing outstanding.</td></tr>
+                  <tr><td colSpan={5} style={{ ...td, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", padding: 36 }}>Nothing outstanding.</td></tr>
                 )}
               </tbody>
             </table>
@@ -310,7 +310,7 @@ export default function TravelReportsPage() {
             <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, overflowX: "auto" }}>
               <div style={{ padding: "14px 16px", borderBottom: `1px solid ${border}` }}>
                 <div style={{ fontSize: 15, fontWeight: 800 }}>{manifest.dep.title}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 3 }}>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 3 }}>
                   {manifest.dep.departureDate} → {manifest.dep.returnDate || "—"} · {manifest.people.length} pilgrims
                 </div>
               </div>
@@ -329,7 +329,7 @@ export default function TravelReportsPage() {
                 <tbody>
                   {manifest.people.map((p, i) => (
                     <tr key={p.id}>
-                      <td style={{ ...td, color: "rgba(var(--ink),.35)" }}>{i + 1}</td>
+                      <td style={{ ...td, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{i + 1}</td>
                       <td style={{ ...td, fontWeight: 700 }}>
                         {p.name || "—"}
                         {p.balance > 0.01 && (
@@ -346,18 +346,18 @@ export default function TravelReportsPage() {
                       </td>
                       <td style={td}>{p.gender}</td>
                       <td style={num}>{p.age === "" ? "—" : p.age}</td>
-                      <td style={{ ...td, color: "rgba(var(--ink),.5)" }}>{p.party}</td>
-                      <td style={{ ...td, color: "rgba(var(--ink),.5)" }}>{p.sharing}</td>
+                      <td style={{ ...td, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.party}</td>
+                      <td style={{ ...td, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.sharing}</td>
                     </tr>
                   ))}
                   {manifest.people.length === 0 && (
-                    <tr><td colSpan={7} style={{ ...td, textAlign: "center", color: "rgba(var(--ink),.3)", padding: 36 }}>Nobody booked on this departure yet.</td></tr>
+                    <tr><td colSpan={7} style={{ ...td, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", padding: 36 }}>Nobody booked on this departure yet.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13 }}>
+            <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>
               Pick a departure to see who is on it.
             </div>
           )}

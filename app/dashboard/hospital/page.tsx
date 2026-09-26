@@ -99,7 +99,7 @@ export default function HospitalOverviewPage() {
             </Link>
           </div>
           <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10 }}>
-            {upcomingAppointments.length === 0 && <div style={{ color: "rgba(var(--ink),.28)", textAlign: "center", padding: 24 }}>No active appointments for today.</div>}
+            {upcomingAppointments.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))", textAlign: "center", padding: 24 }}>No active appointments for today.</div>}
             {upcomingAppointments.map((row) => (
               <div key={row.id} style={{ display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 12, alignItems: "center", padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-c4b5fd, #c4b5fd)" }}>{row.time || "--:--"}</div>
@@ -117,7 +117,7 @@ export default function HospitalOverviewPage() {
           <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, padding: 18 }}>
             <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>{isClinic ? "Urgent Care Watchlist" : "Clinical Risk Watchlist"}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {highRiskQueue.length === 0 && <div style={{ color: "rgba(var(--ink),.28)", padding: "8px 0" }}>No urgent cases in queue.</div>}
+              {highRiskQueue.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))", padding: "8px 0" }}>No urgent cases in queue.</div>}
               {highRiskQueue.map((row, index) => (
                 <div key={`${row.label}-${index}`} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: row.tone }}>{row.label}</div>

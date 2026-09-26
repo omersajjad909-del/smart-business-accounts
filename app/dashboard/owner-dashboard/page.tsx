@@ -10,8 +10,8 @@ const F = "'Outfit','Inter',sans-serif";
 const T = {
   indigo:  "#6366f1", violet: "#818cf8", cyan:    "#22d3ee",
   emerald: "#10b981", amber:  "#f59e0b", red:     "#ef4444",
-  rose:    "#fb7185", panel:  "rgba(255,255,255,.03)",
-  border:  "rgba(var(--ink),.07)", muted: "rgba(255,255,255,.38)",
+  rose:    "#fb7185", panel:  "rgba(var(--ink),.03)",
+  border:  "rgba(var(--ink),.07)", muted: "rgba(var(--ink),var(--ta-38, .38))",
 };
 
 interface SummaryData {

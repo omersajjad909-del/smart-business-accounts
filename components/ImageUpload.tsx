@@ -63,7 +63,7 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
 
   return (
     <div style={{ display: "grid", gap: 6 }}>
-      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".05em" }}>
+      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".05em" }}>
         {label}
       </label>
 
@@ -122,15 +122,15 @@ export default function ImageUpload({ value, onChange, label = "Product Image" }
           {uploading ? (
             <>
               <div style={{ fontSize: 22 }}>⏳</div>
-              <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)" }}>Uploading…</div>
+              <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Uploading…</div>
             </>
           ) : (
             <>
               <div style={{ fontSize: 24, opacity: .5 }}>🖼</div>
-              <div style={{ fontSize: 10, color: "rgba(var(--ink),.35)", textAlign: "center", lineHeight: 1.4 }}>
+              <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", textAlign: "center", lineHeight: 1.4 }}>
                 Click or drag<br />to upload
               </div>
-              <div style={{ fontSize: 9, color: "rgba(var(--ink),.2)" }}>Max 2 MB</div>
+              <div style={{ fontSize: 9, color: "rgba(var(--ink),var(--ta-20, .2))" }}>Max 2 MB</div>
             </>
           )}
         </div>

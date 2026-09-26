@@ -89,16 +89,16 @@ export default function SubcontractorsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Subcontractors", val: subs.length, color: "var(--tx-f97316, #f97316)" }, { label: "Active", val: subs.filter((s) => s.status === "active").length, color: "var(--tx-34d399, #34d399)" }, { label: "Total Contracts", val: `Rs. ${totalContracts.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)" }, { label: "Total Paid", val: `Rs. ${totalPaid.toLocaleString()}`, color: "var(--tx-f59e0b, #f59e0b)" }].map((s) => (
-          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 16, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 16, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ background: constructionBg, border: `1px solid ${constructionBorder}`, borderRadius: 12 }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead><tr>{["Name", "Trade", "Phone", "Project", "Site", "Contract", "Paid", "Balance", "Status", "Action"].map((h) => (
-            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${constructionBorder}`, fontWeight: 600 }}>{h}</th>
+            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${constructionBorder}`, fontWeight: 600 }}>{h}</th>
           ))}</tr></thead>
           <tbody>
             {subs.map((sub) => (
@@ -106,7 +106,7 @@ export default function SubcontractorsPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 600 }}>{sub.name}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{sub.trade}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13 }}>{sub.phone}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{sub.project}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{sub.project}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontSize: 13, color: "var(--tx-fdba74, #fdba74)" }}>{sub.site || "—"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Rs. {sub.contractValue.toLocaleString()}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)" }}>Rs. {sub.paid.toLocaleString()}</td>
@@ -119,7 +119,7 @@ export default function SubcontractorsPage() {
                 </td>
               </tr>
             ))}
-            {!loading && subs.length === 0 && <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No subcontractors yet.</td></tr>}
+            {!loading && subs.length === 0 && <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No subcontractors yet.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -131,7 +131,7 @@ export default function SubcontractorsPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Name", "name", "text", "span 2"], ["Trade", "trade", "text", ""], ["Phone", "phone", "text", ""], ["Project", "project", "select", ""], ["Site", "site", "text", ""], ["Contract Value (Rs.)", "contractValue", "number", "span 2"]].map(([label, key, type, col]) => (
                 <div key={key} style={{ gridColumn: col || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   {type === "select" ? (
                     <select value={String((form as Record<string, unknown>)[key] ?? "")} onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${constructionBorder}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                       <option value="">Select project</option>
@@ -146,7 +146,7 @@ export default function SubcontractorsPage() {
             {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${constructionBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -69,9 +69,9 @@ function runQuery(advances: AdvancePayment[], advNo: string, dateQ: string, supp
 }
 
 const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
-  OPEN:     { bg: "rgba(251,191,36,0.15)",  text: "#fbbf24" },
-  ADJUSTED: { bg: "rgba(99,102,241,0.15)",  text: "#818cf8" },
-  CLOSED:   { bg: "rgba(34,197,94,0.15)",   text: "#22c55e" },
+  OPEN:     { bg: "rgba(251,191,36,0.15)",  text: "var(--tx-fbbf24, #fbbf24)" },
+  ADJUSTED: { bg: "rgba(99,102,241,0.15)",  text: "var(--tx-818cf8, #818cf8)" },
+  CLOSED:   { bg: "rgba(34,197,94,0.15)",   text: "var(--tx-22c55e, #22c55e)" },
 };
 
 export default function AdvancePaymentPage() {

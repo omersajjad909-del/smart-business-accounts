@@ -53,14 +53,14 @@ export default function StockReceiptsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📦 Stock Receipts</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
             History of all stock received
           </p>
         </div>
         <Link
           prefetch={false}
           href="/dashboard/retail/catalog"
-          style={{ padding: "10px 18px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),.7)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}
+          style={{ padding: "10px 18px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),var(--ta-70, .7))", fontSize: 13, fontWeight: 600, textDecoration: "none" }}
         >
           ← Product Catalog
         </Link>
@@ -75,7 +75,7 @@ export default function StockReceiptsPage() {
           { label: "Unique Suppliers", value: uniqueSuppliers, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "18px 22px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -97,7 +97,7 @@ export default function StockReceiptsPage() {
           <thead>
             <tr>
               {["Date", "Product", "SKU", "Supplier", "Qty In", "Cost/Unit", "Total Cost", "Stock Before → After", "Notes"].map(h => (
-                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, color: "rgba(var(--ink),.45)", borderBottom: `1px solid ${border}`, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".04em" }}>
+                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", borderBottom: `1px solid ${border}`, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".04em" }}>
                   {h}
                 </th>
               ))}
@@ -105,26 +105,26 @@ export default function StockReceiptsPage() {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.3)" }}>Loading...</td></tr>
+              <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Loading...</td></tr>
             )}
             {!loading && receipts.length === 0 && (
-              <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>
+              <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                 No stock receipts yet. Use "📦 Receive" button in Product Catalog to add stock.
               </td></tr>
             )}
             {receipts.map(r => (
               <tr key={r.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
-                <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>{r.date}</td>
+                <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{r.date}</td>
                 <td style={{ padding: "12px 16px", fontWeight: 600 }}>{r.productName}</td>
-                <td style={{ padding: "12px 16px", fontSize: 11, color: "rgba(var(--ink),.4)" }}>{r.sku || "—"}</td>
+                <td style={{ padding: "12px 16px", fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{r.sku || "—"}</td>
                 <td style={{ padding: "12px 16px", fontSize: 13 }}>{r.supplierName}</td>
                 <td style={{ padding: "12px 16px", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>+{r.qtyReceived}</td>
                 <td style={{ padding: "12px 16px", fontSize: 13 }}>Rs. {r.costPrice.toLocaleString()}</td>
                 <td style={{ padding: "12px 16px", fontWeight: 700, color: "var(--tx-f59e0b, #f59e0b)" }}>Rs. {r.totalCost.toLocaleString()}</td>
-                <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.55)" }}>
+                <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-55, .55))" }}>
                   {r.stockBefore} → <span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>{r.stockAfter}</span>
                 </td>
-                <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.4)" }}>{r.notes || "—"}</td>
+                <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{r.notes || "—"}</td>
               </tr>
             ))}
           </tbody>

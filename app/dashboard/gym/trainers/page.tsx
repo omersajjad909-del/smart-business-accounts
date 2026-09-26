@@ -11,11 +11,11 @@ const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),var(--ta-50, .5))', marginTop: 4 },
   btn: { background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
   stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),var(--ta-50, .5))', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 },
   card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: 24 },
@@ -23,7 +23,7 @@ const S = {
   name: { fontWeight: 700, fontSize: 17, marginBottom: 4 },
   spec: { display: 'inline-block', background: 'rgba(22,163,74,.15)', color: '#16a34a', borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 600, marginBottom: 12 },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
-  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 8 },
+  infoRow: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'rgba(var(--ink),var(--ta-60, .6))', marginBottom: 8 },
   stars: (r: number) => Array.from({ length: 5 }, (_, i) => i < r ? '⭐' : '☆').join(''),
   certBadge: { background: 'rgba(56,189,248,.12)', color: 'var(--tx-38bdf8, #38bdf8)', borderRadius: 6, padding: '2px 8px', fontSize: 11, marginRight: 4, marginBottom: 4, display: 'inline-block' },
   actRow: { display: 'flex', gap: 8, marginTop: 16 },
@@ -32,7 +32,7 @@ const S = {
   modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),var(--ta-60, .6))', marginBottom: 6 },
   input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
@@ -103,11 +103,11 @@ export default function TrainersPage() {
         <div style={S.stat}><div style={S.statLabel}>Avg Rating</div><div style={{ ...S.statVal, color: 'var(--tx-fbbf24, #fbbf24)' }}>⭐ {avgRating}</div></div>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),var(--ta-40, .4))' }}>Loading...</div>}
 
       <div style={S.grid}>
         {!loading && trainers.length === 0 && (
-          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.25)' }}>No trainers found.</div>
+          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),var(--ta-25, .25))' }}>No trainers found.</div>
         )}
         {trainers.map(t => (
           <div key={t.id} style={S.card}>

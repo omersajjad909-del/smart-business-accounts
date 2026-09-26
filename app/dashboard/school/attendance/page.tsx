@@ -68,7 +68,7 @@ export default function SchoolAttendancePage() {
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.remarks || "—"}</td>
               </tr>
             ))}
-            {!loading && attendance.length === 0 && <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No attendance records yet.</td></tr>}
+            {!loading && attendance.length === 0 && <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No attendance records yet.</td></tr>}
           </tbody>
         </table>
       </div>

@@ -360,7 +360,7 @@ export default function ProductCatalogPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📦 Product Catalog</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage retail product catalog</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage retail product catalog</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button
@@ -370,7 +370,7 @@ export default function ProductCatalogPage() {
           >
             🔗 Sync to Item Master
           </button>
-          <Link prefetch={false} href="/dashboard/retail/categories" style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),.7)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+          <Link prefetch={false} href="/dashboard/retail/categories" style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),var(--ta-70, .7))", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
             📂 Categories
           </Link>
           <button onClick={openAdd} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
@@ -387,13 +387,13 @@ export default function ProductCatalogPage() {
           { label: "Avg Margin", val: `${avgMargin}%`, color: "var(--tx-818cf8, #818cf8)" },
         ].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div>
           </div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       {/* Category filter pills */}
       {categoryNames.length > 0 && (
@@ -404,7 +404,7 @@ export default function ProductCatalogPage() {
               <button
                 key={n}
                 onClick={() => setFilterCategory(n === "All" ? "" : (n === filterCategory ? "" : n))}
-                style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "#f97316" : border}`, background: active ? "rgba(249,115,22,.15)" : "transparent", color: active ? "#f97316" : "rgba(var(--ink),.5)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${active ? "#f97316" : border}`, background: active ? "rgba(249,115,22,.15)" : "transparent", color: active ? "#f97316" : "rgba(var(--ink),var(--ta-50, .5))", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
               >
                 {n}
               </button>
@@ -419,7 +419,7 @@ export default function ProductCatalogPage() {
           <thead>
             <tr>
               {["", "Product", "Category", "SKU", "Unit", "Cost", "Sale Price", "Margin", "Stock", "Status", "Actions"].map(h => (
-                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
+                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -433,8 +433,8 @@ export default function ProductCatalogPage() {
                   }
                 </td>
                 <td style={{ padding: "13px 16px", fontWeight: 600 }}>{p.name}</td>
-                <td style={{ padding: "13px 16px", fontSize: 13 }}>{p.category || <span style={{ color: "rgba(var(--ink),.2)" }}>—</span>}</td>
-                <td style={{ padding: "13px 16px", fontSize: 11, color: "rgba(var(--ink),.4)" }}>{p.sku}</td>
+                <td style={{ padding: "13px 16px", fontSize: 13 }}>{p.category || <span style={{ color: "rgba(var(--ink),var(--ta-20, .2))" }}>—</span>}</td>
+                <td style={{ padding: "13px 16px", fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{p.sku}</td>
                 <td style={{ padding: "13px 16px" }}>
                   <span style={{ background: "rgba(99,102,241,.12)", color: "var(--tx-a5b4fc, #a5b4fc)", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{p.unit}</span>
                 </td>
@@ -492,7 +492,7 @@ export default function ProductCatalogPage() {
               </tr>
             ))}
             {!loading && products.length === 0 && (
-              <tr><td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>
+              <tr><td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                 {filterCategory ? `No products in "${filterCategory}"` : "No products yet."}
               </td></tr>
 
@@ -507,24 +507,24 @@ export default function ProductCatalogPage() {
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 520, fontFamily: ff, maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{editId ? "✏️ Edit Product" : "➕ Add Product"}</h2>
-              <button onClick={() => { setShowModal(false); setFormError(""); }} style={{ background: "none", border: "none", color: "rgba(var(--ink),.5)", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>✕</button>
+              <button onClick={() => { setShowModal(false); setFormError(""); }} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>✕</button>
             </div>
 
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Product Name *</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Product Name *</label>
                 <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}  style={inp} autoFocus />
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Category</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Category</label>
                 {categoryNames.length > 0 ? (
                   <select
                     value={form.category}
                     onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                    style={{ ...inp, background: "var(--dk-1e2535, #1e2535)", cursor: "pointer", color: form.category ? "#fff" : "rgba(var(--ink),.35)" }}
+                    style={{ ...inp, background: "var(--dk-1e2535, #1e2535)", cursor: "pointer", color: form.category ? "#fff" : "rgba(var(--ink),var(--ta-35, .35))" }}
                   >
                     <option value="">-- Select --</option>
                     {categoryNames.map(n => <option key={n} value={n}>{n}</option>)}
@@ -535,14 +535,14 @@ export default function ProductCatalogPage() {
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>
-                  SKU * <span style={{ color: "rgba(var(--ink),.2)", fontWeight: 400 }}>(unique code)</span>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>
+                  SKU * <span style={{ color: "rgba(var(--ink),var(--ta-20, .2))", fontWeight: 400 }}>(unique code)</span>
                 </label>
                 <input type="text" value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))} style={inp} />
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Unit *</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Unit *</label>
                 <select value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
                   style={{ ...inp, background: "var(--dk-1e2535, #1e2535)", cursor: "pointer" }}>
                   {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
@@ -550,7 +550,7 @@ export default function ProductCatalogPage() {
               </div>
 
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Description</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Description</label>
                 <input type="text" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Optional product description" style={inp} />
               </div>
 
@@ -563,12 +563,12 @@ export default function ProductCatalogPage() {
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Cost Price (Rs.)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Cost Price (Rs.)</label>
                 <input type="number" value={form.costPrice} onChange={e => setForm(f => ({ ...f, costPrice: Number(e.target.value) }))} style={inp} />
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Sale Price (Rs.) *</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Sale Price (Rs.) *</label>
                 <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} style={inp} />
               </div>
 
@@ -590,7 +590,7 @@ export default function ProductCatalogPage() {
               </button>
               <button
                 onClick={() => { setShowModal(false); setFormError(""); }}
-                style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}
+                style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}
               >
                 Cancel
               </button>
@@ -605,13 +605,13 @@ export default function ProductCatalogPage() {
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 28, width: 360, textAlign: "center", fontFamily: ff }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
             <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 8px" }}>Delete Product?</h3>
-            <p style={{ fontSize: 13, color: "rgba(var(--ink),.45)", margin: "0 0 22px", lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 22px", lineHeight: 1.6 }}>
              This product will be permanently deleted. This action cannot be undone.
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button
                 onClick={() => setDeleteId(null)}
-                style={{ background: "transparent", border: `1px solid ${border}`, color: "rgba(var(--ink),.6)", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer" }}
+                style={{ background: "transparent", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-60, .6))", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer" }}
               >
                 Cancel
               </button>
@@ -632,11 +632,11 @@ export default function ProductCatalogPage() {
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 440, fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📦 Receive Stock</h2>
-              <button onClick={() => setReceiveProduct(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setReceiveProduct(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 13 }}>
               <strong>{receiveProduct.name}</strong>
-              <span style={{ marginLeft: 10, color: "rgba(var(--ink),.4)", fontSize: 12 }}>Current stock: {receiveProduct.stock}</span>
+              <span style={{ marginLeft: 10, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>Current stock: {receiveProduct.stock}</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[
@@ -644,7 +644,7 @@ export default function ProductCatalogPage() {
                 { label: "Cost Price (Rs.)", key: "costPrice", type: "number" },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{f.label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{f.label}</label>
                   <input
                     type={f.type}
                     value={(receiveForm as Record<string, number | string>)[f.key]}
@@ -654,29 +654,29 @@ export default function ProductCatalogPage() {
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Supplier</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Supplier</label>
                 <select value={receiveForm.supplierId} onChange={e => { const s = suppliers.find(x => x.id === e.target.value); setReceiveForm(p => ({ ...p, supplierId: e.target.value, supplierName: s?.name || "" })); }} style={inp}>
                   <option value="">— Walk-in / No Supplier —</option>
                   {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Notes</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Notes</label>
                 <input value={receiveForm.notes} onChange={e => setReceiveForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" style={inp} />
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Batch # (optional)</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Batch # (optional)</label>
                   <input value={receiveForm.batchNo} onChange={e => setReceiveForm(p => ({ ...p, batchNo: e.target.value }))} placeholder="e.g. B2024-01" style={inp} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Expiry Date (optional)</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Expiry Date (optional)</label>
                   <input type="date" value={receiveForm.expiryDate} onChange={e => setReceiveForm(p => ({ ...p, expiryDate: e.target.value }))} style={{ ...inp, colorScheme: "dark" }} />
                 </div>
               </div>
             </div>
             {receiveForm.qty > 0 && (
-              <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(99,102,241,.08)", borderRadius: 8, fontSize: 12, color: "rgba(var(--ink),.6)" }}>
+              <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(99,102,241,.08)", borderRadius: 8, fontSize: 12, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                 Stock after: <strong style={{ color: "var(--tx-34d399, #34d399)" }}>{receiveProduct.stock + receiveForm.qty}</strong>
                 {receiveForm.costPrice > 0 && <span style={{ marginLeft: 14 }}>Total cost: <strong style={{ color: "var(--tx-f59e0b, #f59e0b)" }}>Rs. {(receiveForm.qty * receiveForm.costPrice).toLocaleString()}</strong></span>}
               </div>
@@ -691,7 +691,7 @@ export default function ProductCatalogPage() {
               </button>
               <button
                 onClick={() => setReceiveProduct(null)}
-                style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}
+                style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}
               >
                 Cancel
               </button>
@@ -706,7 +706,7 @@ export default function ProductCatalogPage() {
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 18, padding: 28, width: 460, fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>🖨 Print Barcode Labels</h2>
-              <button onClick={() => setShowCatPrint(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowCatPrint(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ background: "white", borderRadius: 10, padding: isMobile ? "12px 10px" : "16px 20px", textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#000", marginBottom: 8 }}>{catPrintItem.name}</div>
@@ -714,7 +714,7 @@ export default function ProductCatalogPage() {
               {catPrintItem.price > 0 && <div style={{ fontSize: 13, fontWeight: 800, color: "#000", marginTop: 6 }}>Rs. {catPrintItem.price.toLocaleString()}</div>}
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),.5)", marginBottom: 8 }}>How many labels? (max 100)</label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 8 }}>How many labels? (max 100)</label>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <button onClick={() => setCatPrintQty(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${border}`, background: "rgba(var(--ink),.05)", color: "var(--ink-solid, #fff)", fontSize: 18, cursor: "pointer" }}>−</button>
                 <input type="number" min={1} max={100} value={catPrintQty} onChange={e => setCatPrintQty(Math.max(1, Math.min(100, Number(e.target.value))))}
@@ -723,7 +723,7 @@ export default function ProductCatalogPage() {
                 <div style={{ display: "flex", gap: 5, marginLeft: 6 }}>
                   {[1, 4, 8, 12, 24, 48].map(n => (
                     <button key={n} onClick={() => setCatPrintQty(n)}
-                      style={{ padding: "6px 9px", borderRadius: 7, border: `1px solid ${catPrintQty === n ? "rgba(99,102,241,.5)" : border}`, background: catPrintQty === n ? "rgba(99,102,241,.15)" : "transparent", color: catPrintQty === n ? "#818cf8" : "rgba(var(--ink),.4)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      style={{ padding: "6px 9px", borderRadius: 7, border: `1px solid ${catPrintQty === n ? "rgba(99,102,241,.5)" : border}`, background: catPrintQty === n ? "rgba(99,102,241,.15)" : "transparent", color: catPrintQty === n ? "#818cf8" : "rgba(var(--ink),var(--ta-40, .4))", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                       {n}
                     </button>
                   ))}
@@ -731,7 +731,7 @@ export default function ProductCatalogPage() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button onClick={() => setShowCatPrint(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowCatPrint(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 13, cursor: "pointer" }}>Cancel</button>
               <button onClick={executeCatPrint} style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 🖨 Print {catPrintQty} Label{catPrintQty > 1 ? "s" : ""}
               </button>

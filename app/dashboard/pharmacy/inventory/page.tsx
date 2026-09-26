@@ -91,7 +91,7 @@ export default function PharmacyInventoryPage() {
                 </td>
               </tr>
             ))}
-            {!loading && drugs.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No drugs in inventory.</td></tr>}
+            {!loading && drugs.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No drugs in inventory.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -129,7 +129,7 @@ export default function PharmacyInventoryPage() {
             {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#fb7185", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Drug</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

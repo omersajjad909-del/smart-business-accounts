@@ -219,7 +219,7 @@ export default function BusinessSetupPage() {
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 52, marginBottom: 12 }}>🎉</div>
                 <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 10px" }}>You're on the list!</h3>
-                <p style={{ fontSize: 13, color: "rgba(var(--ink),.45)", margin: "0 0 20px" }}>
+                <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 20px" }}>
                   We'll email you as soon as <strong style={{ color: "var(--ink-solid, white)" }}>{notify.label}</strong> goes live.
                 </p>
                 <button onClick={() => setNotify(null)} style={{ padding: "10px 24px", borderRadius: 9, border: "none", background: "rgba(99,102,241,.2)", color: "#a5b4fc", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
@@ -232,7 +232,7 @@ export default function BusinessSetupPage() {
                   <span style={{ fontSize: 36 }}>{notify.emoji}</span>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink-solid, white)" }}>{notify.label}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 2 }}>Coming Soon — Get notified when live</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>Coming Soon — Get notified when live</div>
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
@@ -257,13 +257,13 @@ export default function BusinessSetupPage() {
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
                     onClick={() => setNotify(null)}
-                    style={{ flex: 1, padding: "11px", borderRadius: 9, border: "1px solid rgba(var(--ink),.08)", background: "transparent", color: "rgba(var(--ink),.4)", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                    style={{ flex: 1, padding: "11px", borderRadius: 9, border: "1px solid rgba(var(--ink),.08)", background: "transparent", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
                     Cancel
                   </button>
                   <button
                     onClick={submitNotify}
                     disabled={notify.loading || !notify.email}
-                    style={{ flex: 2, padding: "11px", borderRadius: 9, border: "none", background: notify.email ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.06)", color: notify.email ? "white" : "rgba(var(--ink),.25)", fontSize: 13, fontWeight: 700, cursor: notify.email ? "pointer" : "not-allowed", fontFamily: "inherit" }}>
+                    style={{ flex: 2, padding: "11px", borderRadius: 9, border: "none", background: notify.email ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.06)", color: notify.email ? "white" : "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13, fontWeight: 700, cursor: notify.email ? "pointer" : "not-allowed", fontFamily: "inherit" }}>
                     {notify.loading ? "Saving…" : "🔔 Notify Me"}
                   </button>
                 </div>
@@ -280,7 +280,7 @@ export default function BusinessSetupPage() {
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
         </div>
-        <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", letterSpacing: ".1em", textTransform: "uppercase" }}>Welcome to FinovaOS</div>
+        <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".1em", textTransform: "uppercase" }}>Welcome to FinovaOS</div>
       </div>
 
       {/* ── STEP 1: Choose business type ── */}
@@ -290,7 +290,7 @@ export default function BusinessSetupPage() {
             <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px", background: "linear-gradient(135deg,#fff,rgba(var(--ink),.7))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               What kind of business do you run?
             </h1>
-            <p style={{ color: "rgba(var(--ink),.4)", fontSize: 14, margin: 0 }}>
+            <p style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 14, margin: 0 }}>
               We'll configure your entire dashboard — accounts, features, and KPIs — automatically
             </p>
           </div>
@@ -299,7 +299,7 @@ export default function BusinessSetupPage() {
             <div style={{ maxWidth: 760, margin: "0 auto 24px", padding: "14px 18px", borderRadius: 14, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "var(--tx-34d399, #34d399)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>All Business Types Live</div>
-                <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)" }}>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-62, .62))" }}>
                   All audited businesses are now available for setup and launch-prep.
                 </div>
               </div>
@@ -331,7 +331,7 @@ export default function BusinessSetupPage() {
                   padding: "6px 16px", borderRadius: 20, fontSize: 12, fontWeight: 600,
                   background: category === cat ? "rgba(99,102,241,.2)" : "rgba(var(--ink),.04)",
                   border: `1px solid ${category === cat ? "rgba(99,102,241,.5)" : "rgba(var(--ink),.08)"}`,
-                  color: category === cat ? "#a5b4fc" : "rgba(var(--ink),.45)",
+                  color: category === cat ? "#a5b4fc" : "rgba(var(--ink),var(--ta-45, .45))",
                 }}
               >
                 {cat}
@@ -344,7 +344,7 @@ export default function BusinessSetupPage() {
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-34d399, #34d399)", textTransform: "uppercase", letterSpacing: ".08em" }}>{allAuditedLive ? "Launch-Ready Business Types" : "🟢 Available Now"}</span>
-                <span style={{ fontSize: 11, color: "rgba(var(--ink),.2)" }}>{liveFiltered.length} business types</span>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-20, .2))" }}>{liveFiltered.length} business types</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12, marginBottom: 32 }}>
                 {liveFiltered.map((b) => {
@@ -367,12 +367,12 @@ export default function BusinessSetupPage() {
                       )}
                       <div style={{ fontSize: 30, marginBottom: 8 }}>{b.icon}</div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 5 }}>{b.label}</div>
-                      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", lineHeight: 1.5, marginBottom: 10 }}>{b.description}</div>
+                      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.5, marginBottom: 10 }}>{b.description}</div>
                       <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                         {badges ? badges.labels.map(l => (
                           <span key={l} style={{ fontSize: 9.5, padding: "2px 7px", borderRadius: 20, background: badges.bg, color: badges.color, fontWeight: 700 }}>{l}</span>
                         )) : null}
-                        <span style={{ fontSize: 9.5, padding: "2px 7px", borderRadius: 20, background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),.35)", fontWeight: 600 }}>
+                        <span style={{ fontSize: 9.5, padding: "2px 7px", borderRadius: 20, background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 600 }}>
                           {b.modules.length} modules
                         </span>
                       </div>
@@ -388,7 +388,7 @@ export default function BusinessSetupPage() {
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, marginTop: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-fbbf24, #fbbf24)", textTransform: "uppercase", letterSpacing: ".08em" }}>⏳ Coming Soon</span>
-                <span style={{ fontSize: 11, color: "rgba(var(--ink),.2)" }}>{comingSoonFiltered.length} more types launching soon</span>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-20, .2))" }}>{comingSoonFiltered.length} more types launching soon</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12 }}>
                 {comingSoonFiltered.map((b) => {
@@ -409,8 +409,8 @@ export default function BusinessSetupPage() {
                         SOON
                       </div>
                       <div style={{ fontSize: 30, marginBottom: 8, filter: "grayscale(.5)" }}>{b.icon}</div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),.6)", marginBottom: 5 }}>{b.label}</div>
-                      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.25)", lineHeight: 1.5, marginBottom: 12 }}>{b.description}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),var(--ta-60, .6))", marginBottom: 5 }}>{b.label}</div>
+                      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-25, .25))", lineHeight: 1.5, marginBottom: 12 }}>{b.description}</div>
                       <button
                         onClick={() => setNotify({
                           businessType: b.id,
@@ -438,7 +438,7 @@ export default function BusinessSetupPage() {
           )}
 
           {liveFiltered.length === 0 && comingSoonFiltered.length === 0 && (
-            <div style={{ textAlign: "center", padding: "60px 20px", color: "rgba(var(--ink),.25)", fontSize: 14 }}>
+            <div style={{ textAlign: "center", padding: "60px 20px", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 14 }}>
               No business types found for "{search}"
             </div>
           )}
@@ -450,7 +450,7 @@ export default function BusinessSetupPage() {
                 <div style={{ fontSize: 28 }}>{bt.icon}</div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)" }}>{bt.label} Selected</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 2 }}>{bt.tagline}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 2 }}>{bt.tagline}</div>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -462,7 +462,7 @@ export default function BusinessSetupPage() {
                   ].map(s => (
                     <div key={s.label} style={{ textAlign: "center", padding: "6px 12px", borderRadius: 9, background: "rgba(var(--ink),.05)" }}>
                       <div style={{ fontSize: 16, fontWeight: 800, color: bt.color }}>{s.value}</div>
-                      <div style={{ fontSize: 10, color: "rgba(var(--ink),.35)" }}>{s.label}</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
@@ -477,7 +477,7 @@ export default function BusinessSetupPage() {
           )}
 
           {!selected && (
-            <div style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "rgba(var(--ink),.25)" }}>
+            <div style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "rgba(var(--ink),var(--ta-25, .25))" }}>
               Select a business type above to continue
             </div>
           )}
@@ -490,12 +490,12 @@ export default function BusinessSetupPage() {
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <div style={{ fontSize: 44, marginBottom: 10 }}>{bt.icon}</div>
             <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 8px" }}>Almost there!</h2>
-            <p style={{ color: "rgba(var(--ink),.4)", fontSize: 13, margin: 0 }}>A few details to personalize your {bt.label} dashboard</p>
+            <p style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13, margin: 0 }}>A few details to personalize your {bt.label} dashboard</p>
           </div>
 
           {/* What will be configured */}
           <div style={{ marginBottom: 20, padding: "16px 18px", borderRadius: 13, background: `${bt.color}08`, border: `1px solid ${bt.color}20` }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 10 }}>What we'll set up for you</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 10 }}>What we'll set up for you</div>
             <div className="setup-3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
               {[
                 { icon: "📊", label: `${bt.defaultAccounts.length} Accounts`, sub: "Chart of Accounts" },
@@ -505,7 +505,7 @@ export default function BusinessSetupPage() {
                 <div key={s.label} style={{ padding: "10px 12px", borderRadius: 9, background: "rgba(var(--ink),.04)", textAlign: "center" }}>
                   <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-solid, white)" }}>{s.label}</div>
-                  <div style={{ fontSize: 10, color: "rgba(var(--ink),.3)", marginTop: 2 }}>{s.sub}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>{s.sub}</div>
                 </div>
               ))}
             </div>
@@ -518,7 +518,7 @@ export default function BusinessSetupPage() {
               { key: "revenue",   label: "Monthly Revenue Range",     placeholder: "e.g. Under Rs.100K, Rs.100K-500K, 500K+" },
             ].map(field => (
               <div key={field.key}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 7 }}>{field.label}</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 7 }}>{field.label}</label>
                 <input
                   value={(details as any)[field.key]}
                   onChange={e => setDetails(d => ({ ...d, [field.key]: e.target.value }))}
@@ -530,7 +530,7 @@ export default function BusinessSetupPage() {
           </div>
 
           <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-            <button onClick={() => setStep("type")} style={{ flex: 1, padding: "13px", borderRadius: 11, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: "rgba(var(--ink),.5)", fontSize: 13, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+            <button onClick={() => setStep("type")} style={{ flex: 1, padding: "13px", borderRadius: 11, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 13, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
               ← Back
             </button>
             <button
@@ -541,7 +541,7 @@ export default function BusinessSetupPage() {
               {saving ? "⚙️ Configuring your dashboard…" : `🚀 Launch ${bt.label} Dashboard`}
             </button>
           </div>
-          <p style={{ textAlign: "center", fontSize: 11, color: "rgba(var(--ink),.2)", marginTop: 14 }}>
+          <p style={{ textAlign: "center", fontSize: 11, color: "rgba(var(--ink),var(--ta-20, .2))", marginTop: 14 }}>
             You can change this anytime in Business Settings
           </p>
         </div>

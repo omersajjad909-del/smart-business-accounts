@@ -59,7 +59,7 @@ export default function ServiceProjectsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Client Projects</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>Track active client assignments and service delivery scope.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>Track active client assignments and service delivery scope.</p>
         </div>
         <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: isMobile ? "8px 10px" : "10px 20px", borderRadius: 10, border: "none", background: "#38bdf8", color: "#fff", fontWeight: 700, cursor: "pointer" }}>+ New Project</button>
       </div>
@@ -70,14 +70,14 @@ export default function ServiceProjectsPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800 }}>{project.name}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>{project.projectCode} • {project.client} • Manager {project.manager || "N/A"}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 4 }}>{project.projectCode} • {project.client} • Manager {project.manager || "N/A"}</div>
               </div>
               <div style={{ fontSize: 12, fontWeight: 700, color: project.status === "completed" ? "var(--tx-22c55e, #22c55e)" : "var(--tx-38bdf8, #38bdf8)" }}>{project.status.toUpperCase()}</div>
             </div>
-            <div style={{ marginTop: 10, fontSize: 13, color: "rgba(var(--ink),.55)" }}>Budget Rs. {project.budget.toLocaleString()} • Due {project.dueDate}</div>
+            <div style={{ marginTop: 10, fontSize: 13, color: "rgba(var(--ink),var(--ta-55, .55))" }}>Budget Rs. {project.budget.toLocaleString()} • Due {project.dueDate}</div>
           </div>
         ))}
-        {!projectStore.loading && projects.length === 0 && <div style={{ color: "rgba(var(--ink),.3)" }}>No service projects yet.</div>}
+        {!projectStore.loading && projects.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}>No service projects yet.</div>}
       </div>
 
       {showModal && (
@@ -87,36 +87,36 @@ export default function ServiceProjectsPage() {
             {formError && <div style={{ marginBottom: 14, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Project Name</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Project Name</label>
                 <input value={form.name} onChange={(e) => setForm((current) => ({ ...current, name: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Client</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Client</label>
                 <input value={form.client} onChange={(e) => setForm((current) => ({ ...current, client: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Manager</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Manager</label>
                 <input value={form.manager} onChange={(e) => setForm((current) => ({ ...current, manager: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Service</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Service</label>
                 <select value={form.serviceName} onChange={(e) => setForm((current) => ({ ...current, serviceName: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", color: "var(--ink-solid, #fff)" }}>
                   <option value="">Select Service</option>
                   {catalog.map((item) => <option key={item.id} value={item.name}>{item.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Due Date</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Due Date</label>
                 <input type="date" value={form.dueDate} onChange={(e) => setForm((current) => ({ ...current, dueDate: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),.45)" }}>Budget</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Budget</label>
                 <input type="number" value={form.budget} onChange={(e) => setForm((current) => ({ ...current, budget: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: isMobile ? "8px 8px" : "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#38bdf8", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: isMobile ? "8px 12px" : "11px 24px", borderRadius: 8, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: isMobile ? "8px 12px" : "11px 24px", borderRadius: 8, border: `1px solid ${border}`, background: "transparent", color: "rgba(var(--ink),var(--ta-65, .65))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

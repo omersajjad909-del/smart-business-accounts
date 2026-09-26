@@ -83,7 +83,7 @@ export default function RolePermissionManager() {
   const s = {
     page:    { padding: "24px", maxWidth: 1100, margin: "0 auto", fontFamily: "inherit" },
     heading: { fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)", marginBottom: 4 },
-    sub:     { fontSize: 13, color: "rgba(var(--ink),0.4)", marginBottom: 24 },
+    sub:     { fontSize: 13, color: "rgba(var(--ink),var(--ta-40, 0.4))", marginBottom: 24 },
     grid:    { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 16 } as React.CSSProperties,
     panel:   { borderRadius: 12, background: "rgba(var(--ink),0.04)", border: "1px solid rgba(var(--ink),0.08)", padding: "16px" },
     roleBtn: (active: boolean): React.CSSProperties => ({
@@ -91,7 +91,7 @@ export default function RolePermissionManager() {
       borderRadius: 8, border: "none", cursor: "pointer", marginBottom: 4,
       background: active ? "rgba(99,102,241,0.2)" : "rgba(var(--ink),0.03)",
       borderLeft: active ? "3px solid #6366f1" : "3px solid transparent",
-      color: active ? "#a5b4fc" : "rgba(var(--ink),0.55)",
+      color: active ? "#a5b4fc" : "rgba(var(--ink),var(--ta-55, 0.55))",
       fontFamily: "inherit",
     }),
     permBox: (checked: boolean): React.CSSProperties => ({
@@ -102,7 +102,7 @@ export default function RolePermissionManager() {
     }),
   };
 
-  if (!user) return <div style={{ color: "rgba(var(--ink),0.4)", padding: 32 }}>Loading…</div>;
+  if (!user) return <div style={{ color: "rgba(var(--ink),var(--ta-40, 0.4))", padding: 32 }}>Loading…</div>;
   if (user.role !== "ADMIN") return (
     <div style={{ padding: 32, color: "var(--tx-f87171, #f87171)" }}>Only ADMIN can manage roles.</div>
   );
@@ -113,19 +113,19 @@ export default function RolePermissionManager() {
       <div style={s.sub}>Configure which permissions each role has</div>
 
       {loading ? (
-        <div style={{ color: "rgba(var(--ink),0.4)" }}>Loading roles…</div>
+        <div style={{ color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading roles…</div>
       ) : (
         <div style={s.grid}>
           {/* Role list */}
           <div style={s.panel}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),0.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 10 }}>Roles</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-30, 0.3))", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 10 }}>Roles</div>
             {ALL_ROLES.map(({ value, label }) => {
               const found = roles.find(r => r.role === value);
               const count = found?.permissions?.length || 0;
               return (
                 <button key={value} style={s.roleBtn(selectedRole === value)} onClick={() => setSelectedRole(value)}>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{label}</div>
-                  <div style={{ fontSize: 11, color: "rgba(var(--ink),0.3)", marginTop: 2 }}>{count} permissions</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, 0.3))", marginTop: 2 }}>{count} permissions</div>
                 </button>
               );
             })}
@@ -138,7 +138,7 @@ export default function RolePermissionManager() {
                 <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink-solid, white)" }}>
                   {ALL_ROLES.find(r => r.value === selectedRole)?.label || selectedRole}
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),0.4)", marginTop: 2 }}>Select which permissions this role should have</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, 0.4))", marginTop: 2 }}>Select which permissions this role should have</div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => setRolePermissions([...availablePermissions])}
@@ -146,7 +146,7 @@ export default function RolePermissionManager() {
                   ✓ Select All
                 </button>
                 <button onClick={() => setRolePermissions([])}
-                  style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(var(--ink),0.1)", background: "rgba(var(--ink),0.04)", color: "rgba(var(--ink),0.5)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(var(--ink),0.1)", background: "rgba(var(--ink),0.04)", color: "rgba(var(--ink),var(--ta-50, 0.5))", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
                   ✗ Clear All
                 </button>
               </div>
@@ -160,7 +160,7 @@ export default function RolePermissionManager() {
                     <input type="checkbox" checked={checked} onChange={() =>
                       setRolePermissions(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
                     } style={{ accentColor: "#6366f1", width: 15, height: 15 }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: checked ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),0.55)" }}>{p}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: checked ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),var(--ta-55, 0.55))" }}>{p}</span>
                   </label>
                 );
               })}

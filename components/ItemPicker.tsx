@@ -812,7 +812,7 @@ export function ItemPicker({
                   style={{
                     fontSize: 11,
                     color:
-                      "var(--text-muted, rgba(var(--ink),.5))",
+                      "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))",
                   }}
                 >
                   {matches.length} shown
@@ -835,7 +835,7 @@ export function ItemPicker({
                     cursor:
                       "pointer",
                     color:
-                      "var(--text-muted, rgba(var(--ink),.6))",
+                      "var(--text-muted, rgba(var(--ink),var(--ta-60, .6)))",
                   }}
                 >
                   <input
@@ -878,7 +878,7 @@ export function ItemPicker({
                   borderBottom:
                     "1px solid var(--border, rgba(var(--ink),.12))",
                   color:
-                    "var(--text-muted, rgba(var(--ink),.5))",
+                    "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))",
                   fontSize: 10,
                   fontWeight: 800,
                   textTransform:
@@ -1039,7 +1039,7 @@ export function ItemPicker({
                       color:
                         previewFields.length
                           ? "var(--text-primary, #fff)"
-                          : "var(--text-muted, rgba(var(--ink),.4))",
+                          : "var(--text-muted, rgba(var(--ink),var(--ta-40, .4)))",
 
                       minWidth: 62,
 
@@ -1099,7 +1099,7 @@ export function ItemPicker({
                         <span
                           style={{
                             color:
-                              "var(--text-muted, rgba(var(--ink),.4))",
+                              "var(--text-muted, rgba(var(--ink),var(--ta-40, .4)))",
 
                             fontSize:
                               11.5,
@@ -1164,7 +1164,7 @@ export function ItemPicker({
                             color:
                               text ===
                               "—"
-                                ? "var(--text-muted, rgba(var(--ink),.35))"
+                                ? "var(--text-muted, rgba(var(--ink),var(--ta-35, .35)))"
                                 : "var(--text-primary, #fff)",
                           }}
                         >
@@ -1212,7 +1212,7 @@ export function ItemPicker({
                         fontSize: 11,
 
                         color:
-                          "var(--text-muted, rgba(var(--ink),.35))",
+                          "var(--text-muted, rgba(var(--ink),var(--ta-35, .35)))",
 
                         marginLeft:
                           previewFields.length
@@ -1262,7 +1262,7 @@ export function ItemPicker({
 
                             color:
                               tone ??
-                              "var(--text-muted, rgba(var(--ink),.55))",
+                              "var(--text-muted, rgba(var(--ink),var(--ta-55, .55)))",
                           }}
                         >
                           {n ===
@@ -1352,7 +1352,7 @@ export function ItemPicker({
                   fontSize: 12.5,
 
                   color:
-                    "var(--text-muted, rgba(var(--ink),.5))",
+                    "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))",
 
                   background:
                     cursor ===
@@ -1391,7 +1391,7 @@ export function ItemPicker({
                 style={{
                   fontSize: 11,
                   color:
-                    "var(--text-muted, rgba(var(--ink),.5))",
+                    "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))",
                 }}
               >
                 ↑↓ move · Enter select · Esc close

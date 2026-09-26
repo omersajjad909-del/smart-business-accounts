@@ -85,7 +85,7 @@ export default function AgeingReportPage() {
   const hiddenBills      = meta ? Math.max(0, meta.openBills - data.filter(r => r.billBalance > 0).length) : 0;
 
   const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
-  const thStyle: React.CSSProperties = { padding:"10px 14px", textAlign:"left", fontSize:11, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:.7, borderBottom:"1px solid rgba(var(--ink),.07)", fontWeight:600, whiteSpace:"nowrap", background:"rgba(var(--ink),.02)" };
+  const thStyle: React.CSSProperties = { padding:"10px 14px", textAlign:"left", fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:.7, borderBottom:"1px solid rgba(var(--ink),.07)", fontWeight:600, whiteSpace:"nowrap", background:"rgba(var(--ink),.02)" };
 
   return (
     <div style={{ fontFamily:"'Outfit','Inter',sans-serif", color:"rgba(var(--ink),.85)" }}>
@@ -94,22 +94,22 @@ export default function AgeingReportPage() {
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
           <div style={{ width:"100%", maxWidth:480, background:"rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
-            <button onClick={() => data.length > 0 ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
+            <button onClick={() => data.length > 0 ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),var(--ta-35, .35))", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             {/* Title */}
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#f59e0b,#ef4444)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>📋</div>
               <div>
                 <div style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", letterSpacing:"-.3px" }}>Ageing Report</div>
-                <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:2 }}>Bill-wise outstanding analysis</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>Bill-wise outstanding analysis</div>
               </div>
             </div>
 
             {/* Type toggle */}
             <div style={{ marginBottom:16 }}>
-              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:8 }}>Party Type</label>
+              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:8 }}>Party Type</label>
               <div style={{ display:"flex", background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.1)", borderRadius:10, overflow:"hidden" }}>
                 {(["customer","supplier"] as const).map(t => (
-                  <button key={t} onClick={() => setType(t)} style={{ flex:1, padding:"10px 0", border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight:700, transition:"all .15s", background:type===t?"linear-gradient(135deg,#6366f1,#4f46e5)":"transparent", color:type===t?"white":"rgba(var(--ink),.4)" }}>
+                  <button key={t} onClick={() => setType(t)} style={{ flex:1, padding:"10px 0", border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight:700, transition:"all .15s", background:type===t?"linear-gradient(135deg,#6366f1,#4f46e5)":"transparent", color:type===t?"white":"rgba(var(--ink),var(--ta-40, .4))" }}>
                     {t === "customer" ? "👤 Customer" : "🏭 Supplier"}
                   </button>
                 ))}
@@ -118,13 +118,13 @@ export default function AgeingReportPage() {
 
             {/* As on date */}
             <div style={{ marginBottom:16 }}>
-              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As On Date</label>
+              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As On Date</label>
               <DateInput ref={dateRef} value={asOnDate} onChange={setAsOnDate} style={inputStyle} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); partyRef.current?.focus(); setDropOpen(true); } }}/>
             </div>
 
             {/* Party autocomplete */}
             <div style={{ marginBottom:22, position:"relative" }}>
-              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>
+              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>
                 {type === "customer" ? "Customer" : "Supplier"}
               </label>
               <input
@@ -176,27 +176,27 @@ export default function AgeingReportPage() {
         <>
           {/* Top bar */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:10 }}>
-            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.6)", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),var(--ta-60, .6))", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
               ⟵ Change Filters
             </button>
-            <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
+            <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
           </div>
 
           {/* Report info bar */}
           <div style={{ background:"linear-gradient(135deg,rgba(245,158,11,.1),rgba(239,68,68,.06))", border:"1px solid rgba(245,158,11,.2)", borderRadius:14, padding: isMobile ? "12px 10px" : "16px 20px", marginBottom:20, display:"flex", gap:24, flexWrap:"wrap", alignItems:"center" }}>
-            <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Party</div><div style={{ fontSize:15, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", marginTop:3 }}>{partyName}</div></div>
-            <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Type</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),.7)", marginTop:3, textTransform:"capitalize" }}>{type}</div></div>
-            <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em" }}>As On</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),.7)", marginTop:3 }}>{asOnDate}</div></div>
+            <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em" }}>Party</div><div style={{ fontSize:15, fontWeight:800, color:"var(--tx-fbbf24, #fbbf24)", marginTop:3 }}>{partyName}</div></div>
+            <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em" }}>Type</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))", marginTop:3, textTransform:"capitalize" }}>{type}</div></div>
+            <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em" }}>As On</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))", marginTop:3 }}>{asOnDate}</div></div>
             {meta?.creditDays ? (
-              <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Credit Days</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),.7)", marginTop:3 }}>{meta.creditDays}</div></div>
+              <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em" }}>Credit Days</div><div style={{ fontSize:14, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, .7))", marginTop:3 }}>{meta.creditDays}</div></div>
             ) : null}
             {meta?.creditLimit ? (
-              <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em" }}>Credit Amount</div><div style={{ fontSize:14, fontWeight:700, color:meta.overLimit ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.7)", marginTop:3 }}>{fmt(meta.creditLimit)}</div></div>
+              <div><div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em" }}>Credit Amount</div><div style={{ fontSize:14, fontWeight:700, color:meta.overLimit ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),var(--ta-70, .7))", marginTop:3 }}>{fmt(meta.creditLimit)}</div></div>
             ) : null}
           </div>
 
           {error && <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"var(--tx-f87171, #f87171)", fontSize:13 }}>{error}</div>}
-          {loading && <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(var(--ink),.25)", fontSize:14 }}>Loading report…</div>}
+          {loading && <div style={{ textAlign:"center", padding:"60px 0", color:"rgba(var(--ink),var(--ta-25, .25))", fontSize:14 }}>Loading report…</div>}
 
           {!loading && (
             <div style={{ background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.08)", borderRadius:14, overflow:"hidden" }}>
@@ -215,7 +215,7 @@ export default function AgeingReportPage() {
                   </thead>
                   <tbody>
                     {data.length === 0 ? (
-                      <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 14px", textAlign:"center", color:"rgba(var(--ink),.2)", fontSize:13 }}>
+                      <tr><td colSpan={7} style={{ padding: isMobile ? "22px 10px" : "40px 14px", textAlign:"center", color:"rgba(var(--ink),var(--ta-20, .2))", fontSize:13 }}>
                         {meta && meta.hasTerms && meta.openBills > 0
                           ? `Within credit terms — ${meta.openBills} open bill${meta.openBills > 1 ? "s" : ""}, none past the agreed days or amount`
                           : "No outstanding bills found"}
@@ -227,9 +227,9 @@ export default function AgeingReportPage() {
                           onMouseEnter={e=>(e.currentTarget.style.background="rgba(245,158,11,.04)")}
                           onMouseLeave={e=>(e.currentTarget.style.background=i%2===0?"transparent":"rgba(var(--ink),.01)")}>
                           <td style={{ padding:"10px 14px", fontSize:12, fontFamily:"monospace", color:"var(--tx-a5b4fc, #a5b4fc)" }}>{r.numType}</td>
-                          <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(var(--ink),.45)", whiteSpace:"nowrap" }}>{r.date}</td>
+                          <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(var(--ink),var(--ta-45, .45))", whiteSpace:"nowrap" }}>{r.date}</td>
                           <td style={{ padding:"10px 14px", fontSize:13, color:"rgba(var(--ink),.75)" }}>{r.narration}</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),.65)" }}>{fmt(r.billAmount)}</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),var(--ta-65, .65))" }}>{fmt(r.billAmount)}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:r.billBalance<0?"var(--tx-f87171, #f87171)":"var(--tx-4ade80, #4ade80)", fontWeight:600 }}>{r.billBalance<0?"−":""}{fmt(r.billBalance)}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color:dayColor }}>{r.days}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color:"rgba(var(--ink),.8)" }}>{r.totalBalance<0?"−":""}{fmt(r.totalBalance)}</td>
@@ -240,7 +240,7 @@ export default function AgeingReportPage() {
                   {data.length > 0 && (
                     <tfoot>
                       <tr style={{ background:"rgba(99,102,241,.08)", borderTop:"2px solid rgba(99,102,241,.2)" }}>
-                        <td colSpan={3} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"rgba(var(--ink),.4)" }}>Totals</td>
+                        <td colSpan={3} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Totals</td>
                         <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),.8)" }}>{fmt(totalBillAmount)}</td>
                         <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:totalBillBalance<0?"var(--tx-f87171, #f87171)":"var(--tx-4ade80, #4ade80)" }}>{totalBillBalance<0?"−":""}{fmt(totalBillBalance)}</td>
                         <td/>
@@ -255,15 +255,15 @@ export default function AgeingReportPage() {
 
           {/* Bills the credit terms kept off the list still count towards the total */}
           {!loading && hiddenBills > 0 && (
-            <div style={{ marginTop:12, fontSize:12, color:"rgba(var(--ink),.4)" }}>
+            <div style={{ marginTop:12, fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>
               {hiddenBills} bill{hiddenBills > 1 ? "s" : ""} within credit terms not listed — included in the total balance.
             </div>
           )}
 
           {/* Age legend */}
-          <div style={{ marginTop:16, display:"flex", gap:20, fontSize:12, color:"rgba(var(--ink),.4)", flexWrap:"wrap" }}>
-            <span style={{ color:"rgba(var(--ink),.5)" }}>Age colour:</span>
-            {[{ label:"0–30 days", color:"rgba(var(--ink),.7)" }, { label:"31–60 days", color:"var(--tx-fbbf24, #fbbf24)" }, { label:"61–90 days", color:"var(--tx-fb923c, #fb923c)" }, { label:"90+ days", color:"var(--tx-f87171, #f87171)" }].map(({ label, color }) => (
+          <div style={{ marginTop:16, display:"flex", gap:20, fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", flexWrap:"wrap" }}>
+            <span style={{ color:"rgba(var(--ink),var(--ta-50, .5))" }}>Age colour:</span>
+            {[{ label:"0–30 days", color:"rgba(var(--ink),var(--ta-70, .7))" }, { label:"31–60 days", color:"var(--tx-fbbf24, #fbbf24)" }, { label:"61–90 days", color:"var(--tx-fb923c, #fb923c)" }, { label:"90+ days", color:"var(--tx-f87171, #f87171)" }].map(({ label, color }) => (
               <span key={label} style={{ display:"flex", alignItems:"center", gap:5 }}>
                 <span style={{ width:10, height:10, borderRadius:"50%", background:color, display:"inline-block" }}/>{label}
               </span>

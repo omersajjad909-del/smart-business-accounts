@@ -55,7 +55,7 @@ export default function UtilitiesOverviewPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>{utilityConfig.title}</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>{utilityConfig.description}</p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{utilityConfig.description}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
@@ -80,7 +80,7 @@ export default function UtilitiesOverviewPage() {
           { label: "Billed Value", value: summary.billedValue.toLocaleString(), color: "var(--tx-60a5fa, #60a5fa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -93,11 +93,11 @@ export default function UtilitiesOverviewPage() {
             {bills.slice(0, 6).map((item) => (
               <div key={item.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.invoice}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 4 }}>{item.account || "-"} | {item.billingMonth || "-"}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 4 }}>{item.account || "-"} | {item.billingMonth || "-"}</div>
                 <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>Amount {item.amount.toLocaleString()} | {item.status}</div>
               </div>
             ))}
-            {bills.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No utility bills available yet.</div>}
+            {bills.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No utility bills available yet.</div>}
           </div>
         </div>
 
@@ -109,11 +109,11 @@ export default function UtilitiesOverviewPage() {
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.account}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.customer || "-"}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.customer || "-"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.tariff || "-"}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.status}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.status}</div>
                   </div>
                 </div>
               ))}
@@ -127,11 +127,11 @@ export default function UtilitiesOverviewPage() {
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.meter}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.account || "-"}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.account || "-"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.units.toLocaleString()}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.status}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.status}</div>
                   </div>
                 </div>
               ))}

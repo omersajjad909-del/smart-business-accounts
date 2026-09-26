@@ -47,10 +47,10 @@ function DiffViewer({ before, after }: { before: string | null; after: string | 
         const bv = b[k], av = a[k];
         const changed = JSON.stringify(bv) !== JSON.stringify(av);
         return (
-          <div key={k} style={{ marginBottom: 4, color: changed ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),0.4)" }}>
+          <div key={k} style={{ marginBottom: 4, color: changed ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-40, 0.4))" }}>
             <span style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>{k}</span>:{" "}
             {changed && bv !== undefined && <><span style={{ color: "var(--tx-f87171, #f87171)", textDecoration: "line-through" }}>{JSON.stringify(bv)}</span>{" → "}</>}
-            <span style={{ color: changed ? "var(--tx-4ade80, #4ade80)" : "rgba(var(--ink),0.5)" }}>{JSON.stringify(av ?? bv)}</span>
+            <span style={{ color: changed ? "var(--tx-4ade80, #4ade80)" : "rgba(var(--ink),var(--ta-50, 0.5))" }}>{JSON.stringify(av ?? bv)}</span>
           </div>
         );
       })}

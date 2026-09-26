@@ -1,6 +1,6 @@
 /**
  * Regenerates the light-theme values for the variables scripts/theme-codemod.cjs
- * writes into the source (--dk-*, --dkb-*, --dkr-*, --tx-*, --txr-*).
+ * writes into the source (--dk-*, --dkb-*, --dkr-*, --tx-*, --txr-*, --ta-*).
  *
  * Scans app/ and components/ for every such variable in use and rewrites the
  * block between the THEME-VARS markers in app/globals.css. Run it after the
@@ -25,10 +25,11 @@ function walk(dir, out) {
   return out;
 }
 
-const names = { dk: new Set(), dkb: new Set(), dkr: new Set(), tx: new Set(), txr: new Set() };
+const names = { dk: new Set(), dkb: new Set(), dkr: new Set(), tx: new Set(), txr: new Set(), ta: new Set() };
 for (const f of [...walk(path.join(ROOT, "app"), []), ...walk(path.join(ROOT, "components"), [])]) {
   const src = fs.readFileSync(f, "utf8");
   for (const m of src.matchAll(/var\(--(dk|dkb|dkr|tx|txr)-([0-9a-f]{6})\b/g)) names[m[1]].add(m[2]);
+  for (const m of src.matchAll(/var\(--ta-(\d{2})\b/g)) names.ta.add(m[1]);
 }
 
 const rgbOf = (h) => [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -79,6 +80,9 @@ const body = [
   rows(names.dkr, (n) => `--dkr-${n}: 255, 255, 255;`),
   rows(names.tx, (n) => `--tx-${n}: ${hex(forWhite(n))};`),
   rows(names.txr, (n) => `--txr-${n}: ${forWhite(n).join(", ")};`),
+  // Text alpha: .3 of near-black on white is ~2:1. Lift every faint alpha into
+  // readable range while keeping the ordering (fainter stays fainter).
+  rows(names.ta, (n) => `--ta-${n}: ${Math.min(1, 0.5 + (+n / 100) * 0.7).toFixed(2)};`),
   "}",
 ].filter(Boolean).join("\n");
 

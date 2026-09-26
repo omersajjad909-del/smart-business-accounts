@@ -61,22 +61,22 @@ export default function FrontDeskPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏁 Front Desk</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage check-ins, check-outs, and reservations</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏁 Front Desk</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage check-ins, check-outs, and reservations</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Reservation</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Reservations", val: reservations.length, color: "var(--tx-f97316, #f97316)" }, { label: "Checked In", val: checkedIn, color: "var(--tx-34d399, #34d399)" }, { label: "Reserved", val: reservations.filter(r => r.status === "reserved").length, color: "var(--tx-818cf8, #818cf8)" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12 }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead><tr>{["Guest", "Room", "Check In", "Check Out", "Phone", "Guests", "Status", "Action"].map(h => (
-            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
+            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
           ))}</tr></thead>
           <tbody>
             {reservations.map(r => (
@@ -108,7 +108,7 @@ export default function FrontDeskPage() {
                 </td>
               </tr>
             ))}
-            {!loading && reservations.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No reservations yet.</td></tr>}
+            {!loading && reservations.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No reservations yet.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -120,23 +120,23 @@ export default function FrontDeskPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Guest Name", "guest", "text", "span 2"], ["Room Number", "room", "text", ""], ["Phone", "phone", "text", ""], ["Check In", "checkIn", "date", ""], ["Check Out", "checkOut", "date", ""]].map(([label, key, type, col]) => (
                 <div key={key} style={{ gridColumn: col || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Adults</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Adults</label>
                 <input type="number" value={form.adults} onChange={e => setForm(f => ({ ...f, adults: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Children</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Children</label>
                 <input type="number" value={form.children} onChange={e => setForm(f => ({ ...f, children: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Create Reservation</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -25,7 +25,7 @@ export default function FoodProcessingOverviewPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>Food Processing Command Center</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>Recipe-led production readiness, unit cost, and batch yield visibility from live records.</p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Recipe-led production readiness, unit cost, and batch yield visibility from live records.</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
@@ -50,7 +50,7 @@ export default function FoodProcessingOverviewPage() {
           { label: "Total Yield", value: summary.totalYield.toLocaleString(), color: "var(--tx-f97316, #f97316)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -63,11 +63,11 @@ export default function FoodProcessingOverviewPage() {
             <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{item.recipe}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.sku || "-"}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.sku || "-"}</div>
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{item.unitCost.toLocaleString()}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.status}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.status}</div>
               </div>
             </div>
           ))}

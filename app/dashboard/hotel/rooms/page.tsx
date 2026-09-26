@@ -51,17 +51,17 @@ export default function HotelRoomsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏨 Hotel Rooms</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage room inventory and status</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏨 Hotel Rooms</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage room inventory and status</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Room</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Rooms", val: rooms.length, color: "var(--tx-f97316, #f97316)" }, { label: "Available", val: available, color: "var(--tx-34d399, #34d399)" }, { label: "Occupied", val: occupied, color: "var(--tx-ef4444, #ef4444)" }, { label: "Occupancy Rate", val: `${occupancy}%`, color: "var(--tx-818cf8, #818cf8)" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 12 }}>
         {rooms.map(r => (
@@ -70,8 +70,8 @@ export default function HotelRoomsPage() {
               <div style={{ fontWeight: 800, fontSize: 18 }}>#{r.number}</div>
               <span style={{ display: "inline-block", background: `${STATUS_COLOR[r.status]}20`, color: STATUS_COLOR[r.status], borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>{r.status}</span>
             </div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 2 }}>{r.type} · Floor {r.floor}</div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 10 }}>Rs. {r.rate.toLocaleString()}/night · {r.capacity} guests</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 2 }}>{r.type} · Floor {r.floor}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 10 }}>Rs. {r.rate.toLocaleString()}/night · {r.capacity} guests</div>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {(["available", "occupied", "cleaning", "maintenance"] as const).filter(s => s !== r.status).map(s => (
                 <button key={s} onClick={() => update(r.id, { status: s })} style={{ padding: "3px 8px", background: `${STATUS_COLOR[s]}15`, border: `1px solid ${STATUS_COLOR[s]}40`, color: STATUS_COLOR[s], borderRadius: 4, fontSize: 10, cursor: "pointer" }}>{s}</button>
@@ -79,7 +79,7 @@ export default function HotelRoomsPage() {
             </div>
           </div>
         ))}
-        {!loading && rooms.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No rooms added yet.</div>}
+        {!loading && rooms.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", gridColumn: "1/-1" }}>No rooms added yet.</div>}
       </div>
 
       {showModal && (
@@ -88,32 +88,32 @@ export default function HotelRoomsPage() {
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Room</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Room Number</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Room Number</label>
                 <input type="text" value={form.number} onChange={e => setForm(f => ({ ...f, number: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Floor</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Floor</label>
                 <input type="text" value={form.floor} onChange={e => setForm(f => ({ ...f, floor: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Room Type</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Room Type</label>
                 <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {["Standard", "Deluxe", "Suite", "Presidential"].map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Rate/Night (Rs.)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Rate/Night (Rs.)</label>
                 <input type="number" value={form.rate} onChange={e => setForm(f => ({ ...f, rate: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Capacity</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Capacity</label>
                 <input type="number" value={form.capacity} onChange={e => setForm(f => ({ ...f, capacity: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Room</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

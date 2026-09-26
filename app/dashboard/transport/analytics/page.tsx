@@ -90,7 +90,7 @@ export default function TransportAnalyticsPage() {
                 <div style={{ fontSize: 12, color: transportMuted }}>{row.trips} trips | Net Rs. {row.revenue.toLocaleString()}</div>
               </div>
             ))}
-            {routeMix.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No trip data available.</div>}
+            {routeMix.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No trip data available.</div>}
           </div>
         </section>
 
@@ -103,7 +103,7 @@ export default function TransportAnalyticsPage() {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f87171, #f87171)" }}>Rs. {row.amount.toLocaleString()}</span>
               </div>
             ))}
-            {fuelByVehicle.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No fuel data available.</div>}
+            {fuelByVehicle.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No fuel data available.</div>}
           </div>
         </section>
       </div>

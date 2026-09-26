@@ -77,7 +77,7 @@ export default function PharmacyBatchesPage() {
                 </td>
               </tr>
             ))}
-            {!loading && batches.length === 0 && <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No batches available.</td></tr>}
+            {!loading && batches.length === 0 && <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>No batches available.</td></tr>}
           </tbody>
         </table>
       </div>

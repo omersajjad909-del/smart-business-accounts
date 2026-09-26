@@ -84,7 +84,7 @@ export default function TripsPage() {
       {loading && <div style={{ textAlign: "center", padding: 40, color: transportMuted }}>Loading...</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No trips found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-25, .25))" }}>No trips found.</div>}
         {filtered.map((t) => {
           const profit = t.fare - t.expenses;
           return (
@@ -98,11 +98,11 @@ export default function TripsPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: "rgba(var(--ink),.04)", borderRadius: 8, padding: "10px 14px" }}>
                     <div style={{ fontWeight: 700, fontSize: 15 }}>{t.from}</div>
                     <div style={{ flex: 1, borderTop: "2px dashed rgba(var(--ink),.2)", position: "relative" }}>
-                      <span style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", fontSize: 11, color: "rgba(var(--ink),.4)", whiteSpace: "nowrap" }}>{t.distance} km</span>
+                      <span style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", whiteSpace: "nowrap" }}>{t.distance} km</span>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: 15 }}>{t.to}</div>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),.6)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                     <div>Vehicle: {t.vehicle}</div>
                     <div>Driver: {t.driver}</div>
                     <div>Cargo: {t.cargo} ({t.weight} kg)</div>

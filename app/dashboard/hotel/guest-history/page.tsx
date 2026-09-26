@@ -40,7 +40,7 @@ export default function HotelGuestHistoryPage() {
                   <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.notes || "—"}</td>
                 </tr>
               ))}
-              {!loading && history.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No guest history yet.</td></tr>}
+              {!loading && history.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No guest history yet.</td></tr>}
             </tbody>
           </table>
         </div>
@@ -55,7 +55,7 @@ export default function HotelGuestHistoryPage() {
                 <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>{row.phone || "No phone"}</div>
               </div>
             ))}
-            {liveGuests.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No guests currently checked in.</div>}
+            {liveGuests.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No guests currently checked in.</div>}
           </div>
         </div>
       </div>

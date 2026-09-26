@@ -100,7 +100,7 @@ export default function PharmacyAnalyticsPage() {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)" }}>{row.count}</span>
               </div>
             ))}
-            {demandRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No prescription data available.</div>}
+            {demandRows.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No prescription data available.</div>}
           </div>
         </section>
 
@@ -113,7 +113,7 @@ export default function PharmacyAnalyticsPage() {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {row.amount.toLocaleString()}</span>
               </div>
             ))}
-            {paymentRows.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No counter sales recorded yet.</div>}
+            {paymentRows.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No counter sales recorded yet.</div>}
           </div>
         </section>
       </div>

@@ -218,7 +218,7 @@ export default function RestaurantOrdersPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Restaurant Order Board</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.45)", margin: 0 }}>Manage dine-in, takeaway, and delivery orders before they hit billing and kitchen.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: 0 }}>Manage dine-in, takeaway, and delivery orders before they hit billing and kitchen.</p>
         </div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 18px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Order</button>
       </div>
@@ -231,7 +231,7 @@ export default function RestaurantOrdersPage() {
           { label: "Ticket Value", value: `Rs. ${orders.reduce((sum, row) => sum + row.total, 0).toLocaleString()}`, color: "var(--tx-fca5a5, #fca5a5)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -242,7 +242,7 @@ export default function RestaurantOrdersPage() {
           <thead>
             <tr>
               {["Order", "Table", "Mode", "Guests", "Items", "Total", "Status", "Actions"].map((header) => (
-                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.45)", borderBottom: `1px solid ${restaurantBorder}` }}>{header}</th>
+                <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", borderBottom: `1px solid ${restaurantBorder}` }}>{header}</th>
               ))}
             </tr>
           </thead>
@@ -253,7 +253,7 @@ export default function RestaurantOrdersPage() {
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.tableRef || "-"}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "capitalize" }}>{order.serviceMode.replace("_", " ")}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.guests}</td>
-                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", maxWidth: 260, color: "rgba(var(--ink),.65)" }}>{order.itemsSummary}</td>
+                <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", maxWidth: 260, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{order.itemsSummary}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {order.total.toLocaleString()}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", textTransform: "uppercase", fontSize: 11, color: "var(--tx-fca5a5, #fca5a5)", fontWeight: 700 }}>{order.status}</td>
                 <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -268,7 +268,7 @@ export default function RestaurantOrdersPage() {
             ))}
             {!orderStore.loading && orders.length === 0 && (
               <tr>
-                <td colSpan={8} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No restaurant orders yet.</td>
+                <td colSpan={8} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No restaurant orders yet.</td>
               </tr>
             )}
           </tbody>
@@ -282,7 +282,7 @@ export default function RestaurantOrdersPage() {
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Service Mode</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Service Mode</label>
                 <select value={form.serviceMode} onChange={(event) => setForm((prev) => ({ ...prev, serviceMode: event.target.value as OrderForm["serviceMode"] }))} style={{ width: "100%", background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff" }}>
                   <option value="dine_in">Dine In</option>
                   <option value="takeaway">Takeaway</option>
@@ -290,7 +290,7 @@ export default function RestaurantOrdersPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Table</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Table</label>
                 <select value={form.tableRef} onChange={(event) => setForm((prev) => ({ ...prev, tableRef: event.target.value }))} style={{ width: "100%", background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff" }}>
                   <option value="">Select table</option>
                   {tables.map((table) => (
@@ -299,25 +299,25 @@ export default function RestaurantOrdersPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Guests</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Guests</label>
                 <input type="number" min={1} value={form.guests} onChange={(event) => setForm((prev) => ({ ...prev, guests: Number(event.target.value) }))} style={{ width: "100%", background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Order Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Order Date</label>
                 <input type="date" value={form.date} onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))} style={{ width: "100%", background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Items Summary</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Items Summary</label>
                 <input value={form.itemsSummary} onChange={(event) => setForm((prev) => ({ ...prev, itemsSummary: event.target.value }))} placeholder={menu.slice(0, 3).map((item) => item.name).join(", ") || "Burger, Fries, Tea"} style={{ width: "100%", background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Total</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Total</label>
                 <input type="number" min={0} value={form.total} onChange={(event) => setForm((prev) => ({ ...prev, total: Number(event.target.value) }))} style={{ width: "100%", background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 8, padding: "10px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{editingId ? "Update Order" : "Create Order"}</button>
-              <button onClick={closeModal} style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={closeModal} style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-65, .65))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

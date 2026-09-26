@@ -70,7 +70,7 @@ export default function WhatsNew() {
           cursor: "pointer",
           background: "rgba(var(--ink),.05)",
           border: "1px solid rgba(var(--ink),.08)",
-          color: "rgba(var(--ink),.6)",
+          color: "rgba(var(--ink),var(--ta-60, .6))",
           fontSize: 16,
           lineHeight: 1,
           display: "inline-flex",
@@ -152,7 +152,7 @@ export default function WhatsNew() {
                     <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.02em" }}>
                       What’s New in FinovaOS
                     </div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 2 }}>
                       {updates.length} update{updates.length !== 1 ? "s" : ""} · Latest first
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export default function WhatsNew() {
                   borderRadius: 8,
                   background: "rgba(var(--ink),.06)",
                   border: "1px solid rgba(var(--ink),.1)",
-                  color: "rgba(var(--ink),.5)",
+                  color: "rgba(var(--ink),var(--ta-50, .5))",
                   fontSize: 16,
                   cursor: "pointer",
                   display: "flex",
@@ -213,7 +213,7 @@ export default function WhatsNew() {
                         )}
                       </div>
                       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-solid, white)", lineHeight: 1.4 }}>{u.title}</div>
-                      <div style={{ fontSize: 10, color: "rgba(var(--ink),.25)", marginTop: 4 }}>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-25, .25))", marginTop: 4 }}>
                         {new Date(u.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                         {u.version && ` · ${u.version}`}
                       </div>
@@ -234,7 +234,7 @@ export default function WhatsNew() {
                           {tc.icon} {tc.label}
                         </span>
                         {u.version && (
-                          <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),.5)", fontSize: 11, fontWeight: 700, fontFamily: "monospace" }}>
+                          <span style={{ padding: "4px 12px", borderRadius: 20, background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 11, fontWeight: 700, fontFamily: "monospace" }}>
                             {u.version}
                           </span>
                         )}
@@ -242,7 +242,7 @@ export default function WhatsNew() {
                       <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-.02em", lineHeight: 1.3, margin: "0 0 12px" }}>
                         {u.title}
                       </h2>
-                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)", marginBottom: 20 }}>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 20 }}>
                         {new Date(u.createdAt).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
                       </div>
                       <div style={{ color: "rgba(var(--ink),.75)", fontSize: 13, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{u.body}</div>

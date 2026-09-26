@@ -10,7 +10,7 @@ const FONT   = "'Outfit','Inter',sans-serif";
 const ACCENT = "#10b981";
 const PANEL  = "rgba(var(--ink),0.03)";
 const BORDER = "rgba(var(--ink),0.08)";
-const TEXT   = "#f1f5f9";
+const TEXT   = "var(--tx-f1f5f9, #f1f5f9)";
 const MUTED  = "rgba(var(--ink),0.45)";
 const INPUT: React.CSSProperties = {
   background: "rgba(var(--ink),0.05)", border: `1px solid ${BORDER}`,

@@ -68,7 +68,7 @@ export default function FranchiseOverviewPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>{franchiseConfig.title}</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>{franchiseConfig.description}</p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{franchiseConfig.description}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
@@ -92,7 +92,7 @@ export default function FranchiseOverviewPage() {
           { label: "Received Cycles", value: summary.receivedCycles, color: "var(--tx-34d399, #34d399)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -105,7 +105,7 @@ export default function FranchiseOverviewPage() {
             {outlets.slice(0, 6).map((item) => (
               <div key={item.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.outletName}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 4 }}>{item.location || "-"} | {item.franchisee || "-"}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 4 }}>{item.location || "-"} | {item.franchisee || "-"}</div>
                 <div style={{ fontSize: 12, color: franchiseConfig.tone, marginTop: 6 }}>{item.monthlySales.toLocaleString()} | {item.status}</div>
               </div>
             ))}
@@ -119,11 +119,11 @@ export default function FranchiseOverviewPage() {
               <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700 }}>{item.outlet}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.month || "-"}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.month || "-"}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 13, fontWeight: 700 }}>{item.amount.toLocaleString()}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.status}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.status}</div>
                 </div>
               </div>
             ))}

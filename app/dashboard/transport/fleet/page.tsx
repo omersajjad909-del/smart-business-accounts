@@ -90,7 +90,7 @@ export default function FleetPage() {
       {loading && <div style={{ textAlign: "center", padding: 40, color: transportMuted }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: 16 }}>
-        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No vehicles found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-25, .25))" }}>No vehicles found.</div>}
         {filtered.map((v) => {
           const overdue = isOverdue(v.nextService);
           const dueSoon = isDueSoon(v.nextService);
@@ -111,7 +111,7 @@ export default function FleetPage() {
                   {statusLabel[v.status] || v.status}
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13, color: "rgba(var(--ink),.6)" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                 <div>Driver: {v.driver || "-"}</div>
                 <div>Capacity: {v.capacity || "-"}</div>
                 <div>Fuel: {v.fuelType}</div>

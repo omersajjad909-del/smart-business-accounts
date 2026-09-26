@@ -62,8 +62,8 @@ export default function BalanceSheetPage() {
   const totalL = (data?.totalLiabilities || 0) + (data?.totalEquity || 0);
   const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
   const sectionCard = (accent: string): React.CSSProperties => ({ background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.08)", borderRadius:14, overflow:"hidden" });
-  const th: React.CSSProperties = { padding:"10px 16px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", textTransform:"uppercase", letterSpacing:".08em", borderBottom:"1px solid rgba(var(--ink),.07)", background:"rgba(var(--ink),.03)" };
-  const td: React.CSSProperties = { padding:"10px 16px", fontSize:13, color:"rgba(var(--ink),.7)", borderBottom:"1px solid rgba(var(--ink),.04)" };
+  const th: React.CSSProperties = { padding:"10px 16px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em", borderBottom:"1px solid rgba(var(--ink),.07)", background:"rgba(var(--ink),.03)" };
+  const td: React.CSSProperties = { padding:"10px 16px", fontSize:13, color:"rgba(var(--ink),var(--ta-70, .7))", borderBottom:"1px solid rgba(var(--ink),.04)" };
 
   return (
     <div style={{ fontFamily:"'Outfit','Inter',sans-serif", color:"rgba(var(--ink),.85)" }}>
@@ -72,16 +72,16 @@ export default function BalanceSheetPage() {
       {showModal && (
         <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
           <div style={{ width:"100%", maxWidth:420, background:"rgba(var(--dkr-0a0d20, 10,13,32),0.97)", border:"1px solid rgba(var(--ink),.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)", position:"relative" }}>
-            <button onClick={() => data ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
+            <button onClick={() => data ? setShowModal(false) : router.back()} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(var(--ink),var(--ta-35, .35))", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6 }}>✕</button>
             <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
               <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#3b82f6,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>🏛️</div>
               <div>
                 <div style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", letterSpacing:"-.3px" }}>Balance Sheet</div>
-                <div style={{ fontSize:12, color:"rgba(var(--ink),.35)", marginTop:2 }}>Select as-of date</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>Select as-of date</div>
               </div>
             </div>
             <div style={{ marginBottom:22 }}>
-              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As of Date</label>
+              <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As of Date</label>
               <DateInput ref={dateRef} value={date} onChange={setDate} style={inputStyle} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
             </div>
             <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#3b82f6,#2563eb)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(59,130,246,.35)" }}>
@@ -96,11 +96,11 @@ export default function BalanceSheetPage() {
         <>
           {/* Top bar */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:10 }}>
-            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.6)", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),var(--ta-60, .6))", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
               ⟵ Change Date
             </button>
             <div style={{ display:"flex", gap:8 }}>
-              <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
+              <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
               <button onClick={sendEmail} disabled={sendingEmail||!data} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"var(--tx-34d399, #34d399)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:(sendingEmail||!data)?0.5:1 }}>
                 {sendingEmail ? "Sending…" : "✉ Email"}
               </button>
@@ -112,7 +112,7 @@ export default function BalanceSheetPage() {
           )}
 
           {loading && (
-            <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(var(--ink),.25)", fontSize:14 }}>Loading report…</div>
+            <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(var(--ink),var(--ta-25, .25))", fontSize:14 }}>Loading report…</div>
           )}
 
           {data && !loading && (
@@ -122,10 +122,10 @@ export default function BalanceSheetPage() {
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
                   <div>
                     <div style={{ fontSize:22, fontWeight:900, color:"var(--ink-solid, white)", letterSpacing:"-.5px" }}>{companyName}</div>
-                    <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", fontWeight:600, textTransform:"uppercase", letterSpacing:".1em", marginTop:4 }}>Balance Sheet Statement</div>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", fontWeight:600, textTransform:"uppercase", letterSpacing:".1em", marginTop:4 }}>Balance Sheet Statement</div>
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    <div style={{ fontSize:10, color:"rgba(var(--ink),.3)", fontWeight:700, textTransform:"uppercase", letterSpacing:".08em", marginBottom:4 }}>As of Date</div>
+                    <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:700, textTransform:"uppercase", letterSpacing:".08em", marginBottom:4 }}>As of Date</div>
                     <div style={{ fontSize:16, fontWeight:800, color:"var(--tx-60a5fa, #60a5fa)" }}>{date}</div>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export default function BalanceSheetPage() {
                     </tr></thead>
                     <tbody>
                       {!data.assets || data.assets.length === 0 ? (
-                        <tr><td colSpan={2} style={{ padding: isMobile ? "13px 10px" : "24px 16px", textAlign:"center", color:"rgba(var(--ink),.3)", fontSize:13 }}>No assets found</td></tr>
+                        <tr><td colSpan={2} style={{ padding: isMobile ? "13px 10px" : "24px 16px", textAlign:"center", color:"rgba(var(--ink),var(--ta-30, .3))", fontSize:13 }}>No assets found</td></tr>
                       ) : data.assets.map((a: any, i: number) => (
                         <tr key={i} style={{ borderBottom:"1px solid rgba(var(--ink),.04)" }}>
                           <td style={td}>{a.name}</td>

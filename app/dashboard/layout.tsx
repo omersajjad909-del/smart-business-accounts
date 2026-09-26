@@ -139,7 +139,7 @@ function FinovaLoader() {
         <div style={{ fontSize: 28, fontWeight: 800, color: "var(--ink-solid, white)", letterSpacing: "-0.5px" }}>
           FinovaOS
         </div>
-        <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", letterSpacing: ".12em", textTransform: "uppercase", marginTop: 4 }}>
+        <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".12em", textTransform: "uppercase", marginTop: 4 }}>
           Global Accounting & Business Suite
         </div>
       </div>
@@ -1241,7 +1241,7 @@ export default function DashboardLayout({
             <div style={{fontSize:22, fontWeight:800, color:"var(--ink-solid, #fff)", marginBottom:8}}>
               Still there?
             </div>
-            <div style={{fontSize:14, color:"rgba(var(--ink),0.6)", lineHeight:1.6, marginBottom:24}}>
+            <div style={{fontSize:14, color:"rgba(var(--ink),var(--ta-60, 0.6))", lineHeight:1.6, marginBottom:24}}>
               You've been inactive for 25 minutes.<br/>
               For your security, you'll be logged out in{" "}
               <span style={{color:"var(--tx-f87171, #f87171)", fontWeight:700}}>
@@ -1264,7 +1264,7 @@ export default function DashboardLayout({
                 style={{
                   padding:"10px 28px", borderRadius:10, cursor:"pointer",
                   background:"transparent", border:"1px solid rgba(var(--ink),0.15)",
-                  color:"rgba(var(--ink),0.6)", fontWeight:600, fontSize:14,
+                  color:"rgba(var(--ink),var(--ta-60, 0.6))", fontWeight:600, fontSize:14,
                 }}
               >
                 Logout Now
@@ -1291,14 +1291,14 @@ export default function DashboardLayout({
             <div style={{fontSize:22, fontWeight:800, color:"var(--ink-solid, #fff)", marginBottom:8}}>
               Shift Ending Soon
             </div>
-            <div style={{fontSize:14, color:"rgba(var(--ink),0.6)", lineHeight:1.6, marginBottom:24}}>
+            <div style={{fontSize:14, color:"rgba(var(--ink),var(--ta-60, 0.6))", lineHeight:1.6, marginBottom:24}}>
               Your shift is about to end.<br/>
               You will be automatically logged out in{" "}
               <span style={{color:"var(--tx-f87171, #f87171)", fontWeight:700}}>
                 {Math.floor(shiftSecsLeft / 60)}:{String(shiftSecsLeft % 60).padStart(2,"0")}
               </span>
               <br/>
-              <span style={{fontSize:12, color:"rgba(var(--ink),0.4)"}}>
+              <span style={{fontSize:12, color:"rgba(var(--ink),var(--ta-40, 0.4))"}}>
                 Please save your work. Contact admin to extend shift.
               </span>
             </div>
@@ -1307,7 +1307,7 @@ export default function DashboardLayout({
               style={{
                 padding:"10px 28px", borderRadius:10, cursor:"pointer",
                 background:"transparent", border:"1px solid rgba(var(--ink),0.15)",
-                color:"rgba(var(--ink),0.6)", fontWeight:600, fontSize:14,
+                color:"rgba(var(--ink),var(--ta-60, 0.6))", fontWeight:600, fontSize:14,
               }}
             >
               Logout Now
@@ -2773,13 +2773,13 @@ export default function DashboardLayout({
         {!sidebarCollapsed && !isCustomPlan && ["STARTER", "PRO"].includes(normalizedPlanCode) && (
           <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(var(--accent-rgb),.18),rgba(139,92,246,.1))",border:"1px solid rgba(var(--accent-rgb),.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
             {/* X close */}
-            <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(var(--ink),.35)"}}
+            <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(var(--ink),var(--ta-35, .35))"}}
               onClick={e=>{e.currentTarget.parentElement!.style.display="none";}}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
             <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,var(--accent),#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,marginBottom:9}}>⭐</div>
             <div style={{fontSize:12,fontWeight:800,color:"rgba(var(--ink),.9)",marginBottom:4}}>Upgrade Plan</div>
-            <div style={{fontSize:10,color:"rgba(var(--ink),.45)",lineHeight:1.5,marginBottom:10}}>Unlock more features and grow your business.</div>
+            <div style={{fontSize:10,color:"rgba(var(--ink),var(--ta-45, .45))",lineHeight:1.5,marginBottom:10}}>Unlock more features and grow your business.</div>
             <a href="/pricing" style={{display:"flex",alignItems:"center",gap:5,padding:"7px 13px",borderRadius:9,background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:11,fontWeight:700,textDecoration:"none",boxShadow:"0 3px 12px rgba(var(--accent-rgb),.4)"}}>
               Upgrade Now
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -2906,7 +2906,7 @@ export default function DashboardLayout({
           ) : isMobileViewport ? (
             <>
               {/* Hamburger */}
-              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:36,height:36,borderRadius:10,background:"rgba(var(--ink),0.05)",border:"1px solid rgba(var(--ink),0.07)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(var(--ink),0.6)",flexShrink:0,marginRight:10}}>
+              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:36,height:36,borderRadius:10,background:"rgba(var(--ink),0.05)",border:"1px solid rgba(var(--ink),0.07)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(var(--ink),var(--ta-60, 0.6))",flexShrink:0,marginRight:10}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
               </button>
               {/* Company logo + name */}
@@ -2929,7 +2929,7 @@ export default function DashboardLayout({
               <div style={{position:"relative",flexShrink:0}} data-panel-anchor="notif">
                 <button
                   onClick={()=>{ const next=!showNotifPanel; setShowNotifPanel(next); setShowHelpPanel(false); setShowUserMenu(false); if(next&&!notifsFetched)fetchNotifs(); }}
-                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.06)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"var(--accent)":"rgba(var(--ink),0.65)"}}>
+                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(var(--ink),0.06)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(var(--ink),0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"var(--accent)":"rgba(var(--ink),var(--ta-65, 0.65))"}}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                   {unreadCount > 0 && (
                     <span style={{position:"absolute",top:7,right:7,minWidth:8,height:8,borderRadius:"50%",background:"#f87171",border:"1.5px solid rgba(10,15,35,0.97)"}}/>
@@ -3240,8 +3240,8 @@ export default function DashboardLayout({
                       </label>
                       <div style={{minWidth:0}}>
                         <div style={{fontSize:13,fontWeight:700,color:"var(--ink-solid, white)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
-                        <div style={{fontSize:10,color:"rgba(var(--ink),0.55)",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.email}</div>
-                        <div style={{fontSize:10,color:"rgba(var(--ink),0.4)",marginTop:1,textTransform:"capitalize"}}>
+                        <div style={{fontSize:10,color:"rgba(var(--ink),var(--ta-55, 0.55))",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.email}</div>
+                        <div style={{fontSize:10,color:"rgba(var(--ink),var(--ta-40, 0.4))",marginTop:1,textTransform:"capitalize"}}>
                           {(currentUser.role||"User").toLowerCase()} · {avatarUploading ? "Uploading..." : "Tap photo to change"}
                         </div>
                         {companyDetail?.companyNo && (
@@ -3263,9 +3263,9 @@ export default function DashboardLayout({
                       { icon:"⭐", label:"Feedback & Reviews",href:"/dashboard/feedback" },
                     ].map(item => (
                       <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
-                        style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(var(--ink),0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
+                        style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(var(--ink),var(--ta-65, 0.65))",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
                         onMouseEnter={e=>{e.currentTarget.style.background="rgba(var(--ink),0.06)";e.currentTarget.style.color="white";}}
-                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(var(--ink),0.65)";}}>
+                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(var(--ink),var(--ta-65, 0.65))";}}>
                         <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
                         {item.label}
                       </a>
@@ -3349,7 +3349,7 @@ export default function DashboardLayout({
                   <span style={{fontSize:18}}>🎮</span>
                   <div>
                     <span style={{fontSize:13,fontWeight:700,color:"var(--tx-fbbf24, #fbbf24)"}}>Demo Mode</span>
-                    <span style={{fontSize:12,color:"rgba(var(--ink),.45)",marginLeft:10}}>
+                    <span style={{fontSize:12,color:"rgba(var(--ink),var(--ta-45, .45))",marginLeft:10}}>
                       You&apos;re viewing a demo account with sample data. Nothing here is real.
                     </span>
                   </div>
@@ -3375,7 +3375,7 @@ export default function DashboardLayout({
                   <span style={{fontSize:18}}>🧪</span>
                   <div>
                     <span style={{fontSize:13,fontWeight:700,color:"var(--accent)"}}>Dev Test Mode</span>
-                    <span style={{fontSize:12,color:"rgba(var(--ink),.45)",marginLeft:10}}>
+                    <span style={{fontSize:12,color:"rgba(var(--ink),var(--ta-45, .45))",marginLeft:10}}>
                       {testMode.testBusinessType} · {testMode.testPlan} — This is an isolated test workspace
                     </span>
                   </div>
@@ -3438,7 +3438,7 @@ export default function DashboardLayout({
           <Link prefetch={false} href="/dashboard" style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, textDecoration:"none",
-            color: pathname==="/dashboard" ? "var(--accent)" : "rgba(var(--ink),0.4)",
+            color: pathname==="/dashboard" ? "var(--accent)" : "rgba(var(--ink),var(--ta-40, 0.4))",
             background: pathname==="/dashboard" ? "rgba(var(--accent-rgb),0.08)" : "transparent",
             borderTop: pathname==="/dashboard" ? "2px solid var(--accent)" : "2px solid transparent",
             transition:"color .15s",
@@ -3454,7 +3454,7 @@ export default function DashboardLayout({
               <Link prefetch={false} href="/dashboard/invoices" style={{
                 flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                 gap:3, paddingTop:6, textDecoration:"none",
-                color: isSalesActive ? "var(--accent)" : "rgba(var(--ink),0.4)",
+                color: isSalesActive ? "var(--accent)" : "rgba(var(--ink),var(--ta-40, 0.4))",
                 background: isSalesActive ? "rgba(var(--accent-rgb),0.08)" : "transparent",
                 borderTop: isSalesActive ? "2px solid var(--accent)" : "2px solid transparent",
                 transition:"color .15s",
@@ -3492,7 +3492,7 @@ export default function DashboardLayout({
               <Link prefetch={false} href="/dashboard/inventory" style={{
                 flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                 gap:3, paddingTop:6, textDecoration:"none",
-                color: isInvActive ? "var(--accent)" : "rgba(var(--ink),0.4)",
+                color: isInvActive ? "var(--accent)" : "rgba(var(--ink),var(--ta-40, 0.4))",
                 background: isInvActive ? "rgba(var(--accent-rgb),0.08)" : "transparent",
                 borderTop: isInvActive ? "2px solid var(--accent)" : "2px solid transparent",
                 transition:"color .15s",
@@ -3507,7 +3507,7 @@ export default function DashboardLayout({
           <button onClick={() => setIsMobileMenuOpen(true)} style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, background:"transparent", border:"none", cursor:"pointer",
-            color: isMobileMenuOpen ? "var(--accent)" : "rgba(var(--ink),0.4)",
+            color: isMobileMenuOpen ? "var(--accent)" : "rgba(var(--ink),var(--ta-40, 0.4))",
             borderTop: isMobileMenuOpen ? "2px solid var(--accent)" : "2px solid transparent",
             transition:"color .15s",
           }}>
@@ -3524,14 +3524,14 @@ export default function DashboardLayout({
           style={{ position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.75)",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"'Outfit','Inter',sans-serif" }}
         >
           <div style={{ width:"100%",maxWidth:560,background:"var(--dk-0e1120, #0e1120)",border:"1px solid rgba(var(--ink),.1)",borderRadius:20,padding:"28px 32px",boxShadow:"0 40px 100px rgba(0,0,0,.7)",maxHeight:"88vh",overflowY:"auto",position:"relative" }}>
-            <button onClick={()=>setShowCompanyModal(false)} style={{ position:"absolute",top:16,right:20,background:"none",border:"none",color:"rgba(var(--ink),.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>✕</button>
+            <button onClick={()=>setShowCompanyModal(false)} style={{ position:"absolute",top:16,right:20,background:"none",border:"none",color:"rgba(var(--ink),var(--ta-40, .4))",cursor:"pointer",fontSize:22,lineHeight:1 }}>✕</button>
 
             {/* Header */}
             <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:24 }}>
               <div style={{ width:50,height:50,borderRadius:13,background:"linear-gradient(135deg,var(--accent-strong),#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>🏢</div>
               <div>
                 <div style={{ fontSize:18,fontWeight:800,color:"var(--ink-solid, white)" }}>{companyDetail?.name || companyName}</div>
-                <div style={{ fontSize:12,color:"rgba(var(--ink),.35)",marginTop:3 }}>
+                <div style={{ fontSize:12,color:"rgba(var(--ink),var(--ta-35, .35))",marginTop:3 }}>
                   {companyDetail?.businessType ? `${companyDetail.businessType.replace(/_/g," ")} Business` : "Business Account"}
                 </div>
               </div>
@@ -3558,7 +3558,7 @@ export default function DashboardLayout({
                 { icon:"🔄", label:"Renews",        value: companyDetail?.currentPeriodEnd ? fmtDate(companyDetail.currentPeriodEnd) : "—" },
               ].map(row => (
                 <div key={row.label} style={{ padding:"12px 14px",borderRadius:10,background:"rgba(var(--ink),.04)",border:"1px solid rgba(var(--ink),.06)" }}>
-                  <div style={{ fontSize:10,color:"rgba(var(--ink),.3)",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:5 }}>{row.icon} {row.label}</div>
+                  <div style={{ fontSize:10,color:"rgba(var(--ink),var(--ta-30, .3))",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:5 }}>{row.icon} {row.label}</div>
                   <div style={{ fontSize:14,fontWeight:700,color:"var(--ink-solid, white)" }}>{String(row.value)}</div>
                 </div>
               ))}

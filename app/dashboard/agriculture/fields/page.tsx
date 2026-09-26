@@ -45,17 +45,17 @@ export default function FieldsPage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🌿 Fields</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage agricultural fields</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🌿 Fields</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage agricultural fields</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#34d399", color: "#0f1117", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Field</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Fields", val: fields.length, color: "var(--tx-34d399, #34d399)" }, { label: "Active", val: fields.filter(f => f.status === "active").length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Total Area", val: `${totalArea.toFixed(1)} acres`, color: "var(--tx-f59e0b, #f59e0b)" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16 }}>
         {fields.map(f => (
@@ -64,16 +64,16 @@ export default function FieldsPage() {
               <div style={{ fontWeight: 700, fontSize: 16 }}>{f.name}</div>
               <span style={{ display: "inline-block", background: f.status === "active" ? "rgba(52,211,153,.15)" : "rgba(107,114,128,.15)", color: f.status === "active" ? "#34d399" : "#6b7280", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{f.status}</span>
             </div>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 4 }}>📐 Area: {f.area} acres</div>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 4 }}>🪨 Soil: {f.soilType}</div>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 4 }}>💧 Irrigation: {f.irrigationType}</div>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 12 }}>📍 {f.location}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 4 }}>📐 Area: {f.area} acres</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 4 }}>🪨 Soil: {f.soilType}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 4 }}>💧 Irrigation: {f.irrigationType}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 12 }}>📍 {f.location}</div>
             <button onClick={() => update(f.id, { status: f.status === "active" ? "fallow" : "active" })} style={{ padding: "5px 12px", background: "rgba(249,115,22,.15)", border: "1px solid rgba(249,115,22,.3)", color: "#f97316", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
               {f.status === "active" ? "Mark Fallow" : "Activate"}
             </button>
           </div>
         ))}
-        {!loading && fields.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No fields yet.</div>}
+        {!loading && fields.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", gridColumn: "1/-1" }}>No fields yet.</div>}
       </div>
 
       {showModal && (
@@ -83,12 +83,12 @@ export default function FieldsPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Field Name", "name", "span 2"], ["Location", "location", "span 2"], ["Area (acres)", "area", ""], ["Soil Type", "soilType", ""]].map(([label, key, col]) => (
                 <div key={key} style={{ gridColumn: col || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   <input type="text" value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Irrigation Type</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Irrigation Type</label>
                 <select value={form.irrigationType} onChange={e => setForm(f => ({ ...f, irrigationType: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {["Drip", "Sprinkler", "Flood", "Canal", "Tube Well", "Rain-fed"].map(t => <option key={t}>{t}</option>)}
                 </select>
@@ -96,7 +96,7 @@ export default function FieldsPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#34d399", border: "none", borderRadius: 8, color: "#0f1117", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Field</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

@@ -25,7 +25,7 @@ const CARD: React.CSSProperties = {
 
 const LABEL: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase",
-  color: "var(--text-muted, rgba(var(--ink),.5))", marginBottom: 10,
+  color: "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))", marginBottom: 10,
 };
 
 export default function AppearancePage() {
@@ -136,14 +136,14 @@ export default function AppearancePage() {
   }
 
   if (loading) {
-    return <div style={{ padding: 40, color: "var(--text-muted, rgba(var(--ink),.5))" }}>Loading appearance…</div>;
+    return <div style={{ padding: 40, color: "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))" }}>Loading appearance…</div>;
   }
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "24px 20px 80px", display: "flex", flexDirection: "column", gap: 22, fontFamily: "'Outfit','Inter',sans-serif" }}>
       <header>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Appearance</h1>
-        <p style={{ fontSize: 14, color: "var(--text-muted, rgba(var(--ink),.5))", margin: "6px 0 0", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 14, color: "var(--text-muted, rgba(var(--ink),var(--ta-50, .5)))", margin: "6px 0 0", lineHeight: 1.6 }}>
           Personal settings apply to your account. Branding is shared across everyone in your company{isAdmin ? "" : " and can only be changed by an admin"}.
         </p>
       </header>
@@ -153,7 +153,7 @@ export default function AppearancePage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18 }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 2 }}>Company branding</div>
-            <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(var(--ink),.45))" }}>
+            <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(var(--ink),var(--ta-45, .45)))" }}>
               Logo and brand color appear on the dashboard, invoices, and shared documents.
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function AppearancePage() {
                 </button>
               )}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted, rgba(var(--ink),.35))", marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted, rgba(var(--ink),var(--ta-35, .35)))", marginTop: 8 }}>
               PNG, JPEG, WebP or SVG — max 1 MB
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function AppearancePage() {
       <section style={CARD}>
         <div style={{ marginBottom: 18 }}>
           <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 2 }}>Personal preferences</div>
-          <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(var(--ink),.45))" }}>
+          <div style={{ fontSize: 12.5, color: "var(--text-muted, rgba(var(--ink),var(--ta-45, .45)))" }}>
             Only affects your view. Every teammate has their own settings.
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function AppearancePage() {
               <div style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", fontSize: 13, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)" }}>
                 🌙 Dark
               </div>
-              <div style={{ fontSize: 12, color: "rgba(var(--ink),.38)" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-38, .38))" }}>
                 Light mode is coming back once its colours are finished.
               </div>
             </div>

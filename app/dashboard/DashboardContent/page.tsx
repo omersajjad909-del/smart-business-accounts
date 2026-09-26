@@ -932,7 +932,7 @@ export default function DashboardContent() {
       borderRadius: 10,
       fontSize: 12,
     },
-    labelStyle: { color: "rgba(var(--ink),.4)", fontWeight: 600 },
+    labelStyle: { color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 600 },
   };
 
   return (
@@ -1575,7 +1575,7 @@ export default function DashboardContent() {
             <div
               style={{
                 fontSize: 11,
-                color: "rgba(var(--ink),.55)",
+                color: "rgba(var(--ink),var(--ta-55, .55))",
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: ".1em",
@@ -1626,7 +1626,7 @@ export default function DashboardContent() {
                 {Math.abs(heroDelta).toFixed(1)}% vs last month
               </div>
             ) : heroKpi.caption ? (
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),.5)", marginTop: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),var(--ta-50, .5))", marginTop: 6 }}>
                 {heroKpi.caption}
               </div>
             ) : null}
@@ -1667,7 +1667,7 @@ export default function DashboardContent() {
               <div
                 style={{
                   fontSize: 9,
-                  color: "rgba(var(--ink),.45)",
+                  color: "rgba(var(--ink),var(--ta-45, .45))",
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: ".07em",
@@ -3414,7 +3414,7 @@ export default function DashboardContent() {
               style={{ display: "flex", alignItems: "center", gap: 12 }}
             >
               {index > 0 && (
-                <span style={{ fontSize: 11, color: "rgba(var(--ink),.2)" }}>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-20, .2))" }}>
                   •
                 </span>
               )}

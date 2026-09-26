@@ -92,7 +92,7 @@ export default function SchoolOverviewPage() {
                 <div style={{ fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)", marginTop: 6 }}>Fee status: {student.feeStatus}</div>
               </div>
             ))}
-            {students.filter((row) => row.feeStatus === "overdue").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No overdue student accounts right now.</div>}
+            {students.filter((row) => row.feeStatus === "overdue").length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No overdue student accounts right now.</div>}
           </div>
         </div>
       </div>

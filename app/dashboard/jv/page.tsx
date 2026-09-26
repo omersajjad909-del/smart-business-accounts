@@ -255,12 +255,12 @@ export default function JVPage() {
             {queryIdx >= 0 && !queryMode && (
               <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(167,139,250,.08)", border: "1px solid rgba(167,139,250,.2)", borderRadius: 10, padding: "6px 12px" }}>
                 <button onClick={() => navTo(queryIdx - 1)} disabled={queryIdx === 0}
-                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === 0 ? "rgba(var(--ink),.2)" : "rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx === 0 ? "default" : "pointer", fontFamily: ff }}>◀</button>
+                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === 0 ? "rgba(var(--ink),var(--ta-20, .2))" : "rgba(var(--ink),var(--ta-70, .7))", fontSize: 13, cursor: queryIdx === 0 ? "default" : "pointer", fontFamily: ff }}>◀</button>
                 <span style={{ fontSize: 12, color: PURPLE, fontWeight: 700, minWidth: 80, textAlign: "center" }}>
                   {queryResults[queryIdx]?.voucherNo} · {queryIdx + 1} / {queryResults.length}
                 </span>
                 <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
-                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === queryResults.length - 1 ? "rgba(var(--ink),.2)" : "rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx === queryResults.length - 1 ? "default" : "pointer", fontFamily: ff }}>▶</button>
+                  style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx === queryResults.length - 1 ? "rgba(var(--ink),var(--ta-20, .2))" : "rgba(var(--ink),var(--ta-70, .7))", fontSize: 13, cursor: queryIdx === queryResults.length - 1 ? "default" : "pointer", fontFamily: ff }}>▶</button>
                 <button onClick={exitQueryMode}
                   style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
               </div>
@@ -325,7 +325,7 @@ export default function JVPage() {
                 <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>
                 Execute Query
               </button>
-              <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
+              <button onClick={exitQueryMode} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
               <span style={{ fontSize: 11, color: "rgba(var(--txr-facc15, 250,204,21),.4)", marginLeft: 8 }}>
                 Operators: <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>&lt;010425</b> (before) &nbsp; <b style={{ color: "rgba(var(--txr-facc15, 250,204,21),.7)" }}>010425</b> (exact)
               </span>
@@ -478,8 +478,8 @@ export default function JVPage() {
               { key: "Enter", label: "Next Field", color: undefined },
             ]).map(s => (
               <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 6, padding: "4px 10px" }}>
-                <span style={{ background: s.color ? `${s.color}22` : "rgba(var(--ink),.06)", color: s.color || "rgba(var(--ink),.5)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(var(--ink),.1)"}` }}>{s.key}</span>
-                <span style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{s.label}</span>
+                <span style={{ background: s.color ? `${s.color}22` : "rgba(var(--ink),.06)", color: s.color || "rgba(var(--ink),var(--ta-50, .5))", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(var(--ink),.1)"}` }}>{s.key}</span>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{s.label}</span>
               </div>
             ))}
           </div>

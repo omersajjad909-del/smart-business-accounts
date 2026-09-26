@@ -11,27 +11,27 @@ const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),var(--ta-50, .5))', marginTop: 4 },
   btn: { background: '#92400e', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
   stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),var(--ta-50, .5))', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   tabs: { display: 'flex', gap: 8, marginBottom: 24 },
-  tab: (a: boolean) => ({ background: a ? '#92400e' : 'rgba(var(--ink),.06)', color: a ? '#fff' : 'rgba(var(--ink),.6)', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }),
+  tab: (a: boolean) => ({ background: a ? '#92400e' : 'rgba(var(--ink),.06)', color: a ? '#fff' : 'rgba(var(--ink),var(--ta-60, .6))', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }),
   grid: { display: 'grid', gap: 16 },
   card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: 24 },
   caseTitle: { fontSize: 16, fontWeight: 700, marginBottom: 4 },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   infoGrid: { display: 'grid', gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 16, marginTop: 16 },
   infoItem: { background: 'rgba(var(--ink),.04)', borderRadius: 8, padding: '10px 12px' },
-  infoLabel: { fontSize: 11, color: 'rgba(var(--ink),.4)', marginBottom: 4 },
+  infoLabel: { fontSize: 11, color: 'rgba(var(--ink),var(--ta-40, .4))', marginBottom: 4 },
   infoVal: { fontSize: 14, fontWeight: 600 },
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
   modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 520 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),var(--ta-60, .6))', marginBottom: 6 },
   input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
@@ -120,11 +120,11 @@ export default function CasesPage() {
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),var(--ta-40, .4))' }}>Loading...</div>}
 
       <div style={S.grid}>
         {!loading && filtered.length === 0 && (
-          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.25)' }}>No cases found.</div>
+          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),var(--ta-25, .25))' }}>No cases found.</div>
         )}
         {filtered.map(c => {
           const days = daysUntil(c.nextHearing);
@@ -133,7 +133,7 @@ export default function CasesPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                 <div>
                   <div style={S.caseTitle}>{c.title}</div>
-                  <div style={{ fontSize: 13, color: 'rgba(var(--ink),.5)' }}>{c.caseNo} · {c.court}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(var(--ink),var(--ta-50, .5))' }}>{c.caseNo} · {c.court}</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <span style={S.badge(TYPE_COLOR[c.type] || '#818cf8')}>{c.type}</span>

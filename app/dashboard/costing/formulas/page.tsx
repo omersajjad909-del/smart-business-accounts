@@ -48,13 +48,13 @@ const input: React.CSSProperties = {
 const monoInput: React.CSSProperties = { ...input, fontFamily: MONO, fontSize: 12.5 };
 const label: React.CSSProperties = {
   display: "block", fontSize: 10, fontWeight: 700, letterSpacing: ".07em",
-  textTransform: "uppercase", color: "rgba(var(--ink),.4)", marginBottom: 5,
+  textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 5,
 };
 const btn = (kind: "primary" | "ghost" | "danger" = "ghost"): React.CSSProperties => ({
   padding: "9px 16px", borderRadius: 9, fontSize: 13, fontWeight: 600,
   cursor: "pointer", fontFamily: FONT, border: `1px solid ${BORDER}`,
   background: kind === "primary" ? "linear-gradient(135deg,#4f46e5,#6366f1)" : "rgba(var(--ink),.05)",
-  color: kind === "danger" ? "#f87171" : kind === "primary" ? "white" : "rgba(var(--ink),.7)",
+  color: kind === "danger" ? "#f87171" : kind === "primary" ? "white" : "rgba(var(--ink),var(--ta-70, .7))",
   ...(kind === "primary" ? { border: "none" } : {}),
 });
 const iconBtn: React.CSSProperties = { ...btn(), padding: "8px 10px", fontSize: 12 };
@@ -70,12 +70,12 @@ const groupHeadRow: React.CSSProperties = {
 };
 const groupTitle: React.CSSProperties = {
   fontSize: 12, fontWeight: 700, letterSpacing: ".04em",
-  color: "rgba(var(--ink),.62)", display: "flex", alignItems: "center",
+  color: "rgba(var(--ink),var(--ta-62, .62))", display: "flex", alignItems: "center",
 };
 const countPill: React.CSSProperties = {
   fontSize: 10.5, fontWeight: 700, padding: "1px 7px", borderRadius: 20,
   background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`,
-  color: "rgba(var(--ink),.45)",
+  color: "rgba(var(--ink),var(--ta-45, .45))",
 };
 /** Sentinel option value — a section name nobody can type by accident. */
 const NEW_SECTION = "\u0000new";
@@ -304,7 +304,7 @@ export default function FormulasPage() {
       onClick={() => setEditing({ id: null, draft: { ...structuredClone(t), name: t.name, profit: toProfit(t.profit) } })}
       style={{ ...btn(), display: "block", textAlign: "left", padding: "13px 15px", lineHeight: 1.5 }}>
       <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 3 }}>{t.name}</div>
-      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", fontWeight: 400 }}>{t.summary}</div>
+      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))", fontWeight: 400 }}>{t.summary}</div>
     </button>
   );
 
@@ -606,7 +606,7 @@ export default function FormulasPage() {
                 const [key, at] = e.target.value.split(":");
                 x.inputs[i].showWhen = { key, is: Number(at) };
               })}
-              style={{ ...input, color: inp.showWhen ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.5)" }}
+              style={{ ...input, color: inp.showWhen ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-50, .5))" }}
               title="Leave on Always unless this box belongs to one branch of a choice. The steps still have to zero the other branch out with if()."
             >
               <option value={ALWAYS}>Always</option>
@@ -625,7 +625,7 @@ export default function FormulasPage() {
               : "The operator is asked for this on every run. Click to fix it here instead."}
             onClick={() => patch((x) => { x.inputs[i].askOnRun = x.inputs[i].askOnRun === false; })}
             style={{ ...iconBtn, padding: "8px 9px", fontSize: 11,
-              color: inp.askOnRun === false ? "rgba(var(--ink),.42)" : "var(--tx-34d399, #34d399)" }}>
+              color: inp.askOnRun === false ? "rgba(var(--ink),var(--ta-42, .42))" : "var(--tx-34d399, #34d399)" }}>
             {inp.askOnRun === false ? "Fixed" : "Ask"}
           </button>
           {removeBtn}
@@ -679,13 +679,13 @@ export default function FormulasPage() {
                 borderRadius: 10,
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-                  <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>{o.label || o.key}</span>
+                  <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{o.label || o.key}</span>
                   <span style={{
                     fontFamily: MONO, fontVariantNumeric: "tabular-nums",
                     fontSize: o.primary ? 17 : 13, fontWeight: 700,
                     color: o.primary ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.85)",
                   }}>
-                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),.3)", marginLeft: 4 }}>{o.unit}</span>
+                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{o.unit}</span>
                   </span>
                 </div>
                 {/* The split, small, under the number it adds up to — a rate
@@ -694,7 +694,7 @@ export default function FormulasPage() {
                 {isMain && profitAmount !== 0 && (
                   <div style={{
                     fontFamily: MONO, fontSize: 11, marginTop: 3,
-                    color: "rgba(var(--ink),.38)", fontVariantNumeric: "tabular-nums",
+                    color: "rgba(var(--ink),var(--ta-38, .38))", fontVariantNumeric: "tabular-nums",
                   }}>
                     {fmt(baseRate)} cost + {fmt(profitAmount)} profit
                     <span style={{ fontFamily: FONT, marginLeft: 5 }}>
@@ -706,7 +706,7 @@ export default function FormulasPage() {
             );
           })}
           {!d.outputs.some((o) => o.key) && (
-            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.3)" }}>Add an output to see the result.</div>
+            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-30, .3))" }}>Add an output to see the result.</div>
           )}
         </div>
 
@@ -745,7 +745,7 @@ export default function FormulasPage() {
                 padding: "6px 12px", borderRadius: 8, fontSize: 12.5, fontWeight: 600,
                 cursor: "pointer", fontFamily: FONT, border: "none",
                 background: detailed === on ? "rgba(99,102,241,.28)" : "transparent",
-                color: detailed === on ? "#c7d2fe" : "rgba(var(--ink),.45)",
+                color: detailed === on ? "#c7d2fe" : "rgba(var(--ink),var(--ta-45, .45))",
               }}>{text}</button>
             ))}
           </div>
@@ -811,23 +811,23 @@ export default function FormulasPage() {
                 ))}
               </div>
 
-              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.28)", lineHeight: 1.6, paddingTop: 4 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-28, .28))", lineHeight: 1.6, paddingTop: 4 }}>
                 {detailed ? (
                   <>
-                    <strong style={{ color: "rgba(var(--ink),.45)" }}>Key</strong> is the name your steps
+                    <strong style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Key</strong> is the name your steps
                     type — rename it and every step that used it must be changed too.{" "}
-                    <strong style={{ color: "rgba(var(--ink),.45)" }}>Type</strong>: Number is one value,
+                    <strong style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Type</strong>: Number is one value,
                     List is several stock sizes for the formula to choose between, Choice is one option or
-                    the other — set <strong style={{ color: "rgba(var(--ink),.45)" }}>Only when</strong> on
+                    the other — set <strong style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Only when</strong> on
                     the boxes that belong to each branch, and zero the other branch in the step with{" "}
                     <code style={{ fontFamily: MONO }}>if()</code>.{" "}
-                    <strong style={{ color: "rgba(var(--ink),.45)" }}>Ask</strong>: the operator types it on
+                    <strong style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Ask</strong>: the operator types it on
                     every run — press it for Fixed, which sets it here and tucks it under Settings when the
                     formula runs.
                   </>
                 ) : (
                   <>
-                    Switch to <strong style={{ color: "rgba(var(--ink),.45)" }}>Detailed</strong> above to rename keys,
+                    Switch to <strong style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Detailed</strong> above to rename keys,
                     move a box into another section, turn an input into a list of stock sizes, or stop the
                     operator being asked for it.
                   </>
@@ -842,7 +842,7 @@ export default function FormulasPage() {
                 background: "rgba(52,211,153,.05)", border: "1px solid rgba(52,211,153,.22)",
               }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Profit</div>
-                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)", marginTop: 2, lineHeight: 1.6, marginBottom: 10 }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2, lineHeight: 1.6, marginBottom: 10 }}>
                   Added on top of the starred output to make the sale rate — Rs 2 a piece, or 15% of cost.
                   This is the formula&rsquo;s usual profit; whoever runs it can still change it for one quote.
                 </div>
@@ -869,20 +869,20 @@ export default function FormulasPage() {
                 </div>
                 {/* The sum spelled out, because "15%" and "Rs 15" look the same
                     in a box and land nowhere near each other on the rate. */}
-                <div style={{ fontSize: 12, fontFamily: MONO, marginTop: 9, color: "rgba(var(--ink),.45)" }}>
+                <div style={{ fontSize: 12, fontFamily: MONO, marginTop: 9, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
                   {baseRate == null ? (
-                    <span style={{ fontFamily: FONT, color: "rgba(var(--ink),.3)" }}>
-                      Star an output under <strong style={{ color: "rgba(var(--ink),.45)" }}>Outputs</strong> to see the sale rate.
+                    <span style={{ fontFamily: FONT, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
+                      Star an output under <strong style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Outputs</strong> to see the sale rate.
                     </span>
                   ) : profitAmount === 0 ? (
-                    <span style={{ fontFamily: FONT, color: "rgba(var(--ink),.3)" }}>
+                    <span style={{ fontFamily: FONT, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
                       No profit — the formula quotes {fmt(baseRate)} {primaryOut?.unit ?? ""} at cost.
                     </span>
                   ) : (
                     <>
                       {fmt(baseRate)} + {fmt(profitAmount)} ={" "}
                       <strong style={{ color: "var(--tx-34d399, #34d399)", fontSize: 13.5 }}>{fmt(saleRate)}</strong>
-                      {primaryOut?.unit && <span style={{ color: "rgba(var(--ink),.3)" }}> {primaryOut.unit}</span>}
+                      {primaryOut?.unit && <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}> {primaryOut.unit}</span>}
                     </>
                   )}
                 </div>
@@ -945,7 +945,7 @@ export default function FormulasPage() {
                         background: "rgba(99,102,241,.16)", color: "#a5b4fc",
                         fontSize: 11, fontWeight: 700, display: "grid", placeItems: "center",
                       }}>{i + 1}</span>
-                      <span style={{ fontFamily: MONO, color: "rgba(var(--ink),.3)", fontSize: 14 }}>=</span>
+                      <span style={{ fontFamily: MONO, color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 14 }}>=</span>
                       <input value={st.expression}
                         // Opening Values here rather than leaving it to the
                         // author: this is the one moment its chips do anything.
@@ -960,7 +960,7 @@ export default function FormulasPage() {
                       }}>
                         {stepErr ? "error" : fmt(result?.value)}
                         {!stepErr && st.unit && (
-                          <span style={{ fontSize: 10, color: "rgba(var(--ink),.3)", marginLeft: 4 }}>{st.unit}</span>
+                          <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{st.unit}</span>
                         )}
                       </div>
                     </div>
@@ -1022,7 +1022,7 @@ export default function FormulasPage() {
                 const starBtn = (
                   <button title="Show as the headline number" onClick={() => patch((x) => {
                     x.outputs.forEach((o, j) => { o.primary = j === i ? !o.primary : false; });
-                  })} style={{ ...iconBtn, padding: "8px 11px", color: out.primary ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.35)" }}>★</button>
+                  })} style={{ ...iconBtn, padding: "8px 11px", color: out.primary ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-35, .35))" }}>★</button>
                 );
                 const removeBtn = (
                   <button title="Remove" onClick={() => patch((x) => { x.outputs.splice(i, 1); })}
@@ -1070,7 +1070,7 @@ export default function FormulasPage() {
               open={valuesOpen}
               onToggle={() => setValuesOpen((o) => !o)}
             >
-              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.32)", marginBottom: 12, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-32, .32))", marginBottom: 12, lineHeight: 1.6 }}>
                 {activeStep === null
                   ? "Click a step's formula box, then click a name to add it."
                   : `Click a name to add it to step ${activeStep + 1}.`}
@@ -1085,7 +1085,7 @@ export default function FormulasPage() {
                       color: "var(--tx-a5b4fc, #a5b4fc)", display: "flex", gap: 6, alignItems: "baseline",
                     }}>
                     {r.key}
-                    <span style={{ color: "rgba(var(--ink),.35)" }}>{fmt(preview?.values[r.key])}</span>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-35, .35))" }}>{fmt(preview?.values[r.key])}</span>
                   </button>
                 ))}
               </div>
@@ -1101,10 +1101,10 @@ export default function FormulasPage() {
                 {FUNCTIONS.map((f) => (
                   <div key={f.name}>
                     <div style={{ fontFamily: MONO, fontSize: 12, color: "var(--tx-818cf8, #818cf8)" }}>{f.signature}</div>
-                    <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", lineHeight: 1.6 }}>{f.description}</div>
+                    <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))", lineHeight: 1.6 }}>{f.description}</div>
                   </div>
                 ))}
-                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.3)", lineHeight: 1.6, paddingTop: 6, borderTop: `1px solid ${BORDER}` }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", lineHeight: 1.6, paddingTop: 6, borderTop: `1px solid ${BORDER}` }}>
                   Operators: <code style={{ fontFamily: MONO }}>+ − * / % ^</code> and comparisons{" "}
                   <code style={{ fontFamily: MONO }}>&gt; &lt; &gt;= &lt;= == !=</code>
                 </div>
@@ -1122,7 +1122,7 @@ export default function FormulasPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
           <h1 style={{ fontSize: 23, fontWeight: 800, margin: "0 0 4px" }}>Formulas</h1>
-          <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.42)", margin: 0 }}>
+          <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
             Write how your products are costed. Use them on the{" "}
             <Link href="/dashboard/costing" style={{ color: "var(--tx-818cf8, #818cf8)" }}>Costing</Link> page.
           </p>
@@ -1141,7 +1141,7 @@ export default function FormulasPage() {
       </div>
 
       {store.loading ? (
-        <div style={{ color: "rgba(var(--ink),.3)", fontSize: 13 }}>Loading…</div>
+        <div style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>Loading…</div>
       ) : (
         <>
           {visible.length > 0 && (
@@ -1154,7 +1154,7 @@ export default function FormulasPage() {
                 }}>
                   <div className="fxFormulaTitle">
                     <div style={{ fontSize: 14.5, fontWeight: 700 }}>{draft.name}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>
                       {draft.category} · {draft.inputs.length} inputs · {draft.steps.length} steps · v{draft.version}
                     </div>
                   </div>
@@ -1187,7 +1187,7 @@ export default function FormulasPage() {
             <div style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 3 }}>
               {visible.length ? "Add another formula" : "No formulas here yet"}
             </div>
-            <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.35)", margin: "0 0 18px", lineHeight: 1.6 }}>
+            <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-35, .35))", margin: "0 0 18px", lineHeight: 1.6 }}>
               Start from a worked example and change it to match your own trade — or start from blank.
               A category holds as many formulas as you need.
             </p>
@@ -1197,7 +1197,7 @@ export default function FormulasPage() {
                 onClick={() => setEditing({ id: null, draft: emptyDraft(category || "General") })}
                 style={{ ...btn(), display: "block", textAlign: "left", padding: "13px 15px", lineHeight: 1.5 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 3 }}>Blank formula</div>
-                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", fontWeight: 400 }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))", fontWeight: 400 }}>
                   One input, one step, one output. Build it up yourself.
                 </div>
               </button>
@@ -1261,7 +1261,7 @@ function Fold({ title, count, open, onToggle, children }: {
         <span aria-hidden style={{
           width: 26, height: 26, flexShrink: 0, borderRadius: 8, display: "grid", placeItems: "center",
           background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`,
-          color: "rgba(var(--ink),.55)", fontSize: 11, lineHeight: 1,
+          color: "rgba(var(--ink),var(--ta-55, .55))", fontSize: 11, lineHeight: 1,
           transform: open ? "rotate(0deg)" : "rotate(-90deg)",
           transition: "transform .16s ease",
         }}>▼</span>
@@ -1282,7 +1282,7 @@ function CategoryBox({ label: text, count, active, onClick }: {
       textAlign: "left", fontFamily: FONT, transition: "all .15s",
     }}>
       <div style={{ fontSize: 13, fontWeight: 700, color: active ? "var(--tx-a5b4fc, #a5b4fc)" : "white" }}>{text}</div>
-      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.33)", marginTop: 2 }}>
+      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-33, .33))", marginTop: 2 }}>
         {count} {count === 1 ? "formula" : "formulas"}
       </div>
     </button>
@@ -1337,11 +1337,11 @@ function Section({ n, title, hint, onAdd, head, children, collapsible = false, d
                 <span style={{
                   fontSize: 10.5, fontWeight: 700, padding: "1px 7px", borderRadius: 20,
                   background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`,
-                  color: "rgba(var(--ink),.45)",
+                  color: "rgba(var(--ink),var(--ta-45, .45))",
                 }}>{count}</span>
               )}
             </div>
-            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)", marginTop: 2 }}>{hint}</div>
+            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>{hint}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -1356,7 +1356,7 @@ function Section({ n, title, hint, onAdd, head, children, collapsible = false, d
             <span aria-hidden style={{
               width: 26, height: 26, borderRadius: 8, display: "grid", placeItems: "center",
               background: "rgba(var(--ink),.05)", border: `1px solid ${BORDER}`,
-              color: "rgba(var(--ink),.55)", fontSize: 11, lineHeight: 1,
+              color: "rgba(var(--ink),var(--ta-55, .55))", fontSize: 11, lineHeight: 1,
               transform: open ? "rotate(0deg)" : "rotate(-90deg)",
               transition: "transform .16s ease",
             }}>▼</span>

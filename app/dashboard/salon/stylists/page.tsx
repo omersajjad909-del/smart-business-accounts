@@ -130,7 +130,7 @@ export default function StylistsPage() {
             <div style={{ marginBottom: 14 }}>
               <span style={{ display: "inline-block", background: `${salonStatusColor(stylist.status)}20`, color: salonStatusColor(stylist.status), borderRadius: 999, padding: "4px 10px", fontSize: 12, fontWeight: 700 }}>{stylist.status}</span>
             </div>
-            <div style={{ display: "grid", gap: 8, fontSize: 13, color: "rgba(var(--ink),.7)" }}>
+            <div style={{ display: "grid", gap: 8, fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Phone</span><span>{stylist.phone}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Appointments Today</span><span style={{ color: "var(--ink-solid, #fff)", fontWeight: 700 }}>{stylist.appointmentsToday}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Revenue</span><span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>Rs. {stylist.monthlyEarnings.toLocaleString()}</span></div>

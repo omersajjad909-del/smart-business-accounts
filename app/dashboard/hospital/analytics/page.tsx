@@ -76,7 +76,7 @@ export default function HospitalAnalyticsPage() {
                 <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(departmentLoad).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No appointment load yet.</div>}
+            {Object.keys(departmentLoad).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No appointment load yet.</div>}
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function HospitalAnalyticsPage() {
                 <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-c4b5fd, #c4b5fd)" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(doctorLoad).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No doctor assignments yet.</div>}
+            {Object.keys(doctorLoad).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No doctor assignments yet.</div>}
           </div>
         </div>
 

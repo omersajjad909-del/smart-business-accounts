@@ -627,7 +627,7 @@ export default function BarcodePage() {
                         <td style={{ padding: "8px 16px" }}>
                           {item.barcode
                             ? <div style={{ display: "inline-block", background: "white", padding: "3px 5px", borderRadius: 4 }}><Barcode128 value={item.barcode} moduleWidth={1} height={28} showText={false} bg="white" fg="black" /></div>
-                            : <span style={{ color: "rgba(var(--ink),.2)", fontSize: 11 }}>Not set</span>}
+                            : <span style={{ color: "rgba(var(--ink),var(--ta-20, .2))", fontSize: 11 }}>Not set</span>}
                         </td>
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.unit || "—"}</td>
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.rate != null ? `${currency}${item.rate}` : "—"}</td>
@@ -1002,7 +1002,7 @@ export default function BarcodePage() {
                 {batchSelectedItems.map(item => (
                   <div key={item.id} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 20, background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11.5, color: "var(--text-primary)", fontWeight: 600 }}>
                     {item.name}
-                    <button onClick={() => toggleSelect(item.id)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.4)", fontSize: 12, cursor: "pointer", padding: 0, lineHeight: 1 }}>✕</button>
+                    <button onClick={() => toggleSelect(item.id)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12, cursor: "pointer", padding: 0, lineHeight: 1 }}>✕</button>
                   </div>
                 ))}
               </div>
@@ -1046,7 +1046,7 @@ export default function BarcodePage() {
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "12px 10px" : "16px 20px" }}>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>Price Scanner Camera</div>
-              <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 2 }}>Barcode ko frame ke andar seedha rakho</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 2 }}>Barcode ko frame ke andar seedha rakho</div>
             </div>
             <button onClick={stopPuCamera}
               style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(var(--ink),.08)", border: "1px solid rgba(var(--ink),.15)", color: "var(--ink-solid, #fff)", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1068,7 +1068,7 @@ export default function BarcodePage() {
                 {puCameraErr}
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.55)" }}>
+              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-55, .55))" }}>
                 {puCameraStatus === "starting" && "Starting camera…"}
                 {puCameraStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
               </div>
@@ -1080,7 +1080,7 @@ export default function BarcodePage() {
               </button>
             </div>
             {puCameraMsg && (
-              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(var(--ink),.45)" }}>{puCameraMsg}</div>
+              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{puCameraMsg}</div>
             )}
           </div>
         </div>

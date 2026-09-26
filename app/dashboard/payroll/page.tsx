@@ -505,7 +505,7 @@ export default function PayrollPage() {
           {/* Toolbar */}
           <div className="print-toolbar" style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ color: "rgba(var(--ink),.5)", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: ff }}>Print Preview</div>
+              <div style={{ color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: ff }}>Print Preview</div>
               <div style={{ color: "var(--ink-solid, #fff)", fontSize: 15, fontWeight: 700, fontFamily: ff }}>{monthLabel}</div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>

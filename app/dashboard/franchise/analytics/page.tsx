@@ -7,7 +7,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 function card(label: string, value: string | number, color: string, isMobile: boolean) {
   return (
     <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-      <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color }}>{value}</div>
     </div>
   );
@@ -60,7 +60,7 @@ export default function FranchiseAnalyticsPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Franchise Analytics</h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
           Outlet spread, royalty recovery, and network health from live franchise records.
         </p>
       </div>
@@ -77,13 +77,13 @@ export default function FranchiseAnalyticsPage() {
         <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 14 }}>Outlet Snapshot</div>
           {outletStore.loading ? (
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>Loading outlets...</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Loading outlets...</div>
           ) : outlets.length ? (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
                   {["Outlet", "Location", "Franchisee", "Monthly Sales", "Status"].map((head) => (
-                    <th key={head} style={{ textAlign: "left", padding: "0 0 10px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em" }}>{head}</th>
+                    <th key={head} style={{ textAlign: "left", padding: "0 0 10px", borderBottom: "1px solid rgba(var(--ink),.07)", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em" }}>{head}</th>
                   ))}
                 </tr>
               </thead>
@@ -100,7 +100,7 @@ export default function FranchiseAnalyticsPage() {
               </tbody>
             </table>
           ) : (
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>No outlets available yet.</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>No outlets available yet.</div>
           )}
         </div>
 
@@ -110,14 +110,14 @@ export default function FranchiseAnalyticsPage() {
             <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(var(--ink),.05)" }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{item.outlet}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.month || "-"}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.month || "-"}</div>
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 13 }}>{Number(item.amount || 0).toLocaleString()}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{String(item.status || "-")}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{String(item.status || "-")}</div>
               </div>
             </div>
-          )) : <div style={{ fontSize: 13, color: "rgba(var(--ink),.45)" }}>No royalty cycles available yet.</div>}
+          )) : <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>No royalty cycles available yet.</div>}
         </div>
       </div>
     </div>

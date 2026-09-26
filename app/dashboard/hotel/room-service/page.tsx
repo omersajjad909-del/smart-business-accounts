@@ -51,17 +51,17 @@ export default function RoomServicePage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🍽️ Room Service</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage room service orders</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🍽️ Room Service</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage room service orders</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ New Order</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[{ label: "Total Orders", val: orders.length, color: "var(--tx-f97316, #f97316)" }, { label: "Pending", val: orders.filter(o => o.status === "pending").length, color: "var(--tx-f59e0b, #f59e0b)" }, { label: "Preparing", val: orders.filter(o => o.status === "preparing").length, color: "var(--tx-3b82f6, #3b82f6)" }, { label: "Revenue", val: `Rs. ${totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div></div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {orders.map(o => (
@@ -69,10 +69,10 @@ export default function RoomServicePage() {
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 4 }}>
                 <span style={{ fontWeight: 700 }}>Room {o.room}</span>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>{o.time}</span>
+                <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{o.time}</span>
               </div>
-              <div style={{ fontSize: 13, color: "rgba(var(--ink),.6)", marginBottom: 2 }}>{o.items}</div>
-              {o.notes && <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>{o.notes}</div>}
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))", marginBottom: 2 }}>{o.items}</div>
+              {o.notes && <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{o.notes}</div>}
             </div>
             <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)", minWidth: 80, textAlign: "right" }}>Rs. {o.amount.toLocaleString()}</div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -82,7 +82,7 @@ export default function RoomServicePage() {
             </div>
           </div>
         ))}
-        {!loading && orders.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No room service orders.</div>}
+        {!loading && orders.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No room service orders.</div>}
       </div>
 
       {showModal && (
@@ -91,18 +91,18 @@ export default function RoomServicePage() {
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>New Room Service Order</h2>
             {[["Room Number", "room", "text"], ["Items Ordered", "items", "text"], ["Notes", "notes", "text"]].map(([label, key, type]) => (
               <div key={key} style={{ marginBottom: 14 }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                 <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             ))}
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Amount (Rs.)</label>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Amount (Rs.)</label>
               <input type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Create Order</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

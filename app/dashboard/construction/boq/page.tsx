@@ -105,7 +105,7 @@ export default function ConstructionBoqPage() {
                 </td>
               </tr>
             ))}
-            {!loading && boqs.length === 0 && <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No BOQ items yet.</td></tr>}
+            {!loading && boqs.length === 0 && <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No BOQ items yet.</td></tr>}
           </tbody>
         </table>
       </div>

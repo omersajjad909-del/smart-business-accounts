@@ -79,7 +79,7 @@ export default function PharmacyOverviewPage() {
                 <div style={{ fontSize: 12, color: "var(--tx-fda4af, #fda4af)", marginTop: 6 }}>{row.drugs}</div>
               </div>
             ))}
-            {prescriptions.filter((row) => row.status !== "dispensed").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No pending prescriptions right now.</div>}
+            {prescriptions.filter((row) => row.status !== "dispensed").length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No pending prescriptions right now.</div>}
           </div>
         </div>
 

@@ -77,7 +77,7 @@ export default function RealEstateAnalyticsPage() {
                 <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(propertyMix).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No property mix available.</div>}
+            {Object.keys(propertyMix).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No property mix available.</div>}
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function RealEstateAnalyticsPage() {
               <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {amount.toLocaleString()}</span>
             </div>
           ))}
-          {Object.keys(rentByProperty).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No rent data yet.</div>}
+          {Object.keys(rentByProperty).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No rent data yet.</div>}
         </div>
       </div>
     </div>

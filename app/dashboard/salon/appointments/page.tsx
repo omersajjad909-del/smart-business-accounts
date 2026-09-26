@@ -218,7 +218,7 @@ export default function SalonAppointmentsPage() {
                         {salonStatusLabel(appointment.status)}
                       </span>
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(var(--ink),.7)" }}>{appointment.service} • {appointment.date}</div>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>{appointment.service} • {appointment.date}</div>
                   </div>
                   <div style={{ minWidth: 92, textAlign: "right" }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {appointment.price.toLocaleString()}</div>

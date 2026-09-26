@@ -33,7 +33,7 @@ export default function ManufacturingOverviewPage() {
     <div style={{ padding: isMobile ? "17px 16px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Manufacturing Command Center</h1>
-        <p style={{ fontSize: 13, color: "rgba(var(--ink),.45)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: 0 }}>
           Raw material planning, production control, work orders, finished goods, and quality monitoring aik jagah.
         </p>
       </div>
@@ -62,7 +62,7 @@ export default function ManufacturingOverviewPage() {
           { label: "Finished Qty", value: summary.finishedQuantity, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 8 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -76,12 +76,12 @@ export default function ManufacturingOverviewPage() {
               <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{item.product}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.orderId} | {item.completed}/{item.quantity}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.orderId} | {item.completed}/{item.quantity}</div>
                 </div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: item.status === "completed" ? "var(--tx-34d399, #34d399)" : item.status === "in_progress" ? "var(--tx-60a5fa, #60a5fa)" : "var(--tx-f59e0b, #f59e0b)" }}>{item.status}</div>
               </div>
             ))}
-            {production.length === 0 && <div style={{ color: "rgba(var(--ink),.45)", fontSize: 13 }}>No production orders yet.</div>}
+            {production.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-45, .45))", fontSize: 13 }}>No production orders yet.</div>}
           </div>
         </div>
 
@@ -95,7 +95,7 @@ export default function ManufacturingOverviewPage() {
               { label: "Rejected checks", value: summary.rejectedChecks, color: "var(--tx-ef4444, #ef4444)" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
-                <span style={{ color: "rgba(var(--ink),.45)" }}>{row.label}</span>
+                <span style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>{row.label}</span>
                 <span style={{ color: row.color, fontWeight: 800 }}>{row.value}</span>
               </div>
             ))}

@@ -93,7 +93,7 @@ export default function PrescriptionsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Prescriptions</h1>
-          <p style={{ margin: "4px 0 0", color: "rgba(var(--ink),0.45)", fontSize: 14 }}>Doctor prescriptions and medicine orders</p>
+          <p style={{ margin: "4px 0 0", color: "rgba(var(--ink),var(--ta-45, 0.45))", fontSize: 14 }}>Doctor prescriptions and medicine orders</p>
         </div>
         <button onClick={() => { setFormError(""); setShowModal(true); }}
           style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: ff }}>
@@ -111,7 +111,7 @@ export default function PrescriptionsPage() {
         ].map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),0.5)", marginTop: 4 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, 0.5))", marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -120,18 +120,18 @@ export default function PrescriptionsPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
         {["all", "active", "completed", "cancelled"].map(s => (
           <button key={s} onClick={() => setFilterStatus(s)}
-            style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${filterStatus === s ? "#3b82f6" : border}`, background: filterStatus === s ? "rgba(59,130,246,0.15)" : bg, color: filterStatus === s ? "#3b82f6" : "rgba(var(--ink),0.5)", cursor: "pointer", fontFamily: ff, fontSize: 12, textTransform: "capitalize" }}>
+            style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${filterStatus === s ? "#3b82f6" : border}`, background: filterStatus === s ? "rgba(59,130,246,0.15)" : bg, color: filterStatus === s ? "#3b82f6" : "rgba(var(--ink),var(--ta-50, 0.5))", cursor: "pointer", fontFamily: ff, fontSize: 12, textTransform: "capitalize" }}>
             {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
           </button>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       {/* List */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.length === 0 && !loading && (
-          <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),0.25)" }}>No prescriptions found.</div>
+          <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-25, 0.25))" }}>No prescriptions found.</div>
         )}
         {filtered.map(rx => (
           <div key={rx.id} style={{ ...card }}>
@@ -139,30 +139,30 @@ export default function PrescriptionsPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <span style={{ color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700, fontSize: 15 }}>{rx.rxNo}</span>
                 <span style={{ fontWeight: 600 }}>{rx.patient}</span>
-                <span style={{ color: "rgba(var(--ink),0.45)", fontSize: 13 }}>{rx.doctor}</span>
-                <span style={{ color: "rgba(var(--ink),0.35)", fontSize: 12 }}>{rx.date}</span>
+                <span style={{ color: "rgba(var(--ink),var(--ta-45, 0.45))", fontSize: 13 }}>{rx.doctor}</span>
+                <span style={{ color: "rgba(var(--ink),var(--ta-35, 0.35))", fontSize: 12 }}>{rx.date}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ background: "rgba(167,139,250,0.15)", color: "#a78bfa", padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
                   {rx.medicines.length} medicine{rx.medicines.length !== 1 ? "s" : ""}
                 </span>
                 <span style={{ background: `${statusColors[rx.status]}22`, color: statusColors[rx.status], padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: "capitalize" }}>{rx.status}</span>
-                <span style={{ color: "rgba(var(--ink),0.3)", fontSize: 16 }}>{expanded === rx.id ? "▲" : "▼"}</span>
+                <span style={{ color: "rgba(var(--ink),var(--ta-30, 0.3))", fontSize: 16 }}>{expanded === rx.id ? "▲" : "▼"}</span>
               </div>
             </div>
 
             {expanded === rx.id && (
               <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${border}` }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-                  <div style={{ fontSize: 13, color: "rgba(var(--ink),0.5)" }}>Diagnosis: <span style={{ color: "var(--ink-solid, #fff)" }}>{rx.diagnosis}</span></div>
-                  <div style={{ fontSize: 13, color: "rgba(var(--ink),0.5)" }}>Notes: <span style={{ color: "var(--ink-solid, #fff)" }}>{rx.notes}</span></div>
+                  <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, 0.5))" }}>Diagnosis: <span style={{ color: "var(--ink-solid, #fff)" }}>{rx.diagnosis}</span></div>
+                  <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, 0.5))" }}>Notes: <span style={{ color: "var(--ink-solid, #fff)" }}>{rx.notes}</span></div>
                 </div>
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                     <thead>
                       <tr style={{ borderBottom: `1px solid ${border}` }}>
                         {["Medicine", "Dosage", "Frequency", "Duration", "Qty"].map(h => (
-                          <th key={h} style={{ padding: "8px 12px", textAlign: "left", color: "rgba(var(--ink),0.4)", fontWeight: 500, fontSize: 11 }}>{h}</th>
+                          <th key={h} style={{ padding: "8px 12px", textAlign: "left", color: "rgba(var(--ink),var(--ta-40, 0.4))", fontWeight: 500, fontSize: 11 }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -170,9 +170,9 @@ export default function PrescriptionsPage() {
                       {rx.medicines.map((m, i) => (
                         <tr key={i} style={{ borderBottom: `1px solid ${border}` }}>
                           <td style={{ padding: "9px 12px", fontWeight: 500 }}>{m.name}</td>
-                          <td style={{ padding: "9px 12px", color: "rgba(var(--ink),0.6)" }}>{m.dosage}</td>
-                          <td style={{ padding: "9px 12px", color: "rgba(var(--ink),0.6)" }}>{m.frequency}</td>
-                          <td style={{ padding: "9px 12px", color: "rgba(var(--ink),0.6)" }}>{m.duration}</td>
+                          <td style={{ padding: "9px 12px", color: "rgba(var(--ink),var(--ta-60, 0.6))" }}>{m.dosage}</td>
+                          <td style={{ padding: "9px 12px", color: "rgba(var(--ink),var(--ta-60, 0.6))" }}>{m.frequency}</td>
+                          <td style={{ padding: "9px 12px", color: "rgba(var(--ink),var(--ta-60, 0.6))" }}>{m.duration}</td>
                           <td style={{ padding: "9px 12px", color: "var(--tx-34d399, #34d399)", fontWeight: 600 }}>{m.qty}</td>
                         </tr>
                       ))}
@@ -199,19 +199,19 @@ export default function PrescriptionsPage() {
           <div style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 620, maxHeight: "88vh", overflowY: "auto", fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Create Prescription</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, 0.5))", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
               {([["Patient Name", "patient"], ["Doctor", "doctor"], ["Date", "date"], ["Diagnosis", "diagnosis"]] as [string, string][]).map(([label, key]) => (
                 <div key={key} style={{ gridColumn: key === "diagnosis" ? "span 2" : "span 1" }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>{label}</label>
                   <input type={key === "date" ? "date" : "text"} value={String((form as Record<string,unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
                     style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),0.45)", marginBottom: 6 }}>Notes</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 6 }}>Notes</label>
                 <input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                   style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: ff, fontSize: 14, boxSizing: "border-box" }} />
               </div>
@@ -219,7 +219,7 @@ export default function PrescriptionsPage() {
 
             {/* Medicines */}
             <div style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(var(--ink),0.7)" }}>Medicines</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(var(--ink),var(--ta-70, 0.7))" }}>Medicines</span>
               <button onClick={addMed} style={{ background: "rgba(59,130,246,0.15)", border: `1px solid rgba(59,130,246,0.3)`, color: "#3b82f6", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: ff, fontSize: 12 }}>+ Add Row</button>
             </div>
             {form.medicines.map((m, i) => (
@@ -236,7 +236,7 @@ export default function PrescriptionsPage() {
 
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#3b82f6", border: "none", borderRadius: 8, color: "#fff", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Save Prescription</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),0.6)", fontFamily: ff, fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, 0.6))", fontFamily: ff, fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

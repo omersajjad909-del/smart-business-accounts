@@ -77,7 +77,7 @@ export default function TransportOverviewPage() {
                 <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>{row.from} to {row.to}</div>
               </div>
             ))}
-            {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No active transport movement right now.</div>}
+            {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No active transport movement right now.</div>}
           </div>
         </div>
 

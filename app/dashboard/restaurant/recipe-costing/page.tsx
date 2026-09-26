@@ -57,7 +57,7 @@ export default function RecipeCostingPage() {
           { label: "High Margin (>60%)", val: recipes.filter((recipe) => recipe.margin > 60).length, color: "var(--tx-fbbf24, #fbbf24)" },
           { label: "Low Margin (<30%)", val: recipes.filter((recipe) => recipe.margin < 30).length, color: "var(--tx-f87171, #f87171)" },
         ].map((cardItem) => (
-          <div key={cardItem.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{cardItem.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: cardItem.color }}>{cardItem.val}</div></div>
+          <div key={cardItem.label} style={card}><div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{cardItem.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: cardItem.color }}>{cardItem.val}</div></div>
         ))}
       </div>
 
@@ -65,7 +65,7 @@ export default function RecipeCostingPage() {
 
       <div style={card}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["Recipe", "Category", "Servings", "Ingredients", "Cost", "Selling Price", "Margin"].map((header) => <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${restaurantBorder}`, fontWeight: 600 }}>{header}</th>)}</tr></thead>
+          <thead><tr>{["Recipe", "Category", "Servings", "Ingredients", "Cost", "Selling Price", "Margin"].map((header) => <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${restaurantBorder}`, fontWeight: 600 }}>{header}</th>)}</tr></thead>
           <tbody>
             {recipes.map((recipe) => (
               <tr key={recipe.id}>
@@ -78,7 +78,7 @@ export default function RecipeCostingPage() {
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}><span style={{ color: recipe.margin > 60 ? "var(--tx-34d399, #34d399)" : recipe.margin > 30 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)", fontWeight: 700 }}>{recipe.margin}%</span></td>
               </tr>
             ))}
-            {!loading && recipes.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No recipes yet.</td></tr>}
+            {!loading && recipes.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No recipes yet.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -117,7 +117,7 @@ export default function RecipeCostingPage() {
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Recipe</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

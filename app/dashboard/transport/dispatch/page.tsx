@@ -231,7 +231,7 @@ export default function TransportDispatchPage() {
       </div>
 
       <div style={{ display: "grid", gap: 12 }}>
-        {!dispatchStore.loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No dispatches logged yet.</div>}
+        {!dispatchStore.loading && filtered.length === 0 && <div style={{ ...card, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>No dispatches logged yet.</div>}
         {filtered.map((row) => (
           <div key={row.id} style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
@@ -243,7 +243,7 @@ export default function TransportDispatchPage() {
                   </span>
                   <span style={{ fontSize: 12, color: transportMuted }}>Trip: {row.tripNo || "-"}</span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),.62)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),var(--ta-62, .62))" }}>
                   <div>Vehicle: {row.vehicle || "-"}</div>
                   <div>Driver: {row.driver || "-"}</div>
                   <div>Customer: {row.customer || "-"}</div>
@@ -261,7 +261,7 @@ export default function TransportDispatchPage() {
                 {row.status === "dispatched" && <button onClick={() => void moveStatus(row.id, "arrived")} style={{ background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.28)", color: "#86efac", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Mark Arrived</button>}
                 {row.status === "arrived" && <button onClick={() => void moveStatus(row.id, "closed")} style={{ background: "rgba(167,139,250,.16)", border: "1px solid rgba(167,139,250,.28)", color: "#ddd6fe", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Close Dispatch</button>}
                 {(row.status === "planned" || row.status === "dispatched") && <button onClick={() => void moveStatus(row.id, "cancelled")} style={{ background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Cancel</button>}
-                <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),.68)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
+                <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),var(--ta-68, .68))", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
               </div>
             </div>
           </div>
@@ -322,7 +322,7 @@ export default function TransportDispatchPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={() => void saveDispatch()} style={{ flex: 1, background: "#2563eb", border: "none", borderRadius: 8, padding: "11px 0", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save Dispatch</button>
-              <button onClick={closeModal} style={{ padding: "11px 20px", borderRadius: 8, border: `1px solid ${transportBorder}`, background: "transparent", color: "rgba(var(--ink),.7)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={closeModal} style={{ padding: "11px 20px", borderRadius: 8, border: `1px solid ${transportBorder}`, background: "transparent", color: "rgba(var(--ink),var(--ta-70, .7))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

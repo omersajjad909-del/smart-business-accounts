@@ -67,7 +67,7 @@ export default function NgoOverviewPage() {
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(129,140,248,.18)", color: "#e0e7ff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)", lineHeight: 1.55 }}>{step.body}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-62, .62))", lineHeight: 1.55 }}>{step.body}</div>
               </div>
             ))}
           </div>

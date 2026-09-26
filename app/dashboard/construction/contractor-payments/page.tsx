@@ -106,7 +106,7 @@ export default function ConstructionContractorPaymentsPage() {
                 </td>
               </tr>
             ))}
-            {!loading && payments.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No contractor payments yet.</td></tr>}
+            {!loading && payments.length === 0 && <tr><td colSpan={8} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No contractor payments yet.</td></tr>}
           </tbody>
         </table>
       </div>

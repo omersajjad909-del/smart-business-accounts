@@ -11,17 +11,17 @@ const S = {
   page: { minHeight: "100vh", background: "var(--dk-0f1117, #0f1117)", color: "var(--ink-solid, #fff)", fontFamily: "'Outfit','Inter',sans-serif", padding: isMobile ? "16px" : "32px" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" },
   title: { fontSize: "24px", fontWeight: 700, margin: 0 },
-  sub: { fontSize: "13px", color: "rgba(var(--ink),.45)", marginTop: "4px" },
+  sub: { fontSize: "13px", color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: "4px" },
   btn: { background: "linear-gradient(135deg,#10b981,#059669)", color: "#fff", border: "none", borderRadius: "10px", padding: "10px 20px", fontSize: "14px", fontWeight: 600, cursor: "pointer" },
   statsGrid: { display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: "16px", marginBottom: "28px" },
   statCard: { background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: "14px", padding: "20px" },
-  statLabel: { fontSize: "12px", color: "rgba(var(--ink),.45)", marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "0.5px" },
+  statLabel: { fontSize: "12px", color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "0.5px" },
   statValue: { fontSize: "28px", fontWeight: 700 },
-  statSub: { fontSize: "12px", color: "rgba(var(--ink),.35)", marginTop: "4px" },
+  statSub: { fontSize: "12px", color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: "4px" },
   filters: { display: "flex", gap: "12px", marginBottom: "20px" },
   select: { background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", borderRadius: "8px", padding: "8px 14px", color: "var(--ink-solid, #fff)", fontSize: "13px", outline: "none" },
   table: { width: "100%", borderCollapse: "collapse" as const, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: "14px", overflow: "hidden" },
-  th: { padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left" as const, fontSize: "11px", color: "rgba(var(--ink),.4)", textTransform: "uppercase" as const, letterSpacing: "0.5px", borderBottom: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.02)" },
+  th: { padding: isMobile ? "12px 10px" : "14px 16px", textAlign: "left" as const, fontSize: "11px", color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase" as const, letterSpacing: "0.5px", borderBottom: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.02)" },
   td: { padding: isMobile ? "12px 10px" : "14px 16px", fontSize: "13px", color: "rgba(var(--ink),.8)", borderBottom: "1px solid rgba(var(--ink),.04)" },
   badge: (color: string) => ({ background: color, color: "#fff", borderRadius: "20px", padding: "3px 10px", fontSize: "11px", fontWeight: 600, display: "inline-block" }),
   actionBtn: (color: string) => ({ background: color, color: "#fff", border: "none", borderRadius: "6px", padding: "5px 12px", fontSize: "12px", cursor: "pointer", marginRight: "5px", fontWeight: 600 }),
@@ -29,7 +29,7 @@ const S = {
   modal: { background: "var(--dk-1a1d2e, #1a1d2e)", border: "1px solid rgba(var(--ink),.1)", borderRadius: "18px", padding: "32px", width: isMobile ? "min(520px, 94vw)" : "520px", maxHeight: "90vh", overflowY: "auto" as const },
   modalTitle: { fontSize: "18px", fontWeight: 700, marginBottom: "24px" },
   formGroup: { marginBottom: "16px" },
-  label: { display: "block", fontSize: "12px", color: "rgba(var(--ink),.5)", marginBottom: "6px", textTransform: "uppercase" as const, letterSpacing: "0.4px" },
+  label: { display: "block", fontSize: "12px", color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: "6px", textTransform: "uppercase" as const, letterSpacing: "0.4px" },
   input: { width: "100%", background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", borderRadius: "8px", padding: "10px 12px", color: "var(--ink-solid, #fff)", fontSize: "14px", outline: "none", boxSizing: "border-box" as const },
   row2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" },
   row3: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: "12px" },
@@ -144,12 +144,12 @@ export default function FeeCollectionPage() {
           <option value="All">All Months</option>
           {months.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
-        <div style={{ marginLeft: "auto", fontSize: "13px", color: "rgba(var(--ink),.4)", alignSelf: "center" }}>
+        <div style={{ marginLeft: "auto", fontSize: "13px", color: "rgba(var(--ink),var(--ta-40, .4))", alignSelf: "center" }}>
           Showing {filtered.length} of {fees.length} records
         </div>
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: "40px", color: "rgba(var(--ink),.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: "40px", color: "rgba(var(--ink),var(--ta-40, .4))" }}>Loading...</div>}
 
       <div style={{ overflowX: "auto" as const }}>
         <table style={S.table}>
@@ -162,7 +162,7 @@ export default function FeeCollectionPage() {
           </thead>
           <tbody>
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={9} style={{ ...S.td, textAlign: "center", color: "rgba(var(--ink),.25)", padding: "32px" }}>No fee records found.</td></tr>
+              <tr><td colSpan={9} style={{ ...S.td, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", padding: "32px" }}>No fee records found.</td></tr>
             )}
             {filtered.map(f => (
               <tr key={f.id}>
@@ -171,8 +171,8 @@ export default function FeeCollectionPage() {
                 <td style={S.td}>{f.month}</td>
                 <td style={{ ...S.td, fontWeight: 700 }}>{fmt(f.amount)}</td>
                 <td style={S.td}>{f.dueDate}</td>
-                <td style={S.td}>{f.paidDate || <span style={{ color: "rgba(var(--ink),.3)" }}>—</span>}</td>
-                <td style={S.td}>{f.paymentMethod || <span style={{ color: "rgba(var(--ink),.3)" }}>—</span>}</td>
+                <td style={S.td}>{f.paidDate || <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}>—</span>}</td>
+                <td style={S.td}>{f.paymentMethod || <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}>—</span>}</td>
                 <td style={S.td}><span style={S.badge(STATUS_COLORS[f.status] || "rgba(107,114,128,.7)")}>{f.status.toUpperCase()}</span></td>
                 <td style={S.td}>
                   {f.status !== "paid"

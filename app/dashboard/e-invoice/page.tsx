@@ -16,7 +16,7 @@ const inp = (extra?: object) => ({
   border: "1px solid rgba(var(--ink),.1)", color: "var(--text-primary)", fontSize: 13,
   fontFamily: "inherit", outline: "none", boxSizing: "border-box" as const, ...(extra || {}),
 });
-const lbl = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase" as const, letterSpacing: ".07em", marginBottom: 5, display: "block" };
+const lbl = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase" as const, letterSpacing: ".07em", marginBottom: 5, display: "block" };
 const section = (extra?: object) => ({ borderRadius: 14, background: "var(--panel-bg)", border: "1px solid var(--border)", padding: "20px 22px", marginBottom: 16, ...(extra || {}) });
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -46,10 +46,10 @@ const SALE_TYPE_STANDARD = "Goods at standard rate";
 const SALE_TYPE_ZERO_RATED = "Goods at zero-rate";
 
 const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
-  NOT_FILED: { bg: "rgba(148,163,184,.12)", fg: "#94a3b8", label: "Not Filed" },
-  PENDING_SYNC: { bg: "rgba(251,191,36,.12)", fg: "#fbbf24", label: "Pending Sync" },
-  FILED: { bg: "rgba(52,211,153,.12)", fg: "#34d399", label: "Filed with FBR" },
-  FAILED: { bg: "rgba(248,113,113,.12)", fg: "#f87171", label: "Failed" },
+  NOT_FILED: { bg: "rgba(148,163,184,.12)", fg: "var(--tx-94a3b8, #94a3b8)", label: "Not Filed" },
+  PENDING_SYNC: { bg: "rgba(251,191,36,.12)", fg: "var(--tx-fbbf24, #fbbf24)", label: "Pending Sync" },
+  FILED: { bg: "rgba(52,211,153,.12)", fg: "var(--tx-34d399, #34d399)", label: "Filed with FBR" },
+  FAILED: { bg: "rgba(248,113,113,.12)", fg: "var(--tx-f87171, #f87171)", label: "Failed" },
 };
 
 function StatusBadge({ status }: { status: string | null }) {
@@ -175,7 +175,7 @@ export default function EInvoicePage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 18 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>🧾 E-Invoice (FBR)</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.5)", margin: "4px 0 0" }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", margin: "4px 0 0" }}>
             File sales invoices with FBR&apos;s digital invoicing gateway and print the FBR QR code.
           </p>
         </div>
@@ -232,7 +232,7 @@ export default function EInvoicePage() {
             Profile — the same NTN, name, address and province the invoice prints. Fill one in only
             when FBR has you registered differently from what the invoice shows.
           </p>
-          <p style={{ fontSize: 12, color: "rgba(var(--ink),.4)", margin: "4px 0 14px" }}>
+          <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", margin: "4px 0 14px" }}>
             Sandbox mode is for testing against FBR&apos;s test gateway — nothing filed there counts as a real return. Switch to Production only once your token and seller details are confirmed with FBR.
           </p>
           <div style={{ display: "flex", gap: 10 }}>
@@ -263,30 +263,30 @@ export default function EInvoicePage() {
             <thead>
               <tr style={{ background: "rgba(var(--ink),.03)", textAlign: "left" }}>
                 {["Invoice #", "Date", "Customer", "Total", "Status", "FBR Invoice No.", ""].map(h => (
-                  <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", color: "rgba(var(--ink),.4)" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", color: "rgba(var(--ink),var(--ta-40, .4))" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={7} style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),.4)" }}>Loading…</td></tr>
+                <tr><td colSpan={7} style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),var(--ta-40, .4))" }}>Loading…</td></tr>
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={7} style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),.4)" }}>No invoices found.</td></tr>
+                <tr><td colSpan={7} style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),var(--ta-40, .4))" }}>No invoices found.</td></tr>
               )}
               {!loading && filtered.map(inv => (
                 <tr key={inv.id} style={{ borderTop: "1px solid var(--border)" }}>
                   <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)" }}>{inv.invoiceNo}</td>
-                  <td style={{ padding: "12px 16px", color: "rgba(var(--ink),.6)" }}>{new Date(inv.date).toLocaleDateString()}</td>
-                  <td style={{ padding: "12px 16px", color: "rgba(var(--ink),.7)" }}>{inv.customer?.name || "—"}</td>
+                  <td style={{ padding: "12px 16px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>{new Date(inv.date).toLocaleDateString()}</td>
+                  <td style={{ padding: "12px 16px", color: "rgba(var(--ink),var(--ta-70, .7))" }}>{inv.customer?.name || "—"}</td>
                   <td style={{ padding: "12px 16px", color: "var(--text-primary)" }}>{fmt(inv.total)}</td>
                   <td style={{ padding: "12px 16px" }}>
                     <StatusBadge status={inv.fbrStatus} />
                     {inv.fbrStatus === "PENDING_SYNC" && !!inv.fbrRetryCount && (
-                      <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.4)", marginTop: 4 }}>attempt {inv.fbrRetryCount}/8</div>
+                      <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4 }}>attempt {inv.fbrRetryCount}/8</div>
                     )}
                   </td>
-                  <td style={{ padding: "12px 16px", color: "rgba(var(--ink),.6)", fontFamily: "monospace", fontSize: 12 }}>{inv.fbrInvoiceNo || "—"}</td>
+                  <td style={{ padding: "12px 16px", color: "rgba(var(--ink),var(--ta-60, .6))", fontFamily: "monospace", fontSize: 12 }}>{inv.fbrInvoiceNo || "—"}</td>
                   <td style={{ padding: "12px 16px", textAlign: "right", whiteSpace: "nowrap" }}>
                     {inv.fbrStatus === "FILED" ? (
                       <button onClick={() => setQrFor(inv)} style={{ background: "rgba(52,211,153,.12)", color: "var(--tx-34d399, #34d399)", border: "none", borderRadius: 7, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View QR</button>
@@ -316,7 +316,7 @@ export default function EInvoicePage() {
         <div onClick={() => setFileDialogFor(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 26, maxWidth: 360, width: "90%" }}>
             <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>File {fileDialogFor.invoiceNo} with FBR</h3>
-            <p style={{ margin: "0 0 16px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>Pick how this sale should be reported.</p>
+            <p style={{ margin: "0 0 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>Pick how this sale should be reported.</p>
             <Field label="Sale Type">
               <select value={fileSaleType} onChange={e => setFileSaleType(e.target.value)} style={inp()}>
                 <option value={SALE_TYPE_STANDARD}>Standard Rate</option>
@@ -358,11 +358,11 @@ export default function EInvoicePage() {
         <div onClick={() => setQrFor(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, textAlign: "center", maxWidth: 320 }}>
             <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>{qrFor.invoiceNo}</h3>
-            <p style={{ margin: "0 0 16px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>FBR Invoice No. {qrFor.fbrInvoiceNo}</p>
+            <p style={{ margin: "0 0 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>FBR Invoice No. {qrFor.fbrInvoiceNo}</p>
             <div style={{ background: "#fff", padding: 12, borderRadius: 10, display: "inline-block" }}>
               <QRCodeSVG value={qrFor.fbrQrPayload || qrFor.fbrInvoiceNo || qrFor.invoiceNo} size={180} />
             </div>
-            <p style={{ margin: "16px 0 0", fontSize: 11, color: "rgba(var(--ink),.4)", wordBreak: "break-all" }}>{qrFor.fbrQrPayload}</p>
+            <p style={{ margin: "16px 0 0", fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", wordBreak: "break-all" }}>{qrFor.fbrQrPayload}</p>
             <button onClick={() => setQrFor(null)} style={{ marginTop: 16, background: "rgba(var(--ink),.06)", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: 8, padding: "8px 18px", fontSize: 12.5, cursor: "pointer" }}>Close</button>
           </div>
         </div>

@@ -87,7 +87,7 @@ const PLAN_CONFIG = {
     tagline: "Perfect for growing businesses",
     color: "var(--tx-818cf8, #818cf8)",
     glow: "rgba(129,140,248,.35)",
-    dim: "rgba(129,140,248,.1)",
+    dim: "rgba(var(--txr-818cf8, 129,140,248),.1)",
     border: "rgba(129,140,248,.3)",
     gradientFrom: "#6366f1",
     gradientTo: "#4f46e5",
@@ -102,7 +102,7 @@ const PLAN_CONFIG = {
     tagline: "For established teams that need more",
     color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.35)",
-    dim: "rgba(52,211,153,.1)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.1)",
     border: "rgba(52,211,153,.3)",
     gradientFrom: "#10b981",
     gradientTo: "#059669",
@@ -117,7 +117,7 @@ const PLAN_CONFIG = {
     tagline: "Tailored for complex organizations",
     color: "var(--tx-fbbf24, #fbbf24)",
     glow: "rgba(251,191,36,.35)",
-    dim: "rgba(251,191,36,.1)",
+    dim: "rgba(var(--txr-fbbf24, 251,191,36),.1)",
     border: "rgba(251,191,36,.3)",
     gradientFrom: "#f59e0b",
     gradientTo: "#d97706",
@@ -132,7 +132,7 @@ const PLAN_CONFIG = {
     tagline: "Tailored to your specific needs",
     color: "var(--tx-34d399, #34d399)",
     glow: "rgba(52,211,153,.35)",
-    dim: "rgba(52,211,153,.1)",
+    dim: "rgba(var(--txr-34d399, 52,211,153),.1)",
     border: "rgba(52,211,153,.3)",
     gradientFrom: "#10b981",
     gradientTo: "#059669",
@@ -152,7 +152,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
         display:"flex", alignItems:"center", justifyContent:"center",
         fontSize:12, fontWeight:700, transition:"all .4s",
         background: done ? "#34d399" : active ? "#6366f1" : "rgba(var(--ink),.06)",
-        color: done||active ? "white" : "rgba(var(--ink),.25)",
+        color: done||active ? "white" : "rgba(var(--ink),var(--ta-25, .25))",
         border: active ? "2px solid rgba(129,140,248,.6)" : done ? "2px solid #34d399" : "2px solid rgba(var(--ink),.08)",
         boxShadow: active ? "0 0 16px rgba(99,102,241,.5)" : done ? "0 0 12px rgba(52,211,153,.4)" : "none",
         transform: active ? "scale(1.1)" : "scale(1)",
@@ -161,7 +161,7 @@ function ProgressStep({ step, label, active, done }: { step: number; label: stri
       </div>
       <span style={{
         fontSize:9, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase",
-        color: active ? "var(--tx-a5b4fc, #a5b4fc)" : done ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),.22)",
+        color: active ? "var(--tx-a5b4fc, #a5b4fc)" : done ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),var(--ta-22, .22))",
       }}>
         {label}
       </span>
@@ -263,7 +263,7 @@ function FloatingInput({
         fontSize: lifted ? 10 : 14,
         letterSpacing: lifted ? ".08em" : "0",
         textTransform: lifted ? "uppercase" : "none",
-        color: focused ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),.3)",
+        color: focused ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-30, .3))",
       }}>
         {label}
       </label>
@@ -307,7 +307,7 @@ function PhoneInput({
         padding:"0 10px 0 14px", borderRight:"1px solid rgba(var(--ink),.08)",
         flexShrink:0,
       }}>
-        <span style={{ fontSize:12, color:"rgba(var(--ink),.3)", userSelect:"none" }}>+</span>
+        <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", userSelect:"none" }}>+</span>
         <input
           type="text" value={dialCode}
           onChange={e => onDialChange(e.target.value.replace(/\D/g,"").slice(0,4))}
@@ -739,7 +739,7 @@ export default function SignupByPlanPage() {
           </div>
 
           <button onClick={() => router.push("/landing")} style={{
-            fontSize:13, fontWeight:600, color:"rgba(var(--ink),.55)",
+            fontSize:13, fontWeight:600, color:"rgba(var(--ink),var(--ta-55, .55))",
             display:"flex", alignItems:"center", gap:4,
             padding:"7px 14px", borderRadius:9,
             border:"1.5px solid rgba(var(--ink),.1)",
@@ -747,7 +747,7 @@ export default function SignupByPlanPage() {
             cursor:"pointer", transition:"all .2s", fontFamily:"inherit",
           }}
             onMouseEnter={e=>{e.currentTarget.style.color="white";e.currentTarget.style.borderColor="rgba(var(--ink),.25)";}}
-            onMouseLeave={e=>{e.currentTarget.style.color="rgba(var(--ink),.55)";e.currentTarget.style.borderColor="rgba(var(--ink),.1)";}}
+            onMouseLeave={e=>{e.currentTarget.style.color="rgba(var(--ink),var(--ta-55, .55))";e.currentTarget.style.borderColor="rgba(var(--ink),.1)";}}
           >
             Back
           </button>
@@ -779,7 +779,7 @@ export default function SignupByPlanPage() {
             }}>
               Create your account
             </h1>
-            <p style={{ fontSize:14, color:"rgba(var(--ink),.38)", fontWeight:400 }}>
+            <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-38, .38))", fontWeight:400 }}>
               Set up your{" "}
               <strong style={{ color:current.color }}>{current.name}</strong>{" "}
               workspace in under 2 minutes.
@@ -823,7 +823,7 @@ export default function SignupByPlanPage() {
                 }}>
                   {current.name}
                 </div>
-                <div style={{ fontSize:13, color:"rgba(var(--ink),.38)" }}>{current.tagline}</div>
+                <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-38, .38))" }}>{current.tagline}</div>
 
                 {/* Price box */}
                 {price && (
@@ -840,7 +840,7 @@ export default function SignupByPlanPage() {
                         {billingCycle === "yearly" ? "/ yr" : "/ mo"}
                       </span>
                     </div>
-                    <div style={{ fontSize:11, color:"rgba(var(--ink),.35)", marginTop:4 }}>
+                    <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:4 }}>
                       Displayed in {currency}
                     </div>
                   </div>
@@ -862,7 +862,7 @@ export default function SignupByPlanPage() {
                       }}>
                         <SidebarIcon icon={b.icon} color={current.color} />
                       </div>
-                      <span style={{ fontSize:13, fontWeight:500, color:"rgba(var(--ink),.65)" }}>{b.text}</span>
+                      <span style={{ fontSize:13, fontWeight:500, color:"rgba(var(--ink),var(--ta-65, .65))" }}>{b.text}</span>
                       <div style={{ marginLeft:"auto", width:16, height:16, borderRadius:"50%",
                         background:current.dim, border:`1px solid ${current.border}`,
                         display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -889,7 +889,7 @@ export default function SignupByPlanPage() {
                 { icon:"flex", text:"Cancel anytime, no lock-in" },
                 { icon:"network", text:"Global cloud infrastructure" },
               ].map(({ icon, text }) => (
-                <div key={text} style={{ display:"flex", alignItems:"center", gap:9, marginBottom:10, fontSize:12.5, color:"rgba(var(--ink),.42)", fontWeight:500 }}>
+                <div key={text} style={{ display:"flex", alignItems:"center", gap:9, marginBottom:10, fontSize:12.5, color:"rgba(var(--ink),var(--ta-42, .42))", fontWeight:500 }}>
                   <div style={{
                     width:22, height:22, borderRadius:8,
                     display:"flex", alignItems:"center", justifyContent:"center",
@@ -957,7 +957,7 @@ export default function SignupByPlanPage() {
                   <label style={{
                     display:"block", fontSize:10, fontWeight:700,
                     letterSpacing:".08em", textTransform:"uppercase",
-                    color:"rgba(var(--ink),.3)", marginBottom:6,
+                    color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6,
                   }}>Country</label>
                   <select
                     value={phoneCountry}
@@ -994,7 +994,7 @@ export default function SignupByPlanPage() {
                   <label style={{
                     display:"block", fontSize:10, fontWeight:700,
                     letterSpacing:".08em", textTransform:"uppercase",
-                    color:"rgba(var(--ink),.3)", marginBottom:6,
+                    color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6,
                   }}>Phone number (optional)</label>
                   <PhoneInput
                     dialCode={dialCode}
@@ -1025,7 +1025,7 @@ export default function SignupByPlanPage() {
                   <label style={{
                     display:"block", fontSize:10, fontWeight:700,
                     letterSpacing:".08em", textTransform:"uppercase",
-                    color:"rgba(var(--ink),.3)", marginBottom:6,
+                    color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6,
                   }}>
                     Business Type <span style={{color:"var(--tx-f87171, #f87171)"}}>*</span>
                   </label>
@@ -1055,7 +1055,7 @@ export default function SignupByPlanPage() {
                     <div style={{
                       marginTop:8,
                       fontSize:11.5,
-                      color:"rgba(var(--ink),.42)",
+                      color:"rgba(var(--ink),var(--ta-42, .42))",
                       lineHeight:1.5,
                     }}>
                       {liveTypes.find((bt) => bt.id === businessType)?.description}
@@ -1065,7 +1065,7 @@ export default function SignupByPlanPage() {
 
                 {false && (
                 <div>
-                  <div style={{ fontSize:11,fontWeight:700,color:"rgba(var(--ink),.4)",letterSpacing:".07em",textTransform:"uppercase",marginBottom:10 }}>
+                  <div style={{ fontSize:11,fontWeight:700,color:"rgba(var(--ink),var(--ta-40, .4))",letterSpacing:".07em",textTransform:"uppercase",marginBottom:10 }}>
                     Business Type <span style={{color:"var(--tx-f87171, #f87171)"}}>*</span>
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:8}}>
@@ -1096,7 +1096,7 @@ export default function SignupByPlanPage() {
                             fontFamily:"inherit",fontSize:12,fontWeight:600,
                             background: sel ? "rgba(99,102,241,.18)" : "rgba(var(--ink),.04)",
                             border:`1.5px solid ${sel ? "rgba(99,102,241,.6)" : "rgba(var(--ink),.08)"}`,
-                            color: sel ? "#a5b4fc" : "rgba(var(--ink),.5)",
+                            color: sel ? "#a5b4fc" : "rgba(var(--ink),var(--ta-50, .5))",
                             transition:"all .15s",
                             boxShadow: sel ? "0 0 14px rgba(99,102,241,.2)" : "none",
                           }}>
@@ -1116,13 +1116,13 @@ export default function SignupByPlanPage() {
                 {/* Team Size */}
                 <div className="name-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
                   <div>
-                    <label style={{ display:"block", fontSize:10, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color:"rgba(var(--ink),.3)", marginBottom:6 }}>
-                      Team Size <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),.2)" }}>(optional)</span>
+                    <label style={{ display:"block", fontSize:10, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6 }}>
+                      Team Size <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),var(--ta-20, .2))" }}>(optional)</span>
                     </label>
                     <select
                       value={teamSize}
                       onChange={e => setTeamSize(e.target.value)}
-                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: teamSize ? "white" : "rgba(var(--ink),.35)", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
+                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: teamSize ? "white" : "rgba(var(--ink),var(--ta-35, .35))", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
                       onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
                       onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                     >
@@ -1138,13 +1138,13 @@ export default function SignupByPlanPage() {
 
                   {/* Referral Source */}
                   <div>
-                    <label style={{ display:"block", fontSize:10, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color:"rgba(var(--ink),.3)", marginBottom:6 }}>
-                      How did you hear about us? <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),.2)" }}>(optional)</span>
+                    <label style={{ display:"block", fontSize:10, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6 }}>
+                      How did you hear about us? <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),var(--ta-20, .2))" }}>(optional)</span>
                     </label>
                     <select
                       value={referralSource}
                       onChange={e => setReferralSource(e.target.value)}
-                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: referralSource ? "white" : "rgba(var(--ink),.35)", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
+                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: referralSource ? "white" : "rgba(var(--ink),var(--ta-35, .35))", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
                       onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
                       onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                     >
@@ -1173,10 +1173,10 @@ export default function SignupByPlanPage() {
                     <button type="button" onClick={() => setShowPass(v => !v)} style={{
                       position:"absolute", right:14, top:"50%", transform:"translateY(-50%)",
                       background:"none", border:"none", cursor:"pointer",
-                      color:"rgba(var(--ink),.3)", fontSize:16, transition:"color .2s",
+                      color:"rgba(var(--ink),var(--ta-30, .3))", fontSize:16, transition:"color .2s",
                     }}
                       onMouseEnter={e=>(e.currentTarget.style.color="#818cf8")}
-                      onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),.3)")}
+                      onMouseLeave={e=>(e.currentTarget.style.color="rgba(var(--ink),var(--ta-30, .3))")}
                     >
                       {showPass ? "Hide" : "Show"}
                     </button>
@@ -1192,7 +1192,7 @@ export default function SignupByPlanPage() {
                           }}/>
                         ))}
                       </div>
-                      <div style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),.35)" }}>
+                      <div style={{ fontSize:11, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>
                         Password strength:{" "}
                         <span style={{ color:strengthMeta[passwordStrength].color }}>
                           {strengthMeta[passwordStrength].label}
@@ -1230,7 +1230,7 @@ export default function SignupByPlanPage() {
                           </svg>
                         )}
                       </div>
-                      <span style={{ fontSize:13, color:"rgba(var(--ink),.5)", fontWeight:400 }}>
+                      <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-50, .5))", fontWeight:400 }}>
                         {label}{" "}
                         <a href={href} onClick={e=>e.stopPropagation()} style={{ color:"var(--tx-818cf8, #818cf8)", fontWeight:600, textDecoration:"underline" }}>
                           {link}
@@ -1242,8 +1242,8 @@ export default function SignupByPlanPage() {
 
                 {/* Referral code */}
                 <div style={{ borderTop:"1px solid rgba(var(--ink),.06)", paddingTop:14 }}>
-                  <label style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),.3)", textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:6 }}>
-                    Referral Code <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),.2)" }}>(optional)</span>
+                  <label style={{ fontSize:11, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:6 }}>
+                    Referral Code <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),var(--ta-20, .2))" }}>(optional)</span>
                   </label>
                   <input
                     value={referralCode}
@@ -1258,7 +1258,7 @@ export default function SignupByPlanPage() {
                   marginTop:4, width:"100%", padding:"14px 24px",
                   borderRadius:13, border:"none",
                   background: disabled ? "rgba(var(--ink),.06)" : `linear-gradient(135deg,${current.gradientFrom},${current.gradientTo})`,
-                  color: disabled ? "rgba(var(--ink),.22)" : "white",
+                  color: disabled ? "rgba(var(--ink),var(--ta-22, .22))" : "white",
                   fontSize:15, fontWeight:700, letterSpacing:".01em",
                   cursor: loading || disabled ? "not-allowed" : "pointer",
                   display:"flex", alignItems:"center", justifyContent:"center", gap:8,
@@ -1280,7 +1280,7 @@ export default function SignupByPlanPage() {
                   )}
                 </button>
 
-                <div style={{ textAlign:"center", fontSize:12.5, color:"rgba(var(--ink),.25)" }}>
+                <div style={{ textAlign:"center", fontSize:12.5, color:"rgba(var(--ink),var(--ta-25, .25))" }}>
                   Already have an account?{" "}
                   <button type="button" onClick={() => router.push("/login")} style={{
                     color:"var(--tx-818cf8, #818cf8)", fontWeight:600, background:"none", border:"none",

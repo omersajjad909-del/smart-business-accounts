@@ -126,19 +126,19 @@ export default function PagePrefsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 6 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Pages</h1>
-          <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.45)", margin: 0, maxWidth: 620, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-45, .45))", margin: 0, maxWidth: 620, lineHeight: 1.6 }}>
             Everything your plan includes. Switch off what this business does not use and it leaves the
             sidebar — nothing is cancelled, and it comes back the moment you switch it on again.
           </p>
         </div>
         <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
           <div style={{ fontSize: 20, fontWeight: 800, color: "var(--tx-22c55e, #22c55e)" }}>{shownCount}</div>
-          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>of {pages.length} shown</div>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>of {pages.length} shown</div>
         </div>
       </div>
 
       {!canEdit && !loading && (
-        <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.28)", color: "rgba(var(--ink),.7)", fontSize: 12.5 }}>
+        <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.28)", color: "rgba(var(--ink),var(--ta-70, .7))", fontSize: 12.5 }}>
           Only an admin can change this — one sidebar is shared by everyone in the company.
         </div>
       )}
@@ -165,7 +165,7 @@ export default function PagePrefsPage() {
       />
 
       {loading ? (
-        <div style={{ marginTop: 24, color: "rgba(var(--ink),.3)", fontSize: 13 }}>Loading…</div>
+        <div style={{ marginTop: 24, color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>Loading…</div>
       ) : (
         <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 14 }}>
           {sections.map(([section, list]) => {
@@ -175,7 +175,7 @@ export default function PagePrefsPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 10, flexWrap: "wrap" }}>
                   <div style={{ fontSize: 13.5, fontWeight: 800 }}>
                     {section}
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(var(--ink),.35)", marginLeft: 8 }}>
+                    <span style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(var(--ink),var(--ta-35, .35))", marginLeft: 8 }}>
                       {list.length - off} of {list.length} on
                     </span>
                   </div>
@@ -209,11 +209,11 @@ export default function PagePrefsPage() {
                           onChange={() => toggle(p.id)}
                         />
                         <span style={{ minWidth: 0 }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: on ? "#fff" : "rgba(var(--ink),.45)" }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: on ? "#fff" : "rgba(var(--ink),var(--ta-45, .45))" }}>
                             {p.label}
                           </span>
                           {p.description && (
-                            <span style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),.3)", marginTop: 1 }}>
+                            <span style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 1 }}>
                               {p.description}
                             </span>
                           )}
@@ -226,7 +226,7 @@ export default function PagePrefsPage() {
             );
           })}
           {sections.length === 0 && (
-            <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)", fontSize: 13 }}>
+            <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))", fontSize: 13 }}>
               Nothing matches “{search}”.
             </div>
           )}
@@ -242,7 +242,7 @@ export default function PagePrefsPage() {
           borderRadius: 14, background: "rgba(var(--dkr-0a0d20, 10,13,32),0.95)", border: `1px solid ${border}`,
           backdropFilter: "blur(10px)", boxShadow: "0 12px 40px rgba(0,0,0,.45)", zIndex: 50,
         }}>
-          <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))", whiteSpace: "nowrap" }}>
             {hidden.size} page{hidden.size === 1 ? "" : "s"} switched off
           </span>
           <button onClick={() => setHidden(new Set(saved))} disabled={saving} style={miniBtn}>Undo</button>
@@ -266,6 +266,6 @@ export default function PagePrefsPage() {
 
 const miniBtn: React.CSSProperties = {
   padding: "5px 11px", borderRadius: 8, background: "rgba(var(--ink),.05)",
-  border: `1px solid ${border}`, color: "rgba(var(--ink),.6)",
+  border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-60, .6))",
   fontSize: 11.5, fontWeight: 700, fontFamily: ff, cursor: "pointer", whiteSpace: "nowrap",
 };

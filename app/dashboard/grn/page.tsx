@@ -53,9 +53,9 @@ type GRN = {
 type PO  = { id: string; poNo: string; supplier: { id: string; name: string }; items: Array<{ itemId: string; item: { id: string; name: string }; qty: number; rate: number }> };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  RECEIVED: { bg: "rgba(52,211,153,0.12)",  text: "#34d399", border: "rgba(52,211,153,0.3)"  },
-  PARTIAL:  { bg: "rgba(251,191,36,0.12)",  text: "#fbbf24", border: "rgba(251,191,36,0.3)"  },
-  PENDING:  { bg: "rgba(148,163,184,0.12)", text: "#94a3b8", border: "rgba(148,163,184,0.3)" },
+  RECEIVED: { bg: "rgba(52,211,153,0.12)",  text: "var(--tx-34d399, #34d399)", border: "rgba(52,211,153,0.3)"  },
+  PARTIAL:  { bg: "rgba(251,191,36,0.12)",  text: "var(--tx-fbbf24, #fbbf24)", border: "rgba(251,191,36,0.3)"  },
+  PENDING:  { bg: "rgba(148,163,184,0.12)", text: "var(--tx-94a3b8, #94a3b8)", border: "rgba(148,163,184,0.3)" },
 };
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {

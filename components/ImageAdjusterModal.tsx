@@ -276,7 +276,7 @@ export default function ImageAdjusterModal({
               width: 30, height: 30, borderRadius: 9, flexShrink: 0,
               border: "1px solid rgba(var(--ink),0.12)",
               background: "rgba(var(--ink),0.06)",
-              color: "rgba(var(--ink),0.7)",
+              color: "rgba(var(--ink),var(--ta-70, 0.7))",
               cursor: "pointer", fontSize: 14,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
@@ -334,7 +334,7 @@ export default function ImageAdjusterModal({
                 transform: "translateX(-50%)",
                 background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)",
                 borderRadius: 20, padding: "4px 12px",
-                fontSize: 10, color: "rgba(var(--ink),0.7)",
+                fontSize: 10, color: "rgba(var(--ink),var(--ta-70, 0.7))",
                 whiteSpace: "nowrap", pointerEvents: "none",
               }}>
                 drag · pinch to zoom
@@ -346,10 +346,10 @@ export default function ImageAdjusterModal({
         {/* Zoom slider */}
         <div style={{ padding: "0 14px 14px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),0.4)" }}>
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>
               Zoom
             </span>
-            <span style={{ fontSize: 11, color: "rgba(var(--ink),0.55)", fontWeight: 600 }}>
+            <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-55, 0.55))", fontWeight: 600 }}>
               {(zoom / minZoom).toFixed(1)}×
             </span>
           </div>
@@ -373,7 +373,7 @@ export default function ImageAdjusterModal({
               flex: 1, padding: "12px", borderRadius: 11,
               border: "1px solid rgba(var(--ink),0.1)",
               background: "rgba(var(--ink),0.04)",
-              color: "rgba(var(--ink),0.65)",
+              color: "rgba(var(--ink),var(--ta-65, 0.65))",
               fontWeight: 600, fontSize: 14, cursor: "pointer",
             }}
           >

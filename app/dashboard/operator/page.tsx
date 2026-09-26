@@ -12,14 +12,14 @@ const isMobile = false;
 
 /* ── Design tokens ──────────────────────────────────────────────────────── */
 const T = {
-  bg:      "#070a1c",
-  panel:   "rgba(10,13,36,.96)",
+  bg:      "var(--dk-070a1c, #070a1c)",
+  panel:   "rgba(var(--dkr-0a0d24, 10,13,36),0.96)",
   glass:   "rgba(255,255,255,.028)",
   border:  "rgba(var(--ink),.075)",
-  borderM: "rgba(255,255,255,.13)",
-  text:    "rgba(255,255,255,.96)",
-  muted:   "rgba(200,210,240,.72)",
-  dim:     "rgba(148,163,184,.58)",
+  borderM: "rgba(var(--ink),.13)",
+  text:    "rgba(var(--ink),.96)",
+  muted:   "rgba(var(--txr-c8d2f0, 200,210,240),.72)",
+  dim:     "rgba(var(--txr-94a3b8, 148,163,184),.58)",
   indigo:  "#6366f1",
   violet:  "#818cf8",
   cyan:    "#22d3ee",
@@ -29,10 +29,10 @@ const T = {
 };
 
 const PRIO = {
-  urgent: { bar:"#ef4444", bg:"rgba(239,68,68,.1)",  border:"rgba(239,68,68,.3)",  text:"#fca5a5", dot:"#ef4444" },
-  high:   { bar:"#f59e0b", bg:"rgba(245,158,11,.1)", border:"rgba(245,158,11,.3)", text:"#fde68a", dot:"#f59e0b" },
-  medium: { bar:"#6366f1", bg:"rgba(99,102,241,.1)", border:"rgba(99,102,241,.3)", text:"#a5b4fc", dot:"#6366f1" },
-  low:    { bar:"#10b981", bg:"rgba(16,185,129,.1)", border:"rgba(16,185,129,.3)", text:"#6ee7b7", dot:"#10b981" },
+  urgent: { bar:"#ef4444", bg:"rgba(239,68,68,.1)",  border:"rgba(239,68,68,.3)",  text:"var(--tx-fca5a5, #fca5a5)", dot:"#ef4444" },
+  high:   { bar:"#f59e0b", bg:"rgba(245,158,11,.1)", border:"rgba(245,158,11,.3)", text:"var(--tx-fde68a, #fde68a)", dot:"#f59e0b" },
+  medium: { bar:"#6366f1", bg:"rgba(99,102,241,.1)", border:"rgba(99,102,241,.3)", text:"var(--tx-a5b4fc, #a5b4fc)", dot:"#6366f1" },
+  low:    { bar:"#10b981", bg:"rgba(16,185,129,.1)", border:"rgba(16,185,129,.3)", text:"var(--tx-6ee7b7, #6ee7b7)", dot:"#10b981" },
 };
 
 function pr(key: string) { return PRIO[key as keyof typeof PRIO] ?? PRIO.low; }
@@ -227,7 +227,7 @@ function DecisionCard({ decision, queueingId, onQueue }: {
           <button onClick={() => onQueue(decision)} disabled={busy} style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: "10px 14px", borderRadius: 12, fontSize: 13,
-            background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.62)",
+            background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-62, .62))",
             border: `1px solid ${T.borderM}`, cursor: busy ? "wait" : "pointer",
             fontWeight: 600, fontFamily: "inherit",
             opacity: busy ? 0.6 : 1,
@@ -329,7 +329,7 @@ function ActionCard({ action, queueingId, buttonLabel, onQueue }: {
         )}
         <button onClick={() => onQueue(action)} disabled={busy || watchOnly} style={{
           padding: "8px 14px", borderRadius: 10, fontSize: 12.5,
-          background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.58)",
+          background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-58, .58))",
           border: `1px solid ${T.borderM}`, fontFamily: "inherit",
           cursor: watchOnly || busy ? "not-allowed" : "pointer", fontWeight: 600,
           opacity: watchOnly ? 0.38 : busy ? 0.6 : 1,

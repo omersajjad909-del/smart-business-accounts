@@ -67,14 +67,14 @@ export default function ServicesDashboard() {
           { label: "Billable Value", value: `Rs. ${summary.billableValue.toLocaleString()}`, color: "var(--tx-f97316, #f97316)" },
         ].map((card) => (
           <div key={card.label} style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
       </div>
 
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.5)", marginBottom: 12, letterSpacing: ".06em" }}>QUICK ACTIONS</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 12, letterSpacing: ".06em" }}>QUICK ACTIONS</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           {quickLinks.map((link) => (
             <Link prefetch={false} key={link.href} href={link.href} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", color: "var(--tx-c7d2fe, #c7d2fe)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
@@ -91,18 +91,18 @@ export default function ServicesDashboard() {
             {deliveries.slice(0, 5).map((delivery) => (
               <div key={delivery.id} style={{ border: `1px solid ${serviceBorder}`, borderRadius: 12, padding: "12px 14px", background: "rgba(var(--ink),.02)" }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{delivery.milestone}</div>
-                <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 4 }}>
                   {delivery.projectCode || "No project"} · {delivery.client || "No client"} · {delivery.status}
                 </div>
               </div>
             ))}
-            {!deliveries.length && <div style={{ color: "rgba(var(--ink),.35)" }}>No deliveries planned yet.</div>}
+            {!deliveries.length && <div style={{ color: "rgba(var(--ink),var(--ta-35, .35))" }}>No deliveries planned yet.</div>}
           </div>
         </div>
 
         <div style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Enterprise Summary</div>
-          <div style={{ fontSize: 13, lineHeight: 1.8, color: "rgba(var(--ink),.55)" }}>
+          <div style={{ fontSize: 13, lineHeight: 1.8, color: "rgba(var(--ink),var(--ta-55, .55))" }}>
             Overdue Deliveries: <span style={{ color: summary.overdueDeliveries ? "var(--tx-f87171, #f87171)" : "var(--tx-22c55e, #22c55e)" }}>{summary.overdueDeliveries}</span>
             <br />
             Waiting Review: <span style={{ color: summary.reviewDeliveries ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" }}>{summary.reviewDeliveries}</span>

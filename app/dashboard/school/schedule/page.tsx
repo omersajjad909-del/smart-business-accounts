@@ -44,11 +44,11 @@ export default function SchedulePage() {
   return (
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: ff, color: "var(--ink-solid, #fff)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📅 Class Schedule</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage class timetable</p></div>
+        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📅 Class Schedule</h1><p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage class timetable</p></div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Period</button>
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 12 }}>
         {DAYS.map(day => {
@@ -60,13 +60,13 @@ export default function SchedulePage() {
                 {dayPeriods.map(p => (
                   <div key={p.id} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "10px 12px" }}>
                     <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{p.subject}</div>
-                    <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)" }}>{p.teacher}</div>
-                    <div style={{ fontSize: 10, color: "rgba(var(--ink),.4)" }}>Class: {p.class} · Rm: {p.room}</div>
+                    <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{p.teacher}</div>
+                    <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Class: {p.class} · Rm: {p.room}</div>
                     <div style={{ fontSize: 10, color: "var(--tx-818cf8, #818cf8)", marginTop: 2 }}>{p.time} · P{p.period}</div>
                     <button onClick={() => remove(p.id)} style={{ marginTop: 4, padding: "2px 6px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-ef4444, #ef4444)", borderRadius: 4, fontSize: 9, cursor: "pointer" }}>Remove</button>
                   </div>
                 ))}
-                {dayPeriods.length === 0 && !loading && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: 16, textAlign: "center", fontSize: 11, color: "rgba(var(--ink),.2)" }}>Free</div>}
+                {dayPeriods.length === 0 && !loading && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: 16, textAlign: "center", fontSize: 11, color: "rgba(var(--ink),var(--ta-20, .2))" }}>Free</div>}
               </div>
             </div>
           );
@@ -80,25 +80,25 @@ export default function SchedulePage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {[["Subject", "subject", "text", "span 2"], ["Teacher", "teacher", "text", ""], ["Class", "class", "text", ""], ["Room", "room", "text", ""], ["Time", "time", "time", ""]].map(([label, key, type, col]) => (
                 <div key={key} style={{ gridColumn: col || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{label}</label>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{label}</label>
                   <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Day</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Day</label>
                 <select value={form.day} onChange={e => setForm(f => ({ ...f, day: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)", fontSize: 14 }}>
                   {DAYS.map(d => <option key={d}>{d}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Period No.</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Period No.</label>
                 <input type="number" min={1} max={8} value={form.period} onChange={e => setForm(f => ({ ...f, period: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               {error && <div style={{ color: "var(--tx-fda4af, #fda4af)", fontSize: 12, flex: 1 }}>{error}</div>}
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#6366f1", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Period</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

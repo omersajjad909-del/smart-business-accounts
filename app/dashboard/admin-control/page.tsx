@@ -74,9 +74,9 @@ const DEFAULT_BRANCH_GEO: BranchGeoProfile = { address: "", latitude: null, long
 
 /* ─── style primitives ─── */
 const ff   = "'Outfit','Inter',sans-serif";
-const BG   = "rgba(255,255,255,.03)";
-const BDR  = "rgba(255,255,255,.08)";
-const MUTED = "rgba(255,255,255,.45)";
+const BG   = "rgba(var(--ink),.03)";
+const BDR  = "rgba(var(--ink),.08)";
+const MUTED = "rgba(var(--ink),var(--ta-45, .45))";
 const ACCENT = "#6366f1";
 
 const inp: React.CSSProperties = { width: "100%", boxSizing: "border-box", background: "rgba(var(--ink),.05)", border: `1px solid ${BDR}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--ink-solid, #fff)", fontFamily: ff, outline: "none" };
@@ -94,7 +94,7 @@ function Field({ label, children, span2 }: { label: string; children: React.Reac
   );
 }
 function Btn({ children, onClick, disabled, variant = "primary" }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean; variant?: "primary" | "secondary" | "danger" }) {
-  const bg = variant === "primary" ? (disabled ? "rgba(99,102,241,.3)" : ACCENT) : variant === "danger" ? "rgba(239,68,68,.15)" : "rgba(255,255,255,.06)";
+  const bg = variant === "primary" ? (disabled ? "rgba(99,102,241,.3)" : ACCENT) : variant === "danger" ? "rgba(239,68,68,.15)" : "rgba(var(--ink),.06)";
   const col = variant === "danger" ? "#f87171" : variant === "secondary" ? MUTED : "#fff";
   const bdr = variant === "secondary" ? `1px solid ${BDR}` : variant === "danger" ? "1px solid rgba(239,68,68,.3)" : "none";
   return (
@@ -547,7 +547,7 @@ export default function AdminControlPage() {
                     <span style={{ display: "block", fontSize: 13.5, fontWeight: 600 }}>
                       What each document shows, and its design
                     </span>
-                    <span style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 2, lineHeight: 1.5 }}>
+                    <span style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 2, lineHeight: 1.5 }}>
                       Logo, addresses and both sides&apos; tax numbers — set per document now, with a
                       live preview. Sales invoice, PO, challan, GRN and the rest each keep their own.
                     </span>

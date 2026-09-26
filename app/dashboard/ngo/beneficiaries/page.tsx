@@ -65,7 +65,7 @@ export default function BeneficiariesPage() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Beneficiary Management</h1>
-          <p style={{ margin:"4px 0 0", color:"rgba(var(--ink),.5)", fontSize:14 }}>Track aid recipients & monthly disbursements</p>
+          <p style={{ margin:"4px 0 0", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:14 }}>Track aid recipients & monthly disbursements</p>
         </div>
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Beneficiary</button>
       </div>
@@ -79,7 +79,7 @@ export default function BeneficiariesPage() {
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:26, fontWeight:700, color:s.color }}>{s.value}</div>
-            <div style={{ color:"rgba(var(--ink),.5)", fontSize:13, marginTop:4 }}>{s.label}</div>
+            <div style={{ color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:13, marginTop:4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -90,10 +90,10 @@ export default function BeneficiariesPage() {
         ))}
       </div>
 
-      {loading && <div style={{ textAlign:"center", padding:40, color:"rgba(var(--ink),.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign:"center", padding:40, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Loading...</div>}
 
       <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign:"center", padding:40, color:"rgba(var(--ink),.25)" }}>No beneficiaries found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ ...card, textAlign:"center", padding:40, color:"rgba(var(--ink),var(--ta-25, .25))" }}>No beneficiaries found.</div>}
         {filtered.map(b=>(
           <div key={b.id} style={{ ...card }}>
             <div style={{ display:"flex", alignItems:"flex-start", gap:16 }}>
@@ -106,19 +106,19 @@ export default function BeneficiariesPage() {
                   <span style={{ background:`${catColor[b.category]}22`, color:catColor[b.category], border:`1px solid ${catColor[b.category]}44`, borderRadius:20, padding:"2px 8px", fontSize:11, fontWeight:600 }}>{catLabel[b.category]}</span>
                   {b.status==="inactive" && <span style={{ background:"rgba(107,114,128,.2)", color:"#6b7280", borderRadius:20, padding:"2px 8px", fontSize:11 }}>Inactive</span>}
                 </div>
-                <div style={{ fontSize:12, color:"rgba(var(--ink),.5)", marginBottom:6 }}>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:6 }}>
                   {b.benefId} · {b.cnic} · {b.phone}
                 </div>
-                <div style={{ fontSize:12, color:"rgba(var(--ink),.4)", marginBottom:8 }}>📍 {b.address} · Enrolled: {b.enrollDate}</div>
+                <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:8 }}>📍 {b.address} · Enrolled: {b.enrollDate}</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                   {b.assistance.map(a=>(
-                    <span key={a} style={{ background:"rgba(var(--ink),.06)", border:`1px solid ${border}`, borderRadius:20, padding:"2px 8px", fontSize:11, color:"rgba(var(--ink),.7)" }}>{a}</span>
+                    <span key={a} style={{ background:"rgba(var(--ink),.06)", border:`1px solid ${border}`, borderRadius:20, padding:"2px 8px", fontSize:11, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{a}</span>
                   ))}
                 </div>
               </div>
               <div style={{ textAlign:"right", flexShrink:0 }}>
                 <div style={{ fontSize:18, fontWeight:700, color:"var(--tx-22c55e, #22c55e)" }}>Rs. {b.monthlyAid.toLocaleString()}</div>
-                <div style={{ fontSize:11, color:"rgba(var(--ink),.4)", marginBottom:10 }}>Monthly Aid</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:10 }}>Monthly Aid</div>
                 <div style={{ display:"flex", gap:6 }}>
                   <button style={{ ...btn("rgba(var(--ink),.07)"), padding:"7px 12px", fontSize:12 }}>Profile</button>
                   <button style={{ ...btn("rgba(34,197,94,.2)"), padding:"7px 12px", fontSize:12, color:"var(--tx-22c55e, #22c55e)" }}>Disburse</button>
@@ -136,23 +136,23 @@ export default function BeneficiariesPage() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               {[["Beneficiary ID","benefId"],["Full Name","name"],["CNIC","cnic"],["Phone","phone"],["Monthly Aid (Rs.)","monthlyAid"]].map(([lbl,key])=>(
                 <div key={key}>
-                  <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>{lbl}</label>
+                  <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>{lbl}</label>
                   <input value={(form as Record<string,string>)[key]} onChange={e=>setForm(p=>({...p,[key]:e.target.value}))} style={inp} />
                 </div>
               ))}
               <div>
-                <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Category</label>
+                <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>Category</label>
                 <select value={form.category} onChange={e=>setForm(p=>({...p,category:e.target.value}))} style={inp}>
                   {["orphan","widow","disabled","student","family"].map(c=><option key={c} value={c}>{catLabel[c]}</option>)}
                 </select>
               </div>
             </div>
             <div style={{ marginTop:12 }}>
-              <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Address</label>
+              <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>Address</label>
               <input value={form.address} onChange={e=>setForm(p=>({...p,address:e.target.value}))} style={inp} />
             </div>
             <div style={{ marginTop:12 }}>
-              <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Assistance Types (comma separated)</label>
+              <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>Assistance Types (comma separated)</label>
               <input value={form.assistance} onChange={e=>setForm(p=>({...p,assistance:e.target.value}))} style={inp} placeholder="Monthly Cash Aid, Food Ration, Medical" />
             </div>
             <div style={{ display:"flex", gap:12, marginTop:20 }}>

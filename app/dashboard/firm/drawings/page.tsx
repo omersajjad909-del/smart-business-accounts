@@ -36,7 +36,7 @@ const S = {
   btnSm: { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: "6px", padding: "0.3rem 0.7rem", fontFamily: font, fontSize: "0.8rem", cursor: "pointer", marginRight: "0.4rem" },
 };
 
-const statusColor: Record<string, string> = { Draft: "#94a3b8", Submitted: "#38bdf8", Approved: "#34d399", Revision: "#f59e0b" };
+const statusColor: Record<string, string> = { Draft: "#94a3b8", Submitted: "var(--tx-38bdf8, #38bdf8)", Approved: "#34d399", Revision: "#f59e0b" };
 const badge = (status: string) => ({ display: "inline-block", padding: "0.2rem 0.65rem", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 600, background: (statusColor[status] ?? "#94a3b8") + "22", color: statusColor[status] ?? "#94a3b8" });
 const EMPTY = { project: "", drawingNo: "", packageName: "", submittedTo: "", dueDate: "", status: "Draft" };
 

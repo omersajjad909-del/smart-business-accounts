@@ -10,12 +10,12 @@ import { AUTOMATION_ADDON_ENABLED } from "@/lib/addons";
 
 /* ── Plan meta ──────────────────────────────────────────── */
 const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: number; color: string; glow: string; dim: string; border: string; gradientFrom: string; gradientTo: string; icon: string }> = {
-  starter:      { name: "Starter",      price: 49,  yearlyPrice: 470,  icon: "🌱", color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.35)", dim: "rgba(129,140,248,.1)",  border: "rgba(129,140,248,.3)",  gradientFrom: "#6366f1", gradientTo: "#4f46e5" },
-  pro:          { name: "Professional", price: 99,  yearlyPrice: 950,  icon: "🚀", color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)",  dim: "rgba(52,211,153,.1)",   border: "rgba(52,211,153,.3)",   gradientFrom: "#10b981", gradientTo: "#059669" },
-  professional: { name: "Professional", price: 99,  yearlyPrice: 950,  icon: "🚀", color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)",  dim: "rgba(52,211,153,.1)",   border: "rgba(52,211,153,.3)",   gradientFrom: "#10b981", gradientTo: "#059669" },
-  enterprise:   { name: "Enterprise",   price: 249, yearlyPrice: 2390, icon: "💎", color: "var(--tx-fbbf24, #fbbf24)", glow: "rgba(251,191,36,.35)",  dim: "rgba(251,191,36,.1)",   border: "rgba(251,191,36,.3)",   gradientFrom: "#f59e0b", gradientTo: "#d97706" },
-  custom:             { name: "Custom",            price: 0,  yearlyPrice: 0,   icon: "⚡", color: "var(--tx-38bdf8, #38bdf8)", glow: "rgba(56,189,248,.35)",  dim: "rgba(56,189,248,.1)",   border: "rgba(56,189,248,.3)",   gradientFrom: "#0ea5e9", gradientTo: "#0284c7" },
-  "addon-automation": { name: "Automation Add-on", price: 79, yearlyPrice: 828, icon: "🤖", color: "var(--tx-a78bfa, #a78bfa)", glow: "rgba(167,139,250,.35)", dim: "rgba(167,139,250,.1)",  border: "rgba(167,139,250,.3)",  gradientFrom: "#7c3aed", gradientTo: "#6d28d9" },
+  starter:      { name: "Starter",      price: 49,  yearlyPrice: 470,  icon: "🌱", color: "var(--tx-818cf8, #818cf8)", glow: "rgba(129,140,248,.35)", dim: "rgba(var(--txr-818cf8, 129,140,248),.1)",  border: "rgba(129,140,248,.3)",  gradientFrom: "#6366f1", gradientTo: "#4f46e5" },
+  pro:          { name: "Professional", price: 99,  yearlyPrice: 950,  icon: "🚀", color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)",  dim: "rgba(var(--txr-34d399, 52,211,153),.1)",   border: "rgba(52,211,153,.3)",   gradientFrom: "#10b981", gradientTo: "#059669" },
+  professional: { name: "Professional", price: 99,  yearlyPrice: 950,  icon: "🚀", color: "var(--tx-34d399, #34d399)", glow: "rgba(52,211,153,.35)",  dim: "rgba(var(--txr-34d399, 52,211,153),.1)",   border: "rgba(52,211,153,.3)",   gradientFrom: "#10b981", gradientTo: "#059669" },
+  enterprise:   { name: "Enterprise",   price: 249, yearlyPrice: 2390, icon: "💎", color: "var(--tx-fbbf24, #fbbf24)", glow: "rgba(251,191,36,.35)",  dim: "rgba(var(--txr-fbbf24, 251,191,36),.1)",   border: "rgba(251,191,36,.3)",   gradientFrom: "#f59e0b", gradientTo: "#d97706" },
+  custom:             { name: "Custom",            price: 0,  yearlyPrice: 0,   icon: "⚡", color: "var(--tx-38bdf8, #38bdf8)", glow: "rgba(56,189,248,.35)",  dim: "rgba(var(--txr-38bdf8, 56,189,248),.1)",   border: "rgba(56,189,248,.3)",   gradientFrom: "#0ea5e9", gradientTo: "#0284c7" },
+  "addon-automation": { name: "Automation Add-on", price: 79, yearlyPrice: 828, icon: "🤖", color: "var(--tx-a78bfa, #a78bfa)", glow: "rgba(167,139,250,.35)", dim: "rgba(var(--txr-a78bfa, 167,139,250),.1)",  border: "rgba(167,139,250,.3)",  gradientFrom: "#7c3aed", gradientTo: "#6d28d9" },
 };
 
 /* ── Payment method types ───────────────────────────────── */
@@ -99,13 +99,13 @@ function Steps({ current, finalLabel = "Done" }: { current: 1|2|3; finalLabel?: 
               width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:12, fontWeight:800,
               background: current > s.n ? "#34d399" : current === s.n ? "#6366f1" : "rgba(var(--ink),.06)",
-              color: current >= s.n ? "white" : "rgba(var(--ink),.2)",
+              color: current >= s.n ? "white" : "rgba(var(--ink),var(--ta-20, .2))",
               border: current===s.n ? "2px solid rgba(129,140,248,.6)" : current>s.n ? "2px solid #34d399" : "2px solid rgba(var(--ink),.08)",
               boxShadow: current===s.n ? "0 0 16px rgba(99,102,241,.5)" : current>s.n ? "0 0 12px rgba(52,211,153,.4)" : "none",
             }}>
               {current>s.n ? "✓" : s.n}
             </div>
-            <span style={{ fontSize:9, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color: current>=s.n ? "rgba(var(--ink),.7)" : "rgba(var(--ink),.2)" }}>{s.label}</span>
+            <span style={{ fontSize:9, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color: current>=s.n ? "rgba(var(--ink),var(--ta-70, .7))" : "rgba(var(--ink),var(--ta-20, .2))" }}>{s.label}</span>
           </div>
           {i < steps.length-1 && (
             <div style={{ width:48, height:2, borderRadius:2, margin:"0 8px", marginBottom:18, background: current>s.n ? "#34d399" : "rgba(var(--ink),.08)" }}/>
@@ -561,7 +561,7 @@ export default function PaymentPage() {
     fontSize:13, outline:"none", fontFamily:"inherit", transition:"border-color .2s",
   };
   const lbl: React.CSSProperties = {
-    fontSize:10, fontWeight:700, color:"rgba(var(--ink),.4)",
+    fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))",
     letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:6,
   };
 
@@ -617,7 +617,7 @@ export default function PaymentPage() {
           </div>
           <div className="pay-steps"><Steps current={step} finalLabel={pendingRealPayment ? "Checkout" : "Done"} /></div>
           <button onClick={() => step===1 ? goBack() : setStep(1)}
-            style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),.45)", padding:"7px 14px", borderRadius:9, border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", cursor:"pointer", fontFamily:"inherit" }}>
+            style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-45, .45))", padding:"7px 14px", borderRadius:9, border:"1.5px solid rgba(var(--ink),.1)", background:"rgba(var(--ink),.04)", cursor:"pointer", fontFamily:"inherit" }}>
             ← Back
           </button>
         </div>
@@ -638,7 +638,7 @@ export default function PaymentPage() {
                     <span style={{ fontSize:20 }}>✅</span>
                     <div>
                       <div style={{ fontWeight:700, fontSize:15, color:"var(--ink-solid, white)" }}>Active {activePlanName} subscription detected</div>
-                      <div style={{ fontSize:12, color:"rgba(var(--ink),.5)", marginTop:2 }}>You can add the Automation Add-on with one click — no re-entry needed</div>
+                      <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", marginTop:2 }}>You can add the Automation Add-on with one click — no re-entry needed</div>
                     </div>
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:12, background:"rgba(0,0,0,.25)", border:"1px solid rgba(var(--ink),.08)", marginBottom:16 }}>
@@ -647,12 +647,12 @@ export default function PaymentPage() {
                     </div>
                     <div style={{ flex:1 }}>
                       <div style={{ fontWeight:600, fontSize:14, color:"var(--ink-solid, white)" }}>{savedPayMethod.label}</div>
-                      <div style={{ fontSize:11, color:"rgba(var(--ink),.45)", marginTop:1 }}>Saved from your {activePlanName} plan</div>
+                      <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-45, .45))", marginTop:1 }}>Saved from your {activePlanName} plan</div>
                     </div>
                     <span style={{ padding:"3px 10px", borderRadius:20, background:"rgba(34,197,94,.12)", border:"1px solid rgba(34,197,94,.25)", color:"var(--tx-22c55e, #22c55e)", fontSize:11, fontWeight:700 }}>Saved</span>
                   </div>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
-                    <div style={{ fontSize:13, color:"rgba(var(--ink),.6)" }}>
+                    <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-60, .6))" }}>
                       Adding <strong style={{ color:"var(--ink-solid, white)" }}>Automation Add-on</strong> — <strong style={{ color:"var(--tx-a78bfa, #a78bfa)" }}>$79/month</strong>
                     </div>
                     <button
@@ -663,7 +663,7 @@ export default function PaymentPage() {
                       {activating ? "Confirming…" : "Confirm & Add — $79/mo →"}
                     </button>
                   </div>
-                  <div style={{ marginTop:12, fontSize:11, color:"rgba(var(--ink),.3)", borderTop:"1px solid rgba(var(--ink),.06)", paddingTop:10 }}>
+                  <div style={{ marginTop:12, fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", borderTop:"1px solid rgba(var(--ink),.06)", paddingTop:10 }}>
                     Or scroll down to choose a different payment method
                   </div>
                 </div>
@@ -676,7 +676,7 @@ export default function PaymentPage() {
                 🔒 Secure Checkout
               </div>
               <h1 style={{ margin:"0 0 6px", fontSize:26, fontWeight:800, letterSpacing:"-0.8px" }}>Complete Your Payment</h1>
-              <p style={{ margin:0, fontSize:13, color:"rgba(var(--ink),.4)" }}>Choose how you&apos;d like to pay — you&apos;ll finish securely on our payment partner&apos;s page</p>
+              <p style={{ margin:0, fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Choose how you&apos;d like to pay — you&apos;ll finish securely on our payment partner&apos;s page</p>
               <div style={{ marginTop:10, display:"inline-flex", alignItems:"center", gap:8, padding:"5px 12px", borderRadius:999, border:"1px solid rgba(56,189,248,.22)", background:"rgba(56,189,248,.08)", color:"var(--tx-7dd3fc, #7dd3fc)", fontSize:11, fontWeight:700 }}>
                 {currency} · {country}
               </div>
@@ -689,7 +689,7 @@ export default function PaymentPage() {
 
                 {/* ── Method Groups ── */}
                 <div style={{ borderRadius:18, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", padding:"20px 20px 14px" }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.35)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>Select Payment Method</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>Select Payment Method</div>
 
                   {availableGroups.map((group, gi) => (
                     <div key={group.label} style={{ marginBottom: gi < availableGroups.length - 1 ? 20 : 4 }}>
@@ -729,7 +729,7 @@ export default function PaymentPage() {
                               background: method===m.id ? `${m.processorColor}18` : "rgba(var(--ink),.04)",
                               border:`1px solid ${method===m.id ? `${m.processorColor}35` : "rgba(var(--ink),.07)"}`,
                               display:"flex", alignItems:"center", justifyContent:"center",
-                              color: method===m.id ? m.processorColor : "rgba(var(--ink),.4)",
+                              color: method===m.id ? m.processorColor : "rgba(var(--ink),var(--ta-40, .4))",
                               transition:"all .18s",
                             }}>
                               {m.icon}
@@ -737,7 +737,7 @@ export default function PaymentPage() {
                             {/* Label + desc */}
                             <div style={{ flex:1, minWidth:0 }}>
                               <div style={{ fontSize:13, fontWeight:700, color:method===m.id?"white":"rgba(var(--ink),.82)", lineHeight:1.2 }}>{m.label}</div>
-                              <div style={{ fontSize:11, color:"rgba(var(--ink),.32)", marginTop:3 }}>{m.desc}</div>
+                              <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-32, .32))", marginTop:3 }}>{m.desc}</div>
                             </div>
                             {/* Badge */}
                             {m.popular && (
@@ -752,7 +752,7 @@ export default function PaymentPage() {
 
                 {/* ── How it works (unified — all methods redirect to a secure hosted checkout) ── */}
                 <div style={{ borderRadius:18, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", padding:"20px" }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>
+                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>
                     Payment Details
                   </div>
 
@@ -763,14 +763,14 @@ export default function PaymentPage() {
                       </div>
                       <div>
                         <div style={{ fontSize:14, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:3 }}>Pay with {selectedMethodDef?.label}</div>
-                        <div style={{ fontSize:11, color:"rgba(var(--ink),.4)", lineHeight:1.55 }}>
+                        <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.55 }}>
                           You&apos;ll enter your details on our secure checkout page — nothing is stored here.
                         </div>
                       </div>
                     </div>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                       {REASSURANCE.map(t=>(
-                        <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(var(--ink),.55)", background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", borderRadius:9, padding:"8px 11px" }}>
+                        <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(var(--ink),var(--ta-55, .55))", background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", borderRadius:9, padding:"8px 11px" }}>
                           <span style={{ color:selectedMethodDef?.processorColor, flexShrink:0 }}>✓</span>{t}
                         </div>
                       ))}
@@ -788,7 +788,7 @@ export default function PaymentPage() {
                 )}
 
                 {/* Trust row above submit */}
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:18, padding:"10px 0 2px", fontSize:11, color:"rgba(var(--ink),.28)" }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:18, padding:"10px 0 2px", fontSize:11, color:"rgba(var(--ink),var(--ta-28, .28))" }}>
                   <span style={{ display:"flex", alignItems:"center", gap:5 }}>🔒 SSL Encrypted</span>
                   <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(var(--ink),.15)", display:"inline-block" }}/>
                   <span>No card stored here</span>
@@ -801,7 +801,7 @@ export default function PaymentPage() {
                   style={{
                     width:"100%", padding:"16px", borderRadius:14, border:"none",
                     background:(processing||activating||allAvailableMethods.length===0) ? "rgba(var(--ink),.06)" : `linear-gradient(135deg,${meta.gradientFrom},${meta.gradientTo})`,
-                    color:(processing||activating||allAvailableMethods.length===0) ? "rgba(var(--ink),.3)" : "white",
+                    color:(processing||activating||allAvailableMethods.length===0) ? "rgba(var(--ink),var(--ta-30, .3))" : "white",
                     fontSize:15, fontWeight:800, cursor:(processing||activating||allAvailableMethods.length===0)?"not-allowed":"pointer",
                     display:"flex", alignItems:"center", justifyContent:"center", gap:10,
                     fontFamily:"inherit", boxShadow:(processing||activating||allAvailableMethods.length===0)?"none":`0 8px 28px ${meta.glow}`,
@@ -817,7 +817,7 @@ export default function PaymentPage() {
                 {/* Policies — shown at the point of payment, not just in the site footer.
                     Opened in a new tab so reading a policy never discards the checkout. */}
                 <div style={{ marginTop:16, paddingTop:16, borderTop:"1px solid rgba(var(--ink),.07)" }}>
-                  <p style={{ fontSize:11.5, color:"rgba(var(--ink),.38)", lineHeight:1.7, margin:"0 0 10px" }}>
+                  <p style={{ fontSize:11.5, color:"rgba(var(--ink),var(--ta-38, .38))", lineHeight:1.7, margin:"0 0 10px" }}>
                     By continuing you agree to our Terms of Service and confirm you have read our
                     Privacy Policy, Refund Policy and Service Delivery Policy. This is a recurring
                     subscription that renews automatically until cancelled — you can cancel at any time
@@ -835,11 +835,11 @@ export default function PaymentPage() {
                         style={{
                           padding:"6px 11px", borderRadius:9,
                           background:"rgba(var(--ink),.04)", border:"1px solid rgba(var(--ink),.1)",
-                          color:"rgba(var(--ink),.5)", fontSize:11, fontWeight:600, textDecoration:"none",
+                          color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:11, fontWeight:600, textDecoration:"none",
                           transition:"all .2s",
                         }}
                         onMouseEnter={e => { e.currentTarget.style.color = "rgba(var(--ink),.85)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.22)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),.5)"; e.currentTarget.style.borderColor = "rgba(var(--ink),.1)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = "rgba(var(--ink),var(--ta-50, .5))"; e.currentTarget.style.borderColor = "rgba(var(--ink),.1)"; }}
                       >
                         {l.label}
                       </a>
@@ -859,30 +859,30 @@ export default function PaymentPage() {
                   <div style={{ fontSize:16, fontWeight:800, color:"var(--ink-solid, white)" }}>{meta.name}</div>
                   {couponApplied && (
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:8 }}>
-                      <span style={{ fontSize:13, color:"rgba(var(--ink),.35)", textDecoration:"line-through" }}>{displayPlanPrice}/{billingCycle==="yearly"?"yr":"mo"}</span>
+                      <span style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-35, .35))", textDecoration:"line-through" }}>{displayPlanPrice}/{billingCycle==="yearly"?"yr":"mo"}</span>
                       <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.18)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>Coupon applied</span>
                     </div>
                   )}
                   <div style={{ fontSize:26, fontWeight:900, color:meta.color, marginTop:4, lineHeight:1 }}>
                     {displayFinalPrice}
-                    <span style={{ fontSize:12, fontWeight:500, color:"rgba(var(--ink),.35)" }}> today</span>
+                    <span style={{ fontSize:12, fontWeight:500, color:"rgba(var(--ink),var(--ta-35, .35))" }}> today</span>
                   </div>
                   {couponApplied && plan !== "custom" && (
-                    <div style={{ fontSize:10, color:"rgba(var(--ink),.38)", marginTop:5 }}>Then {displayPlanPrice}/{billingCycle==="yearly"?"yr":"mo"}</div>
+                    <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-38, .38))", marginTop:5 }}>Then {displayPlanPrice}/{billingCycle==="yearly"?"yr":"mo"}</div>
                   )}
-                  <div style={{ fontSize:10, color:"rgba(var(--ink),.28)", marginTop:4 }}>Billing in {currency}</div>
+                  <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-28, .28))", marginTop:4 }}>Billing in {currency}</div>
                 </div>
 
                 {/* Billing cycle toggle */}
                 {plan !== "custom" && (
                   <div style={{ marginBottom:18 }}>
-                    <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Billing Cycle</div>
+                    <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:8 }}>Billing Cycle</div>
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5, padding:4, borderRadius:12, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.07)" }}>
                       {(["monthly","yearly"] as const).map(c => (
                         <button key={c} className={`cycle-btn${billingCycle===c?" active":""}`} onClick={() => setBillingCycle(c)}
                           style={{ padding:"8px 6px", borderRadius:9, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, fontFamily:"inherit",
                             background: billingCycle===c ? "rgba(var(--ink),.12)" : "transparent",
-                            color: billingCycle===c ? "white" : "rgba(var(--ink),.35)",
+                            color: billingCycle===c ? "white" : "rgba(var(--ink),var(--ta-35, .35))",
                           }}>
                           {c==="monthly" ? "Monthly" : "Yearly"}
                           {c==="yearly" && <div style={{ fontSize:9, fontWeight:600, color:billingCycle==="yearly"?"var(--tx-6ee7b7, #6ee7b7)":"rgba(var(--txr-34d399, 52,211,153),.5)", marginTop:1 }}>Save 20%</div>}
@@ -900,7 +900,7 @@ export default function PaymentPage() {
                   { label:"Trial period", value: "—" },
                 ].map(r => (
                   <div key={r.label} style={{ display:"flex", justifyContent:"space-between", padding:"9px 0", borderBottom:"1px solid rgba(var(--ink),.05)", fontSize:12 }}>
-                    <span style={{ color:"rgba(var(--ink),.35)" }}>{r.label}</span>
+                    <span style={{ color:"rgba(var(--ink),var(--ta-35, .35))" }}>{r.label}</span>
                     <span style={{ color:"var(--ink-solid, white)", fontWeight:700 }}>{r.value}</span>
                   </div>
                 ))}
@@ -910,7 +910,7 @@ export default function PaymentPage() {
                   {couponApplied ? (
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"9px 12px", borderRadius:9, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)", fontSize:12 }}>
                       <span style={{ color:"var(--tx-34d399, #34d399)", fontWeight:700 }}>🎟 {couponApplied.code} — {couponApplied.type==="percent"?`${couponApplied.value}% off`:`$${couponApplied.value} off`}</span>
-                      <button onClick={() => setCouponApplied(null)} style={{ background:"none", border:"none", color:"rgba(var(--ink),.35)", cursor:"pointer", fontSize:16, lineHeight:1 }}>×</button>
+                      <button onClick={() => setCouponApplied(null)} style={{ background:"none", border:"none", color:"rgba(var(--ink),var(--ta-35, .35))", cursor:"pointer", fontSize:16, lineHeight:1 }}>×</button>
                     </div>
                   ) : (
                     <div style={{ display:"flex", gap:7 }}>
@@ -927,11 +927,11 @@ export default function PaymentPage() {
                 {/* Total */}
                 <div style={{ display:"flex", justifyContent:"space-between", padding:"14px 0 0", fontSize:14, fontWeight:800 }}>
                   <div>
-                    <div style={{ color:"rgba(var(--ink),.6)" }}>Total today</div>
+                    <div style={{ color:"rgba(var(--ink),var(--ta-60, .6))" }}>Total today</div>
                     {couponApplied && <div style={{ fontSize:10, fontWeight:500, color:"rgba(var(--txr-f97316, 249,115,22),.7)", marginTop:2 }}>Coupon applied</div>}
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    {couponApplied && <div style={{ fontSize:11, color:"rgba(var(--ink),.3)", textDecoration:"line-through", fontWeight:400 }}>{displayPlanPrice}</div>}
+                    {couponApplied && <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", textDecoration:"line-through", fontWeight:400 }}>{displayPlanPrice}</div>}
                     <span style={{ color:meta.color }}>{displayFinalPrice}</span>
                   </div>
                 </div>
@@ -942,7 +942,7 @@ export default function PaymentPage() {
 
                 {/* We accept */}
                 <div style={{ marginTop:14, padding:"13px 14px", borderRadius:12, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)" }}>
-                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>We accept</div>
+                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-28, .28))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>We accept</div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                     {(isPakistan
                       ? [
@@ -964,10 +964,10 @@ export default function PaymentPage() {
 
                 {/* Subscription features */}
                 <div style={{ marginTop:10, padding:"13px 14px 12px", borderRadius:12, background:"rgba(var(--ink),.02)", border:"1px solid rgba(var(--ink),.06)" }}>
-                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:9 }}>Included in all plans</div>
+                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(var(--ink),var(--ta-28, .28))", letterSpacing:".08em", textTransform:"uppercase", marginBottom:9 }}>Included in all plans</div>
                   <div style={{ display:"grid", gap:7 }}>
                     {["Auto-renewal","Cancel anytime","Upgrade / Downgrade","Invoices & history","Dedicated support"].map(item => (
-                      <div key={item} style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, color:"rgba(var(--ink),.55)" }}>
+                      <div key={item} style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, color:"rgba(var(--ink),var(--ta-55, .55))" }}>
                         <span style={{ color:meta.color, fontWeight:800, fontSize:12 }}>✓</span>
                         <span>{item}</span>
                       </div>
@@ -984,10 +984,10 @@ export default function PaymentPage() {
           <div className="fu" style={{ maxWidth:460, margin:"0 auto", textAlign:"center" }}>
             <div style={{ width:80, height:80, borderRadius:24, background:"rgba(99,102,241,.12)", border:"1.5px solid rgba(99,102,241,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:38, margin:"0 auto 24px" }}>🔐</div>
             <h2 style={{ margin:"0 0 8px", fontSize:26, fontWeight:800, letterSpacing:"-0.5px" }}>Verify Your Payment</h2>
-            <p style={{ fontSize:13, color:"rgba(var(--ink),.4)", lineHeight:1.7, marginBottom:24 }}>
+            <p style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.7, marginBottom:24 }}>
               We&apos;ve sent a 6-digit verification code to confirm your payment.
             </p>
-            <div style={{ marginBottom:24, padding:"14px 18px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", fontSize:13, color:"rgba(var(--ink),.6)", lineHeight:1.6 }}>
+            <div style={{ marginBottom:24, padding:"14px 18px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", fontSize:13, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.6 }}>
               Code sent to <strong style={{ color:"var(--ink-solid, white)" }}>{verificationEmail}</strong>
             </div>
             <div style={{ display:"flex", gap:10, justifyContent:"center", marginBottom:20 }}>
@@ -1005,14 +1005,14 @@ export default function PaymentPage() {
             </div>
             {otpError && <div style={{ marginBottom:16, padding:"10px 16px", borderRadius:10, background:"rgba(239,68,68,.1)", border:"1px solid rgba(239,68,68,.3)", color:"var(--tx-fca5a5, #fca5a5)", fontSize:12 }}>{otpError}</div>}
             <button onClick={handleVerify} disabled={activating}
-              style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:activating?"rgba(var(--ink),.06)":"linear-gradient(135deg,#6366f1,#7c3aed)", color:activating?"rgba(var(--ink),.3)":"white", fontSize:15, fontWeight:800, cursor:activating?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:10, fontFamily:"inherit", boxShadow:activating?"none":"0 6px 28px rgba(99,102,241,.4)" }}>
+              style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:activating?"rgba(var(--ink),.06)":"linear-gradient(135deg,#6366f1,#7c3aed)", color:activating?"rgba(var(--ink),var(--ta-30, .3))":"white", fontSize:15, fontWeight:800, cursor:activating?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:10, fontFamily:"inherit", boxShadow:activating?"none":"0 6px 28px rgba(99,102,241,.4)" }}>
               {activating ? (
                 <><svg width="18" height="18" viewBox="0 0 24 24" style={{ animation:"spin 1s linear infinite" }}><circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" fill="none" strokeDasharray="60" strokeDashoffset="20"/></svg> Activating Plan…</>
               ) : <>✓ Verify &amp; Activate Plan</>}
             </button>
             <div style={{ marginTop:12, display:"flex", alignItems:"center", justifyContent:"center", gap:16 }}>
-              <button onClick={() => setStep(1)} style={{ background:"none", border:"none", color:"rgba(var(--ink),.35)", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>← Change payment method</button>
-              <span style={{ color:"rgba(var(--ink),.15)" }}>|</span>
+              <button onClick={() => setStep(1)} style={{ background:"none", border:"none", color:"rgba(var(--ink),var(--ta-35, .35))", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>← Change payment method</button>
+              <span style={{ color:"rgba(var(--ink),var(--ta-15, .15))" }}>|</span>
               <button onClick={handleResendOtp} style={{ background:"none", border:"none", color:"rgba(var(--txr-818cf8, 129,140,248),.7)", fontSize:12, cursor:"pointer", fontFamily:"inherit", fontWeight:600 }}>Resend code</button>
             </div>
           </div>
@@ -1056,12 +1056,12 @@ export default function PaymentPage() {
                 {pendingRealPayment ? (
                   <>
                     <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Almost there…</h2>
-                    <p style={{ fontSize:14, color:"rgba(var(--ink),.45)", margin:"0 0 28px" }}>Taking you to secure checkout to complete your {pm.name} subscription. Nothing is active yet until payment goes through.</p>
+                    <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", margin:"0 0 28px" }}>Taking you to secure checkout to complete your {pm.name} subscription. Nothing is active yet until payment goes through.</p>
                   </>
                 ) : (
                   <>
                     <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{pm.name} Activated!</h2>
-                    <p style={{ fontSize:14, color:"rgba(var(--ink),.45)", margin:"0 0 28px" }}>Your account is ready. Taking you to your dashboard…</p>
+                    <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", margin:"0 0 28px" }}>Your account is ready. Taking you to your dashboard…</p>
                   </>
                 )}
               </div>
@@ -1069,7 +1069,7 @@ export default function PaymentPage() {
                 <div style={{ fontSize:11, fontWeight:700, color:pm.color, textTransform:"uppercase", letterSpacing:1, marginBottom:14 }}>What&apos;s included</div>
                 <div className="pay-perks" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px 16px" }}>
                   {planPerks.map(perk => (
-                    <div key={perk} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),.7)" }}>
+                    <div key={perk} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(var(--ink),var(--ta-70, .7))" }}>
                       <div style={{ width:16, height:16, borderRadius:"50%", background:`${pm.color}20`, border:`1px solid ${pm.color}40`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                         <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke={pm.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </div>

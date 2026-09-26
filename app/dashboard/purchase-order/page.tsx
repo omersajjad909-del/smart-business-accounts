@@ -41,15 +41,15 @@ type PO = {
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  DRAFT:               { bg: "rgba(148,163,184,0.12)", text: "#94a3b8", border: "rgba(148,163,184,0.3)" },
-  PENDING:             { bg: "rgba(251,191,36,0.12)",  text: "#fbbf24", border: "rgba(251,191,36,0.3)" },
-  APPROVED:            { bg: "rgba(52,211,153,0.12)",  text: "#34d399", border: "rgba(52,211,153,0.3)" },
-  REJECTED:            { bg: "rgba(248,113,113,0.12)", text: "#f87171", border: "rgba(248,113,113,0.3)" },
-  RECEIVED:            { bg: "rgba(99,102,241,0.14)",  text: "#818cf8", border: "rgba(99,102,241,0.3)" },
-  PARTIALLY_RECEIVED:  { bg: "rgba(14,165,233,0.12)",  text: "#38bdf8", border: "rgba(14,165,233,0.3)" },
-  PARTIALLY_INVOICED:  { bg: "rgba(168,85,247,0.12)",  text: "#c084fc", border: "rgba(168,85,247,0.3)" },
-  COMPLETED:           { bg: "rgba(16,185,129,0.12)",  text: "#10b981", border: "rgba(16,185,129,0.3)" },
-  CANCELLED:           { bg: "rgba(248,113,113,0.12)", text: "#f87171", border: "rgba(248,113,113,0.3)" },
+  DRAFT:               { bg: "rgba(148,163,184,0.12)", text: "var(--tx-94a3b8, #94a3b8)", border: "rgba(148,163,184,0.3)" },
+  PENDING:             { bg: "rgba(251,191,36,0.12)",  text: "var(--tx-fbbf24, #fbbf24)", border: "rgba(251,191,36,0.3)" },
+  APPROVED:            { bg: "rgba(52,211,153,0.12)",  text: "var(--tx-34d399, #34d399)", border: "rgba(52,211,153,0.3)" },
+  REJECTED:            { bg: "rgba(248,113,113,0.12)", text: "var(--tx-f87171, #f87171)", border: "rgba(248,113,113,0.3)" },
+  RECEIVED:            { bg: "rgba(99,102,241,0.14)",  text: "var(--tx-818cf8, #818cf8)", border: "rgba(99,102,241,0.3)" },
+  PARTIALLY_RECEIVED:  { bg: "rgba(14,165,233,0.12)",  text: "var(--tx-38bdf8, #38bdf8)", border: "rgba(14,165,233,0.3)" },
+  PARTIALLY_INVOICED:  { bg: "rgba(168,85,247,0.12)",  text: "var(--tx-c084fc, #c084fc)", border: "rgba(168,85,247,0.3)" },
+  COMPLETED:           { bg: "rgba(16,185,129,0.12)",  text: "var(--tx-10b981, #10b981)", border: "rgba(16,185,129,0.3)" },
+  CANCELLED:           { bg: "rgba(248,113,113,0.12)", text: "var(--tx-f87171, #f87171)", border: "rgba(248,113,113,0.3)" },
 };
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {

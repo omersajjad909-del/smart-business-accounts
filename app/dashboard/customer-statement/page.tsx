@@ -74,7 +74,7 @@ export default function CustomerStatementPage() {
     fontSize: 13, fontFamily: FONT, outline: "none", width: "100%", boxSizing: "border-box",
   };
   const labelStyle: React.CSSProperties = {
-    fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.35)",
+    fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))",
     letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6, display: "block",
   };
 
@@ -96,7 +96,7 @@ export default function CustomerStatementPage() {
           }}>
             <button style={{
               position: "absolute", top: 14, right: 16, background: "none", border: "none",
-              color: "rgba(var(--ink),.35)", fontSize: 20, cursor: "pointer", lineHeight: 1,
+              color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 20, cursor: "pointer", lineHeight: 1,
               padding: 4, borderRadius: 6, fontFamily: "inherit",
             }} onClick={() => setShowModal(false)}>✕</button>
             <div style={{ marginBottom: 28 }}>
@@ -104,7 +104,7 @@ export default function CustomerStatementPage() {
                 <div style={{ width: 4, height: 24, borderRadius: 2, background: "linear-gradient(180deg,#818cf8,#6366f1)" }}/>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>Customer Statement</h2>
               </div>
-              <p style={{ margin: 0, fontSize: 12, color: "rgba(var(--ink),.3)", paddingLeft: 14 }}>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))", paddingLeft: 14 }}>
                 Select date range and customer to generate statement
               </p>
             </div>
@@ -136,7 +136,7 @@ export default function CustomerStatementPage() {
               {selected && (
                 <button onClick={() => { setSelected(null); setSearch(""); }} style={{
                   position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                  background: "none", border: "none", color: "rgba(var(--ink),.4)", cursor: "pointer", fontSize: 16,
+                  background: "none", border: "none", color: "rgba(var(--ink),var(--ta-40, .4))", cursor: "pointer", fontSize: 16,
                 }}>×</button>
               )}
               {dropOpen && !selected && (
@@ -147,7 +147,7 @@ export default function CustomerStatementPage() {
                   boxShadow: "0 16px 40px rgba(0,0,0,.5)",
                 }}>
                   {filtered.length === 0 ? (
-                    <div style={{ padding: 14, textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 12 }}>No customers found</div>
+                    <div style={{ padding: 14, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 12 }}>No customers found</div>
                   ) : filtered.map(c => (
                     <div key={c.id} onMouseDown={() => { setSelected(c); setSearch(""); setDropOpen(false); }} style={{
                       padding: "10px 14px", cursor: "pointer", fontSize: 13,
@@ -157,7 +157,7 @@ export default function CustomerStatementPage() {
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
                       <div>{c.name}</div>
-                      {c.email && <div style={{ fontSize: 11, color: "rgba(var(--ink),.3)" }}>{c.email}</div>}
+                      {c.email && <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{c.email}</div>}
                     </div>
                   ))}
                 </div>
@@ -169,7 +169,7 @@ export default function CustomerStatementPage() {
               width: "100%", padding: 12, borderRadius: 10, border: "none",
               cursor: selected ? "pointer" : "not-allowed",
               background: selected ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.08)",
-              color: selected ? "white" : "rgba(var(--ink),.3)",
+              color: selected ? "white" : "rgba(var(--ink),var(--ta-30, .3))",
               fontSize: 14, fontWeight: 700, fontFamily: FONT,
             }}>Generate Statement →</button>
           </div>
@@ -187,7 +187,7 @@ export default function CustomerStatementPage() {
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => { setShowModal(true); setStatement(null); }} style={{
                 padding: "8px 18px", borderRadius: 8, border: "1px solid rgba(var(--ink),.12)",
-                cursor: "pointer", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),.6)",
+                cursor: "pointer", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-60, .6))",
                 fontSize: 12, fontWeight: 600, fontFamily: FONT,
               }}>⟵ Change Customer</button>
               <button onClick={() => window.print()} style={{
@@ -210,25 +210,25 @@ export default function CustomerStatementPage() {
               display: "flex", justifyContent: "space-between", alignItems: "flex-start",
             }}>
               <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Customer Statement</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),var(--ta-30, .3))", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Customer Statement</div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: "var(--ink-solid, white)", letterSpacing: "-.4px" }}>{selected?.name}</div>
-                {selected?.email && <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)", marginTop: 4 }}>{selected.email}</div>}
+                {selected?.email && <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>{selected.email}</div>}
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 10, color: "rgba(var(--ink),.3)", fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 3 }}>Reporting Period</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.7)" }}>
-                  {dateFrom} <span style={{ color: "rgba(var(--ink),.25)" }}>—</span> {dateTo}
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 3 }}>Reporting Period</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-70, .7))" }}>
+                  {dateFrom} <span style={{ color: "rgba(var(--ink),var(--ta-25, .25))" }}>—</span> {dateTo}
                 </div>
               </div>
             </div>
 
             {loading ? (
-              <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 13 }}>Loading statement…</div>
+              <div style={{ padding: "60px 0", textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13 }}>Loading statement…</div>
             ) : !statement ? null : (
               <>
                 {/* Opening balance */}
                 <div style={{ padding: "12px 24px", background: "rgba(99,102,241,.06)", borderBottom: "1px solid rgba(var(--ink),.06)", display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600 }}>
-                  <span style={{ color: "rgba(var(--ink),.4)" }}>Opening Balance</span>
+                  <span style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>Opening Balance</span>
                   <span style={{ color: "var(--tx-818cf8, #818cf8)" }}>{fmt(statement.openingBalance)}</span>
                 </div>
 
@@ -240,7 +240,7 @@ export default function CustomerStatementPage() {
                         {["Date","Description","Invoice Amount","Payment Received","Balance"].map((h, i) => (
                           <th key={h} style={{
                             padding: "10px 16px", fontSize: 10, fontWeight: 700,
-                            color: "rgba(var(--ink),.35)", letterSpacing: ".08em", textTransform: "uppercase",
+                            color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".08em", textTransform: "uppercase",
                             textAlign: i >= 2 ? "right" : "left", whiteSpace: "nowrap",
                           }}>{h}</th>
                         ))}
@@ -248,16 +248,16 @@ export default function CustomerStatementPage() {
                     </thead>
                     <tbody>
                       {statement.transactions.length === 0 ? (
-                        <tr><td colSpan={5} style={{ padding: "50px 0", textAlign: "center", color: "rgba(var(--ink),.2)", fontSize: 13 }}>No transactions in this period</td></tr>
+                        <tr><td colSpan={5} style={{ padding: "50px 0", textAlign: "center", color: "rgba(var(--ink),var(--ta-20, .2))", fontSize: 13 }}>No transactions in this period</td></tr>
                       ) : statement.transactions.map((tx, i) => (
                         <tr key={i} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: i % 2 === 0 ? "transparent" : "rgba(var(--ink),.012)" }}
                           onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,.05)"}
                           onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(var(--ink),.012)"}
                         >
-                          <td style={{ padding: "10px 16px", color: "rgba(var(--ink),.4)", whiteSpace: "nowrap", fontSize: 12 }}>{tx.date}</td>
-                          <td style={{ padding: "10px 16px", color: "rgba(var(--ink),.7)" }}>{tx.description}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.debit > 0 ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),.18)" }}>{tx.debit > 0 ? fmt(tx.debit) : "—"}</td>
-                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.credit > 0 ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.18)" }}>{tx.credit > 0 ? fmt(tx.credit) : "—"}</td>
+                          <td style={{ padding: "10px 16px", color: "rgba(var(--ink),var(--ta-40, .4))", whiteSpace: "nowrap", fontSize: 12 }}>{tx.date}</td>
+                          <td style={{ padding: "10px 16px", color: "rgba(var(--ink),var(--ta-70, .7))" }}>{tx.description}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.debit > 0 ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),var(--ta-18, .18))" }}>{tx.debit > 0 ? fmt(tx.debit) : "—"}</td>
+                          <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, color: tx.credit > 0 ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-18, .18))" }}>{tx.credit > 0 ? fmt(tx.credit) : "—"}</td>
                           <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 800, color: tx.balance >= 0 ? "var(--tx-818cf8, #818cf8)" : "var(--tx-f87171, #f87171)" }}>{fmt(tx.balance)}</td>
                         </tr>
                       ))}
@@ -267,7 +267,7 @@ export default function CustomerStatementPage() {
 
                 {/* Closing balance */}
                 <div style={{ padding: isMobile ? "12px 11px" : "16px 24px", background: "rgba(99,102,241,.08)", borderTop: "1px solid rgba(99,102,241,.2)", display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800 }}>
-                  <span style={{ color: "rgba(var(--ink),.5)" }}>Closing Balance</span>
+                  <span style={{ color: "rgba(var(--ink),var(--ta-50, .5))" }}>Closing Balance</span>
                   <span style={{ color: statement.closingBalance >= 0 ? "var(--tx-818cf8, #818cf8)" : "var(--tx-f87171, #f87171)" }}>
                     {fmt(statement.closingBalance)} <span style={{ fontSize: 11 }}>{statement.closingBalance >= 0 ? "Dr" : "Cr"}</span>
                   </span>

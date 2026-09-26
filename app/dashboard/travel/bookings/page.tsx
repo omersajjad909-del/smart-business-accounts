@@ -41,11 +41,11 @@ const input: React.CSSProperties = {
   fontFamily: "inherit", boxSizing: "border-box",
 };
 const label: React.CSSProperties = {
-  display: "block", fontSize: 11.5, color: "rgba(var(--ink),.45)", marginBottom: 5,
+  display: "block", fontSize: 11.5, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 5,
 };
 const sectionHead: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase",
-  color: "rgba(var(--ink),.4)", margin: "22px 0 10px",
+  color: "rgba(var(--ink),var(--ta-40, .4))", margin: "22px 0 10px",
 };
 
 const STATUS_COLOUR: Record<BookingStatus, string> = {
@@ -244,7 +244,7 @@ export default function BookingsPage() {
         <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 4px" }}>
           {editing.id ? b.partyName || "Booking" : "New booking"}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
           {money.pax} pilgrim{money.pax === 1 ? "" : "s"} · {money.total.toLocaleString()} total ·{" "}
           <strong style={{ color: money.balance > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>
             {money.balance > 0 ? `${money.balance.toLocaleString()} owing` : "paid in full"}
@@ -308,7 +308,7 @@ export default function BookingsPage() {
           </div>
         </div>
         {tiers.length > 0 && (
-          <div style={{ marginTop: 8, fontSize: 11.5, color: "rgba(var(--ink),.38)" }}>
+          <div style={{ marginTop: 8, fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))" }}>
             Rate card: {tiers.filter((t) => t.sellPerPilgrim > 0).map((t) => `${t.tierName} ${t.sellPerPilgrim.toLocaleString()}`).join(" · ") || "not priced"}
           </div>
         )}
@@ -345,19 +345,19 @@ export default function BookingsPage() {
               </div>
               <button tabIndex={-1} title="Remove pilgrim"
                 onClick={() => patch({ pilgrims: b.pilgrims.length === 1 ? [emptyPilgrim()] : b.pilgrims.filter((x) => x.id !== p.id) })}
-                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", padding: "8px 0" }}>×</button>
             </div>
           ))}
         </div>
         <button onClick={() => patch({ pilgrims: [...b.pilgrims, emptyPilgrim()] })}
-          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
           + Add pilgrim
         </button>
 
         <div style={sectionHead}>Instalments</div>
         {b.instalments.length === 0 ? (
           <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 18 }}>
-            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", marginBottom: 12, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 12, lineHeight: 1.7 }}>
               Nothing scheduled. {money.total > 0 ? `${money.total.toLocaleString()} is owed` : "Set a price first"} —
               a balance with no dates on it is a balance nobody will chase.
             </div>
@@ -377,7 +377,7 @@ export default function BookingsPage() {
                 </button>
               ))}
               <button onClick={() => patch({ instalments: [emptyInstalment(today, money.total)] })}
-                style={{ padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                 One payment
               </button>
             </div>
@@ -414,18 +414,18 @@ export default function BookingsPage() {
                         onChange={(e) => patchInstalment(inst.id, { receiptNo: e.target.value })}
                         style={input} />
                     </div>
-                    <div style={{ fontSize: 11.5, fontWeight: 700, paddingBottom: 10, textAlign: "right", color: inst.paidDate ? "var(--tx-34d399, #34d399)" : late ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.35)" }}>
+                    <div style={{ fontSize: 11.5, fontWeight: 700, paddingBottom: 10, textAlign: "right", color: inst.paidDate ? "var(--tx-34d399, #34d399)" : late ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-35, .35))" }}>
                       {inst.paidDate ? "paid" : late ? "overdue" : "due"}
                     </div>
                     <button tabIndex={-1} title="Remove instalment"
                       onClick={() => patch({ instalments: b.instalments.filter((x) => x.id !== inst.id) })}
-                      style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                      style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", padding: "8px 0" }}>×</button>
                   </div>
                 );
               })}
             </div>
             <button onClick={() => patch({ instalments: [...b.instalments, emptyInstalment(today, Math.max(money.unscheduled, 0))] })}
-              style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+              style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
               + Add instalment
             </button>
           </>
@@ -433,10 +433,10 @@ export default function BookingsPage() {
 
         <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.22)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 5 }}>
-            <span style={{ color: "rgba(var(--ink),.6)" }}>{money.pax} × {b.pricePerPilgrim.toLocaleString()}</span>
+            <span style={{ color: "rgba(var(--ink),var(--ta-60, .6))" }}>{money.pax} × {b.pricePerPilgrim.toLocaleString()}</span>
             <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>{money.total.toLocaleString()}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "rgba(var(--ink),.45)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
             <span>Paid ({money.percentPaid}%)</span>
             <span style={{ fontFamily: "ui-monospace, monospace", color: "var(--tx-34d399, #34d399)" }}>{money.paid.toLocaleString()}</span>
           </div>
@@ -477,7 +477,7 @@ export default function BookingsPage() {
             {saving ? "Saving…" : "Save booking"}
           </button>
           <button onClick={() => { setEditing(null); setCancelling(null); }}
-            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
             Close
           </button>
         </div>
@@ -528,7 +528,7 @@ export default function BookingsPage() {
               </button>
 
               {!b.invoiceNo && (
-                <span style={{ fontSize: 11.5, color: "rgba(var(--ink),.35)" }}>
+                <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                   Until the invoice is raised this balance is on no ledger, no statement and no ageing report.
                 </span>
               )}
@@ -538,11 +538,11 @@ export default function BookingsPage() {
                 than as a date typed into the row above. */}
             {b.invoiceNo && b.instalments.some((i) => !i.paidDate) && (
               <div style={{ marginTop: 14 }}>
-                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 8 }}>Receive an instalment</div>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 8 }}>Receive an instalment</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   {b.instalments.filter((i) => !i.paidDate).map((inst) => (
                     <div key={inst.id} style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.6)", minWidth: 190 }}>
+                      <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))", minWidth: 190 }}>
                         due {inst.dueDate || "—"} ·{" "}
                         <strong style={{ color: "var(--ink-solid, #fff)", fontFamily: "ui-monospace, monospace" }}>
                           {inst.amount.toLocaleString()}
@@ -570,7 +570,7 @@ export default function BookingsPage() {
             <div onClick={(e) => e.stopPropagation()}
               style={{ background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 16, padding: 26, width: 460, fontFamily: ff }}>
               <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>Cancel {b.partyName || "booking"}</h2>
-              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", marginBottom: 18, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-42, .42))", marginBottom: 18, lineHeight: 1.6 }}>
                 {money.paid.toLocaleString()} has been received. Keep the agency&rsquo;s charge out of it and refund
                 the rest — the two together cannot come to more than what was paid.
               </div>
@@ -593,7 +593,7 @@ export default function BookingsPage() {
                 <input value={cancelling.reason} placeholder="Visa refused, family withdrew…"
                   onChange={(e) => setCancelling({ ...cancelling, reason: e.target.value })} style={input} />
               </div>
-              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.4)", marginBottom: 16, lineHeight: 1.7 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 16, lineHeight: 1.7 }}>
                 {money.pax} seat{money.pax === 1 ? "" : "s"} go back on the departure.
                 {b.invoiceNo ? ` A credit note reverses ${b.invoiceNo}.` : " Nothing was invoiced, so there is nothing to reverse."}
               </div>
@@ -605,7 +605,7 @@ export default function BookingsPage() {
                   {busyAction === "booking-cancel" ? "Cancelling…" : "Cancel the booking"}
                 </button>
                 <button onClick={() => setCancelling(null)}
-                  style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+                  style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
                   Back
                 </button>
               </div>
@@ -625,7 +625,7 @@ export default function BookingsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Bookings</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
             Who is on which departure, and what they still owe.
           </p>
         </div>
@@ -643,7 +643,7 @@ export default function BookingsPage() {
           { label: "Overdue instalments", value: late.reduce((s, r) => s + r.money.overdueCount, 0), colour: late.length ? "#ef4444" : "#22c55e" },
         ].map((c) => (
           <div key={c.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "15px 18px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 5 }}>{c.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 5 }}>{c.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: c.colour }}>{c.value}</div>
           </div>
         ))}
@@ -660,7 +660,7 @@ export default function BookingsPage() {
                     {row.b.status}
                   </span>
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 4 }}>
                   {row.b.bookingNo ? `${row.b.bookingNo} · ` : ""}
                   {row.b.departureTitle || "no departure"} · {row.money.pax} pax · {occupancyName(row.b.occupancy)}
                   {row.money.nextDue ? ` · next ${row.money.nextDue.dueDate}` : ""}
@@ -670,7 +670,7 @@ export default function BookingsPage() {
                 <div style={{ fontSize: 16, fontWeight: 800, color: row.money.balance > 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-34d399, #34d399)" }}>
                   {row.money.balance > 0 ? row.money.balance.toLocaleString() : "clear"}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                   {row.money.paid.toLocaleString()} of {row.money.total.toLocaleString()}
                 </div>
               </div>
@@ -686,14 +686,14 @@ export default function BookingsPage() {
                 </span>
               )}
               <button onClick={() => setEditing({ id: row.id, b: row.b })}
-                style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-70, .7))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                 Open
               </button>
             </div>
           </div>
         ))}
         {!store.loading && rows.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13.5 }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13.5 }}>
             No bookings yet.
           </div>
         )}

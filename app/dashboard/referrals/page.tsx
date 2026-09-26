@@ -69,7 +69,7 @@ export default function ReferralsPage() {
   }
 
   if (loading) return (
-    <div style={{ padding: 40, color: "rgba(var(--ink),.4)", fontFamily: "inherit" }}>Loading…</div>
+    <div style={{ padding: 40, color: "rgba(var(--ink),var(--ta-40, .4))", fontFamily: "inherit" }}>Loading…</div>
   );
 
   return (
@@ -80,7 +80,7 @@ export default function ReferralsPage() {
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)", margin: "0 0 6px" }}>
           Refer & Earn
         </h1>
-        <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.4)", margin: 0 }}>
+        <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>
           Share your unique link. When someone signs up, you earn rewards.
         </p>
       </div>
@@ -94,7 +94,7 @@ export default function ReferralsPage() {
           { label: "Rewards ($)",    value: `$${(stats?.rewards ?? 0).toFixed(0)}`, color: "var(--tx-f472b6, #f472b6)" },
         ].map(s => (
           <div key={s.label} style={{ borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", padding: isMobile ? "12px 10px" : "16px 18px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, fontWeight: 600 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 6, fontWeight: 600 }}>{s.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -107,7 +107,7 @@ export default function ReferralsPage() {
         {referralCode ? (
           <>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <div style={{ flex: 1, padding: "11px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12.5, color: "rgba(var(--ink),.7)", fontFamily: "monospace", wordBreak: "break-all" }}>
+              <div style={{ flex: 1, padding: "11px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-70, .7))", fontFamily: "monospace", wordBreak: "break-all" }}>
                 {referralLink}
               </div>
               <button
@@ -118,21 +118,21 @@ export default function ReferralsPage() {
               </button>
             </div>
             <div style={{ marginTop: 12, display: "flex", gap: 20 }}>
-              <span style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>
+              <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                 Your code: <span style={{ color: "var(--tx-818cf8, #818cf8)", fontFamily: "monospace", fontWeight: 700, letterSpacing: "1px" }}>{referralCode}</span>
               </span>
             </div>
 
             {/* How it works */}
             <div style={{ marginTop: 18, borderTop: "1px solid rgba(var(--ink),.06)", paddingTop: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 12 }}>How it works</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 12 }}>How it works</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[
                   { step: "1", text: "Share your link with a business owner" },
                   { step: "2", text: "They sign up using your referral link" },
                   { step: "3", text: "When they upgrade to a paid plan, you earn a reward" },
                 ].map(s => (
-                  <div key={s.step} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>
+                  <div key={s.step} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))" }}>
                     <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 11, fontWeight: 700, color: "#818cf8" }}>{s.step}</div>
                     {s.text}
                   </div>
@@ -141,7 +141,7 @@ export default function ReferralsPage() {
             </div>
           </>
         ) : (
-          <div style={{ color: "rgba(var(--ink),.35)", fontSize: 13 }}>Failed to load referral code. Please refresh.</div>
+          <div style={{ color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 13 }}>Failed to load referral code. Please refresh.</div>
         )}
       </div>
 
@@ -151,7 +151,7 @@ export default function ReferralsPage() {
           Referral History
         </div>
         {referrals.length === 0 ? (
-          <div style={{ padding: isMobile ? "22px 10px" : "40px 20px", textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 13 }}>
+          <div style={{ padding: isMobile ? "22px 10px" : "40px 20px", textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13 }}>
             No referrals yet. Share your link to get started!
           </div>
         ) : (
@@ -159,7 +159,7 @@ export default function ReferralsPage() {
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(var(--ink),.06)" }}>
                 {["Email", "Status", "Reward", "Date"].map(h => (
-                  <th key={h} style={{ padding: "10px 20px", textAlign: "left", color: "rgba(var(--ink),.35)", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em" }}>{h}</th>
+                  <th key={h} style={{ padding: "10px 20px", textAlign: "left", color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -168,14 +168,14 @@ export default function ReferralsPage() {
                 const sm = STATUS_LABEL[r.status] || STATUS_LABEL.pending;
                 return (
                   <tr key={r.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
-                    <td style={{ padding: "12px 20px", color: "rgba(var(--ink),.7)" }}>{r.refereeEmail}</td>
+                    <td style={{ padding: "12px 20px", color: "rgba(var(--ink),var(--ta-70, .7))" }}>{r.refereeEmail}</td>
                     <td style={{ padding: "12px 20px" }}>
                       <span style={{ padding: "3px 10px", borderRadius: 20, background: `${sm.color}18`, color: sm.color, fontSize: 11, fontWeight: 700 }}>{sm.label}</span>
                     </td>
-                    <td style={{ padding: "12px 20px", color: r.reward ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.25)" }}>
+                    <td style={{ padding: "12px 20px", color: r.reward ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-25, .25))" }}>
                       {r.reward ? `$${r.reward}` : "—"}
                     </td>
-                    <td style={{ padding: "12px 20px", color: "rgba(var(--ink),.35)" }}>
+                    <td style={{ padding: "12px 20px", color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                       {fmtDate(r.createdAt)}
                     </td>
                   </tr>

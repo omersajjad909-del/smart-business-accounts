@@ -27,7 +27,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const qtyLabel: React.CSSProperties = {
-  display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6,
+  display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6,
 };
 const qtyInput: React.CSSProperties = {
   width: "100%", padding: "10px 12px", borderRadius: 9,
@@ -520,7 +520,7 @@ function BOMPageInner() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 14, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Bill of Materials</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
             What each finished product consumes, and how many one batch makes.
           </p>
         </div>
@@ -530,7 +530,7 @@ function BOMPageInner() {
       </div>
 
       {noItems && (
-        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(249,115,22,.09)", border: "1px solid rgba(249,115,22,.25)", fontSize: 13, color: "rgba(var(--ink),.62)" }}>
+        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(249,115,22,.09)", border: "1px solid rgba(249,115,22,.25)", fontSize: 13, color: "rgba(var(--ink),var(--ta-62, .62))" }}>
           No inventory items yet. Add your raw materials and finished products on the{" "}
           <a href="/dashboard/manufacturing/raw-materials" style={{ color: "var(--tx-fb923c, #fb923c)", fontWeight: 700 }}>Raw Materials</a>{" "}
           page first — a BOM consumes real stock, so it needs real items.
@@ -551,7 +551,7 @@ function BOMPageInner() {
           { label: "Materials Low On Stock", value: lowMaterials, color: lowMaterials ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-48, .48))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -569,7 +569,7 @@ function BOMPageInner() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 12 }}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800 }}>{bom.product}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 4 }}>
                       Version {bom.version} • Linked orders {linkedOrders}
                     </div>
                   </div>
@@ -581,7 +581,7 @@ function BOMPageInner() {
                         the product for attention. Yield also stops repeating
                         itself: it was in the line above as well. */}
                     <div style={{ color: "var(--tx-38bdf8, #38bdf8)", fontSize: 15, fontWeight: 800 }}>{bom.yieldUnits.toLocaleString()}</div>
-                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>{yieldUnit} per batch</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{yieldUnit} per batch</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 9, justifyContent: "flex-end" }}>
                       {/* The whole run from here: raise the order, start it and
                           post it in one confirm. The Production Orders screen
@@ -620,7 +620,7 @@ function BOMPageInner() {
                   // Pre-existing BOMs stored materials as free text with no
                   // quantities, so they cannot drive a production run yet.
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 12, color: "rgba(var(--ink),.4)" }}>{bom.materials.join(", ") || "No materials listed"}</span>
+                    <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{bom.materials.join(", ") || "No materials listed"}</span>
                     <span style={{ padding: "4px 10px", borderRadius: 999, background: "rgba(249,115,22,.14)", border: "1px solid rgba(249,115,22,.3)", color: "#fb923c", fontSize: 11, fontWeight: 700 }}>
                       Needs quantities before it can be produced
                     </span>
@@ -630,7 +630,7 @@ function BOMPageInner() {
             );
           })}
           {!bomStore.loading && boms.length === 0 && (
-            <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
+            <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>
               No BOMs defined yet.
             </div>
           )}
@@ -642,18 +642,18 @@ function BOMPageInner() {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {rawMaterials.length ? rawMaterials.slice(0, 10).map((item) => (
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
-                  <span style={{ color: "rgba(var(--ink),.62)" }}>{item.name}</span>
+                  <span style={{ color: "rgba(var(--ink),var(--ta-62, .62))" }}>{item.name}</span>
                   <span style={{ color: item.isLow ? "var(--tx-fca5a5, #fca5a5)" : "var(--tx-38bdf8, #38bdf8)", fontWeight: 700 }}>
                     {item.currentStock}{item.unit} · Rs. {formatRate(item.unitCost)}
                   </span>
                 </div>
-              )) : <div style={{ color: "rgba(var(--ink),.3)", fontSize: 13 }}>No raw materials yet.</div>}
+              )) : <div style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>No raw materials yet.</div>}
             </div>
           </div>
 
           <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>Flow</div>
-            <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(var(--ink),.55)" }}>
+            <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(var(--ink),var(--ta-55, .55))" }}>
               1. Add raw materials and finished products as inventory items.
               <br />2. Build a BOM — pick the product and what a batch consumes.
               <br />3. Raise a production order against the BOM.
@@ -668,7 +668,7 @@ function BOMPageInner() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 50 }}>
           <div style={{ background: "var(--dk-10131a, #10131a)", border: `1px solid ${border}`, borderRadius: 16, padding: isMobile ? 16 : 24, width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto" }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Make {makeBom.product}</div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 16 }}>
               Raises the order, consumes the material and posts the finished goods — all on confirm.
               Nothing is written until then.
             </div>
@@ -700,7 +700,7 @@ function BOMPageInner() {
 
             {/* Said plainly, because posting an order size as though it were
                 made is how finished goods nobody has produced get into stock. */}
-            <div style={{ fontSize: 11.5, color: partial ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),.32)", marginTop: 6, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 11.5, color: partial ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-32, .32))", marginTop: 6, lineHeight: 1.6 }}>
               {partial
                 ? `${pendingQty.toLocaleString()} left over — the order stays open on Production Orders, and tomorrow's run carries on from there with its own labour.`
                 : "The whole order is finished in this run. Making only part of it today? Put that in “Finished today”."}
@@ -717,7 +717,7 @@ function BOMPageInner() {
                 run consumes material the store did not expect to lose. */}
             {makeQuote && (
               <div style={{ marginTop: 16 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(var(--ink),.4)", marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 8 }}>
                   Material this takes — from {makeQuote.location || "MAIN"}
                 </div>
                 {makeQuote.lines.map((line) => {
@@ -737,7 +737,7 @@ function BOMPageInner() {
                           taken as 16 does not look like a rounding nobody
                           agreed to — and the part that survives says so. */}
                       {(line.exactQty !== line.requiredQty || line.leftoverQty > 0 || line.fromRemnantQty > 0) && (
-                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.35)", marginTop: 1 }}>
+                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 1 }}>
                           {line.exactQty !== line.requiredQty && `needs ${line.exactQty.toFixed(2)}${line.unit}`}
                           {line.fromRemnantQty > 0 && ` · ${line.fromRemnantQty.toFixed(2)}${line.unit} from open stock`}
                           {line.leftoverQty > 0 && ` · ${line.leftoverQty.toFixed(2)}${line.unit} stays as open stock`}
@@ -747,7 +747,7 @@ function BOMPageInner() {
                   );
                 })}
                 <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${border}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>Goes to Finished Goods</span>
+                  <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))" }}>Goes to Finished Goods</span>
                   {/* Named workers replace the BOM's labour figure, so the
                       total has to follow them or the number on screen is not
                       the number that posts. */}
@@ -774,10 +774,10 @@ function BOMPageInner() {
                     CPV like any other creditor. */}
                 <div style={{ marginTop: 18 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(var(--ink),.4)" }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: .6, textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                       Labour on this run
                     </span>
-                    <span style={{ fontSize: 11, color: "rgba(var(--ink),.32)" }}>
+                    <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))" }}>
                       {labourRows.length
                         ? `Rs. ${Math.round(labourTotal).toLocaleString()} — replaces the BOM estimate`
                         : `BOM estimate Rs. ${Math.round(makeQuote.labourCost).toLocaleString()} — nobody owed by name`}
@@ -785,7 +785,7 @@ function BOMPageInner() {
                   </div>
 
                   {labourList.length === 0 ? (
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.35)" }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                       No workers added yet — add them on the{" "}
                       <a href="/dashboard/manufacturing/labour" style={{ color: "var(--tx-fb923c, #fb923c)", fontWeight: 700 }}>Labour</a> page.
                     </div>
@@ -825,7 +825,7 @@ function BOMPageInner() {
                                 deliberate click, not something the keyboard
                                 should pass through. */}
                             <button onClick={() => setLabourRows((rows) => rows.filter((_, i) => i !== index))} tabIndex={-1} title="Remove"
-                              style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
+                              style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", padding: "7px 0", gridColumn: isMobile ? "1 / -1" : "auto" }}>×</button>
                           </div>
                         ))}
                       </div>
@@ -846,15 +846,15 @@ function BOMPageInner() {
                         <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 10, background: "rgba(56,189,248,.07)", border: "1px solid rgba(56,189,248,.24)" }}>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", marginBottom: 8 }}>
                             {jobsToday.map(([job, qty]) => (
-                              <span key={job} style={{ fontSize: 12, color: "rgba(var(--ink),.72)" }}>
+                              <span key={job} style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-72, .72))" }}>
                                 {job}{" "}
-                                <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: qty === slowestJob ? "var(--tx-38bdf8, #38bdf8)" : "rgba(var(--ink),.55)" }}>
+                                <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: qty === slowestJob ? "var(--tx-38bdf8, #38bdf8)" : "rgba(var(--ink),var(--ta-55, .55))" }}>
                                   {qty.toLocaleString()}
                                 </span>
                               </span>
                             ))}
                           </div>
-                          <div style={{ fontSize: 11.5, lineHeight: 1.65, color: "rgba(var(--ink),.55)" }}>
+                          <div style={{ fontSize: 11.5, lineHeight: 1.65, color: "rgba(var(--ink),var(--ta-55, .55))" }}>
                             A piece is finished only once every job is done on it, so{" "}
                             <strong style={{ color: "var(--tx-38bdf8, #38bdf8)" }}>{slowestJob.toLocaleString()}</strong> are
                             finished today. The other {(fastestJob - slowestJob).toLocaleString()} are
@@ -874,7 +874,7 @@ function BOMPageInner() {
                       <button
                         id="bom-add-worker"
                         onClick={() => setLabourRows((rows) => [...rows, { labourId: "", operation: "", qty: makeQty, rate: "" }])}
-                        style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
+                        style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 600, fontFamily: "inherit", cursor: "pointer" }}>
                         + Worker
                       </button>
                     </>
@@ -901,7 +901,7 @@ function BOMPageInner() {
                     : "Pricing…"}
               </button>
               <button onClick={closeMake} disabled={makeBusy}
-                style={{ padding: "11px 20px", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+                style={{ padding: "11px 20px", background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
                 Cancel
               </button>
             </div>
@@ -923,18 +923,18 @@ function BOMPageInner() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Finished Product</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Finished Product</label>
                 <select value={form.finishedItemId} onChange={(e) => setForm((c) => ({ ...c, finishedItemId: e.target.value }))} style={inputStyle}>
                   <option value="">— Select a finished product —</option>
                   {finishedItems.map((item) => <option key={item.id} value={item.id}>{item.name} ({item.code})</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Version</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Version</label>
                 <input value={form.version} onChange={(e) => setForm((c) => ({ ...c, version: e.target.value }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Units per batch</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Units per batch</label>
                 <input type="number" min={1} value={form.yieldUnits} onChange={(e) => setForm((c) => ({ ...c, yieldUnits: Number(e.target.value) }))} style={inputStyle} />
               </div>
             </div>
@@ -943,13 +943,13 @@ function BOMPageInner() {
                 material cost alone, which understates what a batch really cost. */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Labour per batch</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Labour per batch</label>
                 <input type="number" min={0} step="any" value={form.labourPerBatch}
                   onChange={(e) => setForm((c) => ({ ...c, labourPerBatch: Number(e.target.value) }))}
                   placeholder="0" style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Overhead per batch</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Overhead per batch</label>
                 <input type="number" min={0} step="any" value={form.overheadPerBatch}
                   onChange={(e) => setForm((c) => ({ ...c, overheadPerBatch: Number(e.target.value) }))}
                   placeholder="0" style={inputStyle} />
@@ -962,7 +962,7 @@ function BOMPageInner() {
                   three fields away the number gets typed against whatever the
                   operator happens to be thinking in — which is per piece, and
                   which is how a batch of 1,264 buttons gets entered as 2. */}
-              <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8 }}>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8 }}>
                 Materials consumed per batch
                 {form.yieldUnits > 0 && (
                   <span style={{ color: "rgba(var(--ink),.75)", fontWeight: 700 }}>
@@ -983,7 +983,7 @@ function BOMPageInner() {
                         in; the item is not, because only the operator knows
                         which of their own stock it means. */}
                     {line.note && (
-                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.42)", marginBottom: 4 }}>{line.note}</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-42, .42))", marginBottom: 4 }}>{line.note}</div>
                     )}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 96px 32px", gap: 8, alignItems: "center" }}>
                       <select value={line.itemId} onChange={(e) => setLine(index, { itemId: e.target.value })} style={inputStyle}>
@@ -1006,7 +1006,7 @@ function BOMPageInner() {
                           operator did not choose the rate and cannot correct
                           it, so it only invites them to doubt a number that is
                           not theirs to doubt. */}
-                      <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", textAlign: "right", lineHeight: 1.35 }}>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", textAlign: "right", lineHeight: 1.35 }}>
                         {qty > 0 && form.yieldUnits > 0 ? (
                           <div>
                             {(() => {
@@ -1020,15 +1020,15 @@ function BOMPageInner() {
                             })()}
                           </div>
                         ) : (
-                          <div style={{ color: "rgba(var(--ink),.25)" }}>—</div>
+                          <div style={{ color: "rgba(var(--ink),var(--ta-25, .25))" }}>—</div>
                         )}
                       </div>
                       <button
                         onClick={() => setLines((c) => (c.length === 1 ? [{ itemId: "", qty: "", divisible: false }] : c.filter((_, i) => i !== index)))}
                         title="Remove line"
-                        style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}
+                        style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", padding: "8px 0" }}
                       >×</button>
-                      <label style={{ gridColumn: "span 4", display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(var(--ink),.45)", cursor: "pointer", margin: "-2px 0 4px" }}>
+                      <label style={{ gridColumn: "span 4", display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", margin: "-2px 0 4px" }}>
                         <input type="checkbox" checked={line.divisible} onChange={(e) => setLine(index, { divisible: e.target.checked })} />
                         Roll / sheet material — keep the part-used {item?.unit || "unit"} as open stock for the next run
                       </label>
@@ -1037,7 +1037,7 @@ function BOMPageInner() {
                   );
                 })}
               </div>
-              <button onClick={() => setLines((c) => [...c, { itemId: "", qty: "", divisible: false }])} style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+              <button onClick={() => setLines((c) => [...c, { itemId: "", qty: "", divisible: false }])} style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                 + Add material
               </button>
             </div>
@@ -1061,7 +1061,7 @@ function BOMPageInner() {
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(249,115,22,.5)" : "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
                 {saving ? "Saving…" : editingId ? "Save Changes" : "Create BOM"}
               </button>
-              <button onClick={() => { setShowModal(false); resetForm(); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); resetForm(); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-65, .65))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -1072,7 +1072,7 @@ function BOMPageInner() {
 
 export default function BOMPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40, color: "rgba(var(--ink),.35)", fontFamily: ff }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ padding: 40, color: "rgba(var(--ink),var(--ta-35, .35))", fontFamily: ff }}>Loading…</div>}>
       <BOMPageInner />
     </Suspense>
   );

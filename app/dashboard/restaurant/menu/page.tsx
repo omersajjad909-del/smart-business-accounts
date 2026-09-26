@@ -6,7 +6,7 @@ import { restaurantBg, restaurantBorder, restaurantFont, restaurantMuted } from 
 import { useResponsive } from "@/hooks/useResponsive";
 
 const CATEGORIES = ["All", "Starters", "Mains", "Desserts", "Drinks", "Sides"];
-const CAT_COLORS: Record<string, string> = { Starters: "#f59e0b", Mains: "#ef4444", Desserts: "#ec4899", Drinks: "#3b82f6", Sides: "#10b981" };
+const CAT_COLORS: Record<string, string> = { Starters: "#f59e0b", Mains: "#ef4444", Desserts: "#ec4899", Drinks: "var(--tx-3b82f6, #3b82f6)", Sides: "#10b981" };
 
 export default function MenuPage() {
   const { isMobile } = useResponsive();
@@ -66,7 +66,7 @@ export default function MenuPage() {
           { label: "Categories", val: CATEGORIES.length - 1, color: "var(--tx-818cf8, #818cf8)" },
         ].map((card) => (
           <div key={card.label} style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" }}>
-            <div style={{ fontSize: 13, color: "rgba(var(--ink),.5)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: card.color }}>{card.val}</div>
           </div>
         ))}
@@ -74,7 +74,7 @@ export default function MenuPage() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
         {CATEGORIES.map((category) => (
-          <button key={category} onClick={() => setTab(category)} style={{ background: tab === category ? "#ef4444" : "rgba(var(--ink),.06)", color: tab === category ? "#fff" : "rgba(var(--ink),.6)", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>
+          <button key={category} onClick={() => setTab(category)} style={{ background: tab === category ? "#ef4444" : "rgba(var(--ink),.06)", color: tab === category ? "#fff" : "rgba(var(--ink),var(--ta-60, .6))", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>
             {category}
           </button>
         ))}
@@ -102,7 +102,7 @@ export default function MenuPage() {
             </div>
           </div>
         ))}
-        {!loading && filtered.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No items found.</div>}
+        {!loading && filtered.length === 0 && <div style={{ background: restaurantBg, border: `1px solid ${restaurantBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", gridColumn: "1/-1" }}>No items found.</div>}
       </div>
 
       {showModal && (
@@ -140,7 +140,7 @@ export default function MenuPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Item</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

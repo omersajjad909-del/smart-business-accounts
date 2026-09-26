@@ -30,7 +30,7 @@ export default function WorkshopAnalyticsPage() {
     <div style={{ padding: isMobile ? "15px 14px" : "28px 32px", color: "var(--tx-e2e8f0, #e2e8f0)", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>Workshop Analytics</h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>Throughput, mechanic utilization, parts burn, and warranty exposure from live workshop records.</p>
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Throughput, mechanic utilization, parts burn, and warranty exposure from live workshop records.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
@@ -41,7 +41,7 @@ export default function WorkshopAnalyticsPage() {
           { label: "Warranty Exposure", value: data.summary.warrantyExposure.toLocaleString(), color: workshopAccent },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}

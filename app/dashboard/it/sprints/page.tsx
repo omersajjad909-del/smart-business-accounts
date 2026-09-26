@@ -11,18 +11,18 @@ const S = {
   page: { padding: '32px', fontFamily: 'Inter, sans-serif', color: 'var(--ink-solid, #fff)', minHeight: '100vh' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 },
   title: { fontSize: 24, fontWeight: 700, margin: 0 },
-  sub: { fontSize: 14, color: 'rgba(var(--ink),.5)', marginTop: 4 },
+  sub: { fontSize: 14, color: 'rgba(var(--ink),var(--ta-50, .5))', marginTop: 4 },
   btn: { background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, cursor: 'pointer', fontSize: 14 },
   stats: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 16, marginBottom: 28 },
   stat: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: isMobile ? "12px 11px" : "20px 24px" },
-  statLabel: { fontSize: 13, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
+  statLabel: { fontSize: 13, color: 'rgba(var(--ink),var(--ta-50, .5))', marginBottom: 6 },
   statVal: { fontSize: 28, fontWeight: 700 },
   grid: { display: 'grid', gap: 20 },
   card: { background: 'rgba(var(--ink),.03)', border: '1px solid rgba(var(--ink),.07)', borderRadius: 12, padding: 24 },
   badge: (c: string) => ({ display: 'inline-block', background: `${c}20`, color: c, borderRadius: 6, padding: '2px 10px', fontSize: 12, fontWeight: 600 }),
   kanban: { display: 'grid', gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 12, margin: '20px 0' },
   kanbanCol: (c: string) => ({ background: `${c}10`, border: `1px solid ${c}30`, borderRadius: 10, padding: isMobile ? "12px 10px" : "14px 16px", textAlign: 'center' as const }),
-  kanbanLabel: { fontSize: 12, color: 'rgba(var(--ink),.5)', marginBottom: 6 },
+  kanbanLabel: { fontSize: 12, color: 'rgba(var(--ink),var(--ta-50, .5))', marginBottom: 6 },
   kanbanCount: (c: string) => ({ fontSize: 28, fontWeight: 700, color: c }),
   progressBar: { background: 'rgba(var(--ink),.08)', borderRadius: 4, height: 6 },
   progressFill: (pct: number, c: string) => ({ width: `${pct}%`, height: '100%', borderRadius: 4, background: c }),
@@ -30,7 +30,7 @@ const S = {
   modal: { background: 'var(--dk-1a1a2e, #1a1a2e)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 480 },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 24 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),.6)', marginBottom: 6 },
+  label: { display: 'block', fontSize: 13, color: 'rgba(var(--ink),var(--ta-60, .6))', marginBottom: 6 },
   input: { width: '100%', background: 'rgba(var(--ink),.06)', border: '1px solid rgba(var(--ink),.1)', borderRadius: 8, padding: '10px 12px', color: 'var(--ink-solid, #fff)', fontSize: 14, boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   modalBtns: { display: 'flex', gap: 12, marginTop: 24 },
@@ -117,11 +117,11 @@ export default function SprintsPage() {
         <div style={S.stat}><div style={S.statLabel}>Avg Velocity</div><div style={{ ...S.statVal, color: '#7c3aed' }}>{avgVelocity} pts</div></div>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.4)' }}>Loading...</div>}
+      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'rgba(var(--ink),var(--ta-40, .4))' }}>Loading...</div>}
 
       <div style={S.grid}>
         {!loading && sprints.length === 0 && (
-          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),.25)' }}>No sprints found.</div>
+          <div style={{ ...S.card, textAlign: 'center', padding: 40, color: 'rgba(var(--ink),var(--ta-25, .25))' }}>No sprints found.</div>
         )}
         {sprints.map(s => {
           const toDo = s.total - s.completed - s.inProgress - s.blocked;
@@ -132,14 +132,14 @@ export default function SprintsPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 16 }}>{s.name}</div>
-                  <div style={{ fontSize: 13, color: 'rgba(var(--ink),.5)' }}>{s.projectName}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(var(--ink),var(--ta-50, .5))' }}>{s.projectName}</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <span style={S.badge(STATUS_COLOR[s.status])}>{s.status}</span>
-                  {s.status === 'Active' && s.end && <span style={{ fontSize: 13, color: days < 0 ? 'var(--tx-f87171, #f87171)' : days <= 2 ? 'var(--tx-fbbf24, #fbbf24)' : 'rgba(var(--ink),.5)' }}>{days < 0 ? `${Math.abs(days)}d overdue` : `${days}d left`}</span>}
+                  {s.status === 'Active' && s.end && <span style={{ fontSize: 13, color: days < 0 ? 'var(--tx-f87171, #f87171)' : days <= 2 ? 'var(--tx-fbbf24, #fbbf24)' : 'rgba(var(--ink),var(--ta-50, .5))' }}>{days < 0 ? `${Math.abs(days)}d overdue` : `${days}d left`}</span>}
                 </div>
               </div>
-              <div style={{ fontSize: 13, color: 'rgba(var(--ink),.4)', marginBottom: 16 }}>{s.start} → {s.end}</div>
+              <div style={{ fontSize: 13, color: 'rgba(var(--ink),var(--ta-40, .4))', marginBottom: 16 }}>{s.start} → {s.end}</div>
 
               <div style={S.kanban}>
                 <div style={S.kanbanCol('#6b7280')}><div style={S.kanbanLabel}>To Do</div><div style={S.kanbanCount('#d1d5db')}>{toDo}</div></div>
@@ -149,7 +149,7 @@ export default function SprintsPage() {
               </div>
 
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(var(--ink),.5)', marginBottom: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(var(--ink),var(--ta-50, .5))', marginBottom: 6 }}>
                   <span>Progress ({s.completed}/{s.total} stories)</span>
                   <span style={{ color: '#7c3aed', fontWeight: 600 }}>{pct}%</span>
                 </div>
@@ -158,7 +158,7 @@ export default function SprintsPage() {
 
               <div style={{ display: 'flex', alignItems: 'center', marginTop: 16, gap: 8 }}>
                 <div>{s.team.map(m => <span key={m} style={S.avatar}>{m}</span>)}</div>
-                {s.velocity > 0 && <span style={{ fontSize: 13, color: 'rgba(var(--ink),.5)', marginLeft: 8 }}>Velocity: {s.velocity} pts</span>}
+                {s.velocity > 0 && <span style={{ fontSize: 13, color: 'rgba(var(--ink),var(--ta-50, .5))', marginLeft: 8 }}>Velocity: {s.velocity} pts</span>}
               </div>
             </div>
           );

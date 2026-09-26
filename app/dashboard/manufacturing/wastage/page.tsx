@@ -95,7 +95,7 @@ export default function WastagePage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22, gap: 14, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Wastage</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
             Leftover raw material that can&apos;t be used again — logged in kg, meters or pcs and taken off stock.
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function WastagePage() {
           { label: "This Month", value: `Rs. ${Math.round(thisMonthValue).toLocaleString()}`, color: "var(--tx-fb923c, #fb923c)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-48, .48))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -124,38 +124,38 @@ export default function WastagePage() {
             <thead>
               <tr style={{ background: "rgba(var(--ink),.03)" }}>
                 {["Date", "Material", "Qty Wasted", "Value Lost", "Reason", "Notes"].map((h, i) => (
-                  <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i === 2 || i === 3 ? "right" : "left" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", letterSpacing: ".05em", textAlign: i === 2 || i === 3 ? "right" : "left" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {entries.map((e) => (
                 <tr key={e.id} style={{ borderTop: `1px solid ${border}` }}>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{e.date}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{e.date}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13 }}>
                     <div style={{ fontWeight: 700 }}>{e.itemName}</div>
-                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.32)" }}>{e.itemCode}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))" }}>{e.itemCode}</div>
                   </td>
                   <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", fontWeight: 700, color: red }}>{e.qty} {e.unit}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),.62)" }}>Rs. {Math.round(e.valueLost).toLocaleString()}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),.5)" }}>{e.reason}</td>
-                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),.4)" }}>{e.notes || "—"}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, textAlign: "right", color: "rgba(var(--ink),var(--ta-62, .62))" }}>Rs. {Math.round(e.valueLost).toLocaleString()}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{e.reason}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{e.notes || "—"}</td>
                 </tr>
               ))}
               {!loading && entries.length === 0 && (
-                <tr><td colSpan={6} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)", fontSize: 13 }}>
+                <tr><td colSpan={6} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))", fontSize: 13 }}>
                   No wastage logged yet.
                 </td></tr>
               )}
               {loading && (
-                <tr><td colSpan={6} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)", fontSize: 13 }}>Loading…</td></tr>
+                <tr><td colSpan={6} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))", fontSize: 13 }}>Loading…</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div style={{ marginTop: 16, padding: "13px 18px", borderRadius: 12, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "rgba(var(--ink),.55)", lineHeight: 1.6 }}>
+      <div style={{ marginTop: 16, padding: "13px 18px", borderRadius: 12, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.6 }}>
         Logging wastage takes it straight off the raw material&apos;s stock — the same number Raw Materials and the stock reports show, so
         there is nothing to reconcile afterwards. Nothing writes here on its own: a run only records waste when someone says there was
         some.
@@ -167,7 +167,7 @@ export default function WastagePage() {
           asset, and the next run reaches for it before opening a new roll. The
           two are one keystroke apart in an operator's mind and a world apart in
           the ledger. */}
-      <div style={{ marginTop: 12, padding: "13px 18px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.2)", fontSize: 12.5, color: "rgba(var(--ink),.55)", lineHeight: 1.7 }}>
+      <div style={{ marginTop: 12, padding: "13px 18px", borderRadius: 12, background: "rgba(56,189,248,.06)", border: "1px solid rgba(56,189,248,.2)", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.7 }}>
         <strong style={{ color: "var(--tx-7dd3fc, #7dd3fc)" }}>Left over is not wasted.</strong> When a run needs 12.66 rolls and 13 come off the rack,
         the 0.34 that is left stays yours: it is held as <strong style={{ color: "rgba(var(--ink),.75)" }}>open stock</strong> under
         Material Remnants and the next run uses it before opening a new roll. You will find it in the Open Stock column on{" "}
@@ -182,7 +182,7 @@ export default function WastagePage() {
             {error && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{error}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Raw Material</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Raw Material</label>
                 <select value={form.itemId} onChange={(e) => setForm((c) => ({ ...c, itemId: e.target.value }))} style={inputStyle}>
                   <option value="">Select material…</option>
                   {materials.map((m) => (
@@ -191,19 +191,19 @@ export default function WastagePage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>
                   Quantity Wasted{selected ? ` (${selected.unit})` : ""}
                 </label>
                 <input type="number" min={0} step="any" value={form.qty} onChange={(e) => setForm((c) => ({ ...c, qty: e.target.value }))} style={inputStyle} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Reason</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Reason</label>
                 <select value={form.reason} onChange={(e) => setForm((c) => ({ ...c, reason: e.target.value }))} style={inputStyle}>
                   {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Notes</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Notes</label>
                 <textarea value={form.notes} onChange={(e) => setForm((c) => ({ ...c, notes: e.target.value }))} rows={2} style={{ ...inputStyle, resize: "vertical" }} />
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function WastagePage() {
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: saving ? "rgba(248,113,113,.5)" : red, border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
                 {saving ? "Saving…" : "Log Wastage"}
               </button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-65, .65))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

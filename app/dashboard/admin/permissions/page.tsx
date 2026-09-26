@@ -85,7 +85,7 @@ export default function AdminPermissionsPage() {
       <div style={{ padding:32, borderRadius:16, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", textAlign:"center" }}>
         <div style={{ fontSize:32, marginBottom:12 }}>🔒</div>
         <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-f87171, #f87171)" }}>Access Denied</div>
-        <div style={{ fontSize:13, color:"rgba(var(--ink),0.4)", marginTop:6 }}>Only ADMIN can manage permissions.</div>
+        <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-40, 0.4))", marginTop:6 }}>Only ADMIN can manage permissions.</div>
       </div>
     </div>
   );
@@ -113,11 +113,11 @@ export default function AdminPermissionsPage() {
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
         <div>
           <h1 style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", margin:0 }}>User Permissions</h1>
-          <p style={{ fontSize:12, color:"rgba(var(--ink),0.35)", marginTop:4 }}>Assign permissions within your plan&apos;s limits</p>
+          <p style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, 0.35))", marginTop:4 }}>Assign permissions within your plan&apos;s limits</p>
         </div>
         {/* Plan badge */}
         <div style={{ padding:"8px 16px", borderRadius:10, background:"rgba(99,102,241,0.1)", border:"1px solid rgba(99,102,241,0.25)" }}>
-          <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),0.4)", marginBottom:2 }}>Active Plan</div>
+          <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),var(--ta-40, 0.4))", marginBottom:2 }}>Active Plan</div>
           <div style={{ fontSize:14, fontWeight:800, color:"var(--tx-a5b4fc, #a5b4fc)" }}>{plan}</div>
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function AdminPermissionsPage() {
           <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),0.8)", marginBottom:3 }}>
             Plan-Restricted Permissions
           </div>
-          <div style={{ fontSize:12, color:"rgba(var(--ink),0.4)", lineHeight:1.5 }}>
+          <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, 0.4))", lineHeight:1.5 }}>
             Your <strong style={{ color:"var(--tx-a5b4fc, #a5b4fc)" }}>{plan}</strong> plan includes <strong style={{ color:"var(--tx-a5b4fc, #a5b4fc)" }}>{planAllowedCount} permissions</strong>.
             Locked permissions (🔒) are not available on your current plan — upgrade to unlock them.
           </div>
@@ -138,7 +138,7 @@ export default function AdminPermissionsPage() {
 
       {/* User Selector */}
       <div style={card}>
-        <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),0.7)", marginBottom:12 }}>Select User to Manage</div>
+        <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),var(--ta-70, 0.7))", marginBottom:12 }}>Select User to Manage</div>
         <select
           style={{
             width:"100%", padding:"10px 14px", borderRadius:8,
@@ -167,7 +167,7 @@ export default function AdminPermissionsPage() {
               <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),0.8)" }}>
                 Permissions for: <span style={{ color:"var(--tx-a5b4fc, #a5b4fc)" }}>{selectedUser.name}</span>
               </div>
-              <div style={{ fontSize:11, color:"rgba(var(--ink),0.35)", marginTop:3 }}>
+              <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, 0.35))", marginTop:3 }}>
                 {permissions.length} assigned · {planAllowedCount} available in plan
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function AdminPermissionsPage() {
               <button
                 type="button"
                 onClick={() => setPermissions([])}
-                style={{ padding:"6px 14px", borderRadius:8, background:"rgba(var(--ink),0.04)", border:"1px solid rgba(var(--ink),0.08)", color:"rgba(var(--ink),0.45)", fontSize:11, fontWeight:700, cursor:"pointer" }}
+                style={{ padding:"6px 14px", borderRadius:8, background:"rgba(var(--ink),0.04)", border:"1px solid rgba(var(--ink),0.08)", color:"rgba(var(--ink),var(--ta-45, 0.45))", fontSize:11, fontWeight:700, cursor:"pointer" }}
               >
                 Clear All
               </button>
@@ -202,7 +202,7 @@ export default function AdminPermissionsPage() {
                   <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".08em", color:"rgba(var(--txr-6366f1, 99,102,241),0.7)", marginBottom:8, display:"flex", alignItems:"center", gap:8 }}>
                     {cat.label}
                     {lockedInCat.length > 0 && (
-                      <span style={{ padding:"2px 8px", borderRadius:10, background:"rgba(var(--ink),0.05)", color:"rgba(var(--ink),0.25)", fontSize:9 }}>
+                      <span style={{ padding:"2px 8px", borderRadius:10, background:"rgba(var(--ink),0.05)", color:"rgba(var(--ink),var(--ta-25, 0.25))", fontSize:9 }}>
                         {lockedInCat.length} locked
                       </span>
                     )}
@@ -240,10 +240,10 @@ export default function AdminPermissionsPage() {
                               </svg>
                             )}
                           </div>
-                          <span style={{ fontSize:11.5, fontWeight: checked ? 600 : 400, color: locked ? "rgba(var(--ink),0.25)" : checked ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),0.55)", lineHeight:1.3 }}>
+                          <span style={{ fontSize:11.5, fontWeight: checked ? 600 : 400, color: locked ? "rgba(var(--ink),var(--ta-25, 0.25))" : checked ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),var(--ta-55, 0.55))", lineHeight:1.3 }}>
                             {p}
                           </span>
-                          {locked && <span style={{ marginLeft:"auto", fontSize:9, color:"rgba(var(--ink),0.2)", whiteSpace:"nowrap" }}>🔒 Upgrade</span>}
+                          {locked && <span style={{ marginLeft:"auto", fontSize:9, color:"rgba(var(--ink),var(--ta-20, 0.2))", whiteSpace:"nowrap" }}>🔒 Upgrade</span>}
                         </label>
                       );
                     })}

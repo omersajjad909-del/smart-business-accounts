@@ -379,10 +379,10 @@ export default function BusinessFeaturesPage() {
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", marginBottom: 4 }}>One system. Adaptive workflow.</div>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
-              Every feature uses the <strong style={{ color: "rgba(var(--ink),.6)" }}>same database and backend</strong> — only the screen and workflow adapts.
+              Every feature uses the <strong style={{ color: "rgba(var(--ink),var(--ta-60, .6))" }}>same database and backend</strong> — only the screen and workflow adapts.
               Simple 2-click flow for small shops. Full approval + audit trail for enterprise.
               <br />
-              <strong style={{ color: "rgba(var(--ink),.5)" }}>Default: all OFF</strong> — enable only what your business actually needs.
+              <strong style={{ color: "rgba(var(--ink),var(--ta-50, .5))" }}>Default: all OFF</strong> — enable only what your business actually needs.
             </div>
           </div>
         </div>
@@ -429,7 +429,7 @@ export default function BusinessFeaturesPage() {
                     {isOn && <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(16,185,129,.12)", color: "var(--tx-10b981, #10b981)", border: "1px solid rgba(16,185,129,.25)" }}>✓ ENABLED</span>}
                   </div>
                   <div style={{ fontSize: 12, color: "#475569", marginTop: 3 }}>{fc.subtitle}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginTop: 6, lineHeight: 1.6 }}>{fc.description}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginTop: 6, lineHeight: 1.6 }}>{fc.description}</div>
                 </div>
                 <Toggle on={isOn} onChange={() => toggle(fc.key)} />
               </div>

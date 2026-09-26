@@ -69,14 +69,14 @@ export default function PropertiesPage() {
   }
 
   const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 9, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" };
-  const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),.4)", textTransform: "uppercase", letterSpacing: ".05em", display: "block", marginBottom: 6 };
+  const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", letterSpacing: ".05em", display: "block", marginBottom: 6 };
 
   return (
     <div style={{ padding: "28px", color: "var(--ink-solid, white)", fontFamily: ff }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🏢 Properties</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.4)", margin: 0 }}>Manage your real estate portfolio, tenants, and rental income</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: 0 }}>Manage your real estate portfolio, tenants, and rental income</p>
         </div>
         <button onClick={() => { setFormError(""); setShowCreate(true); }} style={{ padding: "10px 22px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#818cf8,#6366f1)", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ Add Property</button>
       </div>
@@ -85,20 +85,20 @@ export default function PropertiesPage() {
         {[{ label: "Total Properties", val: properties.length, color: "var(--tx-818cf8, #818cf8)" }, { label: "Rented", val: occupied, color: "var(--tx-818cf8, #818cf8)" }, { label: "Vacant", val: properties.filter(p => p.status === "vacant").length, color: "var(--tx-34d399, #34d399)" }, { label: "Monthly Income", val: `Rs. ${totalRent.toLocaleString()}`, color: "var(--tx-34d399, #34d399)" }].map(s => (
           <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: isMobile ? "12px 10px" : "16px 18px" }}>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginTop: 3 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-60, .6))", marginTop: 3 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {(["all", "vacant", "rented", "maintenance", "for_sale"] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${filter === f ? "#818cf8" : border}`, background: filter === f ? "rgba(129,140,248,.15)" : bg, color: filter === f ? "#818cf8" : "rgba(var(--ink),.5)", cursor: "pointer", fontSize: 12 }}>
+          <button key={f} onClick={() => setFilter(f)} style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${filter === f ? "#818cf8" : border}`, background: filter === f ? "rgba(129,140,248,.15)" : bg, color: filter === f ? "#818cf8" : "rgba(var(--ink),var(--ta-50, .5))", cursor: "pointer", fontSize: 12 }}>
             {f === "all" ? "All" : STATUS_META[f].label}
           </button>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),0.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : selected ? "1fr 340px" : "1fr", gap: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16 }}>
@@ -111,31 +111,31 @@ export default function PropertiesPage() {
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{prop.name}</div>
                   <span style={{ background: m.bg, color: m.color, borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{m.emoji} {m.label}</span>
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 8 }}>{prop.type} · {prop.size}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginBottom: 12 }}>📍 {prop.address}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 8 }}>{prop.type} · {prop.size}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 12 }}>📍 {prop.address}</div>
                 <div style={{ fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>Rs. {prop.rent.toLocaleString()}/mo</div>
-                {prop.tenant && <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", marginTop: 6 }}>Tenant: {prop.tenant}</div>}
+                {prop.tenant && <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 6 }}>Tenant: {prop.tenant}</div>}
               </div>
             );
           })}
-          {!loading && filtered.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", gridColumn: "1/-1" }}>No properties found.</div>}
+          {!loading && filtered.length === 0 && <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", gridColumn: "1/-1" }}>No properties found.</div>}
         </div>
 
         {selectedProp && (
           <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 16, padding: isMobile ? "12px 10px" : "20px 22px", height: "fit-content" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{selectedProp.name}</div>
-              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.4)", fontSize: 18, cursor: "pointer" }}>×</button>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 18, cursor: "pointer" }}>×</button>
             </div>
             {[["Type", selectedProp.type], ["Address", selectedProp.address], ["Size", selectedProp.size], ["Rooms", String(selectedProp.rooms)], ["Rent", `Rs. ${selectedProp.rent.toLocaleString()}`], ["Tenant", selectedProp.tenant || "—"], ["Lease End", selectedProp.leaseEnd || "—"]].map(([l, v]) => (
               <div key={l} style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 10, color: "rgba(var(--ink),.3)", textTransform: "uppercase", fontWeight: 700 }}>{l}</div>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase", fontWeight: 700 }}>{l}</div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{v}</div>
               </div>
             ))}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
               {(["vacant", "rented", "maintenance", "for_sale"] as PropStatus[]).map(s => (
-                <button key={s} onClick={() => void changeStatus(selectedProp.id, s)} style={{ padding: "8px", borderRadius: 8, border: `1px solid ${selectedProp.status === s ? STATUS_META[s].color : "rgba(var(--ink),.08)"}`, background: selectedProp.status === s ? STATUS_META[s].bg : "transparent", color: selectedProp.status === s ? STATUS_META[s].color : "rgba(var(--ink),.4)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                <button key={s} onClick={() => void changeStatus(selectedProp.id, s)} style={{ padding: "8px", borderRadius: 8, border: `1px solid ${selectedProp.status === s ? STATUS_META[s].color : "rgba(var(--ink),.08)"}`, background: selectedProp.status === s ? STATUS_META[s].bg : "transparent", color: selectedProp.status === s ? STATUS_META[s].color : "rgba(var(--ink),var(--ta-40, .4))", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                   {STATUS_META[s].emoji} {STATUS_META[s].label}
                 </button>
               ))}
@@ -175,7 +175,7 @@ export default function PropertiesPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={createProp} style={{ flex: 1, padding: "11px 0", background: "linear-gradient(135deg,#818cf8,#6366f1)", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Property</button>
-              <button onClick={() => setShowCreate(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowCreate(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

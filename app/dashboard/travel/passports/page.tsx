@@ -9,7 +9,7 @@ import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
 const ff = "'Outfit','Inter',sans-serif";
 const panelBg = "rgba(var(--ink),.03)";
 const panelBorder = "rgba(var(--ink),.07)";
-const inputBg = "rgba(15,23,42,.72)";
+const inputBg = "rgba(var(--dkr-0f172a, 15,23,42),0.72)";
 const ACCENT = "#38bdf8";
 
 const emptyForm = {
@@ -127,7 +127,7 @@ export default function PassportDatabasePage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)" }}>🛂 Passenger Passport Database</h1>
-          <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),.45)" }}>Store and track passenger passports, expiry dates, and nationality.</p>
+          <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--ink),var(--ta-45, .45))" }}>Store and track passenger passports, expiry dates, and nationality.</p>
         </div>
         <button onClick={openAdd} style={{ background: ACCENT, color: "#0f172a", border: "none", borderRadius: 12, padding: "11px 20px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>+ Add Passport</button>
       </div>
@@ -141,7 +141,7 @@ export default function PassportDatabasePage() {
           { label: "Expired", value: totalExpired, color: "var(--tx-f87171, #f87171)" },
         ].map(s => (
           <div key={s.label} style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "16px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -161,14 +161,14 @@ export default function PassportDatabasePage() {
       {/* Table */}
       <div style={{ background: panelBg, border: `1px solid ${panelBorder}`, borderRadius: 16, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.4)" }}>Loading...</div>
+          <div style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-40, .4))" }}>Loading...</div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "rgba(56,189,248,.04)" }}>
                   {["Passenger", "Passport No", "Nationality", "DOB", "Issue Date", "Expiry Date", "Phone", "Status", "Actions"].map(h => (
-                    <th key={h} style={{ textAlign: "left", padding: "12px 14px", fontSize: 11, color: "rgba(var(--ink),.45)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", borderBottom: `1px solid ${panelBorder}`, whiteSpace: "nowrap" }}>{h}</th>
+                    <th key={h} style={{ textAlign: "left", padding: "12px 14px", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", borderBottom: `1px solid ${panelBorder}`, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -177,11 +177,11 @@ export default function PassportDatabasePage() {
                   <tr key={p.id} style={{ borderBottom: `1px solid rgba(var(--ink),.04)` }}>
                     <td style={{ padding: "13px 14px", fontWeight: 600, color: "var(--ink-solid, #fff)" }}>{p.passengerName}</td>
                     <td style={{ padding: "13px 14px", fontFamily: "monospace", fontSize: 13, color: ACCENT, letterSpacing: ".05em" }}>{p.passportNo}</td>
-                    <td style={{ padding: "13px 14px", fontSize: 13, color: "rgba(var(--ink),.7)" }}>{p.nationality || "—"}</td>
-                    <td style={{ padding: "13px 14px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>{p.dob || "—"}</td>
-                    <td style={{ padding: "13px 14px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>{p.issueDate || "—"}</td>
+                    <td style={{ padding: "13px 14px", fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>{p.nationality || "—"}</td>
+                    <td style={{ padding: "13px 14px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.dob || "—"}</td>
+                    <td style={{ padding: "13px 14px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.issueDate || "—"}</td>
                     <td style={{ padding: "13px 14px", fontSize: 13, fontWeight: 600, color: p.statusColor }}>{p.expiryDate || "—"}</td>
-                    <td style={{ padding: "13px 14px", fontSize: 12, color: "rgba(var(--ink),.5)" }}>{p.phone || "—"}</td>
+                    <td style={{ padding: "13px 14px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{p.phone || "—"}</td>
                     <td style={{ padding: "13px 14px" }}>
                       <span style={{ background: `${p.statusColor}18`, color: p.statusColor, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{p.statusLabel}</span>
                     </td>
@@ -194,7 +194,7 @@ export default function PassportDatabasePage() {
                   </tr>
                 ))}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)", fontSize: 13 }}>
+                  <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13 }}>
                     {search || statusFilter !== "all" ? "No passports match your filters." : "No passports yet. Add the first one."}
                   </td></tr>
                 )}
@@ -210,7 +210,7 @@ export default function PassportDatabasePage() {
           <div style={{ background: "var(--dk-0f172a, #0f172a)", border: `1px solid ${panelBorder}`, borderRadius: 18, padding: 28, width: "100%", maxWidth: 560, fontFamily: ff, maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--ink-solid, #fff)" }}>{editId ? "✏️ Edit Passport" : "🛂 Add Passport"}</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
             {formError && <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -225,7 +225,7 @@ export default function PassportDatabasePage() {
                 { label: "Notes", key: "notes", span: 2 },
               ].map(f => (
                 <div key={f.key} style={{ gridColumn: f.span === 2 ? "span 2" : undefined }}>
-                  <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{f.label}</label>
+                  <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{f.label}</label>
                   <input
                     type={f.type || "text"}
                     value={(form as Record<string, string>)[f.key]}
@@ -236,7 +236,7 @@ export default function PassportDatabasePage() {
               ))}
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22 }}>
-              <button onClick={() => setShowModal(false)} style={{ background: "transparent", border: `1px solid ${panelBorder}`, color: "rgba(var(--ink),.6)", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "transparent", border: `1px solid ${panelBorder}`, color: "rgba(var(--ink),var(--ta-60, .6))", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel</button>
               <button onClick={handleSave} disabled={saving} style={{ background: ACCENT, color: "#0f172a", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", opacity: saving ? 0.7 : 1, fontFamily: ff }}>
                 {saving ? "Saving…" : editId ? "Save Changes" : "Add Passport"}
               </button>
@@ -251,9 +251,9 @@ export default function PassportDatabasePage() {
           <div style={{ background: "var(--dk-0f172a, #0f172a)", border: `1px solid ${panelBorder}`, borderRadius: 16, padding: 28, width: 360, textAlign: "center", fontFamily: ff }}>
             <div style={{ fontSize: 36, marginBottom: 12 }}>🗑️</div>
             <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 8px", color: "var(--ink-solid, #fff)" }}>Delete Passport Record?</h3>
-            <p style={{ fontSize: 13, color: "rgba(var(--ink),.45)", margin: "0 0 22px", lineHeight: 1.6 }}>This will permanently delete this passport record.</p>
+            <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 22px", lineHeight: 1.6 }}>This will permanently delete this passport record.</p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button onClick={() => setDeleteId(null)} style={{ background: "transparent", border: `1px solid ${panelBorder}`, color: "rgba(var(--ink),.6)", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel</button>
+              <button onClick={() => setDeleteId(null)} style={{ background: "transparent", border: `1px solid ${panelBorder}`, color: "rgba(var(--ink),var(--ta-60, .6))", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel</button>
               <button onClick={() => handleDelete(deleteId)} style={{ background: "rgba(239,68,68,.15)", color: "#f87171", border: "1px solid rgba(239,68,68,.3)", borderRadius: 10, padding: "10px 22px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Delete</button>
             </div>
           </div>

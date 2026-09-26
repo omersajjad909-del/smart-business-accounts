@@ -65,8 +65,8 @@ export default function PharmacyPrescriptionsPage() {
                 <span style={{ fontWeight: 700 }}>{p.patient}</span>
                 <span style={{ fontSize: 12, color: pharmacyMuted }}>Dr. {p.doctor} | {p.date}</span>
               </div>
-              <div style={{ fontSize: 12, color: "rgba(var(--ink),.65)" }}>{p.drugs}</div>
-              {p.notes && <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)", marginTop: 2 }}>{p.notes}</div>}
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{p.drugs}</div>
+              {p.notes && <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>{p.notes}</div>}
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <span style={{ display: "inline-block", background: `${STATUS_COLOR[p.status]}20`, color: STATUS_COLOR[p.status], borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{p.status}</span>
@@ -74,7 +74,7 @@ export default function PharmacyPrescriptionsPage() {
             </div>
           </div>
         ))}
-        {!loading && prescriptions.length === 0 && <div style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No prescriptions yet.</div>}
+        {!loading && prescriptions.length === 0 && <div style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 12, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No prescriptions yet.</div>}
       </div>
 
       {showModal && (
@@ -92,7 +92,7 @@ export default function PharmacyPrescriptionsPage() {
             {error && <div style={{ marginTop: 14, fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)" }}>{error}</div>}
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#fb7185", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${pharmacyBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

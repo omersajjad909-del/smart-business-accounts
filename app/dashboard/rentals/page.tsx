@@ -56,7 +56,7 @@ export default function RentalsOverviewPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "var(--ink-solid, white)" }}>{rentalsConfig.title}</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>{rentalsConfig.description}</p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{rentalsConfig.description}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
@@ -82,7 +82,7 @@ export default function RentalsOverviewPage() {
           { label: "Booking Value", value: summary.bookingValue.toLocaleString(), color: "var(--tx-f97316, #f97316)" },
         ].map((card) => (
           <div key={card.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -95,7 +95,7 @@ export default function RentalsOverviewPage() {
             {bookings.slice(0, 6).map((item) => (
               <div key={item.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.booking}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 4 }}>{item.customer || "-"} | {item.asset || "-"}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 4 }}>{item.customer || "-"} | {item.asset || "-"}</div>
                 <div style={{ fontSize: 12, color: "var(--tx-93c5fd, #93c5fd)", marginTop: 6 }}>{item.pickupDate || "-"} | {item.status}</div>
               </div>
             ))}
@@ -110,11 +110,11 @@ export default function RentalsOverviewPage() {
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.item}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.category || "-"}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.category || "-"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.quantity.toLocaleString()}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.status}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.status}</div>
                   </div>
                 </div>
               ))}
@@ -128,11 +128,11 @@ export default function RentalsOverviewPage() {
                 <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.job}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.asset || "-"}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.asset || "-"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 13, fontWeight: 700 }}>{item.dueDate || "-"}</div>
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)" }}>{item.status}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{item.status}</div>
                   </div>
                 </div>
               ))}

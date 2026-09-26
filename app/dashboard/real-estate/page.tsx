@@ -93,7 +93,7 @@ export default function RealEstateOverviewPage() {
         <div style={{ background: realEstateBg, border: `1px solid ${realEstateBorder}`, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${realEstateBorder}`, fontSize: 15, fontWeight: 800 }}>Lease Watchlist</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
-            {expiringLeases.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No active leases yet.</div>}
+            {expiringLeases.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No active leases yet.</div>}
             {expiringLeases.map((lease) => (
               <div key={lease.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{lease.tenant}</div>

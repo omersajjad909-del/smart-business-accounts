@@ -108,7 +108,7 @@ export default function WorkOrdersPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Work Orders</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>Assign machines, operators, and execution slots against production orders.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>Assign machines, operators, and execution slots against production orders.</p>
         </div>
         <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           + New Work Order
@@ -123,7 +123,7 @@ export default function WorkOrdersPage() {
           { label: "Completed", value: workOrders.filter((item) => item.status === "completed").length, color: "var(--tx-22c55e, #22c55e)" },
         ].map((card) => (
           <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.48)", marginBottom: 6 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-48, .48))", marginBottom: 6 }}>{card.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -134,7 +134,7 @@ export default function WorkOrdersPage() {
           <thead>
             <tr>
               {["Work Order", "Task", "Linked Production", "Machine", "Operator", "Hours", "Priority", "Status", "Action"].map((head) => (
-                <th key={head} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>
+                <th key={head} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>
                   {head}
                 </th>
               ))}
@@ -143,9 +143,9 @@ export default function WorkOrdersPage() {
           <tbody>
             {workOrders.map((order) => (
               <tr key={order.id}>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "rgba(var(--ink),.48)" }}>{order.workOrderId}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-48, .48))" }}>{order.workOrderId}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{order.title}</td>
-                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "rgba(var(--ink),.55)" }}>{order.linkedProductionOrderId || "Standalone"}</td>
+                <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-55, .55))" }}>{order.linkedProductionOrderId || "Standalone"}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.machine}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.operator}</td>
                 <td style={{ padding: isMobile ? "12px 10px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{order.estimatedHours}h</td>
@@ -175,7 +175,7 @@ export default function WorkOrdersPage() {
             ))}
             {!workStore.loading && workOrders.length === 0 && (
               <tr>
-                <td colSpan={9} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
+                <td colSpan={9} style={{ padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>
                   No work orders yet.
                 </td>
               </tr>
@@ -191,11 +191,11 @@ export default function WorkOrdersPage() {
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Task / Operation</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Task / Operation</label>
                 <input value={form.title} onChange={(e) => setForm((current) => ({ ...current, title: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Linked Production Order</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Linked Production Order</label>
                 <select value={form.linkedProductionOrderId} onChange={(e) => setForm((current) => ({ ...current, linkedProductionOrderId: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)" }}>
                   <option value="">Standalone</option>
                   {productionOrders.map((order) => (
@@ -204,19 +204,19 @@ export default function WorkOrdersPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Machine / Equipment</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Machine / Equipment</label>
                 <input value={form.machine} onChange={(e) => setForm((current) => ({ ...current, machine: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Operator</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Operator</label>
                 <input value={form.operator} onChange={(e) => setForm((current) => ({ ...current, operator: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Scheduled Date</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Scheduled Date</label>
                 <input type="date" value={form.scheduledDate} onChange={(e) => setForm((current) => ({ ...current, scheduledDate: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Priority</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Priority</label>
                 <select value={form.priority} onChange={(e) => setForm((current) => ({ ...current, priority: e.target.value }))} style={{ width: "100%", background: "var(--dk-161b27, #161b27)", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "var(--ink-solid, #fff)" }}>
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
@@ -224,13 +224,13 @@ export default function WorkOrdersPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>Estimated Hours</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>Estimated Hours</label>
                 <input type="number" value={form.estimatedHours} onChange={(e) => setForm((current) => ({ ...current, estimatedHours: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Create Work Order</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-65, .65))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

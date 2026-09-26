@@ -96,7 +96,7 @@ export default function ChangePasswordPage() {
   const labelStyle: React.CSSProperties = {
     fontSize: "11px",
     fontWeight: 700,
-    color: "rgba(var(--ink),.4)",
+    color: "rgba(var(--ink),var(--ta-40, .4))",
     textTransform: "uppercase",
     letterSpacing: ".08em",
     marginBottom: "8px",
@@ -110,7 +110,7 @@ export default function ChangePasswordPage() {
         alignItems: "center",
         gap: "8px",
         fontSize: "13px",
-        color: met ? "var(--tx-86efac, #86efac)" : "rgba(var(--ink),.4)",
+        color: met ? "var(--tx-86efac, #86efac)" : "rgba(var(--ink),var(--ta-40, .4))",
         marginBottom: "6px",
         transition: "color .2s",
       }}
@@ -158,7 +158,7 @@ export default function ChangePasswordPage() {
         <p
           style={{
             fontSize: "14px",
-            color: "rgba(var(--ink),.5)",
+            color: "rgba(var(--ink),var(--ta-50, .5))",
             lineHeight: "1.6",
           }}
         >
@@ -239,7 +239,7 @@ export default function ChangePasswordPage() {
                   transform: "translateY(-50%)",
                   background: "none",
                   border: "none",
-                  color: "rgba(var(--ink),.4)",
+                  color: "rgba(var(--ink),var(--ta-40, .4))",
                   cursor: "pointer",
                   fontSize: "14px",
                   padding: "4px 8px",
@@ -284,7 +284,7 @@ export default function ChangePasswordPage() {
                   transform: "translateY(-50%)",
                   background: "none",
                   border: "none",
-                  color: "rgba(var(--ink),.4)",
+                  color: "rgba(var(--ink),var(--ta-40, .4))",
                   cursor: "pointer",
                   fontSize: "14px",
                   padding: "4px 8px",
@@ -309,7 +309,7 @@ export default function ChangePasswordPage() {
                   style={{
                     fontSize: "10px",
                     fontWeight: 700,
-                    color: "rgba(var(--ink),.35)",
+                    color: "rgba(var(--ink),var(--ta-35, .35))",
                     textTransform: "uppercase",
                     letterSpacing: ".06em",
                     marginBottom: "8px",
@@ -364,7 +364,7 @@ export default function ChangePasswordPage() {
                   transform: "translateY(-50%)",
                   background: "none",
                   border: "none",
-                  color: "rgba(var(--ink),.4)",
+                  color: "rgba(var(--ink),var(--ta-40, .4))",
                   cursor: "pointer",
                   fontSize: "14px",
                   padding: "4px 8px",
@@ -449,7 +449,7 @@ export default function ChangePasswordPage() {
         <p
           style={{
             fontSize: "13px",
-            color: "rgba(var(--ink),.6)",
+            color: "rgba(var(--ink),var(--ta-60, .6))",
             marginBottom: "10px",
             lineHeight: "1.5",
           }}
@@ -501,7 +501,7 @@ export default function ChangePasswordPage() {
         <div
           style={{
             fontSize: "12px",
-            color: "rgba(var(--ink),.5)",
+            color: "rgba(var(--ink),var(--ta-50, .5))",
             lineHeight: "1.6",
           }}
         >

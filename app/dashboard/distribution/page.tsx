@@ -26,7 +26,7 @@ export default function DistributionOverviewPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Distribution Command Center</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.45)", margin: 0 }}>Routes, deliveries, van sales, and collections in one view.</p>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: 0 }}>Routes, deliveries, van sales, and collections in one view.</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
@@ -52,7 +52,7 @@ export default function DistributionOverviewPage() {
           { label: "Recovery", value: `${summary.recoveryRate}%`, color: "var(--tx-a78bfa, #a78bfa)" },
         ].map((card) => (
           <div key={card.label} style={{ background: distributionBg, border: `1px solid ${distributionBorder}`, borderRadius: 12, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 8 }}>{card.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 8 }}>{card.label}</div>
             <div style={{ fontSize: 22, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
         ))}
@@ -63,7 +63,7 @@ export default function DistributionOverviewPage() {
           <thead>
             <tr>
               {["Route", "Area", "Driver", "Deliveries", "Delivered", "Failed", "Revenue", "Collected", "Recovery"].map((header) => (
-                <th key={header} style={{ textAlign: "left", padding: isMobile ? "8px 8px" : "12px 16px", fontSize: 12, color: "rgba(var(--ink),.5)", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
+                <th key={header} style={{ textAlign: "left", padding: isMobile ? "8px 8px" : "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", borderBottom: `1px solid ${distributionBorder}`, fontWeight: 600 }}>
                   {header}
                 </th>
               ))}
@@ -83,7 +83,7 @@ export default function DistributionOverviewPage() {
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", color: metric.recoveryRate >= 80 ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f59e0b, #f59e0b)", fontWeight: 700 }}>{metric.recoveryRate}%</td>
               </tr>
             ))}
-            {routeMetrics.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No route metrics available yet.</td></tr>}
+            {routeMetrics.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No route metrics available yet.</td></tr>}
           </tbody>
         </table>
       </div>

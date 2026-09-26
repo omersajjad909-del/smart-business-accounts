@@ -155,7 +155,7 @@ export default function SubscriptionsOverviewPage() {
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(147,197,253,.16)", color: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(var(--ink),.62)" }}>{step.body}</div>
+                <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(var(--ink),var(--ta-62, .62))" }}>{step.body}</div>
               </div>
             ))}
           </div>
@@ -188,7 +188,7 @@ export default function SubscriptionsOverviewPage() {
                   <div style={{ fontSize: 12, color: saasMuted, marginTop: 4 }}>{item.planName} | Renewal {item.renewalDate || "-"}</div>
                 </div>
               ))}
-              {subscribers.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No subscriber records yet.</div>}
+              {subscribers.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No subscriber records yet.</div>}
             </div>
           </div>
         </div>

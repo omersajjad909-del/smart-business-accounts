@@ -157,14 +157,14 @@ export default function TravelOverviewPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 18, flexWrap: "wrap", marginBottom: 20 }}>
         <div>
           <h1 style={{ margin: "0 0 5px", fontSize: 23, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>Travel</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.42)" }}>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
             What is left to sell, who owes money, and what is about to go wrong.
           </p>
         </div>
         <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
           {LINKS.map((l) => (
             <Link key={l.href} prefetch={false} href={l.href}
-              style={{ padding: "8px 13px", borderRadius: 9, border: `1px solid ${border}`, background: bg, color: "rgba(var(--ink),.62)", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+              style={{ padding: "8px 13px", borderRadius: 9, border: `1px solid ${border}`, background: bg, color: "rgba(var(--ink),var(--ta-62, .62))", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {l.label}
             </Link>
           ))}
@@ -174,7 +174,7 @@ export default function TravelOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {cards.map((c) => (
           <div key={c.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "13px 12px" : "17px 19px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6 }}>{c.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6 }}>{c.label}</div>
             <div style={{ fontSize: 21, fontWeight: 800, color: c.colour }}>{c.value}</div>
           </div>
         ))}
@@ -186,7 +186,7 @@ export default function TravelOverviewPage() {
           <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)", marginBottom: 4 }}>
             Flying soon, not ready
           </div>
-          <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 13 }}>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 13 }}>
             A balance or a missing passport is cheap to fix now and very expensive the week they fly.
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -194,7 +194,7 @@ export default function TravelOverviewPage() {
               <div key={a.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", paddingBottom: 9, borderBottom: `1px solid ${border}` }}>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink-solid, #fff)" }}>{a.name}</div>
-                  <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.42)", marginTop: 2 }}>
+                  <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 2 }}>
                     {a.departure} · {a.reasons.join(" · ")}
                   </div>
                 </div>
@@ -205,7 +205,7 @@ export default function TravelOverviewPage() {
             ))}
           </div>
           {attention.length > 8 && (
-            <div style={{ marginTop: 10, fontSize: 12, color: "rgba(var(--ink),.4)" }}>
+            <div style={{ marginTop: 10, fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
               and {attention.length - 8} more —{" "}
               <Link href="/dashboard/travel/bookings" style={{ color: accent }}>open bookings</Link>
             </div>
@@ -213,7 +213,7 @@ export default function TravelOverviewPage() {
         </div>
       )}
 
-      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(var(--ink),.4)", marginBottom: 10 }}>
+      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 10 }}>
         Next departures
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -228,7 +228,7 @@ export default function TravelOverviewPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap" }}>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>{x.d.title || "—"}</div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 3 }}>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 3 }}>
                     {x.d.departureDate || "no date"}
                     {Number.isFinite(days) && days >= 0 ? ` · in ${days} day${days === 1 ? "" : "s"}` : ""}
                     {" · "}{x.d.legs.filter((l) => l.nights > 0).map((l) => `${l.city} ${l.nights}`).join(" → ") || "no legs"}
@@ -238,14 +238,14 @@ export default function TravelOverviewPage() {
                   <div style={{ fontSize: 15, fontWeight: 800, color: seats.left === 0 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-22c55e, #22c55e)" }}>
                     {seats.over > 0 ? `${seats.over} over` : `${seats.left} left`}
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>{seats.sold} of {seats.quota} sold</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{seats.sold} of {seats.quota} sold</div>
                 </div>
               </div>
               <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 200px", minWidth: 150, background: "rgba(var(--ink),.07)", height: 6, borderRadius: 999, overflow: "hidden" }}>
                   <div style={{ width: `${seats.percent}%`, height: "100%", background: seats.over > 0 ? "#ef4444" : seats.percent >= 90 ? "#fbbf24" : "#22c55e" }} />
                 </div>
-                <span style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>
+                <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>
                   collected <strong style={{ color: "var(--tx-34d399, #34d399)" }}>{collected.toLocaleString()}</strong>
                   {owed > 0 ? <> · owed <strong style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>{owed.toLocaleString()}</strong></> : null}
                 </span>
@@ -254,7 +254,7 @@ export default function TravelOverviewPage() {
           );
         })}
         {!departuresStore.loading && upcoming.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13 }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 36, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>
             No departures ahead.{" "}
             <Link href="/dashboard/travel/departures" style={{ color: accent }}>Create one</Link>.
           </div>
@@ -265,7 +265,7 @@ export default function TravelOverviewPage() {
           the next departure from. */}
       {bookings.length > 0 && (
         <>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(var(--ink),.4)", margin: "22px 0 10px" }}>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-40, .4))", margin: "22px 0 10px" }}>
             What is selling
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -273,7 +273,7 @@ export default function TravelOverviewPage() {
               const mine = bookings.filter((r) => r.b.occupancy === occ);
               const pax = mine.reduce((s, r) => s + r.money.pax, 0);
               return (
-                <span key={occ} style={{ fontSize: 12.5, padding: "7px 14px", borderRadius: 999, background: bg, border: `1px solid ${border}`, color: "rgba(var(--ink),.62)" }}>
+                <span key={occ} style={{ fontSize: 12.5, padding: "7px 14px", borderRadius: 999, background: bg, border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-62, .62))" }}>
                   {occupancyName(occ)} <strong style={{ color: "var(--ink-solid, #fff)" }}>{pax}</strong> pax
                 </span>
               );

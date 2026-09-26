@@ -55,10 +55,10 @@ function evRunQuery(vouchers: ExpenseVoucher[], vNo: string, dateQ: string, desc
 }
 
 const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
-  DRAFT:    { bg: "rgba(148,163,184,0.15)", text: "#94a3b8" },
-  PENDING:  { bg: "rgba(251,191,36,0.15)",  text: "#fbbf24" },
-  APPROVED: { bg: "rgba(34,197,94,0.15)",   text: "#22c55e" },
-  REJECTED: { bg: "rgba(248,113,113,0.15)", text: "#f87171" },
+  DRAFT:    { bg: "rgba(148,163,184,0.15)", text: "var(--tx-94a3b8, #94a3b8)" },
+  PENDING:  { bg: "rgba(251,191,36,0.15)",  text: "var(--tx-fbbf24, #fbbf24)" },
+  APPROVED: { bg: "rgba(34,197,94,0.15)",   text: "var(--tx-22c55e, #22c55e)" },
+  REJECTED: { bg: "rgba(248,113,113,0.15)", text: "var(--tx-f87171, #f87171)" },
 };
 
 const CATEGORIES = ["TRAVEL","FOOD","SUPPLIES","UTILITIES","OTHER"];
@@ -227,9 +227,9 @@ export default function ExpenseVouchersPage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {queryIdx >= 0 && !queryMode && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.2)", borderRadius: 10, padding: "6px 12px" }}>
-              <button onClick={() => evNavTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===0?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
+              <button onClick={() => evNavTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===0?"rgba(var(--ink),var(--ta-20, .2))":"rgba(var(--ink),var(--ta-70, .7))", fontSize: 13, cursor: queryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
               <span style={{ fontSize: 12, color: accent, fontWeight: 700, minWidth: 80, textAlign: "center" }}>{queryResults[queryIdx]?.voucherNo} · {queryIdx+1}/{queryResults.length}</span>
-              <button onClick={() => evNavTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===queryResults.length-1?"rgba(var(--ink),.2)":"rgba(var(--ink),.7)", fontSize: 13, cursor: queryIdx===queryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
+              <button onClick={() => evNavTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: queryIdx===queryResults.length-1?"rgba(var(--ink),var(--ta-20, .2))":"rgba(var(--ink),var(--ta-70, .7))", fontSize: 13, cursor: queryIdx===queryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
               <button onClick={evExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
             </div>
           )}

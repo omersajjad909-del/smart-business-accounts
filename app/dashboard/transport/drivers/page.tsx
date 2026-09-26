@@ -82,7 +82,7 @@ export default function DriversPage() {
       {loading && <div style={{ textAlign: "center", padding: 40, color: transportMuted }}>Loading...</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 16 }}>
-        {!loading && drivers.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),.25)" }}>No drivers found.</div>}
+        {!loading && drivers.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-25, .25))" }}>No drivers found.</div>}
         {drivers.map((d) => {
           const days = daysTo(d.licenseExpiry);
           const expired = days < 0;

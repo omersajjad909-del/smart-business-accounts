@@ -196,7 +196,7 @@ export default function TransportExpensesPage() {
       </div>
 
       <div style={{ display: "grid", gap: 12 }}>
-        {!expenseStore.loading && expenses.length === 0 && <div style={{ ...card, textAlign: "center", color: "rgba(var(--ink),.28)" }}>No transport expenses logged yet.</div>}
+        {!expenseStore.loading && expenses.length === 0 && <div style={{ ...card, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>No transport expenses logged yet.</div>}
         {expenses.map((row) => (
           <div key={row.id} style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
@@ -207,7 +207,7 @@ export default function TransportExpensesPage() {
                     {row.status}
                   </span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),.62)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, fontSize: 13, color: "rgba(var(--ink),var(--ta-62, .62))" }}>
                   <div>Vehicle: {row.vehicle || "-"}</div>
                   <div>Driver: {row.driver || "-"}</div>
                   <div>Trip: {row.tripNo || "-"}</div>
@@ -221,7 +221,7 @@ export default function TransportExpensesPage() {
                 <button onClick={() => editRow(row.id)} style={{ background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#c7d2fe", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Edit</button>
                 {row.status === "logged" && <button onClick={() => void moveStatus(row.id, "approved")} style={{ background: "rgba(245,158,11,.16)", border: "1px solid rgba(245,158,11,.25)", color: "#fcd34d", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Approve</button>}
                 {row.status === "approved" && <button onClick={() => void moveStatus(row.id, "posted")} style={{ background: "rgba(34,197,94,.16)", border: "1px solid rgba(34,197,94,.25)", color: "#86efac", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Post</button>}
-                <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),.68)", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
+                <button onClick={() => void removeRow(row.id)} style={{ background: "transparent", border: `1px solid ${transportBorder}`, color: "rgba(var(--ink),var(--ta-68, .68))", borderRadius: 8, padding: "8px 10px", fontSize: 12, cursor: "pointer" }}>Delete</button>
               </div>
             </div>
           </div>
@@ -284,7 +284,7 @@ export default function TransportExpensesPage() {
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
               <button onClick={() => void saveExpense()} style={{ flex: 1, background: "#dc2626", border: "none", borderRadius: 8, padding: "11px 0", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save Expense</button>
-              <button onClick={closeModal} style={{ padding: "11px 20px", borderRadius: 8, border: `1px solid ${transportBorder}`, background: "transparent", color: "rgba(var(--ink),.7)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={closeModal} style={{ padding: "11px 20px", borderRadius: 8, border: `1px solid ${transportBorder}`, background: "transparent", color: "rgba(var(--ink),var(--ta-70, .7))", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>

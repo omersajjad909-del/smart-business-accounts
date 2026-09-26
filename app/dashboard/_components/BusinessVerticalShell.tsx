@@ -31,7 +31,7 @@ export function BusinessVerticalShell({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>{title}</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),.45)" }}>{subtitle}</p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{subtitle}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {links.map((item) => (
@@ -58,9 +58,9 @@ export function BusinessVerticalShell({
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {highlights.map((card) => (
           <div key={card.title} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: "18px 20px" }}>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 8 }}>{mode === "overview" ? "Module Focus" : "Analytics Focus"}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 8 }}>{mode === "overview" ? "Module Focus" : "Analytics Focus"}</div>
             <div style={{ fontSize: 18, fontWeight: 800, color: accent, marginBottom: 8 }}>{card.title}</div>
-            <div style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(var(--ink),.55)" }}>{card.description}</div>
+            <div style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(var(--ink),var(--ta-55, .55))" }}>{card.description}</div>
           </div>
         ))}
       </div>
@@ -74,7 +74,7 @@ export function BusinessVerticalShell({
             {highlights.map((item) => (
               <div key={item.title} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.title}</div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.45)", marginTop: 6, lineHeight: 1.6 }}>{item.description}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginTop: 6, lineHeight: 1.6 }}>{item.description}</div>
               </div>
             ))}
           </div>
@@ -90,7 +90,7 @@ export function BusinessVerticalShell({
                 <div style={{ width: 22, height: 22, borderRadius: "50%", background: `${accent}22`, color: accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>
                   {index + 1}
                 </div>
-                <div style={{ fontSize: 13, color: "rgba(var(--ink),.72)", lineHeight: 1.55 }}>{step}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.55 }}>{step}</div>
               </div>
             ))}
           </div>

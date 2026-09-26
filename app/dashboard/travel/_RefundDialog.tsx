@@ -25,7 +25,7 @@ import { quoteRefund } from "@/lib/travelRefundMath";
 
 const ff = "'Outfit','Inter',sans-serif";
 const border = "rgba(var(--ink),0.09)";
-const panel = "#161b27";
+const panel = "var(--dk-161b27, #161b27)";
 
 export type RefundTarget = {
   id: string;
@@ -42,7 +42,7 @@ const field: React.CSSProperties = {
   fontFamily: "inherit", boxSizing: "border-box",
 };
 const label: React.CSSProperties = {
-  display: "block", fontSize: 12, color: "rgba(var(--ink),.45)", marginBottom: 6,
+  display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 6,
 };
 
 export function RefundDialog({
@@ -106,9 +106,9 @@ export function RefundDialog({
 
   const row = (name: string, value: number, colour: string, note?: string) => (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, padding: "5px 0" }}>
-      <span style={{ fontSize: 12.5, color: "rgba(var(--ink),.55)" }}>
+      <span style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))" }}>
         {name}
-        {note && <span style={{ color: "rgba(var(--ink),.3)", marginLeft: 6 }}>{note}</span>}
+        {note && <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 6 }}>{note}</span>}
       </span>
       <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: colour, whiteSpace: "nowrap" }}>
         {value.toLocaleString()}
@@ -128,7 +128,7 @@ export function RefundDialog({
         <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>
           {isVoid ? "Void" : "Refund"} {target.label}
         </h2>
-        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.42)", marginBottom: 18, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-42, .42))", marginBottom: 18, lineHeight: 1.6 }}>
           Sold for {target.saleAmount.toLocaleString()}, supplier owed {target.costAmount.toLocaleString()}.
           A credit note posts against the sale and the supplier payable falls to whatever the airline keeps.
           Nothing is deleted.
@@ -207,7 +207,7 @@ export function RefundDialog({
           <button
             onClick={onClose}
             disabled={busy}
-            style={{ padding: "11px 22px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.65)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}
+            style={{ padding: "11px 22px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}
           >
             Cancel
           </button>

@@ -16,12 +16,12 @@ const emptyState: HotelControlCenter = {
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  available:   { bg: "#16a34a", text: "#fff",     label: "AVAILABLE" },
-  occupied:    { bg: "#dc2626", text: "#fff",     label: "OCCUPIED" },
-  reserved:    { bg: "#ca8a04", text: "#fff",     label: "RESERVED" },
-  cleaning:    { bg: "#0891b2", text: "#fff",     label: "CLEANING" },
-  maintenance: { bg: "#ea580c", text: "#fff",     label: "MAINT" },
-  blocked:     { bg: "#374151", text: "#9ca3af",  label: "BLOCKED" },
+  available:   { bg: "#16a34a", text: "var(--ink-solid, #fff)",     label: "AVAILABLE" },
+  occupied:    { bg: "#dc2626", text: "var(--ink-solid, #fff)",     label: "OCCUPIED" },
+  reserved:    { bg: "#ca8a04", text: "var(--ink-solid, #fff)",     label: "RESERVED" },
+  cleaning:    { bg: "#0891b2", text: "var(--ink-solid, #fff)",     label: "CLEANING" },
+  maintenance: { bg: "#ea580c", text: "var(--ink-solid, #fff)",     label: "MAINT" },
+  blocked:     { bg: "#374151", text: "var(--tx-9ca3af, #9ca3af)",  label: "BLOCKED" },
 };
 
 export default function HotelOverviewPage() {

@@ -115,7 +115,7 @@ export default function ConstructionExpensesPage() {
                 </td>
               </tr>
             ))}
-            {!loading && expenses.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No expenses yet.</td></tr>}
+            {!loading && expenses.length === 0 && <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No expenses yet.</td></tr>}
           </tbody>
         </table>
       </div>

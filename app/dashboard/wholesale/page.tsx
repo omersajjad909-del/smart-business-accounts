@@ -161,7 +161,7 @@ function StatCard({ label, value, tone, sub }: { label: string; value: string | 
     <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 18, padding: isMobile ? "12px 10px" : "20px 22px" }}>
       <div style={{ fontSize: 12, color: wholesaleMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
-      {sub ? <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 8 }}>{sub}</div> : null}
+      {sub ? <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 8 }}>{sub}</div> : null}
     </div>
   );
 }
@@ -260,7 +260,7 @@ export default function WholesaleDashboard() {
                   {index + 1}
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
-                <div style={{ fontSize: 13, color: "rgba(var(--ink),.62)", lineHeight: 1.55 }}>{step.body}</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-62, .62))", lineHeight: 1.55 }}>{step.body}</div>
               </div>
             ))}
           </div>

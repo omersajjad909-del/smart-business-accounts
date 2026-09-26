@@ -77,15 +77,15 @@ export default function FuelPage() {
 
       {sortedDates.length > 0 && (
         <div style={{ ...card, marginBottom: 24 }}>
-          <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "rgba(var(--ink),.7)" }}>Daily Fuel Cost (Rs.)</h3>
+          <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "rgba(var(--ink),var(--ta-70, .7))" }}>Daily Fuel Cost (Rs.)</h3>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 80 }}>
             {sortedDates.map((date) => {
               const h = (byDate[date] / maxBar) * 70;
               return (
                 <div key={date} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ fontSize: 9, color: "rgba(var(--ink),.4)" }}>{(byDate[date] / 1000).toFixed(0)}k</div>
+                  <div style={{ fontSize: 9, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{(byDate[date] / 1000).toFixed(0)}k</div>
                   <div style={{ width: "100%", height: h, background: "linear-gradient(to top,#2563eb,#60a5fa)", borderRadius: "4px 4px 0 0" }} />
-                  <div style={{ fontSize: 9, color: "rgba(var(--ink),.4)", transform: "rotate(-30deg)", transformOrigin: "top left", marginTop: 4 }}>{date.slice(5)}</div>
+                  <div style={{ fontSize: 9, color: "rgba(var(--ink),var(--ta-40, .4))", transform: "rotate(-30deg)", transformOrigin: "top left", marginTop: 4 }}>{date.slice(5)}</div>
                 </div>
               );
             })}
@@ -94,11 +94,11 @@ export default function FuelPage() {
       )}
 
       <div style={{ ...card }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "rgba(var(--ink),.7)" }}>Fuel Log</h3>
+        <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "rgba(var(--ink),var(--ta-70, .7))" }}>Fuel Log</h3>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
-              <tr style={{ color: "rgba(var(--ink),.4)" }}>
+              <tr style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                 {["Vehicle", "Driver", "Date", "Fuel Type", "Liters", "Price/L", "Total", "Station", "Mileage"].map((h) => (
                   <th key={h} style={{ textAlign: "left", padding: "8px 12px", borderBottom: `1px solid ${transportBorder}`, fontWeight: 500 }}>{h}</th>
                 ))}
@@ -106,20 +106,20 @@ export default function FuelPage() {
             </thead>
             <tbody>
               {!loading && fuelRecords.length === 0 && (
-                <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No fuel records found.</td></tr>
+                <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No fuel records found.</td></tr>
               )}
               {fuelRecords.map((r) => (
                 <tr key={r.id} style={{ borderBottom: `1px solid ${transportBorder}` }}>
                   <td style={{ padding: "10px 12px", fontWeight: 600 }}>{r.vehicle}</td>
-                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),.6)" }}>{r.driver}</td>
-                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),.6)" }}>{r.date}</td>
+                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>{r.driver}</td>
+                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>{r.date}</td>
                   <td style={{ padding: "10px 12px" }}>
                     <span style={{ background: `${ftColor[r.fuelType] || "#6b7280"}22`, color: ftColor[r.fuelType] || "#6b7280", borderRadius: 20, padding: "2px 8px", fontSize: 11, fontWeight: 600, textTransform: "uppercase" }}>{r.fuelType}</span>
                   </td>
                   <td style={{ padding: "10px 12px" }}>{r.liters} L</td>
-                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),.6)" }}>Rs. {r.pricePerLiter}</td>
+                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>Rs. {r.pricePerLiter}</td>
                   <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--tx-ef4444, #ef4444)" }}>Rs. {r.totalCost.toLocaleString()}</td>
-                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),.6)", fontSize: 12 }}>{r.station || "-"}</td>
+                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 12 }}>{r.station || "-"}</td>
                   <td style={{ padding: "10px 12px", color: r.mileage && r.mileage < 8 ? "var(--tx-ef4444, #ef4444)" : "var(--tx-22c55e, #22c55e)" }}>{r.mileage ? `${r.mileage} km/L` : "-"}</td>
                 </tr>
               ))}

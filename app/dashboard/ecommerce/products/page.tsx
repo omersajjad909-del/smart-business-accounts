@@ -146,7 +146,7 @@ export default function EcommerceProductsPage() {
               ))}
               {!products.length && (
                 <tr>
-                  <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
+                  <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>
                     The catalog is currently empty. Add your first product.
                   </td>
                 </tr>
@@ -192,7 +192,7 @@ export default function EcommerceProductsPage() {
               <button onClick={save} disabled={saving} style={{ flex: 1, padding: "11px 0", background: "#6366f1", border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Saving..." : "Add Product"}
               </button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${ecommerceBorder}`, borderRadius: 10, color: "rgba(var(--ink),.65)", fontSize: 14, cursor: "pointer" }}>
+              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${ecommerceBorder}`, borderRadius: 10, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 14, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>

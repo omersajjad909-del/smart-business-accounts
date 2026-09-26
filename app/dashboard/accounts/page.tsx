@@ -25,19 +25,19 @@ const PREFIX_MAP: Record<string, string> = {
 };
 
 const CATEGORY_COLOR: Record<string, { bg: string; text: string }> = {
-  CUSTOMER:    { bg: "rgba(99,102,241,0.15)",  text: "#818cf8" },
-  SUPPLIER:    { bg: "rgba(251,146,60,0.15)",  text: "#fb923c" },
-  BANKS:       { bg: "rgba(52,211,153,0.15)",  text: "#34d399" },
-  CASH:        { bg: "rgba(45,212,191,0.15)",  text: "#2dd4bf" },
-  EXPENSE:     { bg: "rgba(248,113,113,0.15)", text: "#f87171" },
-  INCOME:      { bg: "rgba(74,222,128,0.15)",  text: "#4ade80" },
-  EQUITY:      { bg: "rgba(167,139,250,0.15)", text: "#a78bfa" },
-  LIABILITIES: { bg: "rgba(251,191,36,0.15)",  text: "#fbbf24" },
-  "FIXED ASSETS": { bg: "rgba(56,189,248,0.15)", text: "#38bdf8" },
-  STOCK:       { bg: "rgba(129,140,248,0.15)", text: "#818cf8" },
-  GENERAL:     { bg: "rgba(148,163,184,0.15)", text: "#94a3b8" },
-  CONTRA:      { bg: "rgba(244,114,182,0.15)", text: "#f472b6" },
-  "ACCUMULATED DEPRECIATION": { bg: "rgba(248,113,113,0.15)", text: "#f87171" },
+  CUSTOMER:    { bg: "rgba(99,102,241,0.15)",  text: "var(--tx-818cf8, #818cf8)" },
+  SUPPLIER:    { bg: "rgba(251,146,60,0.15)",  text: "var(--tx-fb923c, #fb923c)" },
+  BANKS:       { bg: "rgba(52,211,153,0.15)",  text: "var(--tx-34d399, #34d399)" },
+  CASH:        { bg: "rgba(45,212,191,0.15)",  text: "var(--tx-2dd4bf, #2dd4bf)" },
+  EXPENSE:     { bg: "rgba(248,113,113,0.15)", text: "var(--tx-f87171, #f87171)" },
+  INCOME:      { bg: "rgba(74,222,128,0.15)",  text: "var(--tx-4ade80, #4ade80)" },
+  EQUITY:      { bg: "rgba(167,139,250,0.15)", text: "var(--tx-a78bfa, #a78bfa)" },
+  LIABILITIES: { bg: "rgba(251,191,36,0.15)",  text: "var(--tx-fbbf24, #fbbf24)" },
+  "FIXED ASSETS": { bg: "rgba(56,189,248,0.15)", text: "var(--tx-38bdf8, #38bdf8)" },
+  STOCK:       { bg: "rgba(129,140,248,0.15)", text: "var(--tx-818cf8, #818cf8)" },
+  GENERAL:     { bg: "rgba(148,163,184,0.15)", text: "var(--tx-94a3b8, #94a3b8)" },
+  CONTRA:      { bg: "rgba(244,114,182,0.15)", text: "var(--tx-f472b6, #f472b6)" },
+  "ACCUMULATED DEPRECIATION": { bg: "rgba(248,113,113,0.15)", text: "var(--tx-f87171, #f87171)" },
 };
 
 const CATEGORIES = [

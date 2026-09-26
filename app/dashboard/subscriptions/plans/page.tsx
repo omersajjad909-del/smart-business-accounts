@@ -98,7 +98,7 @@ export default function SubscriptionPlansPage() {
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "12px 10px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Plan Catalog</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
-            {!loading && plans.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No plans yet.</div>}
+            {!loading && plans.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No plans yet.</div>}
             {plans.map((plan) => (
               <div key={plan.id} style={{ border: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.03)", borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>

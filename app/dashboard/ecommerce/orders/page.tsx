@@ -206,7 +206,7 @@ export default function EcommerceOrdersPage() {
               ))}
               {!orders.length && (
                 <tr>
-                  <td colSpan={9} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
+                  <td colSpan={9} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>
                     No orders have been created yet.
                   </td>
                 </tr>
@@ -313,7 +313,7 @@ const secondaryButton: CSSProperties = {
   background: "transparent",
   border: `1px solid ${ecommerceBorder}`,
   borderRadius: 10,
-  color: "rgba(var(--ink),.65)",
+  color: "rgba(var(--ink),var(--ta-65, .65))",
   fontSize: 14,
   cursor: "pointer",
 };

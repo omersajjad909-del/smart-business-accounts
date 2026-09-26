@@ -29,7 +29,7 @@ const field: React.CSSProperties = {
 };
 
 const label: React.CSSProperties = {
-  display: "block", fontSize: 11.5, color: "rgba(var(--ink),.5)", marginBottom: 5,
+  display: "block", fontSize: 11.5, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 5,
 };
 
 export default function DangerZonePage() {
@@ -133,7 +133,7 @@ export default function DangerZonePage() {
   return (
     <div style={{ fontFamily: ff, color: "var(--ink-solid, #fff)", padding: isMobile ? "16px 12px 80px" : "24px 28px 80px", maxWidth: 760, margin: "0 auto" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Danger Zone</h1>
-      <p style={{ fontSize: 13.5, color: "rgba(var(--ink),.45)", margin: 0, maxWidth: 620, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-45, .45))", margin: 0, maxWidth: 620, lineHeight: 1.6 }}>
         Actions here cannot be undone. Read each one carefully before continuing.
       </p>
 
@@ -150,24 +150,24 @@ export default function DangerZonePage() {
       )}
 
       {loading ? (
-        <div style={{ marginTop: 24, color: "rgba(var(--ink),.3)", fontSize: 13 }}>Loading…</div>
+        <div style={{ marginTop: 24, color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>Loading…</div>
       ) : (
         <div style={{ marginTop: 18, background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: isMobile ? "16px 14px" : "20px 22px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
             <div style={{ maxWidth: 480 }}>
               <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Reset All System</div>
-              <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", margin: "6px 0 0", lineHeight: 1.7 }}>
+              <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", margin: "6px 0 0", lineHeight: 1.7 }}>
                 Permanently deletes every invoice, voucher, ledger entry, contact, employee, bank
                 account and record this company has ever entered. Your login, the company itself
                 and its subscription are kept — this only empties what is inside.
               </p>
-              <p style={{ fontSize: 12, color: "rgba(var(--ink),.35)", margin: "8px 0 0", lineHeight: 1.7 }}>
+              <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", margin: "8px 0 0", lineHeight: 1.7 }}>
                 Needs your password, the company name, and a code sent to your email before
                 anything is deleted.
               </p>
             </div>
             {!isAdmin ? (
-              <div style={{ fontSize: 12, color: "rgba(var(--ink),.4)", whiteSpace: "nowrap" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", whiteSpace: "nowrap" }}>
                 Only an admin can do this
               </div>
             ) : (
@@ -202,14 +202,14 @@ export default function DangerZonePage() {
               boxShadow: "0 20px 60px rgba(0,0,0,.5)",
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),.3)", textTransform: "uppercase", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase", marginBottom: 6 }}>
               Step {step === "credentials" ? "1" : "2"} of 2
             </div>
 
             {step === "credentials" ? (
               <>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Reset all system data?</div>
-                <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
+                <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", margin: "8px 0 16px", lineHeight: 1.7 }}>
                   This deletes everything this company has recorded, and it cannot be undone.
                   Nothing is deleted yet — confirm your password and the company name, and we will
                   email you a code to finish.
@@ -226,7 +226,7 @@ export default function DangerZonePage() {
             ) : (
               <>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)" }}>Enter the code we emailed you</div>
-                <p style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", margin: "8px 0 16px", lineHeight: 1.7 }}>
+                <p style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", margin: "8px 0 16px", lineHeight: 1.7 }}>
                   A 6-digit code was sent to <strong style={{ color: "var(--ink-solid, #fff)" }}>{sentTo}</strong>. It expires
                   in 15 minutes. <strong style={{ color: "var(--tx-fca5a5, #fca5a5)" }}>Nothing has been deleted yet</strong> —
                   entering this code is what deletes it.
@@ -258,7 +258,7 @@ export default function DangerZonePage() {
                 disabled={submitting}
                 style={{
                   padding: "9px 16px", borderRadius: 9, background: "rgba(var(--ink),.05)",
-                  border: `1px solid ${border}`, color: "rgba(var(--ink),.7)", fontSize: 12.5,
+                  border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-70, .7))", fontSize: 12.5,
                   fontWeight: 700, fontFamily: ff, cursor: submitting ? "not-allowed" : "pointer",
                 }}
               >

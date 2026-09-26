@@ -106,7 +106,7 @@ export default function MembershipContentTiersPage() {
         <div style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 18, overflow: "hidden" }}>
           <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${saasBorder}`, fontSize: 16, fontWeight: 800 }}>Tier Catalog</div>
           <div style={{ display: "grid", gap: 12, padding: 18 }}>
-            {!loading && tiers.length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No content tiers yet.</div>}
+            {!loading && tiers.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No content tiers yet.</div>}
             {tiers.map((tier) => {
               const modules = Array.isArray(tier.data?.modules) ? (tier.data.modules as string[]) : [];
               return (

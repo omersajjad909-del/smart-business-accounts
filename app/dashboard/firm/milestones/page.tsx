@@ -35,7 +35,7 @@ const S = {
   loading: { textAlign: "center" as const, padding: "3rem", color: "var(--text-muted)" },
   btnSm: { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: "6px", padding: "0.3rem 0.7rem", fontFamily: font, fontSize: "0.8rem", cursor: "pointer", marginRight: "0.4rem" },
 };
-const statusColor: Record<string, string> = { Pending: "#f59e0b", Submitted: "#38bdf8", Approved: "#34d399" };
+const statusColor: Record<string, string> = { Pending: "#f59e0b", Submitted: "var(--tx-38bdf8, #38bdf8)", Approved: "#34d399" };
 const badge = (status: string) => ({ display: "inline-block", padding: "0.2rem 0.65rem", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 600, background: (statusColor[status] ?? "#94a3b8") + "22", color: statusColor[status] ?? "#94a3b8" });
 const EMPTY = { project: "", milestone: "", owner: "", dueDate: "", status: "Pending" };
 

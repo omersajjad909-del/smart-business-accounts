@@ -251,10 +251,10 @@ export function SubscriptionReceiptPrinter({
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14 }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, #fff)" }}>{data.planLabel}</div>
-              <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 2 }}>{cycleLabel(data.billingCycle)}</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 2 }}>{cycleLabel(data.billingCycle)}</div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),.32)" }}>Total</div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-32, .32))" }}>Total</div>
               <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink-solid, #fff)", marginTop: 2 }}>{money(data.total, data.currency)}</div>
             </div>
           </div>
@@ -265,13 +265,13 @@ export function SubscriptionReceiptPrinter({
             ) : (
               <span style={{ width: 15, height: 15, borderRadius: "50%", border: "2px solid rgba(var(--ink),.16)", borderTopColor: "#818cf8", animation: "fnvRcptSpin .7s linear infinite", flexShrink: 0 }} />
             )}
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: stage === "done" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.6)" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: stage === "done" ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-60, .6))" }}>
               {statusText}
             </span>
             {stage !== "done" && (
               <button
                 onClick={skip}
-                style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(var(--ink),.35)", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
               >
                 Skip →
               </button>
@@ -283,7 +283,7 @@ export function SubscriptionReceiptPrinter({
         <div className="fnv-receipt-chrome" style={{ width: PAPER_W + 40, maxWidth: "100%", margin: "0 auto", borderRadius: "16px 16px 6px 6px", background: "linear-gradient(180deg,var(--dk-2a2e3a, #2a2e3a),var(--dk-171a23, #171a23))", border: "1px solid rgba(var(--ink),.09)", padding: "14px 20px 12px", boxShadow: "0 22px 50px rgba(0,0,0,.5)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 11 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: stage === "done" ? "#34d399" : "#fbbf24", animation: stage === "done" ? "none" : "fnvRcptLed .8s ease-in-out infinite" }} />
-            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".14em", color: "rgba(var(--ink),.28)", textTransform: "uppercase" }}>
+            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".14em", color: "rgba(var(--ink),var(--ta-28, .28))", textTransform: "uppercase" }}>
               {stage === "done" ? "Ready" : "Printing"}
             </span>
           </div>

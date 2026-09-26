@@ -65,7 +65,7 @@ export default function FundsPage() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:700 }}>Fund Accounting</h1>
-          <p style={{ margin:"4px 0 0", color:"rgba(var(--ink),.5)", fontSize:14 }}>Track funds, receipts & expenditures</p>
+          <p style={{ margin:"4px 0 0", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:14 }}>Track funds, receipts & expenditures</p>
         </div>
         <button onClick={()=>setShowModal(true)} style={btn("#6366f1")}>+ Add Transaction</button>
       </div>
@@ -79,16 +79,16 @@ export default function FundsPage() {
         ].map(s=>(
           <div key={s.label} style={{ ...card, textAlign:"center" }}>
             <div style={{ fontSize:26, fontWeight:700, color:s.color }}>{s.value}</div>
-            <div style={{ color:"rgba(var(--ink),.5)", fontSize:13, marginTop:4 }}>{s.label}</div>
+            <div style={{ color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:13, marginTop:4 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign:"center", padding:40, color:"rgba(var(--ink),.4)" }}>Loading...</div>}
+      {loading && <div style={{ textAlign:"center", padding:40, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Loading...</div>}
 
       {/* Fund Cards */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(380px,1fr))", gap:16, marginBottom:24 }}>
-        {!fundsLoading && funds.length === 0 && <div style={{ ...card, textAlign:"center", padding:40, color:"rgba(var(--ink),.25)" }}>No funds found.</div>}
+        {!fundsLoading && funds.length === 0 && <div style={{ ...card, textAlign:"center", padding:40, color:"rgba(var(--ink),var(--ta-25, .25))" }}>No funds found.</div>}
         {funds.map(f=>{
           const utilPct = f.totalReceived > 0 ? Math.min((f.totalSpent/f.totalReceived)*100, 100) : 0;
           return (
@@ -96,33 +96,33 @@ export default function FundsPage() {
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
                 <div>
                   <div style={{ fontWeight:700, fontSize:15 }}>{f.name}</div>
-                  <div style={{ fontSize:12, color:"rgba(var(--ink),.5)", marginTop:2 }}>{f.purpose}</div>
+                  <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", marginTop:2 }}>{f.purpose}</div>
                 </div>
                 <span style={{ background:f.status==="active"?"rgba(34,197,94,.15)":"rgba(107,114,128,.15)", color:f.status==="active"?"#22c55e":"#6b7280", border:`1px solid ${f.status==="active"?"#22c55e40":"#6b728040"}`, borderRadius:20, padding:"3px 10px", fontSize:12, fontWeight:600 }}>{f.status==="active"?"Active":"Closed"}</span>
               </div>
               <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap:8, marginBottom:12, textAlign:"center" }}>
                 <div>
                   <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-22c55e, #22c55e)" }}>Rs. {(f.balance/1000).toFixed(0)}K</div>
-                  <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>Balance</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Balance</div>
                 </div>
                 <div>
                   <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-3b82f6, #3b82f6)" }}>Rs. {(f.totalReceived/1000).toFixed(0)}K</div>
-                  <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>Received</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Received</div>
                 </div>
                 <div>
                   <div style={{ fontSize:16, fontWeight:700, color:"var(--tx-ef4444, #ef4444)" }}>Rs. {(f.totalSpent/1000).toFixed(0)}K</div>
-                  <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>Spent</div>
+                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Spent</div>
                 </div>
               </div>
               <div style={{ marginBottom:8 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:"rgba(var(--ink),.4)", marginBottom:3 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:3 }}>
                   <span>Utilization</span><span>{utilPct.toFixed(0)}%</span>
                 </div>
                 <div style={{ height:6, background:"rgba(var(--ink),.1)", borderRadius:3, overflow:"hidden" }}>
                   <div style={{ height:"100%", width:`${utilPct}%`, background:utilPct>90?"#ef4444":"#6366f1", borderRadius:3 }} />
                 </div>
               </div>
-              <div style={{ fontSize:12, color:"rgba(var(--ink),.4)" }}>👥 {f.donors} donors</div>
+              <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>👥 {f.donors} donors</div>
             </div>
           );
         })}
@@ -130,8 +130,8 @@ export default function FundsPage() {
 
       {/* Recent Transactions */}
       <div style={{ ...card }}>
-        <h3 style={{ margin:"0 0 16px", fontSize:15, color:"rgba(var(--ink),.7)" }}>Recent Transactions</h3>
-        {!txLoading && transactions.length === 0 && <div style={{ textAlign:"center", padding:20, color:"rgba(var(--ink),.25)" }}>No transactions found.</div>}
+        <h3 style={{ margin:"0 0 16px", fontSize:15, color:"rgba(var(--ink),var(--ta-70, .7))" }}>Recent Transactions</h3>
+        {!txLoading && transactions.length === 0 && <div style={{ textAlign:"center", padding:20, color:"rgba(var(--ink),var(--ta-25, .25))" }}>No transactions found.</div>}
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {transactions.slice(0,8).map(t=>(
             <div key={t.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 14px", background:"rgba(var(--ink),.03)", borderRadius:8, border:`1px solid ${border}` }}>
@@ -140,7 +140,7 @@ export default function FundsPage() {
               </div>
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:13, fontWeight:600 }}>{t.description}</div>
-                <div style={{ fontSize:11, color:"rgba(var(--ink),.4)" }}>{t.fund} · {t.reference} · {t.date}</div>
+                <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-40, .4))" }}>{t.fund} · {t.reference} · {t.date}</div>
               </div>
               <div style={{ fontWeight:700, fontSize:15, color:t.type==="receipt"?"var(--tx-22c55e, #22c55e)":"var(--tx-ef4444, #ef4444)" }}>
                 {t.type==="receipt"?"+":"-"}Rs. {t.amount.toLocaleString()}
@@ -156,21 +156,21 @@ export default function FundsPage() {
             <h2 style={{ margin:"0 0 20px", fontSize:18 }}>Add Transaction</h2>
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               <div>
-                <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Fund</label>
+                <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>Fund</label>
                 <select value={form.fund || (funds[0]?.name || "")} onChange={e=>setForm(p=>({...p,fund:e.target.value}))} style={inp}>
                   {funds.map(f=><option key={f.id} value={f.name}>{f.name}</option>)}
                   {funds.length === 0 && <option value="">No funds available</option>}
                 </select>
               </div>
               <div>
-                <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>Type</label>
+                <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>Type</label>
                 <select value={form.type} onChange={e=>setForm(p=>({...p,type:e.target.value}))} style={inp}>
                   <option value="receipt">Receipt (Income)</option><option value="expense">Expense</option>
                 </select>
               </div>
               {[["Amount (Rs.)","amount"],["Description","description"],["Reference No","reference"]].map(([lbl,key])=>(
                 <div key={key}>
-                  <label style={{ fontSize:12, color:"rgba(var(--ink),.5)", display:"block", marginBottom:4 }}>{lbl}</label>
+                  <label style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", display:"block", marginBottom:4 }}>{lbl}</label>
                   <input value={(form as Record<string,string>)[key]} onChange={e=>setForm(p=>({...p,[key]:e.target.value}))} style={inp} />
                 </div>
               ))}

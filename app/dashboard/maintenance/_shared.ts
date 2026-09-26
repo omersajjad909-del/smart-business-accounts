@@ -1,9 +1,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const maintenanceAccent = "#34d399";
-export const maintenanceBg = "rgba(15,23,42,.72)";
+export const maintenanceBg = "rgba(var(--dkr-0f172a, 15,23,42),0.72)";
 export const maintenanceBorder = "rgba(52,211,153,.18)";
-export const maintenanceMuted = "rgba(226,232,240,.65)";
+export const maintenanceMuted = "rgba(var(--txr-e2e8f0, 226,232,240),.65)";
 export const maintenanceFont = "'Outfit','Inter',sans-serif";
 
 export type MaintenanceContract = ReturnType<typeof mapMaintenanceContract>;

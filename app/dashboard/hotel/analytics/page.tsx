@@ -47,7 +47,7 @@ export default function HotelAnalyticsPage() {
                 <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-fdba74, #fdba74)" }}>{count}</span>
               </div>
             ))}
-            {Object.keys(roomMix).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No room data yet.</div>}
+            {Object.keys(roomMix).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No room data yet.</div>}
           </div>
         </div>
 
@@ -78,7 +78,7 @@ export default function HotelAnalyticsPage() {
               <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>Rs. {amount.toLocaleString()}</span>
             </div>
           ))}
-          {Object.keys(serviceByRoom).length === 0 && <div style={{ color: "rgba(var(--ink),.28)" }}>No delivered room service yet.</div>}
+          {Object.keys(serviceByRoom).length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No delivered room service yet.</div>}
         </div>
       </div>
     </div>

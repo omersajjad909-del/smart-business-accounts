@@ -62,7 +62,7 @@ export default function SchoolTeachersPage() {
                 <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
               </tr>
             ))}
-            {!loading && teachers.length === 0 && <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),.25)" }}>No teachers yet.</td></tr>}
+            {!loading && teachers.length === 0 && <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No teachers yet.</td></tr>}
           </tbody>
         </table>
       </div>

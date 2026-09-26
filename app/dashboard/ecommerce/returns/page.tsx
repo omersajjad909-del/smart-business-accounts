@@ -150,7 +150,7 @@ export default function ReturnsPage() {
               borderRadius: 999,
               border: filter === status ? "1px solid rgba(99,102,241,.4)" : "1px solid rgba(var(--ink),.08)",
               background: filter === status ? "rgba(99,102,241,.16)" : "rgba(var(--ink),.03)",
-              color: filter === status ? "#c7d2fe" : "rgba(var(--ink),.65)",
+              color: filter === status ? "#c7d2fe" : "rgba(var(--ink),var(--ta-65, .65))",
               fontSize: 12,
               fontWeight: 700,
               textTransform: "capitalize",
@@ -217,7 +217,7 @@ export default function ReturnsPage() {
               ))}
               {!filtered.length && (
                 <tr>
-                  <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),.28)" }}>
+                  <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(var(--ink),var(--ta-28, .28))" }}>
                     No return cases matched this filter.
                   </td>
                 </tr>
@@ -335,7 +335,7 @@ const secondaryButton: CSSProperties = {
   background: "transparent",
   border: `1px solid ${ecommerceBorder}`,
   borderRadius: 10,
-  color: "rgba(var(--ink),.65)",
+  color: "rgba(var(--ink),var(--ta-65, .65))",
   fontSize: 14,
   cursor: "pointer",
 };

@@ -56,11 +56,11 @@ const input: React.CSSProperties = {
   fontFamily: "inherit", boxSizing: "border-box",
 };
 const label: React.CSSProperties = {
-  display: "block", fontSize: 11.5, color: "rgba(var(--ink),.45)", marginBottom: 5,
+  display: "block", fontSize: 11.5, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 5,
 };
 const sectionHead: React.CSSProperties = {
   fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase",
-  color: "rgba(var(--ink),.4)", margin: "22px 0 10px",
+  color: "rgba(var(--ink),var(--ta-40, .4))", margin: "22px 0 10px",
 };
 
 type FixedField = { key: keyof PackageFixedCosts; label: string };
@@ -295,7 +295,7 @@ export default function DeparturesPage() {
         <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 4px" }}>
           {editing.id ? d.title || "Departure" : "New departure"}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
           {totalNights(d.legs)} nights · {d.seats || 0} seats · room cost per pilgrim: {d.tiers.map((t) => `${occupancyName(t.occupancy)} ${d.hotelCurrency} ${((roomCostPerRoom(d.legs, t.occupancy) / Math.max(1, t.occupancy))).toLocaleString()}`).join(" · ")}
         </p>
 
@@ -359,7 +359,7 @@ export default function DeparturesPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
                   <div style={{ fontSize: 12.5, fontWeight: 700 }}>{heading}</div>
                   {sectorText(legs) ? (
-                    <div style={{ fontSize: 11, color: "rgba(var(--ink),.45)" }}>{sectorText(legs)}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{sectorText(legs)}</div>
                   ) : null}
                 </div>
 
@@ -371,7 +371,7 @@ export default function DeparturesPage() {
                         /* The hours a group spends in a transit hall between
                            two aircraft. Worked out rather than asked for —
                            both times are already on the page. */
-                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),.4)", margin: "10px 0 6px", display: "flex", alignItems: "center", gap: 6 }}>
+                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-40, .4))", margin: "10px 0 6px", display: "flex", alignItems: "center", gap: 6 }}>
                           <span>↓</span>
                           <span>
                             Change of aircraft at {legs[index - 1].to || "—"}
@@ -425,7 +425,7 @@ export default function DeparturesPage() {
 
                 <button type="button"
                   onClick={() => setLegs([...legs, emptyLeg2(legs[legs.length - 1]?.to || "")])}
-                  style={{ marginTop: 10, padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 11.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                  style={{ marginTop: 10, padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 11.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                   + Change of aircraft
                 </button>
               </div>
@@ -503,7 +503,7 @@ export default function DeparturesPage() {
                 </div>
                 <button tabIndex={-1} title="Remove leg"
                   onClick={() => patch({ legs: d.legs.filter((l) => l.id !== leg.id) })}
-                  style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),.45)", cursor: "pointer", padding: "8px 0" }}>×</button>
+                  style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-45, .45))", cursor: "pointer", padding: "8px 0" }}>×</button>
               </div>
               {mina ? (
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr", gap: 9, marginTop: 9 }}>
@@ -532,7 +532,7 @@ export default function DeparturesPage() {
                     <input type="number" min={0} step="any" value={rate}
                       onChange={(e) => patchLeg(leg.id, { roomRatesPerNight: { ...(leg.roomRatesPerNight || {}), [String(occupancy)]: Number(e.target.value) || 0 } })}
                       onFocus={(e) => e.currentTarget.select()} style={{ ...input, textAlign: "right" }} />
-                    <div style={{ marginTop: 4, textAlign: "right", fontSize: 10, color: "rgba(var(--ink),.42)" }}>
+                    <div style={{ marginTop: 4, textAlign: "right", fontSize: 10, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
                       Stay: {(leg.nights * rate).toLocaleString()} {d.hotelCurrency}
                     </div>
                   </div>;
@@ -544,20 +544,20 @@ export default function DeparturesPage() {
           })}
         </div>
         <button onClick={() => patch({ legs: [...d.legs, emptyLeg(nextLegCity(d))] })}
-          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+          style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
           + Add leg
         </button>
 
         <div style={sectionHead}>
           Per pilgrim, whoever they share with
-          {d.kind === "hajj" ? <span style={{ color: "rgba(var(--ink),.3)", fontWeight: 600, textTransform: "none", letterSpacing: 0 }}> — including the Mashair</span> : null}
+          {d.kind === "hajj" ? <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontWeight: 600, textTransform: "none", letterSpacing: 0 }}> — including the Mashair</span> : null}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit,minmax(110px,1fr))", gap: 10 }}>
           {fixedFieldsFor(d.kind).map((f) =>
             money(f.label, d.fixed[f.key] ?? 0, (n) => patch({ fixed: { ...d.fixed, [f.key]: n } })),
           )}
         </div>
-        <div style={{ marginTop: 8, fontSize: 12, color: "rgba(var(--ink),.42)" }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
           Fixed cost per pilgrim: <strong style={{ color: "var(--ink-solid, #fff)" }}>{totalFixed(d.fixed).toLocaleString()}</strong>
         </div>
 
@@ -569,7 +569,7 @@ export default function DeparturesPage() {
                 padding: "7px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 700, fontFamily: "inherit", cursor: "pointer",
                 background: d.pricingMode === mode ? "rgba(56,189,248,.16)" : "rgba(var(--ink),.04)",
                 border: `1px solid ${d.pricingMode === mode ? "rgba(56,189,248,.45)" : border}`,
-                color: d.pricingMode === mode ? accent : "rgba(var(--ink),.6)",
+                color: d.pricingMode === mode ? accent : "rgba(var(--ink),var(--ta-60, .6))",
               }}>
               {mode === "sharing" ? "Per sharing" : "One flat price"}
             </button>
@@ -586,7 +586,7 @@ export default function DeparturesPage() {
             sharing change, because pricing an Umrah is an argument with a
             calculator and this is the answer to it. */}
         <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.2fr 1fr 80px 34px", gap: 8, padding: "9px 14px", background: "rgba(var(--ink),.03)", fontSize: 10.5, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(var(--ink),.38)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.2fr 1fr 80px 34px", gap: 8, padding: "9px 14px", background: "rgba(var(--ink),.03)", fontSize: 10.5, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-38, .38))" }}>
             <span>Sharing</span><span style={{ textAlign: "right" }}>Room / pilgrim</span><span style={{ textAlign: "right" }}>Total cost / pilgrim</span>
             <span style={{ textAlign: "right" }}>Sells for</span><span style={{ textAlign: "right" }}>Margin</span><span style={{ textAlign: "right" }}>%</span><span />
           </div>
@@ -597,11 +597,11 @@ export default function DeparturesPage() {
                 style={{ ...input, padding: "6px 8px", fontWeight: 700 }}>
                 {Array.from({ length: 10 }, (_, n) => n + 1).map((n) => <option key={n} value={n} disabled={d.tiers.some((other, oi) => oi !== i && other.occupancy === n)} style={{ color: "#111" }}>{occupancyName(n)} ({n})</option>)}
               </select>
-              <span style={{ textAlign: "right", color: "rgba(var(--ink),.55)", fontFamily: "ui-monospace, monospace" }}>{t.roomCost.toLocaleString()}</span>
+              <span style={{ textAlign: "right", color: "rgba(var(--ink),var(--ta-55, .55))", fontFamily: "ui-monospace, monospace" }}>{t.roomCost.toLocaleString()}</span>
               <span style={{ textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{t.costPerPilgrim.toLocaleString()}</span>
               <span style={{ textAlign: "right" }}>
                 {d.pricingMode === "flat" ? (
-                  <span style={{ fontFamily: "ui-monospace, monospace", color: "rgba(var(--ink),.55)" }}>{t.sellPerPilgrim.toLocaleString()}</span>
+                  <span style={{ fontFamily: "ui-monospace, monospace", color: "rgba(var(--ink),var(--ta-55, .55))" }}>{t.sellPerPilgrim.toLocaleString()}</span>
                 ) : (
                   <input type="number" min={0} step="any" value={d.tiers[i]?.sellPrice ?? 0}
                     onChange={(e) => patch({ tiers: d.tiers.map((x, xi) => (xi === i ? { ...x, sellPrice: Number(e.target.value) || 0 } : x)) })}
@@ -612,18 +612,18 @@ export default function DeparturesPage() {
               <span style={{ textAlign: "right", fontFamily: "ui-monospace, monospace", fontWeight: 700, color: t.marginPerPilgrim >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)" }}>
                 {t.marginPerPilgrim.toLocaleString()}
               </span>
-              <span style={{ textAlign: "right", fontSize: 12, color: "rgba(var(--ink),.45)" }}>{t.marginPercent}%</span>
+              <span style={{ textAlign: "right", fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>{t.marginPercent}%</span>
               {d.pricingMode === "sharing" ? (
                 <button tabIndex={-1} title="Remove tier"
                   onClick={() => patch({ tiers: d.tiers.filter((_, xi) => xi !== i) })}
-                  style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 7, color: "rgba(var(--ink),.4)", cursor: "pointer", padding: "5px 0" }}>×</button>
+                  style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 7, color: "rgba(var(--ink),var(--ta-40, .4))", cursor: "pointer", padding: "5px 0" }}>×</button>
               ) : <span />}
             </div>
           ))}
         </div>
         {d.pricingMode === "sharing" && (
           <button onClick={() => patch({ tiers: [...d.tiers, { occupancy: (d.tiers.at(-1)?.occupancy ?? 4) + 1, sellPrice: 0 }] })}
-            style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.65)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
             + Add sharing option
           </button>
         )}
@@ -648,7 +648,7 @@ export default function DeparturesPage() {
             {saving ? "Saving…" : "Save departure"}
           </button>
           <button onClick={() => setEditing(null)}
-            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),.6)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 9, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
             Close
           </button>
         </div>
@@ -662,7 +662,7 @@ export default function DeparturesPage() {
         {editing.id && (
           <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${border}` }}>
             <div style={{ ...sectionHead, margin: "0 0 4px" }}>Supplier bills for this departure</div>
-            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),.38)", marginBottom: 12, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))", marginBottom: 12, lineHeight: 1.6 }}>
               Posts the cost to its own head and the money owed to the supplier, where a CPV clears it.
             </div>
 
@@ -670,7 +670,7 @@ export default function DeparturesPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 14 }}>
                 {billed.map((s) => (
                   <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, fontSize: 12.5, flexWrap: "wrap" }}>
-                    <span style={{ color: "rgba(var(--ink),.62)" }}>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-62, .62))" }}>
                       <strong style={{ color: "var(--ink-solid, #fff)" }}>{s.title}</strong> · {s.componentLabel} · {s.supplierName}
                     </span>
                     <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 700, color: s.status === "settled" ? "var(--tx-34d399, #34d399)" : "var(--tx-fbbf24, #fbbf24)" }}>
@@ -739,7 +739,7 @@ export default function DeparturesPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>Hajj &amp; Umrah Departures</h1>
-          <p style={{ fontSize: 13, color: "rgba(var(--ink),.42)", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))", margin: 0 }}>
             A dated trip with a seat quota. One departure, one price per sharing option — because a room costs
             what it costs and the pilgrims in it split that.
           </p>
@@ -765,7 +765,7 @@ export default function DeparturesPage() {
                       {row.d.kind}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(var(--ink),.42)", marginTop: 4 }}>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 4 }}>
                     {row.d.tripNumber ? `${row.d.tripNumber} · ` : ""}
                     {row.d.departureDate || "no date"} → {row.d.returnDate || "—"} · {totalNights(row.d.legs)} nights ·{" "}
                     {row.d.legs.filter((l) => l.nights > 0).map((l) => `${l.city} ${l.nights}`).join(" → ") || "no legs"}
@@ -775,10 +775,10 @@ export default function DeparturesPage() {
                   {cheapest ? (
                     <>
                       <div style={{ fontSize: 17, fontWeight: 800, color: accent }}>{cheapest.sellPerPilgrim.toLocaleString()}</div>
-                      <div style={{ fontSize: 11, color: "rgba(var(--ink),.35)" }}>from · {cheapest.tierName.toLowerCase()}</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>from · {cheapest.tierName.toLowerCase()}</div>
                     </>
                   ) : (
-                    <div style={{ fontSize: 12, color: "rgba(var(--ink),.3)" }}>not priced</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))" }}>not priced</div>
                   )}
                 </div>
               </div>
@@ -791,14 +791,14 @@ export default function DeparturesPage() {
                     <div style={{ width: `${seats.percent}%`, height: "100%", background: seats.over > 0 ? "#ef4444" : seats.percent >= 90 ? "#fbbf24" : "#22c55e" }} />
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)" }}>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>
                   <strong style={{ color: "var(--ink-solid, #fff)" }}>{seats.sold}</strong> of {seats.quota} sold ·{" "}
                   {seats.over > 0
                     ? <span style={{ color: "var(--tx-fca5a5, #fca5a5)", fontWeight: 700 }}>{seats.over} over quota</span>
                     : <span style={{ color: seats.left === 0 ? "var(--tx-fbbf24, #fbbf24)" : "inherit" }}>{seats.left} left</span>}
                 </div>
                 <button onClick={() => setEditing({ id: row.id, d: row.d })}
-                  style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),.7)", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+                  style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(var(--ink),.05)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-70, .7))", fontSize: 12, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
                   Edit &amp; price
                 </button>
               </div>
@@ -806,7 +806,7 @@ export default function DeparturesPage() {
               {tiers.some((t) => t.sellPerPilgrim > 0) && (
                 <div style={{ marginTop: 11, display: "flex", gap: 7, flexWrap: "wrap" }}>
                   {tiers.filter((t) => t.sellPerPilgrim > 0).map((t) => (
-                    <span key={t.occupancy} style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 999, background: "rgba(var(--ink),.04)", border: `1px solid ${border}`, color: "rgba(var(--ink),.62)" }}>
+                    <span key={t.occupancy} style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 999, background: "rgba(var(--ink),.04)", border: `1px solid ${border}`, color: "rgba(var(--ink),var(--ta-62, .62))" }}>
                       {occupancyName(t.occupancy)}{" "}
                       <strong style={{ color: "var(--ink-solid, #fff)", fontFamily: "ui-monospace, monospace" }}>{t.sellPerPilgrim.toLocaleString()}</strong>
                       <span style={{ color: t.marginPerPilgrim >= 0 ? "var(--tx-34d399, #34d399)" : "var(--tx-fca5a5, #fca5a5)", marginLeft: 6 }}>+{t.marginPercent}%</span>
@@ -818,7 +818,7 @@ export default function DeparturesPage() {
           );
         })}
         {!store.loading && rows.length === 0 && (
-          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(var(--ink),.3)", fontSize: 13.5 }}>
+          <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13.5 }}>
             No departures yet.
           </div>
         )}

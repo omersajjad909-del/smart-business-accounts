@@ -46,7 +46,7 @@ function KitchenKanbanCol({
               <div style={{ fontWeight: 700, fontSize: 14 }}>Table {order.table}</div>
               <div style={{ fontSize: 11, color: order.elapsed > 15 ? "var(--tx-ef4444, #ef4444)" : restaurantMuted }}>⏱ {order.elapsed}m</div>
             </div>
-            <div style={{ fontSize: 12, color: "rgba(var(--ink),.6)", marginBottom: 10 }}>{order.items.join(", ")}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-60, .6))", marginBottom: 10 }}>{order.items.join(", ")}</div>
             {order.notes && <div style={{ fontSize: 11, color: restaurantMuted, marginBottom: 10 }}>Note: {order.notes}</div>}
             <div style={{ display: "flex", gap: 6 }}>
               {order.status === "pending" && <button onClick={() => onMove(order.id, "preparing", order.table)} style={{ flex: 1, padding: "6px", background: "rgba(59,130,246,.15)", border: "1px solid rgba(59,130,246,.3)", color: "#3b82f6", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Start</button>}
@@ -55,7 +55,7 @@ function KitchenKanbanCol({
             </div>
           </div>
         ))}
-        {rows.length === 0 && <div style={{ textAlign: "center", padding: 24, color: "rgba(var(--ink),.2)", fontSize: 13 }}>No orders</div>}
+        {rows.length === 0 && <div style={{ textAlign: "center", padding: 24, color: "rgba(var(--ink),var(--ta-20, .2))", fontSize: 13 }}>No orders</div>}
       </div>
     </div>
   );
@@ -166,7 +166,7 @@ export default function KitchenPage() {
             </div>
             <div style={{ display: "flex", gap: 12 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#ef4444", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Order</button>
-              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowModal(false)} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${restaurantBorder}`, borderRadius: 8, color: "rgba(var(--ink),var(--ta-60, .6))", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>
