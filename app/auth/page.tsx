@@ -71,13 +71,13 @@ const barHeights = [28, 42, 35, 55, 48, 62, 52, 70, 58, 78, 65, 88];
 const DashPreview = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
     {/* Revenue trend chart card */}
-    <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "16px 18px" }}>
+    <div style={{ background: "rgba(var(--ink),0.06)", border: "1px solid rgba(var(--ink),0.1)", borderRadius: 16, padding: "16px 18px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 3 }}>Monthly Revenue</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.6px" }}>$248,930</div>
+          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginBottom: 3 }}>Monthly Revenue</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--ink-solid, #fff)", letterSpacing: "-0.6px" }}>$248,930</div>
         </div>
-        <div style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.25)", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 600, color: "#6ee7b7" }}>↑ 18.3%</div>
+        <div style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.25)", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 600, color: "var(--tx-6ee7b7, #6ee7b7)" }}>↑ 18.3%</div>
       </div>
       {/* Mini bar chart */}
       <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 64 }}>
@@ -85,27 +85,27 @@ const DashPreview = () => (
           <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px 4px 0 0", background: i === barHeights.length - 1 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "rgba(99,102,241,0.25)", transition: "height 0.3s" }} />
         ))}
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10, color: "rgba(255,255,255,0.25)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10, color: "rgba(var(--ink),var(--ta-25, 0.25))" }}>
         <span>Jan</span><span>Apr</span><span>Jul</span><span>Dec</span>
       </div>
     </div>
     {/* Two small metric cards side by side */}
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-      <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px" }}>
+      <div style={{ background: "rgba(var(--ink),0.05)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 14, padding: "14px 16px" }}>
         <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#0ea5e9,#6366f1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 2 }}>Invoices</div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>1,284</div>
-        <div style={{ fontSize: 10, color: "#6ee7b7", marginTop: 4 }}>94% paid on time</div>
+        <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, 0.4))", marginBottom: 2 }}>Invoices</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink-solid, #fff)", letterSpacing: "-0.4px" }}>1,284</div>
+        <div style={{ fontSize: 10, color: "var(--tx-6ee7b7, #6ee7b7)", marginTop: 4 }}>94% paid on time</div>
       </div>
-      <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px" }}>
+      <div style={{ background: "rgba(var(--ink),0.05)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 14, padding: "14px 16px" }}>
         <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 2 }}>Employees</div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>38</div>
-        <div style={{ fontSize: 10, color: "#fcd34d", marginTop: 4 }}>Payroll processed</div>
+        <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, 0.4))", marginBottom: 2 }}>Employees</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink-solid, #fff)", letterSpacing: "-0.4px" }}>38</div>
+        <div style={{ fontSize: 10, color: "var(--tx-fcd34d, #fcd34d)", marginTop: 4 }}>Payroll processed</div>
       </div>
     </div>
   </div>
@@ -301,8 +301,8 @@ function AuthPageInner() {
 
       <div className="auth-page" style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #04061a 0%, #07091f 50%, #0a0d28 100%)",
-        color: "#fff",
+        background: "linear-gradient(135deg, var(--dk-04061a, #04061a) 0%, var(--dk-07091f, #07091f) 50%, var(--dk-0a0d28, #0a0d28) 100%)",
+        color: "var(--ink-solid, #fff)",
         position: "relative",
         overflow: "hidden",
       }}>
@@ -311,7 +311,7 @@ function AuthPageInner() {
           <div style={{ position: "absolute", top: "-10%", left: "-5%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)", animation: "auth-orb1 10s ease-in-out infinite" }} />
           <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(168,85,247,0.14) 0%, transparent 70%)", animation: "auth-orb2 13s ease-in-out infinite" }} />
           {/* Grid */}
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", opacity: 0.6 }} />
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(var(--ink),0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--ink),0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", opacity: 0.6 }} />
         </div>
 
         <div className="auth-grid" style={{ position: "relative", zIndex: 1, display: "grid", gridTemplateColumns: "1.1fr 0.9fr", minHeight: "100vh", maxWidth: 1300, margin: "0 auto", gap: 0 }}>
@@ -322,33 +322,33 @@ function AuthPageInner() {
             flexDirection: "column",
             justifyContent: "space-between",
             padding: "52px 56px",
-            borderRight: "1px solid rgba(255,255,255,0.07)",
+            borderRight: "1px solid rgba(var(--ink),0.07)",
             background: "linear-gradient(180deg, rgba(99,102,241,0.06) 0%, transparent 60%)",
           }}>
             {/* Logo */}
             <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14 }}>
               <img src="/icon1.png" alt="FinovaOS" width={48} height={48} style={{ objectFit: "contain", flexShrink: 0 }}/>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>FinovaOS</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Cloud accounting platform</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "var(--ink-solid, #fff)", letterSpacing: "-0.4px" }}>FinovaOS</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, 0.45))", marginTop: 1 }}>Cloud accounting platform</div>
               </div>
             </Link>
 
             {/* Headline */}
             <div style={{ marginTop: 48, flex: 1 }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)", borderRadius: 100, padding: "6px 14px", fontSize: 12, fontWeight: 600, color: "#6ee7b7", marginBottom: 24 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)", borderRadius: 100, padding: "6px 14px", fontSize: 12, fontWeight: 600, color: "var(--tx-6ee7b7, #6ee7b7)", marginBottom: 24 }}>
                 <IconSparkle />
                 Trusted by finance, trading &amp; service teams
               </div>
 
-              <h1 style={{ fontSize: 42, fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1.2px", color: "#fff", margin: "0 0 20px" }}>
+              <h1 style={{ fontSize: 42, fontWeight: 800, lineHeight: 1.15, letterSpacing: "-1.2px", color: "var(--ink-solid, #fff)", margin: "0 0 20px" }}>
                 Your business<br />
-                <span style={{ background: "linear-gradient(90deg, #818cf8, #c084fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                <span style={{ background: "linear-gradient(90deg, var(--tx-818cf8, #818cf8), var(--tx-c084fc, #c084fc), var(--tx-f472b6, #f472b6))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   command center
                 </span>
               </h1>
 
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: "rgba(255,255,255,0.55)", maxWidth: 400, margin: "0 0 36px" }}>
+              <p style={{ fontSize: 15, lineHeight: 1.7, color: "rgba(var(--ink),var(--ta-55, 0.55))", maxWidth: 400, margin: "0 0 36px" }}>
                 Manage accounting, inventory, payroll, reporting, and AI insights — all from one unified dashboard.
               </p>
 
@@ -363,14 +363,14 @@ function AuthPageInner() {
               {/* The customer count and star rating here were invented — we are
                   pre-launch and have neither yet. */}
               {[
-                { value: "6", label: "Industries", desc: "live workspaces", color: "#34d399", border: "rgba(52,211,153,0.2)", bg: "rgba(52,211,153,0.08)" },
-                { value: "99.9%", label: "Uptime", desc: "SLA guaranteed", color: "#818cf8", border: "rgba(99,102,241,0.2)", bg: "rgba(99,102,241,0.08)" },
-                { value: "Multi", label: "Currency", desc: "invoice anywhere", color: "#fbbf24", border: "rgba(251,191,36,0.2)", bg: "rgba(251,191,36,0.08)" },
+                { value: "6", label: "Industries", desc: "live workspaces", color: "var(--tx-34d399, #34d399)", border: "rgba(52,211,153,0.2)", bg: "rgba(52,211,153,0.08)" },
+                { value: "99.9%", label: "Uptime", desc: "SLA guaranteed", color: "var(--tx-818cf8, #818cf8)", border: "rgba(99,102,241,0.2)", bg: "rgba(99,102,241,0.08)" },
+                { value: "Multi", label: "Currency", desc: "invoice anywhere", color: "var(--tx-fbbf24, #fbbf24)", border: "rgba(251,191,36,0.2)", bg: "rgba(251,191,36,0.08)" },
               ].map((c) => (
                 <div key={c.label} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: 16, padding: "14px 16px" }}>
                   <div style={{ fontSize: 20, fontWeight: 800, color: c.color, letterSpacing: "-0.5px", marginBottom: 2 }}>{c.value}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", marginBottom: 2 }}>{c.label}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{c.desc}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-solid, #fff)", marginBottom: 2 }}>{c.label}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>{c.desc}</div>
                 </div>
               ))}
             </div>
@@ -386,11 +386,11 @@ function AuthPageInner() {
             <div className="auth-card" style={{
               width: "100%",
               maxWidth: 440,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.09)",
+              background: "rgba(var(--ink),0.04)",
+              border: "1px solid rgba(var(--ink),0.09)",
               borderRadius: 28,
               padding: "36px 32px",
-              boxShadow: "0 24px 64px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.4), inset 0 1px 0 rgba(var(--ink),0.06)",
               backdropFilter: "blur(24px)",
             }}>
 
@@ -402,17 +402,17 @@ function AuthPageInner() {
 
               {/* Header */}
               <div style={{ marginBottom: 28 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(165,180,252,0.8)", marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(var(--txr-a5b4fc, 165,180,252),0.8)", marginBottom: 8 }}>
                   {showOtpForm ? "Verify your email" : mode === "signin" ? "Welcome back" : "Create account"}
                 </div>
-                <h2 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-0.7px", color: "#fff", margin: "0 0 10px" }}>
+                <h2 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-0.7px", color: "var(--ink-solid, #fff)", margin: "0 0 10px" }}>
                   {showOtpForm
                     ? "Enter the 6-digit code"
                     : mode === "signin"
                     ? "Sign in to FinovaOS"
                     : "Get started today"}
                 </h2>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                <p style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(var(--ink),var(--ta-50, 0.5))", margin: 0 }}>
                   {showOtpForm
                     ? `Code sent to ${otpEmail || email}`
                     : mode === "signin"
@@ -423,13 +423,13 @@ function AuthPageInner() {
 
               {/* Alerts */}
               {error && (
-                <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "#fca5a5", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "var(--tx-fca5a5, #fca5a5)", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   {error}
                 </div>
               )}
               {message && (
-                <div style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "#6ee7b7", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "var(--tx-6ee7b7, #6ee7b7)", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
                   {message}
                 </div>
@@ -440,9 +440,9 @@ function AuthPageInner() {
                 <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                   {/* Email */}
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.75)", marginBottom: 8 }}>Work email</label>
-                    <div className="auth-input" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "13px 16px" }}>
-                      <span style={{ color: "rgba(255,255,255,0.35)", flexShrink: 0 }}><IconMail /></span>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "rgba(var(--ink),0.75)", marginBottom: 8 }}>Work email</label>
+                    <div className="auth-input" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(var(--ink),0.05)", border: "1px solid rgba(var(--ink),0.1)", borderRadius: 14, padding: "13px 16px" }}>
+                      <span style={{ color: "rgba(var(--ink),var(--ta-35, 0.35))", flexShrink: 0 }}><IconMail /></span>
                       <input
                         type="email"
                         value={email}
@@ -451,16 +451,16 @@ function AuthPageInner() {
                         autoFocus
                         autoComplete="email"
                         placeholder="you@company.com"
-                        style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "#fff", fontFamily: "inherit" }}
+                        style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "var(--ink-solid, #fff)", fontFamily: "inherit" }}
                       />
                     </div>
                   </div>
 
                   {/* Password */}
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.75)", marginBottom: 8 }}>Password</label>
-                    <div className="auth-input" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "13px 16px" }}>
-                      <span style={{ color: "rgba(255,255,255,0.35)", flexShrink: 0 }}><IconLock /></span>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "rgba(var(--ink),0.75)", marginBottom: 8 }}>Password</label>
+                    <div className="auth-input" style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(var(--ink),0.05)", border: "1px solid rgba(var(--ink),0.1)", borderRadius: 14, padding: "13px 16px" }}>
+                      <span style={{ color: "rgba(var(--ink),var(--ta-35, 0.35))", flexShrink: 0 }}><IconLock /></span>
                       <input
                         type={showPassword ? "text" : "password"}
                         value={password}
@@ -468,12 +468,12 @@ function AuthPageInner() {
                         required
                         autoComplete={mode === "signin" ? "current-password" : "new-password"}
                         placeholder="Enter your password"
-                        style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "#fff", fontFamily: "inherit" }}
+                        style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "var(--ink-solid, #fff)", fontFamily: "inherit" }}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((p) => !p)}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.35)", padding: 0, display: "flex" }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--ink),var(--ta-35, 0.35))", padding: 0, display: "flex" }}
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <IconEyeOff /> : <IconEye />}
@@ -484,15 +484,15 @@ function AuthPageInner() {
                   {/* Forgot / Terms */}
                   {mode === "signin" ? (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, fontSize: 13 }}>
-                      <span style={{ color: "rgba(255,255,255,0.4)" }}>Use your company email.</span>
-                      <Link href="/auth/forgot-password" style={{ fontWeight: 600, color: "#a5b4fc", textDecoration: "none" }}>Forgot password?</Link>
+                      <span style={{ color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>Use your company email.</span>
+                      <Link href="/auth/forgot-password" style={{ fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none" }}>Forgot password?</Link>
                     </div>
                   ) : (
-                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, margin: 0 }}>
+                    <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, 0.4))", lineHeight: 1.6, margin: 0 }}>
                       By creating an account you agree to our{" "}
-                      <Link href="/legal/terms" style={{ color: "#a5b4fc", textDecoration: "none" }}>Terms</Link>
+                      <Link href="/legal/terms" style={{ color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none" }}>Terms</Link>
                       {" "}and{" "}
-                      <Link href="/legal/privacy" style={{ color: "#a5b4fc", textDecoration: "none" }}>Privacy Policy</Link>.
+                      <Link href="/legal/privacy" style={{ color: "var(--tx-a5b4fc, #a5b4fc)", textDecoration: "none" }}>Privacy Policy</Link>.
                     </p>
                   )}
 
@@ -520,7 +520,7 @@ function AuthPageInner() {
                 /* ── OTP Form ── */
                 <form onSubmit={handleVerifyOtp} style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.75)", marginBottom: 16, textAlign: "center" }}>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "rgba(var(--ink),0.75)", marginBottom: 16, textAlign: "center" }}>
                       Enter the 6-digit verification code
                     </label>
                     <div className="auth-otp-row" style={{ display: "flex", justifyContent: "center", gap: 10 }} onPaste={handleOtpPaste}>
@@ -538,8 +538,8 @@ function AuthPageInner() {
                           onKeyDown={(e) => handleOtpKeyDown(i, e)}
                           style={{
                             width: 48, height: 58, borderRadius: 14,
-                            background: val ? "rgba(99,102,241,0.1)" : "rgba(255,255,255,0.05)",
-                            border: val ? "1px solid rgba(99,102,241,0.5)" : "1px solid rgba(255,255,255,0.12)",
+                            background: val ? "rgba(99,102,241,0.1)" : "rgba(var(--ink),0.05)",
+                            border: val ? "1px solid rgba(99,102,241,0.5)" : "1px solid rgba(var(--ink),0.12)",
                             fontSize: 22, fontWeight: 700, color: "#fff",
                             textAlign: "center", fontFamily: "inherit",
                             cursor: "text",
@@ -547,13 +547,13 @@ function AuthPageInner() {
                         />
                       ))}
                     </div>
-                    <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 12 }}>
+                    <p style={{ textAlign: "center", fontSize: 12, color: "rgba(var(--ink),var(--ta-35, 0.35))", marginTop: 12 }}>
                       Didn&apos;t receive a code?{" "}
                       <button
                         type="button"
                         onClick={handleResendOtp}
                         disabled={isLoading}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, color: "#a5b4fc", fontFamily: "inherit", padding: 0 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)", fontFamily: "inherit", padding: 0 }}
                       >
                         Resend
                       </button>
@@ -566,7 +566,7 @@ function AuthPageInner() {
                     className="auth-btn-main"
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                      background: otp.length === 6 ? "linear-gradient(135deg,#6366f1,#8b5cf6,#d946ef)" : "rgba(255,255,255,0.07)",
+                      background: otp.length === 6 ? "linear-gradient(135deg,#6366f1,#8b5cf6,#d946ef)" : "rgba(var(--ink),0.07)",
                       border: "none", borderRadius: 14, padding: "14px", fontSize: 14, fontWeight: 600,
                       color: "#fff", cursor: (isLoading || otp.length !== 6) ? "not-allowed" : "pointer",
                       opacity: (isLoading || otp.length !== 6) ? 0.6 : 1,
@@ -582,7 +582,7 @@ function AuthPageInner() {
                   <button
                     type="button"
                     onClick={() => { setShowOtpForm(false); setOtpBoxes(["","","","","",""]); setMessage(null); setError(null); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.4)", fontFamily: "inherit", textAlign: "center" }}
+                    style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(var(--ink),var(--ta-40, 0.4))", fontFamily: "inherit", textAlign: "center" }}
                   >
                     &larr; Back to sign in
                   </button>
@@ -591,14 +591,14 @@ function AuthPageInner() {
 
               {/* Switch mode */}
               {!showOtpForm && (
-                <div style={{ marginTop: 24, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "13px 16px", fontSize: 13, color: "rgba(255,255,255,0.55)", textAlign: "center" }}>
+                <div style={{ marginTop: 24, background: "rgba(var(--ink),0.04)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 14, padding: "13px 16px", fontSize: 13, color: "rgba(var(--ink),var(--ta-55, 0.55))", textAlign: "center" }}>
                   {mode === "signin" ? (
                     <>
                       New to FinovaOS?{" "}
                       <button
                         type="button"
                         onClick={() => router.push(`/auth?mode=signup${redirectTo ? `&redirect=${encodeURIComponent(redirectTo)}` : ""}`)}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#a5b4fc", fontFamily: "inherit", padding: 0 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)", fontFamily: "inherit", padding: 0 }}
                       >
                         Create an account
                       </button>
@@ -609,7 +609,7 @@ function AuthPageInner() {
                       <button
                         type="button"
                         onClick={() => router.push(`/auth?mode=signin${redirectTo ? `&redirect=${encodeURIComponent(redirectTo)}` : ""}`)}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#a5b4fc", fontFamily: "inherit", padding: 0 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--tx-a5b4fc, #a5b4fc)", fontFamily: "inherit", padding: 0 }}
                       >
                         Sign in
                       </button>
@@ -627,7 +627,7 @@ function AuthPageInner() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#04061a" }} />}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--dk-04061a, #04061a)" }} />}>
       <AuthPageInner />
     </Suspense>
   );

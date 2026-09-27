@@ -71,12 +71,12 @@ function ResetPasswordForm() {
 
   if (!token || tokenDead) {
     return (
-      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e,#0c0f2e)", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
-        <div style={{ textAlign:"center", color:"white", maxWidth:360 }}>
+      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e),var(--dk-0c0f2e, #0c0f2e))", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+        <div style={{ textAlign:"center", color:"var(--ink-solid, white)", maxWidth:360 }}>
           <div style={{ fontSize:48, marginBottom:16 }}>⚠️</div>
           <h1 style={{ fontSize:20, marginBottom:10 }}>This reset link is no longer valid</h1>
           {tokenDead && (
-            <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7, marginBottom:20 }}>
+            <p style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.7, marginBottom:20 }}>
               Only the newest reset email works. If you requested more than one,
               open the most recent one — or get a fresh link below.
             </p>
@@ -88,43 +88,43 @@ function ResetPasswordForm() {
   }
 
   return (
-    <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans','Outfit',system-ui,sans-serif" }}>
+    <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 50%,var(--dk-080c1e, #080c1e) 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans','Outfit',system-ui,sans-serif" }}>
       <div style={{ width:"100%", maxWidth:420 }}>
         {/* Logo */}
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <Link href="/" style={{ textDecoration:"none" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:10 }}>
               <img src="/icon1.png" alt="FinovaOS" width={40} height={40} style={{ objectFit:"contain", flexShrink:0 }}/>
-              <span style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>FinovaOS</span>
+              <span style={{ fontSize:20, fontWeight:800, color:"var(--ink-solid, white)", fontFamily:"Lora,serif" }}>FinovaOS</span>
             </div>
           </Link>
         </div>
 
-        <div style={{ background:"rgba(255,255,255,.04)", borderRadius:20, border:"1px solid rgba(255,255,255,.08)", padding:"36px 32px", backdropFilter:"blur(20px)" }}>
+        <div style={{ background:"rgba(var(--ink),.04)", borderRadius:20, border:"1px solid rgba(var(--ink),.08)", padding:"36px 32px", backdropFilter:"blur(20px)" }}>
           {done ? (
             <div style={{ textAlign:"center" }}>
               <div style={{ fontSize:48, marginBottom:16 }}>✅</div>
-              <h1 style={{ fontSize:22, fontWeight:800, color:"white", marginBottom:10 }}>Password reset!</h1>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.5)", lineHeight:1.7 }}>
+              <h1 style={{ fontSize:22, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:10 }}>Password reset!</h1>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-50, .5))", lineHeight:1.7 }}>
                 Your password has been updated. Redirecting to login...
               </p>
             </div>
           ) : (
             <>
-              <h1 style={{ fontSize:24, fontWeight:800, color:"white", marginBottom:8 }}>Set new password</h1>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", marginBottom:24, lineHeight:1.6 }}>
+              <h1 style={{ fontSize:24, fontWeight:800, color:"var(--ink-solid, white)", marginBottom:8 }}>Set new password</h1>
+              <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-45, .45))", marginBottom:24, lineHeight:1.6 }}>
                 Choose a strong password for your FinovaOS account.
               </p>
 
               {error && (
-                <div style={{ marginBottom:16, padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", color:"#f87171", fontSize:13 }}>
+                <div style={{ marginBottom:16, padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", color:"var(--tx-f87171, #f87171)", fontSize:13 }}>
                   {error}
                   {/* A dead link cannot be retyped into working — the only way
                       forward is a fresh email, so say so instead of leaving the
                       user pressing the same button. */}
                   {/token/i.test(error) && (
                     <div style={{ marginTop:8 }}>
-                      <Link href="/auth/forgot-password" style={{ color:"#a5b4fc", fontWeight:700, textDecoration:"none" }}>Request a new link →</Link>
+                      <Link href="/auth/forgot-password" style={{ color:"var(--tx-a5b4fc, #a5b4fc)", fontWeight:700, textDecoration:"none" }}>Request a new link →</Link>
                     </div>
                   )}
                 </div>
@@ -133,14 +133,14 @@ function ResetPasswordForm() {
               <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:14 }}>
                 {/* New password */}
                 <div>
-                  <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>New Password</label>
+                  <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>New Password</label>
                   <div style={{ position:"relative" }}>
                     <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Min 10 chars, mix letters/numbers/symbols" required autoComplete="new-password"
-                      style={{ width:"100%", padding:"12px 40px 12px 14px", borderRadius:11, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
+                      style={{ width:"100%", padding:"12px 40px 12px 14px", borderRadius:11, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.1)", color:"var(--ink-solid, white)", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
                       onFocus={e=>e.target.style.borderColor="rgba(99,102,241,.5)"}
-                      onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
+                      onBlur={e=>e.target.style.borderColor="rgba(var(--ink),.1)"}
                     />
-                    <button type="button" onClick={()=>setShowPass(v=>!v)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:14 }}>
+                    <button type="button" onClick={()=>setShowPass(v=>!v)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(var(--ink),var(--ta-40, .4))", cursor:"pointer", fontSize:14 }}>
                       {showPass?"🙈":"👁️"}
                     </button>
                   </div>
@@ -148,10 +148,10 @@ function ResetPasswordForm() {
                     <div style={{ marginTop:8 }}>
                       <div style={{ display:"flex", gap:4, marginBottom:4 }}>
                         {[1,2,3,4].map(i=>(
-                          <div key={i} style={{ height:3, flex:1, borderRadius:4, background:i<=strength?strengthColor[strength]:"rgba(255,255,255,.08)", transition:"background .3s" }}/>
+                          <div key={i} style={{ height:3, flex:1, borderRadius:4, background:i<=strength?strengthColor[strength]:"rgba(var(--ink),.08)", transition:"background .3s" }}/>
                         ))}
                       </div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>
+                      <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))" }}>
                         Strength: <span style={{ color:strengthColor[strength], fontWeight:700 }}>{strengthLabel[strength]}</span>
                       </div>
                     </div>
@@ -160,12 +160,12 @@ function ResetPasswordForm() {
 
                 {/* Confirm password */}
                 <div>
-                  <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>Confirm Password</label>
+                  <label style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>Confirm Password</label>
                   <input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Repeat your password" required autoComplete="new-password"
-                    style={{ width:"100%", padding:"12px 14px", borderRadius:11, background:"rgba(255,255,255,.05)", border:`1px solid ${confirm&&confirm!==password?"rgba(248,113,113,.4)":confirm&&confirm===password?"rgba(52,211,153,.4)":"rgba(255,255,255,.1)"}`, color:"white", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
+                    style={{ width:"100%", padding:"12px 14px", borderRadius:11, background:"rgba(var(--ink),.05)", border:`1px solid ${confirm&&confirm!==password?"rgba(248,113,113,.4)":confirm&&confirm===password?"rgba(52,211,153,.4)":"rgba(var(--ink),.1)"}`, color:"var(--ink-solid, white)", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
                   />
                   {confirm && confirm !== password && (
-                    <div style={{ fontSize:11, color:"#f87171", marginTop:4 }}>Passwords do not match</div>
+                    <div style={{ fontSize:11, color:"var(--tx-f87171, #f87171)", marginTop:4 }}>Passwords do not match</div>
                   )}
                 </div>
 
@@ -185,8 +185,8 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,#080c1e,#0c0f2e)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-        <div style={{ color:"rgba(255,255,255,.4)", fontSize:14 }}>Loading…</div>
+      <main style={{ minHeight:"100vh", background:"linear-gradient(160deg,var(--dk-080c1e, #080c1e),var(--dk-0c0f2e, #0c0f2e))", display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <div style={{ color:"rgba(var(--ink),var(--ta-40, .4))", fontSize:14 }}>Loading…</div>
       </main>
     }>
       <ResetPasswordForm/>

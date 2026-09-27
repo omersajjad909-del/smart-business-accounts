@@ -31,7 +31,7 @@ function SsoCompleteInner() {
   }, [router, searchParams]);
 
   return (
-    <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"#020817", color:"rgba(255,255,255,.5)", fontSize:14 }}>
+    <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"var(--dk-020817, #020817)", color:"rgba(var(--ink),var(--ta-50, .5))", fontSize:14 }}>
       Finalizing SSO sign-in…
     </div>
   );
@@ -40,7 +40,7 @@ function SsoCompleteInner() {
 export default function SsoCompletePage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"#020817", color:"rgba(255,255,255,.4)", fontSize:14 }}>
+      <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"var(--dk-020817, #020817)", color:"rgba(var(--ink),var(--ta-40, .4))", fontSize:14 }}>
         Loading…
       </div>
     }>
