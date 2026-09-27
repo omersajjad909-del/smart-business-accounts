@@ -142,6 +142,11 @@ export function setAdminCookie(res: NextResponse, token: string) {
     secure: secureCookie,
     // The console is only ever reached by typing its host or from inside
     // itself — no cross-site navigation needs to carry this cookie.
+    //
+    // This does mean the Google Ads OAuth callback (see
+    // /api/admin/google-ads/oauth/callback) can't rely on this cookie when
+    // Google redirects back — that's cross-site by nature. Fix that route
+    // itself (e.g. a signed state param) rather than loosening this.
     sameSite: "strict",
     path: "/",
     // No maxAge and no expires on purpose: that makes this a *session* cookie,
