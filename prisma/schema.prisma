@@ -3258,3 +3258,19 @@ model GoogleAdsSnapshot {
 
   @@index([recordedAt])
 }
+
+// ================= GOOGLE ADS OAUTH =================
+// One row: the refresh token from the OAuth flow at
+// /api/admin/google-ads/oauth/start. The refresh token is what makes the
+// connection permanent — it's exchanged for a short-lived access token on
+// every API call, so this table only ever needs writing once per admin who
+// authorizes, and the sync route reads the newest row.
+
+model GoogleAdsAuth {
+  id           String   @id @default(cuid())
+  refreshToken String
+  connectedBy  String? // admin email, for audit purposes
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
