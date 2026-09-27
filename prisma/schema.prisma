@@ -3233,3 +3233,28 @@ model MarketSignal {
   @@unique([source, externalId])
   @@index([tier, status, createdAt])
 }
+
+// ================= GOOGLE ADS SNAPSHOTS =================
+// No live Google Ads API connection yet (needs a developer token + OAuth
+// app, which requires manual setup in Google Cloud). Until then, an admin
+// pulls the numbers from ads.google.com and this table holds each snapshot
+// so /admin/google-ads has something real to show instead of nothing.
+
+model GoogleAdsSnapshot {
+  id           String   @id @default(cuid())
+  campaignName String
+  dateRangeFrom DateTime
+  dateRangeTo   DateTime
+
+  impressions Int
+  clicks      Int
+  costPkr     Float
+  conversions Float
+  ctr         Float // percent, e.g. 3.8 for 3.8%
+
+  note String? // optional context from whoever recorded it
+
+  recordedAt DateTime @default(now())
+
+  @@index([recordedAt])
+}
