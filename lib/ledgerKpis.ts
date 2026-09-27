@@ -14,6 +14,7 @@
 //   • "Cash" was the stored balance on bank records, without cash in hand.
 
 import { prisma } from "@/lib/prisma";
+import { BILL_EPS, collectPartyBills, settleBills } from "@/lib/billAgeing";
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const INCOME_TYPE = /^(INCOME|REVENUE)$/i;
@@ -197,4 +198,65 @@ export async function ledgerPositions(companyId: string, branchId: string | null
     overdueAmount: round2(overdueAmount),
     overdueCount,
   };
+}
+
+export type OpenBill = {
+  accountId: string;
+  party: string;
+  /** Voucher number of the bill (the invoice number for posted invoices), or "---" for an opening balance. */
+  ref: string;
+  date: Date;
+  dueDate: Date;
+  amount: number;
+  balance: number;
+};
+
+/**
+ * Every customer (RECEIVABLE) or supplier (PAYABLE) bill with something still
+ * open on it, bill-wise from the ledger: payments settle the oldest bills
+ * first (lib/billAgeing.ts). `dueDate` is the bill date plus the party's credit
+ * days (30 when none are set).
+ */
+export async function openPartyBills(
+  companyId: string,
+  side: "RECEIVABLE" | "PAYABLE",
+  asOf = new Date(),
+): Promise<OpenBill[]> {
+  const parties = await prisma.account.findMany({
+    where: { companyId, partyType: side === "RECEIVABLE" ? "CUSTOMER" : "SUPPLIER" },
+    select: { id: true, name: true, creditDays: true, openDebit: true, openCredit: true, openDate: true },
+  });
+  if (!parties.length) return [];
+
+  const entries = await prisma.voucherEntry.findMany({
+    where: { accountId: { in: parties.map((p) => p.id) }, voucher: { companyId, deletedAt: null, date: { lte: asOf } } },
+    select: { accountId: true, amount: true, voucher: { select: { date: true, voucherNo: true, narration: true, type: true } } },
+    orderBy: { voucher: { date: "asc" } },
+  });
+  const byParty = new Map<string, typeof entries>();
+  for (const e of entries) {
+    const list = byParty.get(e.accountId);
+    if (list) list.push(e);
+    else byParty.set(e.accountId, [e]);
+  }
+
+  const out: OpenBill[] = [];
+  for (const p of parties) {
+    const openingDebit = Number(p.openDebit || 0) - Number(p.openCredit || 0);
+    const { bills, credit } = collectPartyBills({
+      entries: byParty.get(p.id) ?? [],
+      opening: side === "RECEIVABLE" ? openingDebit : -openingDebit,
+      openingDate: p.openDate ? new Date(p.openDate) : null,
+      asOn: asOf,
+      side,
+    });
+    const { settled } = settleBills(bills, credit);
+    for (const b of settled) {
+      if (b.balance <= BILL_EPS) continue;
+      const dueDate = new Date(b.date);
+      dueDate.setDate(dueDate.getDate() + (p.creditDays ?? 30));
+      out.push({ accountId: p.id, party: p.name, ref: b.numType, date: b.date, dueDate, amount: round2(b.amount), balance: round2(b.balance) });
+    }
+  }
+  return out;
 }

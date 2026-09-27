@@ -1,10 +1,18 @@
 /**
  * GET /api/reports/expense-breakdown
- * Groups expense voucher items by category | costCenter
+ * Expenses for the period, by expense account (default) or by cost center.
  * Query params: period (month|quarter|year), groupBy (category|costCenter)
+ *
+ * The default view reads the P&L's operating and finance expense lines
+ * (lib/profitLoss.ts), so it adds up to the P&L. It used to read expense
+ * vouchers only, missing salaries, rent posted by journal and anything else
+ * not keyed as an expense voucher. The cost-center view still reads expense
+ * vouchers, since those are what carry a cost center.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
+import { computeProfitLoss } from "@/lib/profitLoss";
 
 function getPeriodRange(period: string): { start: Date; end: Date; prevStart: Date; prevEnd: Date } {
   const now   = new Date();
@@ -36,7 +44,7 @@ function getPeriodRange(period: string): { start: Date; end: Date; prevStart: Da
 
 export async function GET(req: NextRequest) {
   try {
-    const companyId = req.headers.get("x-company-id");
+    const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ rows: [] });
 
     const { searchParams } = new URL(req.url);
@@ -77,34 +85,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ rows });
     }
 
-    // Default: group by ExpenseItem.category in SQL, not by loading all rows into JS.
-    const [currentItems, previousItems] = await Promise.all([
-      prisma.$queryRaw<{ category: string; amount: number }[]>`
-        SELECT COALESCE(ei."category", 'Other') AS category,
-               COALESCE(SUM(ei."amount"), 0)::float AS amount
-        FROM "ExpenseItem" ei
-        INNER JOIN "ExpenseVoucher" ev ON ev."id" = ei."expenseVoucherId"
-        WHERE ev."companyId" = ${companyId}
-          AND ev."date" >= ${start}
-          AND ev."date" < ${end}
-          AND ev."deletedAt" IS NULL
-        GROUP BY COALESCE(ei."category", 'Other')
-      `,
-      prisma.$queryRaw<{ category: string; amount: number }[]>`
-        SELECT COALESCE(ei."category", 'Other') AS category,
-               COALESCE(SUM(ei."amount"), 0)::float AS amount
-        FROM "ExpenseItem" ei
-        INNER JOIN "ExpenseVoucher" ev ON ev."id" = ei."expenseVoucherId"
-        WHERE ev."companyId" = ${companyId}
-          AND ev."date" >= ${prevStart}
-          AND ev."date" < ${prevEnd}
-          AND ev."deletedAt" IS NULL
-        GROUP BY COALESCE(ei."category", 'Other')
-      `,
+    // Default: every operating and finance expense account on the P&L.
+    const branchId = await resolveBranchId(req, companyId);
+    const endInclusive = new Date(end.getTime() - 1);
+    const prevEndInclusive = new Date(prevEnd.getTime() - 1);
+    const [currentPL, prevPL] = await Promise.all([
+      computeProfitLoss({ companyId, branchId, fromDate: start, toDate: endInclusive }),
+      computeProfitLoss({ companyId, branchId, fromDate: prevStart, toDate: prevEndInclusive }),
     ]);
-
-    const aggCurrent = Object.fromEntries(currentItems.map((item) => [item.category || "Other", Number(item.amount || 0)]));
-    const aggPrev = Object.fromEntries(previousItems.map((item) => [item.category || "Other", Number(item.amount || 0)]));
+    const lines = (pl: typeof currentPL) =>
+      Object.fromEntries([...pl.operatingExpenses, ...pl.financeExpenses].map((l) => [l.name, l.amount]));
+    const aggCurrent = lines(currentPL);
+    const aggPrev = lines(prevPL);
 
     const total = Object.values(aggCurrent).reduce((s, v) => s + v, 0);
     const rows = Object.entries(aggCurrent).map(([cat, amount]) => {

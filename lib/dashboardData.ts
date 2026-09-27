@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { ledgerMonthlyPL, ledgerPL, ledgerPositions } from "@/lib/ledgerKpis";
+import { ledgerMonthlyPL, ledgerPL, ledgerPositions, openPartyBills } from "@/lib/ledgerKpis";
 
 export function getPeriodStart(period: string, now = new Date()) {
   if (period === "all") return new Date(2000, 0, 1);
@@ -10,13 +10,6 @@ export function getPeriodStart(period: string, now = new Date()) {
   }
   if (period === "year") return new Date(now.getFullYear(), 0, 1);
   return new Date(now.getFullYear(), now.getMonth(), 1);
-}
-
-// Sargable overdue predicate — bare "date" column on the left so the
-// (companyId, date) / (companyId, deletedAt) indexes can bound the scan
-// instead of Postgres evaluating an interval expression on every row.
-function overdueClause(alias: string, now: Date) {
-  return Prisma.sql`${Prisma.raw(`"${alias}"`)}."date" < ${now} - ((COALESCE(a."creditDays", 30))::text || ' days')::interval`;
 }
 
 export async function getSummary(companyId: string, branchId: string | null, period: string) {
@@ -243,39 +236,14 @@ export async function getTodayStats(companyId: string, branchId: string | null) 
 export async function getDueThisWeek(companyId: string) {
   const now = new Date();
   const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const dayMs = 86_400_000;
 
-  const [overdueReceivables, dueSoon, banks] = await Promise.all([
-    prisma.$queryRaw<{ id: string; invoiceNo: string; party: string; amount: number; dueDate: Date; daysOverdue: number }[]>`
-      SELECT si."id",
-             si."invoiceNo",
-             COALESCE(a."name", '—') AS party,
-             COALESCE(si."total", 0)::float AS amount,
-             (si."date" + ((COALESCE(a."creditDays", 30))::text || ' days')::interval) AS "dueDate",
-             FLOOR(EXTRACT(EPOCH FROM (${now} - (si."date" + ((COALESCE(a."creditDays", 30))::text || ' days')::interval))) / 86400)::int AS "daysOverdue"
-      FROM "SalesInvoice" si
-      LEFT JOIN "Account" a ON a."id" = si."customerId"
-      WHERE si."companyId" = ${companyId}
-        AND si."deletedAt" IS NULL
-        AND ${overdueClause("si", now)}
-      ORDER BY amount DESC
-      LIMIT 5
-    `,
-    prisma.$queryRaw<{ id: string; invoiceNo: string; party: string; amount: number; dueDate: Date; daysLeft: number }[]>`
-      SELECT pi."id",
-             pi."invoiceNo",
-             COALESCE(a."name", '—') AS party,
-             COALESCE(pi."total", 0)::float AS amount,
-             (pi."date" + ((COALESCE(a."creditDays", 30))::text || ' days')::interval) AS "dueDate",
-             FLOOR(EXTRACT(EPOCH FROM ((pi."date" + ((COALESCE(a."creditDays", 30))::text || ' days')::interval) - ${now})) / 86400)::int AS "daysLeft"
-      FROM "PurchaseInvoice" pi
-      LEFT JOIN "Account" a ON a."id" = pi."supplierId"
-      WHERE pi."companyId" = ${companyId}
-        AND pi."deletedAt" IS NULL
-        AND pi."date" >= ${now} - ((COALESCE(a."creditDays", 30))::text || ' days')::interval
-        AND pi."date" <= ${in7Days} - ((COALESCE(a."creditDays", 30))::text || ' days')::interval
-      ORDER BY "daysLeft" ASC
-      LIMIT 5
-    `,
+  // Bill-wise from the ledger (lib/ledgerKpis.ts): only what is still unpaid.
+  // These used to list every invoice past (or near) its credit days at its
+  // full total, paid or not.
+  const [receivable, payable, banks] = await Promise.all([
+    openPartyBills(companyId, "RECEIVABLE", now),
+    openPartyBills(companyId, "PAYABLE", now),
     prisma.bankAccount.findMany({
       where: { companyId },
       select: { id: true, bankName: true, accountName: true, balance: true },
@@ -284,17 +252,31 @@ export async function getDueThisWeek(companyId: string) {
     }),
   ]);
 
-  return {
-    overdueReceivables: overdueReceivables.map((row) => ({
-      ...row,
-      amount: Number(row.amount || 0),
-      dueDate: new Date(row.dueDate).toISOString().slice(0, 10),
-    })),
-    dueSoon: dueSoon.map((row) => ({
-      ...row,
-      amount: Number(row.amount || 0),
-      dueDate: new Date(row.dueDate).toISOString().slice(0, 10),
-    })),
-    banks,
-  };
+  const overdueReceivables = receivable
+    .filter((b) => b.dueDate < now)
+    .sort((a, b) => b.balance - a.balance)
+    .slice(0, 5)
+    .map((b) => ({
+      id: `${b.accountId}:${b.ref}:${b.date.toISOString()}`,
+      invoiceNo: b.ref === "---" ? "Opening balance" : b.ref,
+      party: b.party,
+      amount: b.balance,
+      dueDate: b.dueDate.toISOString().slice(0, 10),
+      daysOverdue: Math.floor((now.getTime() - b.dueDate.getTime()) / dayMs),
+    }));
+
+  const dueSoon = payable
+    .filter((b) => b.dueDate >= now && b.dueDate <= in7Days)
+    .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime())
+    .slice(0, 5)
+    .map((b) => ({
+      id: `${b.accountId}:${b.ref}:${b.date.toISOString()}`,
+      invoiceNo: b.ref === "---" ? "Opening balance" : b.ref,
+      party: b.party,
+      amount: b.balance,
+      dueDate: b.dueDate.toISOString().slice(0, 10),
+      daysLeft: Math.floor((b.dueDate.getTime() - now.getTime()) / dayMs),
+    }));
+
+  return { overdueReceivables, dueSoon, banks };
 }

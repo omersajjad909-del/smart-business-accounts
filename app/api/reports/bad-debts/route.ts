@@ -1,84 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS } from "@/lib/permissions";
+import { openPartyBills } from "@/lib/ledgerKpis";
 
+/**
+ * Customer bills still unpaid past their credit days, oldest first.
+ *
+ * Bill-wise from the customer ledger accounts (openPartyBills): receipts
+ * settle the oldest bills first, and each row is what is left of one bill.
+ * This used to put the customer's *whole* outstanding on every overdue invoice
+ * row — three overdue invoices meant the debt counted three times — and took
+ * payments from receipts only, missing journals and opening balances.
+ */
 export async function GET(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
+    const allowed = await apiHasPermission(
+      req.headers.get("x-user-id"),
+      req.headers.get("x-user-role"),
+      PERMISSIONS.VIEW_FINANCIAL_REPORTS,
+      companyId,
+    );
+    if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
     const today = new Date();
-
-    // Get all sales invoices
-    const invoices = await prisma.salesInvoice.findMany({
-      where: { companyId, deletedAt: null },
-      include: {
-        customer: { select: { id: true, name: true, creditDays: true } },
-      },
-      orderBy: { date: "asc" },
-    });
-
-    // Get total payments received per customer (positive entries on customer accounts)
-    const receipts = await prisma.paymentReceipt.findMany({
-      where: { companyId, deletedAt: null },
-      select: { partyId: true, amount: true, date: true },
-    });
-
-    const paidByCustomer = new Map<string, number>();
-    for (const r of receipts) {
-      if (r.partyId) {
-        paidByCustomer.set(r.partyId, (paidByCustomer.get(r.partyId) || 0) + r.amount);
-      }
-    }
-
-    // Get returns to subtract
-    const returns = await prisma.saleReturn.findMany({
-      where: { companyId },
-      select: { customerId: true, total: true },
-    });
-    const returnsByCustomer = new Map<string, number>();
-    for (const r of returns) {
-      returnsByCustomer.set(r.customerId, (returnsByCustomer.get(r.customerId) || 0) + r.total);
-    }
-
-    // Build outstanding picture per invoice
-    const totalInvoicedByCustomer = new Map<string, number>();
-    for (const inv of invoices) {
-      totalInvoicedByCustomer.set(inv.customerId, (totalInvoicedByCustomer.get(inv.customerId) || 0) + inv.total);
-    }
-
-    const rows: any[] = [];
-
-    for (const inv of invoices) {
-      const creditDays = inv.customer?.creditDays || 30;
-      const dueDate = new Date(inv.date);
-      dueDate.setDate(dueDate.getDate() + creditDays);
-
-      const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysOverdue <= 0) continue;
-
-      const totalInvoiced = totalInvoicedByCustomer.get(inv.customerId) || 0;
-      const totalPaid = paidByCustomer.get(inv.customerId) || 0;
-      const totalReturned = returnsByCustomer.get(inv.customerId) || 0;
-      const outstanding = totalInvoiced - totalPaid - totalReturned;
-
-      if (outstanding <= 0) continue;
-
-      const status = daysOverdue > 180 ? "Bad Debt" : daysOverdue > 90 ? "Doubtful" : "Overdue";
-
-      rows.push({
-        customerName: inv.customer?.name || "Unknown",
-        invoiceNo: inv.invoiceNo,
-        invoiceDate: inv.date,
-        dueDate,
-        amount: outstanding,
-        daysOverdue,
-        status,
-      });
-    }
+    const rows = (await openPartyBills(companyId, "RECEIVABLE", today))
+      .map((b) => ({ ...b, daysOverdue: Math.floor((today.getTime() - b.dueDate.getTime()) / 86_400_000) }))
+      .filter((b) => b.daysOverdue > 0)
+      .map((b) => ({
+        customerName: b.party,
+        invoiceNo: b.ref === "---" ? "Opening balance" : b.ref,
+        invoiceDate: b.date,
+        dueDate: b.dueDate,
+        amount: b.balance,
+        daysOverdue: b.daysOverdue,
+        status: b.daysOverdue > 180 ? "Bad Debt" : b.daysOverdue > 90 ? "Doubtful" : "Overdue",
+      }));
 
     rows.sort((a, b) => b.daysOverdue - a.daysOverdue);
-
     return NextResponse.json({ rows: rows.slice(0, 100) });
   } catch (e: any) {
     console.error("BAD DEBTS ERROR:", e);
