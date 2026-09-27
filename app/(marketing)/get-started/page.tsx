@@ -69,7 +69,7 @@ import { useState, useEffect } from "react";
        <section className="max-w-7xl mx-auto px-6 pt-20 pb-10">
          <div className="grid md:grid-cols-2 gap-10 items-center">
            <div>
-             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-slate-900">Cloud Financial Management for Modern SMEs</h1>
+             <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-slate-900">Cloud Financial Management for SMEs &amp; Enterprises</h1>
              <p className="mt-4 text-lg text-slate-600">Secure, powerful, and simple accounting built for traders, distributors, manufacturers, and service businesses.</p>
              <div className="mt-6 flex flex-wrap gap-3">
                <a

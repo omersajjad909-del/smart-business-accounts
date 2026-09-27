@@ -191,7 +191,7 @@ function Products() {
             </div>
 
             <p style={{ fontSize: 15, color: "rgba(255,255,255,.55)", lineHeight: 1.75, marginBottom: 28 }}>
-              A full-stack cloud business management platform for SMEs. Covers accounting, invoicing, inventory, HR & payroll, CRM, bank reconciliation, multi-branch management, and AI-powered automation — all in one place.
+              A full-stack cloud business management platform for SMEs and enterprises. Covers accounting, invoicing, inventory, HR & payroll, CRM, bank reconciliation, multi-branch management, and AI-powered automation — all in one place.
             </p>
 
             <div className="forge-os-features" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 32 }}>

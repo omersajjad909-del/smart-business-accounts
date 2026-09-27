@@ -12,7 +12,7 @@ const BENEFITS = [
 
 const TRUST_POINTS = [
   { label: "Cloud ERP", value: "Modern" },
-  { label: "Built For", value: "SMEs" },
+  { label: "Built For", value: "SMEs & Enterprises" },
   { label: "Setup Flow", value: "Guided" },
 ];
 

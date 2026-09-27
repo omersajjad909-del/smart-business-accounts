@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   alternates: { canonical: `${BASE}${pathname}` },
   metadataBase: new URL(BASE),
   title: {
-    default: "FinovaOS — Cloud Accounting Software for Pakistan & Gulf SMEs",
+    default: "FinovaOS — Cloud Accounting & ERP for SMEs and Enterprises",
     template: "%s | FinovaOS",
   },
   description:
@@ -78,7 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
     type: "website",
     locale: "en_US",
     siteName: "FinovaOS",
-    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS — Cloud Accounting for SMEs" }],
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS — Cloud Accounting & ERP for SMEs and Enterprises" }],
   },
   twitter: {
     card: "summary_large_image",

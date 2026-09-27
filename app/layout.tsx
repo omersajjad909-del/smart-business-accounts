@@ -66,7 +66,7 @@ const BRAND_ALTERNATE_NAMES = [
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "FinovaOS — AI Cloud Accounting Software for SMEs",
+    default: "FinovaOS — AI Cloud Accounting & ERP for SMEs and Enterprises",
     template: "%s | FinovaOS",
   },
   description:
@@ -139,6 +139,9 @@ export const metadata: Metadata = {
     "business software Karachi", "business software Lahore",
     // Geo — UAE/Gulf
     "accounting software UAE", "cloud accounting Dubai", "SME software Gulf",
+    // Segment — SMEs through multi-branch enterprises
+    "enterprise accounting software", "enterprise ERP software", "ERP for large businesses",
+    "multi-branch accounting software", "enterprise ERP Pakistan", "enterprise ERP UAE",
   ],
   authors: [{ name: "Umer Sajjad", url: "https://www.finovaos.app/forge/about" }, { name: "Finova Forge", url: "https://finovaforge.com" }],
   creator: "Umer Sajjad",
@@ -159,7 +162,7 @@ export const metadata: Metadata = {
     siteName: "FinovaOS",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "AI cloud accounting for SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM in one platform.",
+      "AI cloud accounting & ERP for SMEs and enterprises. Invoicing, inventory, HR & payroll, bank reconciliation, CRM in one platform.",
   },
   twitter: {
     card: "summary_large_image",
@@ -167,7 +170,7 @@ export const metadata: Metadata = {
     creator: "@finovaos",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "AI-powered cloud accounting for SMEs in Pakistan, the UAE & beyond.",
+      "AI-powered cloud accounting & ERP for SMEs and enterprises in Pakistan, the UAE & beyond.",
   },
   applicationName: "FinovaOS",
   generator: "Next.js",
@@ -354,7 +357,7 @@ const websiteJsonLd = {
   name: "FinovaOS",
   alternateName: BRAND_ALTERNATE_NAMES,
   url: BASE_URL,
-  description: "FinovaOS — also written Finova OS — is cloud accounting and ERP software for modern SMEs.",
+  description: "FinovaOS — also written Finova OS — is cloud accounting and ERP software for businesses of every size, from growing SMEs to multi-branch enterprises.",
   publisher: { "@id": `${BASE_URL}/#organization` },
   // No SearchAction here — it used to promise a /search?q= sitelinks
   // searchbox, but no /search page exists (app/api/search/route.ts is an

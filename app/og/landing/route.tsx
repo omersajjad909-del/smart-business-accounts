@@ -47,7 +47,7 @@ export async function GET() {
             lineHeight: 1.3,
           }}
         >
-          Cloud Financial Management for SMEs — professional, trustworthy, and
+          Cloud Financial Management for SMEs &amp; Enterprises — professional, trustworthy, and
           simple. Real-time dashboards, smart reporting, and multi-company
           control.
         </div>

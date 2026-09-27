@@ -42,7 +42,7 @@ export default async function AboutLayout({ children }: { children: React.ReactN
     "@type": "AboutPage",
     name: "About FinovaOS",
     url: `${BASE}/about`,
-    description: "Learn about FinovaOS's mission to simplify business finance for SMEs worldwide.",
+    description: "Learn about FinovaOS's mission to simplify business finance for SMEs and enterprises worldwide.",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [

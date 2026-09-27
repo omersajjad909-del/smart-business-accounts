@@ -22,7 +22,7 @@ const JSON_LD = {
       "@type": "SoftwareApplication",
       "@id": `${BASE}/#software`,
       "name": "FinovaOS",
-      "description": "Cloud accounting software for Pakistan & UAE SMEs. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, and CRM — all in one platform, built for businesses in Karachi, Lahore, and Dubai.",
+      "description": "Cloud accounting & ERP software for Pakistan & UAE SMEs and enterprises. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, and CRM — all in one platform, built for businesses in Karachi, Lahore, and Dubai.",
       "url": BASE,
       "applicationCategory": "BusinessApplication",
       "applicationSubCategory": "AccountingApplication",
@@ -137,7 +137,7 @@ const JSON_LD = {
           "name": "Does FinovaOS work for businesses in Pakistan and UAE?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. FinovaOS is built for SMEs across Pakistan (FBR-ready) and the Gulf (UAE VAT-compatible). It supports PKR, AED, SAR, and other currencies with localized tax settings.",
+            "text": "Yes. FinovaOS is built for SMEs and enterprises across Pakistan (FBR-ready) and the Gulf (UAE VAT-compatible). It supports PKR, AED, SAR, and other currencies with localized tax settings.",
           },
         },
         {

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "FinovaOS — AI Cloud Accounting Software for SMEs";
+export const alt = "FinovaOS — AI Cloud Accounting & ERP for SMEs and Enterprises";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

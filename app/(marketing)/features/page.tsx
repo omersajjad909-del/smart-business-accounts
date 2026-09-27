@@ -2035,7 +2035,7 @@ export default function FeaturesPage() {
     <>
       <Head>
         <title>Features — FinovaOS</title>
-        <meta name="description" content={`${totalFeatures} features for accounting, inventory, HR, CRM and more — built for modern SMEs.`}/>
+        <meta name="description" content={`${totalFeatures} features for accounting, inventory, HR, CRM and more — built for SMEs and enterprises.`}/>
       </Head>
 
       <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,var(--dk-080c1e, #080c1e) 0%,var(--dk-0c0f2e, #0c0f2e) 25%,var(--dk-080c1e, #080c1e) 100%)", color:"var(--ink-solid, white)", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
@@ -2093,7 +2093,7 @@ export default function FeaturesPage() {
             </h1>
 
             <p style={{ fontSize:17, color:"rgba(var(--ink),var(--ta-45, .45))", lineHeight:1.8, maxWidth:580, margin:"0 auto 44px", opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)", transition:"all .6s ease .16s" }}>
-              From double-entry accounting to real-time inventory — every feature purpose-built for the way modern SMEs actually operate.
+              From double-entry accounting to real-time inventory — every feature purpose-built for the way SMEs and enterprises actually operate.
             </p>
 
             <div style={{ display:"flex", justifyContent:"center", gap:14, flexWrap:"wrap", marginBottom:52, opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(14px)", transition:"all .6s ease .22s" }}>
@@ -2162,7 +2162,7 @@ export default function FeaturesPage() {
                 </span>
               </h2>
               <p style={{ fontSize:16, color:"rgba(var(--ink),var(--ta-50, .5))", marginBottom:40, maxWidth:460, margin:"0 auto 40px", lineHeight:1.8 }}>
-                Purpose-built for SMEs who need accounting software that actually fits how they work.
+                Purpose-built for SMEs and enterprises that need accounting software that actually fits how they work.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
                 <Link href="/pricing" style={{ padding:"14px 36px", borderRadius:14, background:"linear-gradient(135deg,#fbbf24,#f59e0b)", color:"#0f172a", fontWeight:800, fontSize:15, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, boxShadow:"0 6px 24px rgba(251,191,36,.4)", transition:"all .25s" }}

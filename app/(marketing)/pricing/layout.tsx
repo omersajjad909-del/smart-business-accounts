@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     "invoicing software cost",
     "cloud accounting plans",
     "SME accounting subscription",
+    "enterprise ERP pricing",
     "affordable accounting software",
     "FinovaOS pricing",
     "business software plans",
