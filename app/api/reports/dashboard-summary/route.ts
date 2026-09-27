@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
           prisma.voucherEntry.findMany({
             where: {
               accountId: { in: partyIds },
-              voucher: { companyId, ...(branchId ? { branchId } : {}) },
+              voucher: { companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
             },
             include: {
               voucher: { select: { date: true, voucherNo: true, narration: true, type: true } },

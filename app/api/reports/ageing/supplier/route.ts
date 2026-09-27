@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     const entries = await prisma.voucherEntry.findMany({
       where: {
         accountId: supplierId,
-        voucher: { date: { lt: before }, companyId },
+        voucher: { date: { lt: before }, companyId, deletedAt: null },
       },
       include: { voucher: { select: { date: true, voucherNo: true, narration: true, type: true } } },
       orderBy: { voucher: { date: "asc" } },

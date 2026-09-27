@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { computeProfitLoss } from "@/lib/profitLoss";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,30 +12,23 @@ export async function GET(req: NextRequest) {
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-    const [invoices, expenses] = await Promise.all([
+    // Money from the P&L (lib/profitLoss.ts), so this agrees with it: revenue
+    // net of tax, variable cost = cost of sales, fixed cost = operating and
+    // finance expenses. It used to take revenue with GST in it and "fixed
+    // costs" from expense vouchers alone, which left out salaries, rent paid by
+    // journal and everything else not keyed as an expense voucher.
+    const [pl, invoices] = await Promise.all([
+      computeProfitLoss({ companyId, fromDate: start, toDate: end }),
       prisma.salesInvoice.findMany({
         where: { companyId, deletedAt: null, date: { gte: start, lte: end } },
-        include: { items: { include: { item: { select: { purchaseRate: true } } } } },
-      }),
-      prisma.expenseVoucher.findMany({
-        where: { companyId, deletedAt: null, date: { gte: start, lte: end } },
-        select: { totalAmount: true },
+        select: { items: { select: { qty: true } } },
       }),
     ]);
 
-    let totalRevenue = 0;
-    let totalCogs = 0;
-    let totalUnits = 0;
-
-    for (const inv of invoices) {
-      totalRevenue += inv.total;
-      for (const it of inv.items) {
-        totalCogs += it.qty * (it.item.purchaseRate || 0);
-        totalUnits += it.qty;
-      }
-    }
-
-    const fixedCosts = expenses.reduce((s, e) => s + e.totalAmount, 0);
+    const totalRevenue = pl.netSales;
+    const totalCogs = pl.cogs;
+    const totalUnits = invoices.reduce((s, inv) => s + inv.items.reduce((t, it) => t + Number(it.qty || 0), 0), 0);
+    const fixedCosts = pl.totalOpEx + pl.totalFinanceExpenses;
     const avgSellingPrice = totalUnits > 0 ? totalRevenue / totalUnits : 0;
     const variableCostPerUnit = totalUnits > 0 ? totalCogs / totalUnits : 0;
     const contributionMargin = avgSellingPrice - variableCostPerUnit;

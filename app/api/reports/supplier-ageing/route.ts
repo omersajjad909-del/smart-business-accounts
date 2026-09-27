@@ -1,70 +1,83 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS } from "@/lib/permissions";
+import { BILL_EPS, asOnWindow, billDays, collectPartyBills, settleBills } from "@/lib/billAgeing";
 
+/**
+ * What is owed to each supplier, by how long each bill has been open.
+ *
+ * Read from the supplier ledger accounts with the same bill-wise settlement the
+ * detailed Ageing report uses (lib/billAgeing.ts). This summary used to age the
+ * full amount of every purchase invoice, took "payments" from expense vouchers
+ * (supplier payments are CPV/bank vouchers) and ignored opening balances — so
+ * paid bills stayed in the buckets and the totals never came down.
+ */
 export async function GET(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
-    const today = new Date();
+    const allowed = await apiHasPermission(
+      req.headers.get("x-user-id"),
+      req.headers.get("x-user-role"),
+      PERMISSIONS.VIEW_FINANCIAL_REPORTS,
+      companyId,
+    );
+    if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const invoices = await prisma.purchaseInvoice.findMany({
-      where: { companyId, deletedAt: null },
-      include: { supplier: { select: { id: true, name: true } } },
+    const asOnKey = req.nextUrl.searchParams.get("date") || new Date().toISOString().slice(0, 10);
+    const { before, lastDay } = asOnWindow(asOnKey);
+
+    const suppliers = await prisma.account.findMany({
+      where: { companyId, partyType: "SUPPLIER" },
+      select: { id: true, name: true, openDebit: true, openCredit: true, openDate: true },
     });
+    if (!suppliers.length) return NextResponse.json({ rows: [] });
 
-    // Total payments made to suppliers
-    const payments = await prisma.expenseVoucher.findMany({
-      where: { companyId, deletedAt: null },
-      select: { expenseAccountId: true, totalAmount: true },
+    const entries = await prisma.voucherEntry.findMany({
+      where: {
+        accountId: { in: suppliers.map((s) => s.id) },
+        voucher: { companyId, deletedAt: null, date: { lt: before } },
+      },
+      select: { accountId: true, amount: true, voucher: { select: { date: true, voucherNo: true, narration: true, type: true } } },
+      orderBy: { voucher: { date: "asc" } },
     });
-
-    const paidBySupplier = new Map<string, number>();
-    for (const p of payments) {
-      paidBySupplier.set(p.expenseAccountId, (paidBySupplier.get(p.expenseAccountId) || 0) + p.totalAmount);
+    const bySupplier = new Map<string, typeof entries>();
+    for (const e of entries) {
+      const list = bySupplier.get(e.accountId);
+      if (list) list.push(e);
+      else bySupplier.set(e.accountId, [e]);
     }
 
-    const map = new Map<string, {
-      name: string;
-      current: number;
-      days30: number;
-      days60: number;
-      days90: number;
-      over90: number;
-    }>();
+    const rows = suppliers
+      .map((s) => {
+        const { bills, credit } = collectPartyBills({
+          entries: bySupplier.get(s.id) ?? [],
+          // A credit opening on a supplier is money owed.
+          opening: Number(s.openCredit || 0) - Number(s.openDebit || 0),
+          openingDate: s.openDate ? new Date(s.openDate) : null,
+          asOn: lastDay,
+          side: "PAYABLE",
+        });
+        const { settled, unapplied } = settleBills(bills, credit);
 
-    for (const inv of invoices) {
-      const sid = inv.supplierId;
-      const supplierName = inv.supplier?.name || "Unknown";
-      if (!map.has(sid)) map.set(sid, { name: supplierName, current: 0, days30: 0, days60: 0, days90: 0, over90: 0 });
-
-      const daysAgo = Math.floor((today.getTime() - inv.date.getTime()) / (1000 * 60 * 60 * 24));
-      const rec = map.get(sid)!;
-
-      if (daysAgo <= 30) rec.current += inv.total;
-      else if (daysAgo <= 60) rec.days30 += inv.total;
-      else if (daysAgo <= 90) rec.days60 += inv.total;
-      else if (daysAgo <= 120) rec.days90 += inv.total;
-      else rec.over90 += inv.total;
-    }
-
-    const rows = [...map.entries()]
-      .map(([id, r]) => {
-        const total = r.current + r.days30 + r.days60 + r.days90 + r.over90;
-        const paid = paidBySupplier.get(id) || 0;
-        const outstanding = Math.max(0, total - paid);
-        return {
-          supplierName: r.name,
-          current: r.current,
-          days30: r.days30,
-          days60: r.days60,
-          days90: r.days90,
-          over90: r.over90,
-          total: outstanding,
-        };
+        const r = { supplierName: s.name, current: 0, days30: 0, days60: 0, days90: 0, over90: 0, total: 0 };
+        for (const bill of settled) {
+          if (bill.balance <= BILL_EPS) continue;
+          const days = billDays(bill.date, lastDay);
+          if (days <= 30) r.current += bill.balance;
+          else if (days <= 60) r.days30 += bill.balance;
+          else if (days <= 90) r.days60 += bill.balance;
+          else if (days <= 120) r.days90 += bill.balance;
+          else r.over90 += bill.balance;
+        }
+        // An advance paid beyond every bill leaves nothing payable.
+        r.total = r.current + r.days30 + r.days60 + r.days90 + r.over90 - unapplied;
+        return r;
       })
-      .filter((r) => r.total > 0)
+      .filter((r) => r.total > BILL_EPS)
       .sort((a, b) => b.total - a.total);
 
     return NextResponse.json({ rows });

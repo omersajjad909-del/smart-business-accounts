@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invoiceRevenue } from "@/lib/invoiceAmounts";
 import { resolveCompanyId } from "@/lib/tenant";
 
 function periodRange(period: string): { start: Date; end: Date } {
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
       const region = inv.customer.city?.trim() || "Unknown";
       if (!map.has(region)) map.set(region, { totalSales: 0, cogs: 0, invoices: new Set(), customers: new Set() });
       const rec = map.get(region)!;
-      rec.totalSales += inv.total;
+      rec.totalSales += invoiceRevenue(inv); // tax excluded — GST is not sales
       rec.invoices.add(inv.id);
       rec.customers.add(inv.customer.id);
       for (const it of inv.items) {

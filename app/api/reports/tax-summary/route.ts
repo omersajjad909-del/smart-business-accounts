@@ -4,6 +4,7 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { getBaseAmounts, resolveAmount } from "@/lib/currencyHelper";
+import { invoiceParts } from "@/lib/invoiceAmounts";
 
 export async function GET(req: NextRequest) {
   try {
@@ -60,13 +61,8 @@ export async function GET(req: NextRequest) {
     const summary = new Map<string, Row>();
 
     const add = (direction: Row["direction"], inv: (typeof salesInvoices)[number]) => {
-      // Tax is not stored on the invoice; it is what the total carries beyond
-      // the taxable value and freight — exact for item-level and invoice-level
-      // tax alike (see the total formula in the invoice routes).
-      const gross = inv.items.reduce((s, i) => s + Number(i.qty) * Number(i.rate), 0);
-      const discount = inv.discountType === "percent" ? gross * Number(inv.discount || 0) / 100 : Number(inv.discount || 0);
-      const taxable = gross - discount;
-      const tax = Number(inv.total) - taxable - Number(inv.freight || 0);
+      // Tax is not stored on the invoice — see lib/invoiceAmounts.ts.
+      const { taxable, tax } = invoiceParts(inv);
       if (tax <= 0.005) return;
 
       // Report in base currency, scaling by the invoice's own conversion.

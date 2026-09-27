@@ -3,6 +3,23 @@ import { prisma } from "@/lib/prisma";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
+import { invoiceRevenue } from "@/lib/invoiceAmounts";
+
+/**
+ * Latest stock rate per item, in one query — this used to run one query per
+ * invoice line.
+ */
+async function latestCost(companyId: string, itemIds: string[]) {
+  if (!itemIds.length) return new Map<string, number>();
+  const rates = await prisma.stockRate.findMany({
+    where: { companyId, itemId: { in: [...new Set(itemIds)] } },
+    orderBy: { createdAt: "desc" },
+    select: { itemId: true, rate: true },
+  });
+  const map = new Map<string, number>();
+  for (const r of rates) if (!map.has(r.itemId)) map.set(r.itemId, Number(r.rate) || 0);
+  return map;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,6 +56,7 @@ export async function GET(req: NextRequest) {
         where: {
           date: { gte: fromDate, lte: toDate },
           companyId,
+          deletedAt: null,
         },
         include: {
           customer: true,
@@ -50,6 +68,7 @@ export async function GET(req: NextRequest) {
         },
       });
 
+      const costOf = await latestCost(companyId, salesInvoices.flatMap((inv) => inv.items.map((i) => i.itemId)));
       const customerProfit: Record<string, Any> = {};
 
       for (const invoice of salesInvoices) {
@@ -68,19 +87,11 @@ export async function GET(req: NextRequest) {
         }
 
         customerProfit[customerId].invoiceCount += 1;
-        customerProfit[customerId].totalSales += invoice.total;
+        // Tax excluded: GST collected is owed to the government, not sales.
+        customerProfit[customerId].totalSales += invoiceRevenue(invoice);
 
-        // Calculate cost (simplified - using average cost)
         for (const item of invoice.items) {
-          const stockRates = await prisma.stockRate.findMany({
-            where: { itemId: item.itemId, companyId },
-            orderBy: { createdAt: "desc" },
-            take: 1,
-          });
-
-          const avgCost = stockRates.length > 0 ? stockRates[0].rate : 0;
-          const cost = avgCost * item.qty;
-          customerProfit[customerId].totalCost += cost;
+          customerProfit[customerId].totalCost += (costOf.get(item.itemId) || 0) * item.qty;
         }
       }
 
@@ -98,6 +109,7 @@ export async function GET(req: NextRequest) {
           invoice: {
             date: { gte: fromDate, lte: toDate },
             companyId,
+            deletedAt: null,
           },
         },
         include: {
@@ -106,6 +118,7 @@ export async function GET(req: NextRequest) {
         },
       });
 
+      const costOf = await latestCost(companyId, salesInvoiceItems.map((i) => i.itemId));
       const productProfit: Record<string, Any> = {};
 
       for (const item of salesInvoiceItems) {
@@ -126,15 +139,7 @@ export async function GET(req: NextRequest) {
         productProfit[itemId].quantitySold += item.qty;
         productProfit[itemId].totalSales += item.amount;
 
-        // Get average cost
-        const stockRates = await prisma.stockRate.findMany({
-          where: { itemId, companyId },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        });
-
-        const avgCost = stockRates.length > 0 ? stockRates[0].rate : 0;
-        productProfit[itemId].totalCost += avgCost * item.qty;
+        productProfit[itemId].totalCost += (costOf.get(itemId) || 0) * item.qty;
       }
 
       const result = Object.values(productProfit).map((pp: any) => ({
