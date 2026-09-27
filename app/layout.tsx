@@ -391,7 +391,7 @@ export default async function RootLayout({
         <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `if(typeof window!=="undefined"&&!window.webkit){window.webkit={messageHandlers:{}}}` }} />
         {/* GA4 — loaded early but defaults to consent denied until AnalyticsLoader updates it */}
         <script nonce={nonce} suppressHydrationWarning async src="https://www.googletagmanager.com/gtag/js?id=G-PY9D7NW061" />
-        <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});gtag('js',new Date());gtag('config','G-PY9D7NW061',{anonymize_ip:true});` }} />
+        <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});gtag('js',new Date());gtag('config','G-PY9D7NW061',{anonymize_ip:true});gtag('config','AW-18478573284');` }} />
         {/* Clarity is injected by AnalyticsLoader only after analytics consent is given */}
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }} />
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
