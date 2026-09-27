@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
+import { getBaseAmounts, resolveAmount } from "@/lib/currencyHelper";
 
 export async function GET(req: NextRequest) {
   try {
@@ -29,137 +30,98 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
     const to = searchParams.get("to");
-    const _taxType = searchParams.get("taxType");
 
     const fromDate = from ? new Date(from + "T00:00:00") : undefined;
     const toDate = to ? new Date(to + "T23:59:59.999") : undefined;
 
-    const where: any = {};
-    if (fromDate && toDate) {
-      where.date = { gte: fromDate, lte: toDate };
-    }
+    // Output tax (charged on sales) and input tax (paid on purchases) are
+    // separate lines: what is owed to the tax authority is output − input.
+    // This report used to add the two together under one "GST" row, which
+    // overstated the liability by the whole input credit.
+    const dateFilter = fromDate && toDate ? { date: { gte: fromDate, lte: toDate } } : {};
+    const scope = { companyId, deletedAt: null, ...dateFilter, ...(branchId ? { branchId } : {}) };
+    const invoiceSelect = {
+      id: true, total: true, discount: true, discountType: true, freight: true,
+      taxConfig: { select: { taxType: true, taxCode: true, taxRate: true } },
+      items: { select: { qty: true, rate: true, taxPercent: true } },
+    } as const;
 
-    // 1. Sales Invoices with Tax
-    const salesInvoicesWithTax = await prisma.salesInvoice.findMany({
-      where: {
-        ...where,
-        taxConfigId: { not: null },
-        companyId,
-        ...(branchId ? { branchId } : {}),
-      },
-      include: {
-        taxConfig: true,
-      },
-    });
+    const [salesInvoices, purchaseInvoices] = await Promise.all([
+      prisma.salesInvoice.findMany({ where: scope, select: invoiceSelect }),
+      prisma.purchaseInvoice.findMany({ where: scope, select: invoiceSelect }),
+    ]);
+    const baseAmounts = await getBaseAmounts([...salesInvoices, ...purchaseInvoices].map((i) => i.id));
 
-    // 2. Purchase Invoices with Tax
-    const purchaseInvoicesWithTax = await prisma.purchaseInvoice.findMany({
-      where: {
-        ...where,
-        taxConfigId: { not: null },
-        companyId,
-        ...(branchId ? { branchId } : {}),
-      },
-      include: {
-        taxConfig: true,
-      },
-    });
+    type Row = {
+      direction: "OUTPUT" | "INPUT";
+      taxType: string; taxCode: string; taxRate: number;
+      invoiceCount: number; totalSubtotal: number; totalTaxAmount: number; totalAmount: number;
+    };
+    const summary = new Map<string, Row>();
 
-    // 3. Legacy InvoiceTax entries from the old system.
+    const add = (direction: Row["direction"], inv: (typeof salesInvoices)[number]) => {
+      // Tax is not stored on the invoice; it is what the total carries beyond
+      // the taxable value and freight — exact for item-level and invoice-level
+      // tax alike (see the total formula in the invoice routes).
+      const gross = inv.items.reduce((s, i) => s + Number(i.qty) * Number(i.rate), 0);
+      const discount = inv.discountType === "percent" ? gross * Number(inv.discount || 0) / 100 : Number(inv.discount || 0);
+      const taxable = gross - discount;
+      const tax = Number(inv.total) - taxable - Number(inv.freight || 0);
+      if (tax <= 0.005) return;
+
+      // Report in base currency, scaling by the invoice's own conversion.
+      const fx = Number(inv.total) ? resolveAmount(inv.id, Number(inv.total), baseAmounts) / Number(inv.total) : 1;
+      const rate = inv.taxConfig?.taxRate ?? Math.round((tax / taxable) * 10000) / 100;
+      const taxType = inv.taxConfig?.taxType || "Sales Tax";
+      const key = `${direction}|${taxType}|${rate}`;
+      const row = summary.get(key) ?? {
+        direction, taxType, taxCode: inv.taxConfig?.taxCode || "", taxRate: rate,
+        invoiceCount: 0, totalSubtotal: 0, totalTaxAmount: 0, totalAmount: 0,
+      };
+      row.invoiceCount += 1;
+      row.totalSubtotal += taxable * fx;
+      row.totalTaxAmount += tax * fx;
+      row.totalAmount += (taxable + tax) * fx;
+      summary.set(key, row);
+    };
+    salesInvoices.forEach((inv) => add("OUTPUT", inv));
+    purchaseInvoices.forEach((inv) => add("INPUT", inv));
+
+    // Legacy InvoiceTax rows from the old tax system, for invoices not already
+    // counted above.
+    const counted = new Set([...salesInvoices, ...purchaseInvoices].map((i) => i.id));
     const legacyTaxes = await prisma.invoiceTax.findMany({
       where: {
-        createdAt: where.createdAt,
         taxConfiguration: { companyId },
+        ...(fromDate && toDate ? { createdAt: { gte: fromDate, lte: toDate } } : {}),
       },
-      include: {
-        taxConfiguration: true,
-      },
+      include: { taxConfiguration: true },
     });
+    for (const it of legacyTaxes) {
+      if (counted.has(it.invoiceId)) continue;
+      const direction = it.invoiceType === "PURCHASE" ? "INPUT" : "OUTPUT";
+      const key = `${direction}|${it.taxConfiguration.taxType}|${it.taxConfiguration.taxRate}`;
+      const row = summary.get(key) ?? {
+        direction, taxType: it.taxConfiguration.taxType, taxCode: it.taxConfiguration.taxCode,
+        taxRate: it.taxConfiguration.taxRate, invoiceCount: 0, totalSubtotal: 0, totalTaxAmount: 0, totalAmount: 0,
+      };
+      row.invoiceCount += 1;
+      row.totalSubtotal += it.subtotal;
+      row.totalTaxAmount += it.taxAmount;
+      row.totalAmount += it.totalAmount;
+      summary.set(key, row);
+    }
 
-    // Group by tax type
-    const summary: Record<string, Any> = {};
-
-    // Process Sales Invoices
-    salesInvoicesWithTax.forEach((inv: any) => {
-      if (!inv.taxConfig) return;
-      const key = inv.taxConfig.taxType;
-      
-      if (!summary[key]) {
-        summary[key] = {
-          taxType: key,
-          taxCode: inv.taxConfig.taxCode,
-          taxRate: inv.taxConfig.taxRate,
-          invoiceCount: 0,
-          totalSubtotal: 0,
-          totalTaxAmount: 0,
-          totalAmount: 0,
-        };
-      }
-
-      // Correct calculation: subtract subtotal from total.
-      const taxRate = inv.taxConfig.taxRate / 100;
-      const subtotal = inv.total / (1 + taxRate);
-      const taxAmount = inv.total - subtotal;
-
-      summary[key].invoiceCount += 1;
-      summary[key].totalSubtotal += subtotal;
-      summary[key].totalTaxAmount += taxAmount;
-      summary[key].totalAmount += inv.total;
-    });
-
-    // Process Purchase Invoices
-    purchaseInvoicesWithTax.forEach((inv: any) => {
-      if (!inv.taxConfig) return;
-      const key = inv.taxConfig.taxType;
-      
-      if (!summary[key]) {
-        summary[key] = {
-          taxType: key,
-          taxCode: inv.taxConfig.taxCode,
-          taxRate: inv.taxConfig.taxRate,
-          invoiceCount: 0,
-          totalSubtotal: 0,
-          totalTaxAmount: 0,
-          totalAmount: 0,
-        };
-      }
-
-      // Correct calculation: subtract subtotal from total.
-      const taxRate = inv.taxConfig.taxRate / 100;
-      const subtotal = inv.total / (1 + taxRate);
-      const taxAmount = inv.total - subtotal;
-
-      summary[key].invoiceCount += 1;
-      summary[key].totalSubtotal += subtotal;
-      summary[key].totalTaxAmount += taxAmount;
-      summary[key].totalAmount += inv.total;
-    });
-
-    // Process Legacy InvoiceTax entries
-    legacyTaxes.forEach((it: any) => {
-      const key = it.taxConfiguration.taxType;
-      if (!summary[key]) {
-        summary[key] = {
-          taxType: key,
-          taxCode: it.taxConfiguration.taxCode,
-          taxRate: it.taxConfiguration.taxRate,
-          invoiceCount: 0,
-          totalSubtotal: 0,
-          totalTaxAmount: 0,
-          totalAmount: 0,
-        };
-      }
-
-      summary[key].invoiceCount += 1;
-      summary[key].totalSubtotal += it.subtotal;
-      summary[key].totalTaxAmount += it.taxAmount;
-      summary[key].totalAmount += it.totalAmount;
-    });
-
-    const result = Object.values(summary).map((s: any) => ({
-      ...s,
-      averageTaxRate: s.totalSubtotal > 0 ? (s.totalTaxAmount / s.totalSubtotal) * 100 : 0,
-    }));
+    const round2 = (n: number) => Math.round(n * 100) / 100;
+    const result = [...summary.values()]
+      .sort((a, b) => (a.direction === b.direction ? b.totalTaxAmount - a.totalTaxAmount : a.direction === "OUTPUT" ? -1 : 1))
+      .map((r) => ({
+        ...r,
+        totalSubtotal: round2(r.totalSubtotal),
+        totalTaxAmount: round2(r.totalTaxAmount),
+        totalAmount: round2(r.totalAmount),
+        averageTaxRate: r.totalSubtotal > 0 ? round2((r.totalTaxAmount / r.totalSubtotal) * 100) : 0,
+      }));
 
     return NextResponse.json(result);
   } catch (e: any) {

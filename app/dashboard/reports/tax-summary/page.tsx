@@ -8,6 +8,7 @@ import { exportToCSV } from "@/lib/export";
 import { useResponsive } from "@/hooks/useResponsive";
 
 type TaxSummary = {
+  direction: "OUTPUT" | "INPUT";
   taxType: string; taxCode: string; taxRate: number; invoiceCount: number;
   totalSubtotal: number; totalTaxAmount: number; totalAmount: number; averageTaxRate: number;
 };
@@ -46,8 +47,11 @@ export default function TaxSummaryPage() {
 
   function handleGenerate() { setShowModal(false); loadReport(); }
 
-  const totalTax = data.reduce((s, d) => s + d.totalTaxAmount, 0);
-  const totalAmt = data.reduce((s, d) => s + d.totalAmount, 0);
+  // Output tax is charged on sales, input tax paid on purchases; what is owed
+  // is the difference, never the sum.
+  const outputTax = data.filter(d => d.direction !== "INPUT").reduce((s, d) => s + d.totalTaxAmount, 0);
+  const inputTax  = data.filter(d => d.direction === "INPUT").reduce((s, d) => s + d.totalTaxAmount, 0);
+  const netTax    = outputTax - inputTax;
   const cur = companyInfo?.baseCurrency || "";
 
   const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(var(--ink),.06)", border:"1px solid rgba(var(--ink),.12)", color:"var(--ink-solid, white)", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
@@ -107,13 +111,13 @@ export default function TaxSummaryPage() {
               {data.length > 0 && (
                 <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:12, marginBottom:20 }}>
                   {[
-                    { label:"Total Tax Collected", val:totalTax, color:"var(--tx-fbbf24, #fbbf24)", bg:"rgba(251,191,36,.08)", border:"rgba(251,191,36,.2)" },
-                    { label:"Total Invoice Amount", val:totalAmt, color:"var(--tx-818cf8, #818cf8)", bg:"rgba(129,140,248,.08)", border:"rgba(129,140,248,.2)" },
-                    { label:"Tax Types", val:data.length, color:"var(--tx-34d399, #34d399)", bg:"rgba(52,211,153,.08)", border:"rgba(52,211,153,.2)", isCount:true },
+                    { label:"Output Tax (on sales)", val:outputTax, color:"var(--tx-fbbf24, #fbbf24)", bg:"rgba(251,191,36,.08)", border:"rgba(251,191,36,.2)" },
+                    { label:"Input Tax (on purchases)", val:inputTax, color:"var(--tx-818cf8, #818cf8)", bg:"rgba(129,140,248,.08)", border:"rgba(129,140,248,.2)" },
+                    { label: netTax >= 0 ? "Net Tax Payable" : "Net Tax Refundable", val:Math.abs(netTax), color: netTax >= 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", bg: netTax >= 0 ? "rgba(248,113,113,.08)" : "rgba(52,211,153,.08)", border: netTax >= 0 ? "rgba(248,113,113,.2)" : "rgba(52,211,153,.2)" },
                   ].map(k => (
                     <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding: isMobile ? "12px 10px" : "18px 20px" }}>
                       <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
-                      <div style={{ fontSize:26, fontWeight:900, color:k.color }}>{(k as any).isCount ? k.val : `${cur ? cur+" " : ""}${fmtN(k.val as number)}`}</div>
+                      <div style={{ fontSize:26, fontWeight:900, color:k.color }}>{`${cur ? cur+" " : ""}${fmtN(k.val)}`}</div>
                     </div>
                   ))}
                 </div>
@@ -149,12 +153,17 @@ export default function TaxSummaryPage() {
                         <tr key={i} style={{ background:i%2===0?"transparent":"rgba(var(--ink),.012)", borderBottom:"1px solid rgba(var(--ink),.04)" }}
                           onMouseEnter={e => (e.currentTarget.style.background="rgba(245,158,11,.05)")}
                           onMouseLeave={e => (e.currentTarget.style.background=i%2===0?"transparent":"rgba(var(--ink),.012)")}>
-                          <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)" }}>{d.taxType}</td>
+                          <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color: d.direction === "INPUT" ? "var(--tx-818cf8, #818cf8)" : "var(--tx-fbbf24, #fbbf24)" }}>
+                            {d.taxType}
+                            <span style={{ marginLeft:8, fontSize:10, fontWeight:700, letterSpacing:".04em", textTransform:"uppercase", color:"rgba(var(--ink),var(--ta-50, .5))" }}>
+                              {d.direction === "INPUT" ? "Input · purchases" : "Output · sales"}
+                            </span>
+                          </td>
                           <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", fontFamily:"monospace" }}>{d.taxCode}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),var(--ta-70, .7))" }}>{d.taxRate}%</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),var(--ta-60, .6))" }}>{d.invoiceCount}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),var(--ta-60, .6))", fontFamily:"monospace" }}>{fmtN(d.totalSubtotal)}</td>
-                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color:"var(--tx-fbbf24, #fbbf24)", fontFamily:"monospace" }}>{fmtN(d.totalTaxAmount)}</td>
+                          <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, fontWeight:700, color: d.direction === "INPUT" ? "var(--tx-818cf8, #818cf8)" : "var(--tx-fbbf24, #fbbf24)", fontFamily:"monospace" }}>{d.direction === "INPUT" ? "−" : ""}{fmtN(d.totalTaxAmount)}</td>
                           <td style={{ padding:"10px 14px", textAlign:"right", fontSize:13, color:"rgba(var(--ink),var(--ta-70, .7))", fontFamily:"monospace" }}>{fmtN(d.totalAmount)}</td>
                         </tr>
                       ))}
@@ -162,10 +171,11 @@ export default function TaxSummaryPage() {
                     {data.length > 0 && (
                       <tfoot>
                         <tr style={{ background:"rgba(245,158,11,.08)", borderTop:"2px solid rgba(245,158,11,.25)" }}>
-                          <td colSpan={4} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),var(--ta-50, .5))" }}>Grand Total</td>
-                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),var(--ta-70, .7))", fontFamily:"monospace" }}>{fmtN(data.reduce((s,d)=>s+d.totalSubtotal,0))}</td>
-                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:900, fontSize:14, color:"var(--tx-fbbf24, #fbbf24)", fontFamily:"monospace" }}>{fmtN(totalTax)}</td>
-                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:800, fontSize:14, color:"rgba(var(--ink),var(--ta-70, .7))", fontFamily:"monospace" }}>{fmtN(totalAmt)}</td>
+                          <td colSpan={5} style={{ padding:"12px 14px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(var(--ink),var(--ta-50, .5))" }}>
+                            {netTax >= 0 ? "Net tax payable" : "Net tax refundable"} (output − input)
+                          </td>
+                          <td style={{ padding:"12px 14px", textAlign:"right", fontWeight:900, fontSize:14, color: netTax >= 0 ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", fontFamily:"monospace" }}>{fmtN(Math.abs(netTax))}</td>
+                          <td />
                         </tr>
                       </tfoot>
                     )}

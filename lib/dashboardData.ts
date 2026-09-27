@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { ledgerMonthlyPL, ledgerPL, ledgerPositions } from "@/lib/ledgerKpis";
 
 export function getPeriodStart(period: string, now = new Date()) {
   if (period === "all") return new Date(2000, 0, 1);
@@ -9,51 +10,6 @@ export function getPeriodStart(period: string, now = new Date()) {
   }
   if (period === "year") return new Date(now.getFullYear(), 0, 1);
   return new Date(now.getFullYear(), now.getMonth(), 1);
-}
-
-function revenueSQL(table: "SalesInvoice" | "PurchaseInvoice", companyId: string, branchId: string | null, startDate: Date, endDate: Date) {
-  return prisma.$queryRaw<[{ total: number }]>`
-    SELECT COALESCE(SUM(COALESCE(ct."amountInBase", si."total")), 0)::float AS total
-    FROM ${Prisma.raw(`"${table}"`)} si
-    LEFT JOIN "CurrencyTransaction" ct
-      ON ct."transactionId" = si."id"
-      AND ct."transactionType" = 'INVOICE'
-    WHERE si."companyId" = ${companyId}
-      AND si."deletedAt" IS NULL
-      AND si."date" >= ${startDate}
-      AND si."date" <= ${endDate}
-      ${branchId ? Prisma.sql`AND si."branchId" = ${branchId}` : Prisma.empty}
-  `;
-}
-
-function allTimeSQL(table: "SalesInvoice" | "PurchaseInvoice", companyId: string, branchId: string | null) {
-  return prisma.$queryRaw<[{ total: number }]>`
-    SELECT COALESCE(SUM(COALESCE(ct."amountInBase", si."total")), 0)::float AS total
-    FROM ${Prisma.raw(`"${table}"`)} si
-    LEFT JOIN "CurrencyTransaction" ct
-      ON ct."transactionId" = si."id"
-      AND ct."transactionType" = 'INVOICE'
-    WHERE si."companyId" = ${companyId}
-      AND si."deletedAt" IS NULL
-      ${branchId ? Prisma.sql`AND si."branchId" = ${branchId}` : Prisma.empty}
-  `;
-}
-
-function monthlySQL(table: "SalesInvoice" | "PurchaseInvoice", companyId: string, from: Date, branchId: string | null) {
-  return prisma.$queryRaw<{ month: Date; total: number }[]>`
-    SELECT DATE_TRUNC('month', si."date") AS month,
-           COALESCE(SUM(COALESCE(ct."amountInBase", si."total")), 0)::float AS total
-    FROM ${Prisma.raw(`"${table}"`)} si
-    LEFT JOIN "CurrencyTransaction" ct
-      ON ct."transactionId" = si."id"
-      AND ct."transactionType" = 'INVOICE'
-    WHERE si."companyId" = ${companyId}
-      AND si."deletedAt" IS NULL
-      AND si."date" >= ${from}
-      ${branchId ? Prisma.sql`AND si."branchId" = ${branchId}` : Prisma.empty}
-    GROUP BY DATE_TRUNC('month', si."date")
-    ORDER BY month ASC
-  `;
 }
 
 // Sargable overdue predicate — bare "date" column on the left so the
@@ -68,45 +24,23 @@ export async function getSummary(companyId: string, branchId: string | null, per
   const startDate = getPeriodStart(period, now);
   const periodMs = now.getTime() - startDate.getTime();
   const prevStart = new Date(startDate.getTime() - periodMs);
-  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
+  // Money KPIs come from the ledger — see lib/ledgerKpis.ts for what the
+  // invoice-total versions of these got wrong.
   const [
-    [revenueRow],
-    [expensesRow],
-    [prevRevenueRow],
-    [prevExpensesRow],
-    [receivablesRow],
-    [payablesRow],
-    bankAgg,
-    monthlySales,
-    monthlyExp,
-    [overdueRow],
+    current,
+    previous,
+    positions,
+    monthly,
     topCustomerRaw,
     recentSales,
     recentPurchases,
     [stockValueRow],
   ] = await Promise.all([
-    revenueSQL("SalesInvoice", companyId, branchId, startDate, now),
-    revenueSQL("PurchaseInvoice", companyId, branchId, startDate, now),
-    revenueSQL("SalesInvoice", companyId, branchId, prevStart, startDate),
-    revenueSQL("PurchaseInvoice", companyId, branchId, prevStart, startDate),
-    allTimeSQL("SalesInvoice", companyId, branchId),
-    allTimeSQL("PurchaseInvoice", companyId, branchId),
-    prisma.bankAccount.aggregate({ where: { companyId }, _sum: { balance: true } }),
-    monthlySQL("SalesInvoice", companyId, twelveMonthsAgo, branchId),
-    monthlySQL("PurchaseInvoice", companyId, twelveMonthsAgo, branchId),
-    prisma.$queryRaw<{ total: number; count: bigint }[]>`
-      SELECT COALESCE(SUM(COALESCE(ct."amountInBase", si."total")), 0)::float AS total,
-             COUNT(si."id") AS count
-      FROM "SalesInvoice" si
-      LEFT JOIN "CurrencyTransaction" ct
-        ON ct."transactionId" = si."id" AND ct."transactionType" = 'INVOICE'
-      LEFT JOIN "Account" a ON a."id" = si."customerId"
-      WHERE si."companyId" = ${companyId}
-        AND si."deletedAt" IS NULL
-        AND ${overdueClause("si", now)}
-        ${branchId ? Prisma.sql`AND si."branchId" = ${branchId}` : Prisma.empty}
-    `,
+    ledgerPL(companyId, branchId, startDate, now),
+    ledgerPL(companyId, branchId, prevStart, startDate),
+    ledgerPositions(companyId, branchId, now),
+    ledgerMonthlyPL(companyId, branchId, 12, now),
     prisma.$queryRaw<{ customerId: string; total: number }[]>`
       SELECT si."customerId",
              COALESCE(SUM(COALESCE(ct."amountInBase", si."total")), 0)::float AS total
@@ -149,32 +83,14 @@ export async function getSummary(companyId: string, branchId: string | null, per
     `,
   ]);
 
-  const revenue = Number(revenueRow.total || 0);
-  const expenses = Number(expensesRow.total || 0);
-  const prevRevenue = Number(prevRevenueRow.total || 0);
-  const prevExpenses = Number(prevExpensesRow.total || 0);
-  const profit = revenue - expenses;
-  const prevProfit = prevRevenue - prevExpenses;
+  const { revenue, expenses, profit } = current;
+  const { revenue: prevRevenue, expenses: prevExpenses, profit: prevProfit } = previous;
   const revenueGrowth = prevRevenue > 0 ? ((revenue - prevRevenue) / prevRevenue) * 100 : (revenue > 0 ? 100 : 0);
   const expensesGrowth = prevExpenses > 0 ? ((expenses - prevExpenses) / prevExpenses) * 100 : (expenses > 0 ? 100 : 0);
   const profitGrowth = prevProfit !== 0 ? ((profit - prevProfit) / Math.abs(prevProfit)) * 100 : (profit !== 0 ? 100 : 0);
 
-  const salesMap = new Map(monthlySales.map((row) => {
-    const d = new Date(row.month);
-    return [`${d.getFullYear()}-${d.getMonth()}`, row.total];
-  }));
-  const expMap = new Map(monthlyExp.map((row) => {
-    const d = new Date(row.month);
-    return [`${d.getFullYear()}-${d.getMonth()}`, row.total];
-  }));
-  const revenueHistory: number[] = [];
-  const expensesHistory: number[] = [];
-  for (let i = 11; i >= 0; i--) {
-    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${month.getFullYear()}-${month.getMonth()}`;
-    revenueHistory.push(Number(salesMap.get(key) || 0));
-    expensesHistory.push(Number(expMap.get(key) || 0));
-  }
+  const revenueHistory = monthly.revenue;
+  const expensesHistory = monthly.expenses;
 
   const [customerAccounts, recentCurrencies] = await Promise.all([
     prisma.account.findMany({
@@ -200,12 +116,12 @@ export async function getSummary(companyId: string, branchId: string | null, per
     revenueGrowth: Math.round(revenueGrowth * 10) / 10,
     expensesGrowth: Math.round(expensesGrowth * 10) / 10,
     profitGrowth: Math.round(profitGrowth * 10) / 10,
-    receivables: Number(receivablesRow.total || 0),
-    payables: Number(payablesRow.total || 0),
-    cashBalance: Number(bankAgg._sum.balance || 0),
+    receivables: positions.receivables,
+    payables: positions.payables,
+    cashBalance: positions.cashBalance,
     stockValue: Number(stockValueRow.total || 0),
-    overdueAmount: Math.round(Number(overdueRow.total || 0)),
-    invoicesPending: Number(overdueRow.count || 0),
+    overdueAmount: Math.round(positions.overdueAmount),
+    invoicesPending: positions.overdueCount,
     revenueHistory,
     expensesHistory,
     topCustomers: topCustomerRaw.map((row) => ({ name: nameMap.get(row.customerId) || "Unknown", revenue: Number(row.total || 0) })),
@@ -286,7 +202,7 @@ export async function getTodayStats(companyId: string, branchId: string | null) 
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
   const branchClause = branchId ? Prisma.sql`AND si."branchId" = ${branchId}` : Prisma.empty;
-  const [[salesRow], [pendingRow], [lowStockRow]] = await Promise.all([
+  const [[salesRow], positions, [lowStockRow]] = await Promise.all([
     prisma.$queryRaw<[{ total: number; count: bigint }]>`
       SELECT COALESCE(SUM(COALESCE(ct."amountInBase", si."total")), 0)::float AS total,
              COUNT(si."id") AS count
@@ -298,15 +214,9 @@ export async function getTodayStats(companyId: string, branchId: string | null) 
         AND si."date" < ${todayEnd}
         ${branchClause}
     `,
-    prisma.$queryRaw<[{ count: bigint }]>`
-      SELECT COUNT(si."id") AS count
-      FROM "SalesInvoice" si
-      LEFT JOIN "Account" a ON a."id" = si."customerId"
-      WHERE si."companyId" = ${companyId}
-        AND si."deletedAt" IS NULL
-        AND ${overdueClause("si", now)}
-        ${branchClause}
-    `,
+    // Overdue = still unpaid and past credit days (lib/ledgerKpis.ts), not
+    // every invoice older than its credit days.
+    ledgerPositions(companyId, branchId, now),
     prisma.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(i."id") AS count
       FROM "ItemNew" i
@@ -325,7 +235,7 @@ export async function getTodayStats(companyId: string, branchId: string | null) 
   return {
     todaySales: Number(salesRow.total || 0),
     todayOrders: Number(salesRow.count || 0),
-    pendingCount: Number(pendingRow.count || 0),
+    pendingCount: positions.overdueCount,
     lowStockCount: Number(lowStockRow.count || 0),
   };
 }
