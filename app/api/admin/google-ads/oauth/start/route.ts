@@ -12,7 +12,12 @@ import { requireAdmin } from "@/lib/adminAuth";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+// NEXT_PUBLIC_BASE_URL points at the marketing site (www.finovaos.app), whose
+// middleware 404s every /admin and /api/admin path on purpose — the admin
+// panel only resolves on its own hostname. Google's registered redirect URI
+// has to match that hostname exactly, so this uses it explicitly rather than
+// the general base URL.
+const ADMIN_BASE = process.env.NEXT_PUBLIC_ADMIN_BASE_URL || "https://pvc.finovaos.app";
 
 export async function GET(req: NextRequest) {
   const admin = await requireAdmin(req);
@@ -26,7 +31,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const redirectUri = `${BASE}/api/admin/google-ads/oauth/callback`;
+  const redirectUri = `${ADMIN_BASE}/api/admin/google-ads/oauth/callback`;
 
   const params = new URLSearchParams({
     client_id: clientId,

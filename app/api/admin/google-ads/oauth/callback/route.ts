@@ -13,7 +13,9 @@ import { requireAdmin } from "@/lib/adminAuth";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+// See the matching comment in oauth/start/route.ts — the admin panel only
+// resolves on its own hostname, not the marketing site's.
+const ADMIN_BASE = process.env.NEXT_PUBLIC_ADMIN_BASE_URL || "https://pvc.finovaos.app";
 
 export async function GET(req: NextRequest) {
   const admin = await requireAdmin(req);
@@ -24,19 +26,19 @@ export async function GET(req: NextRequest) {
   const errorParam = url.searchParams.get("error");
 
   if (errorParam) {
-    return NextResponse.redirect(`${BASE}/admin/google-ads?oauth_error=${encodeURIComponent(errorParam)}`);
+    return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_error=${encodeURIComponent(errorParam)}`);
   }
   if (!code) {
-    return NextResponse.redirect(`${BASE}/admin/google-ads?oauth_error=missing_code`);
+    return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_error=missing_code`);
   }
 
   const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET;
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(`${BASE}/admin/google-ads?oauth_error=missing_client_credentials`);
+    return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_error=missing_client_credentials`);
   }
 
-  const redirectUri = `${BASE}/api/admin/google-ads/oauth/callback`;
+  const redirectUri = `${ADMIN_BASE}/api/admin/google-ads/oauth/callback`;
 
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest) {
     // before (Google only issues one on first consent). Revoke access at
     // myaccount.google.com/permissions and try again to force a new one.
     return NextResponse.redirect(
-      `${BASE}/admin/google-ads?oauth_error=${encodeURIComponent(tokenJson?.error_description || "token_exchange_failed")}`,
+      `${ADMIN_BASE}/admin/google-ads?oauth_error=${encodeURIComponent(tokenJson?.error_description || "token_exchange_failed")}`,
     );
   }
 
@@ -68,5 +70,5 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  return NextResponse.redirect(`${BASE}/admin/google-ads?oauth_connected=1`);
+  return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_connected=1`);
 }
