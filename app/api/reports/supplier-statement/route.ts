@@ -3,11 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
-import { getBaseAmounts, resolveAmount, sumWithCurrency } from "@/lib/currencyHelper";
-
-function daysBetween(a: Date, b: Date): number {
-  return Math.floor((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
-}
+import { computePartyStatement } from "@/lib/partyStatement";
 
 export async function GET(req: NextRequest) {
   try {
@@ -35,76 +31,22 @@ export async function GET(req: NextRequest) {
     });
     if (!supplier) return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
 
-    // Opening balance = purchase invoices - payments BEFORE fromDate (currency-aware)
-    const [prevInvoices, prevPmtAgg] = await Promise.all([
-      prisma.purchaseInvoice.findMany({
-        where: { supplierId, companyId, date: { lt: fromDate }, deletedAt: null },
-        select: { id: true, total: true },
-      }),
-      prisma.paymentReceipt.aggregate({
-        where: { partyId: supplierId, companyId, date: { lt: fromDate }, deletedAt: null },
-        _sum: { amount: true },
-      }),
-    ]);
-    const prevBaseAmounts = await getBaseAmounts(prevInvoices.map((i) => i.id));
-    const prevInvTotal = sumWithCurrency(prevInvoices, prevBaseAmounts);
-    const openingBalance = prevInvTotal - Number(prevPmtAgg._sum.amount || 0);
-
-    // Period transactions
-    const [invoices, payments] = await Promise.all([
-      prisma.purchaseInvoice.findMany({
-        where: { supplierId, companyId, date: { gte: fromDate, lte: toDate }, deletedAt: null },
-        orderBy: { date: "asc" },
-      }),
-      prisma.paymentReceipt.findMany({
-        where: { partyId: supplierId, companyId, date: { gte: fromDate, lte: toDate }, deletedAt: null },
-        orderBy: { date: "asc" },
-      }),
-    ]);
-
-    // Resolve base-currency amounts for period invoices
-    const periodBaseAmounts = await getBaseAmounts(invoices.map((i) => i.id));
-
-    // Supplier perspective: invoice = credit (we owe more), payment = debit (we paid)
-    type RawRow = { date: string; ref: string; type: "Invoice" | "Payment"; description: string; debit: number; credit: number };
-    const raw: RawRow[] = [
-      ...invoices.map((inv) => ({ date: new Date(inv.date).toISOString().slice(0, 10), ref: inv.invoiceNo, type: "Invoice" as const, description: "Purchase Invoice", debit: 0, credit: resolveAmount(inv.id, Number(inv.total), periodBaseAmounts) })),
-      ...payments.map((pmt) => ({ date: new Date(pmt.date).toISOString().slice(0, 10), ref: pmt.receiptNo, type: "Payment" as const, description: pmt.narration || "Payment Made", debit: Number(pmt.amount), credit: 0 })),
-    ];
-    raw.sort((a, b) => a.date.localeCompare(b.date));
-
-    let running = openingBalance;
-    const rows = raw.map((r) => { running += r.credit - r.debit; return { ...r, balance: running }; });
-
-    const totalInvoiced = sumWithCurrency(invoices, periodBaseAmounts);
-    const totalPaid     = payments.reduce((s, p) => s + Number(p.amount), 0);
-
-    // Ageing — currency-aware
-    const [allInv, allPmt] = await Promise.all([
-      prisma.purchaseInvoice.findMany({ where: { supplierId, companyId, deletedAt: null }, orderBy: { date: "asc" } }),
-      prisma.paymentReceipt.findMany({ where: { partyId: supplierId, companyId, deletedAt: null }, orderBy: { date: "asc" } }),
-    ]);
-    const allBaseAmounts = await getBaseAmounts(allInv.map((i) => i.id));
-    let remainingCredit = allPmt.reduce((s, p) => s + Number(p.amount), 0);
-    const ageing = { current: 0, days30: 0, days60: 0, days90plus: 0 };
-    const today  = new Date();
-    for (const inv of allInv) {
-      const invAmt    = resolveAmount(inv.id, Number(inv.total), allBaseAmounts);
-      const applied   = Math.min(remainingCredit, invAmt);
-      remainingCredit = Math.max(0, remainingCredit - invAmt);
-      const outstanding = invAmt - applied;
-      if (outstanding <= 0) continue;
-      const effectiveAge = Math.max(0, daysBetween(new Date(inv.date), today) - Number(supplier.creditDays || 0));
-      if      (effectiveAge <= 30) ageing.current += outstanding;
-      else if (effectiveAge <= 60) ageing.days30  += outstanding;
-      else if (effectiveAge <= 90) ageing.days60  += outstanding;
-      else                         ageing.days90plus += outstanding;
-    }
+    // Read from the supplier's ledger account — see lib/partyStatement.ts for why
+    // invoices + receipts was not enough.
+    const st = await computePartyStatement({
+      companyId,
+      accountId: supplierId,
+      side: "SUPPLIER",
+      from: fromDate,
+      to: toDate,
+      creditDays: supplier.creditDays,
+    });
 
     return NextResponse.json({
       supplier: { id: supplier.id, name: supplier.name, email: supplier.email || null, phone: supplier.phone || null, city: supplier.city || null, creditDays: supplier.creditDays || 0, creditLimit: supplier.creditLimit || 0 },
       period: { from: fromDate.toISOString().slice(0, 10), to: toDate.toISOString().slice(0, 10) },
-      openingBalance, totalInvoiced, totalPaid, closingBalance: running, rows, ageing,
+      openingBalance: st.openingBalance, totalInvoiced: st.totalInvoiced, totalPaid: st.totalSettled,
+      closingBalance: st.closingBalance, rows: st.rows, ageing: st.ageing,
     });
   } catch (err) {
     console.error("SUPPLIER STATEMENT ERROR:", err);
