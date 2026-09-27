@@ -36,7 +36,7 @@ export const dynamic = "force-dynamic";
  */
 const SITE_ROUTES = [
   "/pricing", "/features", "/industries", "/solutions", "/compare",
-  "/case-studies", "/testimonials", "/roi-calculator", "/demo", "/get-started",
+  "/testimonials", "/roi-calculator", "/demo", "/get-started",
   "/integrations", "/security", "/trust", "/faq", "/help", "/docs", "/blog",
   "/about", "/contact", "/support", "/developers/api", "/roles", "/changelog",
 ];

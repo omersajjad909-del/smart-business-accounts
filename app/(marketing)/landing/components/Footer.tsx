@@ -33,7 +33,6 @@ const SOLUTIONS_LINKS = [
 const COMPANY_LINKS = [
   { label: "About Us",           href: "/about" },
   { label: "Careers",            href: "/careers" },
-  { label: "Case Studies",       href: "/case-studies" },
   { label: "Blog",               href: "/blog" },
   { label: "Support Center",     href: "/support" },
   { label: "Contact Us",         href: "/contact" },

@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const URL = `${BASE}/compare`;
 
-// See the comment in case-studies/layout.tsx — this page had no metadata of
-// its own and was falling back to the site-wide default, identical to three
-// other pages.
+// This page had no metadata of its own, so it fell back to the marketing
+// layout's site-wide default title — the same string several other pages
+// used, which a crawler reported as duplicate titles.
 export const metadata: Metadata = {
   title: "Compare FinovaOS vs Competitors",
   description:

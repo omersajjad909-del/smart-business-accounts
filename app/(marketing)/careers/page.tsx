@@ -192,12 +192,6 @@ const PROCESS = [
   { step:"05", title:"Offer & Onboarding", desc:"Fast decisions. Offer within 3 days of final interview. Join a team that's excited to have you.",icon:"🎉", color:"var(--tx-c4b5fd, #c4b5fd)" },
 ];
 
-const TESTIMONIALS = [
-  { name:"Ayesha K.",   role:"Senior Engineer, 2 years",        avatar:"AK", gradient:"linear-gradient(135deg,#4f46e5,#7c3aed)", quote:"The best team I've ever worked on. Everyone is sharp, kind, and genuinely cares about doing great work. Remote culture actually works here." },
-  { name:"James T.",    role:"Product Manager, 1.5 years",       avatar:"JT", gradient:"linear-gradient(135deg,#0891b2,#06b6d4)", quote:"I've worked at Stripe and Monzo. FinovaOS's pace of shipping is unreal. You see your work in production the same week you build it." },
-  { name:"Fatima N.",   role:"Customer Success, 3 years",        avatar:"FN", gradient:"linear-gradient(135deg,#059669,#34d399)", quote:"FinovaOS actually invests in your growth. My manager helped me go from Support to CS Lead in 18 months. The learning budget is real — I used all of mine." },
-];
-
 /* ══════════════════════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════════════════════ */
@@ -364,33 +358,6 @@ function LegacyCareersPage() {
                 <div>
                   <div style={{ fontSize:14, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:5 }}>{p.title}</div>
                   <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))", lineHeight:1.6 }}>{p.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* ── TESTIMONIALS ── */}
-      <Section>
-        <div style={{ maxWidth:1060, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{ textAlign:"center", marginBottom:48 }}>
-            <SectionLabel text="From the Team"/>
-            <h2 style={{ fontSize:"clamp(24px,3.5vw,38px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>
-              Don't take our word for it
-            </h2>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:20 }}>
-            {TESTIMONIALS.map(t=>(
-              <div key={t.name} style={{ background:"rgba(var(--ink),.03)", borderRadius:18, border:"1px solid rgba(var(--ink),.07)", padding:"28px 24px" }}>
-                <div style={{ fontSize:28, color:"var(--tx-818cf8, #818cf8)", marginBottom:16, lineHeight:1 }}>"</div>
-                <p style={{ fontSize:14, color:"rgba(var(--ink),var(--ta-60, .6))", lineHeight:1.75, margin:"0 0 20px", fontStyle:"italic" }}>{t.quote}</p>
-                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                  <div style={{ width:42, height:42, borderRadius:12, background:t.gradient, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"white", flexShrink:0 }}>{t.avatar}</div>
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{t.name}</div>
-                    <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>{t.role}</div>
-                  </div>
                 </div>
               </div>
             ))}

@@ -74,6 +74,10 @@ const nextConfig: NextConfig = {
       { source: "/for/repair", destination: "/for/mobile_repair", permanent: true },
       { source: "/for/import", destination: "/for/import_company", permanent: true },
       { source: "/features/ai", destination: "/features", permanent: true },
+      // /case-studies showed six invented customers with invented results.
+      // Removed until real customers agree to be written up; /testimonials
+      // lists only reviews customers actually submitted.
+      { source: "/case-studies", destination: "/testimonials", permanent: true },
     ];
   },
   async headers() {

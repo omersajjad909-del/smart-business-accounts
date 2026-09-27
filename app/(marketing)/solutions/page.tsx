@@ -26,8 +26,6 @@ const INDUSTRIES = [
       { icon:"🔁", title:"Recurring Transactions",     desc:"Set up monthly rent, utility, and salary entries once." },
       { icon:"📋", title:"Tax Summary Reports",        desc:"Compliance-ready output for your accountant or consultant." },
     ],
-    quote: "We process 200+ invoices a day. FinovaOS handles it without breaking a sweat.",
-    quoteName: "Thomas Miller", quoteTitle: "CEO, Miller Trading Co. — New York",
   },
   {
     id: "distribution",
@@ -50,8 +48,6 @@ const INDUSTRIES = [
       { icon:"🔗", title:"Multi-Branch Consolidation", desc:"Consolidate P&L across all depots with one click." },
       { icon:"📱", title:"Real-Time Stock Alerts",     desc:"Low stock notifications so you never run short mid-route." },
     ],
-    quote: "Our 8 depot managers all work in the same system. Zero confusion, full visibility.",
-    quoteName: "Ryan Kennedy", quoteTitle: "MD, Apex Distribution — Toronto",
   },
 
   // ── WHOLESALE ───────────────────────────────────────────────
@@ -76,8 +72,6 @@ const INDUSTRIES = [
       { icon:"↩️", title:"Sales Returns & Claims",     desc:"Record damaged-goods returns, scheme claims, and credit notes against the right dealer." },
       { icon:"📊", title:"Ageing & Recovery Reports",  desc:"30/60/90-day ageing buckets so recovery calls target the right accounts first." },
     ],
-    quote: "We deal with 300+ retailers on different rate slabs. FinovaOS applies the right price every single time.",
-    quoteName: "Daniel Weber", quoteTitle: "Director, Weber Wholesale — Hamburg",
   },
   {
     id: "manufacturing",
@@ -100,8 +94,6 @@ const INDUSTRIES = [
       { icon:"🔍", title:"Variance Analysis",          desc:"Compare standard vs actual cost. Spot inefficiencies immediately." },
       { icon:"📊", title:"Profitability by Product",   desc:"Know your margin on every SKU before setting the sale price." },
     ],
-    quote: "We finally know our real cost per unit. The margin improvement paid for the software in week one.",
-    quoteName: "Benjamin Harper", quoteTitle: "CFO, Harper Group — Sydney",
   },
   {
     id: "services",
@@ -124,8 +116,6 @@ const INDUSTRIES = [
       { icon:"💸", title:"Payroll Integration",        desc:"Record salaries, advances, and deductions in the ledger directly." },
       { icon:"📈", title:"Revenue Visibility",         desc:"Track billed work, receivables, and service performance over time." },
     ],
-    quote: "Collections used to take 45 days on average. Now it's 18. The automated reminders changed everything.",
-    quoteName: "Sarah Quinn", quoteTitle: "COO, Quinn Consultants — Singapore",
   },
   {
     id: "retail",
@@ -148,8 +138,6 @@ const INDUSTRIES = [
       { icon:"📦", title:"Reorder Point Alerts",       desc:"Never stockout on fast-moving items. Auto-generate POs." },
       { icon:"📊", title:"Category-wise Profitability",desc:"Identify which product categories drive margin. Cut the rest." },
     ],
-    quote: "I manage 6 stores from my phone now. Each store manager sees only their own data — exactly how I wanted it.",
-    quoteName: "Fatima Malik", quoteTitle: "Director, Meridian Retail — Melbourne",
   },
   {
     id: "restaurant",
@@ -172,8 +160,6 @@ const INDUSTRIES = [
       { icon:"📦", title:"Ingredient Inventory",        desc:"Track raw materials. Know when to reorder before you run out." },
       { icon:"📊", title:"Sales & Revenue Reports",     desc:"Best-selling items, peak hours, and daily covers at a glance." },
     ],
-    quote: "We cut our end-of-day reconciliation from 45 minutes to 5. The kitchen never misses an order now.",
-    quoteName: "Ahmad Raza", quoteTitle: "Owner, Spice Route Restaurant — Dubai",
   },
   {
     id: "hospital",
@@ -196,8 +182,6 @@ const INDUSTRIES = [
       { icon:"🔬", title:"Lab & Diagnostic Records",    desc:"Attach lab results to patient files. No lost reports." },
       { icon:"📊", title:"Revenue & Expense Reports",   desc:"Department-wise profitability and daily collections summary." },
     ],
-    quote: "Our pharmacy stock-outs dropped to zero. The expiry tracking alone saved us thousands each month.",
-    quoteName: "Dr. Sana Khalid", quoteTitle: "Medical Director, CareFirst Clinic",
   },
   {
     id: "hotel",
@@ -220,8 +204,6 @@ const INDUSTRIES = [
       { icon:"🧹", title:"Housekeeping Management",     desc:"Assign and track cleaning tasks. Know which rooms are ready." },
       { icon:"📊", title:"Revenue Per Room Reports",    desc:"RevPAR, ADR, and occupancy trends to maximize pricing strategy." },
     ],
-    quote: "Front desk is now paperless. Guests check in faster and we bill accurately every single time.",
-    quoteName: "Hassan Mirza", quoteTitle: "GM, The Grand Hospitality",
   },
   {
     id: "pharmacy",
@@ -244,8 +226,6 @@ const INDUSTRIES = [
       { icon:"🏭", title:"Supplier & Purchase Orders",  desc:"Raise POs to distributors. Match deliveries and invoices." },
       { icon:"📊", title:"Sales & Margin Reports",      desc:"Best-selling drugs, category-wise margin, and daily revenue." },
     ],
-    quote: "We cleared thousands worth of near-expiry stock we didn't even know we had. The alerts paid for everything.",
-    quoteName: "Zubair Ahmed", quoteTitle: "Owner, CityMed Pharmacy",
   },
   {
     id: "travel",
@@ -268,8 +248,6 @@ const INDUSTRIES = [
       { icon:"👥", title:"Passenger File History",      desc:"Keep each client’s travel file, route, passport reference, and case status together." },
       { icon:"📊", title:"Travel Revenue Visibility",   desc:"See total ticket value, active visa cases, and pending files from one dashboard." },
     ],
-    quote: "Before this, our tickets were in one sheet and visas in another. Now every passenger file is finally in one place.",
-    quoteName: "SkyBridge Travels", quoteTitle: "Travel & Tours",
   },
   {
     id: "construction",
@@ -292,8 +270,6 @@ const INDUSTRIES = [
       { icon:"💰", title:"Budget vs Actual Reports",    desc:"Compare planned spend to real cost per project at any time." },
       { icon:"📋", title:"Purchase Orders & GRN",       desc:"Raise POs, receive materials, and match supplier invoices easily." },
     ],
-    quote: "We caught a major budget overrun at 60% completion — early enough to recover. That's priceless.",
-    quoteName: "Tariq Mahmood", quoteTitle: "Director, BuildRight Contractors",
   },
   {
     id: "ecommerce",
@@ -316,8 +292,6 @@ const INDUSTRIES = [
       { icon:"📦", title:"Stock Sync Alerts",           desc:"Low-stock notifications before you oversell and disappoint buyers." },
       { icon:"💰", title:"Seller Profit Reports",       desc:"Deduct platform fees and shipping costs. See real net profit." },
     ],
-    quote: "We were selling on 4 platforms with 4 spreadsheets. Now everything is in one place and we actually know our margin.",
-    quoteName: "Nadia Farooq", quoteTitle: "Founder, StyleBox",
   },
   {
     id: "agriculture",
@@ -340,8 +314,6 @@ const INDUSTRIES = [
       { icon:"💰", title:"Season Expense Tracking",    desc:"Fertilizer, labour, water, and seed costs tracked per field." },
       { icon:"📊", title:"Profit per Crop Reports",    desc:"Compare revenue against all direct costs. Know what to grow more." },
     ],
-    quote: "First time in 10 years I know exactly how much each crop made me — not just what I sold.",
-    quoteName: "Muhammad Arif", quoteTitle: "Farm Owner",
   },
   {
     id: "transport",
@@ -364,8 +336,6 @@ const INDUSTRIES = [
       { icon:"👤", title:"Driver Management",           desc:"Driver records, advance payments, and settlement tracking." },
       { icon:"📊", title:"Fleet Profitability Reports", desc:"Revenue minus all costs per vehicle. Know which trucks earn." },
     ],
-    quote: "I run 14 trucks. For the first time I know which 3 are losing money — and why.",
-    quoteName: "Saleem Baig", quoteTitle: "Director, FastMove Logistics",
   },
   {
     id: "salon",
@@ -388,8 +358,6 @@ const INDUSTRIES = [
       { icon:"📦", title:"Product Inventory",           desc:"Track shampoos, dyes, and retail products. Reorder alerts." },
       { icon:"📊", title:"Revenue by Service Reports",  desc:"Know your most profitable treatments and peak hours." },
     ],
-    quote: "My front desk used to lose cash every week. Now the daily report catches every cent.",
-    quoteName: "Aisha Siddiqui", quoteTitle: "Owner, Glow Beauty Salon",
   },
   {
     id: "school",
@@ -412,8 +380,6 @@ const INDUSTRIES = [
       { icon:"👨‍🏫", title:"Staff & Payroll Records",    desc:"Staff salaries, attendance, advances, and deductions." },
       { icon:"📊", title:"Academic Performance Reports",desc:"Class-wise and student-wise performance analysis." },
     ],
-    quote: "Fee collection improved by 35% after we switched. Parents get reminders automatically now.",
-    quoteName: "Principal Nasreen", quoteTitle: "Bright Futures Academy",
   },
   {
     id: "ngo",
@@ -436,8 +402,6 @@ const INDUSTRIES = [
       { icon:"✅", title:"Compliance & Audit Trails",   desc:"Every transaction logged with user, time, and purpose." },
       { icon:"💰", title:"Budget Utilization Reports",  desc:"Track how much of each grant has been spent vs. remaining." },
     ],
-    quote: "Our annual donor report used to take 3 weeks. Now it takes an afternoon. Our auditors are impressed.",
-    quoteName: "Amara Singh", quoteTitle: "CFO, HopeForward Foundation — Nairobi",
   },
   {
     id: "real_estate",
@@ -460,8 +424,6 @@ const INDUSTRIES = [
       { icon:"📊", title:"Property Revenue Reports",    desc:"Income vs expenses per property. Know your best-performing assets." },
       { icon:"📋", title:"Lease Renewal Alerts",        desc:"Never miss a lease expiry. Get reminded before it's too late." },
     ],
-    quote: "I manage 40 rental units. Before this, I had 40 WhatsApp chats for rent. Now it's all in one place.",
-    quoteName: "Imran Sheikh", quoteTitle: "Property Investor",
   },
 
   // ── AUTOMOTIVE ──────────────────────────────────────────────
@@ -486,8 +448,6 @@ const INDUSTRIES = [
       { icon:"🚙", title:"Car Rental Management",      desc:"Booking calendar, agreements, mileage tracking, and fuel log." },
       { icon:"📊", title:"Profit by Job / Vehicle",   desc:"Know your margin on every sale and every repair job." },
     ],
-    quote: "We run a showroom and workshop together. FinovaOS ties everything — from test drive to final invoice.",
-    quoteName: "Khalid Motors", quoteTitle: "Automotive Dealer",
   },
 
   // ── MEDIA & ADVERTISING ─────────────────────────────────────
@@ -512,8 +472,6 @@ const INDUSTRIES = [
       { icon:"🖨️", title:"Print Job Management",       desc:"Paper stock, ink, print orders, delivery — fully tracked." },
       { icon:"📊", title:"Agency Revenue Reports",     desc:"Retainer vs project vs commission — broken down clearly." },
     ],
-    quote: "We handle 30+ clients. FinovaOS gives us real-time visibility on which accounts are actually profitable.",
-    quoteName: "Sana Digital", quoteTitle: "Digital Marketing Agency",
   },
 
   // ── SaaS / ISP ──────────────────────────────────────────────
@@ -538,8 +496,6 @@ const INDUSTRIES = [
       { icon:"💳", title:"Payment Collections",        desc:"Track paid, unpaid, and overdue subscribers instantly." },
       { icon:"📊", title:"Churn & Growth Reports",     desc:"Understand where you're gaining and losing customers." },
     ],
-    quote: "Running an ISP with 2,000 customers — FinovaOS handles all monthly billing automatically.",
-    quoteName: "NetSpeed ISP", quoteTitle: "Internet Service Provider",
   },
 
   // ── SOLAR & ENERGY ──────────────────────────────────────────
@@ -564,8 +520,6 @@ const INDUSTRIES = [
       { icon:"💰", title:"Project Profitability",      desc:"Know your margin on every project before and after completion." },
       { icon:"🛒", title:"Purchase Orders",            desc:"Raise POs for panels and equipment. Match with GRN on delivery." },
     ],
-    quote: "We do 50 installations a month. FinovaOS tracks every panel, every wire, and every cost.",
-    quoteName: "SunTech Solar", quoteTitle: "Solar Energy Business",
   },
 
   // ── IMPORT / EXPORT ─────────────────────────────────────────
@@ -590,8 +544,6 @@ const INDUSTRIES = [
       { icon:"💱", title:"Multi-Currency Invoicing",   desc:"Invoice in USD, EUR, GBP — convert at real-time rates." },
       { icon:"📊", title:"Import Cost Reports",        desc:"Landed cost vs selling price — instant margin view." },
     ],
-    quote: "Every container has 20+ cost lines. FinovaOS captures every one — our landed cost is finally accurate.",
-    quoteName: "ZamZam Imports", quoteTitle: "Import & Export",
   },
 
   // ── CLEARING & FORWARDING ───────────────────────────────────
@@ -616,8 +568,6 @@ const INDUSTRIES = [
       { icon:"🚚", title:"Transporter & Vendor Bills", desc:"Record haulier, labour, and warehouse bills and recover them on the client invoice." },
       { icon:"📊", title:"Job-Wise P&L",               desc:"Instant profit per consignment and per client — before the file is even closed." },
     ],
-    quote: "Every consignment used to be a guess at month end. Now I know the profit on a file the day it clears.",
-    quoteName: "Marcus Bell", quoteTitle: "Partner, Bell Clearing Services — Rotterdam",
   },
 
   // ── EVENT MANAGEMENT ────────────────────────────────────────
@@ -642,8 +592,6 @@ const INDUSTRIES = [
       { icon:"📄", title:"Quotation & Proposals",     desc:"Send detailed quotes. Convert to booking with client signature." },
       { icon:"📊", title:"Event Profitability",       desc:"Revenue vs cost per event — know which events make money." },
     ],
-    quote: "We planned 120 weddings last year. FinovaOS kept every vendor, every budget, and every client in order.",
-    quoteName: "Royal Events", quoteTitle: "Events & Hospitality",
   },
 
   // ── REPAIR & MAINTENANCE ─────────────────────────────────────
@@ -668,8 +616,6 @@ const INDUSTRIES = [
       { icon:"💳", title:"Customer Billing",           desc:"Invoice service charge + parts. Accept advance on delivery." },
       { icon:"📊", title:"Technician Performance",     desc:"Jobs completed, revenue generated, and parts used per tech." },
     ],
-    quote: "50 phones a day through my shop. FinovaOS tracks every job, every part, every payment automatically.",
-    quoteName: "TechFix Mobile", quoteTitle: "Mobile Repair Services",
   },
 
   // ── FRANCHISE ───────────────────────────────────────────────
@@ -694,8 +640,6 @@ const INDUSTRIES = [
       { icon:"💳", title:"Centralized Billing",        desc:"Raise invoices from HQ or outlet level. Both tracked together." },
       { icon:"🔒", title:"Role-Based Access",          desc:"Outlet managers see only their data. HQ sees everything." },
     ],
-    quote: "12 franchise outlets — I check one dashboard every morning and know exactly how each one is doing.",
-    quoteName: "Spice Chain Foods", quoteTitle: "Food & Beverage Chain",
   },
 ];
 
@@ -1093,34 +1037,6 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
             </div>
 
             {/* Quote — only for live industries */}
-            {!comingSoon && (
-            <div style={{
-              padding:"18px 20px", borderRadius:16,
-              background:"rgba(var(--ink),.03)", border:`1.5px solid ${ind.border}`,
-              opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(14px)",
-              transition:"all .55s ease .28s",
-              position:"relative", overflow:"hidden",
-            }}>
-              <div style={{ position:"absolute", top:10, right:16, fontSize:42, color:ind.color, opacity:.08, fontFamily:"Georgia,serif", userSelect:"none" }}>&quot;</div>
-              <p style={{ fontSize:13.5, color:"rgba(var(--ink),var(--ta-65, .65))", lineHeight:1.75, fontStyle:"italic", marginBottom:12 }}>
-                &quot;{ind.quote}&quot;
-              </p>
-              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <div style={{ width:34, height:34, borderRadius:"50%",
-                  background:`linear-gradient(135deg,color-mix(in srgb, ${ind.color} 40%, transparent),color-mix(in srgb, ${ind.color} 20%, transparent))`,
-                  border:`1.5px solid ${ind.border}`,
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  fontSize:13, fontWeight:800, color:ind.color }}>
-                  {ind.quoteName[0]}
-                </div>
-                <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:"rgba(var(--ink),.85)" }}>{ind.quoteName}</div>
-                  <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:1 }}>{ind.quoteTitle}</div>
-                </div>
-              </div>
-            </div>
-            )}
-
             <div style={{
               marginTop:28,
               opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(14px)",
