@@ -133,7 +133,12 @@ const PRINT_INPUT: FormulaInput = { key: "printCost", label: "Print", unit: "Rs"
    repeat it along the roll, cost the roll by weight (or at a fixed price per
    roll), divide down to one piece. Only what the part measures changes. */
 
-type Part = { key: "back" | "front" | "gusset"; name: string; section: string; rate: number; gauge: number; rollLength: number };
+type Part = {
+  key: "back" | "front" | "gusset" | "zipSlip" | "backStrip" | "piping";
+  name: string; section: string; rate: number; gauge: number; rollLength: number;
+  /** false = cut at its full length, no cutting range — a 152in piping strip is one piece, not a multiple. */
+  ranged?: boolean;
+};
 
 const partInputs = (p: Part): FormulaInput[] => [
   { key: `${p.key}Rate`,         label: `${p.name} material rate`, unit: "per mm", defaultValue: p.rate, askOnRun: true, group: p.section, disabledWhenSet: `${p.key}FixedRate` },
@@ -141,19 +146,21 @@ const partInputs = (p: Part): FormulaInput[] => [
   { key: `${p.key}Widths`,       label: `${p.name} stock widths`,  unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: p.section },
   { key: `${p.key}FixedRate`,    label: "Fixed rate (per roll)",   unit: "Rs", defaultValue: 0, askOnRun: true, group: p.section },
   { key: `${p.key}RollLength`,   label: "Roll length",             unit: "m",  defaultValue: p.rollLength, askOnRun: true, group: p.section },
-  { key: `${p.key}CutMin`,       label: "Cutting range — min",     unit: "in", defaultValue: 30, group: p.section },
-  { key: `${p.key}CutMax`,       label: "Cutting range — max",     unit: "in", defaultValue: 50, group: p.section },
+  ...(p.ranged === false ? [] : [
+    { key: `${p.key}CutMin`,     label: "Cutting range — min",     unit: "in", defaultValue: 30, group: p.section },
+    { key: `${p.key}CutMax`,     label: "Cutting range — max",     unit: "in", defaultValue: 50, group: p.section },
+  ]),
   { key: `${p.key}CutAllowance`, label: "Allowance per cut",       unit: "in", defaultValue: 0.75, group: p.section },
 ];
 
 /** `across` is what the part measures across the roll, `along` what it measures along it. */
-const partSteps = (k: Part["key"], n: string, across: string, along: string): FormulaStep[] => {
+const partSteps = (k: Part["key"], n: string, across: string, along: string, ranged = true): FormulaStep[] => {
   return [
     { key: `${k}RollInches`, label: `${n} roll length`,        expression: `convert(${k}RollLength, m, in)`, unit: "in" },
     { key: `${k}Across`,     label: `${n} pieces across`,      expression: `bestFitCount(${across}, ${k}Widths)` },
     { key: `${k}RollWidth`,  label: `${n} roll width used`,    expression: `bestFitStock(${across}, ${k}Widths)`, unit: "in" },
     { key: `${k}BaseCut`,    label: `${n} base cut`,           expression: along, unit: "in" },
-    { key: `${k}Factor`,     label: `${n} length multiple`,    expression: `scaleToRange(${k}BaseCut, ${k}CutMin, ${k}CutMax)` },
+    { key: `${k}Factor`,     label: `${n} length multiple`,    expression: ranged ? `scaleToRange(${k}BaseCut, ${k}CutMin, ${k}CutMax)` : "1" },
     { key: `${k}CutLength`,  label: `${n} cut length`,         expression: `${k}BaseCut * ${k}Factor + ${k}CutAllowance`, unit: "in" },
     { key: `${k}Repeats`,    label: `${n} layers per roll`,    expression: `floor(${k}RollInches / ${k}CutLength)` },
     { key: `${k}PerRoll`,    label: `${n} pieces per roll`,    expression: `${k}Repeats * ${k}Across * ${k}Factor`, unit: "pcs" },
@@ -464,6 +471,82 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       ...FASTENING_BREAKDOWN,
       { key: "printCost",      label: "Print per bag",          unit: "Rs" },
       ...FASTENING_OUTPUTS,
+    ],
+  },
+
+  {
+    templateId: "zipper-bag",
+    name: "Zipper bag",
+    category: "Packaging",
+    version: 1,
+    summary:
+      "A box-shaped zipper bag in three parts — zip slip, back patti and piping — each costed on its own roll, plus the zip bought by the bundle.",
+    description:
+      "Sizes in inches: width x length x guezzet, e.g. 22 x 22 x 7. Zip slip is (length - zip margin) wide and runs guezzet x 2 + width + allowance. Back patti is (width + allowance) wide and runs length + guezzet x 2 + allowance. Piping is a fixed-width strip, width x 3 + length x 2 + guezzet x 6 long, cut whole. The zip is as long as the zip slip, so a 200-gaz bundle gives 7200 / that many zips.",
+    inputs: [
+      { key: "bagWidth",     label: "Width (chaurai)",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
+      { key: "bagLength",    label: "Length (lambai)",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
+      { key: "guezzet",      label: "Guezzet",           unit: "in", defaultValue: 7,   askOnRun: true, group: "Bag details" },
+      // The ½ taken off the zip slip's width for the zip, and the ½ seam
+      // added to each panel — kept as boxes, not hidden inside the formula.
+      { key: "zipMargin",    label: "Zip margin",        unit: "in", defaultValue: 0.5, group: "Bag details" },
+      { key: "seam",         label: "Seam allowance",    unit: "in", defaultValue: 0.5, group: "Bag details" },
+      { key: "pipingWidth",  label: "Piping width",      unit: "in", defaultValue: 1.5, group: "Bag details" },
+
+      ...partInputs({ key: "zipSlip",   name: "Zip slip",   section: "Zip slip roll",   rate: 12, gauge: 10, rollLength: 100 }),
+      ...partInputs({ key: "backStrip", name: "Back patti", section: "Back patti roll", rate: 12, gauge: 10, rollLength: 100 }),
+      ...partInputs({ key: "piping",    name: "Piping",     section: "Piping roll",     rate: 12, gauge: 10, rollLength: 100, ranged: false }),
+
+      // Zip is bought by the bundle, not by the inch: 200 gaz a bundle, one
+      // zip per bag as long as the zip slip.
+      { key: "zipBundleGaz",  label: "Zip bundle length", unit: "gaz", defaultValue: 200, group: "Zip" },
+      { key: "zipBundleRate", label: "Rate per bundle",   unit: "Rs",  defaultValue: 0, askOnRun: true, group: "Zip" },
+
+      { key: "labour",       label: "Labour",            unit: "Rs", defaultValue: 3,  askOnRun: true, group: "Order details" },
+      PRINT_INPUT,
+      { key: "others",       label: "Others",            unit: "Rs", defaultValue: 0,  askOnRun: true, group: "Order details" },
+      { key: "orderQty",     label: "Order quantity",    unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
+    ],
+    steps: [
+      { key: "zipSlipWidth",   label: "Zip slip width",   expression: "bagLength - zipMargin", unit: "in" },
+      ...partSteps("zipSlip", "Zip slip", "zipSlipWidth", "guezzet * 2 + bagWidth + seam"),
+      { key: "backStripWidth", label: "Back patti width", expression: "bagWidth + seam", unit: "in" },
+      ...partSteps("backStrip", "Back patti", "backStripWidth", "bagLength + guezzet * 2 + seam"),
+      ...partSteps("piping", "Piping", "pipingWidth", "bagWidth * 3 + bagLength * 2 + guezzet * 6", false),
+
+      // One zip per bag, as long as the zip slip.
+      { key: "zipLength",     label: "Zip per bag",        expression: "zipSlipBaseCut", unit: "in" },
+      { key: "zipPerBundle",  label: "Zips per bundle",    expression: "floor(convert(zipBundleGaz, yd, in) / zipLength)", unit: "pcs" },
+      { key: "zipPerPc",      label: "Zip cost per bag",   expression: "zipBundleRate / zipPerBundle", unit: "Rs" },
+      { key: "zipBundles",    label: "Zip bundles required", expression: "orderQty / zipPerBundle" },
+
+      { key: "materialPerPc", label: "Material per bag", expression: "zipSlipPerPc + backStripPerPc + pipingPerPc", unit: "Rs" },
+      { key: "costPerPc",     label: "Cost per bag",     expression: "materialPerPc + zipPerPc + labour + printCost + others", unit: "Rs" },
+      { key: "orderCost",     label: "Order total",      expression: "costPerPc * orderQty", unit: "Rs" },
+    ],
+    outputs: [
+      { key: "costPerPc",         label: "Cost per bag",            unit: "Rs",  role: "cost_per_unit", primary: true },
+      { key: "zipSlipPerPc",      label: "Zip slip cost per bag",   unit: "Rs" },
+      { key: "backStripPerPc",    label: "Back patti cost per bag", unit: "Rs" },
+      { key: "pipingPerPc",       label: "Piping cost per bag",     unit: "Rs" },
+      { key: "zipPerPc",          label: "Zip cost per bag",        unit: "Rs" },
+      { key: "zipSlipWidth",      label: "Zip slip width",          unit: "in" },
+      { key: "zipSlipBaseCut",    label: "Zip slip length",         unit: "in" },
+      { key: "backStripWidth",    label: "Back patti width",        unit: "in" },
+      { key: "backStripBaseCut",  label: "Back patti length",       unit: "in" },
+      { key: "pipingBaseCut",     label: "Piping length",           unit: "in" },
+      { key: "zipSlipPerRoll",    label: "Zip slips per roll",      unit: "pcs", role: "units_per_batch" },
+      { key: "backStripPerRoll",  label: "Back pattis per roll",    unit: "pcs" },
+      { key: "pipingPerRoll",     label: "Pipings per roll",        unit: "pcs" },
+      { key: "zipPerBundle",      label: "Zips per bundle",         unit: "pcs" },
+      { key: "zipSlipRolls",      label: "Zip slip rolls required" },
+      { key: "backStripRolls",    label: "Back patti rolls required" },
+      { key: "pipingRolls",       label: "Piping rolls required" },
+      { key: "zipBundles",        label: "Zip bundles required",    role: "consumable_qty" },
+      { key: "zipSlipRollCost",   label: "Zip slip roll cost",      unit: "Rs",  role: "cost_per_batch" },
+      { key: "zipSlipWasteM",     label: "Zip slip waste per roll", unit: "m",   role: "waste_qty" },
+      { key: "printCost",         label: "Print per bag",           unit: "Rs" },
+      { key: "orderCost",         label: "Order total",             unit: "Rs" },
     ],
   },
 
