@@ -219,6 +219,10 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // in Roll → Pieces. Zero by default so a plain two-panel bag is unaffected.
       { key: "guezzet",      label: "Guezzet (back only)",  unit: "in", defaultValue: 0,    askOnRun: true, group: "Bag details" },
 
+      // Each roll carries its own length and cutting setup: PVC comes in 100 m
+      // or 50 m rolls while frosty is always 50 m, so one shared roll length
+      // costs one of the two faces wrongly.
+      //
       // Either film can be bought at a flat price per roll (frosty, 12 gauge,
       // 60" — Rs 8,000) rather than worked out from a rate. The rate is the
       // default; anything above zero in a roll's fixed rate is that roll's cost
@@ -227,16 +231,20 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "backGauge",    label: "Back gauge",           unit: "",   defaultValue: 10,   askOnRun: true, group: "Back roll", disabledWhenSet: "backFixedRate" },
       { key: "backWidths",   label: "Back stock widths",    unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: "Back roll" },
       { key: "backFixedRate", label: "Fixed rate (per roll)", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Back roll" },
+      { key: "backRollLength",   label: "Roll length",         unit: "m",  defaultValue: 100, askOnRun: true, group: "Back roll" },
+      { key: "backCutMin",       label: "Cutting range — min", unit: "in", defaultValue: 30, group: "Back roll" },
+      { key: "backCutMax",       label: "Cutting range — max", unit: "in", defaultValue: 50, group: "Back roll" },
+      { key: "backCutAllowance", label: "Allowance per cut",   unit: "in", defaultValue: 0.75, group: "Back roll" },
 
       { key: "frontRate",    label: "Front material rate",  unit: "per mm", defaultValue: 15, askOnRun: true, group: "Front roll", disabledWhenSet: "frontFixedRate" },
       { key: "frontGauge",   label: "Front gauge",          unit: "",   defaultValue: 8,    askOnRun: true, group: "Front roll", disabledWhenSet: "frontFixedRate" },
       { key: "frontWidths",  label: "Front stock widths",   unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: "Front roll" },
       { key: "frontFixedRate", label: "Fixed rate (per roll)", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Front roll" },
+      { key: "frontRollLength",   label: "Roll length",         unit: "m",  defaultValue: 50, askOnRun: true, group: "Front roll" },
+      { key: "frontCutMin",       label: "Cutting range — min", unit: "in", defaultValue: 30, group: "Front roll" },
+      { key: "frontCutMax",       label: "Cutting range — max", unit: "in", defaultValue: 50, group: "Front roll" },
+      { key: "frontCutAllowance", label: "Allowance per cut",   unit: "in", defaultValue: 0.75, group: "Front roll" },
 
-      { key: "rollLength",   label: "Roll length",          unit: "m",  defaultValue: 100, group: "Roll details" },
-      { key: "cutMin",       label: "Cutting range — min",  unit: "in", defaultValue: 30, group: "Roll details" },
-      { key: "cutMax",       label: "Cutting range — max",  unit: "in", defaultValue: 50, group: "Roll details" },
-      { key: "cutAllowance", label: "Allowance per cut",    unit: "in", defaultValue: 0.75, group: "Roll details" },
       { key: "labour",       label: "Labour",               unit: "Rs", defaultValue: 3,  askOnRun: true, group: "Order details" },
       // Per piece, not per roll as in Roll → Pieces: there are two rolls here,
       // so loading it onto either one would charge the bag twice or not at all.
@@ -246,29 +254,30 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "orderQty",     label: "Order quantity",       unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
     ],
     steps: [
-      { key: "rollInches",    label: "Roll length",           expression: "convert(rollLength, m, in)", unit: "in" },
 
       /* Back panel — 1 width x (1 length + flap) */
+      { key: "backRollInches", label: "Back roll length",     expression: "convert(backRollLength, m, in)", unit: "in" },
       { key: "backAcross",    label: "Back panels across",    expression: "bestFitCount(bagWidth, backWidths)" },
       { key: "backRollWidth", label: "Back roll width used",  expression: "bestFitStock(bagWidth, backWidths)", unit: "in" },
       { key: "backBaseCut",   label: "Back base cut",         expression: "bagLength + flap + guezzet", unit: "in" },
-      { key: "backFactor",    label: "Back length multiple",  expression: "scaleToRange(backBaseCut, cutMin, cutMax)" },
+      { key: "backFactor",    label: "Back length multiple",  expression: "scaleToRange(backBaseCut, backCutMin, backCutMax)" },
       // Allowance inside the cut length, same as Roll → Pieces.
-      { key: "backCutLength", label: "Back cut length",       expression: "backBaseCut * backFactor + cutAllowance", unit: "in" },
-      { key: "backRepeats",   label: "Back layers per roll",  expression: "floor(rollInches / backCutLength)" },
+      { key: "backCutLength", label: "Back cut length",       expression: "backBaseCut * backFactor + backCutAllowance", unit: "in" },
+      { key: "backRepeats",   label: "Back layers per roll",  expression: "floor(backRollInches / backCutLength)" },
       { key: "backPerRoll",   label: "Back panels per roll",  expression: "backRepeats * backAcross * backFactor", unit: "pcs" },
-      { key: "backRollCost",  label: "Back roll cost",        expression: "if(backFixedRate > 0, backFixedRate, backRate * backGauge * backRollWidth * rollLength / densityDiv)", unit: "Rs" },
+      { key: "backRollCost",  label: "Back roll cost",        expression: "if(backFixedRate > 0, backFixedRate, backRate * backGauge * backRollWidth * backRollLength / densityDiv)", unit: "Rs" },
       { key: "backPerPc",     label: "Back cost per bag",     expression: "backRollCost / backPerRoll", unit: "Rs" },
 
       /* Front panel — 1 width x 1 length, no flap */
+      { key: "frontRollInches", label: "Front roll length",   expression: "convert(frontRollLength, m, in)", unit: "in" },
       { key: "frontAcross",    label: "Front panels across",    expression: "bestFitCount(bagWidth, frontWidths)" },
       { key: "frontRollWidth", label: "Front roll width used",  expression: "bestFitStock(bagWidth, frontWidths)", unit: "in" },
       { key: "frontBaseCut",   label: "Front base cut",         expression: "bagLength", unit: "in" },
-      { key: "frontFactor",    label: "Front length multiple",  expression: "scaleToRange(frontBaseCut, cutMin, cutMax)" },
-      { key: "frontCutLength", label: "Front cut length",       expression: "frontBaseCut * frontFactor + cutAllowance", unit: "in" },
-      { key: "frontRepeats",   label: "Front layers per roll",  expression: "floor(rollInches / frontCutLength)" },
+      { key: "frontFactor",    label: "Front length multiple",  expression: "scaleToRange(frontBaseCut, frontCutMin, frontCutMax)" },
+      { key: "frontCutLength", label: "Front cut length",       expression: "frontBaseCut * frontFactor + frontCutAllowance", unit: "in" },
+      { key: "frontRepeats",   label: "Front layers per roll",  expression: "floor(frontRollInches / frontCutLength)" },
       { key: "frontPerRoll",   label: "Front panels per roll",  expression: "frontRepeats * frontAcross * frontFactor", unit: "pcs" },
-      { key: "frontRollCost",  label: "Front roll cost",        expression: "if(frontFixedRate > 0, frontFixedRate, frontRate * frontGauge * frontRollWidth * rollLength / densityDiv)", unit: "Rs" },
+      { key: "frontRollCost",  label: "Front roll cost",        expression: "if(frontFixedRate > 0, frontFixedRate, frontRate * frontGauge * frontRollWidth * frontRollLength / densityDiv)", unit: "Rs" },
       { key: "frontPerPc",     label: "Front cost per bag",     expression: "frontRollCost / frontPerRoll", unit: "Rs" },
 
       /* The bag */
@@ -276,8 +285,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "costPerPc",     label: "Cost per bag",      expression: "materialPerPc + labour + buttonTape + others", unit: "Rs" },
       { key: "backRolls",     label: "Back rolls required",  expression: "orderQty / backPerRoll" },
       { key: "frontRolls",    label: "Front rolls required", expression: "orderQty / frontPerRoll" },
-      { key: "backWasteM",    label: "Back waste per roll",  expression: "(rollInches - backRepeats * backCutLength) / 39.37", unit: "m" },
-      { key: "frontWasteM",   label: "Front waste per roll", expression: "(rollInches - frontRepeats * frontCutLength) / 39.37", unit: "m" },
+      { key: "backWasteM",    label: "Back waste per roll",  expression: "(backRollInches - backRepeats * backCutLength) / 39.37", unit: "m" },
+      { key: "frontWasteM",   label: "Front waste per roll", expression: "(frontRollInches - frontRepeats * frontCutLength) / 39.37", unit: "m" },
       { key: "orderCost",     label: "Order total",       expression: "costPerPc * orderQty", unit: "Rs" },
     ],
     outputs: [
@@ -543,7 +552,68 @@ export function getTemplate(id: string): FormulaTemplate | undefined {
  * step an author has rewritten is never touched.
  */
 export function upgradeSavedFormula<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T): T {
-  return (["back", "front"] as const).reduce(addFixedRollRate, f);
+  return splitRollDetails((["back", "front"] as const).reduce(addFixedRollRate, f));
+}
+
+const SHARED_ROLL_KEYS = ["rollLength", "cutMin", "cutMax", "cutAllowance"] as const;
+const rollKey = (side: "back" | "front", k: string) => side + k[0].toUpperCase() + k.slice(1);
+
+/**
+ * Two-panel copies made while both faces shared one Roll details block get
+ * a length and cutting setup of their own on each roll. Each side starts on
+ * the value the shared box held, so a saved quote works out exactly as it did
+ * until someone changes it. Only the back… and front… steps are rewritten;
+ * the shared inputs go only once nothing reads them any more.
+ */
+function splitRollDetails<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T): T {
+  if (!f.inputs.some((i) => i.key === "backRate") || !f.inputs.some((i) => i.key === "frontRate")) return f;
+  if (f.inputs.some((i) => i.key === "backRollLength" || i.key === "frontRollLength")) return f;
+  if (!f.inputs.some((i) => i.key === "rollLength")) return f;
+
+  const tpl = FORMULA_TEMPLATES.find((t) => t.templateId === "two-panel-bag")!;
+  let inputs = [...f.inputs];
+  for (const side of ["back", "front"] as const) {
+    const rows = SHARED_ROLL_KEYS.flatMap((k) => {
+      const shared = f.inputs.find((i) => i.key === k);
+      const row = tpl.inputs.find((i) => i.key === rollKey(side, k));
+      if (!shared || !row) return [];
+      return [{ ...row, defaultValue: shared.defaultValue ?? row.defaultValue }];
+    });
+    const rate = inputs.find((i) => i.key === `${side}Rate`)!;
+    let at = inputs.length;
+    inputs.forEach((i, idx) => { if ((i.group ?? "") === (rate.group ?? "")) at = idx + 1; });
+    inputs.splice(at, 0, ...rows.map((r) => ({ ...r, ...(rate.group ? { group: rate.group } : {}) })));
+  }
+
+  const rename = (expr: string, side: "back" | "front") =>
+    ["rollInches", ...SHARED_ROLL_KEYS].reduce(
+      (e, k) => (inputs.some((i) => i.key === rollKey(side, k)) || k === "rollInches"
+        ? e.replace(new RegExp(`\\b${k}\\b`, "g"), rollKey(side, k))
+        : e),
+      expr,
+    );
+  let steps = f.steps.map((s) => {
+    const side = s.key.startsWith("back") ? "back" : s.key.startsWith("front") ? "front" : null;
+    return side ? { ...s, expression: rename(s.expression, side) } : s;
+  });
+  // The one shared "roll length in inches" step becomes one per roll.
+  const ri = steps.findIndex((s) => s.key === "rollInches");
+  if (ri >= 0 && !steps.some((s, idx) => idx !== ri && /\brollInches\b/.test(s.expression))) {
+    const lengthStep = (side: "back" | "front") => tpl.steps.find((s) => s.key === `${side}RollInches`)!;
+    steps.splice(ri, 1);
+    const firstOf = (side: string) => steps.findIndex((s) => s.key.startsWith(side));
+    for (const side of ["back", "front"] as const) {
+      const at = firstOf(side);
+      steps.splice(at < 0 ? steps.length : at, 0, { ...lengthStep(side) });
+    }
+  } else if (ri >= 0) {
+    // Something else still reads the shared step — keep it, add the two beside it.
+    steps.splice(ri + 1, 0, ...(["back", "front"] as const).map((side) => ({ ...tpl.steps.find((s) => s.key === `${side}RollInches`)! })));
+  }
+
+  const stillRead = (k: string) => steps.some((s) => new RegExp(`\\b${k}\\b`).test(s.expression));
+  inputs = inputs.filter((i) => !(SHARED_ROLL_KEYS as readonly string[]).includes(i.key) || stillRead(i.key));
+  return { ...f, inputs, steps };
 }
 
 function addFixedRollRate<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T, side: "back" | "front"): T {
