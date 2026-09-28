@@ -522,10 +522,10 @@ export default function FormulasPage() {
           style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : (
         <input type="number" step="any" value={inch ? toShown(inp.defaultValue ?? 0) : (inp.defaultValue ?? 0)}
-          title={inch && cm ? `= ${tidy(inp.defaultValue ?? 0)} in` : undefined}
           onChange={(e) => patch((x) => { x.inputs[i].defaultValue = inch ? fromShown(Number(e.target.value)) : Number(e.target.value); })}
           disabled={overridden}
-          title={overridden ? "Not used — a fixed rate has been entered" : undefined}
+          title={overridden ? "Not used — a fixed rate has been entered"
+            : inch && cm ? `= ${tidy(inp.defaultValue ?? 0)} in` : undefined}
           style={overridden ? { ...monoInput, opacity: 0.4, cursor: "not-allowed" } : monoInput}/>
       );
 
