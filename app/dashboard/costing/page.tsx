@@ -45,6 +45,8 @@ import {
 import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
 import { upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
+import { LengthUnitSwitch } from "@/components/costing/LengthUnitSwitch";
+import { convertValues, inLengthUnit, loadLengthUnit, runInLengthUnit, saveLengthUnit, type LengthUnit } from "@/lib/formulaUnits";
 
 const CARD = "rgba(var(--ink),.03)";
 const BORDER = "rgba(var(--ink),.09)";
@@ -196,6 +198,10 @@ function CostingInner() {
 
   const [selectedId, setSelectedId] = useState("");
   const [values, setValues] = useState<Record<string, number | number[]>>({});
+  // Inches or centimetres for every size on screen. `values` holds whatever is
+  // on screen; the engine is always handed inches.
+  const [lengthUnit, setLengthUnit] = useState<LengthUnit>("in");
+  useEffect(() => { setLengthUnit(loadLengthUnit()); }, []);
   // Folded away by default. The working is every step of the costing, which is
   // what you open when a number looks wrong — not what you want between the
   // result and the print buttons on every single quote.
@@ -237,7 +243,19 @@ function CostingInner() {
     else if (!selectedId && formulas.length) setSelectedId(formulas[0].id);
   }, [params, formulas, selectedId]);
 
-  const selected = formulas.find((f) => f.id === selectedId) ?? null;
+  const base = formulas.find((f) => f.id === selectedId) ?? null;
+  // Everything below reads the formula as it is shown — inch boxes relabelled
+  // cm while cm is picked. Only the run itself goes back to the inch original.
+  const selected = useMemo(
+    () => (base ? { ...base, formula: inLengthUnit(base.formula, lengthUnit) } : null),
+    [base, lengthUnit],
+  );
+  const switchLengthUnit = (next: LengthUnit) => {
+    if (next === lengthUnit) return;
+    if (base) setValues((v) => convertValues(base.formula, v, lengthUnit, next) as typeof v);
+    setLengthUnit(next);
+    saveLengthUnit(next);
+  };
 
   // Reset the entered values whenever the chosen formula changes.
   useEffect(() => {
@@ -255,8 +273,10 @@ function CostingInner() {
   }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const run = useMemo(
-    () => (selected ? runFormula(selected.formula, values) : null),
-    [selected, values],
+    () => (base
+      ? runInLengthUnit(runFormula(base.formula, convertValues(base.formula, values, lengthUnit, "in")), base.formula, lengthUnit)
+      : null),
+    [base, values, lengthUnit],
   );
 
   // The print sheet has to be in the DOM before the print dialog opens, so the
@@ -517,7 +537,10 @@ function CostingInner() {
             <Link href="/dashboard/costing/formulas" style={{ color: "var(--tx-818cf8, #818cf8)" }}>formulas</Link>.
           </p>
         </div>
-        <Link className="cxHeaderAction" href="/dashboard/costing/formulas" style={{ ...btn(), textDecoration: "none" }}>Manage formulas</Link>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <LengthUnitSwitch value={lengthUnit} onChange={switchLengthUnit} />
+          <Link className="cxHeaderAction" href="/dashboard/costing/formulas" style={{ ...btn(), textDecoration: "none" }}>Manage formulas</Link>
+        </div>
       </div>
 
       {formulaStore.loading ? (
