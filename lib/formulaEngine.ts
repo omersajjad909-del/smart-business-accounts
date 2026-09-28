@@ -534,6 +534,13 @@ export type FormulaInput = {
    * it are what must zero the branch out, usually with if().
    */
   showWhen?: { key: string; is: number };
+  /**
+   * Greyed out while that other input holds anything but zero — a material
+   * rate that a fixed per-roll price has taken over from. Display only, like
+   * showWhen: the engine still reads the value, so the step that uses it is
+   * what has to pick one or the other, usually with if().
+   */
+  disabledWhenSet?: string;
   /** false = fixed in the formula, not asked on every run. */
   askOnRun?: boolean;
   /**
@@ -562,6 +569,16 @@ export function isVisible(
   if (!cond) return true;
   const picked = values[cond.key];
   return typeof picked === "number" && Math.abs(picked - cond.is) < 1e-9;
+}
+
+/** Whether an input is overridden by another one being filled — see disabledWhenSet. */
+export function isDisabled(
+  row: { disabledWhenSet?: string },
+  values: Record<string, FormulaValue>,
+): boolean {
+  if (!row.disabledWhenSet) return false;
+  const v = values[row.disabledWhenSet];
+  return typeof v === "number" && v !== 0;
 }
 
 export type FormulaStep = {
