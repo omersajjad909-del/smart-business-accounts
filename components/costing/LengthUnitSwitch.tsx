@@ -1,7 +1,7 @@
 "use client";
 // FILE: components/costing/LengthUnitSwitch.tsx
 //
-// Inch / CM toggle for the costing screens. Local customers quote a bag in
+// Inch / CM toggle for typing a bag size. Local customers quote a bag in
 // inches, export parties in centimetres — same formula, different ruler. See
 // lib/formulaUnits.ts for why this only changes what is shown and typed.
 
@@ -14,7 +14,7 @@ export function LengthUnitSwitch({ value, onChange }: { value: LengthUnit; onCha
     <div
       role="radiogroup"
       aria-label="Length unit"
-      title="Sizes, widths and cut lengths in inches or centimetres. The costing is the same either way."
+      title="Type the bag size in inches or centimetres. The costing and every result stay in inches."
       style={{
         display: "inline-flex", gap: 3, padding: 3, borderRadius: 11,
         background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.09)",

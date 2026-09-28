@@ -35,7 +35,7 @@ import {
 import { FORMULA_CATEGORIES, FORMULA_TEMPLATES, upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 import { LengthUnitSwitch } from "@/components/costing/LengthUnitSwitch";
-import { isInchUnit, loadLengthUnit, runInLengthUnit, saveLengthUnit, type LengthUnit } from "@/lib/formulaUnits";
+import { cmToIn, inToCm, isSizeInput, loadLengthUnit, saveLengthUnit, tidy, type LengthUnit } from "@/lib/formulaUnits";
 
 const CARD = "rgba(var(--ink),.03)";
 const BORDER = "rgba(var(--ink),.09)";
@@ -276,17 +276,16 @@ export default function FormulasPage() {
   // Simple hides the plumbing (keys, type, ask, roles) and shows a trade the
   // three things it cares about. Detailed is the full table.
   const [detailed, setDetailed] = useState(false);
-  // Same switch as the run screen. The draft is always kept and saved in
-  // inches; only what the boxes and the live result show moves to cm.
+  // Same switch as the run screen: bag sizes typed in cm. The draft is kept
+  // and saved in inches, and the live result stays in inches.
   const [lengthUnit, setLengthUnit] = useState<LengthUnit>("in");
   useEffect(() => { setLengthUnit(loadLengthUnit()); }, []);
   const switchLengthUnit = (next: LengthUnit) => { setLengthUnit(next); saveLengthUnit(next); };
   const cm = lengthUnit === "cm";
-  const shownUnit = (u?: string) => (cm && isInchUnit(u) ? "cm" : u);
   // Tidied either way: 30cm typed and read back in inches is 11.811, not
   // 11.811023622047244.
-  const toShown = (n: number) => Math.round((cm ? n * 2.54 : n) * 1e4) / 1e4;
-  const fromShown = (n: number) => (cm ? n / 2.54 : n);
+  const toShown = (n: number) => tidy(cm ? inToCm(n) : n);
+  const fromShown = (n: number) => (cm ? cmToIn(n) : n);
   // The two reference cards on the right open on demand — an author reads them
   // once and then wants the live result at the top of the rail, not below a
   // wall of chips. Values re-opens itself the moment a formula box is clicked,
@@ -326,8 +325,8 @@ export default function FormulasPage() {
   /* ── live evaluation of the draft ── */
   const preview = useMemo(() => {
     if (!editing) return null;
-    return runInLengthUnit(runFormula(editing.draft), editing.draft, lengthUnit);
-  }, [editing, lengthUnit]);
+    return runFormula(editing.draft);
+  }, [editing]);
 
   function patch(mut: (d: Draft) => void) {
     setEditing((cur) => {
@@ -496,9 +495,9 @@ export default function FormulasPage() {
       const badChoice = !!inp.options && (inp.options.filter((o) => o.trim()).length < 2);
       // Same rule as the run screen: greyed while the box that overrides it is filled.
       const overridden = isDisabled(inp, preview?.values ?? {});
-      // An inch box while cm is picked: shown and typed in cm, saved in inches.
-      // Its unit is fixed meanwhile — renaming it would change the saved unit.
-      const inch = isInchUnit(inp.unit);
+      // A bag size while cm is picked: typed in cm, saved in inches. Its unit is
+      // fixed meanwhile — renaming it would change the saved unit.
+      const inch = isSizeInput(inp);
       const unitCell = inch && cm ? (
         <input value="cm" readOnly title="Saved in inches. Switch to Inch to change the unit." style={{ ...input, opacity: .7 }}/>
       ) : null;
@@ -518,11 +517,12 @@ export default function FormulasPage() {
           style={{ ...input, borderColor: badChoice ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : inp.isList ? (
         <NumberListInput
-          value={inch ? (inp.listValue ?? []).map(toShown) : (inp.listValue ?? [])}
-          onChange={(next) => patch((x) => { x.inputs[i].listValue = inch ? next.map(fromShown) : next; })}
+          value={inp.listValue ?? []}
+          onChange={(next) => patch((x) => { x.inputs[i].listValue = next; })}
           style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : (
         <input type="number" step="any" value={inch ? toShown(inp.defaultValue ?? 0) : (inp.defaultValue ?? 0)}
+          title={inch && cm ? `= ${tidy(inp.defaultValue ?? 0)} in` : undefined}
           onChange={(e) => patch((x) => { x.inputs[i].defaultValue = inch ? fromShown(Number(e.target.value)) : Number(e.target.value); })}
           disabled={overridden}
           title={overridden ? "Not used — a fixed rate has been entered" : undefined}
@@ -712,7 +712,7 @@ export default function FormulasPage() {
                     fontSize: o.primary ? 17 : 13, fontWeight: 700,
                     color: o.primary ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.85)",
                   }}>
-                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{shownUnit(o.unit)}</span>
+                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{o.unit}</span>
                   </span>
                 </div>
                 {/* The split, small, under the number it adds up to — a rate
@@ -988,7 +988,7 @@ export default function FormulasPage() {
                       }}>
                         {stepErr ? "error" : fmt(result?.value)}
                         {!stepErr && st.unit && (
-                          <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{shownUnit(st.unit)}</span>
+                          <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{st.unit}</span>
                         )}
                       </div>
                     </div>

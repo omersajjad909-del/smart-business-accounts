@@ -1,15 +1,13 @@
 // FILE: lib/formulaUnits.ts
 //
-// Inch / centimetre switch for the costing screens.
+// Bag sizes typed in centimetres.
 //
-// Formulas are written, saved and worked out in inches — the roll cost's
-// weight divisor (rate x gauge x width x length / 54) is only right for a
-// width in inches, and every saved formula already holds inch values. So the
-// switch never touches the maths. It is a lens: anything whose unit is "in"
-// is shown and typed in centimetres while cm is picked, and turned back into
-// inches on the way into the engine.
+// Everything in costing stays in inches — the maths, the results, the stock
+// widths, the cutting setup. Export parties hand over a bag's size in cm, so
+// the switch only lets those size boxes be typed in cm; they are turned into
+// inches on the way into the engine and nothing else on screen changes.
 
-import type { CostingFormula, FormulaRun, FormulaValue } from "@/lib/formulaEngine";
+import type { CostingFormula, FormulaInput, FormulaValue } from "@/lib/formulaEngine";
 
 export type LengthUnit = "in" | "cm";
 
@@ -18,41 +16,36 @@ const INCH = new Set(["in", "inch", "inches", '"']);
 
 export const isInchUnit = (unit?: string) => INCH.has((unit ?? "").trim().toLowerCase());
 
+/**
+ * A size of the bag itself — what a party quotes the job by. The bag details
+ * block, plus the six sealer's ear, which sits with its guezzet roll. A roll's
+ * stock widths and cutting setup are the factory's own and stay in inches.
+ */
+export const isSizeInput = (i: Pick<FormulaInput, "key" | "unit" | "isList" | "group">) =>
+  isInchUnit(i.unit) && !i.isList && ((i.group ?? "").trim() === "Bag details" || i.key === "ear");
+
 // Four places is well past anything a ruler reads, and stops 11.5in from
 // coming back as 29.209999999999997cm. For showing a number only — a typed
 // value keeps its full precision, or 30cm switched to inches and back would
 // come home as 29.9999.
 export const tidy = (n: number) => Math.round(n * 1e4) / 1e4;
 
-function convert(v: FormulaValue, from: LengthUnit, to: LengthUnit, round = true): FormulaValue {
-  if (from === to) return v;
-  const f = (n: number) => {
-    const out = to === "cm" ? n * CM_PER_IN : n / CM_PER_IN;
-    return round ? tidy(out) : out;
-  };
-  return Array.isArray(v) ? v.map(f) : f(v);
-}
+export const cmToIn = (n: number) => n / CM_PER_IN;
+export const inToCm = (n: number) => n * CM_PER_IN;
 
-/** The formula as the screen should show it: inch boxes relabelled and their values in cm. */
+/** The formula as the screen should show it: size boxes relabelled cm, their defaults in cm. */
 export function inLengthUnit<T extends CostingFormula>(formula: T, unit: LengthUnit): T {
   if (unit === "in") return formula;
   return {
     ...formula,
     inputs: formula.inputs.map((i) =>
-      isInchUnit(i.unit)
-        ? {
-            ...i,
-            unit: "cm",
-            ...(i.defaultValue != null ? { defaultValue: convert(i.defaultValue, "in", "cm") as number } : {}),
-            ...(i.listValue ? { listValue: convert(i.listValue, "in", "cm") as number[] } : {}),
-          }
+      isSizeInput(i)
+        ? { ...i, unit: "cm", ...(i.defaultValue != null ? { defaultValue: tidy(inToCm(i.defaultValue)) } : {}) }
         : i),
-    steps: formula.steps.map((s) => (isInchUnit(s.unit) ? { ...s, unit: "cm" } : s)),
-    outputs: formula.outputs.map((o) => (isInchUnit(o.unit) ? { ...o, unit: "cm" } : o)),
   };
 }
 
-/** Typed values moved between units — for the switch itself, and for handing cm values to the engine. */
+/** Typed sizes moved between units — for the switch itself, and for handing cm sizes to the engine. */
 export function convertValues(
   formula: CostingFormula,
   values: Record<string, FormulaValue>,
@@ -62,27 +55,10 @@ export function convertValues(
   if (from === to) return values;
   const next = { ...values };
   for (const i of formula.inputs) {
-    if (isInchUnit(i.unit) && next[i.key] != null) next[i.key] = convert(next[i.key], from, to, false);
+    const v = next[i.key];
+    if (isSizeInput(i) && typeof v === "number") next[i.key] = to === "cm" ? inToCm(v) : cmToIn(v);
   }
   return next;
-}
-
-/** A run worked out in inches, with every inch figure read back out in the picked unit. */
-export function runInLengthUnit(run: FormulaRun, formula: CostingFormula, unit: LengthUnit): FormulaRun {
-  if (unit === "in") return run;
-  const inch = new Set(
-    [...formula.inputs, ...formula.steps, ...formula.outputs].filter((r) => isInchUnit(r.unit)).map((r) => r.key),
-  );
-  const values: Record<string, FormulaValue> = {};
-  for (const [k, v] of Object.entries(run.values)) values[k] = inch.has(k) ? convert(v, "in", "cm") : v;
-  return {
-    ...run,
-    values,
-    steps: run.steps.map((s) =>
-      inch.has(s.key)
-        ? { ...s, unit: "cm", value: s.value == null ? s.value : convert(s.value, "in", "cm") }
-        : s),
-  };
 }
 
 const STORE_KEY = "finova.costing.lengthUnit";

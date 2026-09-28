@@ -46,7 +46,7 @@ import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed"
 import { upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 import { LengthUnitSwitch } from "@/components/costing/LengthUnitSwitch";
-import { convertValues, inLengthUnit, isInchUnit, loadLengthUnit, runInLengthUnit, saveLengthUnit, tidy, type LengthUnit } from "@/lib/formulaUnits";
+import { cmToIn, convertValues, inLengthUnit, isSizeInput, loadLengthUnit, saveLengthUnit, tidy, type LengthUnit } from "@/lib/formulaUnits";
 
 const CARD = "rgba(var(--ink),.03)";
 const BORDER = "rgba(var(--ink),.09)";
@@ -198,8 +198,9 @@ function CostingInner() {
 
   const [selectedId, setSelectedId] = useState("");
   const [values, setValues] = useState<Record<string, number | number[]>>({});
-  // Inches or centimetres for every size on screen. `values` holds whatever is
-  // on screen; the engine is always handed inches.
+  // Bag sizes can be typed in cm for export parties. `values` holds the sizes
+  // as typed; the engine is always handed inches, and every result stays in
+  // inches either way.
   const [lengthUnit, setLengthUnit] = useState<LengthUnit>("in");
   useEffect(() => { setLengthUnit(loadLengthUnit()); }, []);
   // Folded away by default. The working is every step of the costing, which is
@@ -244,8 +245,8 @@ function CostingInner() {
   }, [params, formulas, selectedId]);
 
   const base = formulas.find((f) => f.id === selectedId) ?? null;
-  // Everything below reads the formula as it is shown — inch boxes relabelled
-  // cm while cm is picked. Only the run itself goes back to the inch original.
+  // Everything below reads the formula as it is shown — size boxes relabelled
+  // cm while cm is picked. The run itself goes back to the inch original.
   const selected = useMemo(
     () => (base ? { ...base, formula: inLengthUnit(base.formula, lengthUnit) } : null),
     [base, lengthUnit],
@@ -274,7 +275,7 @@ function CostingInner() {
 
   const run = useMemo(
     () => (base
-      ? runInLengthUnit(runFormula(base.formula, convertValues(base.formula, values, lengthUnit, "in")), base.formula, lengthUnit)
+      ? runFormula(base.formula, convertValues(base.formula, values, lengthUnit, "in"))
       : null),
     [base, values, lengthUnit],
   );
@@ -488,7 +489,7 @@ function CostingInner() {
   );
 
   // A size box — shown to four places, since switching units leaves a long tail.
-  const isLength = (inp: FormulaInput) => inp.unit === "cm" || isInchUnit(inp.unit);
+  const isLength = (inp: FormulaInput) => isSizeInput({ ...inp, unit: "in" }) && (inp.unit === "cm" || inp.unit === "in");
 
   /** One field, whether it holds a single number or a list of sizes. */
   const field = (inp: FormulaInput) => (
@@ -509,7 +510,7 @@ function CostingInner() {
         </select>
       ) : inp.isList ? (
         <NumberListInput
-          value={isLength(inp) ? ((values[inp.key] as number[] | undefined) ?? []).map(tidy) : ((values[inp.key] as number[] | undefined) ?? [])}
+          value={(values[inp.key] as number[] | undefined) ?? []}
           onChange={(next) => setValues((v) => ({ ...v, [inp.key]: next }))}
           style={inputStyle}
         />
@@ -524,6 +525,12 @@ function CostingInner() {
           title={isDisabled(inp, values) ? "Not used — a fixed rate has been entered" : undefined}
           style={isDisabled(inp, values) ? { ...inputStyle, opacity: 0.4, cursor: "not-allowed" } : inputStyle}
         />
+      )}
+      {/* The inches the costing actually runs on, under a size typed in cm. */}
+      {inp.unit === "cm" && isLength(inp) && typeof values[inp.key] === "number" && (
+        <div style={{ fontSize: 11, marginTop: 4, color: "rgba(var(--ink),var(--ta-40, .4))", fontFamily: MONO }}>
+          = {tidy(cmToIn(values[inp.key] as number))} in
+        </div>
       )}
     </div>
   );
