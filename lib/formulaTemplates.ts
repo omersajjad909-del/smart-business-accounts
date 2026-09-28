@@ -164,6 +164,11 @@ const partSteps = (k: Part["key"], n: string, across: string, along: string): Fo
   ];
 };
 
+/** Extra strip length on the six sealer's guezzet — zero until a bag has ears. */
+const GUSSET_EAR_INPUT: FormulaInput = { key: "ear", label: "Ear", unit: "in", defaultValue: 0, askOnRun: true, group: "Guezzet roll" };
+const GUSSET_ALONG_OLD = "bagLength * 2 + bagWidth";
+const GUSSET_ALONG = `${GUSSET_ALONG_OLD} + ear`;
+
 export const FORMULA_TEMPLATES: FormulaTemplate[] = [
   /* ───────────────────────── Packaging ───────────────────────── */
   {
@@ -406,7 +411,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
     summary:
       "A bag in three parts — front, back and a guezzet strip that runs round both sides and the bottom. Each part is costed on its own roll, then the three are added.",
     description:
-      "Front and back are cut as in the two-panel bag: back at length + flap, front at length. The guezzet is its own strip, as wide as the guezzet and as long as the bag goes round — length + width + length (11.5 + 12 + 11.5 = 35in).",
+      "Front and back are cut as in the two-panel bag: back at length + flap, front at length. The guezzet is its own strip, as wide as the guezzet and as long as the bag goes round — length + width + length (11.5 + 12 + 11.5 = 35in), plus the ear.",
     inputs: [
       { key: "bagWidth",     label: "Bag width",              unit: "in", defaultValue: 12,   askOnRun: true, group: "Bag details" },
       { key: "bagLength",    label: "Bag length",             unit: "in", defaultValue: 11.5, askOnRun: true, group: "Bag details" },
@@ -416,6 +421,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       ...partInputs({ key: "back",   name: "Back",    section: "Back roll",    rate: 12, gauge: 10, rollLength: 100 }),
       ...partInputs({ key: "front",  name: "Front",   section: "Front roll",   rate: 15, gauge: 8,  rollLength: 50 }),
       ...partInputs({ key: "gusset", name: "Guezzet", section: "Guezzet roll", rate: 12, gauge: 10, rollLength: 100 }),
+      GUSSET_EAR_INPUT,
 
       ...FASTENING_INPUTS,
       { key: "labour",       label: "Labour",                 unit: "Rs", defaultValue: 3,  askOnRun: true, group: "Order details" },
@@ -429,8 +435,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       ...partSteps("back", "Back", "bagWidth", "bagLength + flap"),
       ...partSteps("front", "Front", "bagWidth", "bagLength"),
       // Across the roll it is only as wide as the guezzet; along it, it runs
-      // down one side, across the bottom and up the other.
-      ...partSteps("gusset", "Guezzet", "guezzet", "bagLength * 2 + bagWidth"),
+      // down one side, across the bottom and up the other, plus the ear.
+      ...partSteps("gusset", "Guezzet", "guezzet", GUSSET_ALONG),
 
       ...FASTENING_STEPS,
 
@@ -709,7 +715,22 @@ export function getTemplate(id: string): FormulaTemplate | undefined {
  */
 export function upgradeSavedFormula<T extends Pick<CostingFormula, "inputs" | "steps" | "outputs">>(f: T): T {
   const rolls = splitRollDetails(ungreyGauge((["back", "front"] as const).reduce(addFixedRollRate, f)));
-  return addPrint(addKundaZip(addTwoPanelFastening(rolls)));
+  return addGussetEar(addPrint(addKundaZip(addTwoPanelFastening(rolls))));
+}
+
+/** Six sealer copies made before the ear existed get it — zero, so nothing moves until it is used. */
+function addGussetEar<T extends Pick<CostingFormula, "inputs" | "steps" | "outputs">>(f: T): T {
+  if (f.inputs.some((i) => i.key === "ear") || !f.inputs.some((i) => i.key === "gussetRate")) return f;
+  const cut = f.steps.find((s) => s.key === "gussetBaseCut");
+  if (!cut || cut.expression.replace(/\s+/g, " ").trim() !== GUSSET_ALONG_OLD) return f;
+
+  const group = f.inputs.find((i) => i.key === "gussetRate")!.group ?? "";
+  const inputs = [...f.inputs];
+  let at = inputs.length;
+  inputs.forEach((i, idx) => { if ((i.group ?? "") === group) at = idx + 1; });
+  inputs.splice(at, 0, { ...GUSSET_EAR_INPUT, ...(group ? { group } : {}) });
+  const steps = f.steps.map((s) => (s === cut ? { ...s, expression: GUSSET_ALONG } : s));
+  return { ...f, inputs, steps };
 }
 
 type Upgradable = Pick<CostingFormula, "inputs" | "steps" | "outputs">;
