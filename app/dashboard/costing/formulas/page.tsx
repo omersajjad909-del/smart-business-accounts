@@ -20,6 +20,7 @@ import {
   checkExpression,
   validateKey,
   isVisible,
+  isDisabled,
   applyProfit,
   toProfit,
   NO_PROFIT,
@@ -31,7 +32,7 @@ import {
   type OutputRole,
   type StepResult,
 } from "@/lib/formulaEngine";
-import { FORMULA_CATEGORIES, FORMULA_TEMPLATES } from "@/lib/formulaTemplates";
+import { FORMULA_CATEGORIES, FORMULA_TEMPLATES, upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 
 const CARD = "rgba(var(--ink),.03)";
@@ -179,7 +180,7 @@ function emptyDraft(category: string): Draft {
 
 function toDraft(record: BusinessRecord): Draft {
   const d = (record.data ?? {}) as Record<string, unknown>;
-  return {
+  return upgradeSavedFormula({
     name: record.title,
     category: String(d.category || "General"),
     description: String(d.description || ""),
@@ -188,7 +189,7 @@ function toDraft(record: BusinessRecord): Draft {
     steps: Array.isArray(d.steps) ? (d.steps as FormulaStep[]) : [],
     outputs: Array.isArray(d.outputs) ? (d.outputs as FormulaOutput[]) : [],
     profit: toProfit(d.profit),
-  };
+  });
 }
 
 /* Simple-mode column labels. Written as functions rather than constants
@@ -479,6 +480,8 @@ export default function FormulasPage() {
     const inputRow = ({ inp, i }: InputRow) => {
       const badList = !!inp.isList && !(inp.listValue ?? []).length;
       const badChoice = !!inp.options && (inp.options.filter((o) => o.trim()).length < 2);
+      // Same rule as the run screen: greyed while the box that overrides it is filled.
+      const overridden = isDisabled(inp, preview?.values ?? {});
 
       const valueCell = inp.options ? (
         /* The options themselves, typed as a list. The first one is what the
@@ -501,7 +504,9 @@ export default function FormulasPage() {
       ) : (
         <input type="number" step="any" value={inp.defaultValue ?? 0}
           onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
-          style={monoInput}/>
+          disabled={overridden}
+          title={overridden ? "Not used — a fixed rate has been entered" : undefined}
+          style={overridden ? { ...monoInput, opacity: 0.4, cursor: "not-allowed" } : monoInput}/>
       );
 
       const removeBtn = (

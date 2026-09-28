@@ -219,13 +219,19 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // in Roll → Pieces. Zero by default so a plain two-panel bag is unaffected.
       { key: "guezzet",      label: "Guezzet (back only)",  unit: "in", defaultValue: 0,    askOnRun: true, group: "Bag details" },
 
-      { key: "backRate",     label: "Back material rate",   unit: "per mm", defaultValue: 12, askOnRun: true, group: "Back roll" },
-      { key: "backGauge",    label: "Back gauge",           unit: "",   defaultValue: 10,   askOnRun: true, group: "Back roll" },
+      // Either film can be bought at a flat price per roll (frosty, 12 gauge,
+      // 60" — Rs 8,000) rather than worked out from a rate. The rate is the
+      // default; anything above zero in a roll's fixed rate is that roll's cost
+      // outright, and the rate and gauge that worked it out step aside.
+      { key: "backRate",     label: "Back material rate",   unit: "per mm", defaultValue: 12, askOnRun: true, group: "Back roll", disabledWhenSet: "backFixedRate" },
+      { key: "backGauge",    label: "Back gauge",           unit: "",   defaultValue: 10,   askOnRun: true, group: "Back roll", disabledWhenSet: "backFixedRate" },
       { key: "backWidths",   label: "Back stock widths",    unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: "Back roll" },
+      { key: "backFixedRate", label: "Fixed rate (per roll)", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Back roll" },
 
-      { key: "frontRate",    label: "Front material rate",  unit: "per mm", defaultValue: 15, askOnRun: true, group: "Front roll" },
-      { key: "frontGauge",   label: "Front gauge",          unit: "",   defaultValue: 8,    askOnRun: true, group: "Front roll" },
+      { key: "frontRate",    label: "Front material rate",  unit: "per mm", defaultValue: 15, askOnRun: true, group: "Front roll", disabledWhenSet: "frontFixedRate" },
+      { key: "frontGauge",   label: "Front gauge",          unit: "",   defaultValue: 8,    askOnRun: true, group: "Front roll", disabledWhenSet: "frontFixedRate" },
       { key: "frontWidths",  label: "Front stock widths",   unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: "Front roll" },
+      { key: "frontFixedRate", label: "Fixed rate (per roll)", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Front roll" },
 
       { key: "rollLength",   label: "Roll length",          unit: "m",  defaultValue: 100, group: "Roll details" },
       { key: "cutMin",       label: "Cutting range — min",  unit: "in", defaultValue: 30, group: "Roll details" },
@@ -251,7 +257,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "backCutLength", label: "Back cut length",       expression: "backBaseCut * backFactor + cutAllowance", unit: "in" },
       { key: "backRepeats",   label: "Back layers per roll",  expression: "floor(rollInches / backCutLength)" },
       { key: "backPerRoll",   label: "Back panels per roll",  expression: "backRepeats * backAcross * backFactor", unit: "pcs" },
-      { key: "backRollCost",  label: "Back roll cost",        expression: "backRate * backGauge * backRollWidth * rollLength / densityDiv", unit: "Rs" },
+      { key: "backRollCost",  label: "Back roll cost",        expression: "if(backFixedRate > 0, backFixedRate, backRate * backGauge * backRollWidth * rollLength / densityDiv)", unit: "Rs" },
       { key: "backPerPc",     label: "Back cost per bag",     expression: "backRollCost / backPerRoll", unit: "Rs" },
 
       /* Front panel — 1 width x 1 length, no flap */
@@ -262,7 +268,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "frontCutLength", label: "Front cut length",       expression: "frontBaseCut * frontFactor + cutAllowance", unit: "in" },
       { key: "frontRepeats",   label: "Front layers per roll",  expression: "floor(rollInches / frontCutLength)" },
       { key: "frontPerRoll",   label: "Front panels per roll",  expression: "frontRepeats * frontAcross * frontFactor", unit: "pcs" },
-      { key: "frontRollCost",  label: "Front roll cost",        expression: "frontRate * frontGauge * frontRollWidth * rollLength / densityDiv", unit: "Rs" },
+      { key: "frontRollCost",  label: "Front roll cost",        expression: "if(frontFixedRate > 0, frontFixedRate, frontRate * frontGauge * frontRollWidth * rollLength / densityDiv)", unit: "Rs" },
       { key: "frontPerPc",     label: "Front cost per bag",     expression: "frontRollCost / frontPerRoll", unit: "Rs" },
 
       /* The bag */
@@ -525,4 +531,43 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
 
 export function getTemplate(id: string): FormulaTemplate | undefined {
   return FORMULA_TEMPLATES.find((t) => t.templateId === id);
+}
+
+/* ─────────────────────── Saved-formula upgrades ─────────────────────── */
+
+/**
+ * A formula is saved as a copy of its template, so a template learning
+ * something new never reaches the copies already in use. This carries each
+ * roll's fixed per-roll rate into Two-panel bag copies made before it existed
+ * — only where that roll's cost is still the template's own expression, so a
+ * step an author has rewritten is never touched.
+ */
+export function upgradeSavedFormula<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T): T {
+  return (["back", "front"] as const).reduce(addFixedRollRate, f);
+}
+
+function addFixedRollRate<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T, side: "back" | "front"): T {
+  const rateKey = `${side}Rate`, fixedKey = `${side}FixedRate`, costKey = `${side}RollCost`;
+  const oldCost = `${side}Rate * ${side}Gauge * ${side}RollWidth * rollLength / densityDiv`;
+  if (f.inputs.some((i) => i.key === fixedKey)) return f;
+  if (!f.inputs.some((i) => i.key === rateKey)) return f;
+  const step = f.steps.find((s) => s.key === costKey);
+  if (!step || step.expression.replace(/\s+/g, " ").trim() !== oldCost) return f;
+
+  const tpl = FORMULA_TEMPLATES.find((t) => t.templateId === "two-panel-bag")!;
+  const fixedInput = tpl.inputs.find((i) => i.key === fixedKey)!;
+  // The rate and the gauge only ever fed the worked-out cost, so both step
+  // aside once a fixed price is typed in.
+  const inputs = f.inputs.map((i) =>
+    i.key === rateKey || i.key === `${side}Gauge` ? { ...i, disabledWhenSet: fixedKey } : i);
+  // Sits at the bottom of that roll's own block, whatever it is called there.
+  const rateRow = inputs.find((i) => i.key === rateKey)!;
+  let at = inputs.length;
+  inputs.forEach((i, idx) => { if ((i.group ?? "") === (rateRow.group ?? "")) at = idx + 1; });
+  inputs.splice(at, 0, { ...fixedInput, ...(rateRow.group ? { group: rateRow.group } : {}) });
+
+  const steps = f.steps.map((s) =>
+    s.key === costKey ? { ...s, expression: `if(${fixedKey} > 0, ${fixedKey}, ${oldCost})` } : s,
+  );
+  return { ...f, inputs, steps };
 }

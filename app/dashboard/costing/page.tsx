@@ -34,6 +34,7 @@ import {
   applyProfit,
   toProfit,
   isVisible,
+  isDisabled,
   type CostingFormula,
   type FormulaInput,
   type FormulaStep,
@@ -42,6 +43,7 @@ import {
   type StepResult,
 } from "@/lib/formulaEngine";
 import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed";
+import { upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 
 const CARD = "rgba(var(--ink),.03)";
@@ -147,7 +149,7 @@ const CSS = `
 
 function toFormula(record: BusinessRecord): CostingFormula {
   const d = (record.data ?? {}) as Record<string, unknown>;
-  return {
+  return upgradeSavedFormula({
     name: record.title,
     category: String(d.category || "General"),
     description: String(d.description || ""),
@@ -156,7 +158,7 @@ function toFormula(record: BusinessRecord): CostingFormula {
     steps: Array.isArray(d.steps) ? (d.steps as FormulaStep[]) : [],
     outputs: Array.isArray(d.outputs) ? (d.outputs as FormulaOutput[]) : [],
     profit: toProfit(d.profit),
-  };
+  });
 }
 
 function fmt(v: unknown, decimals = 2): string {
@@ -489,10 +491,15 @@ function CostingInner() {
           style={inputStyle}
         />
       ) : (
+        /* Overridden by another box — a material rate once a fixed per-roll
+           price is typed in. Left on screen, greyed, so the operator can see
+           what stepped aside and why. */
         <input type="number" step="any"
           value={String(values[inp.key] ?? "")}
           onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
-          style={inputStyle}
+          disabled={isDisabled(inp, values)}
+          title={isDisabled(inp, values) ? "Not used — a fixed rate has been entered" : undefined}
+          style={isDisabled(inp, values) ? { ...inputStyle, opacity: 0.4, cursor: "not-allowed" } : inputStyle}
         />
       )}
     </div>
