@@ -11,7 +11,7 @@
 // things that used to break a formula silently — a scalar input flipped to a
 // list, and a list left empty — now name themselves at the top of the page.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
@@ -34,6 +34,8 @@ import {
 } from "@/lib/formulaEngine";
 import { FORMULA_CATEGORIES, FORMULA_TEMPLATES, upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
+import { LengthUnitSwitch } from "@/components/costing/LengthUnitSwitch";
+import { isInchUnit, loadLengthUnit, runInLengthUnit, saveLengthUnit, type LengthUnit } from "@/lib/formulaUnits";
 
 const CARD = "rgba(var(--ink),.03)";
 const BORDER = "rgba(var(--ink),.09)";
@@ -274,6 +276,17 @@ export default function FormulasPage() {
   // Simple hides the plumbing (keys, type, ask, roles) and shows a trade the
   // three things it cares about. Detailed is the full table.
   const [detailed, setDetailed] = useState(false);
+  // Same switch as the run screen. The draft is always kept and saved in
+  // inches; only what the boxes and the live result show moves to cm.
+  const [lengthUnit, setLengthUnit] = useState<LengthUnit>("in");
+  useEffect(() => { setLengthUnit(loadLengthUnit()); }, []);
+  const switchLengthUnit = (next: LengthUnit) => { setLengthUnit(next); saveLengthUnit(next); };
+  const cm = lengthUnit === "cm";
+  const shownUnit = (u?: string) => (cm && isInchUnit(u) ? "cm" : u);
+  // Tidied either way: 30cm typed and read back in inches is 11.811, not
+  // 11.811023622047244.
+  const toShown = (n: number) => Math.round((cm ? n * 2.54 : n) * 1e4) / 1e4;
+  const fromShown = (n: number) => (cm ? n / 2.54 : n);
   // The two reference cards on the right open on demand — an author reads them
   // once and then wants the live result at the top of the rail, not below a
   // wall of chips. Values re-opens itself the moment a formula box is clicked,
@@ -313,8 +326,8 @@ export default function FormulasPage() {
   /* ── live evaluation of the draft ── */
   const preview = useMemo(() => {
     if (!editing) return null;
-    return runFormula(editing.draft);
-  }, [editing]);
+    return runInLengthUnit(runFormula(editing.draft), editing.draft, lengthUnit);
+  }, [editing, lengthUnit]);
 
   function patch(mut: (d: Draft) => void) {
     setEditing((cur) => {
@@ -483,6 +496,12 @@ export default function FormulasPage() {
       const badChoice = !!inp.options && (inp.options.filter((o) => o.trim()).length < 2);
       // Same rule as the run screen: greyed while the box that overrides it is filled.
       const overridden = isDisabled(inp, preview?.values ?? {});
+      // An inch box while cm is picked: shown and typed in cm, saved in inches.
+      // Its unit is fixed meanwhile — renaming it would change the saved unit.
+      const inch = isInchUnit(inp.unit);
+      const unitCell = inch && cm ? (
+        <input value="cm" readOnly title="Saved in inches. Switch to Inch to change the unit." style={{ ...input, opacity: .7 }}/>
+      ) : null;
 
       const valueCell = inp.options ? (
         /* The options themselves, typed as a list. The first one is what the
@@ -499,12 +518,12 @@ export default function FormulasPage() {
           style={{ ...input, borderColor: badChoice ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : inp.isList ? (
         <NumberListInput
-          value={inp.listValue ?? []}
-          onChange={(next) => patch((x) => { x.inputs[i].listValue = next; })}
+          value={inch ? (inp.listValue ?? []).map(toShown) : (inp.listValue ?? [])}
+          onChange={(next) => patch((x) => { x.inputs[i].listValue = inch ? next.map(fromShown) : next; })}
           style={{ ...monoInput, borderColor: badList ? "rgba(251,191,36,.55)" : BORDER }}/>
       ) : (
-        <input type="number" step="any" value={inp.defaultValue ?? 0}
-          onChange={(e) => patch((x) => { x.inputs[i].defaultValue = Number(e.target.value); })}
+        <input type="number" step="any" value={inch ? toShown(inp.defaultValue ?? 0) : (inp.defaultValue ?? 0)}
+          onChange={(e) => patch((x) => { x.inputs[i].defaultValue = inch ? fromShown(Number(e.target.value)) : Number(e.target.value); })}
           disabled={overridden}
           title={overridden ? "Not used — a fixed rate has been entered" : undefined}
           style={overridden ? { ...monoInput, opacity: 0.4, cursor: "not-allowed" } : monoInput}/>
@@ -537,7 +556,7 @@ export default function FormulasPage() {
               placeholder="Width" style={input}/>
             {/* A choice has no unit — leaving an editable box there only
                 invites one to be typed in. */}
-            {inp.options?.length ? <div /> : (
+            {inp.options?.length ? <div /> : unitCell ?? (
               <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
                 placeholder="in" style={input}/>
             )}
@@ -573,8 +592,10 @@ export default function FormulasPage() {
             placeholder="pieceWidth" style={monoInput}/>
           <input value={inp.label} onChange={(e) => setInputLabel(i, e.target.value)}
             placeholder="Width" style={input}/>
-          <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
-            placeholder="in" style={input}/>
+          {unitCell ?? (
+            <input value={inp.unit ?? ""} onChange={(e) => patch((x) => { x.inputs[i].unit = e.target.value; })}
+              placeholder="in" style={input}/>
+          )}
           {/* Was a bare "[ ]" toggle. A named choice, because getting this
               wrong hands a list to a step that wants a number. */}
           <select
@@ -691,7 +712,7 @@ export default function FormulasPage() {
                     fontSize: o.primary ? 17 : 13, fontWeight: 700,
                     color: o.primary ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.85)",
                   }}>
-                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{o.unit}</span>
+                    {fmt(shown)}<span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{shownUnit(o.unit)}</span>
                   </span>
                 </div>
                 {/* The split, small, under the number it adds up to — a rate
@@ -755,6 +776,7 @@ export default function FormulasPage() {
               }}>{text}</button>
             ))}
           </div>
+          <LengthUnitSwitch value={lengthUnit} onChange={switchLengthUnit} />
           <button onClick={close} style={btn()}>Cancel</button>
           <button onClick={save} disabled={saving} style={{ ...btn("primary"), opacity: saving ? .6 : 1 }}>
             {saving ? "Saving…" : editing.id ? "Save new version" : "Create formula"}
@@ -966,7 +988,7 @@ export default function FormulasPage() {
                       }}>
                         {stepErr ? "error" : fmt(result?.value)}
                         {!stepErr && st.unit && (
-                          <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{st.unit}</span>
+                          <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginLeft: 4 }}>{shownUnit(st.unit)}</span>
                         )}
                       </div>
                     </div>

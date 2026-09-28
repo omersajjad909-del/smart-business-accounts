@@ -19,12 +19,17 @@ const INCH = new Set(["in", "inch", "inches", '"']);
 export const isInchUnit = (unit?: string) => INCH.has((unit ?? "").trim().toLowerCase());
 
 // Four places is well past anything a ruler reads, and stops 11.5in from
-// coming back as 29.209999999999997cm.
-const tidy = (n: number) => Math.round(n * 1e4) / 1e4;
+// coming back as 29.209999999999997cm. For showing a number only — a typed
+// value keeps its full precision, or 30cm switched to inches and back would
+// come home as 29.9999.
+export const tidy = (n: number) => Math.round(n * 1e4) / 1e4;
 
-function convert(v: FormulaValue, from: LengthUnit, to: LengthUnit): FormulaValue {
+function convert(v: FormulaValue, from: LengthUnit, to: LengthUnit, round = true): FormulaValue {
   if (from === to) return v;
-  const f = (n: number) => tidy(to === "cm" ? n * CM_PER_IN : n / CM_PER_IN);
+  const f = (n: number) => {
+    const out = to === "cm" ? n * CM_PER_IN : n / CM_PER_IN;
+    return round ? tidy(out) : out;
+  };
   return Array.isArray(v) ? v.map(f) : f(v);
 }
 
@@ -57,7 +62,7 @@ export function convertValues(
   if (from === to) return values;
   const next = { ...values };
   for (const i of formula.inputs) {
-    if (isInchUnit(i.unit) && next[i.key] != null) next[i.key] = convert(next[i.key], from, to);
+    if (isInchUnit(i.unit) && next[i.key] != null) next[i.key] = convert(next[i.key], from, to, false);
   }
   return next;
 }

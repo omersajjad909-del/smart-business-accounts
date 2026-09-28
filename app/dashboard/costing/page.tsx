@@ -46,7 +46,7 @@ import { buildJobWorkSeed, jobWorkHrefFrom, planIssue } from "@/lib/jobWorkSeed"
 import { upgradeSavedFormula } from "@/lib/formulaTemplates";
 import { NumberListInput } from "@/components/costing/NumberListInput";
 import { LengthUnitSwitch } from "@/components/costing/LengthUnitSwitch";
-import { convertValues, inLengthUnit, loadLengthUnit, runInLengthUnit, saveLengthUnit, type LengthUnit } from "@/lib/formulaUnits";
+import { convertValues, inLengthUnit, isInchUnit, loadLengthUnit, runInLengthUnit, saveLengthUnit, tidy, type LengthUnit } from "@/lib/formulaUnits";
 
 const CARD = "rgba(var(--ink),.03)";
 const BORDER = "rgba(var(--ink),.09)";
@@ -487,6 +487,9 @@ function CostingInner() {
     [jobWorkSeed],
   );
 
+  // A size box — shown to four places, since switching units leaves a long tail.
+  const isLength = (inp: FormulaInput) => inp.unit === "cm" || isInchUnit(inp.unit);
+
   /** One field, whether it holds a single number or a list of sizes. */
   const field = (inp: FormulaInput) => (
     <div key={inp.key}>
@@ -506,7 +509,7 @@ function CostingInner() {
         </select>
       ) : inp.isList ? (
         <NumberListInput
-          value={(values[inp.key] as number[] | undefined) ?? []}
+          value={isLength(inp) ? ((values[inp.key] as number[] | undefined) ?? []).map(tidy) : ((values[inp.key] as number[] | undefined) ?? [])}
           onChange={(next) => setValues((v) => ({ ...v, [inp.key]: next }))}
           style={inputStyle}
         />
@@ -515,7 +518,7 @@ function CostingInner() {
            price is typed in. Left on screen, greyed, so the operator can see
            what stepped aside and why. */
         <input type="number" step="any"
-          value={String(values[inp.key] ?? "")}
+          value={String(isLength(inp) && typeof values[inp.key] === "number" ? tidy(values[inp.key] as number) : (values[inp.key] ?? ""))}
           onChange={(e) => setValues((v) => ({ ...v, [inp.key]: Number(e.target.value) }))}
           disabled={isDisabled(inp, values)}
           title={isDisabled(inp, values) ? "Not used — a fixed rate has been entered" : undefined}
