@@ -489,9 +489,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "guezzet",      label: "Guezzet",           unit: "in", defaultValue: 7,   askOnRun: true, group: "Bag details" },
       // The ½ taken off the zip slip's width for the zip, and the ½ seam
       // added to each panel — kept as boxes, not hidden inside the formula.
-      { key: "zipMargin",    label: "Zip margin",        unit: "in", defaultValue: 0.5, group: "Bag details" },
-      { key: "seam",         label: "Seam allowance",    unit: "in", defaultValue: 0.5, group: "Bag details" },
-      { key: "pipingWidth",  label: "Piping width",      unit: "in", defaultValue: 1.5, group: "Bag details" },
+      // Their own block, not Bag details: they are the factory's, so they stay
+      // in inches when a bag's size is typed in cm.
+      { key: "zipMargin",    label: "Zip margin",        unit: "in", defaultValue: 0.5, group: "Allowances" },
+      { key: "seam",         label: "Seam allowance",    unit: "in", defaultValue: 0.5, group: "Allowances" },
+      { key: "pipingWidth",  label: "Piping width",      unit: "in", defaultValue: 1.5, group: "Allowances" },
 
       ...partInputs({ key: "zipSlip",   name: "Zip slip",   section: "Zip slip roll",   rate: 12, gauge: 10, rollLength: 100 }),
       ...partInputs({ key: "backStrip", name: "Back patti", section: "Back patti roll", rate: 12, gauge: 10, rollLength: 100 }),
