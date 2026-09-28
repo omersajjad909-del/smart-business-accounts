@@ -87,7 +87,8 @@ const NEW_SECTION = "\u0000new";
 const CSS = `
 .fxWrap{max-width:1240px;margin:0 auto;padding:0 18px 90px}
 .fxBar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
-  padding:14px 0;margin-bottom:14px;background:rgba(8,11,20,.88);
+  padding:14px 0;margin-bottom:14px;background:var(--app-bg);
+  background:color-mix(in srgb,var(--app-bg) 88%,transparent);
   backdrop-filter:blur(14px);border-bottom:1px solid ${BORDER};flex-wrap:wrap}
 .fxBar .grow{flex:1;min-width:180px}
 .fxCols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
@@ -750,7 +751,7 @@ export default function FormulasPage() {
                 padding: "6px 12px", borderRadius: 8, fontSize: 12.5, fontWeight: 600,
                 cursor: "pointer", fontFamily: FONT, border: "none",
                 background: detailed === on ? "rgba(99,102,241,.28)" : "transparent",
-                color: detailed === on ? "#c7d2fe" : "rgba(var(--ink),var(--ta-45, .45))",
+                color: detailed === on ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),var(--ta-45, .45))",
               }}>{text}</button>
             ))}
           </div>
