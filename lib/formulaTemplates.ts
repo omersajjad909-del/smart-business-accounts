@@ -8,7 +8,7 @@
 // allowance, a density divisor, a wastage percentage — is an *input* the author
 // owns. Nothing in lib/formulaEngine.ts knows what a roll or a garment is.
 
-import type { CostingFormula } from "@/lib/formulaEngine";
+import type { CostingFormula, FormulaInput, FormulaStep, FormulaOutput } from "@/lib/formulaEngine";
 
 export const FORMULA_CATEGORIES = [
   "Packaging",
@@ -22,6 +22,111 @@ export const FORMULA_CATEGORIES = [
 ] as const;
 
 export type FormulaTemplate = CostingFormula & { templateId: string; summary: string };
+
+/* ───────────────────── Fastening (Button / Tape / Kunda / Zip) ─────────────────────
+   Shared by every bag template, so a single bag and a two-panel bag are
+   fastened, costed and issued from the store the same way. */
+
+const FASTENING_INPUTS: FormulaInput[] = [
+  // Buttons are counted, not guessed at. A flat "Button / Tape — Rs 3"
+  // could not answer the two questions a store actually gets asked: how
+  // many buttons to issue for the order, and what they came to. So the
+  // charge is built the way the roll is — a count per piece against a
+  // rate — and the total falls out of it.
+  // A bag is fastened one way or the other, never both, so the two are a
+  // choice rather than two charges that quietly add up. Button first,
+  // which makes it the default.
+  { key: "fitting",      label: "Fastening",          options: ["Button", "Tape", "Kunda", "Zip"], defaultValue: 0, askOnRun: true, group: "Button & Tape" },
+  { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
+  { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
+  // Per piece, not per button — same as the tape branch below. Fitting a
+  // bag is one operation whether it takes two buttons or four, and 0.6 a
+  // bag is a figure a costing clerk can check against a wage; 0.3 a button
+  // is one they have to multiply first. Comes to the same money.
+  { key: "buttonLabour", label: "Labour per piece",   unit: "Rs", defaultValue: 0.6, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
+  // Tape is not counted, it is measured — three inches a bag, bought by
+  // the metre. So it gets a length and a rate rather than a count and a
+  // rate, and the sheet converts between them instead of the operator.
+  // Three boxes either way, and the same three questions in the same
+  // order: how much per piece, what it costs, what it costs to fit. Only
+  // the unit moves — buttons are counted, tape is measured.
+  { key: "tapePerPc",    label: "Tape per piece",     unit: "in", defaultValue: 3, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+  { key: "tapeRate",     label: "Rate per inch",      unit: "Rs", defaultValue: 0.25, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+  // Per piece, not per inch: taping a bag is one operation whatever length
+  // of tape it takes, so it is added once rather than multiplied by the
+  // length. The box above it is the one that scales with inches.
+  { key: "tapeLabour",   label: "Labour per piece",   unit: "Rs", defaultValue: 0.5, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+  // A kunda is counted like a button — so many a bag, bought by the piece.
+  { key: "kundaPerPc",   label: "Kunda per piece",    unit: "pcs", defaultValue: 1, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 2 } },
+  { key: "kundaRate",    label: "Rate per kunda",     unit: "Rs", defaultValue: 2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 2 } },
+  { key: "kundaLabour",  label: "Labour per piece",   unit: "Rs", defaultValue: 0.5, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 2 } },
+  // A zip is measured like tape — so many inches a bag, priced by the inch.
+  { key: "zipPerPc",     label: "Zip per piece",      unit: "in", defaultValue: 10, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 3 } },
+  { key: "zipRate",      label: "Rate per inch",      unit: "Rs", defaultValue: 0.5, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 3 } },
+  { key: "zipLabour",    label: "Labour per piece",   unit: "Rs", defaultValue: 1, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 3 } },
+];
+
+const FASTENING_STEPS: FormulaStep[] = [
+  // Buttons costed like the roll: a count for the store to issue, a rate
+  // against that count, and a total. buttonsNeeded is what actually goes
+  // out of the store for the order — the number a flat per-piece charge
+  // could never tell anybody.
+  // Whichever way the bag is fastened, the other branch has to come out at
+  // zero — the boxes behind it are still on the formula and still hold
+  // last week's numbers, and a hidden field that keeps charging is the
+  // worst kind of costing error: invisible and consistent.
+  // The if() keeps the unpicked branch out of the money; showWhen keeps it
+  // off the paper and off the result card. Both are needed: the steps have
+  // to evaluate either way, because every step below reads them.
+  // What the store issues, which is the only part of this the floor acts
+  // on — grouped, so it prints, and branched, so a buttoned bag does not
+  // carry a tape line reading zero. The money beside it is ungrouped: the
+  // working sheet is a cutting instruction, and what the job costs is the
+  // quoter's business, on the cost sheet.
+  { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+  { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 0 } },
+  { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 0 } },
+  // Same shape as the buttons, in the unit tape is actually bought in: the
+  // store issues metres, the bag is cut in inches.
+  { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+  { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * tapeRate + tapeLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 1 } },
+  { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 1 } },
+  // Kunda counted like buttons, zip measured like tape.
+  { key: "kundasNeeded",   label: "Kunda required",       expression: "if(fitting == 2, kundaPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 2 } },
+  { key: "kundaCostPerPc", label: "Kunda cost per piece", expression: "if(fitting == 2, kundaPerPc * kundaRate + kundaLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 2 } },
+  { key: "kundaTotal",     label: "Total kunda cost",     expression: "kundaCostPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 2 } },
+  { key: "zipNeeded",      label: "Zip required",         expression: "if(fitting == 3, convert(zipPerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 3 } },
+  { key: "zipCostPerPc",   label: "Zip cost per piece",   expression: "if(fitting == 3, zipPerPc * zipRate + zipLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 3 } },
+  { key: "zipTotal",       label: "Total zip cost",       expression: "zipCostPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 3 } },
+];
+
+/** What fastening adds to one piece, whichever way it is fastened — the other branches are zero. */
+const FASTENING_COST = "buttonPerPc + tapeCostPerPc + kundaCostPerPc + zipCostPerPc";
+
+/** Per-piece rows for the cost breakdown. */
+const FASTENING_BREAKDOWN: FormulaOutput[] = [
+  { key: "buttonPerPc",    label: "Button per piece", unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 0 } },
+  { key: "tapeCostPerPc",  label: "Tape per piece",   unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 1 } },
+  { key: "kundaCostPerPc", label: "Kunda per piece",  unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 2 } },
+  { key: "zipCostPerPc",   label: "Zip per piece",    unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 3 } },
+];
+
+const FASTENING_OUTPUTS: FormulaOutput[] = [
+  // Marked as consumables, so a job work challan opens with a line for
+  // them already counted — 20,000 buttons against 10,000 bags — instead of
+  // the store being asked to multiply it out by hand.
+  { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+  { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
+  { key: "tapeNeeded",    label: "Tape required",    unit: "m", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+  { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+  { key: "kundasNeeded",  label: "Kunda required",   unit: "pcs", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 2 } },
+  { key: "kundaTotal",    label: "Total kunda cost", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 2 } },
+  { key: "zipNeeded",     label: "Zip required",     unit: "m", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 3 } },
+  { key: "zipTotal",      label: "Total zip cost",   unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 3 } },
+];
+
+/** Printing on the bag — per piece, zero until a job is printed. */
+const PRINT_INPUT: FormulaInput = { key: "printCost", label: "Print", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" };
 
 export const FORMULA_TEMPLATES: FormulaTemplate[] = [
   /* ───────────────────────── Packaging ───────────────────────── */
@@ -51,38 +156,12 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "cutMin",       label: "Cutting range — min", unit: "in", defaultValue: 30, group: "Roll details" },
       { key: "cutMax",       label: "Cutting range — max", unit: "in", defaultValue: 50, group: "Roll details" },
       { key: "cutAllowance", label: "Allowance per cut",  unit: "in", defaultValue: 0.75, group: "Roll details" },
-      // Buttons are counted, not guessed at. A flat "Button / Tape — Rs 3"
-      // could not answer the two questions a store actually gets asked: how
-      // many buttons to issue for the order, and what they came to. So the
-      // charge is built the way the roll is — a count per piece against a
-      // rate — and the total falls out of it.
-      // A bag is fastened one way or the other, never both, so the two are a
-      // choice rather than two charges that quietly add up. Button first,
-      // which makes it the default.
-      { key: "fitting",      label: "Fastening",          options: ["Button", "Tape"], defaultValue: 0, askOnRun: true, group: "Button & Tape" },
-      { key: "buttonsPerPc", label: "Buttons per piece",  unit: "pcs", defaultValue: 2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonRate",   label: "Rate per button",    unit: "Rs", defaultValue: 1.2, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
-      // Per piece, not per button — same as the tape branch below. Fitting a
-      // bag is one operation whether it takes two buttons or four, and 0.6 a
-      // bag is a figure a costing clerk can check against a wage; 0.3 a button
-      // is one they have to multiply first. Comes to the same money.
-      { key: "buttonLabour", label: "Labour per piece",   unit: "Rs", defaultValue: 0.6, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 0 } },
-      // Tape is not counted, it is measured — three inches a bag, bought by
-      // the metre. So it gets a length and a rate rather than a count and a
-      // rate, and the sheet converts between them instead of the operator.
-      // Three boxes either way, and the same three questions in the same
-      // order: how much per piece, what it costs, what it costs to fit. Only
-      // the unit moves — buttons are counted, tape is measured.
-      { key: "tapePerPc",    label: "Tape per piece",     unit: "in", defaultValue: 3, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeRate",     label: "Rate per inch",      unit: "Rs", defaultValue: 0.25, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
-      // Per piece, not per inch: taping a bag is one operation whatever length
-      // of tape it takes, so it is added once rather than multiplied by the
-      // length. The box above it is the one that scales with inches.
-      { key: "tapeLabour",   label: "Labour per piece",   unit: "Rs", defaultValue: 0.5, askOnRun: true, group: "Button & Tape", showWhen: { key: "fitting", is: 1 } },
+      ...FASTENING_INPUTS,
       { key: "labour",       label: "Labour",             unit: "Rs", defaultValue: 3, askOnRun: true, group: "Order details" },
       // The odds and ends a quote picks up that have no box of their own — a
       // rupee of printing, two of stitching. Per piece, like labour beside it,
       // and zero by default so it changes nothing until somebody types in it.
+      PRINT_INPUT,
       { key: "others",       label: "Others",             unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" },
       { key: "orderQty",     label: "Order quantity",     unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
     ],
@@ -128,30 +207,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // cutLength already carries the allowance, so it is not added again here.
       { key: "wasteM",      label: "Waste per roll",  expression: "(rollInches - repeats * cutLength) / 39.37", unit: "m", group: "Rolls" },
 
-      // Buttons costed like the roll: a count for the store to issue, a rate
-      // against that count, and a total. buttonsNeeded is what actually goes
-      // out of the store for the order — the number a flat per-piece charge
-      // could never tell anybody.
-      // Whichever way the bag is fastened, the other branch has to come out at
-      // zero — the boxes behind it are still on the formula and still hold
-      // last week's numbers, and a hidden field that keeps charging is the
-      // worst kind of costing error: invisible and consistent.
-      // The if() keeps the unpicked branch out of the money; showWhen keeps it
-      // off the paper and off the result card. Both are needed: the steps have
-      // to evaluate either way, because every step below reads them.
-      // What the store issues, which is the only part of this the floor acts
-      // on — grouped, so it prints, and branched, so a buttoned bag does not
-      // carry a tape line reading zero. The money beside it is ungrouped: the
-      // working sheet is a cutting instruction, and what the job costs is the
-      // quoter's business, on the cost sheet.
-      { key: "buttonsNeeded", label: "Buttons required",    expression: "if(fitting == 0, buttonsPerPc * orderQty, 0)", unit: "pcs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonPerPc",   label: "Button cost per piece", expression: "if(fitting == 0, buttonsPerPc * buttonRate + buttonLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonTotal",   label: "Total button cost",   expression: "buttonPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 0 } },
-      // Same shape as the buttons, in the unit tape is actually bought in: the
-      // store issues metres, the bag is cut in inches.
-      { key: "tapeNeeded",    label: "Tape required",       expression: "if(fitting == 1, convert(tapePerPc * orderQty, in, m), 0)", unit: "m", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeCostPerPc", label: "Tape cost per piece", expression: "if(fitting == 1, tapePerPc * tapeRate + tapeLabour, 0)", unit: "Rs", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeTotal",     label: "Total tape cost",     expression: "tapeCostPerPc * orderQty", unit: "Rs", showWhen: { key: "fitting", is: 1 } },
+      ...FASTENING_STEPS,
 
       // Roll cost is the film and nothing else — what the roll weighs times
       // what the material sells for.
@@ -161,7 +217,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // sheet is the one that carries it, and it goes to whoever quotes.
       { key: "rollCost",    label: "Roll cost",       expression: "materialRate * gauge * rollWidth * rollLength / densityDiv", unit: "Rs" },
       { key: "materialPerPc", label: "Material per piece", expression: "rollCost / piecesPerRoll", unit: "Rs" },
-      { key: "costPerPc",   label: "Cost per piece",  expression: "materialPerPc + labour + buttonPerPc + tapeCostPerPc + others", unit: "Rs" },
+      { key: "costPerPc",   label: "Cost per piece",  expression: `materialPerPc + labour + ${FASTENING_COST} + printCost + others`, unit: "Rs" },
       { key: "orderCost",   label: "Order total",     expression: "costPerPc * orderQty", unit: "Rs" },
     ],
     /* Money first. The cost sheet prints these in the order they are written
@@ -178,9 +234,9 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // land on a different number would be worse than one that says so.
       { key: "orderCost",     label: "Order total at cost", unit: "Rs", group: "Order" },
       { key: "materialPerPc", label: "Material per piece", unit: "Rs", group: "Cost breakdown" },
-      { key: "buttonPerPc",   label: "Button per piece", unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 0 } },
-      { key: "tapeCostPerPc", label: "Tape per piece",  unit: "Rs", group: "Cost breakdown", showWhen: { key: "fitting", is: 1 } },
+      ...FASTENING_BREAKDOWN,
       { key: "labour",        label: "Labour per piece", unit: "Rs", group: "Cost breakdown" },
+      { key: "printCost",     label: "Print per piece",  unit: "Rs", group: "Cost breakdown" },
       { key: "others",        label: "Others per piece", unit: "Rs", group: "Cost breakdown" },
       { key: "rollCost",      label: "Roll cost",       unit: "Rs",  role: "cost_per_batch", group: "Cost breakdown" },
       { key: "piecesPerRoll", label: "Pieces per roll", unit: "pcs", role: "units_per_batch", group: "Cutting" },
@@ -192,13 +248,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "rollsToBuy",       label: "Rolls to buy", group: "Rolls" },
       { key: "leftoverStockM",   label: "Leftover → waste stock", unit: "m", group: "Rolls" },
       { key: "wasteM",        label: "Waste per roll",  unit: "m",   role: "waste_qty", group: "Rolls" },
-      // Marked as consumables, so a job work challan opens with a line for
-      // them already counted — 20,000 buttons against 10,000 bags — instead of
-      // the store being asked to multiply it out by hand.
-      { key: "buttonsNeeded", label: "Buttons required", unit: "pcs", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "buttonTotal",   label: "Total button cost", unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 0 } },
-      { key: "tapeNeeded",    label: "Tape required",    unit: "m", role: "consumable_qty", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
-      { key: "tapeTotal",     label: "Total tape cost",  unit: "Rs", group: "Buttons & Tape", showWhen: { key: "fitting", is: 1 } },
+      ...FASTENING_OUTPUTS,
     ],
   },
 
@@ -226,9 +276,10 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       // Either film can be bought at a flat price per roll (frosty, 12 gauge,
       // 60" — Rs 8,000) rather than worked out from a rate. The rate is the
       // default; anything above zero in a roll's fixed rate is that roll's cost
-      // outright, and the rate and gauge that worked it out step aside.
+      // outright, and the material rate steps aside. Gauge stays open — it is
+      // still the film being bought, fixed price or not.
       { key: "backRate",     label: "Back material rate",   unit: "per mm", defaultValue: 12, askOnRun: true, group: "Back roll", disabledWhenSet: "backFixedRate" },
-      { key: "backGauge",    label: "Back gauge",           unit: "",   defaultValue: 10,   askOnRun: true, group: "Back roll", disabledWhenSet: "backFixedRate" },
+      { key: "backGauge",    label: "Back gauge",           unit: "",   defaultValue: 10,   askOnRun: true, group: "Back roll" },
       { key: "backWidths",   label: "Back stock widths",    unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: "Back roll" },
       { key: "backFixedRate", label: "Fixed rate (per roll)", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Back roll" },
       { key: "backRollLength",   label: "Roll length",         unit: "m",  defaultValue: 100, askOnRun: true, group: "Back roll" },
@@ -237,7 +288,7 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "backCutAllowance", label: "Allowance per cut",   unit: "in", defaultValue: 0.75, group: "Back roll" },
 
       { key: "frontRate",    label: "Front material rate",  unit: "per mm", defaultValue: 15, askOnRun: true, group: "Front roll", disabledWhenSet: "frontFixedRate" },
-      { key: "frontGauge",   label: "Front gauge",          unit: "",   defaultValue: 8,    askOnRun: true, group: "Front roll", disabledWhenSet: "frontFixedRate" },
+      { key: "frontGauge",   label: "Front gauge",          unit: "",   defaultValue: 8,    askOnRun: true, group: "Front roll" },
       { key: "frontWidths",  label: "Front stock widths",   unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: "Front roll" },
       { key: "frontFixedRate", label: "Fixed rate (per roll)", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Front roll" },
       { key: "frontRollLength",   label: "Roll length",         unit: "m",  defaultValue: 50, askOnRun: true, group: "Front roll" },
@@ -245,10 +296,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "frontCutMax",       label: "Cutting range — max", unit: "in", defaultValue: 50, group: "Front roll" },
       { key: "frontCutAllowance", label: "Allowance per cut",   unit: "in", defaultValue: 0.75, group: "Front roll" },
 
+      // Fastened exactly as a single bag is, once per bag — the two rolls
+      // have nothing to do with it.
+      ...FASTENING_INPUTS,
       { key: "labour",       label: "Labour",               unit: "Rs", defaultValue: 3,  askOnRun: true, group: "Order details" },
-      // Per piece, not per roll as in Roll → Pieces: there are two rolls here,
-      // so loading it onto either one would charge the bag twice or not at all.
-      { key: "buttonTape",   label: "Button / Tape",        unit: "Rs", defaultValue: 0,  askOnRun: true, group: "Order details" },
+      PRINT_INPUT,
       // Same catch-all as Roll → Pieces: per bag, zero until it is used.
       { key: "others",       label: "Others",               unit: "Rs", defaultValue: 0,  askOnRun: true, group: "Order details" },
       { key: "orderQty",     label: "Order quantity",       unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
@@ -280,9 +332,11 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "frontRollCost",  label: "Front roll cost",        expression: "if(frontFixedRate > 0, frontFixedRate, frontRate * frontGauge * frontRollWidth * frontRollLength / densityDiv)", unit: "Rs" },
       { key: "frontPerPc",     label: "Front cost per bag",     expression: "frontRollCost / frontPerRoll", unit: "Rs" },
 
+      ...FASTENING_STEPS,
+
       /* The bag */
       { key: "materialPerPc", label: "Material per bag",  expression: "backPerPc + frontPerPc", unit: "Rs" },
-      { key: "costPerPc",     label: "Cost per bag",      expression: "materialPerPc + labour + buttonTape + others", unit: "Rs" },
+      { key: "costPerPc",     label: "Cost per bag",      expression: `materialPerPc + labour + ${FASTENING_COST} + printCost + others`, unit: "Rs" },
       { key: "backRolls",     label: "Back rolls required",  expression: "orderQty / backPerRoll" },
       { key: "frontRolls",    label: "Front rolls required", expression: "orderQty / frontPerRoll" },
       { key: "backWasteM",    label: "Back waste per roll",  expression: "(backRollInches - backRepeats * backCutLength) / 39.37", unit: "m" },
@@ -302,6 +356,9 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "frontRolls",   label: "Front rolls required" },
       { key: "backWasteM",   label: "Back waste per roll",  unit: "m",   role: "waste_qty" },
       { key: "orderCost",    label: "Order total",          unit: "Rs" },
+      ...FASTENING_BREAKDOWN,
+      { key: "printCost",    label: "Print per bag",        unit: "Rs" },
+      ...FASTENING_OUTPUTS,
     ],
   },
 
@@ -551,8 +608,112 @@ export function getTemplate(id: string): FormulaTemplate | undefined {
  * — only where that roll's cost is still the template's own expression, so a
  * step an author has rewritten is never touched.
  */
-export function upgradeSavedFormula<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T): T {
-  return splitRollDetails((["back", "front"] as const).reduce(addFixedRollRate, f));
+export function upgradeSavedFormula<T extends Pick<CostingFormula, "inputs" | "steps" | "outputs">>(f: T): T {
+  const rolls = splitRollDetails(ungreyGauge((["back", "front"] as const).reduce(addFixedRollRate, f)));
+  return addPrint(addKundaZip(addTwoPanelFastening(rolls)));
+}
+
+type Upgradable = Pick<CostingFormula, "inputs" | "steps" | "outputs">;
+
+/** Gauge was briefly greyed with the rate under a fixed price; only the rate is. */
+function ungreyGauge<T extends Upgradable>(f: T): T {
+  const stuck = (i: FormulaInput) => (i.key === "backGauge" || i.key === "frontGauge") && !!i.disabledWhenSet;
+  if (!f.inputs.some(stuck)) return f;
+  return { ...f, inputs: f.inputs.map((i) => { if (!stuck(i)) return i; const { disabledWhenSet: _, ...rest } = i; return rest; }) };
+}
+const reads = (expr: string, key: string) => new RegExp(`\\b${key}\\b`).test(expr);
+const clone = <X,>(rows: X[]): X[] => rows.map((r) => JSON.parse(JSON.stringify(r)));
+
+/**
+ * Two-panel copies carried one flat "Button / Tape" rupee box. They get the
+ * same fastening section a single bag has. The flat box goes only while it
+ * is zero — a figure someone has typed in stays and keeps being charged.
+ */
+function addTwoPanelFastening<T extends Upgradable>(f: T): T {
+  if (!f.inputs.some((i) => i.key === "backRate") || !f.inputs.some((i) => i.key === "frontRate")) return f;
+  if (f.inputs.some((i) => i.key === "fitting")) return f;
+  const costIdx = f.steps.findIndex((s) => s.key === "costPerPc");
+  if (costIdx < 0 || !f.inputs.some((i) => i.key === "orderQty")) return f;
+
+  const flat = f.inputs.find((i) => i.key === "buttonTape");
+  const onlyInCost = !f.steps.some((s, idx) => idx !== costIdx && reads(s.expression, "buttonTape"));
+  const dropFlat = !!flat && !flat.defaultValue && onlyInCost && reads(f.steps[costIdx].expression, "buttonTape");
+
+  const inputs = dropFlat ? f.inputs.filter((i) => i.key !== "buttonTape") : [...f.inputs];
+  const labourAt = inputs.findIndex((i) => i.key === "labour");
+  // Button is the default choice, and the template's example button would
+  // quietly add Rs 3 to every saved quote. The flat box they had was zero, so
+  // the button starts at zero too — the operator types in their own.
+  const fastening = clone(FASTENING_INPUTS).map((i) =>
+    flat && !flat.defaultValue && (i.key === "buttonsPerPc" || i.key === "buttonLabour") ? { ...i, defaultValue: 0 } : i);
+  inputs.splice(labourAt < 0 ? inputs.length : labourAt, 0, ...fastening);
+
+  const steps = [...f.steps];
+  const cost = steps[costIdx];
+  steps[costIdx] = {
+    ...cost,
+    expression: dropFlat
+      ? cost.expression.replace(/\bbuttonTape\b/, FASTENING_COST)
+      : `${cost.expression} + ${FASTENING_COST}`,
+  };
+  steps.splice(costIdx, 0, ...clone(FASTENING_STEPS));
+
+  const have = new Set(f.outputs.map((o) => o.key));
+  const outputs = [...f.outputs, ...clone([...FASTENING_BREAKDOWN, ...FASTENING_OUTPUTS]).filter((o) => !have.has(o.key))];
+  return { ...f, inputs, steps, outputs };
+}
+
+/** Button / Tape choices written before Kunda and Zip existed get both. */
+function addKundaZip<T extends Upgradable>(f: T): T {
+  const fitting = f.inputs.find((i) => i.key === "fitting");
+  if (!fitting?.options || fitting.options.length !== 2) return f;
+  const costIdx = f.steps.findIndex((s) => s.key === "costPerPc");
+  if (costIdx < 0 || !reads(f.steps[costIdx].expression, "tapeCostPerPc")) return f;
+  if (f.inputs.some((i) => i.key === "kundaPerPc" || i.key === "zipPerPc")) return f;
+
+  const isNew = (k: string) => k.startsWith("kunda") || k.startsWith("zip");
+  const inputs = f.inputs.map((i) => (i.key === "fitting" ? { ...i, options: [...fitting.options!, "Kunda", "Zip"] } : i));
+  let lastIn = inputs.findIndex((i) => i.key === "fitting");
+  inputs.forEach((i, idx) => { if (i.showWhen?.key === "fitting") lastIn = idx; });
+  inputs.splice(lastIn + 1, 0, ...clone(FASTENING_INPUTS.filter((i) => isNew(i.key)))
+    .map((i) => ({ ...i, ...(fitting.group ? { group: fitting.group } : {}) })));
+
+  const steps = f.steps.map((s) =>
+    s.key === "costPerPc"
+      ? { ...s, expression: s.expression.replace(/\btapeCostPerPc\b/, "tapeCostPerPc + kundaCostPerPc + zipCostPerPc") }
+      : s);
+  let lastStep = -1;
+  steps.forEach((s, idx) => { if (s.showWhen?.key === "fitting") lastStep = idx; });
+  steps.splice(Math.min(lastStep < 0 ? costIdx : lastStep + 1, costIdx), 0, ...clone(FASTENING_STEPS.filter((s) => isNew(s.key))));
+
+  const outputs = [...f.outputs];
+  const after = (key: string, rows: FormulaOutput[]) => {
+    const at = outputs.findIndex((o) => o.key === key);
+    outputs.splice(at < 0 ? outputs.length : at + 1, 0, ...clone(rows));
+  };
+  if (outputs.some((o) => o.key === "tapeCostPerPc")) after("tapeCostPerPc", FASTENING_BREAKDOWN.filter((o) => isNew(o.key)));
+  after("tapeTotal", FASTENING_OUTPUTS.filter((o) => isNew(o.key)));
+  return { ...f, inputs, steps, outputs };
+}
+
+/** A Print box beside Others, added into the cost the same way. */
+function addPrint<T extends Upgradable>(f: T): T {
+  if (f.inputs.some((i) => i.key === "printCost")) return f;
+  const others = f.inputs.find((i) => i.key === "others");
+  const costIdx = f.steps.findIndex((s) => s.key === "costPerPc");
+  if (!others || costIdx < 0 || !reads(f.steps[costIdx].expression, "others")) return f;
+  // Only the bag templates — a formula of some other trade that happens to
+  // have an "others" box is not asked about printing.
+  if (!f.inputs.some((i) => i.key === "stockWidths" || i.key === "backWidths")) return f;
+
+  const inputs = [...f.inputs];
+  inputs.splice(inputs.indexOf(others), 0, { ...PRINT_INPUT, ...(others.group ? { group: others.group } : {}) });
+  const steps = f.steps.map((s, idx) =>
+    idx === costIdx ? { ...s, expression: s.expression.replace(/\bothers\b/, "printCost + others") } : s);
+  const outputs = [...f.outputs];
+  const oAt = outputs.findIndex((o) => o.key === "others");
+  if (oAt >= 0) outputs.splice(oAt, 0, { key: "printCost", label: "Print per piece", unit: "Rs", ...(outputs[oAt].group ? { group: outputs[oAt].group } : {}) });
+  return { ...f, inputs, steps, outputs };
 }
 
 const SHARED_ROLL_KEYS = ["rollLength", "cutMin", "cutMax", "cutAllowance"] as const;
@@ -565,7 +726,7 @@ const rollKey = (side: "back" | "front", k: string) => side + k[0].toUpperCase()
  * until someone changes it. Only the back… and front… steps are rewritten;
  * the shared inputs go only once nothing reads them any more.
  */
-function splitRollDetails<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T): T {
+function splitRollDetails<T extends Pick<CostingFormula, "inputs" | "steps" | "outputs">>(f: T): T {
   if (!f.inputs.some((i) => i.key === "backRate") || !f.inputs.some((i) => i.key === "frontRate")) return f;
   if (f.inputs.some((i) => i.key === "backRollLength" || i.key === "frontRollLength")) return f;
   if (!f.inputs.some((i) => i.key === "rollLength")) return f;
@@ -592,7 +753,7 @@ function splitRollDetails<T extends Pick<CostingFormula, "inputs" | "steps">>(f:
         : e),
       expr,
     );
-  let steps = f.steps.map((s) => {
+  const steps = f.steps.map((s) => {
     const side = s.key.startsWith("back") ? "back" : s.key.startsWith("front") ? "front" : null;
     return side ? { ...s, expression: rename(s.expression, side) } : s;
   });
@@ -616,7 +777,7 @@ function splitRollDetails<T extends Pick<CostingFormula, "inputs" | "steps">>(f:
   return { ...f, inputs, steps };
 }
 
-function addFixedRollRate<T extends Pick<CostingFormula, "inputs" | "steps">>(f: T, side: "back" | "front"): T {
+function addFixedRollRate<T extends Pick<CostingFormula, "inputs" | "steps" | "outputs">>(f: T, side: "back" | "front"): T {
   const rateKey = `${side}Rate`, fixedKey = `${side}FixedRate`, costKey = `${side}RollCost`;
   const oldCost = `${side}Rate * ${side}Gauge * ${side}RollWidth * rollLength / densityDiv`;
   if (f.inputs.some((i) => i.key === fixedKey)) return f;
@@ -626,10 +787,7 @@ function addFixedRollRate<T extends Pick<CostingFormula, "inputs" | "steps">>(f:
 
   const tpl = FORMULA_TEMPLATES.find((t) => t.templateId === "two-panel-bag")!;
   const fixedInput = tpl.inputs.find((i) => i.key === fixedKey)!;
-  // The rate and the gauge only ever fed the worked-out cost, so both step
-  // aside once a fixed price is typed in.
-  const inputs = f.inputs.map((i) =>
-    i.key === rateKey || i.key === `${side}Gauge` ? { ...i, disabledWhenSet: fixedKey } : i);
+  const inputs = f.inputs.map((i) => (i.key === rateKey ? { ...i, disabledWhenSet: fixedKey } : i));
   // Sits at the bottom of that roll's own block, whatever it is called there.
   const rateRow = inputs.find((i) => i.key === rateKey)!;
   let at = inputs.length;
