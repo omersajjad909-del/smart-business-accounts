@@ -128,6 +128,42 @@ const FASTENING_OUTPUTS: FormulaOutput[] = [
 /** Printing on the bag — per piece, zero until a job is printed. */
 const PRINT_INPUT: FormulaInput = { key: "printCost", label: "Print", unit: "Rs", defaultValue: 0, askOnRun: true, group: "Order details" };
 
+/* ───────────────────── One panel cut from its own roll ─────────────────────
+   Every multi-part bag costs each part the same way: nest it across the roll,
+   repeat it along the roll, cost the roll by weight (or at a fixed price per
+   roll), divide down to one piece. Only what the part measures changes. */
+
+type Part = { key: "back" | "front" | "gusset"; name: string; section: string; rate: number; gauge: number; rollLength: number };
+
+const partInputs = (p: Part): FormulaInput[] => [
+  { key: `${p.key}Rate`,         label: `${p.name} material rate`, unit: "per mm", defaultValue: p.rate, askOnRun: true, group: p.section, disabledWhenSet: `${p.key}FixedRate` },
+  { key: `${p.key}Gauge`,        label: `${p.name} gauge`,         unit: "",   defaultValue: p.gauge, askOnRun: true, group: p.section },
+  { key: `${p.key}Widths`,       label: `${p.name} stock widths`,  unit: "in", isList: true, listValue: [48, 50, 52, 54, 56, 58, 60], group: p.section },
+  { key: `${p.key}FixedRate`,    label: "Fixed rate (per roll)",   unit: "Rs", defaultValue: 0, askOnRun: true, group: p.section },
+  { key: `${p.key}RollLength`,   label: "Roll length",             unit: "m",  defaultValue: p.rollLength, askOnRun: true, group: p.section },
+  { key: `${p.key}CutMin`,       label: "Cutting range — min",     unit: "in", defaultValue: 30, group: p.section },
+  { key: `${p.key}CutMax`,       label: "Cutting range — max",     unit: "in", defaultValue: 50, group: p.section },
+  { key: `${p.key}CutAllowance`, label: "Allowance per cut",       unit: "in", defaultValue: 0.75, group: p.section },
+];
+
+/** `across` is what the part measures across the roll, `along` what it measures along it. */
+const partSteps = (k: Part["key"], n: string, across: string, along: string): FormulaStep[] => {
+  return [
+    { key: `${k}RollInches`, label: `${n} roll length`,        expression: `convert(${k}RollLength, m, in)`, unit: "in" },
+    { key: `${k}Across`,     label: `${n} pieces across`,      expression: `bestFitCount(${across}, ${k}Widths)` },
+    { key: `${k}RollWidth`,  label: `${n} roll width used`,    expression: `bestFitStock(${across}, ${k}Widths)`, unit: "in" },
+    { key: `${k}BaseCut`,    label: `${n} base cut`,           expression: along, unit: "in" },
+    { key: `${k}Factor`,     label: `${n} length multiple`,    expression: `scaleToRange(${k}BaseCut, ${k}CutMin, ${k}CutMax)` },
+    { key: `${k}CutLength`,  label: `${n} cut length`,         expression: `${k}BaseCut * ${k}Factor + ${k}CutAllowance`, unit: "in" },
+    { key: `${k}Repeats`,    label: `${n} layers per roll`,    expression: `floor(${k}RollInches / ${k}CutLength)` },
+    { key: `${k}PerRoll`,    label: `${n} pieces per roll`,    expression: `${k}Repeats * ${k}Across * ${k}Factor`, unit: "pcs" },
+    { key: `${k}RollCost`,   label: `${n} roll cost`,          expression: `if(${k}FixedRate > 0, ${k}FixedRate, ${k}Rate * ${k}Gauge * ${k}RollWidth * ${k}RollLength / densityDiv)`, unit: "Rs" },
+    { key: `${k}PerPc`,      label: `${n} cost per bag`,       expression: `${k}RollCost / ${k}PerRoll`, unit: "Rs" },
+    { key: `${k}Rolls`,      label: `${n} rolls required`,     expression: `orderQty / ${k}PerRoll` },
+    { key: `${k}WasteM`,     label: `${n} waste per roll`,     expression: `(${k}RollInches - ${k}Repeats * ${k}CutLength) / 39.37`, unit: "m" },
+  ];
+};
+
 export const FORMULA_TEMPLATES: FormulaTemplate[] = [
   /* ───────────────────────── Packaging ───────────────────────── */
   {
@@ -358,6 +394,69 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
       { key: "orderCost",    label: "Order total",          unit: "Rs" },
       ...FASTENING_BREAKDOWN,
       { key: "printCost",    label: "Print per bag",        unit: "Rs" },
+      ...FASTENING_OUTPUTS,
+    ],
+  },
+
+  {
+    templateId: "six-sealer-bag",
+    name: "Six sealer bag",
+    category: "Packaging",
+    version: 1,
+    summary:
+      "A bag in three parts — front, back and a guezzet strip that runs round both sides and the bottom. Each part is costed on its own roll, then the three are added.",
+    description:
+      "Front and back are cut as in the two-panel bag: back at length + flap, front at length. The guezzet is its own strip, as wide as the guezzet and as long as the bag goes round — length + width + length (11.5 + 12 + 11.5 = 35in).",
+    inputs: [
+      { key: "bagWidth",     label: "Bag width",              unit: "in", defaultValue: 12,   askOnRun: true, group: "Bag details" },
+      { key: "bagLength",    label: "Bag length",             unit: "in", defaultValue: 11.5, askOnRun: true, group: "Bag details" },
+      { key: "guezzet",      label: "Guezzet",                unit: "in", defaultValue: 1,    askOnRun: true, group: "Bag details" },
+      { key: "flap",         label: "Flap / seal (back only)", unit: "in", defaultValue: 2.5, askOnRun: true, group: "Bag details" },
+
+      ...partInputs({ key: "back",   name: "Back",    section: "Back roll",    rate: 12, gauge: 10, rollLength: 100 }),
+      ...partInputs({ key: "front",  name: "Front",   section: "Front roll",   rate: 15, gauge: 8,  rollLength: 50 }),
+      ...partInputs({ key: "gusset", name: "Guezzet", section: "Guezzet roll", rate: 12, gauge: 10, rollLength: 100 }),
+
+      ...FASTENING_INPUTS,
+      { key: "labour",       label: "Labour",                 unit: "Rs", defaultValue: 3,  askOnRun: true, group: "Order details" },
+      PRINT_INPUT,
+      { key: "others",       label: "Others",                 unit: "Rs", defaultValue: 0,  askOnRun: true, group: "Order details" },
+      { key: "orderQty",     label: "Order quantity",         unit: "pcs", defaultValue: 10000, askOnRun: true, group: "Order details" },
+    ],
+    steps: [
+      // The guezzet is its own strip here, so unlike the two-panel bag it is
+      // not added onto the back's cut.
+      ...partSteps("back", "Back", "bagWidth", "bagLength + flap"),
+      ...partSteps("front", "Front", "bagWidth", "bagLength"),
+      // Across the roll it is only as wide as the guezzet; along it, it runs
+      // down one side, across the bottom and up the other.
+      ...partSteps("gusset", "Guezzet", "guezzet", "bagLength * 2 + bagWidth"),
+
+      ...FASTENING_STEPS,
+
+      { key: "materialPerPc", label: "Material per bag", expression: "backPerPc + frontPerPc + gussetPerPc", unit: "Rs" },
+      { key: "costPerPc",     label: "Cost per bag",     expression: `materialPerPc + labour + ${FASTENING_COST} + printCost + others`, unit: "Rs" },
+      { key: "orderCost",     label: "Order total",      expression: "costPerPc * orderQty", unit: "Rs" },
+    ],
+    outputs: [
+      { key: "costPerPc",      label: "Cost per bag",           unit: "Rs",  role: "cost_per_unit", primary: true },
+      { key: "backPerPc",      label: "Back cost per bag",      unit: "Rs" },
+      { key: "frontPerPc",     label: "Front cost per bag",     unit: "Rs" },
+      { key: "gussetPerPc",    label: "Guezzet cost per bag",   unit: "Rs" },
+      { key: "backPerRoll",    label: "Back pieces per roll",   unit: "pcs", role: "units_per_batch" },
+      { key: "frontPerRoll",   label: "Front pieces per roll",  unit: "pcs" },
+      { key: "gussetPerRoll",  label: "Guezzet pieces per roll", unit: "pcs" },
+      { key: "backCutLength",  label: "Back cut length",        unit: "in" },
+      { key: "frontCutLength", label: "Front cut length",       unit: "in" },
+      { key: "gussetCutLength", label: "Guezzet cut length",    unit: "in" },
+      { key: "backRollCost",   label: "Back roll cost",         unit: "Rs",  role: "cost_per_batch" },
+      { key: "backRolls",      label: "Back rolls required" },
+      { key: "frontRolls",     label: "Front rolls required" },
+      { key: "gussetRolls",    label: "Guezzet rolls required" },
+      { key: "backWasteM",     label: "Back waste per roll",    unit: "m",   role: "waste_qty" },
+      { key: "orderCost",      label: "Order total",            unit: "Rs" },
+      ...FASTENING_BREAKDOWN,
+      { key: "printCost",      label: "Print per bag",          unit: "Rs" },
       ...FASTENING_OUTPUTS,
     ],
   },
