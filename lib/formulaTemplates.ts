@@ -484,8 +484,8 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
     description:
       "Sizes in inches: width x length x guezzet, e.g. 22 x 22 x 7. Zip slip is (length - zip margin) wide and runs guezzet x 2 + width + allowance. Back patti is (width + allowance) wide and runs length + guezzet x 2 + allowance. Piping is a fixed-width strip, width x 3 + length x 2 + guezzet x 6 long, cut whole. The zip is as long as the zip slip, so a 200-gaz bundle gives 7200 / that many zips.",
     inputs: [
-      { key: "bagWidth",     label: "Width (chaurai)",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
-      { key: "bagLength",    label: "Length (lambai)",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
+      { key: "bagWidth",     label: "Width",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
+      { key: "bagLength",    label: "Length",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
       { key: "guezzet",      label: "Guezzet",           unit: "in", defaultValue: 7,   askOnRun: true, group: "Bag details" },
       // The ½ taken off the zip slip's width for the zip, and the ½ seam
       // added to each panel — kept as boxes, not hidden inside the formula.
