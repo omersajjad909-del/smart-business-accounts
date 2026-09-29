@@ -6,7 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Careers at FinovaOS",
   description:
-    "We're not actively hiring right now. Leave your email to hear about FinovaOS roles the moment they open — remote-first, equity included, health coverage, learning budget.",
+    "We're not actively hiring right now. Leave your email to hear about roles the moment they open.",
   keywords: [
     "FinovaOS careers",
     "fintech jobs",

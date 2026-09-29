@@ -72,7 +72,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "best-business-management-software-small-business",
     title: "Best Business Management Software for Small Businesses in 2026",
     excerpt:
-      "A vendor-by-vendor breakdown of what small businesses actually run on — what each product is genuinely good at, who should avoid it, and how to run the evaluation without losing three months.",
+      "A vendor-by-vendor breakdown of what small businesses actually run on, who should avoid each, and how to evaluate without losing months.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-818cf8, #818cf8)",
@@ -190,7 +190,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "best-odoo-alternatives",
     title: "Best Odoo Alternatives for Small Businesses in 2026",
     excerpt:
-      "Odoo is powerful and genuinely hard to run without help. Here are the realistic alternatives, what each one trades away, and an honest test of whether you should leave Odoo at all.",
+      "Odoo is powerful and genuinely hard to run without help. Here are the realistic alternatives and what each one trades away.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-34d399, #34d399)",
@@ -368,7 +368,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "best-all-in-one-business-management-software",
     title: "Best All-in-One Business Management Software in 2026",
     excerpt:
-      "All-in-one platforms trade depth for coherence. Here is when that trade pays off, when it does not, and how the main platforms actually differ once you get past the feature grid.",
+      "All-in-one platforms trade depth for coherence. Here's when that trade pays off and how the main platforms differ.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-c4b5fd, #c4b5fd)",
@@ -468,7 +468,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "accounting-crm-inventory-software-small-business",
     title: "Accounting, CRM and Inventory Software for Small Business: One System or Three?",
     excerpt:
-      "Accounting, CRM and inventory are the three systems most small businesses end up running. Here is what changes when they share a database, and how to tell whether yours should.",
+      "Accounting, CRM and inventory are the three systems most small businesses run. Here's what changes when they share a database.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-fbbf24, #fbbf24)",
@@ -575,7 +575,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "business-management-software-wholesale",
     title: "Business Management Software for Wholesale Businesses",
     excerpt:
-      "Wholesale breaks general accounting software in specific, predictable places — customer-specific pricing, unit conversion, credit control and margin per SKU. Here is what to check before you buy.",
+      "Wholesale breaks general accounting software in predictable places — customer pricing, unit conversion, credit control, margin per SKU.",
     category: "business",
     categoryLabel: "Industry Guide",
     color: "var(--tx-f9a8d4, #f9a8d4)",
@@ -665,7 +665,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "business-management-software-distributors",
     title: "Business Management Software for Distributors",
     excerpt:
-      "Distribution adds a layer wholesale does not have: you answer to a principal. Schemes, claims, secondary sales and route accounting are where distributor software is won or lost.",
+      "Distribution adds a layer wholesale doesn't have: schemes, claims, secondary sales, and route accounting decide the winner.",
     category: "business",
     categoryLabel: "Industry Guide",
     color: "var(--tx-06b6d4, #06b6d4)",
@@ -760,7 +760,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "manage-sales-inventory-accounting-one-system",
     title: "How to Manage Sales, Inventory and Accounting in One System",
     excerpt:
-      "A practical guide to consolidating three systems into one — the sequence that works, the data model decisions that matter, and the mistakes that make consolidation fail.",
+      "A practical guide to consolidating three systems into one — the sequence, the data decisions, and the mistakes to avoid.",
     category: "guides",
     categoryLabel: "How-to Guide",
     color: "var(--tx-34d399, #34d399)",
@@ -872,7 +872,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "cloud-accounting-software-for-smes",
     title: "Cloud Accounting Software for SMEs: A 2026 Buyer's Guide",
     excerpt:
-      "What \"cloud\" actually changes for a small business, the features that separate a real cloud ledger from a hosted desktop file, and how to evaluate vendors without being sold on the wrong things.",
+      "What cloud actually changes for a small business, and the features that separate a real cloud ledger from a hosted desktop file.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-34d399, #34d399)",
@@ -959,7 +959,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "best-accounting-software-pakistan",
     title: "Best Accounting Software in Pakistan (2026 Guide)",
     excerpt:
-      "What actually matters when choosing accounting software as a Pakistani business — FBR-ready invoicing, PKR billing, and the operational features (party ledgers, godown stock) that generic Western tools were never built around.",
+      "What actually matters when choosing accounting software as a Pakistani business — FBR-ready invoicing, PKR billing, and local stock features.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-fbbf24, #fbbf24)",
@@ -1031,7 +1031,7 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
     id: "should-you-combine-inventory-and-accounting",
     title: "Should a Small Business Combine Inventory and Accounting Into One System?",
     excerpt:
-      "For most goods-based businesses, yes — but not automatically. Here's the actual test, the cases where staying separate is the better call, and what changes once you combine them.",
+      "For most goods-based businesses, yes — but not automatically. Here's the actual test and when staying separate is better.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-818cf8, #818cf8)",

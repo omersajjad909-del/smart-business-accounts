@@ -37,6 +37,7 @@ const COMPANY_LINKS = [
   { label: "Support Center",     href: "/support" },
   { label: "Contact Us",         href: "/contact" },
   { label: "Affiliate Program",  href: "/affiliate" },
+  { label: "Send Feedback",      href: "/feedback" },
 ];
 
 const LEGAL_LINKS = [
@@ -47,6 +48,7 @@ const LEGAL_LINKS = [
   { label: "Cookie Policy",      href: "/legal/cookies" },
   { label: "SLA",                href: "/legal/sla" },
   { label: "DPA",                href: "/legal/dpa" },
+  { label: "Sub-processors",     href: "/legal/sub-processors" },
   { label: "Acceptable Use",     href: "/legal/aup" },
   { label: "Data Security",      href: "/security" },
   { label: "FAQ",                href: "/faq" },

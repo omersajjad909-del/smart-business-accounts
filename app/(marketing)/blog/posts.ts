@@ -135,7 +135,7 @@ export const ALL_POSTS: Record<string, BlogPost> = {
   "cloud-erp-vs-accounting-software": {
     id: "cloud-erp-vs-accounting-software",
     title: "Cloud ERP vs Accounting Software: What's the Difference and Which Does Your Business Need?",
-    excerpt: "Accounting software tracks your money. ERP runs your whole business. Understanding the difference — and when to upgrade — could be the most important decision your business makes this year.",
+    excerpt: "Accounting software tracks your money. ERP runs your whole business. Here's how to know when it's time to upgrade.",
     category: "business",
     categoryLabel: "Business Growth",
     color: "var(--tx-a78bfa, #a78bfa)",
@@ -183,7 +183,7 @@ export const ALL_POSTS: Record<string, BlogPost> = {
   "hr-payroll-software-guide": {
     id: "hr-payroll-software-guide",
     title: "HR & Payroll Software for SMEs: What to Look For and How to Get Started",
-    excerpt: "Manual payroll in spreadsheets leads to errors, compliance risks, and unhappy staff. Here's how to find the right HR and payroll solution for a growing business.",
+    excerpt: "Manual payroll in spreadsheets leads to errors and unhappy staff. Here's how to find the right HR and payroll solution.",
     category: "guides",
     categoryLabel: "How-to Guides",
     color: "var(--tx-f472b6, #f472b6)",

@@ -18,6 +18,11 @@ import Footer from "./(marketing)/landing/components/Footer";
 import ChatWidget from "./(marketing)/landing/components/ChatWidget";
 
 export const metadata: Metadata = {
+  // Without its own description this page fell through to app/layout.tsx's
+  // sitewide default, which is 271 chars — Ahrefs flagged the actual
+  // homepage as "too long" because of it.
+  description:
+    "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one cloud platform for Pakistan & UAE SMEs and enterprises.",
   alternates: { canonical: "https://www.finovaos.app/" },
 };
 

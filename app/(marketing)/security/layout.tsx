@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   // kind of checkable claim that gets a site distrusted once a reader or an
   // AI answer engine cross-references the actual page.
   description:
-    "Your financial data is protected with 256-bit SSL encryption, two-factor authentication, automated daily backups, and role-based access control. FinovaOS Security.",
+    "256-bit SSL encryption, 2FA, and daily backups keep your data safe with FinovaOS.",
   keywords: [
     "accounting software security",
     "financial data protection",

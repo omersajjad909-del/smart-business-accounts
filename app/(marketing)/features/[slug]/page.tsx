@@ -319,14 +319,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const m = MODULES[slug];
   if (!m) return { title: "Feature Not Found" };
+  // m.description is the long-form on-page body copy (190-250 chars) — good
+  // there, too long for a meta description. m.tagline is already a punchy
+  // one-liner (max 49 chars here), so pairing it with a fixed suffix keeps
+  // every module between 98-114 chars instead of reusing the body text.
+  const metaDescription = `${m.tagline} Part of FinovaOS — cloud accounting & ERP for Pakistan & the Gulf.`;
+  const url = `${BASE}/features/${m.slug}`;
   return {
     title: `${m.title} — FinovaOS`,
-    description: m.description,
+    description: metaDescription,
     // Without this every /features/<slug> page inherits the parent layout's
     // hardcoded `canonical: ${BASE}/features`, so all 11 detail pages — each
     // of them listed in sitemap.ts — told Google they were duplicates of the
     // features index and dropped themselves out of the index.
-    alternates: { canonical: `${BASE}/features/${m.slug}` },
+    alternates: { canonical: url },
+    // No openGraph override here before meant these pages inherited the
+    // parent layout's `openGraph.url: ${BASE}/features` whole (Next merges
+    // openGraph as one block, not per-field) — the same duplicate-looking
+    // mismatch the canonical fix above already solved for search, just still
+    // live for social shares.
+    openGraph: {
+      title: `${m.title} — FinovaOS`,
+      description: metaDescription,
+      url,
+      siteName: "FinovaOS",
+      images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: `FinovaOS ${m.title}` }],
+      type: "website",
+    },
   };
 }
 

@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Pricing Plans — Starter $49/mo · Pro $99/mo · Enterprise",
   description:
-    "Transparent, affordable pricing for every business size. Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). All plans include accounting, invoicing, and inventory. No hidden fees.",
+    "Starter · Professional · Enterprise. Transparent pricing, no hidden fees.",
   keywords: [
     "accounting software pricing",
     "invoicing software cost",

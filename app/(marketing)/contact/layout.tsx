@@ -6,7 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Contact Us — Support, Sales & Partnerships",
   description:
-    "Get in touch with the FinovaOS team. Live chat, email support (hello@finovaos.app), or submit a support ticket. Our team responds within 2 hours during business hours.",
+    "Live chat, email, or ticket — our team responds within 2 hours during business hours.",
   keywords: [
     "contact FinovaOS",
     "FinovaOS support",

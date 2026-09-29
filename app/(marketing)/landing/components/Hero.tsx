@@ -282,17 +282,19 @@ export default function Hero() {
               </div>
               {/* "No credit card required" is gone — there is no free trial to
                   start without one, so the line promised something checkout
-                  cannot honour. */}
+                  cannot honour. "Priority early access" also said pre-launch
+                  next to "Newly Launched" in Testimonials.tsx and live
+                  checkout/signups elsewhere — one status, not two. */}
               <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:32, fontWeight:500 }}>
-                Priority early access · Launch pricing locked in
+                Newly launched · Launch pricing locked in
               </p>
 
               {/* Trust row. The customer count and star rating that used to sit
-                  here were invented — we are pre-launch, so anything a visitor
-                  could check would contradict them. Only claims the product
-                  actually backs are left. */}
+                  here were invented — this is a newly launched product, so
+                  anything a visitor could check would contradict them. Only
+                  claims the product actually backs are left. */}
               <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>14-day money-back guarantee</span>
+                <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>14-day refund on yearly plans</span>
                 <span style={{ width:1, height:16, background:"rgba(var(--ink),.1)", display:"inline-block" }}/>
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(var(--ink),var(--ta-35, .35))" }}>Cancel anytime</span>
                 <span style={{ width:1, height:16, background:"rgba(var(--ink),.1)", display:"inline-block" }}/>
@@ -540,7 +542,7 @@ export default function Hero() {
                  the moment the list changed. */
               { n:String(FOCUSED_INDUSTRIES.length), l:"Business Types", desc:INDUSTRY_SUMMARY, color:"var(--tx-818cf8, #818cf8)" },
               { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"var(--tx-34d399, #34d399)" },
-              { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"var(--tx-fbbf24, #fbbf24)" },
+              { n:"Live",        l:"Status",       desc:"open for signups now",           color:"var(--tx-fbbf24, #fbbf24)" },
               { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"var(--tx-60a5fa, #60a5fa)" },
             ].map((s, i) => (
               <div key={s.l} className="stat-pill" style={{

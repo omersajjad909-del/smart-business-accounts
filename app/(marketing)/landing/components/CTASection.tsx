@@ -66,11 +66,14 @@ function CountUp({ to, prefix = "", suffix = "", duration = 1800, start }: { to:
    "40+ Countries" was the worst offender — FinovaOS launched in August 2026
    and has customers in one. Uptime SLA numbers came out too: there is no
    signed SLA to point at yet. What is left is countable: 9 module groups and
-   67 features in ModulesSection, 6 live industries in SolutionSection. */
+   67 features in ModulesSection, 9 live industries per BUSINESS_PHASE_CONFIG
+   (trading, distribution, retail, wholesale, import/export, clearing &
+   forwarding, investor, manufacturing, travel) — this was hardcoded at 6
+   and had drifted out of sync with the actual config. */
 const STATS = [
   { to: 9,  suffix: "",     label: "Modules",         color: "var(--tx-818cf8, #818cf8)" },
   { to: 60, suffix: "+",    label: "Features",        color: "var(--tx-34d399, #34d399)" },
-  { to: 6,  suffix: "",     label: "Industries Live", color: "var(--tx-fbbf24, #fbbf24)" },
+  { to: 9,  suffix: "",     label: "Industries Live", color: "var(--tx-fbbf24, #fbbf24)" },
   { to: 2,  prefix: "< ", suffix: " min", label: "Setup Time", color: "var(--tx-f87171, #f87171)" },
 ];
 
@@ -282,7 +285,7 @@ export default function CTASection() {
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>
-            ✅ EVERYTHING INCLUDED — NO ADD-ONS
+            ✅ 60+ FEATURES ACROSS OUR PLANS
           </div>
         </div>
 
@@ -299,6 +302,14 @@ export default function CTASection() {
             </div>
           ))}
         </div>
+        {/* This list mixes Starter-tier basics with Professional/Enterprise-only
+            items (Bank Reconciliation, HR & Payroll, CRM, Multi-Branch, Role-Based
+            Access are Starter: false in Pricing.tsx) — "Everything included, no
+            add-ons" read as a plan-level promise it wasn't. This links to the
+            plan comparison instead of restating it as one. */}
+        <p style={{ textAlign: "center", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-32, .32))", marginTop: 16 }}>
+          Exact features vary by plan — <Link href="/pricing" style={{ color: "var(--tx-a5b4fc, #a5b4fc)", fontWeight: 600, textDecoration: "none" }}>see what's included in each</Link>.
+        </p>
       </div>
 
       {/* ── Trust pills ── */}

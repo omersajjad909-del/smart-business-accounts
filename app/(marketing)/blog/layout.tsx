@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Business Finance Blog — Tips, Guides & Updates",
   description:
-    "Expert guides on accounting, bank reconciliation, invoicing, inventory management, and business finance. Written by the FinovaOS team for SME owners, accountants, and finance managers.",
+    "Expert articles on accounting, invoicing, inventory, and business finance.",
   keywords: [
     "accounting blog",
     "business finance tips",

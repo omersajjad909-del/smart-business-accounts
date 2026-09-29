@@ -4,8 +4,11 @@ import { headers } from "next/headers";
 const FORGE_URL = "https://finovaforge.com";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const FORGE_TITLE = "Finova Forge - Industry-Specific Business Software | Trading, Manufacturing, Restaurant, Retail & More";
+// Was 252 chars — over Google's ~160 cutoff on every one of the 14 pages that
+// share this constant verbatim, and identical across all of them on top of
+// that (a duplicate-description problem, not just a length one).
 const FORGE_DESCRIPTION =
-  "Finova Forge is a software company building intelligent, industry-specific business tools — trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, hospital, school, pharmacy, and more. Creators of FinovaOS.";
+  "Finova Forge builds intelligent, industry-specific business software for trading, manufacturing, retail, distribution and more. Creators of FinovaOS.";
 const FORGE_OG_IMAGE = "/FinovaForge.png";
 
 /**
@@ -74,7 +77,11 @@ export async function generateMetadata(): Promise<Metadata> {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: FORGE_URL,
+    // Was hardcoded to FORGE_URL (the bare domain) on every page — the same
+    // bug `alternates.canonical` had before forgeCanonical() was introduced
+    // above, just never carried over to this field. 12 of the 13 /forge/*
+    // pages disagreed with their own canonical because of it.
+    url: forgeCanonical(pathname),
     siteName: "Finova Forge",
     title: FORGE_TITLE,
     description: FORGE_DESCRIPTION,

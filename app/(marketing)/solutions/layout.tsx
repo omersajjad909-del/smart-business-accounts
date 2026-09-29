@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   // OpenRush audit (2026-09-25).
   title: "Industry Solutions for Every Business Type",
   description:
-    "FinovaOS is built for your industry — trading, manufacturing, retail, restaurant, distribution, import/export and more — with accounting and inventory workflows tailored to each one.",
+    "Trading, manufacturing, retail, and services — FinovaOS adapts to your industry.",
   keywords: [
     // Trading & Wholesale
     "trading business accounting software", "wholesale accounting software",

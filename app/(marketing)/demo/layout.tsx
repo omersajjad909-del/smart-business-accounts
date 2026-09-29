@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Try Live Demo - Explore FinovaOS by Business Type",
   description:
-    "Select your business type, explore the exact modules you get, and launch a live FinovaOS demo workspace tailored for traders, wholesalers, distributors, and import/export teams.",
+    "Choose your business type and explore a live FinovaOS demo workspace today.",
   keywords: [
     "live accounting software demo", "business type demo", "FinovaOS live demo", "cloud accounting demo", "trading business demo", "import export demo",
   ],

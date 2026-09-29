@@ -344,7 +344,13 @@ export default function SignupByPlanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams() as { plan?: string };
-  const planCode = String(params?.plan || "").toLowerCase();
+  // Pricing.tsx links the Professional card to /onboarding/signup/professional
+  // (plan.slug), but PLAN_CONFIG's key for that tier is "pro" — the unmapped
+  // "professional" silently fell through to the `|| PLAN_CONFIG.starter`
+  // fallback below, so a Professional signup showed "Set up your Starter
+  // workspace." Normalising here fixes it for every lookup that follows.
+  const rawPlanCode = String(params?.plan || "").toLowerCase();
+  const planCode = rawPlanCode === "professional" ? "pro" : rawPlanCode;
   const current = PLAN_CONFIG[planCode as keyof typeof PLAN_CONFIG] || PLAN_CONFIG.starter;
 
   const DEFAULT_PKR_PRICING = {

@@ -101,7 +101,7 @@ const COMMITMENTS = [
 
 const STATS = [
   { value: "2025", label: "Year Founded", color: "var(--tx-818cf8, #818cf8)" },
-  { value: "6", label: "Industry Verticals", color: "var(--tx-34d399, #34d399)" },
+  { value: "9", label: "Industry Verticals", color: "var(--tx-34d399, #34d399)" },
   { value: "50+", label: "Core Modules", color: "var(--tx-fbbf24, #fbbf24)" },
   { value: "Weekly", label: "Release Cadence", color: "var(--tx-38bdf8, #38bdf8)" },
 ];
@@ -672,7 +672,7 @@ export default function AboutPage() {
                 FinovaOS is Finova Forge's flagship product — a complete cloud-based business management platform covering accounting, inventory, HR, invoicing, CRM, payroll, and more. Built specifically for operational businesses that need real depth, not surface-level tools.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["Cloud ERP", "60+ Features", "6 Industries", "Weekly Releases"].map(t => (
+                {["Cloud ERP", "60+ Features", "9 Industries", "Weekly Releases"].map(t => (
                   <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--txr-6366f1, 99,102,241),var(--ta-80, .8))",
                     background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>
@@ -727,7 +727,7 @@ export default function AboutPage() {
               Ready to run your business smarter?
             </h2>
             <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 32px" }}>
-              Start today — 50% off your first 3 months, 14-day money-back guarantee. No risk, no lock-in.
+              Start today — 50% off your first 3 months, 14-day refund on yearly plans. No lock-in.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
               <Link href="/onboarding/signup/starter" className="about-btn-primary">
@@ -737,7 +737,7 @@ export default function AboutPage() {
               <Link href="/contact" className="about-btn-ghost">Talk to Us →</Link>
             </div>
             <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
-              {["✓ 14-day money-back guarantee", "✓ 50% off first 3 months", "✓ Cancel anytime"].map(t => (
+              {["✓ 14-day refund on yearly plans", "✓ 50% off first 3 months", "✓ Cancel anytime"].map(t => (
                 <span key={t} style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>{t}</span>
               ))}
             </div>

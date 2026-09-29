@@ -100,7 +100,11 @@ export default function BlogPage() {
           </div>
 
           <h1 style={{ fontSize: "clamp(32px,5vw,54px)", fontWeight: 900, letterSpacing: "-.03em", lineHeight: 1.1, fontFamily: "Lora,serif", margin: "0 0 16px" }}>
-            Ideas that help your
+            {/* JSX drops the newline between "your" and the block-level span as
+                whitespace, not a space — any tool that reads the flat text
+                content (a11y tree, PDF export, copy-paste) saw "helpyourbusiness
+                grow" run together. The explicit {" "} keeps a real space there. */}
+            Ideas that help your{" "}
             <span style={{ display: "block", backgroundImage: "linear-gradient(90deg,var(--tx-818cf8, #818cf8) 0%,var(--tx-c4b5fd, #c4b5fd) 50%,var(--tx-38bdf8, #38bdf8) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               business grow
             </span>

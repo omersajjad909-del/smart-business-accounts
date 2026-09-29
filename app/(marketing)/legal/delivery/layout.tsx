@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Service Delivery Policy",
   description:
-    "FinovaOS Service Delivery Policy — how and when your subscription is delivered. Digital service, activated immediately after successful payment. No physical shipment.",
+    "How and when your FinovaOS subscription is delivered and activated — a digital service, no physical shipment.",
   openGraph: {
     title: "Service Delivery Policy | FinovaOS",
     description: "How and when your FinovaOS subscription is delivered and activated.",

@@ -180,11 +180,16 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
   // already carries its own 20% and the two do not stack — the checkout does
   // not stack them either (app/api/billing/checkout, lib/lemonsqueezy).
   const yearly   = billing === "yearly";
-  const first3USD= yearly ? priceUSD : Math.round(priceUSD * 0.50);
+  // Math.round(49 * 0.5) = 25, not 24.50 — the badge next to it says "50% OFF"
+  // but $25 is only a 48.98% discount off $49, i.e. the badge overstates what
+  // the rounded price actually delivers. Math.floor never rounds the discount
+  // below 50%, so "50% OFF" is always at least true (the customer gets 50% or
+  // a little more, never less).
+  const first3USD= yearly ? priceUSD : Math.floor(priceUSD * 0.50);
 
   const pkrPerMonth = rawPkr ? (billing === "yearly" ? Math.round(rawPkr.yearly / 12) : rawPkr.monthly) : 0;
   const pkrNormal   = rawPkr ? rawPkr.monthly : 0;
-  const pkrFirst3   = yearly ? pkrPerMonth : Math.round(pkrPerMonth * 0.50);
+  const pkrFirst3   = yearly ? pkrPerMonth : Math.floor(pkrPerMonth * 0.50);
   const rs = (n: number) => `Rs${Math.round(n).toLocaleString("en-PK")}`;
 
   /** Local list price when there is one, otherwise the converted USD figure. */

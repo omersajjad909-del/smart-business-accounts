@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "FinovaOS — cloud ERP & accounting software purpose-built for trading, wholesale, manufacturing, distribution, restaurant, retail, import/export, construction, and service businesses. Invoicing, inventory, HR, payroll, CRM, bank reconciliation — all in one platform.",
+    "FinovaOS — cloud ERP & accounting software for SMEs and enterprises. Invoicing, inventory, HR, payroll, CRM, and bank reconciliation in one platform.",
   keywords: [
     // Brand — one entry per spelling people actually type into a search box.
     "FinovaOS", "Finova OS", "finovaos", "Finova",

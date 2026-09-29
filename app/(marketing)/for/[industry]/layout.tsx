@@ -34,9 +34,12 @@ export async function generateMetadata({
   // the root template's " | FinovaOS" added on top) to stay under ~60 chars.
   const title = `${config.label} ERP & Accounting Software — Pakistan`;
   const socialTitle = `${title} — FinovaOS`;
-  const description =
-    `${config.description} FinovaOS gives ${config.label.toLowerCase()} businesses in Pakistan and the Gulf FBR-ready accounting, ` +
-    `invoicing, inventory and reporting in one cloud platform built for the way the industry actually works.`;
+  // config.description tops out at 82 chars (Investor / Profit Sharing) and
+  // this fixed suffix is 68, so every industry stays at or under 151 —
+  // comfortably inside Google's ~160 cutoff. The old suffix alone ran ~190
+  // chars before config.description was even added, which pushed all 63 of
+  // these pages over the limit regardless of how short the industry blurb was.
+  const description = `${config.description}. FinovaOS: FBR-ready accounting & inventory for Pakistan & the Gulf.`;
 
   return {
     title,

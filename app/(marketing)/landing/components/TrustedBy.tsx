@@ -55,7 +55,7 @@ export default function TrustedBy() {
           {/* Stats row */}
           <div className="trust-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, maxWidth: 720, margin: "0 auto 40px" }}>
             {[
-              { n: "6",          l: "Industries Live",       color: "var(--tx-818cf8, #818cf8)" },
+              { n: "9",          l: "Industries Live",       color: "var(--tx-818cf8, #818cf8)" },
               { n: "Multi-currency", l: "Invoicing",         color: "var(--tx-34d399, #34d399)" },
               { n: "GST · VAT · WHT", l: "Tax Support",      color: "var(--tx-fbbf24, #fbbf24)" },
               { n: "All-in-one", l: "Accounts · HR · Stock", color: "var(--tx-38bdf8, #38bdf8)" },
@@ -107,7 +107,7 @@ export default function TrustedBy() {
         <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 40, flexWrap: "wrap" }}>
           {[
             { title: "Try before you buy", sub: "Full live demo, no signup",   color: "var(--tx-f97316, #f97316)" },
-            { title: "Money-back",         sub: "14 days, no questions",       color: "var(--tx-3b82f6, #3b82f6)" },
+            { title: "Money-back",         sub: "14 days on yearly plans",     color: "var(--tx-3b82f6, #3b82f6)" },
             { title: "Your data, exportable", sub: "Excel & PDF, anytime",     color: "var(--tx-34d399, #34d399)" },
           ].map(r => (
             <div key={r.title} style={{ textAlign: "center" }}>

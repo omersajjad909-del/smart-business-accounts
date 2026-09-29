@@ -17,9 +17,12 @@ export async function generateMetadata({
 
   const title = `${article.title} — FinovaOS Help Center`;
   const intro = article.content.find(b => b.type === "intro")?.text ?? "";
-  const description = (intro || `A step-by-step FinovaOS Help Center guide: ${article.title.toLowerCase()}.`)
-    .replace(/\*\*/g, "")
-    .slice(0, 160);
+  const raw = (intro || `A step-by-step FinovaOS Help Center guide: ${article.title.toLowerCase()}.`)
+    .replace(/\*\*/g, "");
+  // A blind slice(0, 160) cut mid-word on longer intros (e.g. choose-plan's
+  // ended "...see the multi-compan"). Back up to the last full word instead.
+  const description =
+    raw.length <= 160 ? raw : raw.slice(0, 160).replace(/\s+\S*$/, "") + "…";
 
   return {
     title,
@@ -149,7 +152,7 @@ const ARTICLES: Record<string, {
     category: "Getting Started", categorySlug: "getting-started",
     time: "6 min", updatedAt: "March 5, 2025",
     content: [
-      { type:"intro", text:"How you connect a bank account depends on where it's held." },
+      { type:"intro", text:"How you connect a bank account depends on where it's held — automatic sync for US banks via Plaid, manual entry for others." },
       { type:"heading", text:"US bank accounts — automatic sync" },
       { type:"para", text:"US-based accounts can be linked directly via Plaid, so transactions import automatically without any manual entry." },
       { type:"heading", text:"Pakistani and other banks — manual entry" },
@@ -351,7 +354,7 @@ const ARTICLES: Record<string, {
     category: "Account & Billing", categorySlug: "account",
     time: "3 min", updatedAt: "March 1, 2025",
     content: [
-      { type:"intro", text:"You can change your FinovaOS plan at any time." },
+      { type:"intro", text:"You can change your FinovaOS plan at any time — upgrades and downgrades take effect immediately, and your data carries over." },
       { type:"step", step:1, text:"Go to **Billing** in your dashboard." },
       { type:"step", step:2, text:"Choose **Upgrade** or **Downgrade** on the plan you want." },
       { type:"step", step:3, text:"You'll be taken straight to checkout to complete the plan change." },
@@ -1178,7 +1181,7 @@ const ARTICLES: Record<string, {
     category: "Multi-Branch & Companies", categorySlug: "account",
     time: "1 min", updatedAt: "September 25, 2026",
     content: [
-      { type:"intro", text:"There's no in-app company switcher yet." },
+      { type:"intro", text:"There's no in-app company switcher yet — each company you have is reached by logging in with the account tied to it." },
       { type:"para", text:"If support has set up more than one company for you, each one is reached by logging in with the account tied to it. See the multi-company guide for how a second company gets set up in the first place." },
     ],
     related: [

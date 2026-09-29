@@ -10,7 +10,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const COMING_SOON_METADATA: Metadata = {
   title: "Affiliate Program — Coming Soon",
   description:
-    "The FinovaOS affiliate program is not open yet. We're finishing referral tracking and monthly payouts first, so every partner is paid accurately from their first referral.",
+    "FinovaOS's affiliate program isn't open yet — we're finishing referral tracking and payouts first, so every partner is paid accurately.",
   openGraph: {
     title: "FinovaOS Affiliate Program — Coming Soon",
     description: "Not open yet. We're building referral tracking and payouts properly first.",
@@ -31,7 +31,7 @@ const COMING_SOON_METADATA: Metadata = {
 const LIVE_METADATA: Metadata = {
   title: "Affiliate Program — Earn 20–35% Recurring Commission",
   description:
-    "Join FinovaOS's affiliate program and earn 20–35% recurring commission on every business you refer. Instant dashboard, monthly payouts, no earnings cap. Starter to Elite tiers available.",
+    "Earn 20–35% recurring commission for every business you refer to FinovaOS. Instant dashboard, monthly payouts, no earnings cap.",
   keywords: [
     "FinovaOS affiliate program",
     "accounting software affiliate",

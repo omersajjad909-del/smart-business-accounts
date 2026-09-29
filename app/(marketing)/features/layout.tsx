@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "All Features — Accounting, Inventory, HR, CRM & More",
   description:
-    "Explore FinovaOS's complete feature set: general ledger, sales & purchase invoices, inventory management, HR & payroll, CRM, bank reconciliation, audit logs, and 50+ tools built for SMEs and enterprises.",
+    "50+ tools: invoicing, inventory, payroll, CRM, bank reconciliation, and more.",
   keywords: [
     "accounting software features",
     "invoicing software",

@@ -1050,7 +1050,7 @@ export default function IndustryPageClient({
             </div>
             {/* Trust signals */}
             <div style={{ display:"flex", justifyContent:"center", gap:24, flexWrap:"wrap" }}>
-              {["✓ 10-min setup","✓ 14-day money-back","✓ Cancel anytime","✓ Dedicated support"].map(t => (
+              {["✓ 10-min setup","✓ 14-day refund on yearly plans","✓ Cancel anytime","✓ Dedicated support"].map(t => (
                 <span key={t} style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-30, .3))", fontWeight:600 }}>{t}</span>
               ))}
             </div>

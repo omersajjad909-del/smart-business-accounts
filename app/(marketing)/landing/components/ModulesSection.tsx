@@ -178,7 +178,7 @@ export default function ModulesSection() {
             background: "rgba(99,102,241,.1)", border: "1.5px solid rgba(99,102,241,.22)",
           }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366f1", display: "inline-block" }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>EVERYTHING INCLUDED</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>ONE PLATFORM, NOT TEN TOOLS</span>
           </div>
           <h2 style={{
             fontFamily: "'Lora',serif",
@@ -186,13 +186,13 @@ export default function ModulesSection() {
             fontWeight: 700, color: "var(--ink-solid, white)",
             letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 16,
           }}>
-            60+ features. One platform.{" "}
+            60+ features.{" "}
             <span style={{ background: "var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              Zero add-ons.
+              One platform.
             </span>
           </h2>
           <p style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.8, maxWidth: 520, margin: "0 auto" }}>
-            Unlike competitors that charge extra for each module, FinovaOS gives you everything — accounting, inventory, HR, CRM, banking, AI intelligence, and reports — all in one subscription.
+            Accounting, inventory, HR, CRM, banking, AI intelligence, and reports — all built into one subscription, with no separate tools to stitch together.
           </p>
         </div>
 
@@ -213,7 +213,7 @@ export default function ModulesSection() {
           opacity: hVis ? 1 : 0, transition: "opacity .6s ease .4s",
         }}>
           <p style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 20 }}>
-            Need something specific? All modules are available on every plan.
+            Need something specific? See which modules are in your plan.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/pricing" style={{

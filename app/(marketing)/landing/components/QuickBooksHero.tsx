@@ -49,7 +49,7 @@ export default function QuickBooksHero() {
             {/* The avatar stack and "4.9/5 from 2,000+ reviews" that used to sit
                 here were invented — pre-launch there are no reviews to average. */}
             <div className="flex items-center gap-8 text-sm text-slate-500 font-medium">
-              <span>14-day money-back guarantee</span>
+              <span>14-day refund on yearly plans</span>
               <span className="text-slate-300">|</span>
               <span>Cancel anytime</span>
             </div>
