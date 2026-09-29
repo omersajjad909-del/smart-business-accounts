@@ -171,6 +171,9 @@ const partSteps = (k: Part["key"], n: string, across: string, along: string, ran
   ];
 };
 
+/** A centimetre figure as the inches a formula is stored in. */
+const cm = (n: number) => n / 2.54;
+
 /** Extra strip length on the six sealer's guezzet — zero until a bag has ears. */
 const GUSSET_EAR_INPUT: FormulaInput = { key: "ear", label: "Ear", unit: "in", defaultValue: 0, askOnRun: true, group: "Guezzet roll" };
 const GUSSET_ALONG_OLD = "bagLength * 2 + bagWidth";
@@ -482,18 +485,20 @@ export const FORMULA_TEMPLATES: FormulaTemplate[] = [
     summary:
       "A box-shaped zipper bag in three parts — zip slip, back patti and piping — each costed on its own roll, plus the zip bought by the bundle.",
     description:
-      "Sizes in inches: width x length x guezzet, e.g. 22 x 22 x 7. Zip slip is (length - zip margin) wide and runs guezzet x 2 + width + allowance. Back patti is (width + allowance) wide and runs length + guezzet x 2 + allowance. Piping is a fixed-width strip, width x 3 + length x 2 + guezzet x 6 long, cut whole. The zip is as long as the zip slip, so a 200-gaz bundle gives 7200 / that many zips.",
+      "Width x length x guezzet, e.g. 22 x 22 x 7cm — switch to CM to type it that way. Zip slip is (length - zip margin) wide and runs guezzet x 2 + width + allowance. Back patti is (width + allowance) wide and runs length + guezzet x 2 + allowance. Piping is a fixed-width strip, width x 3 + length x 2 + guezzet x 6 long, cut whole. The zip is as long as the zip slip, so a 200-gaz bundle gives 7200 / that many zips.",
     inputs: [
-      { key: "bagWidth",     label: "Width",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
-      { key: "bagLength",    label: "Length",   unit: "in", defaultValue: 22,  askOnRun: true, group: "Bag details" },
-      { key: "guezzet",      label: "Guezzet",           unit: "in", defaultValue: 7,   askOnRun: true, group: "Bag details" },
-      // The ½ taken off the zip slip's width for the zip, and the ½ seam
-      // added to each panel — kept as boxes, not hidden inside the formula.
-      // Their own block, not Bag details: they are the factory's, so they stay
-      // in inches when a bag's size is typed in cm.
-      { key: "zipMargin",    label: "Zip margin",        unit: "in", defaultValue: 0.5, group: "Allowances" },
-      { key: "seam",         label: "Seam allowance",    unit: "in", defaultValue: 0.5, group: "Allowances" },
-      { key: "pipingWidth",  label: "Piping width",      unit: "in", defaultValue: 1.5, group: "Allowances" },
+      // Zipper bags are quoted in cm (22 x 22 x 7cm is the worked example), so
+      // every default below is that cm figure stored in inches — the CM switch
+      // shows them back as 22, 22, 7, 0.5, 0.5 and 1.5.
+      { key: "bagWidth",     label: "Width",             unit: "in", defaultValue: cm(22),  askOnRun: true, group: "Bag details" },
+      { key: "bagLength",    label: "Length",            unit: "in", defaultValue: cm(22),  askOnRun: true, group: "Bag details" },
+      { key: "guezzet",      label: "Guezzet",           unit: "in", defaultValue: cm(7),   askOnRun: true, group: "Bag details" },
+      // The ½cm taken off the zip slip's width for the zip, the ½cm seam added
+      // to each panel, and the piping strip's width — boxes, not numbers
+      // hidden inside the formula.
+      { key: "zipMargin",    label: "Zip margin",        unit: "in", defaultValue: cm(0.5), group: "Bag details" },
+      { key: "seam",         label: "Seam allowance",    unit: "in", defaultValue: cm(0.5), group: "Bag details" },
+      { key: "pipingWidth",  label: "Piping width",      unit: "in", defaultValue: cm(1.5), group: "Bag details" },
 
       ...partInputs({ key: "zipSlip",   name: "Zip slip",   section: "Zip slip roll",   rate: 12, gauge: 10, rollLength: 100 }),
       ...partInputs({ key: "backStrip", name: "Back patti", section: "Back patti roll", rate: 12, gauge: 10, rollLength: 100 }),
