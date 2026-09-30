@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useVisiblePoll } from "@/hooks/useVisiblePoll";
+import { LIVE_INDUSTRY_COUNT } from "@/lib/businessModules";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 type Msg = {
@@ -17,7 +18,7 @@ const KB: [RegExp, string][] = [
    "Hello! 👋 I'm FinovaOS AI Assistant.\n\nI can help with:\n• Pricing & plans\n• Invoice & billing\n• Inventory management\n• HR & Payroll\n• Banking & reports\n• CRM & AI features\n\nAsk me anything!"],
 
   [/what is finova|finova kya|about finova|kaun sa software|introduce yourself/i,
-   "FinovaOS is a complete cloud Business OS for SMEs — all in one platform:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\nNine industries live today — try any of them free on the demo page. 🚀"],
+   `FinovaOS is a complete cloud Business OS for SMEs — all in one platform:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\n${LIVE_INDUSTRY_COUNT} industries live today — try any of them free on the demo page. 🚀`],
 
   [/pric|plan|cost|kitna|starter|professional|enterprise|subscription|fee|charge/i,
    "FinovaOS ke 4 plans hain:\n\n1. **Starter** — 3 users | PKR 3,999/mo | Invoicing, ledger, basic reports\n2. **Professional** — 10 users | PKR 8,999/mo | + Inventory, HR & Payroll, Banking, CRM\n3. **Enterprise** — 25 users | PKR 19,999/mo | + API access, integrations, priority support\n4. **Custom** — Sirf woh modules jo chahiye, pay per module\n\n🔥 Launch offer: 50% off pehle 3 mahine!\nContact: hello@finovaos.app 💰"],

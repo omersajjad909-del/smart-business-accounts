@@ -25,7 +25,7 @@ const SECTIONS = [
     content: [
       { sub: "Starter Plan", body: "Email support only. Target first response: 72 business hours. Scope: product questions, billing, and account issues." },
       { sub: "Professional Plan", body: "Email + live chat support. Target first response: 24 business hours. Priority handling for critical issues affecting core accounting functions." },
-      { sub: "Enterprise Plan", body: "Email + live chat + dedicated account manager. Target first response: 4 business hours. Critical production issues: 2-hour target. After-hours escalation available." },
+      { sub: "Enterprise Plan", body: "Email + live chat + dedicated account manager. Target first response: 4 business hours. Critical (P1) issues: 1-hour response target, matching the Severity Levels table below. After-hours escalation available." },
       { sub: "Business Hours", body: "Support business hours are Monday–Friday 09:00–18:00 PKT (UTC+5). Enterprise critical support operates 24/7 for P1 issues." },
     ],
   },

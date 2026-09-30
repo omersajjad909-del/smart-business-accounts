@@ -417,9 +417,14 @@ export default function SignupByPlanPage() {
         if (isPkUser) {
           const sourcePlan = pkrPlan || fallbackPkrPlan;
           if (sourcePlan) {
+            // Math.floor on the 50% launch discount, not Math.round — a third
+            // independent copy of this calculation (Pricing.tsx and
+            // pricing/page.tsx are the other two) used to round up, so this
+            // checkout page could charge a cent or two more than what those
+            // pages displayed for the same "50% off" plan.
             const amount = billingCycle === "yearly"
               ? Math.round(Number(sourcePlan.yearly || 0))
-              : Math.round(Number(sourcePlan.monthly || 0) * 0.50);
+              : Math.floor(Number(sourcePlan.monthly || 0) * 0.50);
             setPrice(`₨${amount.toLocaleString("en-PK")}`);
             return;
           }
@@ -429,7 +434,7 @@ export default function SignupByPlanPage() {
         if (baseMonthly !== null) {
           const rate = (rates && rates[cur]) || FX_USD[cur] || 1;
           const sym = CURRENCY_SYMBOL[cur] || "";
-          const usd = billingCycle === "yearly" ? Math.round(baseMonthly * 12 * 0.8) : Math.round(baseMonthly * 0.50);
+          const usd = billingCycle === "yearly" ? Math.round(baseMonthly * 12 * 0.8) : Math.floor(baseMonthly * 0.50);
           const localized = Math.round((usd * rate + Number.EPSILON) * 100) / 100;
           setPrice(`${sym}${localized}`);
         }

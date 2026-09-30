@@ -45,8 +45,14 @@ const PLANS = [
       { text: "Up to 3 users",            yes: true  },
       { text: "Invoicing & billing",       yes: true  },
       { text: "Ledger & trial balance",    yes: true  },
-      { text: "Inventory management",      yes: true  },
+      // /pricing's own comparison table is the detailed source of truth:
+      // Starter gets a bare item catalog (no stock tracking, GRN, barcode,
+      // reorder alerts, valuation, etc.), and its own DEFAULT_HIGHLIGHTS adds
+      // "Inventory management" only at Professional. This card said Starter
+      // included it outright — the two pages disagreed on the same plan.
+      { text: "Basic item catalog",        yes: true  },
       { text: "Basic reports",             yes: true  },
+      { text: "Inventory management",      yes: false },
       { text: "Bank reconciliation",       yes: false },
       { text: "Multi-branch support",      yes: false },
       { text: "HR & Payroll",              yes: false },

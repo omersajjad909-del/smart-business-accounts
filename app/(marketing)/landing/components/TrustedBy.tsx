@@ -1,5 +1,7 @@
 "use client";
 
+import { LIVE_INDUSTRY_COUNT } from "@/lib/businessModules";
+
 /* This strip used to scroll twelve "customer" companies with names and cities
    — Al-Raza Traders, Gulf Star Trading, Royal Traders LLC and so on. None of
    them are customers, and a buyer who searches one finds nothing. The marquee
@@ -55,7 +57,7 @@ export default function TrustedBy() {
           {/* Stats row */}
           <div className="trust-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, maxWidth: 720, margin: "0 auto 40px" }}>
             {[
-              { n: "9",          l: "Industries Live",       color: "var(--tx-818cf8, #818cf8)" },
+              { n: String(LIVE_INDUSTRY_COUNT), l: "Industries Live", color: "var(--tx-818cf8, #818cf8)" },
               { n: "Multi-currency", l: "Invoicing",         color: "var(--tx-34d399, #34d399)" },
               { n: "GST · VAT · WHT", l: "Tax Support",      color: "var(--tx-fbbf24, #fbbf24)" },
               { n: "All-in-one", l: "Accounts · HR · Stock", color: "var(--tx-38bdf8, #38bdf8)" },

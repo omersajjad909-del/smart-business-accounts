@@ -1879,6 +1879,16 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
 export const PHASE_1_TYPES = Object.entries(BUSINESS_PHASE_CONFIG).filter(([,v]) => v.phase === 1).map(([k]) => k);
 export const LIVE_TYPES     = Object.entries(BUSINESS_PHASE_CONFIG).filter(([,v]) => v.status === "live").map(([k]) => k);
 
+// The single number marketing copy should ever show for "how many industries
+// are live". Hero.tsx, TrustedBy.tsx, CTASection.tsx and about/page.tsx each
+// used to hardcode their own figure (6, 6, 6, 6) that drifted from the real
+// count (9) the moment an industry's status changed — none of them agreed
+// with each other or with LIVE_TYPES itself. This does NOT reflect admin
+// overrides stored in the database (see getPublicBusinessTypes/
+// business-module-status for that) — it's the static config's own count,
+// which is what marketing copy compiles against.
+export const LIVE_INDUSTRY_COUNT = LIVE_TYPES.length;
+
 // Get phase/status for any business type (defaults to Phase 2 coming_soon if not in map)
 export function getPhaseConfig(typeId: string) {
   return BUSINESS_PHASE_CONFIG[typeId] ?? { phase: 2 as const, status: "coming_soon" as PhaseStatus, category: "Other", label: typeId, emoji: "🔧", description: "" };

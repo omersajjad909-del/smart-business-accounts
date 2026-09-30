@@ -100,7 +100,7 @@ const PILLARS = [
     subtitle:"Your data is yours. We are just the custodian.",
     points:[
       { icon:"🚫", title:"Zero Data Selling", desc:"We never sell, share, or license your financial data to third parties. Your business data is never used for advertising or analytics sold externally." },
-      { icon:"📤", title:"Full Data Export", desc:"Export your complete data at any time in CSV, Excel, or PDF format. No lock-in. You can leave whenever you want — and take everything with you." },
+      { icon:"📤", title:"Full Data Export", desc:"Export your complete data at any time in CSV or PDF format. No lock-in. You can leave whenever you want — and take everything with you." },
       { icon:"🗑️", title:"Right to Deletion", desc:"Request full account deletion at any time. We will purge all your data within 30 days and provide written confirmation. No hidden retention." },
     ],
   },
@@ -299,9 +299,22 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
                 display:"flex", alignItems:"center", gap:8,
               }}>
                 <span style={{ fontSize:13 }}>🔒</span>
-                <span style={{ fontSize:12, color:p.color, fontWeight:600 }}>
-                  All {p.points.length} protections active on every account
-                </span>
+                {/* "All N active" next to a point titled "(In Progress)" is
+                    the exact "active vs in progress" contradiction flagged
+                    in review — the summary line ignored what the point
+                    titles themselves said. Count only the ones not marked
+                    in-progress/roadmap, and say so when it isn't all of them. */}
+                {(() => {
+                  const activeCount = p.points.filter(pt => !/\(in progress\)|\(roadmap\)/i.test(pt.title)).length;
+                  const allActive = activeCount === p.points.length;
+                  return (
+                    <span style={{ fontSize:12, color:p.color, fontWeight:600 }}>
+                      {allActive
+                        ? `All ${p.points.length} protections active on every account`
+                        : `${activeCount} of ${p.points.length} protections active now — the rest are in progress`}
+                    </span>
+                  );
+                })()}
               </div>
             </div>
           </div>

@@ -4,9 +4,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { signupHrefFor } from "@/lib/signupGate";
 import { useSignupsOpen } from "@/hooks/useSignupsOpen";
 import { FOCUSED_INDUSTRIES } from "./SolutionSection";
+import { LIVE_INDUSTRY_COUNT } from "@/lib/businessModules";
 
-/** Compact industry names, so the stat's caption always matches the list. */
-const INDUSTRY_SUMMARY = FOCUSED_INDUSTRIES.map((i) => i.short).join(", ");
+// FOCUSED_INDUSTRIES is a curated subset (6 entries with full detail cards) of
+// the real live count (LIVE_INDUSTRY_COUNT, 9) — the stat below used to show
+// FOCUSED_INDUSTRIES.length as if it were the total, which is exactly the
+// "6 vs 9" contradiction flagged across the homepage. The number now always
+// matches the real count; the caption names a sample rather than claiming to
+// be the full list.
+const INDUSTRY_SUMMARY = `${FOCUSED_INDUSTRIES.map((i) => i.short).join(", ")} & more`;
 
 /* ── Animated counter ── */
 function useCounter(target: number, duration = 1800, active = false) {
@@ -535,13 +541,17 @@ export default function Hero() {
               /* "60+ Business Types" contradicted the section further down the
                  same page that reads "06 Focused Businesses now", and there is
                  no signed uptime SLA to guarantee. Both replaced with figures
-                 the product backs: the live industries, 60+ shipped features.
+                 the product backs: the live industries, 55+ shipped features
+                 (features/page.tsx's CATEGORIES has 55 listed items — that
+                 page derives its count from the array length; this one is a
+                 plain literal kept in sync by hand since it can't import a
+                 route file's data without pulling the whole page in).
 
                  The count and the list are read off FOCUSED_INDUSTRIES rather
                  than typed here, because a hard-coded number drifted from it
                  the moment the list changed. */
-              { n:String(FOCUSED_INDUSTRIES.length), l:"Business Types", desc:INDUSTRY_SUMMARY, color:"var(--tx-818cf8, #818cf8)" },
-              { n:"60+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"var(--tx-34d399, #34d399)" },
+              { n:String(LIVE_INDUSTRY_COUNT), l:"Business Types", desc:INDUSTRY_SUMMARY, color:"var(--tx-818cf8, #818cf8)" },
+              { n:"55+",         l:"Features",       desc:"accounts, stock, HR, CRM & more",                             color:"var(--tx-34d399, #34d399)" },
               { n:"Live",        l:"Status",       desc:"open for signups now",           color:"var(--tx-fbbf24, #fbbf24)" },
               { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"var(--tx-60a5fa, #60a5fa)" },
             ].map((s, i) => (

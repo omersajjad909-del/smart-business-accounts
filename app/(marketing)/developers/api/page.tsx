@@ -20,7 +20,7 @@ const ENDPOINTS = [
     "code": "ACME",
     "country": "United Arab Emirates",
     "baseCurrency": "AED",
-    "plan": "PROFESSIONAL",
+    "plan": "ENTERPRISE",
     "subscriptionStatus": "ACTIVE",
     "createdAt": "2026-01-10T09:00:00.000Z"
   },
@@ -354,12 +354,16 @@ export default function ApiDocsPage() {
 
         {/* Plan access — was undocumented before, which meant a Starter
             customer's first API call would just fail with no explanation
-            anywhere on this page. */}
+            anywhere on this page. It also used to say Professional got
+            read-only access; lib/subscriptionGuard.ts and the admin
+            plan-config seed both gate `apiAccess` as Enterprise-only
+            (`apiAccess: false` for pro, `true` for enterprise) — and
+            /pricing's comparison table agrees. Professional has none. */}
         <div style={{ borderRadius: 14, padding: "16px 20px", marginBottom: 36, background: "rgba(129,140,248,.05)", border: "1px solid rgba(129,140,248,.18)" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em", marginBottom: 10 }}>API ACCESS BY PLAN</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 10, fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
             <div><b style={{ color: "var(--ink-solid, white)" }}>Starter</b> — no API access</div>
-            <div><b style={{ color: "var(--ink-solid, white)" }}>Professional</b> — read-only (GET)</div>
+            <div><b style={{ color: "var(--ink-solid, white)" }}>Professional</b> — no API access</div>
             <div><b style={{ color: "var(--ink-solid, white)" }}>Enterprise</b> — full access (GET/POST/PUT/DELETE)</div>
           </div>
         </div>

@@ -69,13 +69,12 @@ const CATEGORY_COLORS: Record<string, string> = {
 const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 
 // "60+ Business Types" was the old catalogue count while this page showed one
-// live demo — a number the page itself contradicted.
-const TRUST_STATS = [
-  { value: "8",            label: "Live Demos",       icon: "🏢" },
-  { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
-  { value: "No signup",    label: "To Start",         icon: "⚡" },
-  { value: DEMO_SESSION_DURATION_TEXT, label: "Full Access",      icon: "⏱️" },
-];
+// live demo — a number the page itself contradicted. "8" had the same problem
+// one level later: hardcoded against a catalogue that changes through
+// business-module-status, so it could (and did) drift from the real live
+// count. "Live Demos" is now computed from that same status map, and "Early
+// Access / Limited Spots" — a leftover pre-launch framing — is replaced with
+// wording that matches the homepage's "open for signups" status.
 
 export default function DemoPage() {
   const [selectedBiz, setSelectedBiz] = useState<DemoBusinessId | null>(null);
@@ -161,6 +160,18 @@ export default function DemoPage() {
   }, []);
 
   const isDemoLive = (liveBusinessType: string) => liveStatusMap[liveBusinessType] === "live";
+
+  const liveDemoCount = useMemo(
+    () => BUSINESSES.filter((b) => isDemoLive(b.liveBusinessType)).length,
+    [liveStatusMap]
+  );
+
+  const TRUST_STATS = [
+    { value: String(liveDemoCount), label: "Live Demos",    icon: "🏢" },
+    { value: "Open",       label: "For Signups",  icon: "🚀" },
+    { value: "No signup",  label: "To Start",     icon: "⚡" },
+    { value: DEMO_SESSION_DURATION_TEXT, label: "Full Access", icon: "⏱️" },
+  ];
 
   const filteredBusinesses = useMemo(
     () => (activeCategory ? BUSINESSES.filter((b) => b.category === activeCategory) : BUSINESSES),

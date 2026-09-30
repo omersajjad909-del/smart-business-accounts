@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { LIVE_INDUSTRY_COUNT } from "@/lib/businessModules";
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -101,8 +102,8 @@ const COMMITMENTS = [
 
 const STATS = [
   { value: "2025", label: "Year Founded", color: "var(--tx-818cf8, #818cf8)" },
-  { value: "9", label: "Industry Verticals", color: "var(--tx-34d399, #34d399)" },
-  { value: "50+", label: "Core Modules", color: "var(--tx-fbbf24, #fbbf24)" },
+  { value: String(LIVE_INDUSTRY_COUNT), label: "Industry Verticals", color: "var(--tx-34d399, #34d399)" },
+  { value: "55+", label: "Features", color: "var(--tx-fbbf24, #fbbf24)" },
   { value: "Weekly", label: "Release Cadence", color: "var(--tx-38bdf8, #38bdf8)" },
 ];
 
@@ -672,7 +673,7 @@ export default function AboutPage() {
                 FinovaOS is Finova Forge's flagship product — a complete cloud-based business management platform covering accounting, inventory, HR, invoicing, CRM, payroll, and more. Built specifically for operational businesses that need real depth, not surface-level tools.
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["Cloud ERP", "60+ Features", "9 Industries", "Weekly Releases"].map(t => (
+                {["Cloud ERP", "55+ Features", `${LIVE_INDUSTRY_COUNT} Industries`, "Weekly Releases"].map(t => (
                   <span key={t} style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--txr-6366f1, 99,102,241),var(--ta-80, .8))",
                     background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)",
                     borderRadius: 100, padding: "3px 10px" }}>{t}</span>

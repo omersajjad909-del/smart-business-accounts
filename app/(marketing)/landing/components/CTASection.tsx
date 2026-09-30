@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { LIVE_INDUSTRY_COUNT } from "@/lib/businessModules";
 
 function useInView(threshold = 0.12) {
   const ref = useRef<HTMLElement>(null);
@@ -72,8 +73,8 @@ function CountUp({ to, prefix = "", suffix = "", duration = 1800, start }: { to:
    and had drifted out of sync with the actual config. */
 const STATS = [
   { to: 9,  suffix: "",     label: "Modules",         color: "var(--tx-818cf8, #818cf8)" },
-  { to: 60, suffix: "+",    label: "Features",        color: "var(--tx-34d399, #34d399)" },
-  { to: 9,  suffix: "",     label: "Industries Live", color: "var(--tx-fbbf24, #fbbf24)" },
+  { to: 55, suffix: "+",    label: "Features",        color: "var(--tx-34d399, #34d399)" },
+  { to: LIVE_INDUSTRY_COUNT, suffix: "", label: "Industries Live", color: "var(--tx-fbbf24, #fbbf24)" },
   { to: 2,  prefix: "< ", suffix: " min", label: "Setup Time", color: "var(--tx-f87171, #f87171)" },
 ];
 
@@ -285,7 +286,7 @@ export default function CTASection() {
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", letterSpacing: ".08em" }}>
-            ✅ 60+ FEATURES ACROSS OUR PLANS
+            ✅ 55+ FEATURES ACROSS OUR PLANS
           </div>
         </div>
 

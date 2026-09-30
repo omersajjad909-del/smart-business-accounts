@@ -186,7 +186,7 @@ export default function ModulesSection() {
             fontWeight: 700, color: "var(--ink-solid, white)",
             letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 16,
           }}>
-            60+ features.{" "}
+            55+ features.{" "}
             <span style={{ background: "var(--mk-grad-brand, linear-gradient(135deg,#818cf8,#6366f1,#a78bfa))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               One platform.
             </span>

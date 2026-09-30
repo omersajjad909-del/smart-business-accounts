@@ -256,7 +256,7 @@ const FAQS = [
   { q: "Will prices automatically match my country?", a: "Yes. We detect your region and show localized display pricing. You can still change the currency manually at any time." },
   { q: "Is the charged currency the same as displayed?", a: "Displayed pricing is localized for convenience. Final billing currency is confirmed during checkout." },
   { q: "Can I build my own package?", a: "Yes. The Custom plan lets you pick only the modules you need and see an instant estimate." },
-  { q: "Can I buy just one module — payroll only, for example?", a: "Yes. Payroll & HR, CRM, Inventory, Accounting, Trading Desk and Bank & Payments each run on their own, so you can subscribe to a single one and pay only for that. Modules marked Add-on (Advanced Reports, Multi-Branch, WhatsApp & SMS, API Access, Tax & Compliance) layer on top of one of those." },
+  { q: "Can I buy just one module — payroll only, for example?", a: "Yes, but only through the Custom plan, not Starter/Professional/Enterprise. On Custom, Payroll & HR, CRM, Inventory, Accounting, Trading Desk and Bank & Payments each run on their own, so you can subscribe to a single one and pay only for that. Modules marked Add-on (Advanced Reports, Multi-Branch, WhatsApp & SMS, API Access, Tax & Compliance) layer on top of one of those. Starter, Professional and Enterprise each bundle a fixed set of modules — see the comparison table above for exactly what's in each." },
   { q: "Can I add more modules later?", a: "Yes. Start with one module and add others whenever you need them — your data stays in the same account and billing adjusts from the next cycle." },
   { q: "Is Business Automation included in a plan?", a: "No, it is a separate add-on at a flat monthly price and can be attached to any plan, including a single-module package." },
   { q: "Can I switch plans later?", a: "Yes. You can upgrade, downgrade, or move to a custom package at any time." },
@@ -661,7 +661,12 @@ export default function PricingPage() {
             // Launch offer — 50% off, monthly billing only (matches the
             // homepage pricing section and the onboarding/signup page; it
             // doesn't stack with the yearly 20% discount).
-            const introAmount = Math.round((useAdminPkr ? pkrAmount : regularPrice) * 0.5);
+            // Math.round(49 * 0.5) = 25, not 24.50 — this page showed $25/mo
+            // next to a "50% OFF" badge while the homepage's Pricing.tsx (a
+            // separate component, not shared with this page) showed $24 for
+            // the same plan after its own rounding fix. Math.floor here too,
+            // so both pages agree and the discount is never less than 50%.
+            const introAmount = Math.floor((useAdminPkr ? pkrAmount : regularPrice) * 0.5);
             const displayIntro = useAdminPkr ? `₨${introAmount.toLocaleString("en-PK")}` : formatPrice(introAmount);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(var(--ink),.03))" : "rgba(var(--ink),.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
