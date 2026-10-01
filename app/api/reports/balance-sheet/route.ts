@@ -99,10 +99,12 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      if (isEquity && closing < 0) {
-        const val = Math.abs(closing);
-        equityList.push({ name: acc.name, amount: val });
-        totalEquityAccounts += val;
+      // Credit balance adds to equity; a debit balance (Drawings, or an
+      // Opening Balance Equity plug on the debit side) reduces it. Dropping
+      // the debit side used to leave the sheet out of balance.
+      if (isEquity) {
+        equityList.push({ name: acc.name, amount: -closing });
+        totalEquityAccounts += -closing;
       }
     }
 

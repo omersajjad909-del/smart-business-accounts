@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveCompanyId } from "@/lib/tenant";
+import { syncOpeningBalanceEquity } from "@/lib/openingBalanceEquity";
 import { safeEncryptField, safeDecryptField } from "@/lib/fieldEncrypt";
 
 export async function GET(req: NextRequest) {
@@ -136,6 +137,8 @@ export async function POST(req: NextRequest) {
         },
       });
     }
+
+    await syncOpeningBalanceEquity(companyId);
 
     // Now create the BankAccount in BankAccount table
     const bankAccount = await prisma.bankAccount.create({

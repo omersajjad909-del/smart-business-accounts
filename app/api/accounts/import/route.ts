@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { safeEncryptField } from "@/lib/fieldEncrypt";
+import { syncOpeningBalanceEquity } from "@/lib/openingBalanceEquity";
 // The hand-rolled parser this file used to carry split on every comma, so
 // "M/s Ali Traders, Karachi" became two columns and shifted every value after
 // it one place left — the balance saved was not the balance in the file.
@@ -97,6 +98,8 @@ export async function POST(req: NextRequest) {
       });
       created += 1;
     }
+
+    if (created) await syncOpeningBalanceEquity(companyId);
 
     return NextResponse.json({ created, skipped });
   } catch (e: any) {

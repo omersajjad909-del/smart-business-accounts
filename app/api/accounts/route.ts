@@ -6,6 +6,7 @@ import { logAuditFromReq } from "@/lib/auditLogger";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { seedMinimalChart } from "@/lib/services/accountsSeed";
+import { syncOpeningBalanceEquity } from "@/lib/openingBalanceEquity";
 import { safeEncryptField, safeDecryptFields, ACCOUNT_PII_FIELDS } from "@/lib/fieldEncrypt";
 
 
@@ -250,6 +251,8 @@ export async function POST(req: NextRequest) {
       description: `Created account ${account.code} - ${account.name}`,
     });
 
+    if (account.openDebit || account.openCredit) await syncOpeningBalanceEquity(companyId);
+
     return NextResponse.json(account);
   } catch (e) {
     console.error("ACCOUNT CREATE ERROR:", e);
@@ -308,6 +311,9 @@ export async function PUT(req: NextRequest) {
     if (!updated.count) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
+    if (formattedData.openDebit !== undefined || formattedData.openCredit !== undefined) {
+      await syncOpeningBalanceEquity(companyId);
+    }
     const updatedAccount = await prisma.account.findUnique({ where: { id } });
 
     await logActivity(prisma, {
@@ -363,6 +369,8 @@ export async function DELETE(req: NextRequest) {
         deletedBy: userId || null,
       },
     });
+
+    if (accountBefore?.openDebit || accountBefore?.openCredit) await syncOpeningBalanceEquity(companyId);
 
     await logActivity(prisma, {
       companyId,

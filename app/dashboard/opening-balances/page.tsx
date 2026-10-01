@@ -7,7 +7,7 @@ const FONT = "'Outfit','Inter',sans-serif";
 
 interface Account { id: string; code: string; name: string; type: string; }
 interface BalanceRow { accountId: string; accountCode: string; accountName: string; debit: number | string; credit: number | string; }
-interface ImportResult { updated: number; skipped: number; errors?: string[]; }
+interface ImportResult { updated: number; skipped: number; errors?: string[]; difference?: number; }
 
 const BLANK_ROW = (): BalanceRow => ({ accountId: "", accountCode: "", accountName: "", debit: "", credit: "" });
 
@@ -69,7 +69,6 @@ export default function OpeningBalancesPage() {
 
   // ── Submit manual ────────────────────────────────────────────────────────
   const submitManual = async () => {
-    if (!isBalanced) { setError("Debits and credits must be equal before saving."); return; }
     const valid = rows.filter(r => r.accountId && (parseFloat(String(r.debit)) || parseFloat(String(r.credit))));
     if (!valid.length) { setError("Add at least one account with an amount."); return; }
 
@@ -162,6 +161,12 @@ export default function OpeningBalancesPage() {
         <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 12, padding: isMobile ? "12px 10px" : "14px 20px", marginBottom: 20 }}>
           <div style={{ fontWeight: 700, color: "var(--tx-4ade80, #4ade80)", marginBottom: 4 }}>✓ Opening balances saved successfully</div>
           <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Updated: {result.updated} accounts · Skipped: {result.skipped}</div>
+          {result.difference ? (
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6, lineHeight: 1.6 }}>
+              Unbalanced amount of <strong style={{ color: "var(--text-primary)" }}>{Math.abs(result.difference).toFixed(2)}</strong> is held in <strong style={{ color: "var(--text-primary)" }}>Opening Balance Equity</strong> ({result.difference > 0 ? "Cr" : "Dr"}).
+              Add your cash, bank, stock and capital figures whenever you know them — this amount adjusts on its own and reaches 0 once everything is entered.
+            </div>
+          ) : null}
           {result.errors?.length ? (
             <details style={{ marginTop: 8 }}>
               <summary style={{ fontSize: 12, cursor: "pointer", color: "var(--tx-fbbf24, #fbbf24)" }}>View {result.errors.length} warnings</summary>
@@ -266,11 +271,11 @@ export default function OpeningBalancesPage() {
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: isBalanced ? "#4ade80" : "#f87171" }} />
                       {isBalanced
                         ? <span style={{ fontSize: 12, color: "var(--tx-4ade80, #4ade80)", fontWeight: 600 }}>Balanced — debits equal credits</span>
-                        : <span style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 600 }}>Difference: {Math.abs(totalDebit - totalCredit).toFixed(2)} — must be 0 before saving</span>
+                        : <span style={{ fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 600 }}>Difference: {Math.abs(totalDebit - totalCredit).toFixed(2)} — will be posted to <strong>Opening Balance Equity</strong> ({totalDebit > totalCredit ? "Cr" : "Dr"}). You can move it to Cash, Stock or Capital later.</span>
                       }
                     </div>
-                    <button onClick={submitManual} disabled={saving || !isBalanced || rows.every(r => !r.accountId)}
-                      style={{ background: isBalanced ? "#6366f1" : "rgba(99,102,241,0.3)", color: "#fff", border: "none", borderRadius: 9, padding: "9px 24px", fontSize: 13, fontWeight: 700, cursor: isBalanced ? "pointer" : "not-allowed", fontFamily: FONT, opacity: saving ? 0.7 : 1 }}>
+                    <button onClick={submitManual} disabled={saving || rows.every(r => !r.accountId)}
+                      style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "9px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FONT, opacity: saving || rows.every(r => !r.accountId) ? 0.6 : 1, flexShrink: 0 }}>
                       {saving ? "Saving…" : "Save Opening Balances"}
                     </button>
                   </div>
@@ -301,8 +306,8 @@ export default function OpeningBalancesPage() {
 
       {/* Help tip */}
       <div style={{ marginTop: 20, padding: isMobile ? "12px 10px" : "14px 18px", background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 12, fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>
-        <strong style={{ color: "var(--text-primary)" }}>Tip:</strong> Opening balances must follow double-entry — every debit needs an equal credit.
-        Common entries: Cash/Bank (Dr), Accounts Receivable (Dr), Inventory (Dr) vs Accounts Payable (Cr), Loans (Cr), Capital/Equity (Cr).
+        <strong style={{ color: "var(--text-primary)" }}>Tip:</strong> Don&apos;t know every figure yet? Enter what you know and save — any difference is held in
+        <strong style={{ color: "var(--text-primary)" }}> Opening Balance Equity</strong> so your books stay balanced. Common entries: Cash/Bank (Dr), Accounts Receivable (Dr), Inventory (Dr) vs Accounts Payable (Cr), Loans (Cr), Capital/Equity (Cr).
       </div>
     </div>
   );

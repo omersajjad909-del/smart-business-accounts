@@ -6,6 +6,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 // and parseFloat reads "1,234.56" as 1. See lib/csvParse.ts.
 import { parseCsv } from "@/lib/csvParse";
 import { readOpeningBalanceRow } from "@/lib/importEngine";
+import { syncOpeningBalanceEquity } from "@/lib/openingBalanceEquity";
 
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role")?.toUpperCase();
@@ -76,7 +77,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ updated, skipped, errors });
+    // Whatever does not balance goes to Opening Balance Equity, so a user who
+    // only knows their supplier balances today can still save them.
+    const { difference } = await syncOpeningBalanceEquity(companyId, openDate);
+
+    return NextResponse.json({ updated, skipped, errors, difference });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "Import failed" }, { status: 500 });
   }
