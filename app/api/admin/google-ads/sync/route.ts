@@ -7,13 +7,12 @@
  * produces) so /admin/google-ads's "latest" numbers and history reflect the
  * account without anyone copying numbers off ads.google.com by hand.
  *
- * GOOGLE_ADS_DEVELOPER_TOKEN is optional: as of the account's current setup,
- * API access is granted per-project through Google Cloud Console's "Access
- * levels" page (console.cloud.google.com/google/ads-apis/overview) rather
- * than the classic Ads UI developer-token form, which now only issues tokens
- * for the separate App Conversion Tracking API. The header is sent only when
- * the env var is set; if Google Ads API still requires it, the API's own
- * error response will say so and that becomes the signal to set it.
+ * GOOGLE_ADS_DEVELOPER_TOKEN is optional and normally unset: Google sunset
+ * developer tokens on 9 Sept 2026 (developers.google.com/google-ads/api/docs/
+ * get-started/dev-token) — access is granted per Google Cloud project through
+ * Cloud Console's "Access levels" page instead (console.cloud.google.com/
+ * google/ads-apis/overview), which is where the Ads UI's old API Center form
+ * now redirects. The header is only sent if the env var happens to be set.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -23,8 +22,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Google Ads API versions sunset roughly every few quarters — bump this if
-// Google starts rejecting requests with an UNSUPPORTED_VERSION error.
-const ADS_API_VERSION = "v20";
+// Google starts rejecting requests with an UNSUPPORTED_VERSION error (or a
+// blanket 404, which means the version segment itself no longer exists).
+const ADS_API_VERSION = "v25";
 
 async function getAccessToken(refreshToken: string): Promise<string> {
   const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
