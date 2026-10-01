@@ -25,7 +25,7 @@ type Snapshot = {
   recordedAt: string;
 };
 
-type Data = { latest: Snapshot | null; snapshots: Snapshot[] };
+type Data = { latest: Snapshot | null; snapshots: Snapshot[]; connected: boolean };
 
 const F = "'Outfit','Inter',sans-serif";
 const CARD = "rgba(255,255,255,0.04)";
@@ -63,6 +63,7 @@ export default function AdminGoogleAdsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const [form, setForm] = useState({
     campaignName: "FinovaOS – Accounting & ERP",
@@ -90,6 +91,32 @@ export default function AdminGoogleAdsPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("oauth_connected")) {
+      toast.success("Google Ads connected");
+      window.history.replaceState({}, "", "/admin/google-ads");
+    } else if (params.get("oauth_error")) {
+      toast.error(`Connection failed: ${params.get("oauth_error")}`);
+      window.history.replaceState({}, "", "/admin/google-ads");
+    }
+  }, []);
+
+  async function syncNow() {
+    setSyncing(true);
+    try {
+      const r = await fetch("/api/admin/google-ads/sync", { method: "POST" });
+      const json = await r.json().catch(() => null);
+      if (!r.ok) throw new Error(json?.error || "Sync failed");
+      toast.success("Synced the latest numbers from Google Ads");
+      load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Sync failed");
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   async function submit() {
     const payload = {
@@ -136,20 +163,47 @@ export default function AdminGoogleAdsPage() {
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Google Ads</h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.45)", margin: "6px 0 0", maxWidth: 560 }}>
-            No live API connection yet — numbers are logged by hand from ads.google.com after each check.
-            Real-time auto-sync is a separate setup (Google developer token + OAuth).
+            {data?.connected
+              ? "Connected — click \"Sync now\" to pull the latest 30-day numbers straight from the Google Ads API."
+              : "No live API connection yet — connect your Google Ads account, or keep logging numbers by hand from ads.google.com."}
           </p>
         </div>
-        <button
-          onClick={() => setShowForm((s) => !s)}
-          style={{
-            padding: "9px 16px", borderRadius: 9, cursor: "pointer", fontFamily: F,
-            fontSize: 13, fontWeight: 700, background: "rgba(99,102,241,.18)",
-            border: "1px solid rgba(99,102,241,.45)", color: "#a5b4fc", whiteSpace: "nowrap",
-          }}
-        >
-          {showForm ? "Cancel" : "+ Log a snapshot"}
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {data?.connected ? (
+            <button
+              onClick={syncNow}
+              disabled={syncing}
+              style={{
+                padding: "9px 16px", borderRadius: 9, cursor: syncing ? "default" : "pointer", fontFamily: F,
+                fontSize: 13, fontWeight: 700, background: "#6366f1", border: "none", color: "white",
+                whiteSpace: "nowrap", opacity: syncing ? 0.6 : 1,
+              }}
+            >
+              {syncing ? "Syncing…" : "⟳ Sync now"}
+            </button>
+          ) : (
+            <a
+              href="/api/admin/google-ads/oauth/start"
+              style={{
+                padding: "9px 16px", borderRadius: 9, cursor: "pointer", fontFamily: F,
+                fontSize: 13, fontWeight: 700, background: "#6366f1", border: "none", color: "white",
+                whiteSpace: "nowrap", textDecoration: "none", display: "inline-block",
+              }}
+            >
+              Connect Google Ads
+            </a>
+          )}
+          <button
+            onClick={() => setShowForm((s) => !s)}
+            style={{
+              padding: "9px 16px", borderRadius: 9, cursor: "pointer", fontFamily: F,
+              fontSize: 13, fontWeight: 700, background: "rgba(99,102,241,.18)",
+              border: "1px solid rgba(99,102,241,.45)", color: "#a5b4fc", whiteSpace: "nowrap",
+            }}
+          >
+            {showForm ? "Cancel" : "+ Log a snapshot"}
+          </button>
+        </div>
       </div>
 
       {showForm && (

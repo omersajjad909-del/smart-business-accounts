@@ -18,14 +18,14 @@ export async function GET(req: NextRequest) {
   const admin = await requireAdmin(req);
   if (admin instanceof NextResponse) return admin;
 
-  const snapshots = await prisma.googleAdsSnapshot.findMany({
-    orderBy: { recordedAt: "desc" },
-    take: 100,
-  });
+  const [snapshots, authRow] = await Promise.all([
+    prisma.googleAdsSnapshot.findMany({ orderBy: { recordedAt: "desc" }, take: 100 }),
+    prisma.googleAdsAuth.findFirst({ orderBy: { createdAt: "desc" } }),
+  ]);
 
   const latest = snapshots[0] ?? null;
 
-  return NextResponse.json({ latest, snapshots });
+  return NextResponse.json({ latest, snapshots, connected: Boolean(authRow) });
 }
 
 export async function POST(req: NextRequest) {
