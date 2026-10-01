@@ -8,7 +8,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/adminAuth";
+import { verifyJwt } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,12 +18,10 @@ export const dynamic = "force-dynamic";
 const ADMIN_BASE = process.env.NEXT_PUBLIC_ADMIN_BASE_URL || "https://pvc.finovaos.app";
 
 export async function GET(req: NextRequest) {
-  const admin = await requireAdmin(req);
-  if (admin instanceof NextResponse) return admin;
-
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const errorParam = url.searchParams.get("error");
+  const state = url.searchParams.get("state");
 
   if (errorParam) {
     return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_error=${encodeURIComponent(errorParam)}`);
@@ -31,6 +29,15 @@ export async function GET(req: NextRequest) {
   if (!code) {
     return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_error=missing_code`);
   }
+
+  // See oauth/start/route.ts: the sb_admin cookie never reaches this route
+  // because it's always arrived at via a cross-site redirect from Google, so
+  // the admin is verified through the signed "state" param instead.
+  const statePayload = state ? verifyJwt(state, { maxAgeMs: 10 * 60 * 1000 }) : null;
+  if (!statePayload || statePayload.purpose !== "google_ads_oauth" || !statePayload.email) {
+    return NextResponse.redirect(`${ADMIN_BASE}/admin/google-ads?oauth_error=invalid_or_expired_state`);
+  }
+  const adminEmail = statePayload.email as string;
 
   const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET;
@@ -66,7 +73,7 @@ export async function GET(req: NextRequest) {
   await prisma.googleAdsAuth.create({
     data: {
       refreshToken: tokenJson.refresh_token,
-      connectedBy: admin.email,
+      connectedBy: adminEmail,
     },
   });
 

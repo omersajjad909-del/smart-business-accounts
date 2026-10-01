@@ -8,6 +8,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
+import { signJwt } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,6 +34,15 @@ export async function GET(req: NextRequest) {
 
   const redirectUri = `${ADMIN_BASE}/api/admin/google-ads/oauth/callback`;
 
+  // The callback is always reached via a cross-site redirect FROM
+  // accounts.google.com, so the SameSite:"strict" sb_admin cookie (by design,
+  // see lib/auth.ts) never arrives there — requireAdmin on the callback would
+  // always see "logged out" even for a real admin. The OAuth "state" param is
+  // the standard way around that: a short-lived, server-signed token that
+  // proves this request was initiated by an authenticated admin, verified
+  // without needing any cookie on the way back.
+  const state = signJwt({ email: admin.email, purpose: "google_ads_oauth" }, { ttlMs: 10 * 60 * 1000 });
+
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -40,6 +50,7 @@ export async function GET(req: NextRequest) {
     scope: "https://www.googleapis.com/auth/adwords",
     access_type: "offline", // required to get a refresh_token back
     prompt: "consent", // required to get a refresh_token on every authorization, not just the first
+    state,
   });
 
   return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
