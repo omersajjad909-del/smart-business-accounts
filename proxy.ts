@@ -288,7 +288,14 @@ export async function proxy(req: NextRequest) {
     // The two-step sign-in endpoints must stay open — they are what mints the
     // session in the first place. Everything else needs a completed one.
     const isAdminAuthEndpoint = pathname.startsWith("/api/admin/auth/");
-    if (!isAdminAuthEndpoint && !adminAuthed) {
+    // Google always lands here via a cross-site redirect from
+    // accounts.google.com, so the SameSite:"strict" sb_admin cookie never
+    // arrives with this specific request — adminAuthed is always false for it
+    // even for a real admin. The route itself (oauth/callback) verifies the
+    // caller independently via a short-lived signed "state" param instead, so
+    // this edge gate would do nothing but permanently 401 a legitimate flow.
+    const isGoogleAdsOauthCallback = pathname === "/api/admin/google-ads/oauth/callback";
+    if (!isAdminAuthEndpoint && !isGoogleAdsOauthCallback && !adminAuthed) {
       return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
     }
   }
@@ -451,6 +458,11 @@ export async function proxy(req: NextRequest) {
     // cookie, so both authenticate with a per-device ingest key that the route
     // verifies itself (x-device-key here, the serial number on /iclock).
     "/api/attendance/ingest",
+    // Google Ads OAuth callback — always arrives via a cross-site redirect
+    // from accounts.google.com, so no sb_admin/x-company-id is present. The
+    // route verifies the caller itself through a short-lived signed "state"
+    // param minted by /api/admin/google-ads/oauth/start.
+    "/api/admin/google-ads/oauth/callback",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
