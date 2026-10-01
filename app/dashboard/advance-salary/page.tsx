@@ -45,6 +45,13 @@ function getHeaders(): Record<string, string> {
   };
 }
 
+// Local calendar date, not UTC — toISOString() reads yesterday before 5 AM in Pakistan.
+function todayLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+const blankForm = () => ({ employeeId: "", amount: "", reason: "", deductMonths: "1", date: todayLocal() });
+
 export default function AdvanceSalaryPage() {
   const { isMobile } = useResponsive();
   const [advances, setAdvances] = useState<Advance[]>([]);
@@ -52,7 +59,7 @@ export default function AdvanceSalaryPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ employeeId: "", amount: "", reason: "", deductMonths: "1" });
+  const [form, setForm] = useState(blankForm);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -78,6 +85,7 @@ export default function AdvanceSalaryPage() {
 
   async function handleSave() {
     if (!form.employeeId || !form.amount) { setMsg("Please select an employee and enter amount"); return; }
+    if (!form.date) { setMsg("Please select the advance date"); return; }
     setSaving(true);
     try {
       const payload = {
@@ -86,6 +94,7 @@ export default function AdvanceSalaryPage() {
         amount: parseFloat(form.amount),
         reason: form.reason,
         deductMonths: parseInt(form.deductMonths),
+        date: form.date,
       };
       const method = editingId ? "PATCH" : "POST";
       const r = await fetch("/api/hr/advance-salary", {
@@ -105,7 +114,7 @@ export default function AdvanceSalaryPage() {
           deductMonths: parseInt(form.deductMonths),
           deductedSoFar: 0,
           status: "PENDING" as const,
-          date: new Date().toISOString().slice(0, 10),
+          date: form.date,
         };
         if (editingId) {
           setAdvances(prev => prev.map(a => a.id === editingId ? advance : a));
@@ -116,7 +125,7 @@ export default function AdvanceSalaryPage() {
         }
         setShowForm(false);
         setEditingId(null);
-        setForm({ employeeId: "", amount: "", reason: "", deductMonths: "1" });
+        setForm(blankForm());
       } else {
         setMsg(d?.error || "Failed to save");
       }
@@ -142,7 +151,7 @@ export default function AdvanceSalaryPage() {
         if (editingId === id) {
           setEditingId(null);
           setShowForm(false);
-          setForm({ employeeId: "", amount: "", reason: "", deductMonths: "1" });
+          setForm(blankForm());
         }
         setMsg("Advance deleted");
       } else {
@@ -162,6 +171,7 @@ export default function AdvanceSalaryPage() {
       amount: a.amount.toString(),
       reason: a.reason,
       deductMonths: a.deductMonths.toString(),
+      date: a.date?.slice(0, 10) || todayLocal(),
     });
     setMsg("");
     setShowForm(true);
@@ -195,7 +205,7 @@ export default function AdvanceSalaryPage() {
           <h1 style={s.title}>Advance Salary</h1>
           <p style={s.sub}>Manage employee salary advances and auto-deduction schedules</p>
         </div>
-        <button style={s.btn} onClick={() => { setMsg(""); setEditingId(null); setShowForm(true); }}>+ New Advance</button>
+        <button style={s.btn} onClick={() => { setMsg(""); setEditingId(null); setForm(blankForm()); setShowForm(true); }}>+ New Advance</button>
       </div>
 
       {/* KPI Cards */}
@@ -297,6 +307,11 @@ export default function AdvanceSalaryPage() {
                 {employees.length === 0 && (
                   <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>No employees found. Add employees first.</div>
                 )}
+              </div>
+              <div>
+                <label style={s.label}>Advance Date</label>
+                {/* Often written up a few days after the cash was handed over. */}
+                <input style={s.input} type="date" max={todayLocal()} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
               </div>
               <div>
                 <label style={s.label}>Advance Amount (Rs.)</label>

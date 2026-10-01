@@ -26,6 +26,16 @@ function parsePayload(remarks?: string | null): AdvancePayload {
   }
 }
 
+// "YYYY-MM-DD" from the form. Stored at noon UTC so the calendar day reads the
+// same in every timezone the record is displayed in. Absent → today.
+function parseAdvanceDate(raw: unknown): Date | null {
+  if (raw === undefined || raw === null || raw === "") return new Date();
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(raw));
+  if (!m) return null;
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], 12));
+  return d.getUTCDate() === +m[3] ? d : null;
+}
+
 function mapAdvance(advance: {
   id: string;
   employeeId: string;
@@ -102,6 +112,10 @@ export async function PATCH(req: NextRequest) {
     const amount = Number(body.amount || 0);
     const reason = String(body.reason || "").trim();
     const deductMonths = Math.max(1, Number(body.deductMonths || 1));
+    const date = body.date !== undefined ? parseAdvanceDate(body.date) : undefined;
+    if (date === null) {
+      return NextResponse.json({ error: "Invalid advance date" }, { status: 400 });
+    }
 
     if (!id || !employeeId || amount <= 0) {
       return NextResponse.json({ error: "Advance id, employee and valid amount are required" }, { status: 400 });
@@ -128,6 +142,7 @@ export async function PATCH(req: NextRequest) {
         employeeId,
         amount,
         remarks: JSON.stringify({ reason, deductMonths }),
+        ...(date ? { date } : {}),
         updatedAt: new Date(),
       },
       include: { employee: { select: { firstName: true, lastName: true } } },
@@ -189,6 +204,10 @@ export async function POST(req: NextRequest) {
     const amount = Number(body.amount || 0);
     const reason = String(body.reason || "").trim();
     const deductMonths = Math.max(1, Number(body.deductMonths || 1));
+    const date = parseAdvanceDate(body.date);
+    if (!date) {
+      return NextResponse.json({ error: "Invalid advance date" }, { status: 400 });
+    }
 
     if (!employeeId || amount <= 0) {
       return NextResponse.json({ error: "Employee and valid amount are required" }, { status: 400 });
@@ -208,7 +227,7 @@ export async function POST(req: NextRequest) {
         companyId,
         employeeId,
         amount,
-        date: new Date(),
+        date,
         status: "PENDING",
         remarks: JSON.stringify({ reason, deductMonths }),
       },
