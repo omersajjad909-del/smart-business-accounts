@@ -61,9 +61,11 @@ async function listAccessibleCustomers(accessToken: string, developerToken?: str
     `https://googleads.googleapis.com/${ADS_API_VERSION}/customers:listAccessibleCustomers`,
     { headers: adsHeaders(accessToken, developerToken) },
   );
-  const json = await res.json().catch(() => null);
+  const text = await res.text();
+  const json = (() => { try { return JSON.parse(text); } catch { return null; } })();
   if (!res.ok) {
-    throw new Error(json?.error?.message || "Could not list accessible Google Ads accounts");
+    console.error("[google-ads/sync] listAccessibleCustomers failed", res.status, text.slice(0, 2000));
+    throw new Error(json?.error?.message || `Could not list accessible Google Ads accounts (HTTP ${res.status}): ${text.slice(0, 300) || "empty response"}`);
   }
   const resourceNames: string[] = json?.resourceNames || [];
   return resourceNames.map((rn) => rn.split("/")[1]).filter(Boolean);
@@ -92,9 +94,11 @@ async function fetchCampaignMetrics(
       body: JSON.stringify({ query }),
     },
   );
-  const json = await res.json().catch(() => null);
+  const text = await res.text();
+  const json = (() => { try { return JSON.parse(text); } catch { return null; } })();
   if (!res.ok) {
-    throw new Error(json?.error?.message || `Google Ads query failed for customer ${customerId}`);
+    console.error("[google-ads/sync] fetchCampaignMetrics failed", res.status, text.slice(0, 2000));
+    throw new Error(json?.error?.message || `Google Ads query failed for customer ${customerId} (HTTP ${res.status}): ${text.slice(0, 300) || "empty response"}`);
   }
   return (json?.results || []) as CampaignRow[];
 }
