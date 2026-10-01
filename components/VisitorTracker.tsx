@@ -19,8 +19,10 @@ export default function VisitorTracker() {
     if (!pathname || SKIP_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return;
 
     const sendVisit = () => {
+      // Opt-out model, matching AnalyticsLoader: track unless the visitor
+      // explicitly rejected analytics in the cookie banner.
       const consent = readCookieConsent();
-      if (!consent?.analytics) return;
+      if (consent && !consent.analytics) return;
 
       const payload = JSON.stringify({
         page: pathname,

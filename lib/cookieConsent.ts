@@ -14,8 +14,8 @@ export const COOKIE_CONSENT_VERSION = "2026-04";
 export const defaultCookieConsent = (): CookieConsent => ({
   necessary: true,
   functional: true,
-  analytics: false,
-  marketing: false,
+  analytics: true,
+  marketing: true,
   consentVersion: COOKIE_CONSENT_VERSION,
   savedAt: "",
 });

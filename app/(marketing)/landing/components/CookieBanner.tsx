@@ -102,8 +102,8 @@ export default function CookieBanner() {
   const [prefs, setPrefs] = useState<Omit<CookieConsent, "savedAt" | "consentVersion">>({
     necessary: true,
     functional: true,
-    analytics: false,
-    marketing: false,
+    analytics: true,
+    marketing: true,
   });
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     necessary: true,
@@ -118,8 +118,8 @@ export default function CookieBanner() {
       setPrefs({
         necessary: true,
         functional: saved?.functional ?? true,
-        analytics: saved?.analytics ?? false,
-        marketing: saved?.marketing ?? false,
+        analytics: saved?.analytics ?? true,
+        marketing: saved?.marketing ?? true,
       });
       const timer = setTimeout(() => setShowBanner(true), 1200);
       return () => clearTimeout(timer);

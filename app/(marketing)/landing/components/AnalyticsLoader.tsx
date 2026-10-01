@@ -37,8 +37,12 @@ function loadClarity(id: string) {
 }
 
 function applyConsent(consent: CookieConsent | null) {
-  const analyticsGranted = consent?.analytics === true;
-  const marketingGranted = consent?.marketing === true;
+  // No saved preference yet (new visitor, banner not yet answered) defaults to
+  // granted (opt-out model) so visitors are tracked immediately instead of
+  // only after they interact with the cookie banner. An explicit reject
+  // (consent.analytics === false) still turns tracking off.
+  const analyticsGranted = consent ? consent.analytics === true : true;
+  const marketingGranted = consent ? consent.marketing === true : true;
 
   // Update GA4 Consent Mode
   if (typeof window.gtag === "function") {

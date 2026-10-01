@@ -130,7 +130,10 @@ function buildCsp(nonce: string): string {
     "img-src 'self' data: blob: https:",
     // www.facebook.com is where fbevents.js posts the event itself (/tr).
     // Without it the script loads and every event is silently dropped.
-    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.clarity.ms https://connect.facebook.net https://www.facebook.com",
+    // *.doubleclick.net + googleadservices.com are where the Google Ads
+    // conversion-linker pixel (loaded by the AW- gtag config) reports clicks —
+    // without them every ad click's conversion attribution is silently blocked.
+    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.doubleclick.net https://www.googleadservices.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.clarity.ms https://connect.facebook.net https://www.facebook.com",
     "worker-src 'self' blob: https://www.clarity.ms",
     "child-src 'self' blob:",
     "frame-src 'self'",
