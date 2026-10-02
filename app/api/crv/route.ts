@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { voucherNarration } from "@/lib/voucherNarration";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -140,7 +141,7 @@ export async function POST(req: Request) {
           voucherNo,
           type:      "CRV",
           date:      new Date(date),
-          narration: narration || "Cash Receipt",
+          narration: voucherNarration(narration, validEntries, "Cash Receipt"),
           companyId,
           branchId,
           entries:   { create: voucherEntries },

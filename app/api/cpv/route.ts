@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { voucherNarration } from "@/lib/voucherNarration";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -142,7 +143,7 @@ export async function POST(req: Request) {
           voucherNo,
           type:      "CPV",
           date:      new Date(date),
-          narration: narration || "Cash Payment",
+          narration: voucherNarration(narration, validEntries, "Cash Payment"),
           companyId,
           branchId,
           entries:   { create: voucherEntries },
@@ -264,7 +265,7 @@ export async function PUT(req: NextRequest) {
         where: { id },
         data: {
           date:      new Date(date),
-          narration: narration || "Cash Payment",
+          narration: voucherNarration(narration, validEntries, "Cash Payment"),
           entries: {
             create: [
               { accountId: paymentAccount.id, amount: -totalAmount, companyId },
