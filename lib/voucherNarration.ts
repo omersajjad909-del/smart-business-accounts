@@ -21,3 +21,24 @@ export function voucherNarration(
   const unique = [...new Set(lines)];
   return unique.length ? unique.join("; ") : fallback;
 }
+
+/*
+ * Cheque vouchers post exactly like bank vouchers — the money moves through the
+ * chosen bank account — and differ only in carrying a cheque number. There is
+ * no column for it, so it rides at the front of the narration ("Chq# 004512 —
+ * …"), where it also shows up in the ledger and on the printed voucher.
+ */
+const CHEQUE_PREFIX = /^Chq# (\S+)(?: — )?/;
+
+export function withChequeNo(narration: string, chequeNo: unknown): string {
+  const no = typeof chequeNo === "string" ? chequeNo.trim().replace(/\s+/g, "") : "";
+  if (!no) return narration;
+  return narration ? `Chq# ${no} — ${narration}` : `Chq# ${no}`;
+}
+
+/** Undo withChequeNo, so an edited voucher does not get the prefix twice. */
+export function splitChequeNo(narration: string | null | undefined): { chequeNo: string; narration: string } {
+  const text = narration || "";
+  const m = text.match(CHEQUE_PREFIX);
+  return m ? { chequeNo: m[1], narration: text.slice(m[0].length) } : { chequeNo: "", narration: text };
+}

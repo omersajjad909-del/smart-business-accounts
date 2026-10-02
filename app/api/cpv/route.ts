@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { voucherNarration } from "@/lib/voucherNarration";
+import { splitChequeNo, voucherNarration, withChequeNo } from "@/lib/voucherNarration";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
     const bankByAccount = new Map(banks.map((b: any) => [b.accountId, b.id]));
 
     const formatted = vouchers.map((v: any) => {
+      const chq = splitChequeNo(v.narration);
       // cash/bank = negative (credit)
       const cashEntry = v.entries.find((e: any) => e.amount < 0);
       // party entries = positive (debit) — could be multiple
@@ -49,7 +50,7 @@ export async function GET(req: NextRequest) {
           accountName: e.account?.name || "",
           accountCode: e.account?.code || "",
           amount:      Math.abs(e.amount),
-          narration:   v.narration,
+          narration:   chq.narration,
         }));
 
       const total = partyEntries.reduce((s: number, e: any) => s + e.amount, 0);
@@ -58,8 +59,9 @@ export async function GET(req: NextRequest) {
         id:             v.id,
         voucherNo:      v.voucherNo,
         date:           v.date.toISOString().split("T")[0],
-        narration:      v.narration,
-        paymentMode:    cashEntry?.account?.name?.toLowerCase().includes("cash") ? "CASH" : "BANK",
+        narration:      chq.narration,
+        chequeNo:      chq.chequeNo,
+        paymentMode:    chq.chequeNo ? "CHEQUE" : cashEntry?.account?.name?.toLowerCase().includes("cash") ? "CASH" : "BANK",
         paymentAccId:   cashEntry?.accountId || "",
         paymentAccName: cashEntry?.account?.name || "",
         bankAccountId:  (cashEntry && bankByAccount.get(cashEntry.accountId)) || "",
@@ -88,7 +90,9 @@ export async function POST(req: Request) {
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
-    const { date, paymentMode, bankAccountId, narration, entries } = body;
+    const { date, paymentMode, bankAccountId, narration, chequeNo, entries } = body;
+    // A cheque goes through the bank account just like a transfer.
+    const viaBank = paymentMode === "BANK" || paymentMode === "CHEQUE";
 
     if (!date || !Array.isArray(entries) || entries.length === 0) {
       return NextResponse.json({ error: "Date and at least one entry required" }, { status: 400 });
@@ -105,7 +109,7 @@ export async function POST(req: Request) {
     let paymentAccount: any;
     let bankAccountRecord: any = null;
 
-    if (paymentMode === "BANK" && bankAccountId) {
+    if (viaBank && bankAccountId) {
       bankAccountRecord = await prisma.bankAccount.findUnique({
         where: { id: bankAccountId, companyId },
         include: { account: true },
@@ -143,7 +147,9 @@ export async function POST(req: Request) {
           voucherNo,
           type:      "CPV",
           date:      new Date(date),
-          narration: voucherNarration(narration, validEntries, "Cash Payment"),
+          narration: paymentMode === "CHEQUE"
+            ? withChequeNo(voucherNarration(narration, validEntries, chequeNo ? "" : "Cheque Payment"), chequeNo)
+            : voucherNarration(narration, validEntries, "Cash Payment"),
           companyId,
           branchId,
           entries:   { create: voucherEntries },
@@ -151,7 +157,7 @@ export async function POST(req: Request) {
         include: { entries: { include: { account: true } } },
       });
 
-      if (paymentMode === "BANK" && bankAccountRecord) {
+      if (viaBank && bankAccountRecord) {
         await tx.bankAccount.update({
           where: { id: bankAccountRecord.id },
           data:  { balance: { decrement: totalAmount } },
@@ -218,7 +224,9 @@ export async function PUT(req: NextRequest) {
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
-    const { id, date, paymentMode, bankAccountId, narration, entries } = body;
+    const { id, date, paymentMode, bankAccountId, narration, chequeNo, entries } = body;
+    // A cheque goes through the bank account just like a transfer.
+    const viaBank = paymentMode === "BANK" || paymentMode === "CHEQUE";
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
     if (!date || !Array.isArray(entries) || entries.length === 0) {
@@ -240,7 +248,7 @@ export async function PUT(req: NextRequest) {
     let paymentAccount: any;
     let bankAccountRecord: any = null;
 
-    if (paymentMode === "BANK" && bankAccountId) {
+    if (viaBank && bankAccountId) {
       bankAccountRecord = await prisma.bankAccount.findUnique({
         where: { id: bankAccountId, companyId },
         include: { account: true },
@@ -265,7 +273,9 @@ export async function PUT(req: NextRequest) {
         where: { id },
         data: {
           date:      new Date(date),
-          narration: voucherNarration(narration, validEntries, "Cash Payment"),
+          narration: paymentMode === "CHEQUE"
+            ? withChequeNo(voucherNarration(narration, validEntries, chequeNo ? "" : "Cheque Payment"), chequeNo)
+            : voucherNarration(narration, validEntries, "Cash Payment"),
           entries: {
             create: [
               { accountId: paymentAccount.id, amount: -totalAmount, companyId },
@@ -279,7 +289,7 @@ export async function PUT(req: NextRequest) {
         },
       });
 
-      if (paymentMode === "BANK" && bankAccountRecord) {
+      if (viaBank && bankAccountRecord) {
         await tx.bankAccount.update({
           where: { id: bankAccountRecord.id },
           data:  { balance: { decrement: totalAmount } },

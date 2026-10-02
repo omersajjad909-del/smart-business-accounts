@@ -13,7 +13,7 @@ type BankAcc  = { id: string; name: string };
 type EntryRow = { id: number; accountId: string; accountCode: string; accountName: string; amount: string; narration: string };
 type Voucher  = {
   id: string; voucherNo: string; date: string; narration: string;
-  paymentMode: string; paymentAccId: string; paymentAccName: string; totalAmount: number;
+  paymentMode: string; chequeNo?: string; paymentAccId: string; paymentAccName: string; totalAmount: number;
   entries: { accountId: string; accountName: string; accountCode: string; amount: number; narration: string }[];
 };
 
@@ -173,8 +173,9 @@ export default function CRVPage() {
   const [saving,    setSaving]    = useState(false);
 
   const [date,      setDate]      = useState(today);
-  const [mode,      setMode]      = useState<"CASH"|"BANK">("CASH");
+  const [mode,      setMode]      = useState<"CASH"|"BANK"|"CHEQUE">("CASH");
   const [bankId,    setBankId]    = useState("");
+  const [chequeNo,  setChequeNo]  = useState("");
   const [narration, setNarration] = useState("");
   const [entries,   setEntries]   = useState<EntryRow[]>(initRows);
 
@@ -232,9 +233,10 @@ export default function CRVPage() {
   // ── Query Mode helpers ───────────────────────────────────────────────────────
   function applyVoucher(v: Voucher) {
     setDate(v.date);
-    setMode(v.paymentMode as "CASH" | "BANK");
+    setMode(v.paymentMode as "CASH" | "BANK" | "CHEQUE");
+    setChequeNo(v.chequeNo || "");
     setNarration(v.narration || "");
-    if (v.paymentMode === "BANK") {
+    if (v.paymentMode === "BANK" || v.paymentMode === "CHEQUE") {
       const matched = bankAccs.find(b => b.name === v.paymentAccName);
       setBankId(matched?.id || "");
     } else {
@@ -327,20 +329,23 @@ export default function CRVPage() {
     ? (queryResults[queryIdx]?.voucherNo || `CRV-${vouchers.length + 1}`)
     : `CRV-${vouchers.length + 1}`;
 
+  const modeLabel = mode === "CHEQUE" && chequeNo.trim() ? `CHEQUE #${chequeNo.trim()}` : mode;
+
   async function save() {
     const valid = entries.filter(e => e.accountId && Number(e.amount) > 0);
     if (!valid.length) { toast.error("At least one valid entry with an account and amount is required"); return; }
-    if (mode === "BANK" && !bankId) { toast.error("Please select a bank account"); return; }
+    if (mode !== "CASH" && !bankId) { toast.error("Please select a bank account"); return; }
+    if (mode === "CHEQUE" && !chequeNo.trim()) { toast.error("Please enter the cheque number"); return; }
     setSaving(true);
     try {
       const r = await fetch("/api/crv", {
         method: "POST", headers: h(),
-        body: JSON.stringify({ date, paymentMode: mode, bankAccountId: bankId || undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
+        body: JSON.stringify({ date, paymentMode: mode, bankAccountId: bankId || undefined, chequeNo: mode === "CHEQUE" ? chequeNo : undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
       toast.success(`CRV ${d.voucherNo} saved successfully!`);
-      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId("");
+      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId(""); setChequeNo("");
       fetch("/api/crv", { headers: h() }).then(r => r.json()).then(v => Array.isArray(v) && setVouchers(v));
     } catch (e: any) { toast.error(e.message); }
     finally { setSaving(false); }
@@ -368,7 +373,7 @@ export default function CRVPage() {
       toast.success(`${target.voucherNo} deleted`);
       // Back to a blank voucher rather than sitting on a record that is gone.
       exitQueryMode();
-      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId("");
+      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId(""); setChequeNo("");
       const fresh = await fetch("/api/crv", { headers: h() }).then(r => r.json());
       if (Array.isArray(fresh)) setVouchers(fresh);
     } catch (e: any) { toast.error(e.message); }
@@ -588,15 +593,19 @@ export default function CRVPage() {
             <select value={mode} onChange={e => setMode(e.target.value as any)} style={{ ...inp, cursor:"pointer" }}>
               <option value="CASH">Cash</option>
               <option value="BANK">Bank Transfer</option>
+              <option value="CHEQUE">Cheque</option>
             </select>
           </div>
-          {mode === "BANK" ? (
+          {mode !== "CASH" ? (
             <div>
-              <label style={lbl}>Bank Account</label>
+              <label style={lbl}>{mode === "CHEQUE" ? "Bank / Cheque No." : "Bank Account"}</label>
               <select value={bankId} onChange={e => setBankId(e.target.value)} style={{ ...inp, cursor:"pointer" }}>
                 <option value="">Select Bank…</option>
                 {bankAccs.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
+              {mode === "CHEQUE" && (
+                <input value={chequeNo} onChange={e => setChequeNo(e.target.value)} placeholder="Cheque No." style={{ ...inp, marginTop:8 }} />
+              )}
             </div>
           ) : <div />}
           <div>
@@ -685,7 +694,7 @@ export default function CRVPage() {
                       <button
                         type="button"
                         title="Print Receipt"
-                        onClick={() => row.accountId && printReceipt(row, previewVoucherNo, date, mode, company)}
+                        onClick={() => row.accountId && printReceipt(row, previewVoucherNo, date, modeLabel, company)}
                         disabled={!row.accountId || !Number(row.amount)}
                         style={{ padding:"4px 8px", borderRadius:6, background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:11, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}
                       >🧾</button>
@@ -714,7 +723,7 @@ export default function CRVPage() {
               <div style={{ fontSize:22, fontWeight:900, color:GREEN }}>{company?.baseCurrency || "PKR"} {fmt(total)}</div>
             </div>
             <button
-              onClick={() => printVoucher(entries, previewVoucherNo, date, mode, total, company, narration)}
+              onClick={() => printVoucher(entries, previewVoucherNo, date, modeLabel, total, company, narration)}
               disabled={total <= 0}
               style={{ padding:"10px 18px", borderRadius:9, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),var(--ta-65, .65))", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}
             >🖨 Print Voucher</button>

@@ -13,7 +13,7 @@ type BankAcc  = { id: string; name: string };
 type EntryRow = { id: number; accountId: string; accountCode: string; accountName: string; amount: string; narration: string };
 type Voucher  = {
   id: string; voucherNo: string; date: string; narration: string;
-  paymentMode: string; paymentAccId: string; paymentAccName: string; bankAccountId?: string; totalAmount: number;
+  paymentMode: string; chequeNo?: string; paymentAccId: string; paymentAccName: string; bankAccountId?: string; totalAmount: number;
   entries: { accountId: string; accountName: string; accountCode: string; amount: number; narration: string }[];
 };
 
@@ -134,8 +134,9 @@ export default function CPVPage() {
   const [saving,    setSaving]    = useState(false);
 
   const [date,      setDate]      = useState(today);
-  const [mode,      setMode]      = useState<"CASH"|"BANK">("CASH");
+  const [mode,      setMode]      = useState<"CASH"|"BANK"|"CHEQUE">("CASH");
   const [bankId,    setBankId]    = useState("");
+  const [chequeNo,  setChequeNo]  = useState("");
   const [narration, setNarration] = useState("");
   const [entries,   setEntries]   = useState<EntryRow[]>(initRows);
   // The voucher currently loaded from the database — set while a saved CPV is
@@ -191,9 +192,10 @@ export default function CPVPage() {
   function applyVoucher(v: Voucher) {
     setEditing(v);
     setDate(v.date);
-    setMode(v.paymentMode as "CASH" | "BANK");
+    setMode(v.paymentMode as "CASH" | "BANK" | "CHEQUE");
+    setChequeNo(v.chequeNo || "");
     setNarration(v.narration || "");
-    if (v.paymentMode === "BANK") {
+    if (v.paymentMode === "BANK" || v.paymentMode === "CHEQUE") {
       setBankId(v.bankAccountId || bankAccs.find(b => b.name === v.paymentAccName)?.id || "");
     } else { setBankId(""); }
     const loaded: EntryRow[] = v.entries.map(e => ({
@@ -215,7 +217,7 @@ export default function CPVPage() {
 
   function resetForm() {
     setEditing(null); setEntries(initRows()); setNarration("");
-    setMode("CASH"); setBankId(""); setDate(today);
+    setMode("CASH"); setBankId(""); setChequeNo(""); setDate(today);
     setQueryIdx(-1); setQueryResults([]);
   }
 
@@ -279,16 +281,19 @@ export default function CPVPage() {
   const total = entries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const previewVoucherNo = editing?.voucherNo || `CPV-${vouchers.length + 1}`;
 
+  const modeLabel = mode === "CHEQUE" && chequeNo.trim() ? `CHEQUE #${chequeNo.trim()}` : mode;
+
   async function save() {
     const valid = entries.filter(e => e.accountId && Number(e.amount) > 0);
     if (!valid.length) { toast.error("At least one valid entry with an account and amount is required"); return; }
-    if (mode === "BANK" && !bankId) { toast.error("Please select a bank account"); return; }
+    if (mode !== "CASH" && !bankId) { toast.error("Please select a bank account"); return; }
+    if (mode === "CHEQUE" && !chequeNo.trim()) { toast.error("Please enter the cheque number"); return; }
     setSaving(true);
     try {
       const open = editing;
       const r = await fetch("/api/cpv", {
         method: open ? "PUT" : "POST", headers: h(),
-        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
+        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, chequeNo: mode === "CHEQUE" ? chequeNo : undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Could not save the voucher");
@@ -487,14 +492,18 @@ export default function CPVPage() {
             <select value={mode} onChange={e => setMode(e.target.value as any)} style={{ ...inp, cursor:"pointer" }}>
               <option value="CASH">Cash</option>
               <option value="BANK">Bank Transfer</option>
+              <option value="CHEQUE">Cheque</option>
             </select>
           </div>
-          {mode === "BANK" ? (
-            <div><label style={lbl}>Bank Account</label>
+          {mode !== "CASH" ? (
+            <div><label style={lbl}>{mode === "CHEQUE" ? "Bank / Cheque No." : "Bank Account"}</label>
               <select value={bankId} onChange={e => setBankId(e.target.value)} style={{ ...inp, cursor:"pointer" }}>
                 <option value="">Select Bank…</option>
                 {bankAccs.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select></div>
+              </select>
+              {mode === "CHEQUE" && (
+                <input value={chequeNo} onChange={e => setChequeNo(e.target.value)} placeholder="Cheque No." style={{ ...inp, marginTop:8 }} />
+              )}</div>
           ) : <div />}
           <div><label style={lbl}>Voucher Narration</label><input value={narration} onChange={e => setNarration(e.target.value)} placeholder="Optional overall narration…" style={inp} /></div>
         </div>
@@ -542,7 +551,7 @@ export default function CPVPage() {
                   </td>
                   <td style={{ padding:"4px 8px", textAlign:"center" }}>
                     <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
-                      <button type="button" title="Print Receipt" onClick={() => row.accountId && printVoucher([row], previewVoucherNo, date, mode, Number(row.amount), company, row.narration)}
+                      <button type="button" title="Print Receipt" onClick={() => row.accountId && printVoucher([row], previewVoucherNo, date, modeLabel, Number(row.amount), company, row.narration)}
                         disabled={!row.accountId || !Number(row.amount)}
                         style={{ padding:"4px 8px", borderRadius:6, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:BLUE, fontSize:11, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}>🧾</button>
                       <button onClick={() => removeRow(row.id)}
@@ -565,7 +574,7 @@ export default function CPVPage() {
               <div style={{ fontSize:10, color:"rgba(var(--ink),var(--ta-35, .35))", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>
               <div style={{ fontSize:22, fontWeight:900, color:BLUE }}>{company?.baseCurrency || "PKR"} {fmt(total)}</div>
             </div>
-            <button onClick={() => printVoucher(entries, previewVoucherNo, date, mode, total, company, narration)} disabled={total <= 0}
+            <button onClick={() => printVoucher(entries, previewVoucherNo, date, modeLabel, total, company, narration)} disabled={total <= 0}
               style={{ padding:"10px 18px", borderRadius:9, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.12)", color:"rgba(var(--ink),var(--ta-65, .65))", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}>
               🖨 Print Voucher
             </button>
