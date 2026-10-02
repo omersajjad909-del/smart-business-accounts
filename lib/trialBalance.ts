@@ -52,7 +52,8 @@ function resolveCategory(acc: { partyType?: string | null; type?: string | null 
  * Soft-deleted accounts are deliberately included when they carry entries: an
  * account can be retired after it has been posted to, and dropping it would
  * take its side of those entries out of the totals and unbalance the report.
- * Deleted *vouchers* are excluded, because their entries are excluded too.
+ * Deleted *vouchers* are excluded, because their entries are excluded too. A
+ * deleted account's master opening balance is excluded as well (see below).
  *
  * `branchId` narrows to one branch; null (the default when no branch is chosen)
  * reports the whole company.
@@ -100,7 +101,11 @@ export async function computeTrialBalance(opts: {
 
   const rows: TrialBalanceRow[] = [];
   for (const acc of accounts) {
-    const openingFromMaster = Number(acc.openDebit || 0) - Number(acc.openCredit || 0);
+    // A deleted account's typed-in opening figure goes with it: Opening Balance
+    // Equity is recomputed from live accounts only, so keeping the figure here
+    // left both it and the stale plug of every deleted OBE account on the
+    // report, and the trial balance stopped balancing. Its vouchers still count.
+    const openingFromMaster = acc.deletedAt ? 0 : Number(acc.openDebit || 0) - Number(acc.openCredit || 0);
     const openingNet = openingFromMaster + (openingMap.get(acc.id) ?? 0);
     const transDebit = debitMap.get(acc.id) ?? 0;
     const transCredit = creditMap.get(acc.id) ?? 0;

@@ -49,7 +49,9 @@ export async function GET(req: NextRequest) {
     let totalEquityAccounts = 0;
 
     for (const acc of accounts) {
-      const opening  = Number(acc.openDebit || 0) - Number(acc.openCredit || 0);
+      // Deleted accounts keep their vouchers but not their opening figure — the
+      // same rule Opening Balance Equity and the trial balance follow.
+      const opening  = acc.deletedAt ? 0 : Number(acc.openDebit || 0) - Number(acc.openCredit || 0);
       const movement = movMap[acc.id] ?? 0;
       const closing  = opening + movement;
 
