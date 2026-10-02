@@ -51,6 +51,30 @@ export function trackEvent(event: ConversionEvent, params: EventParams = {}) {
 }
 
 /**
+ * Google Ads conversion action "Signup Complete" (goal: Sign-up).
+ *
+ * GA4 events do not reach Google Ads on their own, which is why Ads reported 0
+ * conversions while GA4 saw every signup_complete. The Ads tag (AW-18478573284)
+ * is already configured in app/layout.tsx; this only adds the event snippet.
+ * Label from Google Ads → Goals → Conversions → Signup Complete → Tag setup.
+ */
+const ADS_SIGNUP_SEND_TO = "AW-18478573284/l4uXCMPt7I0dEOTNoutE";
+
+/** Report a completed signup to Google Ads. Same no-op guarantees as trackEvent. */
+export function trackAdsSignupConversion() {
+  if (typeof window === "undefined") return;
+
+  const gtag = (window as any).gtag;
+  if (typeof gtag !== "function") return;
+
+  try {
+    gtag("event", "conversion", { send_to: ADS_SIGNUP_SEND_TO, value: 1.0, currency: "PKR" });
+  } catch {
+    // Analytics must never break a signup.
+  }
+}
+
+/**
  * Fire an event at most once per page load.
  *
  * signup_start would otherwise re-fire on every React re-render of the signup
