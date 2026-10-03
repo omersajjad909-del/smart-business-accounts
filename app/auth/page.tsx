@@ -250,11 +250,20 @@ function AuthPageInner() {
     setIsLoading(true);
     setMessage(null);
     setError(null);
+    // Signup saved where the visitor goes after verifying (the payment step).
+    // Send it along so a resend can't fall back to /dashboard if the
+    // sb_verify cookie went missing.
+    let next: string | undefined;
+    try {
+      const saved = JSON.parse(localStorage.getItem("pendingVerification") || "null");
+      const path = saved?.next ? String(saved.next) : "";
+      if (path.startsWith("/") && !path.startsWith("//")) next = path;
+    } catch {}
     try {
       const response = await fetch("/api/auth/verify/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: otpEmail, verificationToken }),
+        body: JSON.stringify({ email: otpEmail, verificationToken, ...(next ? { next } : {}) }),
       });
       const data = await response.json();
       if (!response.ok) { setError(data.error || "Unable to resend code."); return; }
@@ -540,7 +549,7 @@ function AuthPageInner() {
                             width: 48, height: 58, borderRadius: 14,
                             background: val ? "rgba(99,102,241,0.1)" : "rgba(var(--ink),0.05)",
                             border: val ? "1px solid rgba(99,102,241,0.5)" : "1px solid rgba(var(--ink),0.12)",
-                            fontSize: 22, fontWeight: 700, color: "#fff",
+                            fontSize: 22, fontWeight: 700, color: "var(--ink-solid, #fff)",
                             textAlign: "center", fontFamily: "inherit",
                             cursor: "text",
                           }}

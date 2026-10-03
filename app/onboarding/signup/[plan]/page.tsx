@@ -252,7 +252,7 @@ function FloatingInput({
           background: focused ? "rgba(99,102,241,.08)" : "rgba(var(--ink),.04)",
           padding:"20px 16px 8px",
           fontSize:14, fontFamily:"inherit",
-          color:"white", outline:"none", transition:"all .22s",
+          color:"var(--ink-solid, white)", outline:"none", transition:"all .22s",
           boxShadow: focused ? "0 0 0 4px rgba(99,102,241,.1)" : "none",
         }}
       />
@@ -624,8 +624,9 @@ export default function SignupByPlanPage() {
       // Clear any previous session/demo data to ensure fresh login
       try {
         localStorage.removeItem("user");
-        // Clear all relevant cookies
-        const cookies = ["sb_auth", "sb_verify", "first_login"];
+        // Clear stale session cookies. Not sb_verify: the signup response just
+        // set it, and the OTP step needs it to find this pending signup.
+        const cookies = ["sb_auth", "first_login"];
         cookies.forEach(c => {
           document.cookie = `${c}=; Max-Age=0; path=/;`;
           document.cookie = `${c}=; Max-Age=0; path=/; domain=${window.location.hostname};`;
@@ -1134,7 +1135,7 @@ export default function SignupByPlanPage() {
                     <select
                       value={teamSize}
                       onChange={e => setTeamSize(e.target.value)}
-                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: teamSize ? "white" : "rgba(var(--ink),var(--ta-35, .35))", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
+                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: teamSize ? "var(--ink-solid, white)" : "rgba(var(--ink),var(--ta-35, .35))", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
                       onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
                       onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                     >
@@ -1156,7 +1157,7 @@ export default function SignupByPlanPage() {
                     <select
                       value={referralSource}
                       onChange={e => setReferralSource(e.target.value)}
-                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: referralSource ? "white" : "rgba(var(--ink),var(--ta-35, .35))", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
+                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(var(--ink),.09)", background:"rgba(var(--ink),.04)", padding:"13px 12px", fontSize:13, color: referralSource ? "var(--ink-solid, white)" : "rgba(var(--ink),var(--ta-35, .35))", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
                       onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
                       onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),.09)")}
                     >

@@ -84,8 +84,23 @@ export async function GET(req: NextRequest) {
   const totalSignups     = signupLogs.length;
   const recentSignups    = signupLogs.filter(l => l.createdAt >= since).length;
 
-  const activeCompanies  = companies.filter(c => String(c.subscriptionStatus || "").toUpperCase() === "ACTIVE");
   const cancelledCompanies = companies.filter(c => String(c.subscriptionStatus || "").toUpperCase() === "CANCELLED");
+
+  // All active companies, for the plan-distribution breakdown — a business-
+  // health snapshot of the whole customer base, not scoped to the funnel.
+  const allActiveCompanies = companies.filter(c => String(c.subscriptionStatus || "").toUpperCase() === "ACTIVE");
+
+  // Active companies that came through a *tracked* signup (i.e. have a SIGNUP
+  // ActivityLog row). Companies created manually/by seed/before signup
+  // logging existed are active but were never a "Signup" in this funnel, so
+  // counting them here made Signup → Active exceed 100% (31 active vs 5
+  // tracked signups → 620%). The funnel is a waterfall: each stage must be
+  // a subset of the one before it, so this scopes "Active" to the same cohort
+  // as "Signups" instead of the whole companies table.
+  const trackedSignupCompanyIds = new Set(signupLogs.map(l => l.companyId).filter(Boolean));
+  const activeCompanies = companies.filter(
+    c => trackedSignupCompanyIds.has(c.id) && String(c.subscriptionStatus || "").toUpperCase() === "ACTIVE",
+  );
 
   // Paid = companies that have had a succeeded payment event.
   //
@@ -130,7 +145,7 @@ export async function GET(req: NextRequest) {
 
   // --- Plan breakdown of active companies ---
   const planCounts: Record<string, number> = {};
-  for (const c of activeCompanies) {
+  for (const c of allActiveCompanies) {
     const p = String(c.plan || "STARTER").toUpperCase();
     planCounts[p] = (planCounts[p] || 0) + 1;
   }
