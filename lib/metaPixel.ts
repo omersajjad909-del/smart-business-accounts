@@ -75,3 +75,8 @@ export function trackMetaEvent(event: string, params?: Record<string, unknown>) 
 export function trackLead(params?: Record<string, unknown>) {
   trackMetaEvent("Lead", params);
 }
+
+/** Someone finished the signup form — the conversion the Leads ad set tracks. */
+export function trackCompleteRegistration(params?: Record<string, unknown>) {
+  trackMetaEvent("CompleteRegistration", params);
+}

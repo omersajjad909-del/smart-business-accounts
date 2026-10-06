@@ -13,6 +13,7 @@ import { clientRegionHeaders } from "@/lib/clientRegion";
 import PasswordChecklist from "@/components/PasswordChecklist";
 import { MIN_PASSWORD_LENGTH } from "@/lib/passwordPolicy";
 import { trackAdsSignupConversion, trackEvent, trackEventOnce } from "@/lib/analytics";
+import { trackCompleteRegistration } from "@/lib/metaPixel";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
 /* ─── Phone number format groups per country ─── */
@@ -620,6 +621,7 @@ export default function SignupByPlanPage() {
         requires_verification: Boolean(data?.needsVerification),
       });
       trackAdsSignupConversion();
+      trackCompleteRegistration({ plan: planCode, billing_cycle: billingCycle });
 
       // Clear any previous session/demo data to ensure fresh login
       try {
