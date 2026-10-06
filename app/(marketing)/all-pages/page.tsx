@@ -35,7 +35,7 @@ const SITEMAP = [
       { label: "Login", href: "/login", desc: "Sign in to your account" },
       { label: "Sign Up", href: "/website-signup", desc: "Create a new account" },
       { label: "Magic Link Login", href: "/login-email", desc: "Passwordless login via email" },
-      { label: "Forgot Password", href: "/forgot-password", desc: "Reset your password" },
+      { label: "Forgot Password", href: "/auth/forgot-password", desc: "Reset your password" },
       { label: "SSO Login", href: "/sso", desc: "Enterprise single sign-on" },
       { label: "Choose Plan", href: "/pricing", desc: "Select subscription plan" },
     ],

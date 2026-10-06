@@ -14,7 +14,20 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 // minutes ago end up indistinguishable. Content types that carry their own
 // real date (blog posts, SEO articles, legal pages) use it below; only pages
 // with no tracked per-page date fall back to the build time.
-const LEGAL_LAST_UPDATED = new Date("2026-05-10");
+//
+// Per-page dates below — each one must match that page's own on-page
+// `LAST_UPDATED` constant (app/(marketing)/legal/<slug>/page.tsx). Six of the
+// eight previously all pointed at this same May date regardless of what the
+// page itself said, which defeats the point described above for exactly the
+// pages meant to demonstrate it.
+const LEGAL_LAST_UPDATED = new Date("2026-05-10"); // privacy, terms
+const LEGAL_SLA_LAST_UPDATED = new Date("2026-06-15");
+const LEGAL_DPA_LAST_UPDATED = new Date("2026-06-15");
+const LEGAL_AUP_LAST_UPDATED = new Date("2026-06-15");
+const LEGAL_REFUND_LAST_UPDATED = new Date("2026-06-13");
+const LEGAL_DELIVERY_LAST_UPDATED = new Date("2026-08-21");
+const LEGAL_COOKIES_LAST_UPDATED = new Date("2026-07-12");
+const LEGAL_SUBPROCESSORS_LAST_UPDATED = new Date("2026-07-09");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -30,9 +43,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/contact`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${BASE}/waitlist`,          lastModified: now, changeFrequency: "weekly" as const,  priority: 0.75 },
     { url: `${BASE}/careers`,           lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
+    // Real pages, each with its own self-referencing canonical, that were
+    // linked from the footer and/or another marketing page but never added
+    // here — Google had to discover them by crawling those links instead of
+    // being told about them directly.
+    { url: `${BASE}/culture`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${BASE}/roles`,             lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
+    { url: `${BASE}/feedback`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${BASE}/automation`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
     // Resources
     { url: `${BASE}/blog`,              lastModified: now, changeFrequency: "daily" as const,   priority: 0.8 },
     { url: `${BASE}/changelog`,         lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
+    { url: `${BASE}/updates`,           lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
     { url: `${BASE}/demo`,              lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${BASE}/affiliate`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${BASE}/trust`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
@@ -42,13 +64,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/industries`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
     // Legal — real last-updated date (matches LAST_UPDATED shown on each page)
     { url: `${BASE}/legal/privacy`,     lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.4 },
-    { url: `${BASE}/legal/cookies`,     lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.38 },
+    { url: `${BASE}/legal/cookies`,     lastModified: LEGAL_COOKIES_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.38 },
     { url: `${BASE}/legal/terms`,       lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.4 },
-    { url: `${BASE}/legal/sla`,         lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/dpa`,         lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/aup`,         lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/refund`,      lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
-    { url: `${BASE}/legal/delivery`,    lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/sla`,         lastModified: LEGAL_SLA_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/dpa`,         lastModified: LEGAL_DPA_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/aup`,         lastModified: LEGAL_AUP_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/refund`,      lastModified: LEGAL_REFUND_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/delivery`,    lastModified: LEGAL_DELIVERY_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.35 },
+    // Linked from the footer ("Sub-processors") and from /legal/dpa, but
+    // missing from this sitemap entirely until now — a real, indexable page
+    // that depended on Google finding it by crawling the footer link instead
+    // of being told about it directly.
+    { url: `${BASE}/legal/sub-processors`, lastModified: LEGAL_SUBPROCESSORS_LAST_UPDATED, changeFrequency: "yearly" as const, priority: 0.35 },
     // Tools & converters
     { url: `${BASE}/roi-calculator`,    lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${BASE}/compare`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },

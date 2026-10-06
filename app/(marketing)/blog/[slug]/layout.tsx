@@ -1,11 +1,26 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ALL_POSTS } from "../posts";
 import { SEO_ARTICLES } from "../seo-articles";
+import { LOCAL_POSTS } from "./local-posts";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
-/** Same merge order as the article page, so metadata never describes a different page than the one that renders. */
-const POSTS: Record<string, any> = { ...ALL_POSTS, ...SEO_ARTICLES };
+/**
+ * Same three sources, same merge order, as the article page's own ALL_POSTS
+ * (BlogDetailPage in ./page.tsx) — so metadata never describes a different
+ * page than the one that renders.
+ *
+ * LOCAL_POSTS was missing here until this fix: this object used to be
+ * `{ ...ALL_POSTS, ...SEO_ARTICLES }`, so every post that exists only in
+ * LOCAL_POSTS — the numeric-slug posts "1" through "15" — fell into the
+ * `!post` branch below and shipped the generic "Blog Post | FinovaOS"
+ * fallback with no canonical tag at all, while the page itself rendered
+ * real, distinct content at that URL. That is exactly the shape of a
+ * "Duplicate without user-selected canonical" GSC error: ~15 distinct pages
+ * all missing a self-referencing canonical.
+ */
+const POSTS: Record<string, any> = { ...ALL_POSTS, ...LOCAL_POSTS, ...SEO_ARTICLES };
 
 /** "August 17, 2026" → ISO. Returns undefined rather than an Invalid Date string. */
 function toIso(date?: string): string | undefined {
@@ -30,6 +45,10 @@ export async function generateMetadata({
   }
 
   const published = toIso(post.date);
+  // `slug` (the actual route param) rather than `post.id` — the LOCAL_POSTS
+  // entries ("1" through "15") carry no `id` field at all, so building the
+  // canonical from `post.id` emitted `/blog/undefined` for every one of them.
+  const url = `${BASE}/blog/${slug}`;
 
   return {
     title: post.title,
@@ -39,7 +58,7 @@ export async function generateMetadata({
     openGraph: {
       title: post.title,
       description: post.excerpt || post.title,
-      url: `${BASE}/blog/${post.id}`,
+      url,
       siteName: "FinovaOS",
       images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: post.title }],
       type: "article",
@@ -52,7 +71,7 @@ export async function generateMetadata({
       description: post.excerpt || post.title,
       images: [`${BASE}/icon.png`],
     },
-    alternates: { canonical: `${BASE}/blog/${post.id}` },
+    alternates: { canonical: url },
   };
 }
 
@@ -71,7 +90,9 @@ function buildJsonLd(slug: string) {
   const post = POSTS[slug];
   if (!post) return null;
 
-  const url = `${BASE}/blog/${post.id}`;
+  // Same `slug`-not-`post.id` fix as generateMetadata above — LOCAL_POSTS
+  // entries have no `id` field.
+  const url = `${BASE}/blog/${slug}`;
   const published = toIso(post.date);
 
   const graph: Record<string, unknown>[] = [
@@ -132,6 +153,16 @@ export default async function BlogPostLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
+  // The page below is a client component ("use client"), so it cannot call
+  // notFound() itself — it rendered an "Article not found" message at HTTP
+  // 200 for any unrecognized slug instead, which Search Console reports as a
+  // soft 404 (content that reads as an error page but returns 200). This
+  // layout is the one server-rendered file in the route, so the check lives
+  // here: an unknown slug now returns a real 404 before the client page ever
+  // mounts.
+  if (!POSTS[slug]) notFound();
+
   const jsonLd = buildJsonLd(slug);
 
   return (

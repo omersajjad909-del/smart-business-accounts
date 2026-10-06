@@ -80,14 +80,24 @@ export default function Hero() {
         
         *, *::before, *::after { box-sizing: border-box; margin: 0; }
 
-        @keyframes fadeUp   { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        /* fadeUp/slideInR used to animate opacity 0→1 (see below). Chrome's
+           LCP algorithm does not count an element as painted while its
+           opacity is 0, so every piece of hero content — badge, headline,
+           subheadline, CTAs — sat invisible until its staggered delay
+           (.08s→.56s) plus the .65s animation finished, pushing the actual
+           LCP timestamp for this above-the-fold, mostly-text hero back by
+           roughly a second on top of everything else. Keeping the
+           translateY/translateX slide but dropping the opacity keyframe
+           lets the content paint at full opacity immediately while still
+           looking animated. */
+        @keyframes fadeUp   { from{transform:translateY(22px)} to{transform:translateY(0)} }
         @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
         @keyframes floatY   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
         @keyframes floatY2  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
         @keyframes orbA     { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-30px)} }
         @keyframes orbB     { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-25px,20px)} }
         @keyframes pulse2   { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 70%{box-shadow:0 0 0 7px rgba(16,185,129,0)} }
-        @keyframes slideInR { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes slideInR { from{transform:translateX(30px)} to{transform:translateX(0)} }
         @keyframes slideInL { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
         @keyframes countUp  { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
         @keyframes barGrow  { from{height:0} to{height:var(--h)} }

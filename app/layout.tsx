@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
+import { unstable_cache } from "next/cache";
 import { Toaster } from "react-hot-toast";
 import { prisma } from "@/lib/prisma";
 import "./globals.css";
@@ -365,6 +366,29 @@ const websiteJsonLd = {
   // Add this back once a real on-site search page ships.
 };
 
+/**
+ * Review aggregate for the SoftwareApplication JSON-LD, cached.
+ *
+ * This ran as a live `await prisma.testimonial.aggregate(...)` on every
+ * single request to every single page — it's in the root layout, so it
+ * gated the HTML for the homepage too. Google/Meta ad traffic landing cold
+ * (serverless cold start + a fresh DB round trip) paid for that on top of
+ * everything else before a single byte could paint, which is exactly the
+ * kind of TTFB hit that shows up as LCP. The rating only needs to be
+ * approximately fresh — `unstable_cache` with a 5-minute revalidate (the
+ * same window lib/apiPermission.ts already uses for its plan-config cache)
+ * removes the DB call from the request path for the overwhelming majority
+ * of hits without changing what gets rendered.
+ */
+const getCachedReviewAggregate = unstable_cache(
+  async () =>
+    prisma.testimonial
+      .aggregate({ where: { status: "PUBLISHED" }, _avg: { rating: true }, _count: true })
+      .catch(() => null),
+  ["root-layout-review-aggregate"],
+  { revalidate: 300 }
+);
+
 export default async function RootLayout({
   children,
 }: {
@@ -372,9 +396,7 @@ export default async function RootLayout({
 }) {
   const nonce = (await headers()).get("x-nonce") || undefined;
 
-  const reviewAgg = await prisma.testimonial
-    .aggregate({ where: { status: "PUBLISHED" }, _avg: { rating: true }, _count: true })
-    .catch(() => null);
+  const reviewAgg = await getCachedReviewAggregate();
   const aggregateRating =
     reviewAgg && reviewAgg._count > 0 && reviewAgg._avg.rating !== null
       ? { ratingValue: Math.round(reviewAgg._avg.rating * 10) / 10, reviewCount: reviewAgg._count }
@@ -386,7 +408,33 @@ export default async function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
+        {/*
+          Loaded as `media="print"` so it is NOT render-blocking, then flipped
+          to `media="all"` once the page has loaded. A plain
+          `<link rel="stylesheet">` here — even with the preconnects above —
+          still forces the browser to fetch and parse this stylesheet before
+          painting anything, on every page, which is exactly the kind of
+          render-blocking request LCP penalizes. The components that consume
+          these fonts hard-code `fontFamily: "'Outfit',sans-serif"` etc., so
+          they already fall back to the system sans/serif the instant they
+          render; this just lets that fallback actually paint immediately and
+          swaps to the real font in one pass (not 63 reflows — see the
+          GOOGLE_FONTS_HREF comment above) once it's ready. `font-display:
+          swap` in the URL keeps individual glyphs from going invisible
+          (FOIT) during that swap.
+        */}
+        <link rel="preload" as="style" href={GOOGLE_FONTS_HREF} />
+        <link id="gfonts-stylesheet" rel="stylesheet" href={GOOGLE_FONTS_HREF} media="print" />
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.getElementById("gfonts-stylesheet");if(!l)return;function sw(){l.media="all";}if(document.readyState==="complete"){sw();}else{window.addEventListener("load",sw,{once:true});}})();`,
+          }}
+        />
+        <noscript>
+          <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
+        </noscript>
         {/* Guard against third-party scripts (Clarity, etc.) probing window.webkit.messageHandlers in non-WKWebView contexts */}
         <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `if(typeof window!=="undefined"&&!window.webkit){window.webkit={messageHandlers:{}}}` }} />
         {/* GA4 — defaults to consent granted (opt-out model); AnalyticsLoader denies it if the visitor explicitly rejects in the cookie banner */}
