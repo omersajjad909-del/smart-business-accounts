@@ -66,8 +66,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   Finance: "var(--tx-14b8a6, #14b8a6)",
 };
 
-const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
-
 // "60+ Business Types" was the old catalogue count while this page showed one
 // live demo — a number the page itself contradicted. "8" had the same problem
 // one level later: hardcoded against a catalogue that changes through
@@ -93,10 +91,10 @@ export default function DemoPage() {
     STARTER: [], PRO: [], ENTERPRISE: [],
   });
 
-  // Seed from hardcoded values so there's no flash on load
-  const [liveStatusMap, setLiveStatusMap] = useState<Record<string, string>>(
-    Object.fromEntries(BUSINESSES.map(b => [b.liveBusinessType, b.demoAvailable ? "live" : "coming_soon"]))
-  );
+  // Starts empty so a type switched off in Admin → Modules never flashes on
+  // screen before the status arrives. Only if that request fails do we fall
+  // back to the catalogue's own demoAvailable flags.
+  const [liveStatusMap, setLiveStatusMap] = useState<Record<string, string>>({});
 
   /**
    * Pulls the live plan catalogue.
@@ -155,15 +153,28 @@ export default function DemoPage() {
   useEffect(() => {
     fetch("/api/public/business-module-status", { cache: "no-store" })
       .then(r => r.json())
-      .then(d => { if (d?.statusMap) setLiveStatusMap(d.statusMap); })
-      .catch(() => {});
+      .then(d => {
+        if (!d?.statusMap) throw new Error("no statusMap");
+        setLiveStatusMap(d.statusMap);
+      })
+      .catch(() => {
+        setLiveStatusMap(Object.fromEntries(BUSINESSES.map(b => [b.liveBusinessType, b.demoAvailable ? "live" : "coming_soon"])));
+      });
   }, []);
 
   const isDemoLive = (liveBusinessType: string) => liveStatusMap[liveBusinessType] === "live";
 
-  const liveDemoCount = useMemo(
-    () => BUSINESSES.filter((b) => isDemoLive(b.liveBusinessType)).length,
+  // Only business types switched on in Admin → Modules are listed. A type
+  // turned off there disappears from this page rather than showing as a
+  // "Coming Soon" card.
+  const liveBusinesses = useMemo(
+    () => BUSINESSES.filter((b) => isDemoLive(b.liveBusinessType)),
     [liveStatusMap]
+  );
+  const liveDemoCount = liveBusinesses.length;
+  const categories = useMemo(
+    () => Array.from(new Set(liveBusinesses.map((b) => b.category))),
+    [liveBusinesses]
   );
 
   const TRUST_STATS = [
@@ -174,8 +185,8 @@ export default function DemoPage() {
   ];
 
   const filteredBusinesses = useMemo(
-    () => (activeCategory ? BUSINESSES.filter((b) => b.category === activeCategory) : BUSINESSES),
-    [activeCategory]
+    () => (activeCategory ? liveBusinesses.filter((b) => b.category === activeCategory) : liveBusinesses),
+    [activeCategory, liveBusinesses]
   );
 
   const biz = useMemo(() => BUSINESSES.find((b) => b.id === selectedBiz) || null, [selectedBiz]);
@@ -306,7 +317,7 @@ export default function DemoPage() {
         {/* The page now lists only what actually opens. A grid of "coming soon"
             cards next to live ones just made a visitor guess which was which. */}
         <p style={{ fontSize: 17, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 32px" }}>
-          {BUSINESSES.length} business types, all live right now. Each one opens a private {DEMO_SESSION_LABEL}
+          {liveDemoCount} business types, all live right now. Each one opens a private {DEMO_SESSION_LABEL}
           workspace configured for your industry — real customers, stock, posted invoices and payroll already
           loaded, so you can test it like it is your own business.
         </p>
@@ -332,9 +343,9 @@ export default function DemoPage() {
             onClick={() => setActiveCategory(null)}
             style={{ padding: "7px 16px", borderRadius: 999, background: !activeCategory ? "rgba(var(--ink),.1)" : "rgba(var(--ink),.03)", color: !activeCategory ? "var(--ink-solid, white)" : "rgba(var(--ink),var(--ta-50, .5))", fontSize: 12, fontWeight: 700, fontFamily: FONT }}
           >
-            All ({BUSINESSES.length})
+            All ({liveDemoCount})
           </button>
-          {CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const active = activeCategory === cat;
             const c = CATEGORY_COLORS[cat] || "var(--tx-a5b4fc, #a5b4fc)";
             return (
