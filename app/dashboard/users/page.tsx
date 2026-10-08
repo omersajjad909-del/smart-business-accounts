@@ -161,6 +161,10 @@ export default function TeamAndPermissionsPage() {
   const [shiftOvertiming, setShiftOvertiming] = useState<string | null>(null);
 
   const allPermValues = Object.values(PERMISSIONS) as string[];
+  // Registered pages the sidebar deliberately doesn't link. Payment Receipts
+  // posts the same CRV voucher as the Receipts screen, so its menu entry was
+  // removed; listing it here would offer a switch that opens nothing.
+  const RETIRED_PAGES = new Set(["CORE_PAYMENT_RECEIPTS"]);
   // Every page the company's plan ships, with the permission that opens it. The
   // sidebar is built from pages, so this is the list an admin thinks in. A page
   // is listed when it's in the company's page list; the plan's permission list
@@ -170,7 +174,7 @@ export default function TeamAndPermissionsPage() {
     const seen = new Set<string>();
     const out: { id: string; perm: string; label: string; route: string }[] = [];
     for (const f of [...DASHBOARD_FEATURE_DEFS, ...CORE_DASHBOARD_FEATURES] as { id: string; label: string; route: string; permKey?: string }[]) {
-      if (seen.has(f.id)) continue;
+      if (seen.has(f.id) || RETIRED_PAGES.has(f.id)) continue;
       if (companyPages && !companyPages.has(f.id)) continue;
       const perm = f.permKey && allPermValues.includes(f.permKey) ? f.permKey : allPermValues.includes(f.id) ? f.id : null;
       if (!perm) continue;
