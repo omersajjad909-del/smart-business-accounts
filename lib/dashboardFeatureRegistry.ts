@@ -2906,6 +2906,11 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // turning up in their sidebar because it was finally wired in.
   { id: "CORE_DEPARTMENT_BUDGETS", label: "Department Budgets", route: "/dashboard/department-budgets", section: "Settings", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Budget per department, alongside Budget Planning and Cost Centers." },
   { id: "CORE_REFERRALS", label: "Referrals", route: "/dashboard/referrals", section: "Settings", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Refer other businesses and track what each referral turned into." },
+  // Had no entry at all, and a route the registry doesn't know is shown to
+  // everyone (canShowDashboardHref), so it appeared on every plan and in every
+  // business type with no switch in Plans → Pages & Modules. Pakistan-only (FBR),
+  // so it ships off and is ticked on for the plans that sell it.
+  { id: "CORE_E_INVOICE", label: "E-Invoice (FBR)", route: "/dashboard/e-invoice", section: "Sales & Purchase", core: true, permKey: "CREATE_SALES_INVOICE", defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Submit sales invoices to FBR (Pakistan) and track their status." },
 ];
 
 // Core pages join the same list the sidebar, the admin grid and the route
