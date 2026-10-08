@@ -91,7 +91,8 @@ function groupPerms(perms: string[]) {
       p.startsWith("CREATE_")                                                                          ? "Create"         :
       p.startsWith("EDIT_") || p.startsWith("UPDATE_")                                                ? "Edit"           :
       p.startsWith("DELETE_")                                                                          ? "Delete"         :
-      p.startsWith("BANK_") || p.startsWith("PAYMENT_") || p.startsWith("EXPENSE_") || p.startsWith("TAX_") ? "Banking & Tax" :
+      p.startsWith("BANK_") || p.startsWith("TAX_")                                                   ? "Banking & Tax" :
+      p.startsWith("PAYMENT_") || p.startsWith("EXPENSE_") || p === "BULK_PAYMENTS"                    ? "Payments & Expenses" :
       p.startsWith("MANAGE_")                                                                          ? "Management"     : "Other";
     if (!groups[cat]) groups[cat] = [];
     groups[cat].push(p);
