@@ -29,9 +29,18 @@ export async function POST(req: NextRequest) {
     const userId = payload.userId as string;
     const buffer = Buffer.from(await file.arrayBuffer());
     // Inline data URLs are the fallback for when Cloudinary keys are not set.
-    const avatar = isMediaConfigured()
-      ? await uploadMedia(buffer, { kind: "avatars", scope: userId })
-      : `data:${file.type};base64,${buffer.toString("base64")}`;
+    const inline = `data:${file.type};base64,${buffer.toString("base64")}`;
+    let avatar = inline;
+    if (isMediaConfigured()) {
+      try {
+        avatar = await uploadMedia(buffer, { kind: "avatars", scope: userId });
+      } catch (err: any) {
+        // Cloudinary refusing the upload (bad key, disabled account, quota)
+        // must not stop someone setting a profile photo — keep it inline, the
+        // same fallback used while Cloudinary isn't configured.
+        console.error("[avatar] Cloudinary upload failed, storing inline:", err?.message || err);
+      }
+    }
 
     const previous = await prisma.user.findUnique({ where: { id: userId }, select: { avatar: true } });
     await prisma.user.update({
