@@ -172,7 +172,7 @@ export default function TeamAndPermissionsPage() {
     const user = getCurrentUser();
     setMe(user);
     if (user?.role === "ADMIN") {
-      Promise.all([loadUsers(user), loadBranches(), loadBranchMap(), loadRoles(user), loadUserPerms(user), loadShiftSettings()]).finally(() => setLoading(false));
+      Promise.all([loadUsers(user), loadBranches(), loadBranchMap(), loadRoles(user), loadUserPerms(user), loadShiftSettings(user)]).finally(() => setLoading(false));
     } else setLoading(false);
   }, []);
 
@@ -211,9 +211,9 @@ export default function TeamAndPermissionsPage() {
     if (Array.isArray(d)) for (const x of d) map[x.id] = (x.permissions || []).map((p: any) => p.permission);
     setUserPermsMap(map);
   }
-  async function loadShiftSettings() {
+  async function loadShiftSettings(u?: any) {
     try {
-      const res = await fetch("/api/admin/shift-settings");
+      const res = await fetch("/api/admin/shift-settings", { headers: h(u) });
       if (!res.ok) return;
       const data = await res.json();
       const list: ShiftUserEntry[] = data.users || [];
@@ -363,7 +363,7 @@ export default function TeamAndPermissionsPage() {
     setShiftSaving(userId);
     try {
       const res = await fetch("/api/admin/shift-settings", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json", ...h() },
         body: JSON.stringify({ userId, shift }),
       });
       if (!res.ok) throw new Error();
@@ -376,7 +376,7 @@ export default function TeamAndPermissionsPage() {
     setShiftOvertiming(userId);
     try {
       const res = await fetch("/api/admin/shift-settings/overtime", {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
+        method: "PATCH", headers: { "Content-Type": "application/json", ...h() },
         body: JSON.stringify({ userId, overtimeMinutes: minutes }),
       });
       if (!res.ok) throw new Error();
