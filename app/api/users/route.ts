@@ -135,6 +135,12 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+    // The admin typed this email and set the password, so the account is
+    // vouched for already. Login asks for an OTP until it finds this log, which
+    // made every admin-created member verify an address the admin had supplied.
+    await prisma.activityLog.create({
+      data: { action: "ACCOUNT_VERIFIED", details: "Created by company admin", userId: user.id, companyId },
+    }).catch(() => {});
     if (avatarValue && isMediaConfigured()) {
       const url = await uploadMedia(avatarValue, { kind: "avatars", scope: user.id });
       return NextResponse.json(await prisma.user.update({ where: { id: user.id }, data: { avatar: url } }));
