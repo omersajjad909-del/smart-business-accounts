@@ -32,6 +32,13 @@ export async function GET(req: NextRequest) {
       .filter((p: any) => !companyId || p.companyId === companyId)
       .map((p: any) => p.permission);
 
+    const roleRows = companyId
+      ? await prisma.rolePermission.findMany({
+          where: { companyId, role: String(user.role || "VIEWER").toUpperCase() },
+          select: { permission: true },
+        }).catch(() => [] as { permission: string }[])
+      : [];
+
     const safeUser = {
       id: user.id,
       name: user.name,
@@ -40,7 +47,7 @@ export async function GET(req: NextRequest) {
       companyId,
       avatar: user.avatar || null,
       permissions: userPermissions,
-      rolePermissions: [],
+      rolePermissions: roleRows.map((r) => r.permission),
       companies: companies.map((c: any) => ({
         id: c.companyId,
         name: c.company?.name,

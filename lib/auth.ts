@@ -45,12 +45,16 @@ export function getCurrentUser() {
   }
 }
 
+/** Fired after the stored user changes, so permission gates can re-check. */
+export const USER_CHANGED_EVENT = "finova:user-changed";
+
 export function setCurrentUser(user: unknown) {
   if (typeof window === "undefined") return;
   const serialized = JSON.stringify(user);
   window.sessionStorage.setItem(BROWSER_USER_KEY, serialized);
   // Remove stale localStorage entry if it exists (legacy cleanup)
   try { window.localStorage.removeItem(BROWSER_USER_KEY); } catch {}
+  window.dispatchEvent(new Event(USER_CHANGED_EVENT));
 }
 
 export function clearCurrentUser() {
@@ -66,6 +70,7 @@ export function updateStoredUser(mutator: (current: any) => any) {
     const parsed = JSON.parse(sessionRaw || "{}");
     const next = mutator(parsed);
     window.sessionStorage.setItem(BROWSER_USER_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event(USER_CHANGED_EVENT));
     return next;
   } catch {
     return null;

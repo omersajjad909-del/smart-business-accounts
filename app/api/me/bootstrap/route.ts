@@ -176,6 +176,15 @@ export async function GET(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
+    // What the user's role grants in this company. This was hard-coded to [] —
+    // fine while every member also had the plan's permissions copied onto their
+    // own row, but a role set in Team & Permissions never reached the client, so
+    // a Manager's sidebar showed almost nothing.
+    const roleRows = await prisma.rolePermission.findMany({
+      where: { companyId, role: String(user.role || "VIEWER").toUpperCase() },
+      select: { permission: true },
+    }).catch(() => [] as { permission: string }[]);
+
     // Build user object
     const userPermissions = (user.permissions || [])
       .filter((p: any) => !companyId || p.companyId === companyId)
@@ -189,7 +198,7 @@ export async function GET(req: NextRequest) {
       companyId,
       avatar: user.avatar || null,
       permissions: userPermissions,
-      rolePermissions: [] as string[],
+      rolePermissions: roleRows.map((r) => r.permission),
       companies: (companiesRaw as any[]).map((c: any) => ({
         id: c.companyId,
         name: c.company?.name,
