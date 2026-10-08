@@ -164,7 +164,9 @@ export default function TeamAndPermissionsPage() {
   // Registered pages the sidebar deliberately doesn't link. Payment Receipts
   // posts the same CRV voucher as the Receipts screen, so its menu entry was
   // removed; listing it here would offer a switch that opens nothing.
-  const RETIRED_PAGES = new Set(["CORE_PAYMENT_RECEIPTS"]);
+  // The four self-service pages (account settings, appearance, notifications,
+  // feedback) stay open to every member, so there is nothing to switch.
+  const RETIRED_PAGES = new Set(["CORE_PAYMENT_RECEIPTS", "CORE_ACCOUNT_SETTINGS", "CORE_SETTINGS_APPEARANCE", "CORE_NOTIFICATIONS", "CORE_FEEDBACK"]);
   // Every page the company's plan ships, with the permission that opens it. The
   // sidebar is built from pages, so this is the list an admin thinks in. A page
   // is listed when it's in the company's page list; the plan's permission list

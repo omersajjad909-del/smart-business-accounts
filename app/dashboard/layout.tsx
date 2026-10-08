@@ -943,9 +943,18 @@ export default function DashboardLayout({
     return getDashboardFeatureAccessIds(featureId).some((id) => allowedDashboardFeatures.has(id));
   };
 
+  // Pages every member keeps for their own account, whatever the role grants.
+  const SELF_SERVICE_PAGES = new Set(["CORE_ACCOUNT_SETTINGS", "CORE_SETTINGS_APPEARANCE", "CORE_NOTIFICATIONS", "CORE_FEEDBACK"]);
+
   const canShowDashboardHref = (href: string) => {
     const feature = findDashboardFeatureByRoute(href);
     if (!feature) return true;
+    // The page's own permission, the one Team & Permissions switches. Links used
+    // to be gated by whatever permission their group or neighbours happened to
+    // use, so ticking a page there changed nothing here (Journal Voucher followed
+    // VIEW_ACCOUNTING; AI Intelligence sat inside the VIEW_DASHBOARD block).
+    const permKey = (feature as { permKey?: string }).permKey;
+    if (permKey && !SELF_SERVICE_PAGES.has(feature.id) && !hasPermission(currentUser, permKey)) return false;
     return hasDashboardFeature(feature.id);
   };
 
@@ -1449,7 +1458,7 @@ export default function DashboardLayout({
           )}
 
           {/* Dashboard utilities */}
-          {canShowDashboardUtilities && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
+          {canShowDashboardUtilities && (
             <div style={{marginBottom:6}}>
               {/* Each of these now honours its own module toggle, like every
                   other feature. They were previously unconditional, so the
@@ -1510,7 +1519,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/e-invoice" pathname={pathname}>E-Invoice (FBR)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
               {/* Both had a module toggle and a working page but no way in. */}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && hasModule(businessType, "outward") && <NavLink href="/dashboard/outward" pathname={pathname}>Outward / Dispatch</NavLink>}
+              {hasModule(businessType, "outward") && <NavLink href="/dashboard/outward" pathname={pathname}>Outward / Dispatch</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && hasModule(businessType, "landed_cost") && <NavLink href="/dashboard/landed-cost" pathname={pathname}>Landed Cost</NavLink>}
               {/* ── Admin ── */}
 
@@ -1568,17 +1577,17 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_ACCOUNTS) && <NavLink href="/dashboard/accounts" pathname={pathname}>Chart of Accounts</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_CPV) && <NavLink href="/dashboard/cpv" pathname={pathname}>Cash Payment Voucher (CPV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_CRV) && <NavLink href="/dashboard/crv" pathname={pathname}>Cash Receipt Voucher (CRV)</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>}
+              <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>
               {hasPermission(currentUser, PERMISSIONS.MANAGE_OPENING_BALANCES) && <NavLink href="/dashboard/opening-balances" pathname={pathname}>Opening Balances</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>}
+              <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>
               {/* These four shipped as working pages with a module toggle in the
                   admin panel, but no sidebar entry anywhere — an admin could
                   switch them on and the customer still had no way to reach them
                   short of typing the URL. */}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "contra") && <NavLink href="/dashboard/contra" pathname={pathname}>Contra Entry</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "petty_cash") && <NavLink href="/dashboard/petty-cash" pathname={pathname}>Petty Cash</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "loans") && <NavLink href="/dashboard/loans" pathname={pathname}>Loans</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && hasModule(businessType, "recurring") && <NavLink href="/dashboard/recurring-transactions" pathname={pathname}>Recurring Transactions</NavLink>}
+              {hasModule(businessType, "contra") && <NavLink href="/dashboard/contra" pathname={pathname}>Contra Entry</NavLink>}
+              {hasModule(businessType, "petty_cash") && <NavLink href="/dashboard/petty-cash" pathname={pathname}>Petty Cash</NavLink>}
+              {hasModule(businessType, "loans") && <NavLink href="/dashboard/loans" pathname={pathname}>Loans</NavLink>}
+              {hasModule(businessType, "recurring") && <NavLink href="/dashboard/recurring-transactions" pathname={pathname}>Recurring Transactions</NavLink>}
             </NavGroup>
           )}
 
