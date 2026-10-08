@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
+import { DASHBOARD_FEATURE_DEFS, CORE_DASHBOARD_FEATURES } from "@/lib/dashboardFeatureRegistry";
 import { DEPARTMENTS, DESIGNATIONS, fmtDept } from "@/lib/hrCatalog";
 import { useResponsive } from "@/hooks/useResponsive";
 
@@ -147,6 +148,9 @@ export default function TeamAndPermissionsPage() {
   // Plan limits and per-role defaults come from /api/admin/roles?meta=1.
   const [planPerms,    setPlanPerms]    = useState<string[] | null>(null);
   const [roleDefaults, setRoleDefaults] = useState<Record<string, string[]>>({});
+  // Pages this company's plan actually ships (what the sidebar shows). A
+  // permission tied to a page that isn't in this set is hidden here too.
+  const [companyPages, setCompanyPages] = useState<Set<string> | null>(null);
 
   /* shift */
   const [shiftUsers,      setShiftUsers]      = useState<ShiftUserEntry[]>([]);
@@ -155,7 +159,21 @@ export default function TeamAndPermissionsPage() {
   const [shiftSaving,     setShiftSaving]     = useState<string | null>(null);
   const [shiftOvertiming, setShiftOvertiming] = useState<string | null>(null);
 
-  const allPerms      = useMemo(() => Object.values(PERMISSIONS).filter(p => !planPerms || planPerms.includes(p)), [planPerms]);
+  const permPages     = useMemo(() => {
+    // permission -> ids of the pages it gates (a page's id, or its permKey)
+    const map: Record<string, string[]> = {};
+    for (const f of [...DASHBOARD_FEATURE_DEFS, ...CORE_DASHBOARD_FEATURES]) {
+      for (const key of [f.id, (f as { permKey?: string }).permKey]) {
+        if (key && (Object.values(PERMISSIONS) as string[]).includes(key)) (map[key] ||= []).push(f.id);
+      }
+    }
+    return map;
+  }, []);
+  const allPerms      = useMemo<string[]>(() => (Object.values(PERMISSIONS) as string[]).filter(p => {
+    if (planPerms && !planPerms.includes(p)) return false;
+    const pages = permPages[p];
+    return !companyPages || !pages || pages.some(id => companyPages.has(id));
+  }), [planPerms, companyPages, permPages]);
   const filteredPerms = useMemo(() => permSearch ? allPerms.filter(p => p.toLowerCase().includes(permSearch.toLowerCase())) : allPerms, [allPerms, permSearch]);
   const permGroups    = useMemo(() => groupPerms(filteredPerms), [filteredPerms]);
 
@@ -176,7 +194,7 @@ export default function TeamAndPermissionsPage() {
     const user = getCurrentUser();
     setMe(user);
     if (user?.role === "ADMIN") {
-      Promise.all([loadUsers(user), loadBranches(), loadBranchMap(), loadRoles(user), loadUserPerms(user), loadShiftSettings(user)]).finally(() => setLoading(false));
+      Promise.all([loadUsers(user), loadBranches(), loadBranchMap(), loadRoles(user), loadUserPerms(user), loadCompanyPages(user), loadShiftSettings(user)]).finally(() => setLoading(false));
     } else setLoading(false);
   }, []);
 
@@ -209,6 +227,11 @@ export default function TeamAndPermissionsPage() {
     if (d?.defaults) setRoleDefaults(d.defaults);
     const cur = list.find(r => r.role === (keepRole || "ADMIN"));
     if (cur) setRolePerms(cur.permissions || []);
+  }
+  async function loadCompanyPages(u?: any) {
+    const res = await fetch("/api/me/bootstrap", { headers: h(u) }).catch(() => null);
+    const d = await res?.json().catch(() => null);
+    setCompanyPages(Array.isArray(d?.dashboardFeatures) ? new Set<string>(d.dashboardFeatures) : null);
   }
   async function loadUserPerms(u?: any) {
     const res = await fetch("/api/admin/user-permissions", { headers: h(u) }).catch(() => null);
@@ -726,7 +749,7 @@ export default function TeamAndPermissionsPage() {
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <input placeholder="Search…" value={permSearch} onChange={e => setPermSearch(e.target.value)} style={{ ...inp, width: 160, padding: "7px 12px" }} />
-                {!selUser && <button onClick={() => setRolePerms([...(roleDefaults[selRole] || [])])} title="Restore this role's recommended permissions, then press Save" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(var(--ink),.15)", background: "transparent", color: "#475569", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Defaults</button>}
+                {!selUser && <button onClick={() => setRolePerms((roleDefaults[selRole] || []).filter(p => allPerms.includes(p)))} title="Restore this role's recommended permissions, then press Save" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(var(--ink),.15)", background: "transparent", color: "#475569", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Defaults</button>}
                 <button onClick={() => selUser ? setUserExtra([...allPerms]) : setRolePerms([...allPerms])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", color: "var(--tx-34d399, #34d399)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>All</button>
                 <button onClick={() => selUser ? setUserExtra([]) : setRolePerms([])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "var(--tx-f87171, #f87171)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>None</button>
                 <button onClick={selUser ? saveUserPermissions : savePermissions} disabled={savingPerms} style={{ padding: "7px 18px", borderRadius: 8, background: savingPerms ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: savingPerms ? "default" : "pointer" }}>
