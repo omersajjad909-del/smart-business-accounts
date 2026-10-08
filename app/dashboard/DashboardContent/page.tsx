@@ -787,19 +787,37 @@ export default function DashboardContent() {
     if (p && p !== businessType) setBT(p);
   }, [storedUser?.email, businessType]);
 
-  if (allowed === false)
+  // No dashboard access: a quiet branded screen instead of an error. The rest
+  // of the menu still works, so this is a landing page, not a dead end.
+  if (allowed === false) {
+    const firstName = String((getCurrentUser() as { name?: string } | null)?.name || "").trim().split(/\s+/)[0];
     return (
       <div
         style={{
-          padding: 40,
+          minHeight: "calc(100vh - 120px)",
+          margin: 16,
+          borderRadius: 20,
+          background: "radial-gradient(ellipse at 50% 35%, #1c1612 0%, #0b0a09 70%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 14,
+          padding: 32,
           textAlign: "center",
-          color: "var(--tx-f87171, #f87171)",
-          fontWeight: 700,
         }}
       >
-        Access Denied
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/finova-mark.png" alt="FinovaOS" width={84} height={84} style={{ opacity: 0.95 }} />
+        <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-.02em", color: "#f5efe6" }}>
+          Finova<span style={{ color: "#e8a35c" }}>OS</span>
+        </div>
+        <div style={{ fontSize: 15, color: "#a89c8c", maxWidth: 360, lineHeight: 1.6 }}>
+          {firstName ? `Welcome, ${firstName}.` : "Welcome."} Choose a section from the menu to get started.
+        </div>
       </div>
     );
+  }
   if (allowed === null)
     return (
       <div
