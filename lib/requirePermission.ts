@@ -21,6 +21,13 @@ export async function requirePermission(
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
 
+  // A per-user removal ("-PERM" row) beats the role's grant.
+  const denied = await prisma.userPermission.findFirst({
+    where: { userId, permission: `-${permission}`, companyId },
+    select: { id: true },
+  });
+  if (denied) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   // 2️⃣ Role based permission
   const roleAllowed = await prisma.rolePermission.findFirst({
     where: { role, permission, companyId },

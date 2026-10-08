@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const companyId = await resolveCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
-  const { userId, permissions } = await req.json();
+  const { userId, permissions, denied } = await req.json();
   if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
 
   const membership = await prisma.userCompany.findFirst({ where: { userId, companyId } });
@@ -19,9 +19,15 @@ export async function POST(req: NextRequest) {
 
   await prisma.userPermission.deleteMany({ where: { userId, companyId } });
 
-  if (Array.isArray(permissions) && permissions.length > 0) {
+  // Extras are stored as-is; a removal is stored as "-PERM" so one table
+  // carries both without a schema change.
+  const rows = [
+    ...(Array.isArray(permissions) ? permissions : []).map((p: string) => p.toUpperCase()),
+    ...(Array.isArray(denied) ? denied : []).map((p: string) => `-${p.toUpperCase()}`),
+  ];
+  if (rows.length > 0) {
     await prisma.userPermission.createMany({
-      data: permissions.map((p: string) => ({ userId, permission: p.toUpperCase(), companyId })),
+      data: rows.map((permission) => ({ userId, permission, companyId })),
       skipDuplicates: true,
     });
   }

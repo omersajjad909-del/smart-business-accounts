@@ -145,6 +145,7 @@ export default function TeamAndPermissionsPage() {
   const [selUserId,    setSelUserId]    = useState<string | null>(null);
   const [userPermsMap, setUserPermsMap] = useState<Record<string, string[]>>({});
   const [userExtra,    setUserExtra]    = useState<string[]>([]);
+  const [userDenied,   setUserDenied]   = useState<string[]>([]);
   // Plan limits and per-role defaults come from /api/admin/roles?meta=1.
   const [planPerms,    setPlanPerms]    = useState<string[] | null>(null);
   const [roleDefaults, setRoleDefaults] = useState<Record<string, string[]>>({});
@@ -179,7 +180,7 @@ export default function TeamAndPermissionsPage() {
 
   const selUser   = selUserId ? users.find(u => u.id === selUserId) || null : null;
   const inherited = useMemo(() => roles.find(x => x.role === selRole)?.permissions || [], [roles, selRole]);
-  const activePerms = selUser ? Array.from(new Set([...inherited, ...userExtra])) : rolePerms;
+  const activePerms = selUser ? Array.from(new Set([...inherited.filter(p => !userDenied.includes(p)), ...userExtra])) : rolePerms;
 
   const h = (u?: any) => {
     const usr = u || me;
@@ -354,7 +355,9 @@ export default function TeamAndPermissionsPage() {
     const r = u.role.toUpperCase();
     setSelRole(r); setSelUserId(u.id);
     setRolePerms(roles.find(x => x.role === r)?.permissions || []);
-    setUserExtra(userPermsMap[u.id] || []);
+    const raw = userPermsMap[u.id] || [];
+    setUserExtra(raw.filter(p => !p.startsWith("-")));
+    setUserDenied(raw.filter(p => p.startsWith("-")).map(p => p.slice(1)));
   }
   async function saveUserPermissions() {
     if (!selUserId) return;
@@ -362,7 +365,8 @@ export default function TeamAndPermissionsPage() {
     try {
       const inherited = new Set(roles.find(x => x.role === selRole)?.permissions || []);
       const extras = userExtra.filter(p => !inherited.has(p));
-      const res = await fetch("/api/users/permissions", { method: "POST", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ userId: selUserId, permissions: extras }) });
+      const denied = userDenied.filter(p => inherited.has(p));
+      const res = await fetch("/api/users/permissions", { method: "POST", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ userId: selUserId, permissions: extras, denied }) });
       if (res.ok) { toast.success("User permissions saved!"); loadUserPerms(); }
       else toast.error(await res.json().then(d => d?.error).catch(() => null) || "Failed to save permissions");
     } finally { setSavingPerms(false); }
@@ -725,7 +729,7 @@ export default function TeamAndPermissionsPage() {
                   {active && !selUserId && <div style={{ width: 6, height: 6, borderRadius: "50%", background: rm.color, flexShrink: 0 }} />}
                 </button>
                   {users.filter(u => u.role.toUpperCase() === r).map(u => {
-                    const ua = selUserId === u.id; const extra = userPermsMap[u.id]?.length || 0;
+                    const ua = selUserId === u.id; const extra = userPermsMap[u.id]?.length || 0; // extras and removals both
                     return (
                       <button key={u.id} onClick={() => pickUser(u)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, width: "calc(100% - 14px)", margin: "0 0 3px 14px", padding: "6px 10px", borderRadius: 8, border: "none", cursor: "pointer", fontFamily: ff, background: ua ? rm.bg : "transparent", borderLeft: `2px solid ${ua ? rm.color : "rgba(var(--ink),.12)"}` }}>
                         <span style={{ fontSize: 11, fontWeight: ua ? 700 : 600, color: ua ? rm.color : "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name || u.email}</span>
@@ -744,14 +748,14 @@ export default function TeamAndPermissionsPage() {
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: roleMeta(selRole).color }}>{selUser ? (selUser.name || selUser.email) : selRole.replace(/_/g, " ")}</div>
                 <div style={{ fontSize: 12, color: "#475569", marginTop: 2 }}>
-                  {selUser ? `${selRole.replace(/_/g, " ")} · ${inherited.length} from role + ${userExtra.filter(p => !inherited.includes(p)).length} extra · ` : ""}{activePerms.length} of {allPerms.length} permissions enabled
+                  {selUser ? `${selRole.replace(/_/g, " ")} · ${inherited.length - userDenied.filter(p => inherited.includes(p)).length} from role + ${userExtra.filter(p => !inherited.includes(p)).length} extra · ` : ""}{activePerms.length} of {allPerms.length} permissions enabled
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <input placeholder="Search…" value={permSearch} onChange={e => setPermSearch(e.target.value)} style={{ ...inp, width: 160, padding: "7px 12px" }} />
                 {!selUser && <button onClick={() => setRolePerms((roleDefaults[selRole] || []).filter(p => allPerms.includes(p)))} title="Restore this role's recommended permissions, then press Save" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(var(--ink),.15)", background: "transparent", color: "#475569", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Defaults</button>}
-                <button onClick={() => selUser ? setUserExtra([...allPerms]) : setRolePerms([...allPerms])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", color: "var(--tx-34d399, #34d399)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>All</button>
-                <button onClick={() => selUser ? setUserExtra([]) : setRolePerms([])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "var(--tx-f87171, #f87171)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>None</button>
+                <button onClick={() => selUser ? (setUserExtra([...allPerms]), setUserDenied([])) : setRolePerms([...allPerms])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.07)", color: "var(--tx-34d399, #34d399)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>All</button>
+                <button onClick={() => selUser ? (setUserExtra([]), setUserDenied([...inherited])) : setRolePerms([])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "var(--tx-f87171, #f87171)", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>None</button>
                 <button onClick={selUser ? saveUserPermissions : savePermissions} disabled={savingPerms} style={{ padding: "7px 18px", borderRadius: 8, background: savingPerms ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: savingPerms ? "default" : "pointer" }}>
                   {savingPerms ? "Saving…" : "💾 Save"}
                 </button>
@@ -766,19 +770,23 @@ export default function TeamAndPermissionsPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 6 }}>
                   {perms.map(perm => {
                     const fromRole = !!selUser && inherited.includes(perm);
+                    const removed = fromRole && userDenied.includes(perm);
+                    const adminUser = selUser?.role?.toUpperCase() === "ADMIN";
                     const on = activePerms.includes(perm);
                     const toggle = () => {
-                      if (fromRole) return;
+                      if (adminUser) return;
                       const flip = (p: string[]) => p.includes(perm) ? p.filter(x => x !== perm) : [...p, perm];
-                      if (selUser) setUserExtra(flip); else setRolePerms(flip);
+                      if (!selUser) setRolePerms(flip);
+                      else if (fromRole) setUserDenied(flip);
+                      else setUserExtra(flip);
                     };
                     return (
-                      <label key={perm} title={fromRole ? "Granted by the role — change it on the role itself" : undefined} onClick={toggle} style={{ opacity: fromRole ? .6 : 1, cursor: fromRole ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "rgba(var(--ink),.06)"}`, background: on ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.01)", transition: "all .1s" }}>
+                      <label key={perm} title={adminUser ? "Admins always have every permission" : fromRole ? (removed ? "Removed for this user only" : "From the role — untick to remove for this user only") : undefined} onClick={toggle} style={{ opacity: adminUser ? .6 : 1, cursor: adminUser ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "rgba(var(--ink),.06)"}`, background: on ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.01)", transition: "all .1s" }}>
                         <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${on ? "#6366f1" : "rgba(var(--ink),.15)"}`, background: on ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           {on && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 600, color: on ? "white" : "#475569" }}>{perm}</span>
-                        {fromRole && <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, color: "#475569" }}>ROLE</span>}
+                        {fromRole && <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, color: removed ? "#dc2626" : "#475569" }}>{removed ? "REMOVED" : "ROLE"}</span>}
                       </label>
                     );
                   })}

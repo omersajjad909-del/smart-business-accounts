@@ -85,6 +85,16 @@ export async function apiHasPermission(
   // Determine if allowed by role/user assignment
   let allowedByUserOrRole = isAdmin; // ADMIN always allowed by role
 
+  // A per-user removal ("-PERM" row) beats the role's grant. Admins skip it:
+  // they hold every permission by role and can't be locked out of their own app.
+  if (!isAdmin) {
+    const denied = await prisma.userPermission.findFirst({
+      where: { userId, permission: `-${permission}`, companyId },
+      select: { id: true },
+    });
+    if (denied) return false;
+  }
+
   if (!allowedByUserOrRole) {
     // User-specific permission override
     const userPerm = await prisma.userPermission.findFirst({

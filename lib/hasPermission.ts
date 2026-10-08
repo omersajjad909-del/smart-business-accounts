@@ -33,6 +33,9 @@ export function hasPermission(
     ...(user.rolePermissions ?? []),
   ].map(p => typeof p === "string" ? p : p.permission);
 
+  // "-PERM" is a per-user removal: it beats whatever the role grants.
+  if (allPerms.includes(`-${permission}`)) return false;
+
   // Check if permission exists in combined list
   return allPerms.includes(permission);
 }
