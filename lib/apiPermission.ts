@@ -36,6 +36,34 @@ const _getCachedPlanConfig = unstable_cache(
   { revalidate: 300 }
 );
 
+/**
+ * Permissions the company's plan allows, resolved the same way the sidebar and
+ * apiHasPermission do. Returns null when the plan can't be resolved.
+ */
+export async function getCompanyPlanPermissions(companyId: string): Promise<string[] | null> {
+  try {
+    const company = await prisma.company.findUnique({
+      where: { id: companyId },
+      select: { plan: true, activeModules: true, country: true, baseCurrency: true },
+    });
+    const planCode = String(company?.plan || "STARTER").toUpperCase();
+    const cfg = await _getCachedPlanConfig();
+    const isPkrCompany =
+      company?.baseCurrency === "PKR" ||
+      String(company?.country || "").toUpperCase() === "PK" ||
+      String(company?.country || "").toLowerCase() === "pakistan";
+    return resolvePlanPermissions({
+      plan: planCode,
+      configuredPlanPermissions: cfg?.world?.planPermissions || null,
+      activeModules: company?.activeModules || null,
+      isPkrUser: isPkrCompany,
+      pkrPlanPermissions: cfg?.pkr?.planPermissions || null,
+    });
+  } catch {
+    return null;
+  }
+}
+
 export async function apiHasPermission(
   userId: string | null,
   userRole: string | null,
