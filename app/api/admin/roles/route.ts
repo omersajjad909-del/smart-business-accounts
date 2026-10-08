@@ -90,26 +90,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Delete existing permissions for this role
-    await prisma.rolePermission.deleteMany({
-      where: { role, companyId },
-    });
+    const unique = Array.from(new Set(permissions.filter((p: unknown): p is string => typeof p === "string" && p.length > 0)));
 
-    // Create new permissions
-    const createdPermissions = await Promise.all(
-      permissions.map((permission: string) =>
-        prisma.rolePermission.create({
-          data: { role, permission, companyId },
-        })
-      )
-    );
+    // One transaction, one bulk insert: 80+ parallel creates exhausted the
+    // pooled connection and left the role with its permissions already deleted.
+    await prisma.$transaction([
+      prisma.rolePermission.deleteMany({ where: { role, companyId } }),
+      prisma.rolePermission.createMany({
+        data: unique.map((permission) => ({ role, permission, companyId })),
+        skipDuplicates: true,
+      }),
+    ]);
 
     console.log(`✅ Updated ${role} role with ${permissions.length} permissions`);
 
     return NextResponse.json({
       success: true,
       role,
-      permissions: createdPermissions,
+      permissions: unique,
     });
   } catch (error: any) {
     console.error("Error updating role:", error);

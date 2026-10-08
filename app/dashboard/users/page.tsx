@@ -309,7 +309,10 @@ export default function TeamAndPermissionsPage() {
     setSavingPerms(true);
     const res = await fetch("/api/admin/roles", { method: "POST", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ role: selRole, permissions: rolePerms }) });
     if (res.ok) { toast.success(`${selRole} permissions saved!`); loadRoles(); }
-    else toast.error("Failed to save permissions");
+    else {
+      const msg = await res.json().then(d => d?.error).catch(() => null);
+      toast.error(msg || "Failed to save permissions");
+    }
     setSavingPerms(false);
   }
 
