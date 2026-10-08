@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isSupabaseStorageConfigured, supabaseAdmin, PRODUCT_IMAGES_BUCKET } from "@/lib/supabase";
 import { resolveCompanyId } from "@/lib/tenant";
 import { randomUUID } from "crypto";
+import { deleteMedia, isCloudinaryUrl, isMediaConfigured, uploadMedia } from "@/lib/media";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
@@ -23,6 +24,10 @@ export async function POST(req: NextRequest) {
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const path = `${companyId}/${randomUUID()}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    if (isMediaConfigured()) {
+      return NextResponse.json({ url: await uploadMedia(buffer, { kind: "products", scope: companyId }) });
+    }
 
     if (isSupabaseStorageConfigured() && supabaseAdmin) {
       try {
@@ -63,6 +68,11 @@ export async function DELETE(req: NextRequest) {
     const { url: imageUrl } = await req.json();
     if (!imageUrl) return NextResponse.json({ error: "URL required" }, { status: 400 });
     if (String(imageUrl).startsWith("data:")) return NextResponse.json({ ok: true });
+    if (isCloudinaryUrl(imageUrl)) {
+      // deleteMedia only touches files under this company's folder.
+      await deleteMedia(imageUrl, { kind: "products", scope: companyId });
+      return NextResponse.json({ ok: true });
+    }
 
     // Extract path from public URL: .../product-images/companyId/uuid.ext
     const bucketPrefix = `${PRODUCT_IMAGES_BUCKET}/`;

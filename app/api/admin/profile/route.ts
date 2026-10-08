@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
+import { deleteMedia, isCloudinaryUrl, isMediaConfigured, uploadMedia } from "@/lib/media";
 
 /**
- * Profile photos are stored inline as data URLs on the user row, the same way
- * /api/me/avatar stores the customer-side ones. That route authenticates off
+ * Profile photos arrive as data URLs and are uploaded to Cloudinary, the same
+ * way /api/me/avatar stores the customer-side ones (inline on the user row
+ * when Cloudinary is not configured). That route authenticates off
  * the JWT cookie; this panel authenticates off the x-user-id/x-user-role
  * headers, so the admin photo rides along on this route rather than borrowing
  * an auth scheme the admin pages do not use.
@@ -103,6 +105,9 @@ export async function PATCH(req: NextRequest) {
     let avatar: string | null | undefined;
     if (body?.avatar === null) {
       avatar = null;
+    } else if (typeof body?.avatar === "string" && isCloudinaryUrl(body.avatar)) {
+      // The photo already on file, sent back unchanged.
+      avatar = undefined;
     } else if (typeof body?.avatar === "string") {
       if (!body.avatar.startsWith("data:image/")) {
         return NextResponse.json({ error: "Photo must be an image" }, { status: 400 });
@@ -144,6 +149,9 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (user) {
+      if (typeof avatar === "string" && isMediaConfigured()) {
+        avatar = await uploadMedia(avatar, { kind: "avatars", scope: userId });
+      }
       const updated = await prisma.user.update({
         where: { id: userId },
         data: {
@@ -158,6 +166,10 @@ export async function PATCH(req: NextRequest) {
           createdAt: true,
         },
       });
+
+      if (avatar !== undefined && user.avatar !== avatar) {
+        await deleteMedia(user.avatar, { kind: "avatars", scope: userId });
+      }
 
       return NextResponse.json({
         success: true,

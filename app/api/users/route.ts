@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { resolveCompanyId } from "@/lib/tenant";
 import { getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
+import { deleteMedia, isCloudinaryUrl, isMediaConfigured, uploadMedia } from "@/lib/media";
 
 /**
  * A profile photo arrives as a base64 data URL, the same shape /api/me/avatar
@@ -12,6 +13,8 @@ import { getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 function readAvatar(avatar: unknown): string | null | undefined {
   if (avatar === undefined) return undefined;
   if (avatar === null || avatar === "") return null;
+  // The photo already on file, sent back unchanged with the rest of the form.
+  if (typeof avatar === "string" && isCloudinaryUrl(avatar)) return undefined;
   if (typeof avatar !== "string" || !/^data:image\/[a-z+.-]+;base64,/i.test(avatar)) {
     throw new Error("Profile photo must be an image");
   }
@@ -123,13 +126,19 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role: role || "ACCOUNTANT",
         active: true,
-        avatar: avatarValue ?? null,
+        // Inline only when Cloudinary is off; otherwise uploaded below, once
+        // the user has an id to file it under.
+        avatar: isMediaConfigured() ? null : avatarValue ?? null,
         defaultCompanyId: companyId,
         companies: {
           create: [{ companyId, isDefault: true }],
         },
       },
     });
+    if (avatarValue && isMediaConfigured()) {
+      const url = await uploadMedia(avatarValue, { kind: "avatars", scope: user.id });
+      return NextResponse.json(await prisma.user.update({ where: { id: user.id }, data: { avatar: url } }));
+    }
     return NextResponse.json(user);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -154,7 +163,6 @@ export async function PUT(req: NextRequest) {
     let avatarValue: string | null | undefined;
     try { avatarValue = readAvatar(avatar); }
     catch (e: any) { return NextResponse.json({ error: e.message }, { status: 400 }); }
-    if (avatarValue !== undefined) updateData.avatar = avatarValue;
     if (password && password.trim()) {
       updateData.password = await bcrypt.hash(password, 10);
     }
@@ -167,11 +175,23 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "User not in company" }, { status: 404 });
     }
 
+    const previous = avatarValue !== undefined
+      ? await prisma.user.findUnique({ where: { id }, select: { avatar: true } })
+      : null;
+    if (avatarValue !== undefined) {
+      updateData.avatar = avatarValue && isMediaConfigured()
+        ? await uploadMedia(avatarValue, { kind: "avatars", scope: id })
+        : avatarValue;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateData,
       select: { id: true, name: true, email: true, role: true, active: true, createdAt: true, avatar: true },
     });
+    if (previous && previous.avatar !== updatedUser.avatar) {
+      await deleteMedia(previous.avatar, { kind: "avatars", scope: id });
+    }
     return NextResponse.json(updatedUser);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

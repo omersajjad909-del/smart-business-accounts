@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin, isSupabaseStorageConfigured } from "@/lib/supabase";
 import { randomUUID } from "crypto";
+import { deleteMedia, isMediaConfigured, uploadMedia } from "@/lib/media";
 
 const LOGO_BUCKET = "company-logos";
 const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
@@ -31,6 +32,14 @@ export async function POST(req: NextRequest) {
     const ext = file.name.split(".").pop()?.toLowerCase() || "png";
     const buffer = Buffer.from(await file.arrayBuffer());
     let logoUrl: string;
+    const previous = await prisma.company.findUnique({ where: { id: companyId }, select: { logoUrl: true } });
+
+    if (isMediaConfigured()) {
+      logoUrl = await uploadMedia(buffer, { kind: "logos", scope: companyId });
+      await prisma.company.update({ where: { id: companyId }, data: { logoUrl } });
+      await deleteMedia(previous?.logoUrl, { kind: "logos", scope: companyId });
+      return NextResponse.json({ logoUrl });
+    }
 
     if (isSupabaseStorageConfigured() && supabaseAdmin) {
       const path = `${companyId}/${randomUUID()}.${ext}`;
@@ -67,6 +76,8 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Only admins can remove the logo" }, { status: 403 });
   }
 
+  const previous = await prisma.company.findUnique({ where: { id: companyId }, select: { logoUrl: true } });
   await prisma.company.update({ where: { id: companyId }, data: { logoUrl: null } });
+  await deleteMedia(previous?.logoUrl, { kind: "logos", scope: companyId });
   return NextResponse.json({ ok: true });
 }

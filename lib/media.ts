@@ -93,7 +93,7 @@ export async function deleteMedia(url: string | null | undefined, opts: { kind: 
   if (!configured || !isCloudinaryUrl(url)) return;
   const folder = `${ROOT}/${opts.kind}/${opts.scope.replace(/[^a-zA-Z0-9_-]/g, "_")}/`;
   // .../image/upload/v1712345678/<folder>/<uuid>.<ext>
-  const match = /\/image\/upload\/(?:[^/]+\/)*?(?:v\d+\/)?(.+)\.[a-z0-9]+$/i.exec(new URL(url!).pathname);
+  const match = /\/image\/upload\/(?:v\d+\/)?(.+)\.[a-z0-9]+$/i.exec(new URL(url!).pathname);
   const publicId = match?.[1];
   if (!publicId || !publicId.startsWith(folder)) return;
   try {
@@ -101,10 +101,4 @@ export async function deleteMedia(url: string | null | undefined, opts: { kind: 
   } catch (err) {
     console.error("Cloudinary delete failed:", err);
   }
-}
-
-/** Insert a delivery transformation, e.g. "w_200,h_200,c_fill,f_auto,q_auto". */
-export function mediaVariant(url: string, transformation: string): string {
-  if (!isCloudinaryUrl(url)) return url;
-  return url.replace("/image/upload/", `/image/upload/${transformation}/`);
 }
