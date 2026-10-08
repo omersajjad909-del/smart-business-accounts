@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 
 type Props = {
   feature: string;        // e.g. "hrPayroll", "crm", "bankReconciliation", "apiAccess", "multiBranch"
@@ -25,6 +26,20 @@ export default function PlanGate({ feature, requiredPlan, children }: Props) {
   useEffect(() => {
     (async () => {
       try {
+        // A page the company has been given — by its plan grid or by a super
+        // admin assigning it to this company — is open whatever the plan name
+        // says. This is the same list the sidebar and the route guard use; the
+        // plan check below only decides for pages nobody assigned.
+        const bRes = await fetch("/api/me/bootstrap", { cache: "no-store" }).catch(() => null);
+        if (bRes?.ok) {
+          const b = await bRes.json();
+          const page = findDashboardFeatureByRoute(window.location.pathname);
+          if (page && Array.isArray(b?.dashboardFeatures) && b.dashboardFeatures.includes(page.id)) {
+            setAllowed(true);
+            return;
+          }
+        }
+
         const [cRes, cfgRes] = await Promise.all([
           fetch("/api/me/company", { cache: "no-store" }),
           fetch("/api/public/plan-config", { cache: "no-store" }),
