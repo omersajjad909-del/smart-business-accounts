@@ -703,6 +703,17 @@ export default function DashboardLayout({
   const [shiftSecsLeft, setShiftSecsLeft] = useState(0);
   const shiftEndMsRef = useRef(0);
   const shiftWarningActiveRef = useRef(false);
+  // Dismissed = the person acknowledged the warning and went back to work. The
+  // modal then gives way to a small countdown pill, and comes back once more
+  // for the last two minutes (finalReminderShownRef).
+  const [shiftDismissed, setShiftDismissed] = useState(false);
+  const shiftDismissedRef = useRef(false);
+  const finalReminderShownRef = useRef(false);
+  const dismissShiftWarning = () => {
+    shiftDismissedRef.current = true;
+    setShiftDismissed(true);
+    setShowShiftWarning(false);
+  };
 
   // Every signed-in user on every dashboard screen runs this, so it is only
   // worth a request while the tab is in front of someone. A shift that ends
@@ -725,9 +736,13 @@ export default function DashboardLayout({
         shiftEndMsRef.current = Date.now() + d.minutesRemaining * 60_000;
         shiftWarningActiveRef.current = true;
         setShiftSecsLeft(d.minutesRemaining * 60);
-        setShowShiftWarning(true);
+        if (!shiftDismissedRef.current) setShowShiftWarning(true);
       } else {
+        // Out of the warning window (e.g. the admin gave overtime): start clean.
         shiftWarningActiveRef.current = false;
+        shiftDismissedRef.current = false;
+        finalReminderShownRef.current = false;
+        setShiftDismissed(false);
         setShowShiftWarning(false);
       }
     } catch {}
@@ -739,7 +754,13 @@ export default function DashboardLayout({
       if (!shiftWarningActiveRef.current) return;
       const s = Math.max(0, Math.floor((shiftEndMsRef.current - Date.now()) / 1000));
       setShiftSecsLeft(s);
-      if (s <= 0) logout();
+      if (s <= 0) { logout(); return; }
+      if (s <= 120 && shiftDismissedRef.current && !finalReminderShownRef.current) {
+        finalReminderShownRef.current = true;
+        shiftDismissedRef.current = false;
+        setShiftDismissed(false);
+        setShowShiftWarning(true);
+      }
     }, 1000);
 
     return () => clearInterval(countHandle);
@@ -1294,8 +1315,17 @@ export default function DashboardLayout({
           <div style={{
             background:"var(--dk-0d1035, #0d1035)", border:"1px solid rgba(239,68,68,0.4)",
             borderRadius:20, padding:"36px 40px", maxWidth:420, width:"90%",
-            boxShadow:"0 0 60px rgba(239,68,68,0.25)", textAlign:"center",
+            boxShadow:"0 0 60px rgba(239,68,68,0.25)", textAlign:"center", position:"relative",
           }}>
+            <button
+              onClick={dismissShiftWarning}
+              aria-label="Close"
+              style={{
+                position:"absolute", top:12, right:14, width:30, height:30, borderRadius:8,
+                background:"transparent", border:"none", cursor:"pointer", fontSize:20, lineHeight:1,
+                color:"rgba(var(--ink),var(--ta-60, 0.6))",
+              }}
+            >✕</button>
             <div style={{fontSize:44, marginBottom:12}}>🕐</div>
             <div style={{fontSize:22, fontWeight:800, color:"var(--ink-solid, #fff)", marginBottom:8}}>
               Shift Ending Soon
@@ -1311,17 +1341,40 @@ export default function DashboardLayout({
                 Please save your work. Contact admin to extend shift.
               </span>
             </div>
-            <button
-              onClick={logout}
-              style={{
-                padding:"10px 28px", borderRadius:10, cursor:"pointer",
-                background:"transparent", border:"1px solid rgba(var(--ink),0.15)",
-                color:"rgba(var(--ink),var(--ta-60, 0.6))", fontWeight:600, fontSize:14,
-              }}
-            >
-              Logout Now
-            </button>
+            <div style={{display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap"}}>
+              <button
+                onClick={dismissShiftWarning}
+                style={{
+                  padding:"10px 24px", borderRadius:10, cursor:"pointer",
+                  background:"#0f766e", border:"none", color:"#fff", fontWeight:700, fontSize:14,
+                }}
+              >
+                Continue working
+              </button>
+              <button
+                onClick={logout}
+                style={{
+                  padding:"10px 24px", borderRadius:10, cursor:"pointer",
+                  background:"transparent", border:"1px solid rgba(var(--ink),0.15)",
+                  color:"rgba(var(--ink),var(--ta-60, 0.6))", fontWeight:600, fontSize:14,
+                }}
+              >
+                Logout Now
+              </button>
+            </div>
           </div>
+        </div>
+      )}
+
+      {/* Small countdown once the warning has been acknowledged. */}
+      {shiftDismissed && !showShiftWarning && shiftSecsLeft > 0 && (
+        <div style={{
+          position:"fixed", right:16, bottom:16, zIndex:9990,
+          padding:"8px 14px", borderRadius:999, fontSize:12, fontWeight:700,
+          background:"var(--dk-0d1035, #0d1035)", color:"var(--tx-f87171, #f87171)",
+          border:"1px solid rgba(239,68,68,0.4)", boxShadow:"0 4px 16px rgba(0,0,0,.3)",
+        }}>
+          🕐 Shift ends in {Math.floor(shiftSecsLeft / 60)}:{String(shiftSecsLeft % 60).padStart(2,"0")}
         </div>
       )}
 
