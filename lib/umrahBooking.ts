@@ -30,6 +30,12 @@ export type Instalment = {
   receiptNo?: string;
 };
 
+export type PilgrimDocumentFile = {
+  attachmentId: string;
+  fileName: string;
+  fileType?: string;
+};
+
 export type BookingPilgrim = {
   id: string;
   name: string;
@@ -64,6 +70,9 @@ export type BookingPilgrim = {
 
   /** Documents received, keyed by PILGRIM_DOCUMENTS. */
   documents?: Record<string, boolean>;
+  /** The scan behind each tick, when one was uploaded — an attachment record,
+      keyed by PILGRIM_DOCUMENTS. A tick without a file is an original in hand. */
+  documentFiles?: Record<string, PilgrimDocumentFile>;
 
   /** The Traveler this pilgrim is, once they are one — so next season does not
       start by typing the passport out of a photocopy again. */

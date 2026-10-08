@@ -15,9 +15,10 @@
  * ability to fix any of them in place.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useResponsive } from "@/hooks/useResponsive";
+import { getCurrentUser } from "@/lib/auth";
 import { useCurrency } from "@/lib/useCurrency";
 import { alertToast } from "@/lib/toast-feedback";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -30,6 +31,7 @@ import {
   readBooking,
   type BookingPilgrim,
   type PassportState,
+  type PilgrimDocumentFile,
 } from "@/lib/umrahBooking";
 import { readDeparture } from "@/lib/umrahPackage";
 import { syncUmrahPilgrimPassports } from "@/lib/umrahPassportSync";
@@ -67,6 +69,16 @@ const PASSPORT_TONE: Record<PassportState, { tone: string; label: string }> = {
 const VISA_TONE: Record<string, string> = {
   pending: "#94a3b8", applied: "#60a5fa", approved: "#34d399", rejected: "#f87171",
 };
+
+/** Attachments filed against one document of one pilgrim. */
+const DOC_ENTITY = "umrah_pilgrim_document";
+const docEntityId = (row: Row, docKey: string) => `${row.bookingId}:${row.pilgrim.id || row.index}:${docKey}`;
+const DOC_MAX_BYTES = 10 * 1024 * 1024;
+
+function attachmentHeaders(): Record<string, string> {
+  const user = getCurrentUser();
+  return user ? { "x-company-id": user.companyId || "", "x-user-id": user.id } : {};
+}
 
 /** Pakistani CNIC format: five digits, seven digits, then one digit. */
 function formatCnic(value: string): string {
@@ -203,12 +215,92 @@ export default function GroupOpsPage() {
     [bookings],
   );
 
+  /* Documents are files, not just ticks. One hidden picker serves every chip;
+     the chip that opened it is remembered until the file comes back. */
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploadTarget, setUploadTarget] = useState<{ row: Row; docKey: string } | null>(null);
+  const [docBusy, setDocBusy] = useState("");
+
+  const pickFile = (row: Row, docKey: string) => {
+    setUploadTarget({ row, docKey });
+    if (fileRef.current) { fileRef.current.value = ""; fileRef.current.click(); }
+  };
+
+  const uploadDocument = async (file: File | undefined) => {
+    const target = uploadTarget;
+    setUploadTarget(null);
+    if (!file || !target) return;
+    if (file.size > DOC_MAX_BYTES) { alertToast("That file is over 10 MB.", "error", "Too Large"); return; }
+    const { row, docKey } = target;
+    const busyKey = `${row.bookingId}:${row.index}:${docKey}`;
+    setDocBusy(busyKey);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("entityType", DOC_ENTITY);
+      fd.append("entityId", docEntityId(row, docKey));
+      const res = await fetch("/api/attachments", { method: "POST", headers: attachmentHeaders(), body: fd });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body?.id) { alertToast(body?.error || "Upload failed.", "error", "Not Uploaded"); return; }
+      const previous = row.pilgrim.documentFiles?.[docKey];
+      const entry: PilgrimDocumentFile = { attachmentId: body.id, fileName: file.name, fileType: file.type };
+      await patchPilgrim(row, {
+        documents: { ...(row.pilgrim.documents ?? {}), [docKey]: true },
+        documentFiles: { ...(row.pilgrim.documentFiles ?? {}), [docKey]: entry },
+      });
+      // A re-upload replaces the scan; the old file should not linger in storage.
+      if (previous?.attachmentId) {
+        fetch(`/api/attachments?id=${encodeURIComponent(previous.attachmentId)}`, { method: "DELETE", headers: attachmentHeaders() }).catch(() => {});
+      }
+    } catch {
+      alertToast("Upload failed.", "error", "Not Uploaded");
+    } finally {
+      setDocBusy("");
+    }
+  };
+
+  const viewDocument = async (row: Row, docKey: string) => {
+    const entry = row.pilgrim.documentFiles?.[docKey];
+    if (!entry) return;
+    // Open the tab now, while the click still counts as a user gesture.
+    const tab = window.open("", "_blank");
+    try {
+      const res = await fetch(`/api/attachments?entityType=${DOC_ENTITY}&entityId=${encodeURIComponent(docEntityId(row, docKey))}`, { headers: attachmentHeaders() });
+      const list: Array<{ id: string; fileUrl: string }> = res.ok ? await res.json() : [];
+      const url = list.find((a) => a.id === entry.attachmentId)?.fileUrl;
+      if (!url) throw new Error("missing");
+      if (tab) tab.location.href = url; else window.open(url, "_blank");
+    } catch {
+      tab?.close();
+      alertToast("Could not open that file.", "error", "Not Found");
+    }
+  };
+
+  const removeDocument = async (row: Row, docKey: string) => {
+    const entry = row.pilgrim.documentFiles?.[docKey];
+    if (!entry || !window.confirm(`Remove the ${PILGRIM_DOCUMENTS.find((d) => d.key === docKey)?.label ?? docKey} file for ${row.pilgrim.name || "this pilgrim"}?`)) return;
+    const busyKey = `${row.bookingId}:${row.index}:${docKey}`;
+    setDocBusy(busyKey);
+    try {
+      await fetch(`/api/attachments?id=${encodeURIComponent(entry.attachmentId)}`, { method: "DELETE", headers: attachmentHeaders() });
+      const files = { ...(row.pilgrim.documentFiles ?? {}) };
+      delete files[docKey];
+      await patchPilgrim(row, { documents: { ...(row.pilgrim.documents ?? {}), [docKey]: false }, documentFiles: files });
+    } catch {
+      alertToast("Could not remove that file.", "error", "Not Removed");
+    } finally {
+      setDocBusy("");
+    }
+  };
+
   const cell = { ...inputStyle, padding: "6px 8px", fontSize: 12 };
   const seats = departure?.d.seats ?? 0;
 
   return (
     <div className="fl-form" style={{ padding: isMobile ? 16 : "24px 28px", fontFamily: ff, color: T.text, maxWidth: "100%", overflow: "hidden" }}>
       <style dangerouslySetInnerHTML={{ __html: flightCss }} />
+      <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" hidden
+        onChange={(e) => uploadDocument(e.target.files?.[0])} />
 
       <header style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap" }}>
         <span style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, display: "grid", placeItems: "center", background: "linear-gradient(135deg,var(--accent),var(--accent-strong))", fontSize: 19 }}>🕋</span>
@@ -384,29 +476,44 @@ export default function GroupOpsPage() {
                       })}
                     </div>
 
-                    {/* Five ticks. At a hundred pilgrims this is the five hundred
-                        things that were living in a register. */}
+                    {/* Five documents. Upload the scan, or tick it when only the
+                        original has been handed over. */}
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", borderTop: `1px solid ${T.border}`, paddingTop: 10 }}>
                       <span style={{ fontSize: 10.5, color: T.muted, textTransform: "uppercase", letterSpacing: ".05em" }}>
                         Documents {documentsIn(row.pilgrim)}/{PILGRIM_DOCUMENTS.length}
                       </span>
                       {PILGRIM_DOCUMENTS.map((doc) => {
                         const on = Boolean(docs[doc.key]);
+                        const file = row.pilgrim.documentFiles?.[doc.key];
+                        const working = docBusy === `${row.bookingId}:${row.index}:${doc.key}`;
+                        const green = "rgba(52,211,153,.45)";
+                        const pill = {
+                          border: `1px solid ${on ? green : T.border}`,
+                          background: on ? "rgba(52,211,153,.14)" : "transparent",
+                          color: on ? "#34d399" : T.muted,
+                          fontSize: 11, fontWeight: 700, cursor: working ? "wait" : "pointer", fontFamily: "inherit",
+                        } as const;
                         return (
-                          <button
-                            key={doc.key}
-                            type="button"
-                            onClick={() => patchPilgrim(row, { documents: { ...docs, [doc.key]: !on } })}
-                            style={{
-                              border: `1px solid ${on ? "rgba(52,211,153,.45)" : T.border}`,
-                              background: on ? "rgba(52,211,153,.14)" : "transparent",
-                              color: on ? "#34d399" : T.muted,
-                              borderRadius: 999, padding: "4px 11px", fontSize: 11, fontWeight: 700,
-                              cursor: "pointer", fontFamily: "inherit",
-                            }}
-                          >
-                            {on ? "✓ " : ""}{doc.label}
-                          </button>
+                          <span key={doc.key} style={{ display: "inline-flex", opacity: working ? 0.6 : 1 }}>
+                            <button
+                              type="button"
+                              disabled={working}
+                              title={file ? `View ${file.fileName}` : on ? "Original received — click to upload the scan" : `Upload ${doc.label}`}
+                              onClick={() => (file ? viewDocument(row, doc.key) : pickFile(row, doc.key))}
+                              style={{ ...pill, borderRadius: "999px 0 0 999px", padding: "4px 10px", borderRight: "none" }}
+                            >
+                              {working ? "… " : file ? "📎 " : on ? "✓ " : "⬆ "}{doc.label}
+                            </button>
+                            {file ? (
+                              <button type="button" disabled={working} title="Remove file" onClick={() => removeDocument(row, doc.key)}
+                                style={{ ...pill, borderRadius: "0 999px 999px 0", padding: "4px 8px" }}>×</button>
+                            ) : (
+                              <button type="button" disabled={working}
+                                title={on ? "Unmark original received" : "Mark original received (no scan)"}
+                                onClick={() => patchPilgrim(row, { documents: { ...docs, [doc.key]: !on } })}
+                                style={{ ...pill, borderRadius: "0 999px 999px 0", padding: "4px 8px" }}>{on ? "✓" : "○"}</button>
+                            )}
+                          </span>
                         );
                       })}
                     </div>
