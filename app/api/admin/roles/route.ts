@@ -108,10 +108,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const planPermissions = await getCompanyPlanPermissions(companyId);
+    // Only real permission names. Not narrowed to the plan's permission list:
+    // what a plan ships is decided by its pages, and a page can be on while its
+    // permission isn't in that list — dropping it here made the tick vanish.
+    const known = new Set<string>(Object.values(PERMISSIONS));
     const unique = Array.from(new Set(
-      permissions.filter((p: unknown): p is string =>
-        typeof p === "string" && p.length > 0 && (!planPermissions || planPermissions.includes(p)))
+      permissions.filter((p: unknown): p is string => typeof p === "string" && known.has(p))
     ));
 
     // One transaction, one bulk insert: 80+ parallel creates exhausted the

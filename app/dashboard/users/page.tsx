@@ -160,23 +160,45 @@ export default function TeamAndPermissionsPage() {
   const [shiftSaving,     setShiftSaving]     = useState<string | null>(null);
   const [shiftOvertiming, setShiftOvertiming] = useState<string | null>(null);
 
-  const permPages     = useMemo(() => {
-    // permission -> ids of the pages it gates (a page's id, or its permKey)
-    const map: Record<string, string[]> = {};
-    for (const f of [...DASHBOARD_FEATURE_DEFS, ...CORE_DASHBOARD_FEATURES]) {
-      for (const key of [f.id, (f as { permKey?: string }).permKey]) {
-        if (key && (Object.values(PERMISSIONS) as string[]).includes(key)) (map[key] ||= []).push(f.id);
-      }
+  const allPermValues = Object.values(PERMISSIONS) as string[];
+  // Every page the company's plan ships, with the permission that opens it. The
+  // sidebar is built from pages, so this is the list an admin thinks in. A page
+  // is listed when it's in the company's page list; the plan's permission list
+  // is not consulted, since a page can be on while its permission isn't in that
+  // list (Inventory Intelligence on Starter) and would otherwise vanish here.
+  const pageItems = useMemo(() => {
+    const seen = new Set<string>();
+    const out: { id: string; perm: string; label: string; route: string }[] = [];
+    for (const f of [...DASHBOARD_FEATURE_DEFS, ...CORE_DASHBOARD_FEATURES] as { id: string; label: string; route: string; permKey?: string }[]) {
+      if (seen.has(f.id)) continue;
+      if (companyPages && !companyPages.has(f.id)) continue;
+      const perm = f.permKey && allPermValues.includes(f.permKey) ? f.permKey : allPermValues.includes(f.id) ? f.id : null;
+      if (!perm) continue;
+      seen.add(f.id);
+      out.push({ id: f.id, perm, label: f.label, route: f.route });
     }
-    return map;
-  }, []);
-  const allPerms      = useMemo<string[]>(() => (Object.values(PERMISSIONS) as string[]).filter(p => {
-    if (planPerms && !planPerms.includes(p)) return false;
-    const pages = permPages[p];
-    return !companyPages || !pages || pages.some(id => companyPages.has(id));
-  }), [planPerms, companyPages, permPages]);
-  const filteredPerms = useMemo(() => permSearch ? allPerms.filter(p => p.toLowerCase().includes(permSearch.toLowerCase())) : allPerms, [allPerms, permSearch]);
-  const permGroups    = useMemo(() => groupPerms(filteredPerms), [filteredPerms]);
+    return out;
+  }, [companyPages, allPermValues]);
+  // Permissions that don't open a page (create/approve/export actions).
+  const otherItems = useMemo(() => {
+    const pagePerm = new Set<string>();
+    for (const f of [...DASHBOARD_FEATURE_DEFS, ...CORE_DASHBOARD_FEATURES] as { id: string; permKey?: string }[]) {
+      if (f.permKey) pagePerm.add(f.permKey);
+      if (allPermValues.includes(f.id)) pagePerm.add(f.id);
+    }
+    return allPermValues
+      .filter(p => !pagePerm.has(p) && (!planPerms || planPerms.includes(p)))
+      .map(p => ({ id: p, perm: p, label: p, route: "" }));
+  }, [planPerms, allPermValues]);
+  const allPerms = useMemo<string[]>(() => Array.from(new Set([...pageItems, ...otherItems].map(i => i.perm))), [pageItems, otherItems]);
+  const permSections = useMemo(() => {
+    const q = permSearch.trim().toLowerCase();
+    const match = (i: { label: string; route: string; perm: string }) => !q || `${i.label} ${i.route} ${i.perm}`.toLowerCase().includes(q);
+    return [
+      { title: "Pages", items: pageItems.filter(match) },
+      { title: "Other permissions", items: otherItems.filter(match) },
+    ].filter(sec => sec.items.length > 0);
+  }, [pageItems, otherItems, permSearch]);
 
   const selUser   = selUserId ? users.find(u => u.id === selUserId) || null : null;
   const inherited = useMemo(() => roles.find(x => x.role === selRole)?.permissions || [], [roles, selRole]);
@@ -761,14 +783,15 @@ export default function TeamAndPermissionsPage() {
                 </button>
               </div>
             </div>
-            {Object.entries(permGroups).map(([cat, perms]) => (
-              <div key={cat} style={{ marginBottom: 20 }}>
+            {permSections.map(sec => (
+              <div key={sec.title} style={{ marginBottom: 20 }}>
                 <div style={{ fontSize: 10, fontWeight: 800, color: "#334155", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>{cat}</span>
-                  <span style={{ fontWeight: 600, color: "#475569" }}>({perms.filter(p => activePerms.includes(p)).length}/{perms.length})</span>
+                  <span>{sec.title}</span>
+                  <span style={{ fontWeight: 600, color: "#475569" }}>({sec.items.filter(i => activePerms.includes(i.perm)).length}/{sec.items.length})</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 6 }}>
-                  {perms.map(perm => {
+                  {sec.items.map(item => {
+                    const perm = item.perm;
                     const fromRole = !!selUser && inherited.includes(perm);
                     const removed = fromRole && userDenied.includes(perm);
                     const adminUser = selUser?.role?.toUpperCase() === "ADMIN";
@@ -781,12 +804,12 @@ export default function TeamAndPermissionsPage() {
                       else setUserExtra(flip);
                     };
                     return (
-                      <label key={perm} title={adminUser ? "Admins always have every permission" : fromRole ? (removed ? "Removed for this user only" : "From the role — untick to remove for this user only") : undefined} onClick={toggle} style={{ opacity: adminUser ? .6 : 1, cursor: adminUser ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "rgba(var(--ink),.06)"}`, background: on ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.01)", transition: "all .1s" }}>
+                      <label key={item.id} title={`${perm}${adminUser ? " — admins always have every permission" : fromRole ? (removed ? " — removed for this user only" : " — from the role; untick to remove for this user only") : ""}`} onClick={toggle} style={{ opacity: adminUser ? .6 : 1, cursor: adminUser ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "rgba(var(--ink),.06)"}`, background: on ? "rgba(99,102,241,.07)" : "rgba(var(--ink),.01)", transition: "all .1s" }}>
                         <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${on ? "#6366f1" : "rgba(var(--ink),.15)"}`, background: on ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           {on && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                         </div>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: on ? "white" : "#475569" }}>{perm}</span>
-                        {fromRole && <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, color: removed ? "#dc2626" : "#475569" }}>{removed ? "REMOVED" : "ROLE"}</span>}
+                        <span style={{ fontSize: 12, fontWeight: 600, color: on ? "white" : "#475569", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>
+                        {fromRole && <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, color: removed ? "#dc2626" : "#475569", flexShrink: 0 }}>{removed ? "REMOVED" : "ROLE"}</span>}
                       </label>
                     );
                   })}
