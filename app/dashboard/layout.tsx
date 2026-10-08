@@ -3253,9 +3253,11 @@ export default function DashboardLayout({
                     {[
                       ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
                       { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
-                      { icon:"💳", label:"My Billing",        href:"/dashboard/billing" },
+                      // Billing and the team list are the company's, not the member's:
+                      // everyone else keeps only the items about their own account.
+                      ...(currentUser?.role === "ADMIN" ? [{ icon:"💳", label:"My Billing", href:"/dashboard/billing" }] : []),
                       { icon:"🎨", label:"Appearance",       href:"/dashboard/settings/appearance" },
-                      { icon:"👥", label:"Team Members",     href:"/dashboard/users" },
+                      ...(currentUser?.role === "ADMIN" ? [{ icon:"👥", label:"Team Members", href:"/dashboard/users" }] : []),
                       { icon:"🔔", label:"Notifications",    href:"/dashboard/notifications" },
                       { icon:"⭐", label:"Feedback & Reviews",href:"/dashboard/feedback" },
                     ].map(item => (
