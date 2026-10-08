@@ -6,6 +6,9 @@
  *   npx tsx --env-file=.env scripts/copy-hr-between-companies.ts --from A --to B          # dry run: counts + conflicts
  *   npx tsx --env-file=.env scripts/copy-hr-between-companies.ts --from A --to B --apply  # copy
  *
+ * `--from none` reads the old HR rows that have no company at all (from before
+ * the app was multi-tenant).
+ *
  * Copies: employees, attendance, leaves, payroll, salary advances, employee
  * document records and holidays. Every row gets a new id and the target's
  * companyId; the source is only read, never changed.
@@ -57,9 +60,10 @@ async function listCompanies() {
 async function main() {
   if (!from || !to) return listCompanies();
   if (from === to) throw new Error("--from and --to are the same company.");
+  const fromId: string | null = from === "none" ? null : from;
 
   const [src, dst] = await Promise.all([
-    prisma.company.findUnique({ where: { id: from }, select: { id: true, name: true } }),
+    fromId === null ? Promise.resolve({ id: "none", name: "(rows with no company)" }) : prisma.company.findUnique({ where: { id: fromId }, select: { id: true, name: true } }),
     prisma.company.findUnique({ where: { id: to }, select: { id: true, name: true } }),
   ]);
   if (!src) throw new Error(`Source company ${from} not found.`);
@@ -67,7 +71,7 @@ async function main() {
   console.log(`From: ${src.name} (${src.id})\nTo:   ${dst.name} (${dst.id})\n`);
 
   const [employees, existing] = await Promise.all([
-    prisma.employee.findMany({ where: { companyId: from } }),
+    prisma.employee.findMany({ where: { companyId: fromId } }),
     prisma.employee.findMany({ where: { companyId: to }, select: { employeeId: true, email: true, biometricId: true } }),
   ]);
   const taken = {
@@ -88,7 +92,7 @@ async function main() {
     prisma.payroll.findMany({ where: { employeeId: { in: oldIds } } }),
     prisma.advanceSalary.findMany({ where: { employeeId: { in: oldIds } } }),
     prisma.employeeDocument.findMany({ where: { employeeId: { in: oldIds } } }),
-    prisma.holiday.findMany({ where: { companyId: from } }),
+    prisma.holiday.findMany({ where: { companyId: fromId ?? "none" } }),
     prisma.holiday.findMany({ where: { companyId: to }, select: { date: true } }),
   ]);
   const haveDates = new Set(existingHolidays.map((h) => h.date.toISOString()));
