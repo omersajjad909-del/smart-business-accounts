@@ -6,6 +6,7 @@ import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags, readSavedDas
 import { COMPANY_PAGE_OVERRIDES_ACTION, applyCompanyPageOverrides, parseCompanyPageOverrides } from "@/lib/companyPageOverrides";
 import { COMPANY_PAGE_PREFS_ACTION, applyCompanyPagePrefs, parseCompanyPagePrefs } from "@/lib/companyPagePrefs";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
+import { businessDoesJobWork } from "@/lib/corePack";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
 import { needsTwoFactorEnrollment } from "@/lib/securityPolicy";
@@ -317,9 +318,14 @@ export async function GET(req: NextRequest) {
     }
 
     // Pages that follow from the kind of workspace this is — see above. Same
-    // two conditions lib/jobWork.ts lets through, so the sidebar link, the route
-    // guard and the module's own API all answer alike.
-    if ((company?.isDemo || company?.isInternalTest) && dashboardFeatures) {
+    // conditions lib/jobWork.ts lets through (a production business type, then
+    // demo or internal test), so the sidebar link, the route guard and the
+    // module's own API all answer alike.
+    if (
+      (company?.isDemo || company?.isInternalTest) &&
+      businessDoesJobWork(String(company?.businessType || "")) &&
+      dashboardFeatures
+    ) {
       const list = dashboardFeatures;
       const missing = WORKSPACE_KIND_FEATURES.filter((id) => !list.includes(id));
       if (missing.length) dashboardFeatures = [...list, ...missing];

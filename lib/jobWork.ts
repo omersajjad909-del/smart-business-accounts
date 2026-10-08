@@ -45,6 +45,7 @@ import {
 import { MFG_ACCOUNTS, ensureAccount, getAverageCosts, getStockOnHand } from "@/lib/manufacturingPosting";
 import { round2, round6 } from "@/lib/manufacturingRemnants";
 import { companyOwnsDashboardFeature } from "@/lib/companyPlanFeatures";
+import { businessDoesJobWork } from "@/lib/corePack";
 
 type Db = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
 
@@ -109,7 +110,9 @@ export const JOB_WORK_ACCOUNTS = {
 export const JOB_WORK_FEATURE_ID = "JOB_WORK";
 
 /**
- * Three ways in, and no fourth.
+ * Only a production business type gets Job Work at all — see
+ * JOB_WORK_BUSINESS_TYPES in lib/corePack.ts. Within those, three ways in, and
+ * no fourth.
  *
  * An internal test workspace, where the module was built. A demo sandbox —
  * throwaway data on a company nobody keeps books in, which is the point of
@@ -125,9 +128,10 @@ export const JOB_WORK_FEATURE_ID = "JOB_WORK";
 export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { isInternalTest: true, isDemo: true },
+    select: { isInternalTest: true, isDemo: true, businessType: true },
   });
   if (!company) return false;
+  if (!businessDoesJobWork(String(company.businessType || ""))) return false;
   if (company.isInternalTest === true) return true;
   if (company.isDemo === true) return true;
   return companyOwnsDashboardFeature(companyId, JOB_WORK_FEATURE_ID);

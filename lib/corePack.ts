@@ -435,7 +435,6 @@ const CORE_PAGE_RULES: { when: PackTest; ids: string[] }[] = [
     "CORE_REPORTS_STOCK_TURNOVER",
     "CORE_REPORTS_STOCK_VALUATION",
     "CORE_REPORTS_STOCK_WAREHOUSE",
-    "JOB_WORK",
   ] },
   // A warehouse is a warehouse whatever you sell — but only once there is more
   // than one place to keep it and something physical to put there.
@@ -487,8 +486,37 @@ export function corePackAllows(pack: CorePack, featureId: string): boolean {
   return CORE_PAGE_RULES.some((rule) => rule.ids.includes(featureId) && rule.when(pack));
 }
 
+/**
+ * Business types that send material out to be converted — the only ones that
+ * get Job Work.
+ *
+ * Job Work used to ride on the full-stock rule, which handed it to every trade
+ * that holds stock: a trading company, a wholesaler and a pharmacy all saw a
+ * manufacturing page. A pack cannot tell a factory from a warehouse — both are
+ * GOODS_TRADER — so this one page is decided by business type instead.
+ */
+export const JOB_WORK_BUSINESS_TYPES: ReadonlySet<string> = new Set([
+  "manufacturing",
+  "food_processing",
+  "garments",
+  "textile_mill",
+  "steel_mill",
+  "chemical",
+]);
+
+export function businessDoesJobWork(businessType: string): boolean {
+  return JOB_WORK_BUSINESS_TYPES.has(String(businessType || "").trim());
+}
+
+/** Core pages decided by business type rather than by pack. */
+const BUSINESS_TYPE_RULES: Record<string, (businessType: string) => boolean> = {
+  JOB_WORK: businessDoesJobWork,
+};
+
 /** Same question, keyed by business type. */
 export function businessOwnsCoreFeature(businessType: string, featureId: string): boolean {
+  const byType = BUSINESS_TYPE_RULES[featureId];
+  if (byType) return byType(businessType);
   return corePackAllows(getCorePack(businessType), featureId);
 }
 

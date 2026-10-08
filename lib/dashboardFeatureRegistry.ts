@@ -4,7 +4,7 @@ import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
 // The ownership half of page access: which pages a trade's paperwork actually
 // uses. corePack imports nothing but a type from businessModules, so there is
 // no cycle back here.
-import { corePackAllows, getCorePack } from "@/lib/corePack";
+import { businessOwnsCoreFeature } from "@/lib/corePack";
 
 export type DashboardFeaturePlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
 
@@ -2890,11 +2890,12 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // ids that are in the defaults, so no existing tenant picks it up on its own.
   // Demo sandboxes get it regardless — see /api/me/bootstrap.
   //
-  // Core rather than scoped to manufacturing on purpose: the Manufacturing
-  // group only renders for a business type carrying the "bom" module, and the
-  // merchant manufacturer this was built for — one who owns no machines and
-  // sends everything out to a thekedar — is usually set up as trading.
-  { id: "JOB_WORK", label: "Job Work", route: "/dashboard/job-work", section: "Operations", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (all businesses)", description: "Issue material to an outside worker on a challan and take the finished pieces back, with the stock and the ledger following." },
+  // Production business types only (manufacturing, food processing, garments,
+  // textile, steel, chemical) — see JOB_WORK_BUSINESS_TYPES in lib/corePack.ts.
+  // It used to reach trading too, for the merchant manufacturer set up as a
+  // trader; that put a factory page in every trading workspace, so it was
+  // narrowed. Such a business should be set up as manufacturing.
+  { id: "JOB_WORK", label: "Job Work", route: "/dashboard/job-work", section: "Operations", core: true, defaultEnabled: false, business: "service", businessLabel: "Core (production businesses)", description: "Issue material to an outside worker on a challan and take the finished pieces back, with the stock and the ledger following." },
 
   // ── Built, but linked to nothing until now ──
   //
@@ -3015,9 +3016,8 @@ export const CROSS_BUSINESS_FEATURE_LABELS = new Set(["AI Intelligence", "Core (
 export function dashboardFeaturesForBusinessType(businessType: string): DashboardFeatureDefinition[] {
   const target = String(businessType || "").trim();
   if (!target) return [];
-  const pack = getCorePack(target);
   return DASHBOARD_FEATURE_DEFS.filter((feature) => {
-    if (feature.core) return corePackAllows(pack, feature.id);
+    if (feature.core) return businessOwnsCoreFeature(target, feature.id);
     if (CROSS_BUSINESS_FEATURE_LABELS.has(feature.businessLabel)) return true;
     const allowed = feature.businessTypes?.length ? feature.businessTypes : [feature.business];
     return allowed.includes(target);

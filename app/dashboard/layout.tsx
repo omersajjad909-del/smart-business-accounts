@@ -1749,13 +1749,10 @@ export default function DashboardLayout({
             </NavGroup>
           )}
           {/* Job Work — material sent out to a thekedar and the pieces that come
-              back. Its own group rather than a Manufacturing sub-item on purpose:
-              the Manufacturing group only renders for a business type that has
-              the "bom" module, and a merchant manufacturer who owns no machines
-              is usually set up as trading — which would have hidden the page from
-              exactly the company it was built for. Gated purely on the server's
-              own answer, which covers all three ways in — internal test, demo
-              sandbox, or a plan an admin has ticked it for. */}
+              back. Gated purely on the server's own answer: a production
+              business type (lib/corePack.ts JOB_WORK_BUSINESS_TYPES), then one
+              of internal test, demo sandbox, or a plan an admin has ticked it
+              for. Trading and other stock-holding trades do not get it. */}
           {jobWorkEnabled && (
             <NavGroup
               title="Job Work"
