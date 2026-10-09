@@ -22,6 +22,7 @@ const PREFIX_MAP: Record<string, string> = {
   "FIXED ASSETS": "FA", "ACCUMULATED DEPRECIATION": "ADEP",
   EXPENSE: "EXP", INCOME: "INC", EQUITY: "EQT",
   LIABILITIES: "LIAB", STOCK: "STK", GENERAL: "GEN", CONTRA: "CON",
+  EMPLOYEES: "EMP",
 };
 
 const CATEGORY_COLOR: Record<string, { bg: string; text: string }> = {
@@ -38,6 +39,7 @@ const CATEGORY_COLOR: Record<string, { bg: string; text: string }> = {
   GENERAL:     { bg: "rgba(148,163,184,0.15)", text: "var(--tx-94a3b8, #94a3b8)" },
   CONTRA:      { bg: "rgba(244,114,182,0.15)", text: "var(--tx-f472b6, #f472b6)" },
   "ACCUMULATED DEPRECIATION": { bg: "rgba(248,113,113,0.15)", text: "var(--tx-f87171, #f87171)" },
+  EMPLOYEES:   { bg: "rgba(14,165,233,0.15)", text: "var(--tx-0ea5e9, #0ea5e9)" },
 };
 
 const CATEGORIES = [
@@ -51,12 +53,13 @@ const CATEGORIES = [
   { value: "INCOME",                    label: "Income / Revenue" },
   { value: "EQUITY",                    label: "Equity (Capital)" },
   { value: "LIABILITIES",               label: "Liabilities" },
+  { value: "EMPLOYEES",                 label: "Employees" },
   { value: "STOCK",                     label: "Stock / Inventory" },
   { value: "GENERAL",                   label: "General" },
   { value: "CONTRA",                    label: "Contra" },
 ];
 
-const TABS = ["ALL", "CUSTOMER", "SUPPLIER", "BANKS", "EXPENSE", "FIXED ASSETS", "EQUITY", "LIABILITIES", "CASH", "INCOME", "GENERAL", "CONTRA"];
+const TABS = ["ALL", "CUSTOMER", "SUPPLIER", "BANKS", "EXPENSE", "FIXED ASSETS", "EQUITY", "LIABILITIES", "EMPLOYEES", "CASH", "INCOME", "GENERAL", "CONTRA"];
 
 type Account = {
   id: string; code: string; name: string;

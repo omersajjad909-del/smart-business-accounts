@@ -21,6 +21,7 @@ const CATEGORY_TYPE_MAP: Record<string, string> = {
   INCOME: "INCOME",
   EQUITY: "EQUITY",
   LIABILITIES: "LIABILITY",
+  EMPLOYEES: "LIABILITY",
   STOCK: "ASSET",
   GENERAL: "ASSET",
   CONTRA: "CONTRA_ASSET",
@@ -80,6 +81,34 @@ export async function GET(req: NextRequest) {
   }
 
   const partyTypeParam = searchParams.get("partyType");
+
+  // Existing employee payable subaccounts are liabilities in the ledger, but
+  // belong in their own Employees chart-of-accounts category. The shared
+  // Salaries Payable control account is intentionally left under Liabilities.
+  if (!partyTypeParam || partyTypeParam.toUpperCase() === "EMPLOYEES") {
+    const linkedEmployees = await prisma.employee.findMany({
+      where: { companyId, accountId: { not: null } },
+      select: { accountId: true },
+    });
+    const accountIds = linkedEmployees.map(e => e.accountId).filter((id): id is string => Boolean(id));
+    if (accountIds.length) {
+      await prisma.account.updateMany({
+        where: { companyId, id: { in: accountIds }, partyType: { not: "EMPLOYEES" } },
+        data: { partyType: "EMPLOYEES", type: "LIABILITY" },
+      });
+    }
+    // Older payroll versions created employee accounts as "Name (Salary)"
+    // without linking accountId back to the employee record.
+    await prisma.account.updateMany({
+      where: {
+        companyId,
+        deletedAt: null,
+        partyType: "LIABILITIES",
+        name: { contains: "(SALARY)", mode: "insensitive" },
+      },
+      data: { partyType: "EMPLOYEES", type: "LIABILITY" },
+    });
+  }
 
   const accounts = await prisma.account.findMany({
     where: {

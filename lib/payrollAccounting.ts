@@ -20,17 +20,27 @@ async function findOrCreateAccount(params: {
   name: string;
   type: string;
   parentId?: string | null;
+  partyType?: string | null;
 }) {
   const existing = await prisma.account.findFirst({
     where: { companyId: params.companyId, code: params.code },
   });
-  if (existing) return existing;
+  if (existing) {
+    if (params.partyType && existing.partyType !== params.partyType) {
+      return prisma.account.update({
+        where: { id: existing.id },
+        data: { partyType: params.partyType, type: params.type },
+      });
+    }
+    return existing;
+  }
   return prisma.account.create({
     data: {
       companyId: params.companyId,
       code:      params.code,
       name:      params.name,
       type:      params.type,
+      ...(params.partyType ? { partyType: params.partyType } : {}),
       parentId:  params.parentId || null,
     },
   });
@@ -98,7 +108,15 @@ export async function ensureEmployeePayableAccount(params: {
   if (emp?.accountId) {
     // Verify it still exists (not deleted)
     const still = await prisma.account.findFirst({ where: { id: emp.accountId, companyId: params.companyId } });
-    if (still) return still.id;
+    if (still) {
+      if (still.partyType !== "EMPLOYEES" || still.type !== "LIABILITY") {
+        await prisma.account.update({
+          where: { id: still.id },
+          data: { partyType: "EMPLOYEES", type: "LIABILITY" },
+        });
+      }
+      return still.id;
+    }
   }
 
   const parent = await ensureSalariesPayableParent(params.companyId);
@@ -108,6 +126,7 @@ export async function ensureEmployeePayableAccount(params: {
     code,
     name: `${params.employeeName} — Salary Payable`,
     type: "LIABILITY",
+    partyType: "EMPLOYEES",
     parentId: parent.id,
   });
 
