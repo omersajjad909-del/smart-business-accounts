@@ -106,8 +106,11 @@ export default function PayrollPage() {
 
       if (calcData?.breakdown) {
         const bd = calcData.breakdown;
-        attDeduction = Math.round(Number(bd.netDeduction) || 0);
+        // Basic salary is prorated to credited attendance below, so absences
+        // must not also be deducted from that already-prorated amount.
+        attDeduction = 0;
         otAllowance  = Math.round(Number(bd.otAllowance)  || 0);
+        setForm(p => ({ ...p, baseSalary: Math.round(Number(bd.earnedBasicSalary) || 0) }));
         setAttSummary({
           present: calcData.counts.present,
           absent:  calcData.counts.absent,
