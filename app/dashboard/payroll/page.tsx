@@ -35,6 +35,7 @@ export default function PayrollPage() {
     present: number; absent: number; halfDay: number; leave: number; late: number; holiday: number; unmarked: number;
     otHours: number;
     perDay: number; perHour: number;
+    creditedDays: number; earnedBasicSalary: number;
     absentDeduction: number; halfDayDeduction: number;
     grossDeduction: number; otCredit: number;
     netDeduction: number; otAllowance: number;
@@ -122,6 +123,8 @@ export default function PayrollPage() {
           otHours: calcData.overtime.totalHours,
           perDay:  calcData.rates.perDay,
           perHour: calcData.rates.perHour,
+          creditedDays: bd.creditedDays,
+          earnedBasicSalary: bd.earnedBasicSalary,
           absentDeduction:  bd.absentDeduction,
           halfDayDeduction: bd.halfDayDeduction,
           grossDeduction:   bd.grossDeduction,
@@ -384,11 +387,15 @@ export default function PayrollPage() {
             {/* Numbers grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 12 }}>
               <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Earned basic ({attSummary.creditedDays} credited days)</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>Rs. {fmt(attSummary.earnedBasicSalary)}</div>
+              </div>
+              <div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Per-day rate</div>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>Rs. {fmt(Math.round(attSummary.perDay))}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Absent deduction</div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Absent pay excluded</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.absentDeduction > 0 ? "var(--tx-f87171, #f87171)" : "var(--text-primary)" }}>
                   Rs. {fmt(Math.round(attSummary.absentDeduction))}
                 </div>
