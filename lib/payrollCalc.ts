@@ -50,6 +50,8 @@ export type PayrollComputed = {
   };
 
   breakdown: {
+    creditedDays: number;             // paid attendance days (half-days count as 0.5)
+    earnedBasicSalary: number;        // monthly base prorated to credited attendance
     absentDeduction: number;          // absent × perDay
     halfDayDeduction: number;         // halfDay × perDay/2
     grossDeduction: number;           // absent + halfDay
@@ -134,24 +136,27 @@ export function computePayroll(params: {
   const grossDeduction   = money(absentDeduction + halfDayDeduction);
   const otCredit         = money(otTotal * perHour * rates.otMultiplier);
 
-  const netDeduction  = money(Math.max(0, grossDeduction - otCredit));
-  const otAllowance   = money(Math.max(0, otCredit       - grossDeduction));
+  // Absences reduce earned days above, so do not deduct their value again.
+  const netDeduction  = 0;
+  const otAllowance   = otCredit;
 
-  const suggestedNetSalary = money(params.baseSalary + otAllowance - netDeduction);
+  // Pay only days credited by attendance. Unmarked days do not earn salary;
+  // paid leave and holidays remain credited. Absence deductions are retained
+  // as a separate line for the existing payroll breakdown.
+  const creditedDays = counts.present + counts.late + counts.leave + counts.holiday + counts.halfDay / 2;
+  const earnedBasicSalary = money(creditedDays * perDay);
+  const suggestedNetSalary = money(earnedBasicSalary + otAllowance - netDeduction);
 
   const reasonBits: string[] = [];
   if (counts.absent)  reasonBits.push(`${counts.absent} absent (Rs. ${fmt(absentDeduction)})`);
   if (counts.halfDay) reasonBits.push(`${counts.halfDay} half-day (Rs. ${fmt(halfDayDeduction)})`);
   if (otTotal > 0)    reasonBits.push(`${otTotal}h OT (Rs. ${fmt(otCredit)})`);
   let reasonText = reasonBits.join(" + ");
-  if (grossDeduction > 0 && otCredit >= grossDeduction) {
-    reasonText += ` → OT offsets deduction; extra OT allowance Rs. ${fmt(otAllowance)}`;
-  } else if (grossDeduction > 0 && otCredit > 0) {
-    reasonText += ` → net deduction Rs. ${fmt(netDeduction)}`;
-  } else if (grossDeduction > 0) {
-    reasonText += ` → deduction Rs. ${fmt(netDeduction)}`;
-  } else if (otTotal > 0) {
-    reasonText += ` → OT allowance Rs. ${fmt(otAllowance)}`;
+  if (grossDeduction > 0) {
+    reasonText += ` → unpaid days excluded from earned salary`;
+  }
+  if (otTotal > 0) {
+    reasonText += `${grossDeduction > 0 ? "; " : " → "}OT allowance Rs. ${fmt(otAllowance)}`;
   } else {
     reasonText = "Full attendance — no deduction, no OT.";
   }
@@ -170,6 +175,8 @@ export function computePayroll(params: {
       standardHoursPerDay: rates.standardHoursPerDay,
     },
     breakdown: {
+      creditedDays,
+      earnedBasicSalary,
       absentDeduction,
       halfDayDeduction,
       grossDeduction,
