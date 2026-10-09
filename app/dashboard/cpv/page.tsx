@@ -16,6 +16,7 @@ type Voucher  = {
   paymentMode: string; chequeNo?: string; paymentAccId: string; paymentAccName: string; bankAccountId?: string; totalAmount: number;
   entries: { accountId: string; accountName: string; accountCode: string; amount: number; narration: string }[];
 };
+type PendingAdvance = { employeeId: string; amount: number; reason: string; deductMonths: number };
 
 let nextId = 1;
 function newRow(): EntryRow { return { id: nextId++, accountId: "", accountCode: "", accountName: "", amount: "", narration: "" }; }
@@ -142,6 +143,7 @@ export default function CPVPage() {
   // The voucher currently loaded from the database — set while a saved CPV is
   // open, so Save updates that record instead of posting a fresh one.
   const [editing,   setEditing]   = useState<Voucher | null>(null);
+  const [pendingAdvance, setPendingAdvance] = useState<PendingAdvance | null>(null);
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
   const [queryMode,    setQueryMode]    = useState(false);
@@ -162,6 +164,27 @@ export default function CPVPage() {
   const h = () => ({ "x-user-role": user?.role||"", "x-user-id": user?.id||"", "x-company-id": user?.companyId||"", "Content-Type": "application/json" });
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("advanceSalary") === "1") {
+      const employeeId = params.get("employeeId") || "";
+      const amount = Number(params.get("amount") || 0);
+      const reason = params.get("reason") || "";
+      const deductMonths = Math.max(1, Number(params.get("deductMonths") || 1));
+      const advanceDate = params.get("date") || today;
+      if (employeeId && amount > 0) {
+        setPendingAdvance({ employeeId, amount, reason, deductMonths });
+        setDate(advanceDate);
+        setNarration(`Advance salary${reason ? ` — ${reason}` : ""}`);
+        fetch("/api/employees", { headers: h() }).then(r => r.ok ? r.json() : []).then((employees: any[]) => {
+          const employee = Array.isArray(employees) ? employees.find(e => e.id === employeeId) : null;
+          if (!employee?.accountId) return toast.error("Employee salary account is missing");
+          setEntries(prev => {
+            const row = { ...newRow(), accountId: employee.accountId, accountCode: "", accountName: `${employee.firstName} ${employee.lastName || ""} — Salary Payable`, amount: String(amount), narration: reason || "Advance salary" };
+            return [row, ...prev.slice(1)];
+          });
+        }).catch(() => toast.error("Could not load employee account"));
+      }
+    }
     Promise.all([
       fetch("/api/cpv",           { headers: h() }).then(r => r.json()),
       fetch("/api/bank-accounts", { headers: h() }).then(r => r.json()),
@@ -293,7 +316,7 @@ export default function CPVPage() {
       const open = editing;
       const r = await fetch("/api/cpv", {
         method: open ? "PUT" : "POST", headers: h(),
-        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, chequeNo: mode === "CHEQUE" ? chequeNo : undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })) }),
+        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, chequeNo: mode === "CHEQUE" ? chequeNo : undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })), ...(pendingAdvance ? { advanceSalary: pendingAdvance } : {}) }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Could not save the voucher");
@@ -306,6 +329,11 @@ export default function CPVPage() {
         else resetForm();
       } else {
         toast.success(`CPV ${d.voucherNo} saved successfully!`);
+        if (pendingAdvance) {
+          setPendingAdvance(null);
+          window.location.href = "/dashboard/advance-salary";
+          return;
+        }
         resetForm();
         await refreshVouchers();
       }
@@ -387,6 +415,11 @@ export default function CPVPage() {
       )}
 
       {/* ── Title ── */}
+      {pendingAdvance && (
+        <div style={{ marginBottom: 14, padding: "11px 14px", borderRadius: 9, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)", color: "rgba(var(--ink),.8)", fontSize: 13 }}>
+          Employee advance payment · Rs. {fmt(pendingAdvance.amount)} · Save this CPV to post the ledger entry and record the advance in HR.
+        </div>
+      )}
       <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
         <div>
           <h1 style={{ margin:0, fontSize:22, fontWeight:800, color: queryMode ? "var(--tx-facc15, #facc15)" : BLUE }}>

@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 
@@ -53,6 +54,7 @@ function todayLocal() {
 const blankForm = () => ({ employeeId: "", amount: "", reason: "", deductMonths: "1", date: todayLocal() });
 
 export default function AdvanceSalaryPage() {
+  const router = useRouter();
   const { isMobile } = useResponsive();
   const [advances, setAdvances] = useState<Advance[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -88,6 +90,18 @@ export default function AdvanceSalaryPage() {
     if (!form.date) { setMsg("Please select the advance date"); return; }
     setSaving(true);
     try {
+      if (!editingId) {
+        const params = new URLSearchParams({
+          advanceSalary: "1",
+          employeeId: form.employeeId,
+          amount: form.amount,
+          reason: form.reason,
+          deductMonths: form.deductMonths,
+          date: form.date,
+        });
+        router.push(`/dashboard/cpv?${params.toString()}`);
+        return;
+      }
       const payload = {
         employeeId: form.employeeId,
         employeeName: selectedEmployee ? employeeLabel(selectedEmployee) : "",
@@ -96,7 +110,7 @@ export default function AdvanceSalaryPage() {
         deductMonths: parseInt(form.deductMonths),
         date: form.date,
       };
-      const method = editingId ? "PATCH" : "POST";
+      const method = "PATCH";
       const r = await fetch("/api/hr/advance-salary", {
         method,
         credentials: "include",
@@ -116,13 +130,8 @@ export default function AdvanceSalaryPage() {
           status: "PENDING" as const,
           date: form.date,
         };
-        if (editingId) {
-          setAdvances(prev => prev.map(a => a.id === editingId ? advance : a));
-          setMsg("Advance updated successfully");
-        } else {
-          setAdvances(prev => [advance, ...prev]);
-          setMsg("Advance recorded successfully");
-        }
+        setAdvances(prev => prev.map(a => a.id === editingId ? advance : a));
+        setMsg("Advance updated successfully");
         setShowForm(false);
         setEditingId(null);
         setForm(blankForm());
@@ -329,7 +338,7 @@ export default function AdvanceSalaryPage() {
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button style={{ ...s.btn, flex: 1 }} onClick={handleSave} disabled={saving}>
-                  {saving ? "Saving" : "Save Advance"}
+                  {saving ? "Opening CPV…" : editingId ? "Update Advance" : "Continue to CPV"}
                 </button>
                 <button style={{ ...s.btn, background: "var(--border)", color: "var(--text-muted)", flex: 1 }} onClick={() => { setShowForm(false); setMsg(""); setEditingId(null); }}>
                   Cancel

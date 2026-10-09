@@ -5,6 +5,7 @@ import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/l
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { nextVoucherNo } from "@/lib/inventoryAccounts";
+import { ensureEmployeePayableAccount } from "@/lib/payrollAccounting";
 
 // GET — list vouchers with all their party entries
 export async function GET(req: NextRequest) {
@@ -90,7 +91,7 @@ export async function POST(req: Request) {
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
-    const { date, paymentMode, bankAccountId, narration, chequeNo, entries } = body;
+    const { date, paymentMode, bankAccountId, narration, chequeNo, entries, advanceSalary } = body;
     // A cheque goes through the bank account just like a transfer.
     const viaBank = paymentMode === "BANK" || paymentMode === "CHEQUE";
 
@@ -104,6 +105,34 @@ export async function POST(req: Request) {
     }
 
     const totalAmount = validEntries.reduce((s: number, e: any) => s + Number(e.amount), 0);
+
+    let advanceDetails: { employeeId: string; reason: string; deductMonths: number; accountId: string } | null = null;
+    if (advanceSalary) {
+      const employeeId = String(advanceSalary.employeeId || "");
+      const employee = await prisma.employee.findFirst({
+        where: { id: employeeId, companyId, isActive: true },
+        select: { id: true, employeeId: true, firstName: true, lastName: true },
+      });
+      if (!employee) return NextResponse.json({ error: "Employee not found for salary advance" }, { status: 400 });
+      if (validEntries.length !== 1) {
+        return NextResponse.json({ error: "An employee advance CPV must contain exactly one employee entry" }, { status: 400 });
+      }
+      const accountId = await ensureEmployeePayableAccount({
+        companyId,
+        employeeId,
+        employeeCode: employee.employeeId,
+        employeeName: `${employee.firstName} ${employee.lastName || ""}`.trim(),
+      });
+      if (validEntries[0].accountId !== accountId) {
+        return NextResponse.json({ error: "Advance payment must be posted to the selected employee's salary account" }, { status: 400 });
+      }
+      advanceDetails = {
+        employeeId,
+        reason: String(advanceSalary.reason || "").trim(),
+        deductMonths: Math.max(1, Number(advanceSalary.deductMonths || 1)),
+        accountId,
+      };
+    }
 
     // Resolve cash/bank account
     let paymentAccount: any;
@@ -156,6 +185,19 @@ export async function POST(req: Request) {
         },
         include: { entries: { include: { account: true } } },
       });
+
+      if (advanceDetails) {
+        await tx.advanceSalary.create({
+          data: {
+            companyId,
+            employeeId: advanceDetails.employeeId,
+            amount: totalAmount,
+            date: new Date(date),
+            status: "PENDING",
+            remarks: JSON.stringify({ reason: advanceDetails.reason, deductMonths: advanceDetails.deductMonths, cpvNo: voucherNo }),
+          },
+        });
+      }
 
       if (viaBank && bankAccountRecord) {
         await tx.bankAccount.update({
