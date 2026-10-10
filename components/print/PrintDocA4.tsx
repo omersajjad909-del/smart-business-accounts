@@ -664,7 +664,9 @@ export function PrintDocA4({
             const shown = signatureLabels.slice(0, count);
             const rightAligned = signatureStyle !== "three";
             return (
-              <div style={{ display: "flex", justifyContent: rightAligned ? "flex-end" : "space-between", gap: 30, marginTop: 28 }}>
+              {/* Leave a proper signing area between totals and the line, rather
+                  than letting the signature row read as another attached footer. */}
+              <div style={{ display: "flex", justifyContent: rightAligned ? "flex-end" : "space-between", gap: 30, marginTop: 64 }}>
                 {shown.map((lbl) => (
                   <div key={lbl} style={{ flex: rightAligned ? "0 0 170px" : 1, textAlign: "center" }}>
                     <div className="pdoc-sig-line" style={{ borderTop: `1px solid ${theme.ink}`, margin: "0 auto 4px", maxWidth: 150 }} />
