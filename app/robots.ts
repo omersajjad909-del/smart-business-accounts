@@ -1,7 +1,10 @@
 // FILE: app/robots.ts
 import { MetadataRoute } from "next";
+import { headers } from "next/headers";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+const FINOVAOS_BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+const FORGE_BASE = "https://finovaforge.com";
+const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
 
 /** Private surfaces. Applied to every crawler, including the AI ones. */
 const PRIVATE_PATHS = [
@@ -63,7 +66,16 @@ const AI_CRAWLERS = [
   "cohere-ai",
 ];
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  // finovaforge.com is a second brand served from this same deployment
+  // (see FORGE_HOSTS in proxy.ts). This file used to hardcode the FinovaOS
+  // base regardless of which domain asked, so finovaforge.com/robots.txt
+  // pointed crawlers at www.finovaos.app/sitemap.xml instead of its own —
+  // Google had no sitemap signal for any Forge page at all.
+  const host = (await headers()).get("host") || "";
+  const isForge = FORGE_HOSTS.includes(host.toLowerCase());
+  const base = isForge ? FORGE_BASE : FINOVAOS_BASE;
+
   return {
     rules: [
       {
@@ -77,7 +89,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: PRIVATE_PATHS,
       })),
     ],
-    sitemap: `${BASE}/sitemap.xml`,
-    host: BASE,
+    sitemap: `${base}/sitemap.xml`,
+    host: base,
   };
 }

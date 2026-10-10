@@ -2,11 +2,43 @@
 // Next.js 13+ automatic sitemap generation
 
 import { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { SEO_ARTICLES } from "./(marketing)/blog/seo-articles";
 import { ALL_POSTS } from "./(marketing)/blog/posts";
 import { LIVE_TYPES } from "@/lib/businessModules";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+const FORGE_BASE = "https://finovaforge.com";
+const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
+
+// finovaforge.com is a second brand served from this same deployment (see
+// FORGE_HOSTS in proxy.ts and forgeCanonical() in app/(forge)/forge/layout.tsx).
+// This file used to return the FinovaOS sitemap unconditionally, so
+// finovaforge.com/sitemap.xml served 134 www.finovaos.app URLs and not one of
+// its own 13 pages — Google had no sitemap-level way to discover the Forge
+// site at all. /status is deliberately left out: robots.ts disallows it.
+function forgeSitemap(now: Date): MetadataRoute.Sitemap {
+  const forgePages = [
+    { path: "",            changeFrequency: "weekly" as const,  priority: 1.0 },
+    { path: "/about",      changeFrequency: "monthly" as const, priority: 0.8 },
+    { path: "/products",   changeFrequency: "monthly" as const, priority: 0.9 },
+    { path: "/industries", changeFrequency: "monthly" as const, priority: 0.8 },
+    { path: "/solutions",  changeFrequency: "monthly" as const, priority: 0.8 },
+    { path: "/blog",       changeFrequency: "weekly" as const,  priority: 0.7 },
+    { path: "/careers",    changeFrequency: "weekly" as const,  priority: 0.6 },
+    { path: "/contact",    changeFrequency: "monthly" as const, priority: 0.7 },
+    { path: "/support",    changeFrequency: "monthly" as const, priority: 0.6 },
+    { path: "/security",   changeFrequency: "monthly" as const, priority: 0.6 },
+    { path: "/privacy",    changeFrequency: "yearly" as const,  priority: 0.4 },
+    { path: "/terms",      changeFrequency: "yearly" as const,  priority: 0.4 },
+  ];
+  return forgePages.map(({ path, changeFrequency, priority }) => ({
+    url: `${FORGE_BASE}${path}`,
+    lastModified: now,
+    changeFrequency,
+    priority,
+  }));
+}
 
 // A sitemap where every URL carries the exact same lastModified (the build
 // timestamp) tells a crawler nothing — it reads as "everything changed at
@@ -29,8 +61,13 @@ const LEGAL_DELIVERY_LAST_UPDATED = new Date("2026-08-21");
 const LEGAL_COOKIES_LAST_UPDATED = new Date("2026-07-12");
 const LEGAL_SUBPROCESSORS_LAST_UPDATED = new Date("2026-07-09");
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+
+  const host = (await headers()).get("host") || "";
+  if (FORGE_HOSTS.includes(host.toLowerCase())) {
+    return forgeSitemap(now);
+  }
 
   const staticPages = [
     // Marketing - highest priority
