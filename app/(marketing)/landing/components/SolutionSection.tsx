@@ -875,7 +875,7 @@ export default function SolutionSection() {
                 color: "var(--tx-fbbf24, #fbbf24)",
               }}
             >
-              LIMITED OFFER - 50% OFF FIRST 3 MONTHS
+              LIMITED OFFER - 50% OFF FIRST 3 MONTHS ON MONTHLY PLANS
             </div>
             <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "var(--ink-solid, white)", letterSpacing: "-.4px", marginBottom: 6 }}>
               Stop patching. Start running.

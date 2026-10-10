@@ -194,7 +194,7 @@ export default function CTASection() {
           transition: "all .5s ease",
           animation: vis ? "floatBadge 3.5s ease-in-out infinite 0.6s" : "none",
         }}>
-          🔥 LIMITED TIME — 50% OFF · FIRST 3 MONTHS
+          🔥 LIMITED TIME — 50% OFF · FIRST 3 MONTHS ON MONTHLY PLANS
         </div>
 
         {/* Headline */}
@@ -234,7 +234,7 @@ export default function CTASection() {
           transition: "all .6s ease .26s",
         }}>
           <Link href="/pricing" className="cta-primary">
-            Get Started — 50% OFF
+            Get Started — 50% OFF Monthly
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
             </svg>

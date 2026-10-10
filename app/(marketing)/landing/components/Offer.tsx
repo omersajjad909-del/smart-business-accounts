@@ -38,7 +38,7 @@ export default function Offer() {
         color: "#fbbf24", letterSpacing: ".06em",
       }}>Launch Offer</span>
       <span className="offer-text" style={{ color: "rgba(255,255,255,.85)" }}>
-        50% Off — First 3 Months. Limited Time.
+        50% Off — First 3 Months on Monthly Plans. Limited Time.
       </span>
 
       <Link href="/pricing" style={{
