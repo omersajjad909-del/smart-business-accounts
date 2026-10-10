@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
 import { loadTrialActivity } from "@/lib/trialMetrics";
+import { getSupportAccessUntil } from "@/lib/supportAccess";
 import { TRIAL_GRACE_DAYS, trialDaysLeft, trialState } from "@/lib/trial";
 
 export const runtime = "nodejs";
@@ -52,6 +53,10 @@ export async function GET(req: NextRequest) {
         return { companyId: l.companyId, name: nameOf.get(l.companyId || "") || l.companyId, note, at: l.createdAt };
       });
 
+    const access = new Map<string, Date | null>(
+      await Promise.all(companies.map(async (c) => [c.id, await getSupportAccessUntil(c.id)] as const)),
+    );
+
     const rows = companies.map((c) => {
       const a = activity.get(c.id);
       const state = trialState(c.subscriptionStatus, c.trialEndsAt);
@@ -71,6 +76,7 @@ export async function GET(req: NextRequest) {
         invoices: a?.invoices ?? 0,
         receipts: a?.receipts ?? 0,
         activated: !!a?.activated,
+        supportAccessUntil: access.get(c.id) ?? null,
       };
     });
 

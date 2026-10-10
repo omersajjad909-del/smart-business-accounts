@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { signJwt } from "@/lib/auth";
+import { getSupportAccessUntil } from "@/lib/supportAccess";
 
 
 export const runtime = "nodejs";
@@ -33,10 +34,20 @@ export async function POST(req: NextRequest) {
     // 2. Find the company
     const company = await prisma.company.findUnique({
       where: { id: companyId },
-      select: { id: true, name: true, isActive: true, subscriptionStatus: true },
+      select: { id: true, name: true, isActive: true, subscriptionStatus: true, trialEndsAt: true },
     });
     if (!company) {
       return NextResponse.json({ error: "Company not found" }, { status: 404 });
+    }
+
+    // Trial customers are promised that staff cannot open their account unless
+    // they allow it. A company that has ever had a trial is covered; accounts
+    // from before trials existed were never given that promise.
+    if (company.trialEndsAt && !(await getSupportAccessUntil(companyId))) {
+      return NextResponse.json(
+        { error: "This customer has not allowed support access. Ask them to press \"Allow support access\" in their dashboard." },
+        { status: 403 },
+      );
     }
 
     // 3. Find the owner (ADMIN role user in this company, else first user)

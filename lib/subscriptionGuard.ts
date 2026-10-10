@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { trialState, trialEndedMessage } from "@/lib/trial";
+import { trialState, trialEndedMessage, trialNeedsPhone } from "@/lib/trial";
 
 // Statuses with full access
 const ALLOWED_STATUSES = ["ACTIVE", "TRIALING"];
@@ -66,8 +66,16 @@ function trialEndedResponse(
   req: Request,
   status: string,
   trialEndsAt: Date | null | undefined,
+  trialPhone: string | null | undefined,
+  trialSource: string | null | undefined,
 ): NextResponse | null | undefined {
   const state = trialState(status, trialEndsAt);
+  if (state === "active" && trialNeedsPhone(status, trialEndsAt, trialPhone, trialSource) && !isReadOnlyRequest(req.method)) {
+    return NextResponse.json(
+      { error: "Add your phone number to start your free trial. You can still view everything meanwhile." },
+      { status: 402 },
+    );
+  }
   if (state !== "grace" && state !== "expired") return undefined;
   if (state === "grace" && isReadOnlyRequest(req.method)) return null;
   return NextResponse.json({ error: trialEndedMessage(state === "grace") }, { status: 402 });
@@ -81,7 +89,7 @@ export async function requireEntitlement(req: Request, entitlement: string) {
 
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { plan: true, subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true, trialEndsAt: true },
+    select: { plan: true, subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true, trialEndsAt: true, trialPhone: true, trialSource: true },
   });
 
   const plan   = (company?.plan || "STARTER").toUpperCase();
@@ -102,7 +110,7 @@ export async function requireEntitlement(req: Request, entitlement: string) {
     );
   }
 
-  const trialEnded = trialEndedResponse(req, status, company?.trialEndsAt);
+  const trialEnded = trialEndedResponse(req, status, company?.trialEndsAt, company?.trialPhone, company?.trialSource);
   if (trialEnded !== undefined) return trialEnded;
 
   // A hand-granted period that has run out ends access even though the status
@@ -178,7 +186,7 @@ export async function requireActiveSubscription(req: Request) {
   }
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true, trialEndsAt: true },
+    select: { subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true, trialEndsAt: true, trialPhone: true, trialSource: true },
   });
   const status = (company?.subscriptionStatus || "ACTIVE").toUpperCase();
   if (!ALLOWED_STATUSES.includes(status)) {
@@ -195,7 +203,7 @@ export async function requireActiveSubscription(req: Request) {
     );
   }
 
-  const trialEnded = trialEndedResponse(req, status, company?.trialEndsAt);
+  const trialEnded = trialEndedResponse(req, status, company?.trialEndsAt, company?.trialPhone, company?.trialSource);
   if (trialEnded !== undefined) return trialEnded;
 
   // A hand-granted period that has run out ends access even though the status

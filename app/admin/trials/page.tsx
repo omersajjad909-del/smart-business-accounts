@@ -30,6 +30,7 @@ type Row = {
   invoices: number;
   receipts: number;
   activated: boolean;
+  supportAccessUntil: string | null;
 };
 
 type Payload = {
@@ -170,6 +171,11 @@ export default function AdminTrialsPage() {
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)" }}>
                       {r.email || "—"}{r.phone ? ` · ${r.phone}` : ""}
                     </div>
+                    {r.supportAccessUntil ? (
+                      <div style={{ fontSize: 11, color: "#34d399", marginTop: 2 }}>
+                        Support access allowed until {fmtDate(r.supportAccessUntil)}
+                      </div>
+                    ) : null}
                   </div>
                   <div><Pill tone={STAGES[r.stage].tone}>{STAGES[r.stage].label}</Pill></div>
                   <div style={{ color: "rgba(255,255,255,.7)" }}>

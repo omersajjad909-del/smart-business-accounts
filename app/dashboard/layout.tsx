@@ -444,7 +444,10 @@ export default function DashboardLayout({
   }, []);
 
   const [setupAsked, setSetupAsked] = useState(false);
-  const [subInfo, setSubInfo] = useState<{ plan: string; status: string; trialEndsAt?: string | null } | null>(null);
+  const [supportUntil, setSupportUntil] = useState<string | null>(null);
+  const [trialPhoneInput, setTrialPhoneInput] = useState("");
+  const [trialPhoneError, setTrialPhoneError] = useState<string | null>(null);
+  const [subInfo, setSubInfo] = useState<{ plan: string; status: string; trialEndsAt?: string | null; needsPhone?: boolean } | null>(null);
   const [testMode, setTestMode] = useState<{ isTestMode: boolean; testBusinessType: string | null; testPlan: string | null } | null>(null);
 
   // MOBILE MENU STATE
@@ -871,7 +874,11 @@ export default function DashboardLayout({
           setCompanyDetail(d.company);
           const status = String(d.company.subscriptionStatus || "").toUpperCase();
           setIsPro(String(d.company.plan || "").toUpperCase() === "PRO" && status === "ACTIVE");
-          setSubInfo({ plan: String(d.company.plan || "STARTER"), status, trialEndsAt: d.company.trialEndsAt ?? null });
+          setSubInfo({ plan: String(d.company.plan || "STARTER"), status, trialEndsAt: d.company.trialEndsAt ?? null,
+            needsPhone: !!d.company.trialEndsAt && status === "TRIALING" && !d.company.trialPhone && ["google","magic"].includes(String(d.company.trialSource || "")) });
+          if (status === "TRIALING") {
+            fetch("/api/support-access").then(r => r.json()).then(j => setSupportUntil(j?.until ?? null)).catch(() => {});
+          }
           if (preferredDemoBusiness) {
             setBusinessType(preferredDemoBusiness);
             updateStoredUser(p => ({ ...(p||{}), businessType: preferredDemoBusiness, user: p?.user ? { ...p.user, businessType: preferredDemoBusiness } : undefined }));
@@ -3477,6 +3484,41 @@ export default function DashboardLayout({
                 and where to go when it runs out. After the end date the guards
                 refuse writes while the status still reads TRIALING, so the
                 banner switches to the read-only wording. */}
+            {/* A trial that began with Google or a magic link has no phone number
+                yet. The number is what limits a person to one trial, so until it
+                is added the server holds writes (reads still work). */}
+            {subInfo?.needsPhone && (
+              <div style={{ margin:"0 0 16px", padding:"14px 16px", borderRadius:12, background:"rgba(249,115,22,.08)", border:"1px solid rgba(249,115,22,.25)" }}>
+                <div style={{ fontSize:13, lineHeight:1.6, marginBottom:10 }}>
+                  <strong>One last step to start your free trial.</strong> Add your phone number (with country code). We use it to allow one trial per person and to help you set up.
+                </div>
+                <form
+                  style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setTrialPhoneError(null);
+                    const res = await fetch("/api/trial/phone", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ phone: trialPhoneInput }) });
+                    const j = await res.json().catch(() => ({}));
+                    if (!res.ok) { setTrialPhoneError(j?.error || "Could not save the number."); return; }
+                    setSubInfo((p) => (p ? { ...p, needsPhone: false } : p));
+                  }}
+                >
+                  <input
+                    type="tel"
+                    value={trialPhoneInput}
+                    onChange={(e) => setTrialPhoneInput(e.target.value)}
+                    placeholder="+92 300 1234567"
+                    required
+                    style={{ padding:"9px 12px", borderRadius:8, border:"1px solid rgba(249,115,22,.4)", background:"transparent", color:"inherit", fontSize:13, minWidth:200 }}
+                  />
+                  <button type="submit" style={{ padding:"9px 16px", borderRadius:8, border:"none", background:"#c2410c", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                    Save number
+                  </button>
+                  {trialPhoneError && <span style={{ fontSize:12.5, color:"#f87171" }}>{trialPhoneError}</span>}
+                </form>
+              </div>
+            )}
+
             {subInfo?.status?.toUpperCase() === "TRIALING" && subInfo.trialEndsAt && (() => {
               const msLeft = new Date(subInfo.trialEndsAt).getTime() - Date.now();
               const daysLeft = Math.max(0, Math.ceil(msLeft / 86_400_000));
@@ -3502,6 +3544,20 @@ export default function DashboardLayout({
                       style={{ fontSize:13, fontWeight:600, background:"none", border:"none", cursor: setupAsked ? "default" : "pointer", textDecoration: setupAsked ? "none" : "underline", color:"inherit", padding:0 }}
                     >
                       {setupAsked ? "Request sent. We will contact you." : "Need help setting up?"}
+                    </button>
+                  )}
+                  {!ended && (
+                    <button
+                      type="button"
+                      title="Lets Finova support open your account for 7 days. You can turn it off any time."
+                      onClick={async () => {
+                        const res = await fetch("/api/support-access", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ action: supportUntil ? "revoke" : "grant" }) });
+                        const j = await res.json().catch(() => ({}));
+                        if (res.ok) setSupportUntil(j.until ?? null);
+                      }}
+                      style={{ fontSize:13, fontWeight:600, background:"none", border:"none", cursor:"pointer", textDecoration:"underline", color:"inherit", padding:0 }}
+                    >
+                      {supportUntil ? "Support access on until " + new Date(supportUntil).toLocaleDateString() + " (turn off)" : "Allow support access (7 days)"}
                     </button>
                   )}
                   <Link href="/dashboard/billing" style={{ fontSize:13, fontWeight:600, textDecoration:"underline" }}>Choose a plan</Link>

@@ -46,6 +46,29 @@ export function trialState(
   return overdue <= TRIAL_GRACE_DAYS * DAY_MS ? "grace" : "expired";
 }
 
+/** Signup routes that never ask for a phone number. */
+const PHONELESS_SOURCES = ["google", "magic"];
+
+/**
+ * A trial that began through a route with no phone field (Google, magic link)
+ * and has not been given one since. Its writes are held until the number is
+ * added. Keyed on the source so a trial an admin extended by hand, on an older
+ * account, is never held for a number it was never asked for.
+ */
+export function trialNeedsPhone(
+  status: string | null | undefined,
+  trialEndsAt: Date | null | undefined,
+  trialPhone: string | null | undefined,
+  trialSource: string | null | undefined,
+): boolean {
+  return (
+    !!trialEndsAt &&
+    String(status || "").toUpperCase() === "TRIALING" &&
+    !trialPhone &&
+    PHONELESS_SOURCES.includes(String(trialSource || ""))
+  );
+}
+
 /** Whole days left, rounded up, never negative. */
 export function trialDaysLeft(trialEndsAt: Date | null | undefined, now: number = Date.now()): number {
   if (!trialEndsAt) return 0;
