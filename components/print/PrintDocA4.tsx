@@ -663,9 +663,9 @@ export function PrintDocA4({
             const count = signatureStyle === "three" ? 3 : signatureStyle === "two_right" ? 2 : 1;
             const shown = signatureLabels.slice(0, count);
             const rightAligned = signatureStyle !== "three";
+            // Leave a proper signing area between totals and the line, rather
+            // than letting the signature row read as another attached footer.
             return (
-              {/* Leave a proper signing area between totals and the line, rather
-                  than letting the signature row read as another attached footer. */}
               <div style={{ display: "flex", justifyContent: rightAligned ? "flex-end" : "space-between", gap: 30, marginTop: 64 }}>
                 {shown.map((lbl) => (
                   <div key={lbl} style={{ flex: rightAligned ? "0 0 170px" : 1, textAlign: "center" }}>
