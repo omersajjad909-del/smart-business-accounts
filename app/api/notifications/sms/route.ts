@@ -22,6 +22,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { getAutomationCompanyId, encryptCredentials, decryptCredentials } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 import {
   sendSmsWithRegionRouting,
   sendSmsTwilio,
@@ -260,6 +261,9 @@ async function handleSendSingle(req: NextRequest, companyId: string) {
   const phone = normalizePhone(to);
   if (!phone) return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
 
+  const quota = await consumeTrialQuota(companyId, "SMS");
+  if (!quota.ok) return NextResponse.json({ error: quota.message }, { status: 402 });
+
   if (useRegionRouting === false) {
     // Force Twilio directly, no region logic
     const result = await sendSmsTwilio({ to: phone, message });
@@ -334,6 +338,12 @@ async function handleBulk(req: NextRequest, companyId: string) {
 
     const personalVars = { name: contact.name || "", ...variables };
     const personalizedMessage = interpolate(template, personalVars);
+
+    const quota = await consumeTrialQuota(companyId, "SMS");
+    if (!quota.ok) {
+      results.push({ to: phone, success: false, provider: "none", error: quota.message });
+      continue;
+    }
 
     const result = await sendSmsWithRegionRouting({
       to: phone,

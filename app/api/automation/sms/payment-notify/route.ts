@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { sendSms } from "@/lib/sms";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 
 type PaymentType = "received" | "reminder" | "overdue" | "partial";
 
@@ -68,6 +69,8 @@ export async function POST(req: NextRequest) {
     }
 
     const message = buildMessage(type as PaymentType, amount, currency);
+    const quota = await consumeTrialQuota(companyId, "SMS");
+    if (!quota.ok) return NextResponse.json({ error: quota.message }, { status: 402 });
     const result = await sendSms({ to: phone, message });
 
     await prisma.activityLog.create({

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { aiUrl } from "@/lib/aiGateway";
+import { resolveCompanyId } from "@/lib/tenant";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -40,6 +42,13 @@ export async function POST(req: NextRequest) {
   try {
     if (!HAS_VISION_KEY) {
       return NextResponse.json({ error: "No vision AI key configured (GEMINI_API_KEY or OPENAI_API_KEY)" }, { status: 500 });
+    }
+
+    // Receipt scanning is paid per image; a trial company gets a bounded number.
+    const scanCompanyId = await resolveCompanyId(req);
+    if (scanCompanyId) {
+      const quota = await consumeTrialQuota(scanCompanyId, "AI");
+      if (!quota.ok) return NextResponse.json({ error: quota.message }, { status: 402 });
     }
 
     const formData = await req.formData();

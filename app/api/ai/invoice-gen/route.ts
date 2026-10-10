@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 import { aiUrl } from "@/lib/aiGateway";
 
 export const runtime = "nodejs";
@@ -22,6 +23,9 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+
+    const quota = await consumeTrialQuota(companyId, "AI");
+    if (!quota.ok) return NextResponse.json({ error: quota.message }, { status: 402 });
 
     const body = await req.json() as { prompt?: string };
     const prompt = (body.prompt || "").trim();

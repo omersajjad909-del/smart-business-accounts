@@ -18,6 +18,7 @@ import {
   decryptCredentials,
 } from "@/lib/automationHelpers";
 import { sendSms } from "@/lib/sms";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 
 // ─── Config helpers ───────────────────────────────────────────────────────────
 
@@ -151,6 +152,8 @@ export async function POST(req: NextRequest) {
     if (!message) return NextResponse.json({ error: "message is required" }, { status: 400 });
 
     const config = await getSmsConfig(companyId);
+    const quota = await consumeTrialQuota(companyId, "SMS");
+    if (!quota.ok) return NextResponse.json({ error: quota.message }, { status: 402 });
     const result = await sendSms({ to, message });
 
     await prisma.activityLog.create({
@@ -209,6 +212,13 @@ async function handleBulk(req: NextRequest, companyId: string) {
       for (const [key, val] of Object.entries(variables)) {
         message = message.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), String(val));
       }
+    }
+
+    const quota = await consumeTrialQuota(companyId, "SMS");
+    if (!quota.ok) {
+      results.push({ to: contact.to, name: contact.name || "", status: "failed", error: quota.message });
+      failed++;
+      continue;
     }
 
     const result = await sendSms({ to: contact.to, message });

@@ -13,6 +13,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 // import Anthropic from "@anthropic-ai/sdk"; // switched to OpenAI
 import OpenAI from "openai";
 import crypto from "crypto";
@@ -144,6 +145,11 @@ export async function POST(req: NextRequest) {
 
     const { companyId, botName, systemPrompt, active } = rows[0];
     if (!active) return NextResponse.json({ reply: "Chat is currently unavailable. Please try again later." });
+
+    // The widget answers the company's own customers, but the model bill is
+    // ours: a trial company gets a bounded number of replies.
+    const quota = await consumeTrialQuota(companyId, "AI");
+    if (!quota.ok) return NextResponse.json({ reply: "Chat is currently unavailable. Please try again later." });
 
     // Load or create conversation
     const sid = sessionId || crypto.randomBytes(12).toString("hex");

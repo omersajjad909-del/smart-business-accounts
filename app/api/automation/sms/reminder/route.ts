@@ -18,6 +18,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { sendSms } from "@/lib/sms";
+import { consumeTrialQuota } from "@/lib/trialLimits";
 
 interface OverdueRow {
   id: string;
@@ -102,6 +103,18 @@ export async function POST(req: NextRequest) {
       }
 
       const message = buildReminderMessage(customMessage, row);
+      const quota = await consumeTrialQuota(companyId, "SMS");
+      if (!quota.ok) {
+        results.push({
+          invoiceId: row.id,
+          customerName: row.customerName,
+          phone: row.phone,
+          status: "failed",
+          error: quota.message,
+        });
+        failed++;
+        continue;
+      }
       const result = await sendSms({ to: row.phone, message });
 
       await prisma.activityLog.create({
