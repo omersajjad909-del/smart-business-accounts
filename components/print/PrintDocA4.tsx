@@ -58,6 +58,8 @@ export interface PrintDocA4Props {
   docTitle: string;
   docNo: string;
   date: string;
+  /** Hide the duplicate date beside the document title while keeping the date in its details. */
+  showHeaderDate?: boolean;
   dueDate?: string;
   status?: string;
 
@@ -155,6 +157,7 @@ export function PrintDocA4({
   docTitle,
   docNo,
   date,
+  showHeaderDate = true,
   dueDate,
   status,
   partyLabel = "Bill To",
@@ -307,7 +310,7 @@ export function PrintDocA4({
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, textTransform: "uppercase" }}>{docTitle}</div>
-            <div className="pdoc-label" style={{ fontSize: 8.5, marginTop: 3 }}>{date}</div>
+            {showHeaderDate && <div className="pdoc-label" style={{ fontSize: 8.5, marginTop: 3 }}>{date}</div>}
           </div>
         </div>
       )}
@@ -326,7 +329,7 @@ export function PrintDocA4({
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, textTransform: "uppercase" }}>{docTitle}</div>
-            <div style={{ fontSize: 8.5, marginTop: 3, opacity: 0.85 }}>{date}</div>
+            {showHeaderDate && <div style={{ fontSize: 8.5, marginTop: 3, opacity: 0.85 }}>{date}</div>}
           </div>
         </div>
       )}
@@ -353,7 +356,7 @@ export function PrintDocA4({
           </div>
           <div style={{ borderTop: `2px solid ${theme.ink}`, paddingTop: 6, display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16 }}>
             <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", lineHeight: 1 }}>{docTitle}</div>
-            <div className="pdoc-label" style={{ fontSize: 9 }}>{date}</div>
+            {showHeaderDate && <div className="pdoc-label" style={{ fontSize: 9 }}>{date}</div>}
           </div>
         </div>
       )}

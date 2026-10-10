@@ -47,6 +47,7 @@ const BORDER = "var(--border)";
 const TEXT = "var(--text-primary)";
 const MUTED = "var(--text-muted)";
 const ACCENT = "#6366f1";
+const CHALLAN_NO_SIGNATURE_NOTE = "Note: This is a computer generated document, does not require any signature";
 
 /* ── Sample data ───────────────────────────────────────────────
    Real-shaped, and plainly a sample: a preview built on empty rows shows
@@ -146,6 +147,14 @@ export default function PrintPreferencesPage() {
   function update(next: PrintProfiles) {
     setProfiles(next);
     setDirty(true);
+  }
+
+  function updateChallanFooter(mode: "signatures" | "note") {
+    if (isBase || doc !== "delivery_challan") return;
+    let next = setDocField(profiles, doc, "signatures", mode === "signatures");
+    next = setDocField(next, doc, "footerNote", mode === "note");
+    if (mode === "note") next = setDocFooterNote(next, doc, CHALLAN_NO_SIGNATURE_NOTE);
+    update(next);
   }
 
   async function save() {
@@ -317,6 +326,28 @@ export default function PrintPreferencesPage() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr auto", gap: 12, alignItems: "end" }}>
+              {!isBase && doc === "delivery_challan" && (
+                <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <span style={{ fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED }}>Challan footer</span>
+                  {([
+                    ["signatures", "Print signature lines"],
+                    ["note", "Print computer generated note"],
+                  ] as const).map(([mode, label]) => {
+                    const checked = mode === "signatures"
+                      ? resolved.fields.signatures
+                      : resolved.fields.footerNote && !resolved.fields.signatures;
+                    return (
+                      <label key={mode} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                        <input type="radio" name="challan-footer" checked={checked} onChange={() => updateChallanFooter(mode)} style={{ marginTop: 2, accentColor: ACCENT }} />
+                        <span>{label}</span>
+                      </label>
+                    );
+                  })}
+                  {!resolved.fields.signatures && resolved.fields.footerNote && (
+                    <div style={{ fontSize: 12, color: MUTED }}>{CHALLAN_NO_SIGNATURE_NOTE}</div>
+                  )}
+                </div>
+              )}
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                 <label htmlFor={`pp-${sel}-footer`} style={{ fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase", color: MUTED }}>
                   Footer note

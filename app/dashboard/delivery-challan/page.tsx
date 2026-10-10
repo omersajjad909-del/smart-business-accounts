@@ -544,6 +544,7 @@ export default function DeliveryChallanPage() {
 
   function resetForm() {
     setEditing(null);
+    setChallanNo("");
     setCustomerId("");
     setCustomerName("");
     setDate(today);
@@ -808,7 +809,10 @@ export default function DeliveryChallanPage() {
                 Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <input value={challanNo} readOnly className="border p-2 bg-gray-100" placeholder="Challan No (Auto)" />
+                <div>
+                  <label className="text-xs font-bold">Challan No</label>
+                  <input value={challanNo} onChange={e => setChallanNo(e.target.value)} className="border p-2 w-full" placeholder="Leave blank for auto number" />
+                </div>
                 <div>
                   <label className="text-xs font-bold">Customer</label>
                   <select className="border p-2 w-full" value={customerId} onChange={e => {
@@ -953,6 +957,7 @@ export default function DeliveryChallanPage() {
                 docTitle="DELIVERY CHALLAN"
                 docNo={savedChallan?.challanNo || challanNo}
                 date={fmtDate(date)}
+                showHeaderDate={false}
                 partyLabel="Customer"
                 partyName={customerName}
                 metaFields={[

@@ -9,6 +9,7 @@ import { withDocNo, formatDocNo, highestSeq } from "@/lib/docNumber";
 // VALIDATION SCHEMA
 const challanSchema = z.object({
   id: z.string().optional(),
+  challanNo: z.string().trim().optional().default(""),
   date: z.string(),
   customerId: z.string(),
   driverName: z.string().optional().nullable(),
@@ -131,9 +132,7 @@ export async function POST(req: NextRequest) {
     });
     const top = highestSeq(issued, "challanNo");
 
-    const challan = await withDocNo(
-      async (offset) => formatDocNo("DC-", top + 1 + offset),
-      (challanNo) => prisma.deliveryChallan.create({
+    const createChallan = (challanNo: string) => prisma.deliveryChallan.create({
       data: {
         companyId,
         branchId,
@@ -168,8 +167,18 @@ export async function POST(req: NextRequest) {
           include: { item: true },
         },
       },
-      }),
-    );
+      });
+    const requestedNo = data.challanNo.trim();
+    if (requestedNo) {
+      const duplicate = await prisma.deliveryChallan.findFirst({ where: { companyId, challanNo: requestedNo }, select: { id: true } });
+      if (duplicate) return NextResponse.json({ error: `Challan number ${requestedNo} is already in use` }, { status: 409 });
+    }
+    const challan = requestedNo
+      ? await createChallan(requestedNo)
+      : await withDocNo(
+          async (offset) => formatDocNo("DC-", top + 1 + offset),
+          createChallan,
+        );
 
     // Deduct stock when challan is created as DELIVERED (immediate dispatch)
     if ((data.status || "PENDING") === "DELIVERED") {
@@ -206,6 +215,15 @@ export async function PUT(req: NextRequest) {
       select: { status: true },
     });
 
+    const requestedNo = data.challanNo.trim();
+    if (requestedNo) {
+      const duplicate = await prisma.deliveryChallan.findFirst({
+        where: { companyId, challanNo: requestedNo, id: { not: data.id } },
+        select: { id: true },
+      });
+      if (duplicate) return NextResponse.json({ error: `Challan number ${requestedNo} is already in use` }, { status: 409 });
+    }
+
     // Transaction to update: delete old items, create new ones
     const updated = await prisma.$transaction(async (tx) => {
       await tx.deliveryChallanItem.deleteMany({
@@ -215,6 +233,7 @@ export async function PUT(req: NextRequest) {
       return await tx.deliveryChallan.update({
         where: { id: data.id, companyId, ...(branchId ? { branchId } : {}) },
         data: {
+          ...(requestedNo ? { challanNo: requestedNo } : {}),
           date: new Date(data.date),
           customerId: data.customerId,
           driverName: data.driverName || null,
