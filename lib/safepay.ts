@@ -614,7 +614,6 @@ export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | 
   switch (String(event || "").toLowerCase()) {
     // A completed charge — initial purchase or a renewal.
     case "payment.succeeded":
-    case "subscription.created":
     case "subscription.resumed":
     case "subscription.payment.succeeded":
     // v1 aliases
@@ -624,6 +623,14 @@ export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | 
     case "payment:succeeded":
     case "subscription:activated":
       return "ACTIVE";
+
+    // subscription.created fires when Safepay creates the subscription object,
+    // BEFORE the first payment is actually captured — the subscription can sit
+    // at Safepay-side status INCOMPLETE with balance 0 at this point, so it
+    // must not activate a plan or record an invoice (incident Oct 9 2026).
+    // Falls through to the same no-op as authorization.*/void.* below.
+    case "subscription.created":
+      return "INACTIVE";
 
     // A charge that did not go through. Renewal failures land here too, which
     // is what keeps a lapsing customer out of ACTIVE — the old mapper had no
