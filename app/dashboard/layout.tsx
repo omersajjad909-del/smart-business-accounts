@@ -443,7 +443,8 @@ export default function DashboardLayout({
       .catch(() => {});
   }, []);
 
-  const [subInfo, setSubInfo] = useState<{ plan: string; status: string } | null>(null);
+  const [setupAsked, setSetupAsked] = useState(false);
+  const [subInfo, setSubInfo] = useState<{ plan: string; status: string; trialEndsAt?: string | null } | null>(null);
   const [testMode, setTestMode] = useState<{ isTestMode: boolean; testBusinessType: string | null; testPlan: string | null } | null>(null);
 
   // MOBILE MENU STATE
@@ -870,7 +871,7 @@ export default function DashboardLayout({
           setCompanyDetail(d.company);
           const status = String(d.company.subscriptionStatus || "").toUpperCase();
           setIsPro(String(d.company.plan || "").toUpperCase() === "PRO" && status === "ACTIVE");
-          setSubInfo({ plan: String(d.company.plan || "STARTER"), status });
+          setSubInfo({ plan: String(d.company.plan || "STARTER"), status, trialEndsAt: d.company.trialEndsAt ?? null });
           if (preferredDemoBusiness) {
             setBusinessType(preferredDemoBusiness);
             updateStoredUser(p => ({ ...(p||{}), businessType: preferredDemoBusiness, user: p?.user ? { ...p.user, businessType: preferredDemoBusiness } : undefined }));
@@ -1070,7 +1071,11 @@ export default function DashboardLayout({
   useEffect(() => {
     if (!ready || !subInfo) return;
     const status = subInfo.status.toUpperCase();
-    const canBrowse = status === "ACTIVE" || status === "TRIALING" || status === "READ_ONLY";
+    // A trial stays TRIALING in the database until the lifecycle cron moves it,
+    // so the end of the grace window is checked here as well.
+    const trialClosed = status === "TRIALING" && !!subInfo.trialEndsAt &&
+      Date.now() - new Date(subInfo.trialEndsAt).getTime() > 3 * 86_400_000;
+    const canBrowse = !trialClosed && (status === "ACTIVE" || status === "TRIALING" || status === "READ_ONLY");
     const onBilling = pathname.startsWith("/dashboard/billing");
     if (!canBrowse && !onBilling) {
       router.replace("/dashboard/billing?required=1");
@@ -3467,6 +3472,43 @@ export default function DashboardLayout({
             {/* Read-only grace. Without this the app looks entirely normal
                 while saves are being refused, and the customer has no way to
                 tell why — the status is the only thing that changed. */}
+            {/* Free trial. Shown for the whole trial, not only the last days: a
+                customer on a no-card trial should always know how long is left
+                and where to go when it runs out. After the end date the guards
+                refuse writes while the status still reads TRIALING, so the
+                banner switches to the read-only wording. */}
+            {subInfo?.status?.toUpperCase() === "TRIALING" && subInfo.trialEndsAt && (() => {
+              const msLeft = new Date(subInfo.trialEndsAt).getTime() - Date.now();
+              const daysLeft = Math.max(0, Math.ceil(msLeft / 86_400_000));
+              const ended = msLeft <= 0;
+              const urgent = ended || daysLeft <= 3;
+              return (
+                <div style={{ margin:"0 0 16px", padding:"12px 16px", borderRadius:12, display:"flex", alignItems:"center", gap:10, flexWrap:"wrap",
+                  background: urgent ? "rgba(249,115,22,.08)" : "rgba(52,211,153,.08)",
+                  border: urgent ? "1px solid rgba(249,115,22,.25)" : "1px solid rgba(52,211,153,.25)" }}>
+                  <div style={{ fontSize:13, lineHeight:1.6, flex:1, minWidth:200 }}>
+                    {ended
+                      ? <><strong>Your free trial has ended.</strong> Your data is safe. Choose a plan to keep creating records.</>
+                      : <><strong>Free trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left.</strong> Everything is unlocked. No card needed until you choose a plan.</>}
+                  </div>
+                  {!ended && (
+                    <button
+                      type="button"
+                      disabled={setupAsked}
+                      onClick={() => {
+                        setSetupAsked(true);
+                        fetch("/api/setup-request", { method:"POST", headers:{ "Content-Type":"application/json" }, body: "{}" }).catch(() => setSetupAsked(false));
+                      }}
+                      style={{ fontSize:13, fontWeight:600, background:"none", border:"none", cursor: setupAsked ? "default" : "pointer", textDecoration: setupAsked ? "none" : "underline", color:"inherit", padding:0 }}
+                    >
+                      {setupAsked ? "Request sent. We will contact you." : "Need help setting up?"}
+                    </button>
+                  )}
+                  <Link href="/dashboard/billing" style={{ fontSize:13, fontWeight:600, textDecoration:"underline" }}>Choose a plan</Link>
+                </div>
+              );
+            })()}
+
             {subInfo?.status?.toUpperCase() === "READ_ONLY" && (
               <div style={{ margin:"0 0 16px", padding:"12px 16px", borderRadius:12, background:"rgba(249,115,22,.08)", border:"1px solid rgba(249,115,22,.25)", display:"flex", alignItems:"center", gap:10 }}>
                 <span style={{ fontSize:18 }}>🔒</span>

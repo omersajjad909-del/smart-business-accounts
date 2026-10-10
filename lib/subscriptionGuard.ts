@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { trialState, trialEndedMessage } from "@/lib/trial";
 
 // Statuses with full access
 const ALLOWED_STATUSES = ["ACTIVE", "TRIALING"];
@@ -53,6 +54,25 @@ function grantEndedMessage(until: Date, grace: boolean): string {
     : "Your access period ended on " + on + ". Please renew to continue.";
 }
 
+/**
+ * A finished trial. The status stays TRIALING until the lifecycle cron moves
+ * it, so the guard reads the end date itself rather than trusting the status:
+ * writes stop the moment the trial ends, reads survive the grace window so the
+ * customer can still see and export their data, then everything is refused.
+ *
+ * Returns undefined when the trial is not over, so the caller carries on.
+ */
+function trialEndedResponse(
+  req: Request,
+  status: string,
+  trialEndsAt: Date | null | undefined,
+): NextResponse | null | undefined {
+  const state = trialState(status, trialEndsAt);
+  if (state !== "grace" && state !== "expired") return undefined;
+  if (state === "grace" && isReadOnlyRequest(req.method)) return null;
+  return NextResponse.json({ error: trialEndedMessage(state === "grace") }, { status: 402 });
+}
+
 export async function requireEntitlement(req: Request, entitlement: string) {
   const companyId = await resolveCompanyId(req as any);
   if (!companyId) {
@@ -61,7 +81,7 @@ export async function requireEntitlement(req: Request, entitlement: string) {
 
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { plan: true, subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true },
+    select: { plan: true, subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true, trialEndsAt: true },
   });
 
   const plan   = (company?.plan || "STARTER").toUpperCase();
@@ -81,6 +101,9 @@ export async function requireEntitlement(req: Request, entitlement: string) {
       { status: 402 }
     );
   }
+
+  const trialEnded = trialEndedResponse(req, status, company?.trialEndsAt);
+  if (trialEnded !== undefined) return trialEnded;
 
   // A hand-granted period that has run out ends access even though the status
   // still reads ACTIVE — nothing else moves it off ACTIVE.
@@ -155,7 +178,7 @@ export async function requireActiveSubscription(req: Request) {
   }
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true },
+    select: { subscriptionStatus: true, cancelledAt: true, accessGrantedUntil: true, trialEndsAt: true },
   });
   const status = (company?.subscriptionStatus || "ACTIVE").toUpperCase();
   if (!ALLOWED_STATUSES.includes(status)) {
@@ -171,6 +194,9 @@ export async function requireActiveSubscription(req: Request) {
       { status: 402 }
     );
   }
+
+  const trialEnded = trialEndedResponse(req, status, company?.trialEndsAt);
+  if (trialEnded !== undefined) return trialEnded;
 
   // A hand-granted period that has run out ends access even though the status
   // still reads ACTIVE — nothing else moves it off ACTIVE.

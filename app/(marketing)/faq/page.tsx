@@ -30,7 +30,7 @@ const GROUPS: Group[] = [
       },
       {
         q: "Do you offer a free trial?",
-        a: "No. FinovaOS is a paid product from day one — we would rather charge fairly and support you properly than run a trial funnel. If you want to see it working first, book a demo and we will walk through your actual use case.",
+        a: "Yes. You get 14 days of full access with the Professional features, and no credit card is needed to start. After the trial your data is kept, and you can view and export it for 3 more days while you choose a plan. If you would rather see it working first, you can also book a demo.",
       },
     ],
   },

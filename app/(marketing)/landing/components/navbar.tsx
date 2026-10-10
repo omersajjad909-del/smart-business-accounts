@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
 import ThemeToggle from "./ThemeToggle"
+import { useSignupsOpen } from "@/hooks/useSignupsOpen"
 
 /* ─── Features Mega Data ─── */
 const FEATURES_COLS = [
@@ -359,6 +360,9 @@ function MegaPanel({
 export default function Navbar() {
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app"
   const [mobileOpen, setMobileOpen] = useState(false)
+  // While signups are gated the button keeps pointing at /pricing as before.
+  const signupsOpen = useSignupsOpen()
+  const ctaHref = signupsOpen ? "/onboarding/signup/pro?trial=1&src=navbar" : "/pricing"
   const [activeMega, setActiveMega] = useState<"features" | "solutions" | null>(null)
   const [scrolled,   setScrolled]   = useState(false)
   const featuresRef  = useRef<HTMLDivElement>(null)
@@ -475,8 +479,8 @@ export default function Navbar() {
                 Sign In
               </Link>
 
-              <Link href="/pricing" className="fn-cta">
-                Get Started
+              <Link href={ctaHref} className="fn-cta">
+                {signupsOpen ? "Start Free Trial" : "Get Started"}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
@@ -562,8 +566,8 @@ export default function Navbar() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
                 Sign In to Dashboard
               </Link>
-              <Link href="/pricing" style={{ display:"block", padding:"13px 16px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", fontFamily:"'Outfit',sans-serif", boxShadow:"0 4px 16px rgba(99,102,241,.4)" }}>
-                Get Started Now →
+              <Link href={ctaHref} style={{ display:"block", padding:"13px 16px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", fontFamily:"'Outfit',sans-serif", boxShadow:"0 4px 16px rgba(99,102,241,.4)" }}>
+                {signupsOpen ? "Start Free Trial →" : "Get Started Now →"}
               </Link>
             </div>
           </div>

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { signJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { TRIAL_PLAN } from "@/lib/trial";
 import { claimReferral, REF_COOKIE } from "@/lib/affiliateTracking";
 import {
   getAvailableChannels,
@@ -45,6 +46,8 @@ export async function POST(req: NextRequest) {
       referralCode,
       teamSize,
       referralSource,
+      startTrial,
+      trialSource,
     } = await req.json();
 
     if (!companyName || !name || !email || !password) {
@@ -61,6 +64,29 @@ export async function POST(req: NextRequest) {
     // on the email, and claimReferral is first-touch and idempotent.
     await claimReferral(emailNormalized, req.cookies.get(REF_COOKIE)?.value).catch(() => {});
     const phoneNormalized = normalizePhone(phone);
+
+    // Free trial: no card is taken, so the phone number is what stops one
+    // person farming trials with fresh email addresses. Required, and one
+    // trial per number.
+    const isTrial = startTrial === true;
+    if (isTrial) {
+      if (!phoneNormalized) {
+        return NextResponse.json(
+          { error: "A phone number is required to start a free trial." },
+          { status: 400 },
+        );
+      }
+      const phoneUsed = await prisma.company.findFirst({
+        where: { trialPhone: phoneNormalized },
+        select: { id: true },
+      });
+      if (phoneUsed) {
+        return NextResponse.json(
+          { error: "A free trial has already been started with this phone number. Please log in or choose a plan." },
+          { status: 409 },
+        );
+      }
+    }
 
     const existing = await prisma.user.findUnique({
       where: { email: emailNormalized },
@@ -162,7 +188,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const normalizedPlanCode = String(planCode || "STARTER").toUpperCase();
+    const normalizedPlanCode = isTrial ? TRIAL_PLAN : String(planCode || "STARTER").toUpperCase();
     const normalizedBillingCycle =
       String(billingCycle || "").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
     const customModuleIds =
@@ -177,7 +203,8 @@ export async function POST(req: NextRequest) {
     nextParams.set("cycle", normalizedBillingCycle.toLowerCase());
     if (customModuleIds.length > 0) nextParams.set("modules", customModuleIds.join(","));
     if (computedCustomPrice !== null) nextParams.set("price", String(computedCustomPrice));
-    const next = `/onboarding/payment/${planPath}?${nextParams.toString()}`;
+    // A trial has nothing to pay for yet, so it goes straight to the app.
+    const next = isTrial ? "/dashboard" : `/onboarding/payment/${planPath}?${nextParams.toString()}`;
 
     const channel = "email";
     const { code, expMs } = newOtpCode();
@@ -205,6 +232,8 @@ export async function POST(req: NextRequest) {
           referralCode: referralCode || null,
           teamSize: teamSize || null,
           referralSource: referralSource || null,
+          trial: isTrial,
+          trialSource: isTrial ? String(trialSource || "web").slice(0, 40) : null,
         }),
         otpHash: getOtpHash(code),
         otpExpiresAt: new Date(expMs),
@@ -228,6 +257,8 @@ export async function POST(req: NextRequest) {
           referralCode: referralCode || null,
           teamSize: teamSize || null,
           referralSource: referralSource || null,
+          trial: isTrial,
+          trialSource: isTrial ? String(trialSource || "web").slice(0, 40) : null,
         }),
         otpHash: getOtpHash(code),
         otpExpiresAt: new Date(expMs),

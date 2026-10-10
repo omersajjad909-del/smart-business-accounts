@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { signJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { trialCompanyFields } from "@/lib/trial";
 import {
   createVerificationCodeLog,
   isUserVerified,
@@ -84,6 +85,7 @@ export async function GET(req: NextRequest) {
           name: `${name.split(" ")[0]}'s Company`,
           code: null,
           isActive: true,
+          ...trialCompanyFields("google"),
         },
       } as any);
       companyId = company.id;
@@ -105,6 +107,7 @@ export async function GET(req: NextRequest) {
           name: `${name.split(" ")[0]}'s Company`,
           code: null,
           isActive: true,
+          ...trialCompanyFields("google"),
         },
       } as any);
       companyId = company.id;

@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
         select: {
           id: true, name: true, country: true, baseCurrency: true,
           plan: true, subscriptionStatus: true, activeModules: true,
-          currentPeriodEnd: true, businessType: true, businessSetupDone: true,
+          currentPeriodEnd: true, trialEndsAt: true, businessType: true, businessSetupDone: true,
           logoUrl: true, createdAt: true, isDemo: true, isInternalTest: true,
         },
       }),

@@ -552,9 +552,13 @@ export default function SignupByPlanPage() {
   const isCustomPlan = planCode.toLowerCase() === "custom";
   const effectiveBusinessType = businessType || (isCustomPlan ? "other" : "");
 
+  // ?trial=1 is the free-trial entry (the hero button). No card is taken, so
+  // the phone number is required — the server allows one trial per number.
+  const isTrial = searchParams.get("trial") === "1";
+
   const disabled = useMemo(
-    () => !firstName || !lastName || !email || !companyName || !password || !agreeTerms || !agreePrivacy || !effectiveBusinessType,
-    [firstName, lastName, email, companyName, password, agreeTerms, agreePrivacy, effectiveBusinessType]
+    () => !firstName || !lastName || !email || !companyName || !password || !agreeTerms || !agreePrivacy || !effectiveBusinessType || (isTrial && !phone),
+    [firstName, lastName, email, companyName, password, agreeTerms, agreePrivacy, effectiveBusinessType, isTrial, phone]
   );
 
 
@@ -608,6 +612,8 @@ export default function SignupByPlanPage() {
           referralCode: referralCode.trim().toUpperCase() || undefined,
           teamSize: teamSize || undefined,
           referralSource: referralSource || undefined,
+          startTrial: isTrial || undefined,
+          trialSource: isTrial ? (searchParams.get("src") || "web") : undefined,
         }),
       });
       const data = await res.json();
@@ -1010,7 +1016,7 @@ export default function SignupByPlanPage() {
                     display:"block", fontSize:10, fontWeight:700,
                     letterSpacing:".08em", textTransform:"uppercase",
                     color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6,
-                  }}>Phone number (optional)</label>
+                  }}>Phone number {isTrial ? "(required for the free trial)" : "(optional)"}</label>
                   <PhoneInput
                     dialCode={dialCode}
                     country={phoneCountry}

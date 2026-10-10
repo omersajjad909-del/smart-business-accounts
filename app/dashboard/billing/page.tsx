@@ -741,7 +741,10 @@ function BillingPage() {
       toast.error("Payment method setup is not configured yet.");
       return;
     }
-    setShowAddCard(true);
+    // No card is ever stored here (the add-card route always refuses), so the
+    // form is never the answer — send the customer to the real checkout.
+    setActiveTab("plans");
+    toast("Choose your plan to pay securely at checkout.");
   }
 
   if (loading) return (

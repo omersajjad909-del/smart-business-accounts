@@ -277,17 +277,23 @@ export default function Hero() {
                     </svg>
                   </Link>
                 )}
-                {/* Sends to /pricing rather than straight into the Starter
-                    signup — a visitor clicking "Get Started" from the hero
-                    hasn't chosen a plan yet, and dropping them into Starter
-                    specifically skipped Pro/Enterprise entirely. */}
-                <Link href={signupHrefFor(signupsOpen, "/pricing")} className={signupsOpen ? "cta-primary" : "cta-ghost"}>
-                  Get Started
-                  {signupsOpen && (
+                {/* The free trial is the primary action once signups are open. It
+                    goes to the Professional signup form in trial mode — no plan
+                    to choose and no card to enter; the phone number is what the
+                    form asks for instead. While signups are gated, the waitlist
+                    button above stays the primary one. */}
+                {signupsOpen && (
+                  <Link href="/onboarding/signup/pro?trial=1&src=hero" className="cta-primary">
+                    Start 14-Day Free Trial
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                     </svg>
-                  )}
+                  </Link>
+                )}
+                {/* Sends to /pricing rather than straight into a signup — a
+                    visitor who wants to compare plans first still can. */}
+                <Link href={signupHrefFor(signupsOpen, "/pricing")} className="cta-ghost">
+                  {signupsOpen ? "View Pricing" : "Get Started"}
                 </Link>
                 <Link href="/demo" className="cta-ghost">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -296,13 +302,16 @@ export default function Hero() {
                   Watch Demo
                 </Link>
               </div>
-              {/* "No credit card required" is gone — there is no free trial to
-                  start without one, so the line promised something checkout
-                  cannot honour. "Priority early access" also said pre-launch
-                  next to "Newly Launched" in Testimonials.tsx and live
-                  checkout/signups elsewhere — one status, not two. */}
+              {/* The no-card line is back because the trial now backs it: signup
+                  for the trial asks for no payment, and the app stays usable
+                  read-only for three days after it ends. Before a trial
+                  existed this line promised something checkout could not
+                  honour. The launch-offer wording is only what is true after
+                  the trial: 50% off the first three months, monthly plans. */}
               <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:32, fontWeight:500 }}>
-                Newly launched · Launch pricing locked in
+                {signupsOpen
+                  ? "14 days free · No credit card required · 50% off your first 3 months after the trial"
+                  : "Newly launched · Launch pricing locked in"}
               </p>
 
               {/* Trust row. The customer count and star rating that used to sit

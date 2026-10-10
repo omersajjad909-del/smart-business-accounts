@@ -144,6 +144,16 @@ const FAQS = [
   // ── Plans & Billing ──
   {
     cat: "billing", color: "var(--tx-f97316, #f97316)",
+    q: "Is there a free trial? Do I need a credit card?",
+    a: "Yes. You get 14 days of full access with the Professional features, and no credit card is needed to start. We ask for a phone number instead, so we can help you get set up. When the 14 days end, your data stays safe: you can still view and export it for 3 more days while you choose a plan.",
+  },
+  {
+    cat: "billing", color: "var(--tx-f97316, #f97316)",
+    q: "What happens to my data when the trial ends?",
+    a: "Nothing is deleted. For 3 days after the trial you can log in, view everything and export it, but new records are paused. Choose a plan at any point and full access comes straight back, with everything you entered still there.",
+  },
+  {
+    cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "What does the 50% discount cover?",
     a: "On monthly billing, your first 3 months are 50% off the regular plan price — on any plan (Starter, Pro, or Enterprise). After 3 months, standard monthly pricing applies. Yearly billing gets 20% off instead; the two offers do not combine. No contracts. Cancel anytime before month 4 if you change your mind.",
   },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { trialCompanyFields } from "@/lib/trial";
 import { signJwt, verifyJwt } from "@/lib/auth";
 import { SIGNUPS_OPEN, WAITLIST_PATH } from "@/lib/signupGate";
 import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
     if (!user) {
       const hash = await bcrypt.hash(cryptoRandom(), 10);
       const company = await prisma.company.create({
-        data: { name: "My Company", code: null, isActive: true },
+        data: { name: "My Company", code: null, isActive: true, ...trialCompanyFields("magic") },
       } as any);
       companyId = company.id;
       await createDefaultBranchForCompany(companyId, { name: company.name });
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
     } else {
       if (!companyId) {
         const company = await prisma.company.create({
-          data: { name: "My Company", code: null, isActive: true },
+          data: { name: "My Company", code: null, isActive: true, ...trialCompanyFields("magic") },
         } as any);
         companyId = company.id;
         await createDefaultBranchForCompany(companyId, { name: company.name });

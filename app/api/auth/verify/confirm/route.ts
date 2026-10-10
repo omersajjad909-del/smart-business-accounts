@@ -5,6 +5,7 @@ import type { BusinessType } from "@/lib/businessModules";
 import { seedMinimalChart } from "@/lib/services/accountsSeed";
 import { currencyByCountry } from "@/lib/currency";
 import { prisma } from "@/lib/prisma";
+import { trialCompanyFields } from "@/lib/trial";
 import {
   getLatestVerificationLog,
   getOtpHash,
@@ -45,8 +46,11 @@ async function promotePendingSignup(pendingId: string) {
         baseCurrency: currencyByCountry(country) || "USD",
         businessType: (data.businessType ? String(data.businessType) : "trading") as BusinessType,
         businessSetupDone: Boolean(data.businessType),
-        plan: String(data.planCode || "STARTER"),
-        subscriptionStatus: "INACTIVE",
+        // A trial signup starts TRIALING on the trial plan with an end date;
+        // a paid signup waits INACTIVE for its first payment.
+        ...(data.trial
+          ? trialCompanyFields(String(data.trialSource || "web"), data.phone ? String(data.phone) : null)
+          : { plan: String(data.planCode || "STARTER"), subscriptionStatus: "INACTIVE" }),
         activeModules: customModuleIds.length > 0 ? customModuleIds.join(",") : null,
         customPrice: data.customPrice ?? null,
       },

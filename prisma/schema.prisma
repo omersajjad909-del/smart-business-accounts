@@ -582,6 +582,14 @@ model Company {
   // currentPeriodEnd and the dunning cron only looks at failed payments.
   accessGrantedUntil        DateTime?
   cancelledAt               DateTime? // Timestamp when subscription was cancelled
+  // Free trial. All nullable: a company with trialEndsAt = null never had one
+  // (every account that existed before the trial launched), and the guards
+  // leave it alone. trialPhone is the normalised signup number — one trial per
+  // phone is how a no-card trial is kept from being farmed with fresh emails.
+  trialStartedAt            DateTime?
+  trialEndsAt               DateTime?
+  trialSource               String? // where the signup came from: hero, ads, referral, google, magic ...
+  trialPhone                String?
   dataRetentionUntil        DateTime? // 90 days after cancellation — hard delete after this date
   paymentFailedAt           DateTime? // First failed platform payment in current streak — cleared on next success. Drives platform-dunning cron (7d → READ_ONLY, 30d → SUSPENDED per ToS)
   retentionReminder14SentAt DateTime? // Set when 14-day pre-deletion reminder email sent (idempotency guard)
@@ -678,6 +686,9 @@ model Company {
   bulkPaymentBatches    BulkPaymentBatch[]
   paymentFollowUpLogs   PaymentFollowUpLog[]
   fbrCredential         CompanyFbrCredential?
+
+  @@index([trialPhone])
+  @@index([subscriptionStatus, trialEndsAt])
 }
 
 // The FBR digital-invoicing bearer token, held apart from AdminControlSettings

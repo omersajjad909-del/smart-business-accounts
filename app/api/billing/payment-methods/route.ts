@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
   // under a green Active badge and a paid invoice. Answered on its own terms
   // instead: no card is stored, and that is correct rather than incomplete.
   const company = await prisma.company
-    .findUnique({ where: { id: companyId }, select: { accessGrantedUntil: true, country: true } })
+    .findUnique({ where: { id: companyId }, select: { accessGrantedUntil: true, country: true, subscriptionStatus: true } })
     .catch(() => null);
 
   // Region is resolved server-side from the request, the same way checkout
@@ -127,6 +127,21 @@ export async function GET(req: NextRequest) {
         canReCheckout: true,
         reCheckoutLabel: "Pay by card",
         reCheckoutReason: "Move this workspace onto card billing. Your data and settings stay exactly as they are.",
+      };
+    }
+    // A Safepay subscription whose payment never went through (declined card,
+    // or the first charge was never captured) leaves a `sub_` id behind, so the
+    // branches above and below both say "nothing to offer" — and the page fell
+    // through to the add-card form, which cannot work. Offer a fresh checkout.
+    const safepayUnpaid =
+      String(subscription.provider).toUpperCase() === "SAFEPAY" &&
+      (["PAST_DUE", "INACTIVE", "READ_ONLY", "SUSPENDED"].includes(String(company?.subscriptionStatus || "").toUpperCase()) ||
+        !["ACTIVE", "TRIALING"].includes(String(subscription.status || "").toUpperCase()));
+    if (safepayUnpaid) {
+      return {
+        canReCheckout: true,
+        reCheckoutLabel: "Retry payment",
+        reCheckoutReason: "Your last payment did not go through. Pay again to keep your workspace running — your data and settings stay exactly as they are.",
       };
     }
     const wouldUseSafepay = region.isPakistan && isSafepayCheckoutEnabled();

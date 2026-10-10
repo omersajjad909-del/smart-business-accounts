@@ -93,6 +93,10 @@ export async function POST(req: NextRequest) {
         data: {
           subscriptionStatus: "TRIALING",
           currentPeriodEnd: newEnd,
+          // The guards read trialEndsAt, not currentPeriodEnd — without this
+          // an extension would change nothing a customer could feel.
+          trialEndsAt: newEnd,
+          ...(company.trialStartedAt ? {} : { trialStartedAt: new Date() }),
         },
       });
     }

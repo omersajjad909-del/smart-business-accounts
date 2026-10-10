@@ -313,6 +313,13 @@ function PlanCard({ plan, billing, prices, pkrPrices, vis, i, currency, planLimi
           <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
         </svg>
       </Link>
+      {signupsOpen && !isCustom && (
+        <div style={{ textAlign:"center", margin:"-12px 0 20px", fontSize:12.5 }}>
+          <Link href="/onboarding/signup/pro?trial=1&src=pricing" style={{ color:"inherit", opacity:.7, textDecoration:"underline" }}>
+            or try free for 14 days. No card needed.
+          </Link>
+        </div>
+      )}
 
       {/* Feature list */}
       <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
