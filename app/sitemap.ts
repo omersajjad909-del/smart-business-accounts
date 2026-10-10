@@ -143,6 +143,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/features/purchase-grn`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
     { url: `${BASE}/features/multi-currency`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
     { url: `${BASE}/features/multi-branch`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/role-access`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.7  },
   ];
 
   // Blog articles — only add real published slugs here (must exist in app/(marketing)/blog/posts.ts)

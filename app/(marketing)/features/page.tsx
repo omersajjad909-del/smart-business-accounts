@@ -2144,6 +2144,45 @@ export default function FeaturesPage() {
           <CategorySection key={cat.id} cat={cat} startIdx={startIndices[i]}/>
         ))}
 
+        {/* ── EXPLORE EACH FEATURE ──
+            This page describes every module inline but never linked to its
+            own dedicated page, so none of the 12 /features/<slug> pages had
+            an internal link pointing at them — Google had to find each one
+            by guessing the sitemap, and several never got indexed (SEO
+            audit, Oct 2026). Slugs/titles mirror MODULES in
+            features/[slug]/page.tsx. */}
+        <section style={{ padding:"24px 24px 80px", maxWidth:1100, margin:"0 auto" }}>
+          <h2 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"var(--ink-solid, white)", marginBottom:18, textAlign:"center" }}>
+            Explore every feature in depth
+          </h2>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:10 }}>
+            {[
+              { slug:"accounting",          title:"Accounting & Ledger" },
+              { slug:"invoicing",           title:"Invoicing" },
+              { slug:"inventory",           title:"Inventory Management" },
+              { slug:"bank-reconciliation", title:"Bank Reconciliation" },
+              { slug:"hr-payroll",          title:"HR & Payroll" },
+              { slug:"crm",                 title:"CRM" },
+              { slug:"multi-branch",        title:"Multi-Branch & Multi-Company" },
+              { slug:"role-access",         title:"Role-Based Access Control" },
+              { slug:"reports",             title:"Reports & Analytics" },
+              { slug:"pos",                 title:"Point of Sale (POS)" },
+              { slug:"purchase-grn",        title:"Purchase & GRN" },
+              { slug:"multi-currency",      title:"Multi-Currency" },
+            ].map(({ slug, title }) => (
+              <Link
+                key={slug}
+                href={`/features/${slug}`}
+                style={{ display:"block", padding:"13px 16px", borderRadius:12, border:"1px solid rgba(var(--ink),.08)", background:"rgba(var(--ink),.03)", color:"rgba(var(--ink),var(--ta-70, .7))", fontSize:13, fontWeight:600, textDecoration:"none", transition:"all .18s" }}
+                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(99,102,241,.35)"; e.currentTarget.style.background="rgba(99,102,241,.07)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(var(--ink),.08)"; e.currentTarget.style.background="rgba(var(--ink),.03)"; }}
+              >
+                {title} →
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* ── FINAL CTA ── */}
         <section style={{ padding:"80px 24px", maxWidth:1100, margin:"0 auto" }}>
           <div ref={ctaRef} className="feat-cta-inner" style={{ borderRadius:28, overflow:"hidden", position:"relative", background:"var(--mk-card-indigo, linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%))", padding:"72px 48px", textAlign:"center", boxShadow:"0 32px 80px rgba(99,102,241,.35)", border:"1px solid rgba(165,180,252,.2)", opacity:ctaVisible?1:0, transform:ctaVisible?"translateY(0)":"translateY(20px)", transition:"all .7s ease" }}>

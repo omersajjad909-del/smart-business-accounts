@@ -9,6 +9,48 @@ import MarketingThemeScope from "./landing/components/MarketingThemeScope";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
+// A handful of pages already build their own, more specific BreadcrumbList
+// (real blog post titles, page-specific @type) nested inside their own
+// JSON-LD — skip those here so a page never carries two.
+const OWN_BREADCRUMB = [/^\/$/, /^\/about$/, /^\/contact$/, /^\/blog\/[^/]+$/];
+
+const ACRONYMS = new Set(["crm", "hr", "pos", "grn", "api", "faq", "aup", "dpa", "sla"]);
+
+function humanize(segment: string): string {
+  return decodeURIComponent(segment)
+    .split("-")
+    .map((word) => (ACRONYMS.has(word.toLowerCase()) ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join(" ");
+}
+
+/**
+ * Generic breadcrumb for every marketing page that doesn't build its own.
+ * Was present on only 3 of ~45 pages (audit, Oct 2026) because the rest had
+ * no breadcrumb at all, not because they didn't need one — this derives one
+ * from the URL path instead of hand-writing it per page.
+ */
+function breadcrumbJsonLd(pathname: string): object | null {
+  const path = pathname.split("?")[0].replace(/\/+$/, "");
+  if (OWN_BREADCRUMB.some((re) => re.test(path))) return null;
+
+  const segments = path.split("/").filter(Boolean);
+  if (segments.length === 0) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE },
+      ...segments.map((seg, i) => ({
+        "@type": "ListItem",
+        position: i + 2,
+        name: humanize(seg),
+        item: `${BASE}/${segments.slice(0, i + 1).join("/")}`,
+      })),
+    ],
+  };
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const pathname = (await headers()).get("x-pathname") ?? "/";
 
@@ -90,13 +132,21 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const hdrs = await headers();
+  const pathname = hdrs.get("x-pathname") ?? "/";
+  const nonce = hdrs.get("x-nonce") || undefined;
+  const breadcrumb = breadcrumbJsonLd(pathname);
+
   return (
     <MarketingThemeScope className="mkt-page flex min-h-dvh flex-col">
+      {breadcrumb && (
+        <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      )}
       <style>{`
         @media(max-width:640px){
           .mkt-page [style*="130px 24px"]{padding-top:60px !important;padding-bottom:28px !important;}

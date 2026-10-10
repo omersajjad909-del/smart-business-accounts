@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SEO_ARTICLES } from "./seo-articles";
+import { ALL_POSTS } from "./posts";
 
 const CATEGORIES = [
   { id: "all",        label: "All",            color: "var(--tx-818cf8, #818cf8)", bg: "#818cf820" },
@@ -38,6 +39,28 @@ const SEO_POSTS = Object.values(SEO_ARTICLES).map(a => ({
   icon: a.icon,
 }));
 
+/**
+ * The 4 hand-written posts in posts.ts other than the featured one — these
+ * had no entry anywhere on this index page at all (not SEO_POSTS, not
+ * LEGACY_POSTS), so the only way to reach them was a direct link from
+ * another post or the sitemap; this page's own search/filter UI couldn't
+ * find them (SEO audit, Oct 2026).
+ */
+const HAND_WRITTEN_POSTS = Object.values(ALL_POSTS)
+  .filter(p => p.id !== FEATURED.slug)
+  .map(p => ({
+    slug: p.id,
+    title: p.title,
+    excerpt: p.excerpt,
+    category: p.category,
+    categoryLabel: p.categoryLabel,
+    author: p.author,
+    date: p.date.replace(/^(\w{3})\w*\s/, "$1 "),
+    readTime: p.readTime.replace(" read", ""),
+    color: p.color,
+    icon: "📝",
+  }));
+
 const LEGACY_POSTS = [
   { slug: "1", title: "How to Create and Send Professional Invoices with FinovaOS", excerpt: "From custom templates to automatic payment reminders — get paid faster using FinovaOS's invoicing module.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 8, 2026", readTime: "5 min", color: "var(--tx-34d399, #34d399)", icon: "📄" },
   { slug: "2", title: "FinovaOS HR & Payroll: A Practical Setup Guide", excerpt: "Set up employees, salary components, allowances, and deductions — with support for custom statutory rules per country.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 6, 2026", readTime: "7 min", color: "var(--tx-fbbf24, #fbbf24)", icon: "👥" },
@@ -56,7 +79,7 @@ const LEGACY_POSTS = [
   { slug: "15", title: "Cloud Accounting vs Desktop Software for SMEs in 2026", excerpt: "Why Pakistani businesses are switching from Peachtree, QuickBooks Desktop and manual Excel to cloud-based accounting — and what to watch out for.", category: "fintech", categoryLabel: "Fintech", author: "FinovaOS Team", date: "May 28, 2026", readTime: "7 min", color: "var(--tx-c4b5fd, #c4b5fd)", icon: "☁️" },
 ];
 
-const POSTS = [...SEO_POSTS, ...LEGACY_POSTS];
+const POSTS = [...HAND_WRITTEN_POSTS, ...SEO_POSTS, ...LEGACY_POSTS];
 
 const catColor = (id: string) => CATEGORIES.find(c => c.id === id)?.color || "var(--tx-818cf8, #818cf8)";
 const catBg    = (id: string) => CATEGORIES.find(c => c.id === id)?.bg    || "#818cf820";

@@ -252,7 +252,7 @@ export default function IndustriesPageClient({ initialTypes }: { initialTypes: B
 
                       {isLive && (
                         <Link
-                          href={`/pricing`}
+                          href={`/for/${b.id}`}
                           style={{
                             display: "inline-flex", alignItems: "center", gap: 5,
                             fontSize: 11.5, fontWeight: 700, color: "var(--tx-34d399, #34d399)",
@@ -263,7 +263,7 @@ export default function IndustriesPageClient({ initialTypes }: { initialTypes: B
                             transition: "all .18s",
                           }}
                         >
-                          Get Started →
+                          Learn more →
                         </Link>
                       )}
                     </div>
