@@ -160,7 +160,7 @@ const FAQS = [
   {
     cat: "billing", color: "var(--tx-f97316, #f97316)",
     q: "What's the difference between monthly and yearly billing?",
-    a: "Monthly billing charges you each month at the standard rate. Yearly billing gives you an additional 20% discount on top — you pay for 12 months upfront but save significantly. The 50% first-3-months offer applies to both billing cycles.",
+    a: "Monthly billing charges you each month at the standard rate. Yearly billing gives you a 20% discount — you pay for 12 months upfront but save significantly. The 50% first-3-months offer applies to monthly billing only; yearly billing has its own 20% discount instead, and the two do not combine.",
   },
   {
     cat: "billing", color: "var(--tx-f97316, #f97316)",

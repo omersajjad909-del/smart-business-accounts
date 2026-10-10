@@ -310,7 +310,7 @@ export default function Hero() {
                   the trial: 50% off the first three months, monthly plans. */}
               <p style={{ fontSize:12.5, color:"rgba(var(--ink),var(--ta-40, .4))", marginBottom:32, fontWeight:500 }}>
                 {signupsOpen
-                  ? "14 days free · No credit card required · 50% off your first 3 months after the trial"
+                  ? "14 days free · No credit card required · 50% off your first 3 months on monthly plans"
                   : "Newly launched · Launch pricing locked in"}
               </p>
 
