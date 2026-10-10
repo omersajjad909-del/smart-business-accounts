@@ -14,7 +14,7 @@
 // dry run is the same code path as the commit (see app/api/import/route.ts), so
 // the preview cannot promise one thing and the import do another.
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -158,6 +158,14 @@ function ImportWizardInner() {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [plan, setPlan] = useState<ImportPlan | null>(null);
   const [resume, setResume] = useState<Resume | null>(null);
+  // Columns the importer did not recognise, and what the person chose for them.
+  // The map lives in a ref as well as being rendered from state: re-running the
+  // preview straight after choosing must send the new choice, not last render's.
+  type ColSuggestion = { header: string; field: string | null; source: "rules" | "ai" | "none"; samples: string[] };
+  const [colSuggest, setColSuggest] = useState<{ items: ColSuggestion[]; fields: string[]; aiAvailable: boolean; aiUsed: boolean } | null>(null);
+  const [colChoice, setColChoice] = useState<Record<string, string>>({});
+  const [colBusy, setColBusy] = useState(false);
+  const colMapRef = useRef<Record<string, string>>({});
 
   useEffect(() => { setResume(loadResume()); }, []);
 
@@ -187,6 +195,9 @@ function ImportWizardInner() {
 
   async function readFile(file: File) {
     setError("");
+    colMapRef.current = {};
+    setColSuggest(null);
+    setColChoice({});
     setNotice("");
     setPreview(null);
     setResult(null);
@@ -251,6 +262,7 @@ function ImportWizardInner() {
           ambiguousCodes: current.ambiguousCodes,
           continuedParties: chunk.continuedParties,
           codeSegment,
+          columnMap: colMapRef.current,
         }),
       });
       const body = await res.json();
@@ -260,7 +272,38 @@ function ImportWizardInner() {
     [headers, source, dataType, date, party, codeSegment],
   );
 
-  async function runPreview() {
+  /** Asks the server which headings it did not recognise. `useAI` also lets a model propose a field. */
+  async function loadColumnSuggestions(useAI: boolean) {
+    if (!dataType || !csv.trim()) return;
+    setColBusy(true);
+    try {
+      const res = await fetch("/api/import/suggest-columns", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", ...headers() },
+        body: JSON.stringify({ csv: csv.slice(0, 60000), dataType, useAI }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || "Could not check the columns.");
+      setColSuggest({ items: body.suggestions || [], fields: body.fields || [], aiAvailable: !!body.aiAvailable, aiUsed: !!body.aiUsed });
+      setColChoice((prev) => {
+        const next = { ...prev };
+        for (const sg of (body.suggestions || []) as ColSuggestion[]) if (sg.field && !next[sg.header]) next[sg.header] = sg.field;
+        return next;
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not check the columns.");
+    } finally {
+      setColBusy(false);
+    }
+  }
+
+  async function runPreview(columnMap?: Record<string, string>) {
+    if (columnMap) {
+      colMapRef.current = columnMap;
+      // Columns that now have a field are no longer 'unrecognised'.
+      setColSuggest((prev) => (prev ? { ...prev, items: prev.items.filter((i) => !columnMap[i.header]) } : prev));
+    }
     if (!dataType) { setError("Pick what you are importing first."); return; }
     if (!csv.trim()) { setError("Upload a file, or paste the rows in."); return; }
 
@@ -314,6 +357,7 @@ function ImportWizardInner() {
         reshaped: built.reshaped ?? first.reshaped,
       });
       setStep(4);
+      if (!columnMap) void loadColumnSuggestions(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read the file.");
     } finally {
@@ -694,7 +738,7 @@ function ImportWizardInner() {
             )}
 
             <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
-              <button onClick={runPreview} disabled={busy || !csv.trim()} style={{
+              <button onClick={() => runPreview()} disabled={busy || !csv.trim()} style={{
                 padding: "11px 22px", borderRadius: 10, border: "none",
                 background: busy || !csv.trim() ? "rgba(99,102,241,.4)" : "#6366f1",
                 color: "#fff", fontSize: 13.5, fontWeight: 700,
@@ -778,6 +822,66 @@ function ImportWizardInner() {
               padding: "13px 16px", marginBottom: 14, fontSize: 12.5, lineHeight: 1.65,
             }}>
               <b>File reshaped.</b> {preview.reshaped}
+            </div>
+          )}
+
+          {colSuggest && colSuggest.items.length > 0 && (
+            <div style={{ ...card, padding: "14px 16px", marginBottom: 14 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                {colSuggest.items.length} column{colSuggest.items.length === 1 ? "" : "s"} we did not recognise
+              </div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 12 }}>
+                These columns were left out of the import. If one of them holds data we need, say which field it is.
+                Nothing changes until you press the button.
+              </div>
+              {colSuggest.items.map((c) => (
+                <div key={c.header} style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", padding: "8px 0", borderTop: "1px solid var(--border)" }}>
+                  <div style={{ minWidth: 170, fontFamily: MONO, fontSize: 12 }}>{c.header}</div>
+                  <div style={{ flex: 1, minWidth: 140, fontSize: 11.5, color: "var(--text-muted)" }}>
+                    {c.samples.length ? c.samples.join(" · ") : "empty"}
+                  </div>
+                  <select
+                    value={colChoice[c.header] || ""}
+                    onChange={(e) => setColChoice((p) => ({ ...p, [c.header]: e.target.value }))}
+                    style={{ padding: "7px 10px", borderRadius: 8, fontSize: 12, border: "1px solid var(--border)", background: "transparent", color: "inherit" }}
+                  >
+                    <option value="">Ignore this column</option>
+                    {colSuggest.fields.map((f) => <option key={f} value={f}>{f}</option>)}
+                  </select>
+                  {c.source === "ai" && <span style={{ fontSize: 10.5, color: "var(--tx-f59e0b, #f59e0b)" }}>AI suggestion</span>}
+                  {c.source === "rules" && <span style={{ fontSize: 10.5, color: "var(--text-muted)" }}>Suggested</span>}
+                </div>
+              ))}
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12, alignItems: "center" }}>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    const map: Record<string, string> = {};
+                    for (const [h, f] of Object.entries(colChoice)) if (f) map[h] = f;
+                    void runPreview(map);
+                  }}
+                  style={{ padding: "9px 16px", borderRadius: 9, border: "none", background: "#c2410c", color: "#fff", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}
+                >
+                  Use these and check again
+                </button>
+                {colSuggest.aiAvailable && !colSuggest.aiUsed && (
+                  <button
+                    type="button"
+                    disabled={colBusy}
+                    onClick={() => void loadColumnSuggestions(true)}
+                    style={{ padding: "9px 16px", borderRadius: 9, border: "1px solid var(--border)", background: "transparent", color: "inherit", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
+                  >
+                    {colBusy ? "Asking…" : "Ask AI to suggest the rest"}
+                  </button>
+                )}
+              </div>
+              {colSuggest.aiAvailable && !colSuggest.aiUsed && (
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 8, lineHeight: 1.55 }}>
+                  The AI sees only the heading and up to three short sample values of the columns listed above, nothing else from your file.
+                  It suggests names; it never imports anything.
+                </div>
+              )}
             </div>
           )}
 

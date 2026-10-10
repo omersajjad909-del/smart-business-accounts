@@ -728,7 +728,7 @@ export default function AboutPage() {
               Ready to run your business smarter?
             </h2>
             <p style={{ fontSize: 15, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 32px" }}>
-              Start today — 50% off your first 3 months, 14-day refund on yearly plans. No lock-in.
+              Try it free for 14 days, no card needed. Then 50% off your first 3 months on monthly plans, or a 14-day refund on yearly plans. No lock-in.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
               <Link href="/onboarding/signup/starter" className="about-btn-primary">
@@ -738,7 +738,7 @@ export default function AboutPage() {
               <Link href="/contact" className="about-btn-ghost">Talk to Us →</Link>
             </div>
             <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
-              {["✓ 14-day refund on yearly plans", "✓ 50% off first 3 months", "✓ Cancel anytime"].map(t => (
+              {["✓ 14 days free, no card", "✓ 50% off first 3 months (monthly plans)", "✓ 14-day refund on yearly plans", "✓ Cancel anytime"].map(t => (
                 <span key={t} style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", fontWeight: 600 }}>{t}</span>
               ))}
             </div>

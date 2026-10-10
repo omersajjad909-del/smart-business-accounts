@@ -20,6 +20,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { safeEncryptField } from "@/lib/fieldEncrypt";
 import { parseCsv, type CsvRow } from "@/lib/csvParse";
+import { applyColumnMap } from "@/lib/importColumnMap";
 import {
   flattenRepeatedReportExport,
   flattenLedgerExport,
@@ -1054,6 +1055,8 @@ type ImportBody = {
    * which is what every other system needs.
    */
   codeSegment: number;
+  /** Column the person confirmed as a template field: { "Sale Price": "rate" }. */
+  columnMap?: Record<string, string>;
   /** What the segments are separated by. Hyphen on every EBS install we have seen. */
   codeSeparator: string;
   error?: string;
@@ -1064,6 +1067,16 @@ const EMPTY_BODY: ImportBody = {
   lineOffset: 0, chunkCount: 1, chunkIndex: 1, ambiguousCodes: [], continuedParties: [],
   codeSegment: 0, codeSeparator: "-",
 };
+
+/** A { heading: field } map from an untrusted caller: strings only, bounded. */
+function cleanColumnMap(raw: unknown): Record<string, string> | undefined {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>).slice(0, 60)) {
+    if (typeof v === "string" && k.length <= 200 && v.length <= 60) out[k] = v;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
 
 /** A count from an untrusted caller, kept sane and non-negative. */
 function counted(raw: unknown, fallback: number): number {
@@ -1121,6 +1134,7 @@ async function readBody(req: NextRequest): Promise<ImportBody> {
     ambiguousCodes: stringList(json.ambiguousCodes),
     continuedParties: stringList(json.continuedParties),
     codeSegment: counted(json.codeSegment, 0),
+    columnMap: cleanColumnMap(json.columnMap),
     codeSeparator: String(json.codeSeparator || "-"),
   };
 }
@@ -1227,7 +1241,8 @@ export async function POST(req: NextRequest) {
         if (result.converted) { flattened = result; break; }
       }
     }
-    const parsed = parseCsv(flattened.text);
+    // Headings the person matched to a field in the preview step.
+    const parsed = applyColumnMap(parseCsv(flattened.text), dataType, body.columnMap);
     if (parsed.rows.length === 0) {
       return NextResponse.json(
         { error: "No data rows found — the file needs a heading row and at least one row under it" },
