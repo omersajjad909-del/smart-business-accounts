@@ -910,13 +910,17 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
         }
 
         @media print {
+          @page { size: A4 portrait; margin: 10mm; }
           .print-paper-wrapper { background: #fff !important; padding: 0 !important; }
           .print-doc-a4 {
             box-shadow: none !important;
             width: auto !important;
             /* Fills the sheet so the signatures sit at the foot of the paper,
-               not under the last line item. */
-            min-height: 100% !important;
+               not under the last line item. A percentage does nothing here —
+               the wrappers above are auto-height in print — so it is an
+               absolute length: A4 less the 10mm page margins, with a little
+               slack so it never spills onto a second blank page. */
+            min-height: 274mm !important;
             padding: 0 !important;
           }
           /* A band runs to the paper's edge on screen; on paper the printer's

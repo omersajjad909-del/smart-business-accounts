@@ -8,6 +8,8 @@ import { emailTemplates } from "@/lib/emailTemplates";
 import { cancelLemonSubscription, mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
 import {
   cancelSafepaySubscription,
+  isSafepaySubscriptionActive,
+  isSafepayWebhookFromConfiguredMerchant,
   mapSafepayEventToStatus,
   normalizeSafepayMetadata,
   paisaToPkr,
@@ -1050,6 +1052,16 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
   }
 
   const payload  = JSON.parse(raw);
+
+  // Environment guard: the signature check above proves the body wasn't
+  // tampered with, not which Safepay account sent it. merchant_api_key is
+  // that account's own secret key echoed back in the body — if it doesn't
+  // match the one this deployment is configured with, this event belongs to
+  // a different merchant/environment and must not touch anyone's account.
+  if (!isSafepayWebhookFromConfiguredMerchant(payload?.merchant_api_key)) {
+    return apiError("Safepay webhook merchant mismatch", 400);
+  }
+
   const event    = String(payload?.type || payload?.event || "");
   const data     = payload?.data || payload?.payload || {};
   const tracker  = String(data?.tracker?.token || data?.tracker || payload?.tracker || "");
@@ -1166,6 +1178,19 @@ async function handleSafepayWebhook(req: NextRequest, raw: string) {
     : typeof sub?.price_amount === "number"   ? sub.price_amount
     : null;
   const amountPkr = rawAmount == null ? null : paisaToPkr(rawAmount);
+
+  // Defense in depth: mapSafepayEventToStatus trusts the event *name*. This
+  // cross-checks it against the subscription object's own status field, which
+  // every subscription webhook carries — so an event this code hasn't been
+  // taught about yet can't still activate a plan ahead of the money the way
+  // subscription.created did on Oct 9 2026.
+  if (status === "ACTIVE" && isSubscriptionEvent && !isSafepaySubscriptionActive(sub)) {
+    return apiOk({
+      received: true,
+      provider: "safepay",
+      ignored: `subscription status "${sub?.status}" is not ACTIVE`,
+    });
+  }
 
   if (status === "ACTIVE") {
     // Calculate 30-day (monthly) or 365-day (yearly) period end

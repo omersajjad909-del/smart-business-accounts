@@ -612,12 +612,17 @@ export function verifySafepaySignature(rawBody: string, signatureHeader: string 
 
 export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | "CANCELLED" | "REFUNDED" | "INACTIVE" {
   switch (String(event || "").toLowerCase()) {
-    // A completed charge — initial purchase or a renewal.
+    // A completed charge — initial purchase or a renewal. Confirmed against
+    // https://safepay-docs.netlify.app/developers/webhooks/webhook-types, which
+    // documents only the dot-separated v2 names below — our integration only
+    // ever calls the v3/embedded checkout (see getCheckoutBase), never the old
+    // /order/v1/init flow, so the colon-separated v1 spellings should never
+    // actually arrive. The unambiguous ones (name says success/succeeded) are
+    // kept as harmless aliases in case Safepay ever resurrects that flow.
     case "payment.succeeded":
     case "subscription.resumed":
     case "subscription.payment.succeeded":
-    // v1 aliases
-    case "payment:created":
+    // v1 aliases — unambiguous by name, dead code today
     case "payment:success":
     case "payment.success":
     case "payment:succeeded":
@@ -628,8 +633,17 @@ export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | 
     // BEFORE the first payment is actually captured — the subscription can sit
     // at Safepay-side status INCOMPLETE with balance 0 at this point, so it
     // must not activate a plan or record an invoice (incident Oct 9 2026).
+    // The docs' own example payload for this event shows "status": "INCOMPLETE".
     // Falls through to the same no-op as authorization.*/void.* below.
+    //
+    // payment:created is grouped here rather than with the other v1 aliases
+    // above for the same reason: "created" is not documented anywhere as
+    // meaning "captured", and nothing has confirmed what it actually carries.
+    // Guessing it belongs in the ACTIVE case is exactly the mistake that
+    // caused the Oct 9 2026 incident for subscription.created, so it is not
+    // repeated here on an unverified event name.
     case "subscription.created":
+    case "payment:created":
       return "INACTIVE";
 
     // A charge that did not go through. Renewal failures land here too, which
@@ -659,6 +673,51 @@ export function mapSafepayEventToStatus(event: string): "ACTIVE" | "PAST_DUE" | 
     default:
       return "INACTIVE";
   }
+}
+
+/**
+ * Second opinion on a subscription webhook, independent of the event name.
+ *
+ * Every subscription event carries the subscription object's own `status`
+ * field — confirmed against the example payloads at
+ * https://safepay-docs.netlify.app/developers/webhooks/webhook-types:
+ * subscription.created ships "INCOMPLETE" before the first charge settles,
+ * subscription.resumed/subscription.payment.succeeded ship "ACTIVE".
+ *
+ * Trusting mapSafepayEventToStatus's event-name mapping alone was the root
+ * cause of the Oct 9 2026 incident. This reads the data Safepay actually
+ * sent instead, so an event this code hasn't been taught about yet — Safepay
+ * warns it may add new types — can't activate a plan ahead of the money.
+ *
+ * Returns true when there is nothing to contradict the event-name mapping
+ * (no status field on this payload, e.g. a one-off payment) — it narrows
+ * trust, it does not replace it.
+ */
+export function isSafepaySubscriptionActive(sub: any): boolean {
+  const s = String(sub?.status || "").trim().toUpperCase();
+  if (!s) return true;
+  return s === "ACTIVE";
+}
+
+/**
+ * Confirms a webhook was sent by the Safepay merchant account this deployment
+ * is configured for, not just signed with whatever secret SAFEPAY_WEBHOOK_SECRET
+ * happens to hold. Safepay's webhook body carries the sending account's own
+ * secret key back as `merchant_api_key` (see the example payloads linked
+ * above) — comparing it to our configured SAFEPAY_SECRET_KEY is a second,
+ * independent check that a sandbox event (or a different merchant entirely)
+ * can't be processed as if it came from the production account, e.g. if a
+ * webhook secret were ever shared or misconfigured across environments.
+ *
+ * Returns true when we have nothing to compare against — no secret key
+ * configured yet, or Safepay omitted the field — so this narrows trust
+ * rather than replacing the signature check.
+ */
+export function isSafepayWebhookFromConfiguredMerchant(payloadMerchantApiKey: unknown): boolean {
+  const expected = env("SAFEPAY_SECRET_KEY");
+  const actual = String(payloadMerchantApiKey || "").trim();
+  if (!expected || !actual) return true;
+  return actual === expected;
 }
 
 // ─── PKR pricing helpers ──────────────────────────────────────────────────────
