@@ -3534,7 +3534,7 @@ export default function DashboardLayout({
                   <div style={{ fontSize:13, lineHeight:1.6, flex:1, minWidth:200 }}>
                     {ended
                       ? <><strong>Your free trial has ended.</strong> Your data is safe. Choose a plan to keep creating records.</>
-                      : <><strong>Free trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left.</strong> Everything is unlocked. No card needed until you choose a plan.</>}
+                      : <><strong>Free trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left.</strong> Everything is unlocked. No card needed until you choose a plan. <strong>Free setup included:</strong> set it up yourself in 2 minutes, or ask our team.</>}
                   </div>
                   {!ended && (
                     <Link href="/dashboard/quick-setup" style={{ fontSize:13, fontWeight:700, textDecoration:"underline" }}>
