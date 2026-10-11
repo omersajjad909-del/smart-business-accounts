@@ -5,6 +5,7 @@ import { trialCompanyFields } from "@/lib/trial";
 import { signJwt, verifyJwt } from "@/lib/auth";
 import { SIGNUPS_OPEN, WAITLIST_PATH } from "@/lib/signupGate";
 import { createDefaultBranchForCompany } from "@/lib/companyBranchBootstrap";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,6 +35,7 @@ export async function GET(req: NextRequest) {
       } as any);
       companyId = company.id;
       await createDefaultBranchForCompany(companyId, { name: company.name });
+      await notifyAdmins({ title: "🆕 New free trial (email link)", message: email, type: "SUCCESS", link: "/admin/trials" });
       user = await prisma.user.create({
         data: {
           name: email.split("@")[0],

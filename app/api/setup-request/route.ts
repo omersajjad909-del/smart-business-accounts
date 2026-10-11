@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,13 @@ export async function POST(req: NextRequest) {
 
   await prisma.activityLog.create({
     data: { companyId, action: "SETUP_REQUEST", details: JSON.stringify({ note }) },
+  });
+  const co = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true, trialPhone: true } }).catch(() => null);
+  await notifyAdmins({
+    title: "🛠 Setup help requested",
+    message: [co?.name, co?.trialPhone, note].filter(Boolean).join(" · "),
+    type: "WARNING",
+    link: "/admin/trials",
   });
   return NextResponse.json({ ok: true });
 }

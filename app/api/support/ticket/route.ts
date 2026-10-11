@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export async function POST(req: NextRequest) {
   const { subject, message } = await req.json();
@@ -22,5 +23,11 @@ export async function POST(req: NextRequest) {
   } catch {
     // Ignore if the model is not present; API still returns success
   }
+  await notifyAdmins({
+    title: "🎫 New support ticket",
+    message: `${subject} — ${String(message).slice(0, 200)}`,
+    type: "WARNING",
+    link: "/admin/tickets",
+  });
   return NextResponse.json({ success: true });
 }

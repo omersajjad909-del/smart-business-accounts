@@ -12,6 +12,7 @@ import {
   isUserVerified,
   safeJson,
 } from "@/lib/verification";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 /** Guessing six digits is cheap; make each pending signup pay for its tries. */
 const MAX_OTP_ATTEMPTS = 5;
@@ -98,6 +99,13 @@ async function promotePendingSignup(pendingId: string) {
       })
       .catch(() => {});
   }
+
+  await notifyAdmins({
+    title: data.trial ? "🆕 New free trial" : "🆕 New signup",
+    message: [company.name, user.email, data.phone, country].filter(Boolean).join(" · "),
+    type: "SUCCESS",
+    link: data.trial ? "/admin/trials" : "/admin/companies",
+  });
 
   await prisma.activityLog
     .create({

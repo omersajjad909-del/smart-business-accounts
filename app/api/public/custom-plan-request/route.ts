@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCustomPlanMonthlyUsd, parseCustomModules } from "@/lib/customPlanPricing";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await notifyAdmins({
+      title: "🧩 Custom plan request",
+      message: `${name} · ${company} · ${email} · $${computedPrice}/mo`,
+      type: "INFO",
+      link: "/admin/subscriptions",
+    });
     return NextResponse.json(request);
   } catch (error) {
     console.error("Custom Plan Request Error:", error);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveChatScope } from "@/lib/chatScope";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export const runtime = "nodejs";
 
@@ -79,6 +80,22 @@ export async function POST(req: NextRequest) {
         text:           text,
       },
     });
+
+    // A reply from the visitor to a conversation a human agent has been asked
+    // to take is the one chat message the admin must not miss.
+    if (!["agent", "bot", "system"].includes(sender)) {
+      const conv = await prisma.chatConversation.findUnique({
+        where: { id: conversationId }, select: { status: true, customerName: true },
+      }).catch(() => null);
+      if (conv?.status === "waiting") {
+        await notifyAdmins({
+          title: `✉️ Message from ${conv.customerName || "visitor"}`,
+          message: text.slice(0, 200),
+          type: "INFO",
+          link: "/admin/chat",
+        });
+      }
+    }
 
     // Bump conversation updatedAt (ignore failure)
     prisma.chatConversation.update({

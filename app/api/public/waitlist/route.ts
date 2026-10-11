@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 const db = prisma as any;
 
@@ -153,6 +154,12 @@ export async function POST(req: NextRequest) {
       // Welcome email is best-effort — signup succeeds even if send fails.
     }
 
+    await notifyAdmins({
+      title: "📝 New waitlist signup",
+      message: `${name} · ${company} · ${email}`,
+      type: "INFO",
+      link: "/admin/waitlist",
+    });
     return NextResponse.json({
       success: true,
       message: "You're on the list. We'll reach out as soon as early access opens.",

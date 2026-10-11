@@ -24,6 +24,7 @@ import {
   parsePaymentEventDetails,
 } from "@/lib/billingInvoice";
 import { markPlatformInvoiceRefunded, recordPlatformInvoice } from "@/lib/platformInvoice";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 function safeDate(value: unknown) {
   if (!value) return null;
@@ -647,6 +648,15 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         : "soon";
       const failedAmount = typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 : 0;
       await sendPaymentFailedEmail(companyId, planCode, failedAmount, attrs?.currency || "USD", retryDate);
+      {
+        const co = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } }).catch(() => null);
+        await notifyAdmins({
+          title: "❌ Payment failed",
+          message: `${co?.name || companyId} · ${planCode}`,
+          type: "ERROR",
+          link: "/admin/subscriptions",
+        });
+      }
 
       // ── Dunning state machine kickoff ─────────────────────────────────────
       // Stamp paymentFailedAt on the Company row (idempotent — only set on the
@@ -711,6 +721,12 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 :
         typeof attrs?.total    === "number" ? Number(attrs.total)    / 100 : 0;
       const refundedCurrency = attrs?.currency || "USD";
+      await notifyAdmins({
+        title: "↩️ Payment refunded",
+        message: `${refundedCurrency} ${refundedAmount.toFixed(2)} · company ${companyId}`,
+        type: "WARNING",
+        link: "/admin/subscriptions",
+      });
 
       await prisma.activityLog.create({
         data: {

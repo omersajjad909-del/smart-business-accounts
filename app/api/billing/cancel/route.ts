@@ -4,6 +4,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { apiError, apiOk } from "@/lib/apiError";
 import { cancelLemonSubscription } from "@/lib/lemonsqueezy";
 import { cancelSafepaySubscription } from "@/lib/safepay";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 // Data Retention Policy:
 //   Day  0      — subscription cancelled, account becomes read-only
@@ -116,6 +117,16 @@ export async function POST(req: NextRequest) {
       retentionDays: RETENTION_DAYS,
       message: `Your data will be retained until ${dataRetentionUntil.toLocaleDateString()}. You have ${GRACE_PERIOD_DAYS} days to export your data in read-only mode.`,
     });
+
+    {
+      const co = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } }).catch(() => null);
+      await notifyAdmins({
+        title: "⚠️ Subscription cancelled",
+        message: `${co?.name || companyId}${reason ? ` — ${String(reason).slice(0, 150)}` : ""}`,
+        type: "ERROR",
+        link: "/admin/subscriptions",
+      });
+    }
   } catch (e: unknown) {
     return apiError(e instanceof Error ? e.message : "Cancel failed", 500);
   }

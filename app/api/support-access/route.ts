@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveCompanyId } from "@/lib/tenant";
+import { prisma } from "@/lib/prisma";
 import { getSupportAccessUntil, grantSupportAccess, revokeSupportAccess } from "@/lib/supportAccess";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +21,15 @@ export async function POST(req: NextRequest) {
   const { action } = await req.json().catch(() => ({}));
   const userId = req.headers.get("x-user-id");
   if (action === "grant") {
-    return NextResponse.json({ until: await grantSupportAccess(companyId, userId) });
+    const until = await grantSupportAccess(companyId, userId);
+    const co = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } }).catch(() => null);
+    await notifyAdmins({
+      title: "🔓 Support access granted",
+      message: `${co?.name || companyId} allowed support access`,
+      type: "INFO",
+      link: "/admin/trials",
+    });
+    return NextResponse.json({ until });
   }
   if (action === "revoke") {
     await revokeSupportAccess(companyId, userId);

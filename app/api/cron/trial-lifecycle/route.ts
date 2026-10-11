@@ -4,6 +4,7 @@ import { sendEmail } from "@/lib/email";
 import { getLaunchDiscount } from "@/lib/launchDiscount";
 import { loadTrialActivity } from "@/lib/trialMetrics";
 import { TRIAL_GRACE_DAYS } from "@/lib/trial";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -104,6 +105,12 @@ export async function runTrialLifecycle() {
       await prisma.activityLog
         .create({ data: { companyId: co.id, action: "TRIAL_CLOSED", details: JSON.stringify({ trialEndsAt: co.trialEndsAt }) } })
         .catch(() => {});
+      await notifyAdmins({
+        title: "⌛ Trial ended without paying",
+        message: co.name || co.id,
+        type: "WARNING",
+        link: "/admin/trials",
+      });
       closed++;
       continue;
     }

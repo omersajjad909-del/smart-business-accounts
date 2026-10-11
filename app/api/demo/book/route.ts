@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendBookingConfirmation } from "@/lib/demoBookingEmails";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 const SLOT_MINUTES = 60;
 
@@ -96,6 +97,12 @@ export async function POST(req: NextRequest) {
         console.error("Booking confirmation email failed:", err?.message || err);
       });
 
+      await notifyAdmins({
+        title: "📅 Demo booked",
+        message: `${booking.name} · ${booking.email} · ${new Date(booking.slotStart).toLocaleString("en-GB")}`,
+        type: "SUCCESS",
+        link: "/admin/leads",
+      });
       return NextResponse.json({ booking });
     } catch (e: any) {
       if (e?.code === "P2002") {

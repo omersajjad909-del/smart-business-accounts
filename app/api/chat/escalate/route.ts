@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export const runtime = "nodejs";
 
@@ -24,6 +25,12 @@ export async function POST(req: NextRequest) {
     await prisma.chatMessage.create({
       data: { conversationId, sender: "bot", text: "⚡ Customer requested a human agent." },
     }).catch(() => {});
+    await notifyAdmins({
+      title: "🙋 Visitor wants a human",
+      message: "A website chat visitor asked for a live agent.",
+      type: "WARNING",
+      link: "/admin/chat",
+    });
   } catch { /* ignore — conversation may not exist yet */ }
 
   return NextResponse.json({ ok: true });

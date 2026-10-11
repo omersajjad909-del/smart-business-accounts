@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { runChatEngine } from "@/lib/chatEngine";
 import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 export const runtime = "nodejs";
 
@@ -76,6 +77,12 @@ async function getOrCreateConversation(
         customerEmail: email || null,
         status:        "bot",
       },
+    });
+    await notifyAdmins({
+      title: "💬 New chat started",
+      message: `${name || "Website Visitor"}${email ? ` · ${email}` : ""}`,
+      type: "INFO",
+      link: "/admin/chat",
     });
     return conv.id;
   } catch {

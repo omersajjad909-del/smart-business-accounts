@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { notifyAdmins } from "@/lib/adminNotify";
 
 const db = prisma as any;
 
@@ -72,6 +73,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await notifyAdmins({
+      title: `💬 New ${type}${ratingValue ? ` (${ratingValue}★)` : ""}`,
+      message: `${subject.trim()} — ${message.trim().slice(0, 200)}`,
+      type: type === "complaint" || type === "bug" ? "WARNING" : "INFO",
+      link: "/admin/feedback",
+    });
     return NextResponse.json({ success: true, id: fb.id });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
