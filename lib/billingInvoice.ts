@@ -208,8 +208,9 @@ export async function getCompanyBillingContext(companyId: string): Promise<Billi
   }
 
   // Nothing in the ledger. The derived fallback below invents an invoice from
-  // the plan's list price, which is only meaningful for a live subscription.
-  if (!effectiveStatus || effectiveStatus.toUpperCase() === "INACTIVE") {
+  // the plan's list price, which is only meaningful for a paying subscription.
+  // A free trial has been charged nothing, so it has no invoice and no PDF.
+  if (!effectiveStatus || ["INACTIVE", "TRIALING"].includes(effectiveStatus.toUpperCase())) {
     return { ...base, invoices: [] };
   }
 

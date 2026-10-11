@@ -499,7 +499,9 @@ function BillingPage() {
           setCompanyName(String(d.name || ""));
           const rawPlan = (d.plan || "STARTER").toUpperCase();
           // Addon codes are not base plans — treat as Enterprise (highest tier that would have addons)
-          const planUpper = rawPlan.startsWith("ADDON-") ? "ENTERPRISE" : rawPlan;
+          // The plan list uses PROFESSIONAL; the company row stores PRO. Without this
+          // a Pro company (every free trial) fell through to Starter on this page.
+          const planUpper = rawPlan.startsWith("ADDON-") ? "ENTERPRISE" : rawPlan === "PRO" ? "PROFESSIONAL" : rawPlan;
           const amountMap: Record<string,number> = { STARTER:49, PRO:99, PROFESSIONAL:99, ENTERPRISE:249 };
           // What the card was actually charged, not the plan's international
           // list price. A Pakistan-region Starter sale settles at ~$7.14, and
@@ -668,6 +670,14 @@ function BillingPage() {
   const currentPlanCode = subscription?.plan?.toUpperCase() ?? "STARTER";
   const currentPlan     = PLANS.find(p => p.code === currentPlanCode) ?? PLANS[0];
   const isCanceled      = subscription?.status?.toLowerCase() === "canceled";
+  // A Pakistan company that has not paid yet (a free trial) is quoted the PKR
+  // list price, not the USD default. A recorded charge keeps its own currency.
+  const pkTierKey = currentPlanCode === "ENTERPRISE" ? "enterprise" : currentPlanCode === "PROFESSIONAL" ? "professional" : "starter";
+  const showSubPkr = !!subscription && invoices.length === 0 && isPkCompany && !!pkrPricing;
+  const dispSub = showSubPkr && subscription
+    ? { ...subscription, currency: "PKR", amount: pkrPricing![pkTierKey][subscription.billingCycle === "yearly" ? "yearly" : "monthly"] }
+    : subscription;
+  const isTrialing = String(subscription?.status || "").toLowerCase() === "trialing";
   const paymentProvider = String(paymentMeta?.provider || "INTERNAL").toUpperCase();
   const paymentManagedExternally = Boolean(paymentMeta?.managedExternally);
   // Signed, short-lived Lemon Squeezy link for replacing the card on file.
@@ -766,6 +776,8 @@ function BillingPage() {
 
   const seatCyclePrice = seatPricing[subscription?.billingCycle === "yearly" ? "yearly" : "monthly"];
   const seatTotalCost  = seatQty * seatCyclePrice;
+  // Seat list price is USD; Pakistani companies see it converted, like the plan cards.
+  const seatMoney = (usd: number) => isPkCompany ? `₨${Math.round(usd * (FX_USD.PKR || 278)).toLocaleString("en-US")}` : `$${usd}`;
 
   return (
     <div style={{ padding:"28px 28px 80px", maxWidth:1050, margin:"0 auto", fontFamily:"'Outfit','DM Sans',sans-serif", color:"var(--ink-solid, white)" }}>
@@ -895,7 +907,7 @@ function BillingPage() {
           { label:"Status",         value: subscription?.status||"—",                 icon: "●",              color: "var(--tx-34d399, #34d399)", isStatus:true },
           { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—", icon:"📅", color:"var(--tx-fbbf24, #fbbf24)" },
           { label: subscription?.billingCycle === "yearly" ? "Yearly Amount" : "Monthly Amount",
-            value: subscription ? `${formatInvoiceAmount(subscription.amount, subscription.currency)}/${subscription.billingCycle === "yearly" ? "yr" : "mo"}` : "—",
+            value: dispSub ? `${formatInvoiceAmount(dispSub.amount, dispSub.currency)}/${dispSub.billingCycle === "yearly" ? "yr" : "mo"}` : "—",
             icon: "💰", color: "var(--tx-38bdf8, #38bdf8)" },
         ].map(s => (
           <div key={s.label} style={{ padding: isMobile ? "12px 10px" : "17px 18px", borderRadius:16, background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", display:"flex", alignItems:"center", gap:14 }}>
@@ -936,7 +948,7 @@ function BillingPage() {
                   <div style={{ fontSize:30, marginBottom:6 }}>{currentPlan.icon}</div>
                   <div style={{ fontSize:19, fontWeight:900, color:currentPlan.color }}>{currentPlan.name}</div>
                   <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:4 }}>
-                    {subscription ? formatInvoiceAmount(subscription.amount, subscription.currency) : `$${currentPlan.monthlyPrice}`}
+                    {dispSub ? formatInvoiceAmount(dispSub.amount, dispSub.currency) : `$${currentPlan.monthlyPrice}`}
                     <span style={{ fontSize:11 }}>/{subscription?.billingCycle === "yearly" ? "yr" : "mo"}</span>
                   </div>
                   {isCanceled && <div style={{ marginTop:8, padding:"3px 10px", borderRadius:99, background:"rgba(239,68,68,.12)", border:"1px solid rgba(239,68,68,.22)", fontSize:10, fontWeight:700, color:"var(--tx-f87171, #f87171)", display:"inline-block" }}>CANCELED</div>}
@@ -947,7 +959,7 @@ function BillingPage() {
                     { label:"Status",        node: <StatusBadge status={subscription?.status?.toLowerCase()||"active"} /> },
                     { label:"Billing Cycle", node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.billingCycle==="yearly"?"Yearly":"Monthly"}</span> },
                     { label:"Renewal Date",  node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "—"}</span> },
-                    { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currency || "USD"}</span> },
+                    { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>{dispSub?.currency || "USD"}</span> },
                   ].map(r => (
                     <div key={r.label}>
                       <div style={{ fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-30, .3))", letterSpacing:".06em", textTransform:"uppercase", marginBottom:7 }}>{r.label}</div>
@@ -964,7 +976,7 @@ function BillingPage() {
                         disabled={!!checkingOut}
                         style={{ padding:"11px 20px", borderRadius:12, background:`linear-gradient(135deg,${currentPlan.gradFrom},${currentPlan.gradTo})`, border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity: checkingOut ? 0.5 : 1 }}
                       >
-                        {checkingOut ? "Processing..." : `Renew ${currentPlan.name}`}
+                        {checkingOut ? "Processing..." : isTrialing ? `Subscribe to ${currentPlan.name}` : `Renew ${currentPlan.name}`}
                       </button>
                       <button onClick={() => setActiveTab("plans")} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(var(--ink),.05)", border:"1px solid rgba(var(--ink),.09)", color:"rgba(var(--ink),var(--ta-60, .6))", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
                         View all plans
@@ -1019,8 +1031,8 @@ function BillingPage() {
                   {/* Right: pricing + button */}
                   <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"flex-end" }}>
                     <div style={{ textAlign:"right" }}>
-                      <div style={{ fontSize:20, fontWeight:900, color:"var(--ink-solid, white)" }}>+${seatCyclePrice}<span style={{ fontSize:12, fontWeight:500, color:"rgba(var(--ink),var(--ta-40, .4))" }}>/seat/mo</span></div>
-                      {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>Current: +${extraSeats * seatCyclePrice}/mo for {extraSeats} extra seat{extraSeats > 1 ? "s" : ""}</div>}
+                      <div style={{ fontSize:20, fontWeight:900, color:"var(--ink-solid, white)" }}>+{seatMoney(seatCyclePrice)}<span style={{ fontSize:12, fontWeight:500, color:"rgba(var(--ink),var(--ta-40, .4))" }}>/seat/mo</span></div>
+                      {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))", marginTop:2 }}>Current: +{seatMoney(extraSeats * seatCyclePrice)}/mo for {extraSeats} extra seat{extraSeats > 1 ? "s" : ""}</div>}
                     </div>
                     <button onClick={() => { setSeatQty(1); setShowSeatModal(true); }} style={{ padding:"10px 20px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
                       + Add Seats
@@ -1420,13 +1432,13 @@ function BillingPage() {
               {/* Price breakdown */}
               <div style={{ padding: isMobile ? "12px 10px" : "14px 18px", borderRadius:14, background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(124,58,237,.08))", border:"1px solid rgba(99,102,241,.2)", marginBottom:20 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                  <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{seatQty} seat{seatQty > 1 ? "s" : ""} × ${seatCyclePrice}/seat/mo</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>${seatTotalCost}/mo</span>
+                  <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))" }}>{seatQty} seat{seatQty > 1 ? "s" : ""} × {seatMoney(seatCyclePrice)}/seat/mo</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:"var(--ink-solid, white)" }}>{seatMoney(seatTotalCost)}/mo</span>
                 </div>
                 {subscription?.billingCycle === "yearly" && (
                   <div style={{ display:"flex", justifyContent:"space-between" }}>
                     <span style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-40, .4))" }}>Billed yearly</span>
-                    <span style={{ fontSize:12, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>${seatTotalCost * 12}/year</span>
+                    <span style={{ fontSize:12, fontWeight:700, color:"var(--tx-34d399, #34d399)" }}>{seatMoney(seatTotalCost * 12)}/year</span>
                   </div>
                 )}
                 <div style={{ borderTop:"1px solid rgba(var(--ink),.07)", marginTop:10, paddingTop:10, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -1441,7 +1453,7 @@ function BillingPage() {
                 disabled={buyingSeats}
                 style={{ width:"100%", padding:"14px", borderRadius:14, background:buyingSeats?"rgba(var(--ink),.07)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:buyingSeats?"rgba(var(--ink),var(--ta-30, .3))":"white", fontSize:15, fontWeight:800, cursor:buyingSeats?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}
               >
-                {buyingSeats ? "Processing…" : `Confirm — Add ${seatQty} seat${seatQty > 1 ? "s" : ""} for $${seatTotalCost}/mo`}
+                {buyingSeats ? "Processing…" : `Confirm — Add ${seatQty} seat${seatQty > 1 ? "s" : ""} for ${seatMoney(seatTotalCost)}/mo`}
               </button>
               <div style={{ marginTop:10, fontSize:11, color:"rgba(var(--ink),var(--ta-30, .3))", textAlign:"center" }}>Seats are added immediately · Cancel anytime</div>
             </div>
