@@ -27,6 +27,10 @@ type Row = {
   trialStartedAt: string | null;
   source: string | null;
   phone: string | null;
+  plan: string;
+  businessType: string | null;
+  createdAt: string | null;
+  items: number;
   invoices: number;
   receipts: number;
   activated: boolean;
@@ -171,6 +175,9 @@ export default function AdminTrialsPage() {
                     <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)" }}>
                       {r.email || "—"}{r.phone ? ` · ${r.phone}` : ""}
                     </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
+                      {[r.businessType, r.plan, r.createdAt ? `signed up ${fmtDate(r.createdAt)}` : null].filter(Boolean).join(" · ")}
+                    </div>
                     {r.supportAccessUntil ? (
                       <div style={{ fontSize: 11, color: "#34d399", marginTop: 2 }}>
                         Support access allowed until {fmtDate(r.supportAccessUntil)}
@@ -185,6 +192,9 @@ export default function AdminTrialsPage() {
                     {r.activated
                       ? <Pill tone="green">{r.invoices} inv · {r.receipts} pay</Pill>
                       : <Pill tone="grey">No transaction</Pill>}
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
+                      {r.items} item{r.items === 1 ? "" : "s"} added
+                    </div>
                   </div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>{r.source || "—"} · {r.country || "—"}</div>
                   <div style={{ textAlign: "right" }}>

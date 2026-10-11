@@ -846,8 +846,23 @@ export default function SignupByPlanPage() {
                 </div>
                 <div style={{ fontSize:13, color:"rgba(var(--ink),var(--ta-38, .38))" }}>{current.tagline}</div>
 
+                {/* Trial: no card is taken, so showing a price only scares people off */}
+                {isTrial && (
+                  <div style={{
+                    marginTop:18, padding:"14px 16px", borderRadius:13,
+                    background:current.dim, border:`1px solid ${current.border}`,
+                  }}>
+                    <div style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"var(--ink-solid, white)", letterSpacing:"-.3px" }}>
+                      14 days free
+                    </div>
+                    <div style={{ fontSize:12, color:"rgba(var(--ink),var(--ta-50, .5))", marginTop:4 }}>
+                      No credit card needed. Cancel any time.
+                    </div>
+                  </div>
+                )}
+
                 {/* Price box */}
-                {price && (
+                {price && !isTrial && (
                   <div style={{
                     marginTop:18, padding:"14px 16px", borderRadius:13,
                     background:current.dim, border:`1px solid ${current.border}`,

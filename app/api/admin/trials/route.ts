@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
       select: {
         id: true, name: true, country: true, subscriptionStatus: true, plan: true,
         trialStartedAt: true, trialEndsAt: true, trialSource: true, trialPhone: true,
+        businessType: true, createdAt: true,
         defaultUsers: { select: { email: true }, take: 1 },
       },
     });
@@ -73,6 +74,10 @@ export async function GET(req: NextRequest) {
         trialStartedAt: c.trialStartedAt,
         source: c.trialSource,
         phone: c.trialPhone,
+        plan: c.plan,
+        businessType: c.businessType,
+        createdAt: c.createdAt,
+        items: a?.items ?? 0,
         invoices: a?.invoices ?? 0,
         receipts: a?.receipts ?? 0,
         activated: !!a?.activated,
