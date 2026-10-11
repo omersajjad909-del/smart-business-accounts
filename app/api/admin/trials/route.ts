@@ -51,7 +51,15 @@ export async function GET(req: NextRequest) {
       .map((l) => {
         let note = "";
         try { note = JSON.parse(l.details || "{}").note || ""; } catch {}
-        return { companyId: l.companyId, name: nameOf.get(l.companyId || "") || l.companyId, note, at: l.createdAt };
+        const c = companies.find((x) => x.id === l.companyId);
+        return {
+          companyId: l.companyId,
+          name: c?.name || l.companyId,
+          note,
+          at: l.createdAt,
+          email: c?.defaultUsers[0]?.email || null,
+          phone: c?.trialPhone || null,
+        };
       });
 
     const access = new Map<string, Date | null>(
@@ -120,7 +128,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "companyId and action=setup_done required" }, { status: 400 });
   }
   await prisma.activityLog.create({
-    data: { companyId, userId: admin.id, action: "SETUP_DONE", details: JSON.stringify({ by: admin.id }) },
+    // The admin id goes in details, not userId: that column is a foreign key to
+    // User, and a platform admin is not a User row, so the insert failed with a 500.
+    data: { companyId, action: "SETUP_DONE", details: JSON.stringify({ by: admin.id }) },
   });
   return NextResponse.json({ ok: true });
 }

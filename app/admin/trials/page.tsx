@@ -44,7 +44,7 @@ type Payload = {
     converted: number; activationRate: number; conversionRate: number;
   };
   rows: Row[];
-  openRequests: { companyId: string; name: string; note: string; at: string }[];
+  openRequests: { companyId: string; name: string; note: string; at: string; email: string | null; phone: string | null }[];
 };
 
 const STAGES = {
@@ -130,7 +130,10 @@ export default function AdminTrialsPage() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{r.name}</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>
-                      {fmtDate(r.at)}{r.note ? ` · ${r.note}` : ""}
+                      {fmtDate(r.at)}{[r.email, r.phone].filter(Boolean).map((x) => ` · ${x}`).join("")}
+                    </div>
+                    <div style={{ fontSize: 13, color: r.note ? "#fbbf24" : "rgba(255,255,255,.35)", marginTop: 4 }}>
+                      {r.note ? `Needs help with: ${r.note}` : "No details given. Contact them to ask what they need."}
                     </div>
                   </div>
                   <Button tone="ghost" busy={busy === `done:${r.companyId}`} onClick={() => setupDone(r.companyId)}>

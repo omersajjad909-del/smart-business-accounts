@@ -444,6 +444,8 @@ export default function DashboardLayout({
   }, []);
 
   const [setupAsked, setSetupAsked] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [setupNote, setSetupNote] = useState("");
   const [supportUntil, setSupportUntil] = useState<string | null>(null);
   const [trialPhoneInput, setTrialPhoneInput] = useState("");
   const [trialPhoneError, setTrialPhoneError] = useState<string | null>(null);
@@ -3537,10 +3539,7 @@ export default function DashboardLayout({
                     <button
                       type="button"
                       disabled={setupAsked}
-                      onClick={() => {
-                        setSetupAsked(true);
-                        fetch("/api/setup-request", { method:"POST", headers:{ "Content-Type":"application/json" }, body: "{}" }).catch(() => setSetupAsked(false));
-                      }}
+                      onClick={() => setSetupOpen((v) => !v)}
                       style={{ fontSize:13, fontWeight:600, background:"none", border:"none", cursor: setupAsked ? "default" : "pointer", textDecoration: setupAsked ? "none" : "underline", color:"inherit", padding:0 }}
                     >
                       {setupAsked ? "Request sent. We will contact you." : "Need help setting up?"}
@@ -3561,6 +3560,45 @@ export default function DashboardLayout({
                     </button>
                   )}
                   <Link href="/dashboard/billing" style={{ fontSize:13, fontWeight:600, textDecoration:"underline" }}>Choose a plan</Link>
+                  {!ended && setupOpen && !setupAsked && (
+                    <div style={{ flexBasis:"100%", display:"flex", flexDirection:"column", gap:8, paddingTop:6 }}>
+                      <div style={{ fontSize:13, fontWeight:600 }}>What do you need help with?</div>
+                      <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                        {["Importing my data", "Setting up my chart of accounts", "Creating my first invoice", "Adding users", "Something else"].map((t) => (
+                          <button key={t} type="button" onClick={() => setSetupNote((cur) => (cur ? cur + "; " + t : t))}
+                            style={{ fontSize:12, padding:"4px 10px", borderRadius:99, border:"1px solid rgba(128,128,128,.35)", background:"transparent", color:"inherit", cursor:"pointer" }}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                      <textarea
+                        value={setupNote}
+                        onChange={(e) => setSetupNote(e.target.value.slice(0, 500))}
+                        rows={3}
+                        placeholder="Tell us in a few words what you are stuck on (optional)"
+                        style={{ width:"100%", fontSize:13, padding:10, borderRadius:10, border:"1px solid rgba(128,128,128,.35)", background:"transparent", color:"inherit", fontFamily:"inherit", resize:"vertical" }}
+                      />
+                      <div style={{ display:"flex", gap:10 }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSetupAsked(true);
+                            setSetupOpen(false);
+                            fetch("/api/setup-request", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ note: setupNote }) })
+                              .then((r) => { if (!r.ok) setSetupAsked(false); })
+                              .catch(() => setSetupAsked(false));
+                          }}
+                          style={{ fontSize:13, fontWeight:700, padding:"7px 16px", borderRadius:10, border:"none", background:"#059669", color:"white", cursor:"pointer" }}
+                        >
+                          Send request
+                        </button>
+                        <button type="button" onClick={() => setSetupOpen(false)}
+                          style={{ fontSize:13, background:"none", border:"none", color:"inherit", textDecoration:"underline", cursor:"pointer" }}>
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
