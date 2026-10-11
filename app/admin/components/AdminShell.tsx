@@ -14,6 +14,7 @@ type AdminNotification = {
   title?: string;
   message?: string;
   type?: string;
+  link?: string | null;
   isRead?: boolean;
   createdAt?: string;
 };
@@ -189,21 +190,32 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  // Load notifications + profile
+  // Profile loads once; the notification feed is polled so a payment, message or
+  // signup shows up on the bell without the admin reloading the page.
   useEffect(() => {
     const headers: Record<string, string> = {};
     if (user?.role) headers["x-user-role"] = user.role;
     if (user?.id)   headers["x-user-id"]   = user.id;
+    let stopped = false;
+    const loadNotifications = async () => {
+      try {
+        const res = await fetch("/api/admin/notifications", { cache: "no-store", headers, credentials: "include" });
+        if (res.ok && !stopped) setNotifications((await res.json()).notifications || []);
+      } catch {}
+    };
     (async () => {
       try {
-        const [notifRes, profileRes] = await Promise.all([
-          fetch("/api/admin/notifications", { cache: "no-store", headers, credentials: "include" }),
-          fetch("/api/admin/profile",        { cache: "no-store", headers, credentials: "include" }),
-        ]);
-        if (notifRes.ok)   setNotifications((await notifRes.json()).notifications   || []);
-        if (profileRes.ok) setProfile(await profileRes.json());
+        const profileRes = await fetch("/api/admin/profile", { cache: "no-store", headers, credentials: "include" });
+        if (profileRes.ok && !stopped) setProfile(await profileRes.json());
       } catch {}
     })();
+    loadNotifications();
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") loadNotifications();
+    }, 30000);
+    const onFocus = () => loadNotifications();
+    window.addEventListener("focus", onFocus);
+    return () => { stopped = true; window.clearInterval(timer); window.removeEventListener("focus", onFocus); };
   }, [user?.id, user?.role]);
 
   // The settings page saves the photo and name on its own and this shell only
@@ -242,6 +254,22 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     ? <img src={profile.avatar} alt="" className="fin-admin-avatarImg" />
     : initials;
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  async function openNotification(n: AdminNotification) {
+    setNotifOpen(false);
+    if (!n.isRead) {
+      setNotifications((cur) => cur.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)));
+      try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (user?.role) headers["x-user-role"] = user.role;
+        await fetch("/api/admin/notifications", {
+          method: "POST", headers, credentials: "include",
+          body: JSON.stringify({ action: "MARK_READ", id: n.id }),
+        });
+      } catch {}
+    }
+    if (n.link) router.push(n.link);
+  }
 
   async function markAllRead() {
     try {
@@ -425,7 +453,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                     </div>
                     <div className="fin-admin-dropdownList">
                       {notifications.length ? notifications.map((n) => (
-                        <div key={n.id} className={`fin-admin-dropdownItem${n.isRead ? "" : " is-unread"}`}>
+                        <div key={n.id} role="button" tabIndex={0}
+                          className={`fin-admin-dropdownItem${n.isRead ? "" : " is-unread"}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => openNotification(n)}
+                          onKeyDown={(e) => { if (e.key === "Enter") openNotification(n); }}>
                           <strong>{n.title || n.type || "Admin update"}</strong>
                           <p>{n.message || "New activity available."}</p>
                           <span>{n.createdAt

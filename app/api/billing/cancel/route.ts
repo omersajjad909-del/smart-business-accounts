@@ -110,14 +110,6 @@ export async function POST(req: NextRequest) {
       },
     }).catch(() => {});
 
-    return apiOk({
-      canceled: true,
-      dataRetentionUntil: dataRetentionUntil.toISOString(),
-      gracePeriodEnd: gracePeriodEnd.toISOString(),
-      retentionDays: RETENTION_DAYS,
-      message: `Your data will be retained until ${dataRetentionUntil.toLocaleDateString()}. You have ${GRACE_PERIOD_DAYS} days to export your data in read-only mode.`,
-    });
-
     {
       const co = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } }).catch(() => null);
       await notifyAdmins({
@@ -127,6 +119,14 @@ export async function POST(req: NextRequest) {
         link: "/admin/subscriptions",
       });
     }
+
+    return apiOk({
+      canceled: true,
+      dataRetentionUntil: dataRetentionUntil.toISOString(),
+      gracePeriodEnd: gracePeriodEnd.toISOString(),
+      retentionDays: RETENTION_DAYS,
+      message: `Your data will be retained until ${dataRetentionUntil.toLocaleDateString()}. You have ${GRACE_PERIOD_DAYS} days to export your data in read-only mode.`,
+    });
   } catch (e: unknown) {
     return apiError(e instanceof Error ? e.message : "Cancel failed", 500);
   }

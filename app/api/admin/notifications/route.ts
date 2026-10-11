@@ -15,8 +15,11 @@ export async function GET(req: NextRequest) {
     let notifications: any[] = [];
     try {
       notifications = await (prisma as any).notification.findMany({
+        // userId null = platform-admin events. Rows with a userId are a customer's
+        // own notifications and must not show up in the admin's bell.
+        where: { userId: null },
         orderBy: { createdAt: "desc" },
-        take: 20,
+        take: 30,
       });
     } catch {
       // Notification model nahi hai schema mein — empty return karo
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
       try {
         if (id === "ALL") {
           await (prisma as any).notification.updateMany({
-            where: { isRead: false },
+            where: { isRead: false, userId: null },
             data: { isRead: true },
           });
         } else {
