@@ -10,6 +10,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { getAppUrl } from "@/lib/domains";
 import {
   Button, Empty, ErrorNote, KpiRow, Loading, PageHeader, Pill, Section,
   aiKitCss, card, fmtDate, getJson, pageStyle, postJson,
@@ -89,6 +90,18 @@ export default function AdminTrialsPage() {
     act(`ext:${companyId}`, () =>
       postJson("/api/admin/billing/override", { companyId, action: "EXTEND_TRIAL", payload: { days: 7 } }),
     );
+  // Opens the customer's dashboard as their owner for an hour. The server
+  // refuses unless the customer pressed "Allow support access", and every use is
+  // written to the admin audit log.
+  const openAccount = (companyId: string) =>
+    act(`open:${companyId}`, async () => {
+      const j = await postJson<{ token?: string }>("/api/admin/companies/impersonate", { companyId });
+      const target = j?.token
+        ? `${getAppUrl()}/api/auth/impersonate-handoff?token=${encodeURIComponent(j.token)}`
+        : `${getAppUrl()}/dashboard`;
+      window.open(target, "_blank");
+    });
+  const accessOf = (companyId: string) => data?.rows.find((r) => r.companyId === companyId)?.supportAccessUntil || null;
   const setupDone = (companyId: string) =>
     act(`done:${companyId}`, () => postJson("/api/admin/trials", { companyId, action: "setup_done" }));
 
@@ -136,9 +149,20 @@ export default function AdminTrialsPage() {
                       {r.note ? `Needs help with: ${r.note}` : "No details given. Contact them to ask what they need."}
                     </div>
                   </div>
-                  <Button tone="ghost" busy={busy === `done:${r.companyId}`} onClick={() => setupDone(r.companyId)}>
-                    Mark done
-                  </Button>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                    {accessOf(r.companyId) ? (
+                      <Button tone="primary" busy={busy === `open:${r.companyId}`} onClick={() => openAccount(r.companyId)}>
+                        Open their account
+                      </Button>
+                    ) : (
+                      <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", maxWidth: 220, textAlign: "right" }}>
+                        Support access not allowed yet. Ask them to press "Allow support access".
+                      </span>
+                    )}
+                    <Button tone="ghost" busy={busy === `done:${r.companyId}`} onClick={() => setupDone(r.companyId)}>
+                      Mark done
+                    </Button>
+                  </div>
                 </div>
               ))}
               <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 10 }}>
@@ -169,7 +193,7 @@ export default function AdminTrialsPage() {
             ) : (
               rows.map((r, i) => (
                 <div key={r.companyId} style={{
-                  display: "grid", gridTemplateColumns: "minmax(180px,2fr) 110px 90px 130px minmax(120px,1fr) 100px",
+                  display: "grid", gridTemplateColumns: "minmax(180px,2fr) 110px 90px 130px minmax(120px,1fr) 190px",
                   gap: 12, alignItems: "center", padding: "14px 18px",
                   borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.06)", fontSize: 13,
                 }}>
@@ -200,7 +224,12 @@ export default function AdminTrialsPage() {
                     </div>
                   </div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>{r.source || "—"} · {r.country || "—"}</div>
-                  <div style={{ textAlign: "right" }}>
+                  <div style={{ textAlign: "right", display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                    {r.supportAccessUntil ? (
+                      <Button tone="primary" busy={busy === `open:${r.companyId}`} onClick={() => openAccount(r.companyId)} title="Open this customer's dashboard (they allowed support access)">
+                        Open account
+                      </Button>
+                    ) : null}
                     {r.stage === "active" || r.stage === "grace" || r.stage === "expired" ? (
                       <Button tone="ghost" busy={busy === `ext:${r.companyId}`} onClick={() => extend(r.companyId)} title="Give this trial 7 more days from today">
                         +7 days
