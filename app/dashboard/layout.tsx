@@ -3536,13 +3536,18 @@ export default function DashboardLayout({
                       : <><strong>Free trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left.</strong> Everything is unlocked. No card needed until you choose a plan.</>}
                   </div>
                   {!ended && (
+                    <Link href="/dashboard/quick-setup" style={{ fontSize:13, fontWeight:700, textDecoration:"underline" }}>
+                      Set up my business now
+                    </Link>
+                  )}
+                  {!ended && (
                     <button
                       type="button"
                       disabled={setupAsked}
                       onClick={() => setSetupOpen((v) => !v)}
                       style={{ fontSize:13, fontWeight:600, background:"none", border:"none", cursor: setupAsked ? "default" : "pointer", textDecoration: setupAsked ? "none" : "underline", color:"inherit", padding:0 }}
                     >
-                      {setupAsked ? "Request sent. We will contact you." : "Need help setting up?"}
+                      {setupAsked ? "Request sent. We will contact you." : "Need a person to help?"}
                     </button>
                   )}
                   {!ended && (
@@ -3562,7 +3567,7 @@ export default function DashboardLayout({
                   <Link href="/dashboard/billing" style={{ fontSize:13, fontWeight:600, textDecoration:"underline" }}>Choose a plan</Link>
                   {!ended && setupOpen && !setupAsked && (
                     <div style={{ flexBasis:"100%", display:"flex", flexDirection:"column", gap:8, paddingTop:6 }}>
-                      <div style={{ fontSize:13, fontWeight:600 }}>What do you need help with?</div>
+                      <div style={{ fontSize:13, fontWeight:600 }}>What do you need help with? (You can also <Link href="/dashboard/quick-setup" style={{ textDecoration:"underline" }}>set it up yourself right now</Link>.)</div>
                       <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                         {["Importing my data", "Setting up my chart of accounts", "Creating my first invoice", "Adding users", "Something else"].map((t) => (
                           <button key={t} type="button" onClick={() => setSetupNote((cur) => (cur ? cur + "; " + t : t))}
