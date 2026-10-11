@@ -446,6 +446,7 @@ export default function DashboardLayout({
   const [setupAsked, setSetupAsked] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
   const [setupNote, setSetupNote] = useState("");
+  const [setupAllowAccess, setSetupAllowAccess] = useState(true);
   const [supportUntil, setSupportUntil] = useState<string | null>(null);
   const [trialPhoneInput, setTrialPhoneInput] = useState("");
   const [trialPhoneError, setTrialPhoneError] = useState<string | null>(null);
@@ -3583,14 +3584,25 @@ export default function DashboardLayout({
                         placeholder="Tell us in a few words what you are stuck on (optional)"
                         style={{ width:"100%", fontSize:13, padding:10, borderRadius:10, border:"1px solid rgba(128,128,128,.35)", background:"transparent", color:"inherit", fontFamily:"inherit", resize:"vertical" }}
                       />
+                      <label style={{ display:"flex", gap:8, alignItems:"flex-start", fontSize:12.5, lineHeight:1.5, cursor:"pointer" }}>
+                        <input type="checkbox" checked={setupAllowAccess} onChange={(e) => setSetupAllowAccess(e.target.checked)} style={{ marginTop:3 }} />
+                        <span>
+                          Also let Finova support open my account for 7 days so they can do this setup for me without waiting for me.
+                          I can turn this off any time from this bar.
+                        </span>
+                      </label>
                       <div style={{ display:"flex", gap:10 }}>
                         <button
                           type="button"
                           onClick={() => {
                             setSetupAsked(true);
                             setSetupOpen(false);
-                            fetch("/api/setup-request", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ note: setupNote }) })
-                              .then((r) => { if (!r.ok) setSetupAsked(false); })
+                            fetch("/api/setup-request", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ note: setupNote, allowAccess: setupAllowAccess }) })
+                              .then(async (r) => {
+                                if (!r.ok) { setSetupAsked(false); return; }
+                                const j = await r.json().catch(() => ({}));
+                                if (j?.supportUntil) setSupportUntil(j.supportUntil);
+                              })
                               .catch(() => setSetupAsked(false));
                           }}
                           style={{ fontSize:13, fontWeight:700, padding:"7px 16px", borderRadius:10, border:"none", background:"#059669", color:"white", cursor:"pointer" }}
