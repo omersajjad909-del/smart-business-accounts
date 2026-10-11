@@ -5,6 +5,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { openPartyBills } from "@/lib/ledgerKpis";
 import { aiUrl } from "@/lib/aiGateway";
 import { getMarketIntelligenceLocalReply, getBusinessAdvisorLocalReply } from "@/lib/marketIntelligence";
 import { groqRequest, groqRequestWithTools, HAS_GROQ, GROQ_KEY_COUNT } from "@/lib/groqKeyRotator";
@@ -659,6 +660,11 @@ export interface FinancialContext {
   customerPaymentHistory: { name: string; avgDaysToPay: number; overdueCount: number; totalRevenue: number }[];
 }
 
+/** "35% of this month's revenue", or null when there is no revenue to compare against. */
+function overdueShareOfRevenue(overdue: number, revenue: number): number | null {
+  return revenue > 0 ? Math.round((overdue / revenue) * 100) : null;
+}
+
 function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
@@ -870,47 +876,38 @@ export async function buildFinancialContext(companyId: string): Promise<Financia
   const profitLast = revLast - expLast;
   const profitChange = profitLast !== 0 ? Math.round(((profitThis - profitLast) / Math.abs(profitLast)) * 100) : 0;
 
-  // ── Receivables
+  // ── Receivables & payables
+  // Read from the ledger, bill by bill, the way the dashboard cards and the
+  // ageing report do. Summing every invoice ever raised counted bills the
+  // customer had already paid as overdue, so this said "PKR 3,510 overdue" on a
+  // dashboard that showed Rs 0 receivable.
+  const [receivableBills, payableBills] = await Promise.all([
+    openPartyBills(companyId, "RECEIVABLE", now),
+    openPartyBills(companyId, "PAYABLE", now),
+  ]);
   let totalReceivables = 0;
   let overdueReceivables = 0;
   let overdueCount = 0;
   const overdueCustomerMap = new Map<string, { name: string; overdueCount: number; totalRevenue: number; creditDays: number }>();
-  overdueData.forEach((inv) => {
-    const amt = Number(inv.total || 0);
-    totalReceivables += amt;
-    const creditDays = inv.customer?.creditDays ?? 30;
-    const dueDate = new Date(inv.date);
-    dueDate.setDate(dueDate.getDate() + creditDays);
-    if (dueDate < now) {
-      overdueReceivables += amt;
-      overdueCount++;
-      if (inv.customerId) {
-        const existing = overdueCustomerMap.get(inv.customerId);
-        if (existing) {
-          existing.overdueCount += 1;
-          existing.totalRevenue += amt;
-        } else {
-          overdueCustomerMap.set(inv.customerId, {
-            name: inv.customer?.name || "Unknown",
-            overdueCount: 1,
-            totalRevenue: amt,
-            creditDays,
-          });
-        }
-      }
+  for (const bill of receivableBills) {
+    totalReceivables += bill.balance;
+    if (bill.dueDate >= now) continue;
+    overdueReceivables += bill.balance;
+    overdueCount++;
+    const existing = overdueCustomerMap.get(bill.accountId);
+    if (existing) {
+      existing.overdueCount += 1;
+      existing.totalRevenue += bill.balance;
+    } else {
+      overdueCustomerMap.set(bill.accountId, { name: bill.party, overdueCount: 1, totalRevenue: bill.balance, creditDays: 30 });
     }
-  });
-
-  // ── Payables
+  }
   let totalPayables = 0;
   let overduePayables = 0;
-  payablesData.forEach((inv) => {
-    const amt = Number(inv.total || 0);
-    totalPayables += amt;
-    const dueDate = new Date(inv.date);
-    dueDate.setDate(dueDate.getDate() + 30);
-    if (dueDate < now) overduePayables += amt;
-  });
+  for (const bill of payableBills) {
+    totalPayables += bill.balance;
+    if (bill.dueDate < now) overduePayables += bill.balance;
+  }
 
   // ── Low stock + stock value
   const qtyMap = new Map<string, number>();
@@ -1434,7 +1431,7 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
       `💰 Receivables — ${ctx.company.name}:`,
       `- Total outstanding: ${fmt(ctx.receivables.total)}`,
       `- Overdue amount: ${fmt(ctx.receivables.overdue)} (${ctx.receivables.overdueCount} invoice(s))`,
-      ctx.receivables.overdue > ctx.revenue.thisMonth * 0.3 ? `🚨 Overdue is ${Math.round((ctx.receivables.overdue / Math.max(ctx.revenue.thisMonth, 1)) * 100)}% of this month's revenue — critical!` : "",
+      ctx.receivables.overdue > ctx.revenue.thisMonth * 0.3 ? (overdueShareOfRevenue(ctx.receivables.overdue, ctx.revenue.thisMonth) !== null ? `🚨 Overdue is ${overdueShareOfRevenue(ctx.receivables.overdue, ctx.revenue.thisMonth)}% of this month's revenue — critical!` : `🚨 ${fmt(ctx.receivables.overdue)} is overdue and no revenue has been recorded this month.`) : "",
       lateCustomer && (lateCustomer.overdueCount > 0 || lateCustomer.avgDaysToPay > 30) ? `⚠️ Highest risk customer: ${lateCustomer.name} — avg ${lateCustomer.avgDaysToPay} days to pay, ${lateCustomer.overdueCount} overdue invoice(s)` : "",
       `- Top customers by revenue:`,
       ...ctx.topCustomers.slice(0, 3).map((c, i) => `  ${i + 1}. ${c.name}: ${fmt(c.amount)}`),
@@ -2043,7 +2040,11 @@ export async function detectAnomalies(companyIdOrCtx: string | FinancialContext)
     alerts.push({
       severity,
       title: `${ctx.receivables.overdueCount} Overdue Invoice${ctx.receivables.overdueCount > 1 ? "s" : ""}`,
-      description: `${formatCurrency(ctx.receivables.overdue, c)} in overdue receivables. This is ${Math.round((ctx.receivables.overdue / Math.max(ctx.revenue.thisMonth, 1)) * 100)}% of this month's revenue.`,
+      description: `${formatCurrency(ctx.receivables.overdue, c)} in overdue receivables.${
+        overdueShareOfRevenue(ctx.receivables.overdue, ctx.revenue.thisMonth) !== null
+          ? ` This is ${overdueShareOfRevenue(ctx.receivables.overdue, ctx.revenue.thisMonth)}% of this month's revenue.`
+          : " There is no revenue recorded this month to compare it with."
+      }`,
       action: "Send payment reminders to overdue customers",
       link: "/dashboard/sales-invoice",
     });
