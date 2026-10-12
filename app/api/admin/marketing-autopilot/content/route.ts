@@ -60,7 +60,7 @@ ${langInstr}
 
 FinovaOS features relevant to this niche: invoicing, inventory management, purchase orders, expense tracking, financial reports (P&L, balance sheet), multi-currency support, WhatsApp notifications, multi-branch management, payroll, CRM.
 
-Pricing: Starter $49/mo, Pro $99/mo, Enterprise $249/mo. NO FREE TRIAL. Direct paid subscription.
+Pricing: Starter $49/mo, Pro $99/mo, Enterprise $249/mo. 14-day free trial, full Professional features, no credit card required.
 
 For each post use these types in this order (cycle if needed): ${POST_TYPES.join(", ")}.
 
@@ -81,7 +81,7 @@ Rules:
 - Feature posts: one specific feature with a concrete benefit
 - ROI posts: use numbers (save 3 hours/day, reduce errors by 80%, etc.)
 - CTA: "Visit finovaos.app" or "Get started today"
-- No "free trial" — never mention trial
+- When a trial mention fits, say "14-day free trial, no credit card required" exactly — never a different day count
 - Keep posts under 250 characters for Instagram, LinkedIn can be longer
 - Return ONLY the JSON array, no other text`;
 

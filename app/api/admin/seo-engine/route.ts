@@ -127,8 +127,10 @@ Writing rules on top of the voice above:
   needs a feature that does not exist, leave it out and note it in intent.
 - No statistics, no percentages, no customer counts, no awards. None of them
   can be sourced.
-- Never mention a free trial. The calls to action are "Get Started",
-  "View Pricing", "Book a Demo".
+- The real offer is a 14-day free trial, full Professional features, no
+  credit card required. State it exactly that way when a trial mention fits
+  the page — never a different day count, never "free forever". Calls to
+  action: "Start Free Trial", "Get Started", "View Pricing", "Book a Demo".
 `;
 
 export async function POST(req: NextRequest) {

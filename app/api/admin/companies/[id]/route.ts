@@ -46,9 +46,12 @@ export async function GET(
 
     // stripeCustomerId holds whichever gateway's id arrived on the activating
     // webhook, so ship the provider along and let the UI label it honestly.
+    // billingCycle/currentPeriodStart/createdAt ride along too, so the admin
+    // page can work out whether a yearly plan is still inside its 14-day
+    // money-back window — see refundEligibility() in the page component.
     const sub = await prisma.subscription.findUnique({
       where: { companyId: id },
-      select: { provider: true },
+      select: { provider: true, billingCycle: true, currentPeriodStart: true, createdAt: true },
     });
 
     // Users with roles for this company — NO password field
@@ -105,7 +108,12 @@ export async function GET(
     const effectiveUserLimit = await getEffectiveUserLimitForCompany(id, company.plan);
 
     return NextResponse.json({
-      company: { ...company, billingProvider: sub?.provider || null },
+      company: {
+        ...company,
+        billingProvider: sub?.provider || null,
+        billingCycle: sub?.billingCycle || null,
+        subscriptionPeriodStart: sub?.currentPeriodStart || sub?.createdAt || null,
+      },
       users,
       roleCounts,
       lastLogin: lastLogin?.createdAt || null,

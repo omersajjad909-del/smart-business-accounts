@@ -6,7 +6,10 @@
  * personalisation, and it reads as a blast.
  *
  * Hard product rule, enforced both in the prompt and by a post-check below:
- * FinovaOS has no free trial. The ask is always a walkthrough or a demo call.
+ * the trial is exactly 14 days, no credit card required. Yearly plans carry a
+ * 14-day money-back guarantee from the purchase date; monthly plans do not.
+ * Any other day count, or a promise this product doesn't make (free forever,
+ * a refund on monthly plans), must never reach the review queue looking clean.
  */
 
 import { generateProspectingText } from "./ai";
@@ -28,10 +31,10 @@ const TONE_INSTRUCTION: Record<CampaignBrief["tone"], string> = {
   direct: "Blunt and short. Lead with the problem, close with the ask. No warm-up.",
 };
 
-/** Phrases that would make the email a lie about our own pricing. */
+/** Phrases that would make the email a lie about our own offer. */
 const BANNED_PHRASES = [
-  "free trial", "trial period", "try it free", "14-day", "30-day free",
-  "no credit card", "muft trial", "free for 14", "free for 30",
+  "trial period", "30-day free", "free for 30", "free for 7", "7-day free",
+  "free forever", "freemium",
 ];
 
 export function containsBannedOffer(text: string): string | null {
@@ -138,7 +141,7 @@ TONE: ${TONE_INSTRUCTION[brief.tone]}
 SEQUENCE: ${stepInstruction(step)}
 
 HARD RULES
-- ABSOLUTELY NO free trial, no trial period, no "try it free", no "no credit card needed". FinovaOS is paid from day one. The only ask is a short walkthrough or demo call.
+- The real offer: a 14-day free trial, full Professional features, no credit card required. Yearly plans also carry a 14-day money-back guarantee from the purchase date — mention it only if scoped to yearly plans, never implied for monthly. Never state a different trial or refund length, never "free forever", never a discount.
 - Under 130 words for the body of a first email. Follow-ups shorter still.
 - Open with something true about THIS company, not about us. If we know nothing specific, open with the industry-specific pain, never with "I hope this email finds you well".
 - No bullet lists, no bold, no emoji, no exclamation marks. Plain sentences.
@@ -168,7 +171,7 @@ Return ONLY this JSON, no prose, no markdown fence:
   // is the kind of thing that must never reach the review queue looking clean.
   const banned = containsBannedOffer(`${subject}\n${bodyText}`);
   if (banned) {
-    throw new Error(`Draft promised "${banned}" — FinovaOS has no free trial. Regenerate.`);
+    throw new Error(`Draft promised "${banned}" — the real offer is a 14-day free trial, no credit card required. Regenerate.`);
   }
 
   return {

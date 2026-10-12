@@ -111,7 +111,7 @@ export async function PATCH(req: NextRequest) {
       const banned = containsBannedOffer(`${nextSubject}\n${nextBody}`);
       if (banned) {
         return NextResponse.json(
-          { error: `The copy promises "${banned}". FinovaOS has no free trial — remove it before approving.` },
+          { error: `The copy promises "${banned}" — the real offer is a 14-day free trial, no credit card required. Fix it before approving.` },
           { status: 400 },
         );
       }

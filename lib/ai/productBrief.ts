@@ -6,16 +6,16 @@
  * Six of the AI console pages produce customer-facing or public text — support
  * replies, SEO pages, case studies, objection answers, onboarding notes, report
  * explanations. Each of them needs the same product context, and without it the
- * model fills the gap with a generic SaaS invented on the spot: a free trial
- * that does not exist, a mobile app that is not shipped, an integration nobody
- * built.
+ * model fills the gap with a generic SaaS invented on the spot: a mobile app
+ * that is not shipped, an integration nobody built, a trial that runs longer
+ * or shorter than the real one.
  *
  * Two things here are load-bearing rather than descriptive:
  *
  *   FORBIDDEN is a list of claims that are false about this product. It exists
- *   because a model asked to write a landing section for accounting software
- *   will offer a free trial by default — every competitor has one — and that
- *   single sentence is a promise the business has decided not to make.
+ *   because a model left to improvise will get specifics wrong — a trial
+ *   length that is not 14 days, a refund policy nobody confirmed — and those
+ *   are promises the business has to actually keep.
  *
  *   The pricing line refuses to state a number. Prices live in the database and
  *   differ by currency and region; a model that guesses one is quoting a price
@@ -42,9 +42,11 @@ What it does:
 - Built-in AI assistant that answers questions about the business finances
 - Works in English and Urdu, both Roman and script
 
-How it is sold: paid plans only — Starter, Professional, Enterprise, plus a
-Custom plan where the customer pays per module. Monthly or yearly billing.
-Pakistan pays through a local gateway; everyone else through Lemon Squeezy.
+How it is sold: a 14-day free trial, no credit card required, with full
+Professional features. After the trial, paid plans only — Starter,
+Professional, Enterprise, plus a Custom plan where the customer pays per
+module. Monthly or yearly billing. Pakistan pays through a local gateway;
+everyone else through Lemon Squeezy.
 
 How it is positioned: cheaper and far simpler than Xero, Zoho Books or
 QuickBooks for a business in this region, and unlike those it speaks Urdu,
@@ -57,11 +59,24 @@ actually work rather than how a Western small business does.
  * these is wrong, not merely off-tone.
  */
 export const FORBIDDEN_CLAIMS = `
+The real trial, stated exactly: 14 days free, full Professional features, no
+credit card required to start. If the trial ends before a plan is chosen, data
+stays safe and viewable/exportable for 3 more days. Use these numbers exactly
+— never a different day count, never "free forever", never a freemium tier.
+
+The real refund policy, stated exactly: yearly plans carry a 14-day
+money-back guarantee, counted from the purchase date — not from how much of
+the plan was used. A customer 11 months into a yearly plan is not eligible.
+Monthly plans carry no refund; the customer can cancel before the next
+renewal to stop future charges. Never describe this as applying to monthly
+plans, never give a window other than 14 days, and never imply the window
+resets or extends with usage.
+
 Never write, imply, or offer any of the following. Each one is untrue:
-- A free trial, a free plan, a freemium tier, or "try it free". FinovaOS is paid
-  only. The calls to action are "Get Started", "View Pricing", or "Book a Demo".
-- A money-back guarantee, a discount, or a limited-time offer, unless the exact
-  offer is given to you in the prompt as data.
+- Any trial length other than 14 days, or a trial that needs a credit card.
+- A refund policy other than the one stated above, or a discount, or a
+  limited-time offer, unless the exact offer is given to you in the prompt as
+  data.
 - Specific prices, in any currency. Prices live in the database and vary by
   region. If a price is needed and was not given to you, write it as a
   placeholder the human will fill in.
@@ -95,23 +110,29 @@ export function brandContext(): string {
 }
 
 /**
- * Catch the two forbidden claims that are worth catching mechanically.
+ * Catch the forbidden claims that are worth catching mechanically.
  *
  * This is a backstop, not a filter. A prompt instruction is followed most of
- * the time, and "most of the time" is not good enough for a free-trial offer
- * that reaches a customer, so any page that publishes text runs the output past
- * this and shows the operator what it found. It looks for the offer, not the
- * words: "free" alone is fine ("free up your evening"), "free trial" is not.
+ * the time, and "most of the time" is not good enough for an offer that
+ * reaches a customer, so any page that publishes text runs the output past
+ * this and shows the operator what it found. It looks for a WRONG trial or
+ * refund claim (free forever, a freemium tier, a day count that isn't 14, a
+ * refund window that isn't 14 days), not the correct ones — "free trial",
+ * "no credit card required" and "money-back guarantee" are all true and
+ * expected. A flagged "money-back guarantee" line still needs a human glance
+ * to confirm it was scoped to yearly plans, not monthly — that scoping is not
+ * mechanically checkable here.
  */
 export function checkForbiddenClaims(text: string): string[] {
   const found: string[] = [];
   const t = text.toLowerCase();
 
   const patterns: Array<[RegExp, string]> = [
-    [/\bfree\s+(trial|plan|tier|forever|for\s+\d+\s+days?)\b/, "Offers a free trial or free plan — FinovaOS is paid only"],
-    [/\btry\s+(it\s+)?(for\s+)?free\b/, 'Says "try it free"'],
-    [/\bno\s+credit\s+card\s+required\b/, 'Says "no credit card required" — implies a free trial'],
-    [/\bmoney[-\s]?back\s+guarantee\b/, "Promises a money-back guarantee"],
+    [/\bfree\s+(forever|plan|tier)\b/, "Implies a free-forever plan or freemium tier — the real offer is a 14-day trial"],
+    [/\bfree\s+for\s+(?!14\s+days?\b)\d+\s+days?\b/, "States a trial length other than 14 days"],
+    [/\b(?!14\b)\d{1,3}[-\s]day\s+(free\s+)?trial\b/, "States a trial length other than 14 days"],
+    [/\b(?!14\b)\d{1,3}[-\s]day\s+(money[-\s]?back\s+)?(guarantee|refund)\b/, "States a refund window other than 14 days"],
+    [/\bmoney[-\s]?back\s+guarantee\b/, "Promises a money-back guarantee — confirm this is scoped to yearly plans only, counted from purchase date, not usage"],
     [/\b\d{1,3},?\d{0,3}\+?\s+(businesses|customers|companies|users)\s+(trust|use|rely)/, "States a customer count"],
     [/\b(soc\s?2|iso\s?27001|gdpr[-\s]certified)\b/, "Claims a compliance certification"],
   ];

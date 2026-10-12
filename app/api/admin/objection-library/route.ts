@@ -156,7 +156,9 @@ What a good answer does:
   anything" beats "migration is easy".
 - Ends by handing control back — a question, or an offer to show them.
 - Is four to seven sentences. It is spoken, not written.
-- Never offers a discount, a free trial, or a free month. Never invents a
+- Can mention the real 14-day free trial (full Professional features, no
+  credit card required) where it genuinely answers the objection. Never offers
+  a discount, a free month, or any other trial length. Never invents a
   feature, an integration, a customer, or a statistic.
 - Where the honest answer is "we do not do that yet", say so and say what
   happens instead. An objection you cannot answer is worth knowing about.

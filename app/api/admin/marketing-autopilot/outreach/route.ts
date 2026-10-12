@@ -62,7 +62,7 @@ ${painPoints}
 
 FinovaOS solves these problems with: smart invoicing, inventory management, expense tracking, financial reports, multi-currency support, WhatsApp notifications, and more. Pricing starts at $49/month.
 
-IMPORTANT: NO free trial. Do NOT offer trial. Instead, offer to show them how it works (demo/conversation).
+IMPORTANT: FinovaOS offers a 14-day free trial, full Professional features, no credit card required — mention it exactly that way, or offer to show them how it works (demo/conversation), whichever fits better.
 
 Write:
 1. Initial outreach message

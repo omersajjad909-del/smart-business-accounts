@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "FinovaOS — cloud ERP & accounting software for SMEs and enterprises. Invoicing, inventory, HR, payroll, CRM, and bank reconciliation in one platform.",
+    "FinovaOS — cloud ERP & accounting software for SMEs and enterprises. Invoicing, inventory, HR, payroll, CRM, and bank reconciliation in one platform. 14-day free trial, no credit card required.",
   keywords: [
     // Brand — one entry per spelling people actually type into a search box.
     "FinovaOS", "Finova OS", "finovaos", "Finova",
@@ -163,7 +163,7 @@ export const metadata: Metadata = {
     siteName: "FinovaOS",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "AI cloud accounting & ERP for SMEs and enterprises. Invoicing, inventory, HR & payroll, bank reconciliation, CRM in one platform.",
+      "AI cloud accounting & ERP for SMEs and enterprises. Invoicing, inventory, HR & payroll, bank reconciliation, CRM in one platform. 14-day free trial, no credit card required.",
   },
   twitter: {
     card: "summary_large_image",
@@ -171,7 +171,7 @@ export const metadata: Metadata = {
     creator: "@finovaos",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "AI-powered cloud accounting & ERP for SMEs and enterprises in Pakistan, the UAE & beyond.",
+      "AI-powered cloud accounting & ERP for SMEs and enterprises in Pakistan, the UAE & beyond. 14-day free trial, no credit card required.",
   },
   applicationName: "FinovaOS",
   generator: "Next.js",
@@ -239,6 +239,7 @@ function buildSoftwareApplicationJsonLd(aggregateRating: { ratingValue: number; 
     highPrice: "249",
     priceCurrency: "USD",
     offerCount: "3",
+    description: "14-day free trial with full Professional features, no credit card required.",
   },
   ...(aggregateRating && aggregateRating.reviewCount > 0
     ? {

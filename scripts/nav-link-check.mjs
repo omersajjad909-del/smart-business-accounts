@@ -30,6 +30,19 @@ const REACHED_FROM_A_PAGE = new Map([
   // Opened from the ticket, trip and pilgrim-booking screens with the id of
   // the thing being printed; it means nothing on its own.
   ["/dashboard/travel/print", "opened from the document it prints"],
+  // Receipts live on the CRV screen. A sidebar link here posted the same
+  // voucher (type "CRV") under a second numbering series — see the comment
+  // in app/dashboard/layout.tsx next to the Sales & Purchase group.
+  ["/dashboard/payment-receipts", "duplicate of CRV; linking it caused a double voucher-numbering series"],
+  // /dashboard/ai-assistant only redirects to /dashboard/ai, which is linked.
+  // Kept for old bookmarks and so the ai_assistant module stays assignable.
+  ["/dashboard/ai-assistant", "redirects to /dashboard/ai, which is already linked"],
+  // Opened from the Import Wizard and Import overview screens, not meant to
+  // stand alone in the sidebar.
+  ["/dashboard/import/guide", "opened from the import wizard and import overview screens"],
+  // All five report views are linked with a ?view= query string; there is no
+  // bare "all reports" destination to point a sixth link at.
+  ["/dashboard/investors/reports", "reached via its five ?view= links in the Reports group, not as a bare route"],
 ]);
 
 const dir = mkdtempSync(join(tmpdir(), "nav-link-check-"));

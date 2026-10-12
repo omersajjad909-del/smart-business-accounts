@@ -7,7 +7,7 @@
  * meaning anything.
  */
 
-export const FINOVA_PITCH = `FinovaOS is a business accounting and operations platform: invoicing, inventory across multiple warehouses, purchase and sales orders, expenses, payroll, multi-currency, financial reports, WhatsApp notifications, and 60+ industry-specific modules. It replaces the Excel-plus-paper stack most small and mid-size businesses in South Asia and the Gulf still run on. Pricing starts at $49/month. It is a paid product — there is no free trial; the offer is a walkthrough or a demo call.`;
+export const FINOVA_PITCH = `FinovaOS is a business accounting and operations platform: invoicing, inventory across multiple warehouses, purchase and sales orders, expenses, payroll, multi-currency, financial reports, WhatsApp notifications, and 60+ industry-specific modules. It replaces the Excel-plus-paper stack most small and mid-size businesses in South Asia and the Gulf still run on. Pricing starts at $49/month. It offers a 14-day free trial with full Professional features, no credit card required.`;
 
 /** Business-type ids (lib/businessTypes.ts) ranked by how well we serve them. */
 export const ICP_TIERS: Record<string, number> = {

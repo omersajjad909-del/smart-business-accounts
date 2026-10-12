@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   // sitewide default, which is 271 chars — Ahrefs flagged the actual
   // homepage as "too long" because of it.
   description:
-    "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one cloud platform for Pakistan & UAE SMEs and enterprises.",
+    "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one cloud platform. 14-day free trial, no credit card required.",
   alternates: { canonical: "https://www.finovaos.app/" },
 };
 

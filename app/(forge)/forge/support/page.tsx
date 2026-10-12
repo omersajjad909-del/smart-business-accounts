@@ -29,7 +29,7 @@ const faqs = [
     items: [
       { q: "What happens when my trial ends?", a: "You'll be prompted to choose a plan. Your data is preserved. You can export everything before making a decision." },
       { q: "Can I change my plan at any time?", a: "Yes. Upgrades take effect immediately. Downgrades take effect at the start of the next billing cycle." },
-      { q: "Do you offer refunds?", a: "We don't offer refunds for completed billing periods, but you can cancel before your next renewal to avoid future charges." },
+      { q: "Do you offer refunds?", a: "Yearly plans come with a 14-day money-back guarantee from your purchase date — after that, or on monthly plans, we don't offer refunds for completed billing periods, but you can cancel before your next renewal to avoid future charges." },
     ],
   },
   {

@@ -262,7 +262,8 @@ Rules:
 - Someone who abandoned a signup after typing the wrong code may have hit a
   problem, not lost interest. Ask whether the code arrived, and offer to set the
   account up manually.
-- No discount, no free trial, no urgency, no deadline.
+- Can remind them of the real 14-day free trial (no credit card required) if
+  they haven't started it yet. No discount, no urgency, no deadline.
 - Pakistani or Gulf names or businesses: Roman Urdu mixed with English is fine
   and usually better. Otherwise plain English.
 

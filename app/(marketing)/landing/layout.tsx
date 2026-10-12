@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "FinovaOS — Cloud Accounting & ERP for SMEs and Enterprises",
   description:
-    "Cloud accounting software for Pakistan & UAE businesses. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, CRM — all in one platform, built for SMEs and enterprises in Karachi, Lahore, and Dubai.",
+    "Cloud accounting software for Pakistan & UAE businesses. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, CRM — all in one platform. 14-day free trial, no credit card required.",
   keywords: [
     // Pakistan-specific
     "accounting software Pakistan", "cloud accounting Pakistan", "FBR accounting software",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "FinovaOS — Cloud Accounting & ERP for SMEs and Enterprises",
-    description: "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one cloud platform for Pakistan & UAE SMEs and enterprises.",
+    description: "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one cloud platform. 14-day free trial, no credit card required.",
     url: `${BASE}/`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS — Cloud Accounting & ERP for SMEs and Enterprises" }],
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS — Cloud Accounting & ERP for SMEs and Enterprises",
-    description: "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform built for SMEs and enterprises.",
+    description: "FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. 14-day free trial, no credit card required.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/` },

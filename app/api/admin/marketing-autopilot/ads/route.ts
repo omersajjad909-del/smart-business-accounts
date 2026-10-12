@@ -47,14 +47,14 @@ Generate 3 different ad sets. Each should target a different awareness level:
 
 For each ad set, provide:
 - A scroll-stopping headline (under 40 chars)
-- Primary text (the main ad copy, 3-5 sentences, conversational, no "free trial")
+- Primary text (the main ad copy, 3-5 sentences, conversational)
 - CTA button text
 - Detailed Facebook/Instagram targeting parameters
 - Daily budget recommendation
 - Estimated reach per day
 - Campaign objective
 
-IMPORTANT: NO free trial mention. FinovaOS is a paid product starting at $49/month.
+IMPORTANT: FinovaOS offers a 14-day free trial, no credit card required, starting at $49/month after. State the trial exactly that way when it fits the ad — never a different day count.
 
 Respond with a JSON array of exactly 3 objects:
 [

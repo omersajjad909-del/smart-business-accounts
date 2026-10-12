@@ -206,7 +206,10 @@ COMMON QUESTIONS & ANSWERS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Q: Is there a free trial?
-A: FinovaOS is a paid product — no free trial. Instead, we offer a 14-day money-back guarantee on all paid plans. Get started on any plan risk-free — if you're not satisfied within 14 days, you get a full refund. You can also book a demo call to see everything in action first.
+A: Yes! You get 14 days of full access to FinovaOS Professional features, and no credit card is needed to start. If you don't choose a plan before the trial ends, your data stays safe and you can view and export it for 3 more days while you decide. You can also book a demo call to see everything in action first.
+
+Q: Do you offer refunds?
+A: Yearly plans come with a 14-day money-back guarantee, counted from your purchase date — not from how much you've used the product. Monthly plans don't offer refunds, but you can cancel anytime before your next renewal to avoid future charges.
 
 Q: Can I import data from QuickBooks / Xero / Tally?
 A: Yes! FinovaOS supports CSV/Excel import for customers, items, transactions, and accounts. We also have native migration tools for QuickBooks, Xero, Sage, and Tally.

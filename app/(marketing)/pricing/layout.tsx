@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Pricing Plans — Starter $49/mo · Pro $99/mo · Enterprise",
   description:
-    "Starter · Professional · Enterprise. Transparent pricing, no hidden fees.",
+    "Starter · Professional · Enterprise. Transparent pricing, no hidden fees. 14-day free trial, no credit card required.",
   keywords: [
     "accounting software pricing",
     "invoicing software cost",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Pricing Plans — Start at $49/month | FinovaOS",
     description:
-      "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees. Cancel anytime.",
+      "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees, cancel anytime. 14-day free trial, no credit card required.",
     url: `${BASE}/pricing`,
     siteName: "FinovaOS",
     type: "website",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS Pricing — Plans from $49/month",
-    description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees.",
+    description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees. 14-day free trial, no credit card required.",
   },
   alternates: { canonical: `${BASE}/pricing` },
 };
@@ -51,7 +51,7 @@ export default function PricingLayout({ children }: { children: React.ReactNode 
         name: "How much does FinovaOS cost?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "FinovaOS offers three plans: Starter at $49/month (up to 3 users), Professional at $99/month (up to 10 users), and Enterprise at $249/month (up to 25 users). All plans include accounting, invoicing, and inventory management.",
+          text: "FinovaOS offers three plans: Starter at $49/month (up to 3 users), Professional at $99/month (up to 10 users), and Enterprise at $249/month (up to 25 users). All plans include accounting, invoicing, and inventory management. Every plan starts with a 14-day free trial of full Professional features, no credit card required.",
         },
       },
       {

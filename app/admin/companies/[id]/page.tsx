@@ -11,6 +11,7 @@ type Company = {
   plan: string | null; activeModules: string | null; subscriptionStatus: string | null;
   stripeCustomerId: string | null; billingProvider?: string | null; currentPeriodEnd: string | null;
   createdAt: string; businessType: string | null; businessSetupDone: boolean;
+  billingCycle?: string | null; subscriptionPeriodStart?: string | null;
 };
 type User = { id: string; name: string | null; email: string; phone?: string | null; role: string; joinedAt: string };
 type Activity = { action: string; createdAt: string; userId: string | null };
@@ -69,6 +70,36 @@ function timeAgo(d: string) {
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
   if (s < 2592000) return `${Math.floor(s / 86400)}d ago`;
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/**
+ * Yearly plans carry a 14-day money-back guarantee counted from the start of
+ * the current billing period (the closest signal we have to "purchase date"
+ * — a plan switch from monthly to yearly moves this forward, so it tracks
+ * the yearly charge that would actually be refunded, not the account's
+ * original signup). Monthly plans are never refundable — see
+ * app/(marketing)/legal/refund/page.tsx, the canonical policy text.
+ *
+ * This is a decision-support read, not an enforcement gate: refunds are
+ * issued by a human through LemonSqueezy/Safepay's own dashboard, not by any
+ * button in this app, so nothing here can block a request on its own — it
+ * only tells the admin what the policy says before they act on it.
+ */
+function refundEligibility(cycle: string | null | undefined, periodStart: string | null | undefined) {
+  const isYearly = String(cycle || "").toUpperCase() === "YEARLY";
+  if (!isYearly) {
+    return { applicable: false, eligible: false, daysElapsed: null as number | null, daysLeft: null as number | null };
+  }
+  if (!periodStart) {
+    return { applicable: true, eligible: null, daysElapsed: null as number | null, daysLeft: null as number | null };
+  }
+  const daysElapsed = Math.floor((Date.now() - new Date(periodStart).getTime()) / 86400000);
+  return {
+    applicable: true,
+    eligible: daysElapsed <= 14,
+    daysElapsed,
+    daysLeft: Math.max(0, 14 - daysElapsed),
+  };
 }
 
 function adminHdrs(json = false): Record<string, string> {
@@ -154,6 +185,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   );
 
   const { company, users, roleCounts, lastLogin, recentActivity, totalUsers, extraSeats, effectiveUserLimit } = data;
+  const refund = refundEligibility(company.billingCycle, company.subscriptionPeriodStart);
 
   const kpiCard = (label: string, value: React.ReactNode, sub?: React.ReactNode) => (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px" }}>
@@ -215,6 +247,8 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               <InfoRow label="Currency" value={company.baseCurrency} />
               <InfoRow label="Business Type" value={company.businessType?.replace(/_/g, " ")} />
               <InfoRow label="Setup Complete" value={company.businessSetupDone ? "✅ Yes" : "⏳ No"} />
+              <InfoRow label="Billing Cycle" value={company.billingCycle} />
+              <InfoRow label="Current Period Started" value={company.subscriptionPeriodStart ? new Date(company.subscriptionPeriodStart).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : null} />
               <InfoRow label="Renewal Date" value={company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : null} />
               <InfoRow label={billingCustomerIdLabel(company.billingProvider)} value={company.stripeCustomerId} mono />
               <InfoRow label="Active Modules" value={company.activeModules || "Default"} />
@@ -259,6 +293,37 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Right */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Refund Eligibility */}
+          {refund.applicable && (
+            <div style={{
+              background: refund.eligible === false ? "rgba(239,68,68,.06)" : refund.eligible === true ? "rgba(34,197,94,.06)" : CARD,
+              border: `1px solid ${refund.eligible === false ? "rgba(239,68,68,.25)" : refund.eligible === true ? "rgba(34,197,94,.25)" : BORDER}`,
+              borderRadius: 14, padding: "18px 22px",
+            }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0", marginBottom: 10 }}>Refund Eligibility</div>
+              {refund.eligible === null ? (
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Yearly plan, but no billing period start on record — check the gateway directly.</div>
+              ) : refund.eligible ? (
+                <>
+                  <div style={{ fontSize: 13, color: "#22c55e", fontWeight: 700, marginBottom: 4 }}>✅ Within the 14-day window</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+                    {refund.daysElapsed}d into the current yearly period · {refund.daysLeft}d left to request a refund.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 13, color: "#f87171", fontWeight: 700, marginBottom: 4 }}>❌ Window closed</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+                    {refund.daysElapsed}d into the current yearly period — {(refund.daysElapsed ?? 0) - 14}d past the 14-day cutoff. Not eligible, regardless of usage.
+                  </div>
+                </>
+              )}
+              <div style={{ marginTop: 10, fontSize: 10, color: "rgba(255,255,255,.3)", lineHeight: 1.5 }}>
+                Monthly plans are never refundable. Refunds are issued manually through the gateway — this panel only tells you what the policy says.
+              </div>
+            </div>
+          )}
+
           {/* Quick Actions */}
           <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "20px 22px" }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0", marginBottom: 16 }}>Quick Actions</div>
