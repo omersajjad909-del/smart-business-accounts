@@ -2354,66 +2354,95 @@ export default function DashboardLayout({
 
           {/* Rental Business */}
             {hasModule(businessType, "travel_bookings") && isBusinessEnabled(businessType) && (
+              <>
+                {/* Travel used to be one group with sub-headings inside it. Each
+                    desk is now its own sidebar category, like Sales or Banking. */}
               <NavGroup
                 title="Travel"
                 icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>}
                 open={openSection === "travel"}
                 onToggle={() => toggle("travel")}
               >
-                {/* Twenty-five links in one column asked the operator to
-                    remember where everything was. They are the same links,
-                    under the desk each one belongs to. */}
                 {hasDashboardFeature("TRAVEL_OVERVIEW") && <NavLink href="/dashboard/travel" pathname={pathname}>Overview</NavLink>}
                 {hasDashboardFeature("TRAVEL_NEW_BOOKING") && <NavLink href="/dashboard/travel/new" pathname={pathname}>➕ New Booking</NavLink>}
+              </NavGroup>
 
                 {/* One customer buying one thing. */}
-                <NavSection label="Tickets">
+              <NavGroup
+                title="Tickets"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9V7a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 6v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-6z"/><path d="M13 5v14" strokeDasharray="2 2"/></svg>}
+                open={openSection === "travelTickets"}
+                onToggle={() => toggle("travelTickets")}
+              >
                   {hasDashboardFeature("TRAVEL_BOOK_FLIGHT") && <NavLink href="/dashboard/travel/book" pathname={pathname}>🎫 Book Flight Ticket</NavLink>}
                   {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>✈️ Airline Tickets</NavLink>}
                   {hasDashboardFeature("TRAVEL_FLIGHT_SEARCH") && <NavLink href="/dashboard/travel/flight-search" pathname={pathname}>🔍 Flight Search</NavLink>}
                   {hasDashboardFeature("TRAVEL_FARE_SHEET") && <NavLink href="/dashboard/travel/fare-sheet" pathname={pathname}>💱 Contract Fares</NavLink>}
                   {hasDashboardFeature("TRAVEL_SCHEDULES") && <NavLink href="/dashboard/travel/schedules" pathname={pathname}>🕑 Flight Schedules</NavLink>}
-                </NavSection>
+              </NavGroup>
 
                 {/* One customer buying several things at once. */}
-                <NavSection label="Trips & Packages">
+              <NavGroup
+                title="Trips & Packages"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="8" width="16" height="13" rx="2"/><path d="M9 8V5a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>}
+                open={openSection === "travelTrips"}
+                onToggle={() => toggle("travelTrips")}
+              >
                   {hasDashboardFeature("TRAVEL_TRIPS") && <NavLink href="/dashboard/travel/trips" pathname={pathname}>🧳 Trips</NavLink>}
                   {hasDashboardFeature("TRAVEL_PACKAGES") && <NavLink href="/dashboard/travel/packages" pathname={pathname}>📦 Packages</NavLink>}
                   {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
                   {hasDashboardFeature("TRAVEL_TRANSPORT") && <NavLink href="/dashboard/travel/transport" pathname={pathname}>🚐 Transport</NavLink>}
                   {hasDashboardFeature("TRAVEL_INSURANCE") && <NavLink href="/dashboard/travel/insurance" pathname={pathname}>🛡 Travel Insurance</NavLink>}
-                </NavSection>
+              </NavGroup>
 
                 {/* A hundred people on one aircraft, in the order the work
                     happens: build the departure, put people on it, run the
                     checks, hand out the voucher. */}
-                <NavSection label="Hajj & Umrah">
+              <NavGroup
+                title="Hajj & Umrah"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12"/><path d="M21 7l-9 5-9-5"/></svg>}
+                open={openSection === "travelHajj"}
+                onToggle={() => toggle("travelHajj")}
+              >
                   {hasDashboardFeature("TRAVEL_DEPARTURES") && <NavLink href="/dashboard/travel/departures" pathname={pathname}>🕋 Departures</NavLink>}
                   {hasDashboardFeature("TRAVEL_BOOKINGS") && <NavLink href="/dashboard/travel/bookings" pathname={pathname}>📋 Pilgrim Bookings</NavLink>}
                   {hasDashboardFeature("TRAVEL_GROUP_OPS") && <NavLink href="/dashboard/travel/group-ops" pathname={pathname}>🧭 Group Operations</NavLink>}
                   {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
                   {hasDashboardFeature("TRAVEL_VOUCHERS") && <NavLink href="/dashboard/travel/vouchers" pathname={pathname}>🎟 Vouchers</NavLink>}
-                </NavSection>
+              </NavGroup>
 
                 {/* Who they are and what they need to travel. */}
-                <NavSection label="People & Documents">
+              <NavGroup
+                title="People & Documents"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>}
+                open={openSection === "travelPeople"}
+                onToggle={() => toggle("travelPeople")}
+              >
                   {hasDashboardFeature("TRAVEL_CUSTOMERS") && <NavLink href="/dashboard/travel/customers" pathname={pathname}>🗂 Customers</NavLink>}
                   {hasDashboardFeature("TRAVEL_TRAVELERS") && <NavLink href="/dashboard/travel/travelers" pathname={pathname}>👤 Travellers</NavLink>}
                   {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
                   {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>📕 Passport Database</NavLink>}
-                </NavSection>
-
-                <NavSection label="Money">
+              </NavGroup>
+              <NavGroup
+                title="Money"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>}
+                open={openSection === "travelMoney"}
+                onToggle={() => toggle("travelMoney")}
+              >
                   <NavLink href="/dashboard/quotation" pathname={pathname}>📝 Quotations</NavLink>
                   <NavLink href="/dashboard/sales-invoice" pathname={pathname}>🧾 Sales Invoices</NavLink>
                   {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>💳 Supplier Settlements</NavLink>}
-                </NavSection>
-
-                <NavSection label="Reports">
+              </NavGroup>
+              <NavGroup
+                title="Reports"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>}
+                open={openSection === "travelReports"}
+                onToggle={() => toggle("travelReports")}
+              >
                   {hasDashboardFeature("TRAVEL_REPORTS") && <NavLink href="/dashboard/travel/reports" pathname={pathname}>📑 Travel Reports</NavLink>}
                   {hasDashboardFeature("TRAVEL_ANALYTICS") && <NavLink href="/dashboard/travel/analytics" pathname={pathname}>📊 Analytics</NavLink>}
-                </NavSection>
               </NavGroup>
+              </>
             )}
 
           {/* Rental Business */}
