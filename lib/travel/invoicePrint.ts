@@ -74,6 +74,8 @@ export type TicketSource = {
   paxCount?: number;
 };
 
+const PAX_LABEL: Record<string, string> = { ADT: "Adult", CHD: "Child", INF: "Infant" };
+
 export function buildTicketInvoice(source: TicketSource): TravelInvoiceDoc {
   /* One line per passenger, because that is how a ticket is sold and how a
      customer checks it. A party of four on one PNR paying 185,000 each is four
@@ -96,7 +98,7 @@ export function buildTicketInvoice(source: TicketSource): TravelInvoiceDoc {
       passenger: clean((person as { name?: string }).name) || `Passenger ${index + 1}`,
       passport: clean((person as { passport?: string }).passport),
       ticketNo: clean((person as { ticketNo?: string }).ticketNo),
-      paxType: clean((person as { type?: string }).type) || "Adult",
+      paxType: PAX_LABEL[clean((person as { type?: string }).type).toUpperCase()] || clean((person as { type?: string }).type) || "Adult",
       fare: perHead,
     }),
   );

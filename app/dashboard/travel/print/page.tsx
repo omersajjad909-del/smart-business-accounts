@@ -16,7 +16,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { PrintActionBar } from "@/components/print/PrintActionBar";
-import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
+import { TravelInvoiceSheet, TravelPaper } from "@/components/print/TravelInvoiceSheet";
 import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import { useCurrency } from "@/lib/useCurrency";
 import type { TravelInvoiceDoc } from "@/lib/travel/invoicePrint";
@@ -34,10 +34,9 @@ function TravelPrint() {
   const kind = params.get("kind") || "";
   const id = params.get("id") || "";
 
-  // The travel invoice inherits the sales-invoice letterhead: it is the same
-  // company on the same paper, and asking them to set it up twice would be a
-  // second place for the logo to go stale.
-  const printHeader = useCompanyPrintHeader("sales_invoice");
+  // Same company letterhead as every other document; the design and what may
+  // show come from the Travel Invoice entry in Print Preferences.
+  const printHeader = useCompanyPrintHeader("travel_invoice");
   const symbol = useCurrency();
 
   const [payload, setPayload] = useState<Payload | null>(null);
@@ -67,43 +66,34 @@ function TravelPrint() {
   const { doc } = payload;
   const money = (n: unknown) => `${symbol}${Math.round(Number(n) || 0).toLocaleString()}`;
 
-  const props = {
-    ...printHeader,
-    docTitle: doc.docTitle,
-    docNo: payload.invoiceNo || "—",
-    date: payload.date,
-    partyLabel: "Bill To",
-    partyName: payload.partyName,
-    metaFields: doc.metaFields,
-    columns: doc.columns.map((col) => ({
-      ...col,
-      // Money reads as money on the page, and only the money columns do.
-      render: ["fare", "rate", "amount"].includes(col.key)
-        ? (value: unknown) => money(value)
-        : undefined,
-    })),
-    rows: doc.rows,
-    totalsLines: [{ label: "Total", value: Number(payload.total) || 0, bold: true, borderTop: true }],
-    summaryFields: doc.summaryFields,
-    notes: doc.notes,
-  };
-
   return (
     <div style={{ padding: 20 }}>
+      {/* One Back. The bar's second button is for pages with two destinations,
+          and this one has only the list it was opened from. */}
       <PrintActionBar
         onPrintA4={() => window.print()}
         onEdit={() => window.history.back()}
-        onNew={() => window.history.back()}
         editLabel="Back"
-        newLabel="Back"
       />
-      {/* One document, not two. globals.css promotes the only PrintDocA4 on a
-          page at print time and hides the shell around it — a second copy in a
-          .print-area is the legacy shape it explicitly tells new pages not to
-          add, and on screen it just prints the invoice twice. */}
-      <PrintPaperWrapper>
-        <PrintDocA4 {...props} />
-      </PrintPaperWrapper>
+      <TravelPaper>
+        <TravelInvoiceSheet
+          {...printHeader}
+          docTitle={doc.docTitle}
+          docNo={payload.invoiceNo || "—"}
+          date={payload.date}
+          partyName={payload.partyName}
+          metaFields={doc.metaFields}
+          columns={doc.columns.map((col) => ({
+            ...col,
+            // Money reads as money on the page, and only the money columns do.
+            render: ["fare", "rate", "amount"].includes(col.key) ? (value: unknown) => money(value) : undefined,
+          }))}
+          rows={doc.rows}
+          totalText={money(payload.total)}
+          summaryFields={doc.summaryFields}
+          notes={doc.notes}
+        />
+      </TravelPaper>
     </div>
   );
 }

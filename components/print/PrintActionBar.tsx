@@ -11,7 +11,8 @@ interface PrintActionBarProps {
   onWhatsApp?: () => Promise<void> | void;
   onSms?: () => void;
   onEdit: () => void;
-  onNew: () => void;
+  /** Omit when there is no second destination — a duplicate button is worse than none. */
+  onNew?: () => void;
   newLabel?: string;
   editLabel?: string;
   extraActions?: { label: string; icon: string; onClick: () => void }[];
@@ -109,7 +110,7 @@ export function PrintActionBar({
       </div>
 
       <button onClick={onEdit} style={ghostBtn}>{editLabel}</button>
-      <button onClick={onNew} style={ghostBtn}>{newLabel}</button>
+      {onNew && <button onClick={onNew} style={ghostBtn}>{newLabel}</button>}
     </div>
   );
 }

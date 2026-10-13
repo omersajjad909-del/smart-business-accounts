@@ -29,6 +29,7 @@
  */
 
 import type { PrintTemplateId } from "./printTemplates";
+import type { TravelDesignId } from "./travelDesigns";
 
 export type PrintDesignId =
   | "classic_ledger"
@@ -36,7 +37,9 @@ export type PrintDesignId =
   | "modern_band"
   | "clean_minimal"
   | "compact_dense"
-  | "bold_statement";
+  | "bold_statement"
+  /** Travel invoices only — see ./travelDesigns.ts. Not in PRINT_DESIGNS. */
+  | TravelDesignId;
 
 export type HeaderStyle =
   /** Company left, document name right, on one line. */

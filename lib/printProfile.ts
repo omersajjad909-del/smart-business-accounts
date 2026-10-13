@@ -24,6 +24,7 @@
  */
 
 import type { PrintDesignId } from "@/components/print/printLayouts";
+import { isTravelDesign } from "@/components/print/travelDesigns";
 
 // ─────────────────────────────────────────────────────────────
 //  The documents
@@ -36,7 +37,9 @@ export type DocKind =
   | "purchase_order"
   | "delivery_challan"
   | "grn"
-  | "sale_return";
+  | "sale_return"
+  /** A travel agency's ticket, trip or package invoice. Own designs. */
+  | "travel_invoice";
 
 export const DOC_KINDS: { id: DocKind; label: string; route: string; partyWord: string }[] = [
   { id: "sales_invoice",    label: "Sales Invoice",    route: "/dashboard/sales-invoice",    partyWord: "Customer" },
@@ -46,6 +49,7 @@ export const DOC_KINDS: { id: DocKind; label: string; route: string; partyWord: 
   { id: "delivery_challan", label: "Delivery Challan", route: "/dashboard/delivery-challan", partyWord: "Customer" },
   { id: "grn",              label: "GRN",              route: "/dashboard/grn",              partyWord: "Supplier" },
   { id: "sale_return",      label: "Sale Return",      route: "/dashboard/sale-return",      partyWord: "Customer" },
+  { id: "travel_invoice",   label: "Travel Invoice",   route: "/dashboard/travel/tickets",   partyWord: "Customer" },
 ];
 
 export function docKindLabel(doc: DocKind): string {
@@ -387,7 +391,7 @@ const DESIGN_IDS = new Set<string>([
 ]);
 
 function isDesignId(v: unknown): v is PrintDesignId {
-  return typeof v === "string" && DESIGN_IDS.has(v);
+  return typeof v === "string" && (DESIGN_IDS.has(v) || isTravelDesign(v));
 }
 
 /** The old four template names, mapped onto the nearest of the new designs. */

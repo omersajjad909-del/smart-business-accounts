@@ -20,6 +20,9 @@ import toast from "react-hot-toast";
 import { useResponsive } from "@/hooks/useResponsive";
 import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { PRINT_DESIGNS } from "@/components/print/printLayouts";
+import { TravelInvoiceSheet } from "@/components/print/TravelInvoiceSheet";
+import { TRAVEL_DESIGNS, travelDesign, type TravelDesign } from "@/components/print/travelDesigns";
+import { buildTicketInvoice } from "@/lib/travel/invoicePrint";
 import type { PrintDesignId } from "@/components/print/printLayouts";
 import {
   DOC_KINDS,
@@ -75,6 +78,23 @@ const SAMPLE_TOTALS = [
   { label: "Net Total", value: 206500, bold: true, borderTop: true },
 ];
 
+/* A ticket for two, shaped exactly as the real invoice builds it. */
+const SAMPLE_TRAVEL = buildTicketInvoice({
+  bookingRef: "TRV-261013-372",
+  pnr: "A1B2C3",
+  route: "KHI -> DXB",
+  airline: "Emirates",
+  flightNo: "EK 601",
+  travelDate: "2026-10-27",
+  cabin: "economy",
+  baggageKg: 30,
+  amount: 390000,
+  passengers: [
+    { name: "Ali Raza", passport: "BE2212457", type: "ADT", ticketNo: "176-2401198842" },
+    { name: "Sana Raza", passport: "BE2212458", type: "ADT", ticketNo: "176-2401198843" },
+  ],
+});
+
 type CompanyBits = {
   name: string;
   address?: string;
@@ -97,6 +117,9 @@ export default function PrintPreferencesPage() {
   const [sel, setSel] = useState<DocKind | "base">("base");
   const [profiles, setProfiles] = useState<PrintProfiles>(DEFAULT_PRINT_PROFILES);
   const [company, setCompany] = useState<CompanyBits>({ name: "Your Company" });
+  // Travel Invoice has designs of its own and means nothing to a bakery, so it
+  // is only offered to a travel agency.
+  const [businessType, setBusinessType] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -107,6 +130,7 @@ export default function PrintPreferencesPage() {
       ]);
       if (cancelled) return;
       if (adminRes?.printProfiles) setProfiles(adminRes.printProfiles as PrintProfiles);
+      setBusinessType(String(companyRes?.businessType || ""));
       const identity = adminRes?.companyIdentity || {};
       const contact = adminRes?.invoiceContact || {};
       const tax = adminRes?.taxProfile || {};
@@ -129,6 +153,8 @@ export default function PrintPreferencesPage() {
   const isBase = sel === "base";
   /** The document being edited. On the base row, the sales invoice stands in for the preview. */
   const doc = (isBase ? "sales_invoice" : sel) as DocKind;
+  const isTravel = !isBase && doc === "travel_invoice";
+  const docs = DOC_KINDS.filter(d => d.id !== "travel_invoice" || businessType === "travel");
 
   const resolved = useMemo(
     () => (isBase ? profiles.base : resolvePrintProfile(profiles, doc)),
@@ -235,7 +261,7 @@ export default function PrintPreferencesPage() {
             <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>The starting point for all seven</div>
           </div>
 
-          {DOC_KINDS.map(d => {
+          {docs.map(d => {
             const active = d.id === sel;
             const n = overriddenKeys(profiles, d.id).length;
             return (
@@ -392,8 +418,8 @@ export default function PrintPreferencesPage() {
               </p>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(190px, 1fr))", gap: 10 }}>
-              {PRINT_DESIGNS.map(d => {
-                const active = d.id === resolved.design;
+              {(isTravel ? TRAVEL_DESIGNS : PRINT_DESIGNS).map(d => {
+                const active = d.id === (isTravel ? travelDesign(resolved.design).id : resolved.design);
                 return (
                   <div
                     key={d.id}
@@ -409,12 +435,14 @@ export default function PrintPreferencesPage() {
                       display: "flex", flexDirection: "column", gap: 8,
                     }}
                   >
-                    <DesignThumb design={d.id} />
+                    {isTravel ? <TravelThumb design={d as TravelDesign} /> : <DesignThumb design={d.id} />}
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 700 }}>{d.label}</div>
                       <div style={{ fontSize: 11.5, color: MUTED, lineHeight: 1.4, marginTop: 2 }}>{d.blurb}</div>
                       <div style={{ fontSize: 10.5, color: MUTED, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>
-                        ~{d.linesPerPage} lines / A4 sheet
+                        {"linesPerPage" in d
+                          ? `~${d.linesPerPage} lines / A4 sheet`
+                          : d.toner === "low" ? "Low toner" : d.toner === "medium" ? "Medium toner" : "Colour — best emailed"}
                       </div>
                     </div>
                   </div>
@@ -433,6 +461,36 @@ export default function PrintPreferencesPage() {
             </div>
             <div style={{ border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
               <div style={{ overflow: "auto", maxHeight: 760 }}>
+                {isTravel ? (
+                  <div style={{ background: "#e9edf2", padding: 24 }}>
+                    <TravelInvoiceSheet
+                      design={resolved.design}
+                      fields={resolved.fields}
+                      companyName={company.name}
+                      companyAddress={company.address || "p-277, Lasani Town, Faisalabad"}
+                      companyPhone={company.phone || "+92-317-8653693"}
+                      companyEmail={company.email}
+                      companyTaxLabel={company.taxLabel}
+                      companyTaxValue={company.taxValue}
+                      companyStrn={company.strn}
+                      logoUrl={company.logoUrl}
+                      showLogo
+                      docTitle={SAMPLE_TRAVEL.docTitle}
+                      docNo="SI-1042"
+                      date="2026-10-27"
+                      partyName="Ali Raza"
+                      metaFields={SAMPLE_TRAVEL.metaFields}
+                      columns={SAMPLE_TRAVEL.columns.map(c => ({
+                        ...c,
+                        render: c.key === "fare" ? (v: unknown) => `Rs${Math.round(Number(v) || 0).toLocaleString()}` : undefined,
+                      }))}
+                      rows={SAMPLE_TRAVEL.rows}
+                      totalText="Rs390,000"
+                      notes={SAMPLE_TRAVEL.notes}
+                      footerNote={resolved.footerNote}
+                    />
+                  </div>
+                ) : (
                 <PrintPaperWrapper>
                   <PrintDocA4
                     design={resolved.design}
@@ -468,6 +526,7 @@ export default function PrintPreferencesPage() {
                     signatureLabels={resolved.signatureLabels}
                   />
                 </PrintPaperWrapper>
+                )}
               </div>
             </div>
           </section>
@@ -618,6 +677,90 @@ function DesignThumb({ design }: { design: string }) {
           {bar("40%", 2)}{bar("24%", 2)}
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Travel design thumbnail ───────────────────────────────────
+   Same idea as above: a drawing of where things sit, in the design's own
+   colours, because seven scaled-down sheets are seven pale rectangles. */
+function TravelThumb({ design: d }: { design: TravelDesign }) {
+  const bar = (w: string, h = 3, color = "#9aa3ad", extra: React.CSSProperties = {}) => (
+    <div style={{ width: w, height: h, background: color, borderRadius: 1, ...extra }} />
+  );
+  const head =
+    d.header === "band" ? (
+      <div style={{ margin: -7, marginBottom: 2, padding: "6px 7px", background: d.accent, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {bar("30px", 4, d.onAccent)}{bar("18px", 4, d.onAccent)}
+      </div>
+    ) : d.header === "soft" ? (
+      <div style={{ margin: -7, marginBottom: 2, padding: "6px 7px 8px", background: d.tint, borderRadius: "0 0 12px 12px", borderBottom: `2px solid ${d.accent}`, display: "flex", justifyContent: "space-between" }}>
+        {bar("30px", 4, d.ink)}{bar("18px", 4, d.accent)}
+      </div>
+    ) : d.header === "centered" ? (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+        {bar("34px", 4, d.ink)}
+        <div style={{ borderTop: `1px solid ${d.ink}`, borderBottom: `1px solid ${d.ink}`, padding: "2px 0", width: "100%", display: "flex", justifyContent: "center" }}>{bar("22px", 3, d.ink)}</div>
+      </div>
+    ) : (
+      <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `1.5px solid ${d.accent}`, paddingBottom: 3 }}>
+        {bar("30px", 4, d.ink)}{bar("18px", 4, d.accent)}
+      </div>
+    );
+
+  const route =
+    d.route === "ticket" ? (
+      <div style={{ display: "flex", border: `1px solid ${d.accent}`, borderRadius: 4, overflow: "hidden", height: 16 }}>
+        <div style={{ flex: 1, background: d.tint, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 4px" }}>
+          {bar("12px", 5, d.accent)}{bar("20px", 1, d.accent)}{bar("12px", 5, d.accent)}
+        </div>
+        <div style={{ width: "26%", background: d.accent, borderLeft: `1px dashed ${d.onAccent}` }} />
+      </div>
+    ) : d.route === "hero" ? (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2px 0", borderTop: `1px solid ${d.rule}`, borderBottom: `1px solid ${d.rule}` }}>
+        {bar("14px", 7, d.accent)}{bar("40%", 1, d.accent, { opacity: 0.6 })}{bar("14px", 7, d.accent)}
+      </div>
+    ) : (
+      <div style={{ display: "flex", gap: 3 }}>{bar("30%", 6, d.tint, { border: `1px solid ${d.rule}` })}{bar("30%", 6, d.tint, { border: `1px solid ${d.rule}` })}{bar("30%", 6, d.tint, { border: `1px solid ${d.rule}` })}</div>
+    );
+
+  const rowStyle = (i: number): React.CSSProperties => ({
+    height: 6, display: "flex", alignItems: "center", gap: 3, paddingInline: 2,
+    background: d.grid === "zebra" ? (i % 2 ? d.tint : "transparent") : d.grid === "pills" ? d.tint : "transparent",
+    borderRadius: d.grid === "pills" ? 6 : 0,
+    borderBottom: d.grid === "ruled" || d.grid === "rows" || d.grid === "open" ? `1px solid ${d.rule}` : "none",
+    border: d.grid === "ruled" ? `1px solid ${d.rule}` : undefined,
+  });
+
+  const content = (
+    <>
+      {route}
+      <div style={{ display: "flex", flexDirection: "column", gap: d.grid === "pills" ? 2 : 0, flex: 1, minHeight: 0 }}>
+        <div style={{ height: 6, background: d.grid === "zebra" ? d.accent : d.grid === "open" ? "transparent" : d.tint, borderBottom: d.grid === "open" ? `1px solid ${d.ink}` : "none", borderRadius: d.grid === "pills" ? 6 : 0 }} />
+        {[0, 1, 2].map(i => <div key={i} style={rowStyle(i)}>{bar("40%", 1.5)}{bar("20%", 1.5)}</div>)}
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        {d.totals === "bar" ? <div style={{ width: "42%", height: 7, background: d.accent, borderRadius: d.header === "soft" ? 6 : 1 }} />
+          : d.totals === "box" ? <div style={{ width: "42%", height: 7, border: `1px solid ${d.accent}` }} />
+          : <div style={{ width: "42%", borderTop: `1.5px solid ${d.ink}`, paddingTop: 2 }}>{bar("60%", 3, d.ink, { marginLeft: "auto" })}</div>}
+      </div>
+    </>
+  );
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 6,
+        aspectRatio: "210 / 148", overflow: "hidden", display: "flex",
+      }}
+    >
+      {d.header === "side" && <div style={{ width: "28%", background: d.accent, padding: 5, display: "flex", flexDirection: "column", gap: 3 }}>{bar("80%", 4, d.onAccent)}{bar("60%", 2, d.onAccent, { opacity: 0.7 })}{bar("70%", 2, d.onAccent, { opacity: 0.7 })}</div>}
+      <div style={{ flex: 1, minWidth: 0, padding: 7, display: "flex", flexDirection: "column", gap: 4 }}>
+        {d.header !== "side" && head}
+        {d.header === "side" && bar("50%", 5, d.ink)}
+        {content}
+      </div>
     </div>
   );
 }

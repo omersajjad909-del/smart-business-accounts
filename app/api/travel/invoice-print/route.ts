@@ -70,7 +70,8 @@ export async function GET(req: NextRequest) {
         passengers: Array.isArray(data.passengers)
           ? (data.passengers as Record<string, unknown>[]).map((p) => ({
               name: str(p.name),
-              passport: str(p.passport),
+              // The booking desk stores it as passportNo; older rows say passport.
+              passport: str(p.passportNo) || str(p.passport),
               type: str(p.type),
               ticketNo: str(p.ticketNo),
             }))
