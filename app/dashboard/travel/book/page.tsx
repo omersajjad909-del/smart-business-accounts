@@ -399,12 +399,12 @@ export default function BookFlightPage() {
                   <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>
                     {visibleOffers.length} flight{visibleOffers.length === 1 ? "" : "s"} found
                   </div>
-                  {visibleOffers.map((row, index) => (
+                  {visibleOffers.map((row, index) => row.id === offer?.id ? null : (
                     <OfferCard
                       key={row.id}
                       offer={row}
                       pax={pricedFor?.pax ?? query.pax}
-                      selected={row.id === offer?.id}
+                      selected={false}
                       best={index === 0}
                       onSelect={() => chooseOffer(row, pricedFor?.pax ?? query.pax, markup)}
                       tripType={pricedFor?.tripType ?? query.tripType}
