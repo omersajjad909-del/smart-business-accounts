@@ -13,6 +13,11 @@ export default function TravelSettlementsPage() {
       accent={travelAccent}
       category="travel_settlement"
       emptyState="No supplier settlements yet. Create one from a ticket or visa case."
+      /* A settlement is raised from the file it belongs to: that is the path
+         that posts the supplier's payable to the ledger. A record typed in here
+         is only a note — it counts in Exposure but the airline's account never
+         sees it — so the form stays out of the way until asked for. */
+      headerAction={{ label: "🎫 Raise from a ticket", href: "/dashboard/travel/tickets" }}
       fields={[
         { key: "settlementRef", label: "Settlement Ref", placeholder: "SET-TRV-24018", required: true },
         { key: "supplierName", label: "Supplier", placeholder: "Qatar Airways BSP", required: true },
