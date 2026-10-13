@@ -91,7 +91,7 @@ export async function POST(req: Request) {
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
-    const { date, paymentMode, bankAccountId, narration, chequeNo, entries, advanceSalary } = body;
+    const { date, paymentMode, bankAccountId, narration, chequeNo, entries, advanceSalary, travelSettlementId } = body;
     // A cheque goes through the bank account just like a transfer.
     const viaBank = paymentMode === "BANK" || paymentMode === "CHEQUE";
 
@@ -132,6 +132,24 @@ export async function POST(req: Request) {
         deductMonths: Math.max(1, Number(advanceSalary.deductMonths || 1)),
         accountId,
       };
+    }
+
+    /* Paying a travel supplier's settlement. The voucher must debit exactly that
+       supplier's account — a payment posted anywhere else would settle a bill
+       the ledger still shows as owing. Checked here, not trusted from the page,
+       because the page only had the id in a link. */
+    let settlement: { id: string; amount: number; paid: number; ref: string; data: Record<string, unknown> } | null = null;
+    if (travelSettlementId) {
+      const record = await prisma.businessRecord.findFirst({
+        where: { id: String(travelSettlementId), companyId, category: "travel_settlement" },
+      });
+      if (!record) return NextResponse.json({ error: "Settlement not found" }, { status: 400 });
+      const data = (record.data && typeof record.data === "object" ? record.data : {}) as Record<string, unknown>;
+      if (record.status === "settled") return NextResponse.json({ error: "This settlement is already settled" }, { status: 400 });
+      if (validEntries.length !== 1 || validEntries[0].accountId !== String(data.supplierId || "")) {
+        return NextResponse.json({ error: "A settlement payment must be posted to that supplier's account, as one entry" }, { status: 400 });
+      }
+      settlement = { id: record.id, amount: Number(record.amount || 0), paid: Number(data.paidAmount || 0), ref: record.title, data };
     }
 
     // Resolve cash/bank account
@@ -195,6 +213,26 @@ export async function POST(req: Request) {
             date: new Date(date),
             status: "PENDING",
             remarks: JSON.stringify({ reason: advanceDetails.reason, deductMonths: advanceDetails.deductMonths, cpvNo: voucherNo }),
+          },
+        });
+      }
+
+      if (settlement) {
+        // Part payments are normal with an airline: the settlement closes only
+        // when what has been paid reaches what is owed.
+        const paid = settlement.paid + totalAmount;
+        await tx.businessRecord.update({
+          where: { id: settlement.id },
+          data: {
+            status: paid >= settlement.amount ? "settled" : "processing",
+            data: {
+              ...settlement.data,
+              paidAmount: paid,
+              payments: [
+                ...(Array.isArray(settlement.data.payments) ? settlement.data.payments : []),
+                { cpvNo: voucherNo, amount: totalAmount, date },
+              ],
+            },
           },
         });
       }

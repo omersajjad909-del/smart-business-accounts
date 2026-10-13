@@ -130,10 +130,12 @@ export function mapTravelSettlement(record: BusinessRecord) {
   return {
     id: record.id,
     settlementRef: record.title,
+    supplierId: String(record.data?.supplierId || ""),
     supplierName: String(record.data?.supplierName || ""),
     customerName: String(record.data?.customerName || ""),
     sourceTitle: String(record.data?.sourceTitle || ""),
     invoiceNo: String(record.data?.invoiceNo || ""),
+    paidAmount: Number(record.data?.paidAmount || 0),
     dueDate: String(record.date || "").slice(0, 10),
     amount: Number(record.amount || 0),
     status: record.status || "pending",

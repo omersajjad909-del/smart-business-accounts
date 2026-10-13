@@ -22,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveBranchIdOrDefault, resolveCompanyId } from "@/lib/tenant";
 import { readPassengers, totalPassengers, validatePassengers } from "@/lib/travelPassengers";
 import { describeRoute, type FlightLeg } from "@/lib/travel/flightSearch";
+import { raiseTravelSettlement, type RaisedSettlement } from "@/lib/travel/settlement";
 
 const WRITE_ROLES = new Set(["ADMIN", "ACCOUNTANT", "MANAGER"]);
 
@@ -179,7 +180,21 @@ export async function POST(req: NextRequest) {
         `sale ${totals.sale.toLocaleString()}, cost ${totals.cost.toLocaleString()}`,
     });
 
-    return NextResponse.json({ success: true, record, totals });
+    /* The airline has the seat, so the agency owes for it from today. A quote
+       holds nothing and posts nothing. The booking is already saved by now, so
+       a settlement that cannot be raised is reported beside it, not allowed to
+       undo it — the button on the Settlements desk can still raise it. */
+    let settlement: RaisedSettlement | null = null;
+    let settlementWarning = "";
+    if (status !== "quoted") {
+      try {
+        settlement = await raiseTravelSettlement(req, companyId, record.id);
+      } catch (settleError) {
+        settlementWarning = settleError instanceof Error ? settleError.message : "Settlement could not be raised";
+      }
+    }
+
+    return NextResponse.json({ success: true, record, totals, settlement, settlementWarning });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to save the booking" },

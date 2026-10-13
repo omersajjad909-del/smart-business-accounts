@@ -150,7 +150,7 @@ export default function BookFlightPage() {
   const [suppliers, setSuppliers] = useState<PartyChoice[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState<{ id: string; ref: string; sale: number; cost: number; margin: number } | null>(null);
+  const [done, setDone] = useState<{ id: string; ref: string; sale: number; cost: number; margin: number; settlement: string; settlementWarning: string } | null>(null);
   const [invoice, setInvoice] = useState<{ no: string; id: string } | null>(null);
   const [invoicing, setInvoicing] = useState(false);
 
@@ -295,6 +295,8 @@ export default function BookFlightPage() {
         sale: Number(body.totals?.sale) || totals.sale,
         cost: Number(body.totals?.cost) || totals.cost,
         margin: Number(body.totals?.margin) || totals.margin,
+        settlement: String(body.settlement?.settlementRef || ""),
+        settlementWarning: String(body.settlementWarning || ""),
       });
       setStep(4);
     } catch (saveError) {
@@ -693,6 +695,7 @@ export default function BookFlightPage() {
                   ["Airline / Supplier", booking.supplier],
                   ["Route", offer ? describeRoute(offer.legs) : "—"],
                   ["Status", booking.status],
+                  ["Supplier payable", done.settlement ? `${done.settlement} raised` : done.settlementWarning ? `Not raised — ${done.settlementWarning}` : "None — quote only"],
                 ].map(([label, value]) => (
                   <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontSize: 12.5, color: T.muted }}>{label}</span>

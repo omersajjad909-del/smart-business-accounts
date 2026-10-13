@@ -41,6 +41,30 @@ export default function TravelSettlementsPage() {
       ]}
       statusOptions={statusOptions}
       mapRecord={mapTravelSettlement}
+      actions={[
+        {
+          /* Opens a payment voucher already filled in for this supplier. The
+             voucher, not this page, marks the settlement paid — so the status
+             can never say settled for money that did not leave. */
+          label: (row) => {
+            const left = Number(row.amount || 0) - Number(row.paidAmount || 0);
+            return `Pay ${left.toLocaleString()}`;
+          },
+          tone: "success",
+          hidden: (row) => String(row.status) === "settled" || !row.supplierId,
+          onClick: (row) => {
+            const left = Number(row.amount || 0) - Number(row.paidAmount || 0);
+            const q = new URLSearchParams({
+              travelSettlement: String(row.id),
+              supplierId: String(row.supplierId),
+              supplierName: String(row.supplierName || ""),
+              amount: String(left),
+              ref: String(row.settlementRef || ""),
+            });
+            window.location.href = `/dashboard/cpv?${q.toString()}`;
+          },
+        },
+      ]}
       buildCreatePayload={(form) => ({
         title: form.settlementRef,
         status: form.status,
@@ -54,7 +78,10 @@ export default function TravelSettlementsPage() {
         },
       })}
       summarize={(rows) => {
-        const totalPayable = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+        // What is still owed, not what was ever owed: a settled bill is no exposure.
+        const totalPayable = rows
+          .filter((row) => String(row.status) !== "settled")
+          .reduce((sum, row) => sum + Number(row.amount || 0) - Number(row.paidAmount || 0), 0);
         return [
           { label: "Settlements", value: rows.length, color: travelAccent },
           { label: "Pending", value: rows.filter((row) => String(row.status) === "pending").length, color: "var(--tx-fbbf24, #fbbf24)" },

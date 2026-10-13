@@ -144,6 +144,7 @@ export default function CPVPage() {
   // open, so Save updates that record instead of posting a fresh one.
   const [editing,   setEditing]   = useState<Voucher | null>(null);
   const [pendingAdvance, setPendingAdvance] = useState<PendingAdvance | null>(null);
+  const [pendingSettlement, setPendingSettlement] = useState<{ id: string } | null>(null);
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
   const [queryMode,    setQueryMode]    = useState(false);
@@ -184,6 +185,20 @@ export default function CPVPage() {
           });
         }).catch(() => toast.error("Could not load employee account"));
       }
+    }
+    // Paying a supplier settlement: the settlements page links here with the
+    // supplier and what is outstanding, so only cash/bank is left to choose.
+    const settlementId = params.get("travelSettlement");
+    const supplierId = params.get("supplierId") || "";
+    const settleAmount = Number(params.get("amount") || 0);
+    if (settlementId && supplierId && settleAmount > 0) {
+      const ref = params.get("ref") || "";
+      setPendingSettlement({ id: settlementId });
+      setNarration(`Payment against ${ref}`.trim());
+      setEntries(prev => [
+        { ...newRow(), accountId: supplierId, accountCode: "", accountName: params.get("supplierName") || "Supplier", amount: String(settleAmount), narration: `Settlement ${ref}`.trim() },
+        ...prev.slice(1),
+      ]);
     }
     Promise.all([
       fetch("/api/cpv",           { headers: h() }).then(r => r.json()),
@@ -316,7 +331,7 @@ export default function CPVPage() {
       const open = editing;
       const r = await fetch("/api/cpv", {
         method: open ? "PUT" : "POST", headers: h(),
-        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, chequeNo: mode === "CHEQUE" ? chequeNo : undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })), ...(pendingAdvance ? { advanceSalary: pendingAdvance } : {}) }),
+        body: JSON.stringify({ ...(open ? { id: open.id } : {}), date, paymentMode: mode, bankAccountId: bankId || undefined, chequeNo: mode === "CHEQUE" ? chequeNo : undefined, narration, entries: valid.map(e => ({ accountId: e.accountId, amount: Number(e.amount), narration: e.narration })), ...(pendingAdvance ? { advanceSalary: pendingAdvance } : {}), ...(pendingSettlement ? { travelSettlementId: pendingSettlement.id } : {}) }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Could not save the voucher");
@@ -332,6 +347,11 @@ export default function CPVPage() {
         if (pendingAdvance) {
           setPendingAdvance(null);
           window.location.href = "/dashboard/advance-salary";
+          return;
+        }
+        if (pendingSettlement) {
+          setPendingSettlement(null);
+          window.location.href = "/dashboard/travel/settlements";
           return;
         }
         resetForm();
