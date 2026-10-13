@@ -88,7 +88,8 @@ export async function buildTravelSource(companyId: string, recordId: string) {
         invoiceLabel: "Hotel Booking Revenue",
         revenueAccount: "Hotel Booking Revenue",
         serviceItemName: "Hotel Booking Service",
-        customerName: String(data.guestName || record.title || "").trim(),
+        // The guest is not always who pays — a company books a room for its staff.
+        customerName: String(data.customerName || data.guestName || record.title || "").trim(),
         supplierName: String(data.supplier || data.hotelName || "").trim(),
         amount: Number(record.amount || 0),
         costAmount: Number(data.cost || 0),

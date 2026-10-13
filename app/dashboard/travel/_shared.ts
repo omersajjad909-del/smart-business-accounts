@@ -92,6 +92,7 @@ export function mapHotelBooking(record: BusinessRecord) {
     destination: String(record.data?.destination || ""),
     checkIn: String(record.date || "").slice(0, 10),
     checkOut: String(record.data?.checkOut || "").slice(0, 10),
+    nights: Number(record.data?.nights || 0) || Math.max(0, Math.round((Date.parse(String(record.data?.checkOut || "")) - Date.parse(String(record.date || ""))) / 86_400_000)) || "",
     rooms: Number(record.data?.rooms || 1),
     mealPlan: String(record.data?.mealPlan || "room_only"),
     supplier: String(record.data?.supplier || ""),

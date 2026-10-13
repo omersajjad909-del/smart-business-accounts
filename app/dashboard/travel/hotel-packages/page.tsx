@@ -12,9 +12,10 @@ export default function HotelPackagesPage() {
     <BusinessRecordWorkspace
       title="Hotel & Package Bookings"
       subtitle="Track hotel reservations, package tours, check-in/out dates, and supplier costs."
-      accent="#a78bfa"
+      accent={travelAccent}
       category="travel_hotel"
-      emptyState="No hotel bookings yet. Create the first reservation."
+      emptyState="No hotel bookings yet. Book the first room."
+      headerAction={{ label: "🏨 Book a Hotel", href: "/dashboard/travel/hotel-packages/new" }}
       fields={[
         { key: "bookingRef", label: "Booking Ref", placeholder: "HTL-24001", required: true },
         { key: "guestName", label: "Guest Name", placeholder: "Ahmed Khan", required: true },
@@ -38,6 +39,7 @@ export default function HotelPackagesPage() {
         { key: "destination", label: "Destination" },
         { key: "checkIn", label: "Check-in" },
         { key: "checkOut", label: "Check-out" },
+        { key: "nights", label: "Nights" },
         { key: "rooms", label: "Rooms" },
         { key: "mealPlan", label: "Meal Plan" },
         { key: "supplier", label: "Supplier" },
@@ -109,7 +111,7 @@ export default function HotelPackagesPage() {
         const totalSale = rows.reduce((s, r) => s + Number(r.amount || 0), 0);
         const totalCost = rows.reduce((s, r) => s + Number(r.cost || 0), 0);
         return [
-          { label: "Bookings", value: rows.length, color: "var(--tx-a78bfa, #a78bfa)" },
+          { label: "Bookings", value: rows.length, color: travelAccent },
           { label: "Confirmed", value: rows.filter(r => String(r.status) === "confirmed").length, color: "var(--tx-34d399, #34d399)" },
           { label: "Checked In", value: rows.filter(r => String(r.status) === "checked_in").length, color: travelAccent },
           { label: "Invoice Pending", value: rows.filter(r => !String(r.invoiceNo || "")).length, color: "var(--tx-f97316, #f97316)" },
