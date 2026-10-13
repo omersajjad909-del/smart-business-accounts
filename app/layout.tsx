@@ -390,6 +390,18 @@ const getCachedReviewAggregate = unstable_cache(
   { revalidate: 300 }
 );
 
+// Forces this layout — and every page under it — to render fresh on every
+// request. Without this, Next.js can serve a statically-shelled version of
+// the HTML whose inline <script> tags carry whatever nonce was baked in at
+// build/cache time, while proxy.ts still emits a brand-new nonce on the
+// Content-Security-Policy response header for every request. The two stop
+// matching, and the browser silently refuses every inline script that relies
+// on them lining up — GA4, the Google Ads conversion config and the JSON-LD
+// blocks included. `headers()` below is a dynamic API and should force this
+// on its own, but PPR can still shell a layout around it; this makes it
+// explicit instead of depending on that inference.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: {
