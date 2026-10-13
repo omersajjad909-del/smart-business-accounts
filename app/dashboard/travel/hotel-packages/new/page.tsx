@@ -227,8 +227,16 @@ export default function BookHotelPage() {
 
           <Card title="Stay" icon="🛏️" hint="Nights are counted from the dates">
             <div style={row2}>
-              <Field label="Hotel" required>
-                <input value={form.hotelName} onChange={(e) => set({ hotelName: e.target.value })} placeholder="Pearl Continental Lahore" style={cell} className="fl-in" />
+              <Field label="Hotel" required hint="Also the account the hotel's bill is owed to">
+                <PartyInput
+                  compact
+                  value={form.hotelName}
+                  options={suppliers}
+                  kind={TRAVEL_SUPPLIER_KIND.HOTEL}
+                  kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
+                  placeholder="Pick or type, e.g. Pearl Continental Lahore"
+                  onChange={(name) => set({ hotelName: name })}
+                />
               </Field>
               <Field label="Destination">
                 <input value={form.destination} onChange={(e) => set({ destination: e.target.value })} placeholder="Lahore / Dubai / Istanbul" style={cell} className="fl-in" />
@@ -267,16 +275,15 @@ export default function BookHotelPage() {
             </div>
           </Card>
 
-          <Card title="Supplier & Payment" icon="🏦" hint="Who the hotel bill is owed to, and when">
+          <Card title="Payment" icon="🏦" hint={`The bill is owed to ${form.supplier.trim() || form.hotelName.trim() || "the hotel"}`}>
             <div style={row2}>
-              <Field label="Hotel / Supplier" hint="The account the payable lands in. Blank uses the hotel's name.">
+              <Field label="Booked Through" hint="Only if not direct — a portal or agent. Blank means you owe the hotel itself.">
                 <PartyInput
                   compact
                   value={form.supplier}
                   options={suppliers}
-                  kind={TRAVEL_SUPPLIER_KIND.HOTEL}
-                  kindLabel={partyKindHeading(TRAVEL_SUPPLIER_KIND.HOTEL)}
-                  placeholder={form.hotelName || "Pick or type"}
+                  kind="Hotel Portal / Agent"
+                  placeholder="Direct with the hotel"
                   onChange={(name) => set({ supplier: name })}
                 />
               </Field>
