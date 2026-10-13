@@ -47,7 +47,15 @@ export async function buildTravelSource(companyId: string, recordId: string) {
   if (!record) throw new Error("Travel record not found");
 
   const data = asRecord(record.data);
-  const issueDate = parseDate(record.date || data.submissionDate || data.travelDate);
+  /* The day the books should record this, which is not the day the passenger
+     flies. A ticket's `date` is its travel date, and a ticket sold today for a
+     flight on the 27th was being invoiced and settled ON the 27th: the
+     vouchers sat in the future, so the customer's ledger, the airline's ledger
+     and every report run to today showed nothing for a sale already made. A
+     posting can never be later than the day the file was opened; a trip that
+     is already over keeps its own, earlier, date. */
+  const fileDate = parseDate(record.date || data.submissionDate || data.travelDate);
+  const issueDate = record.createdAt && fileDate > record.createdAt ? record.createdAt : fileDate;
   const dueDate = data.paymentDue ? parseDate(data.paymentDue, issueDate) : null;
 
   if (record.category === "travel_ticket") {
