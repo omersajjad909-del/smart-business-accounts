@@ -484,6 +484,7 @@ export default async function RootLayout({
           enableSystem={ALLOW_LIGHT_THEME && FOLLOW_SYSTEM_THEME}
           forcedTheme={ALLOW_LIGHT_THEME ? undefined : DEFAULT_THEME}
           disableTransitionOnChange
+          nonce={nonce}
         >
           <Toaster
             position="top-right"
