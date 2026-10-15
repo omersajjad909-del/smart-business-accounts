@@ -1387,7 +1387,12 @@ export default function DashboardContent() {
         >
           {/* Avatar — profile photo, then company logo, then initials */}
           <div
+            role="button"
+            aria-label="Open account menu"
+            onClick={() => window.dispatchEvent(new Event("finova:open-user-menu"))}
+            data-panel-anchor="user"
             style={{
+              cursor: "pointer",
               width: 52,
               height: 52,
               borderRadius: "50%",
