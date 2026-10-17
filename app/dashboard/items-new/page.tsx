@@ -457,14 +457,15 @@ export default function ItemsNewPage() {
       </div>
 
       {/* ── Table ── */}
-      <div style={{ background:PANEL, border:`1px solid ${BORDER}`, borderRadius:16, overflow:"hidden" }}>
+      <div style={{ background:PANEL, border:`1px solid ${BORDER}`, borderRadius:16, overflowX:"auto" }}>
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:`1px solid ${BORDER}` }}>
               {["","Code","Name",...specFields.map(f => f.label),"Category","Unit","Sale Rate","Purchase Rate","Margin","Tax %","Min Stock","Barcode","Actions"].map(h => (
                 <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontSize:11,
                   fontWeight:700, color:MUTED, textTransform:"uppercase", letterSpacing:".06em",
-                  whiteSpace:"nowrap" }}>{h}</th>
+                  whiteSpace:"nowrap",
+                  ...(h === "Actions" ? { position:"sticky", right:0, background:"var(--app-bg, #fff)" } : {}) }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -527,7 +528,7 @@ export default function ItemsNewPage() {
                   <td style={{ padding:"10px 14px", fontFamily:"monospace", fontSize:11, color:MUTED }}>
                     {item.barcode || "—"}
                   </td>
-                  <td style={{ padding:"10px 14px", whiteSpace:"nowrap" }}>
+                  <td style={{ padding:"10px 14px", whiteSpace:"nowrap", position:"sticky", right:0, background:"var(--app-bg, #fff)" }}>
                     <button onClick={()=>handleEdit(item)}
                       style={{ padding:"4px 12px", borderRadius:6, border:`1px solid rgba(99,102,241,0.4)`,
                         background:"rgba(99,102,241,0.1)", color:"var(--tx-818cf8, #818cf8)", fontFamily:FONT,
