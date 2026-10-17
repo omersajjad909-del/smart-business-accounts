@@ -677,17 +677,14 @@ export function PrintDocA4({
             );
           })()}
 
-          {/* The company's own footer note, and nothing else.
-              
-              Documents used to close with a "Powered by …" mark. It came off
-              every print: these go out to a customer on the company's own
-              letterhead, and the software that produced them has no business
-              signing them. The five arrangements stay — they lay out the
-              note — and theme.poweredChip is now unused rather than removed,
-              so a stored print preference does not have to be migrated. */}
+          {/* Footer note, closed by the "Powered by Finova OS" mark. */}
           {(() => {
             const note = footerNote && on("footerNote") ? footerNote : "";
-            const mark = null;
+            const mark = (
+              <span className="pdoc-powered" style={{ fontSize: 8, letterSpacing: 0.3, opacity: 0.7 }}>
+                Powered by Finova OS
+              </span>
+            );
 
             if (footerStyle === "band") {
               return (
@@ -920,7 +917,7 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
                absolute length, kept well under A4 less the browser's own
                margins and its header/footer lines (Safari reserves more than
                the 10mm it shows), so it can never spill onto a second page. */
-            min-height: 235mm !important;
+            min-height: 262mm !important;
             padding: 0 !important;
           }
           /* A band runs to the paper's edge on screen; on paper the printer's
