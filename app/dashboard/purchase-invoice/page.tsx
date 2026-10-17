@@ -27,7 +27,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemPickerLabel, itemGroupKey, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { itemNameWithoutSpec, computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemPickerLabel, itemGroupKey, itemIsDefaultPhr, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -343,6 +343,82 @@ const [searchTerm, setSearchTerm] = useState("");
     });
   };
 
+  const focusQty = (i: number) => {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`pi-qty-${i}`) as HTMLInputElement | null;
+      el?.focus();
+      el?.select?.();
+    });
+  };
+
+  /**
+   * F3 copies the box the cursor is in to the same box one line down; F4 copies
+   * the whole line into a new line right below it. Both leave the cursor in the
+   * same box of the new copy, so repeated presses keep working down the grid.
+   *
+   * The box is identified from the DOM — the formula columns carry an id, every
+   * other cell a data-pi-col — because the grid draws plain inputs with no
+   * shared cell component to hang a handler on.
+   */
+  const copyShortcut = (kind: "cell" | "row") => {
+    const el = document.activeElement as HTMLElement | null;
+    const tr = el?.closest?.("tr[data-pi-row]") as HTMLElement | null;
+    if (!el || !tr) return false;
+    const i = Number(tr.dataset.piRow);
+    const src = rows[i];
+    if (!src) return false;
+
+    let col: string | null = null;
+    let rfKey: string | null = null;
+    if (el.id.startsWith(`rf-${i}-`)) rfKey = el.id.slice(`rf-${i}-`.length);
+    else col = (el.closest("[data-pi-col]") as HTMLElement | null)?.dataset.piCol ?? null;
+    if (!rfKey && !col) return false;
+
+    const refocus = (row: number) => requestAnimationFrame(() => {
+      const target = rfKey
+        ? document.getElementById(`rf-${row}-${rfKey}`)
+        : document.querySelector(`tr[data-pi-row="${row}"] [data-pi-col="${col}"] input`);
+      (target as HTMLInputElement | null)?.focus();
+      (target as HTMLInputElement | null)?.select?.();
+    });
+
+    if (kind === "row") {
+      if (!src.itemId) return true;
+      const copy = [...rows];
+      copy.splice(i + 1, 0, { ...src, meta: src.meta ? { ...src.meta } : undefined });
+      setRows(copy);
+      refocus(i + 1);
+      return true;
+    }
+
+    const t = i + 1;
+    const copy = [...rows];
+    while (copy.length <= t) copy.push(emptyRow());
+    const dest = { ...copy[t] };
+    if (rfKey) {
+      dest.meta = { ...(dest.meta || {}), [rfKey]: src.meta?.[rfKey] ?? "" };
+      const r = computeRateFromFormula(rf, dest.meta);
+      if (r.rate != null) dest.rate = r.rate;
+    } else if (col === "item") {
+      // The item and what it carries — except the typed-per-document column
+      // (PHR), which belongs to the line and is copied from its own box.
+      dest.itemId = src.itemId; dest.name = src.name; dest.description = src.description;
+      dest.sku = src.sku; dest.unit = src.unit; dest.rate = src.rate;
+      if (rfActive) {
+        const meta = { ...(dest.meta || emptyRateFormulaMeta(rf)) };
+        for (const f of rf.fields) if (!f.focusOnPick) meta[f.key] = src.meta?.[f.key] ?? "";
+        dest.meta = meta;
+      }
+    } else {
+      (dest as any)[col!] = (src as any)[col!];
+    }
+    copy[t] = dest;
+    if (t === copy.length - 1) copy.push(emptyRow());
+    setRows(copy);
+    refocus(t);
+    return true;
+  };
+
   function handlePIScan(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -403,6 +479,12 @@ const [searchTerm, setSearchTerm] = useState("");
   // ── Keyboard shortcuts ──
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      if ((e.key === "F3" || e.key === "F4") && showForm && !piQueryMode) {
+        // Only claimed when the cursor is in a grid line; anywhere else the
+        // browser's own F3/F4 is left alone.
+        if (copyShortcut(e.key === "F3" ? "cell" : "row")) e.preventDefault();
+        return;
+      }
       if (e.key === "F7") { e.preventDefault(); piEnterQuery(); }
       if (e.key === "Escape" && piQueryMode) { e.preventDefault(); piExitQuery(); }
       if (e.key === "PageDown" && piQueryIdx >= 0) { e.preventDefault(); piNavTo(piQueryIdx + 1); }
@@ -411,7 +493,7 @@ const [searchTerm, setSearchTerm] = useState("");
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [piQueryMode, piQueryIdx, piQueryResults]);
+  }, [piQueryMode, piQueryIdx, piQueryResults, rows, rfActive, rf]);
 
   useEffect(() => {
     fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo((c: any) => ({ ...d, ...c })); }).catch(() => {});
@@ -620,9 +702,19 @@ const [searchTerm, setSearchTerm] = useState("");
    * `suppliersAwaitingInvoice` above), the full inventory stays available.
    */
   const selectedGrnForItems = selectedGrnId ? allGrns.find((grn) => grn.id === selectedGrnId) : null;
-  const pickerItems = selectedGrnForItems
-    ? allInventoryItems.filter((item) => selectedGrnForItems.items.some((line) => line.itemId === item.id))
-    : allInventoryItems;
+  // Memoised: every picker row re-indexes the whole catalogue whenever this
+  // array's identity changes, and a fresh filter() result each render made
+  // every keystroke in any cell do that once per line.
+  const pickerItems = useMemo(
+    () => selectedGrnForItems
+      ? allInventoryItems.filter((item) => selectedGrnForItems.items.some((line) => line.itemId === item.id))
+      : allInventoryItems,
+    [selectedGrnForItems, allInventoryItems],
+  );
+  // Stable for the same reason: a new function each render re-ran the grouping
+  // (a name parse per catalogue row) in every open picker on every keystroke.
+  const pickerGroupKey = useMemo(() => (rfActive ? itemGroupKey(rf) : undefined), [rfActive, rf]);
+  const pickerGroupPrefer = useMemo(() => (rfActive ? itemIsDefaultPhr(rf, 30) : undefined), [rfActive, rf]);
 
   /* The picker's table columns — the same spec columns and stock figures the
      sales invoice shows, so the two grids read alike. RT/MM is left out: it is
@@ -632,11 +724,17 @@ const [searchTerm, setSearchTerm] = useState("");
     [rf],
   );
 
-  const itemPreviewValues = useCallback(
-    (item: { id: string; name: string; description?: string | null; meta?: unknown }) =>
-      itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`) as Record<string, unknown>,
-    [rf],
-  );
+  const itemPreviewValues = useMemo(() => {
+    const cache = new WeakMap<object, Record<string, unknown>>();
+    return (item: { id: string; name: string; description?: string | null; meta?: unknown }) => {
+      let v = cache.get(item);
+      if (!v) {
+        v = itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`) as Record<string, unknown>;
+        cache.set(item, v);
+      }
+      return v;
+    };
+  }, [rf]);
 
   const itemStockValues = useCallback((item: { id: string }) => {
     const row = item as InventoryItem;
@@ -1341,8 +1439,10 @@ const [searchTerm, setSearchTerm] = useState("");
                     style={{ width: "100%", padding: "6px 10px", borderRadius: 7, background: "transparent", border: `1px solid ${BORDER}`, color: TEXT, fontSize: 13, fontFamily: "monospace", outline: "none" }} />
                 </div>
                 <div style={{ fontSize: 10, color: MUTED, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                  <span style={{ background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10 }}>F4</span>
-                  <span>Item Search</span>
+                  <span style={{ background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10 }}>F3</span>
+                  <span>Copy box ↓</span>
+                  <span style={{ background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10, marginLeft: 6 }}>F4</span>
+                  <span>Copy row</span>
                 </div>
               </div>
 
@@ -1409,16 +1509,17 @@ const [searchTerm, setSearchTerm] = useState("");
                               const lineTax = (lineBase - lineDisc) * (Number(r.taxPercent) || 0) / 100;
                               const lineTotal = lineBase - lineDisc + lineTax;
                               return (
-                                <tr key={i} style={{ borderBottom: `1px solid ${BORDER}` }}
+                                <tr key={i} data-pi-row={i} style={{ borderBottom: `1px solid ${BORDER}` }}
                                   onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.025)")}
                                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                                   <td style={{ padding: "7px 8px", color: MUTED, fontSize: 11.5, width: 28 }}>{i + 1}</td>
                                   <td style={{ padding: "7px 8px", width: 90 }}>
                                     {r.sku ? <span style={{ fontFamily: "monospace", fontSize: 11, color: ACCENT, fontWeight: 700 }}>{r.sku}</span> : <span style={{ color: MUTED, fontSize: 11 }}>—</span>}
                                   </td>
-                                  <td style={{ padding: "7px 8px", minWidth: 160 }}>
+                                  <td data-pi-col="item" style={{ padding: "7px 8px", minWidth: 160 }}>
                                     <ItemPicker
- groupKey={rfActive ? itemGroupKey(rf) : undefined}
+                                      groupKey={pickerGroupKey}
+                                      groupPrefer={pickerGroupPrefer}
                                       items={pickerItems as any}
                                       value={r.itemId}
                                       onChange={(__picked: string) => {
@@ -1464,12 +1565,17 @@ const [searchTerm, setSearchTerm] = useState("");
                                       meta={r.meta}
                                       rowIndex={i}
                                       onChange={(key, value) => updateRowMeta(i, key, value)}
+                                      onEnterField={() => focusQty(i)}
                                     />
                                   )}
-                                  <td style={{ padding: "7px 8px", width: 64 }}>
-                                    <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
+                                  <td data-pi-col="unit" style={{ padding: "7px 8px", width: 64 }}>
+                                    {/* The unit belongs to the item — it came with the pick and is not the line's to
+                                        change on a formula document, so Tab and Enter walk past it. */}
+                                    <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs"
+                                      readOnly={rfActive && !!r.itemId} tabIndex={rfActive && !!r.itemId ? -1 : undefined}
+                                      style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center", ...(rfActive && r.itemId ? { opacity: 0.7, cursor: "default", background: "transparent" } : {}) })} />
                                   </td>
-                                  <td style={{ padding: "7px 8px", width: 76 }}><input id={`pi-qty-${i}`} type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td data-pi-col="qty" style={{ padding: "7px 8px", width: 76 }}><input id={`pi-qty-${i}`} type="number" step="any" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   {rfActive && rtmmFormula.fields.length > 0 && (
                                     <RateFormulaRowCells
                                       settings={rtmmFormula}
@@ -1478,7 +1584,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                       onChange={(key, value) => updateRowMeta(i, key, value)}
                                     />
                                   )}
-                                  <td style={{ padding: "7px 8px", width: 96 }}>
+                                  <td data-pi-col="rate" style={{ padding: "7px 8px", width: 96 }}>
                                     <input
                                       type="number"
                                       value={r.rate}
@@ -1492,8 +1598,8 @@ const [searchTerm, setSearchTerm] = useState("");
                                       })}
                                     />
                                   </td>
-                                  <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
-                                  <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td data-pi-col="discountPercent" style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td data-pi-col="taxPercent" style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
                                   <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 96, color: lineTotal > 0 ? TEXT : MUTED, whiteSpace: "nowrap" }}>{lineTotal > 0 ? lineTotal.toLocaleString() : "—"}</td>
                                   <td style={{ padding: "7px 8px", width: 28, textAlign: "center" }}>
                                     {/* Clearing the only line empties it rather
@@ -1696,7 +1802,8 @@ const [searchTerm, setSearchTerm] = useState("");
                   { key: "Esc", label: "Clear Query", c: undefined },
                 ] : [
                   { key: "F2", label: "Supplier", c: undefined },
-                  { key: "F4", label: "Item Search", c: undefined },
+                  { key: "F3", label: "Copy Box ↓", c: undefined },
+                  { key: "F4", label: "Copy Row", c: undefined },
                   { key: "F7", label: "Query Mode", c: ACCENT },
                   { key: "F8", label: "Save Draft", c: "#34d399" },
                   { key: "F9", label: "Save & Post", c: "#3b82f6" },
@@ -1821,7 +1928,7 @@ const [searchTerm, setSearchTerm] = useState("");
                   const lineAmt = (Number(r.qty) * Number(r.rate) || 0) * (1 - (Number(r.discountPercent) || 0) / 100);
                   return {
                     no: i + 1,
-                    name: r.name,
+                    name: rfActive ? itemNameWithoutSpec(r.name) : r.name,
                     ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
                     qty: r.qty,
                     unit: r.unit || "—",

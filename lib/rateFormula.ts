@@ -668,11 +668,38 @@ export function metaFromItem(
  * the product once instead of once per PHR it has ever been bought at.
  */
 export function itemGroupKey(settings: RateFormulaSettings) {
+  // Called for every catalogue row on every render of every picker, and each
+  // call parses the item's name — so the answer is kept per item. The cache
+  // lives as long as the returned function, which callers memoise on settings.
+  const cache = new WeakMap<object, string>();
   return (item: { name: string; code?: string | null; description?: string | null; meta?: unknown }): string => {
+    const hit = cache.get(item);
+    if (hit !== undefined) return hit;
     const known = itemMetaWithName(settings, item.meta, `${item.name || ""} ${item.description || ""}`);
     const spec = settings.fields.filter((f) => !f.focusOnPick).map((f) => String(known[f.key] ?? "")).join("|");
     const name = String(item.name ?? "").replace(/\bPHR\s*\d+(?:\.\d+)?/gi, "").replace(/\s+/g, " ").trim().toUpperCase();
-    return `${name}#${spec}`;
+    const key = `${name}#${spec}`;
+    cache.set(item, key);
+    return key;
+  };
+}
+
+/**
+ * Ready to hand to <ItemPicker groupPrefer={…}>: of the PHR variants a grouped
+ * row stands for, the one at the default PHR (30) is the one listed.
+ */
+export function itemIsDefaultPhr(settings: RateFormulaSettings, defaultPhr = 30) {
+  const phrKey = settings.fields.find((f) => itemSpecRole(f) === "phr")?.key;
+  const cache = new WeakMap<object, boolean>();
+  return (item: { name: string; description?: string | null; meta?: unknown }): boolean => {
+    if (!phrKey) return false;
+    const hit = cache.get(item);
+    if (hit !== undefined) return hit;
+    const known = itemMetaWithName(settings, item.meta, `${item.name || ""} ${item.description || ""}`);
+    const v = known[phrKey];
+    const out = v !== "" && v !== undefined && Number(v) === defaultPhr;
+    cache.set(item, out);
+    return out;
   };
 }
 

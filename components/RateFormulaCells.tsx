@@ -172,6 +172,7 @@ export function RateFormulaRowCells({
   onChange,
   disabled,
   rowIndex,
+  onEnterField,
 }: {
   settings: RateFormulaSettings;
   meta: RateFormulaMeta | undefined;
@@ -179,6 +180,11 @@ export function RateFormulaRowCells({
   disabled?: boolean;
   /** Pass the line's index to let focusRateFormulaCell() find these inputs. */
   rowIndex?: number;
+  /**
+   * Enter in the typed-per-document column (PHR) hands the cursor to the
+   * caller — the grid sends it on to Qty, past the item-locked columns.
+   */
+  onEnterField?: (key: string) => void;
 }) {
   return (
     <>
@@ -200,6 +206,12 @@ export function RateFormulaRowCells({
               tabIndex={locked ? -1 : undefined}
               maxLength={isText ? RATE_FORMULA_TEXT_MAX : undefined}
               onChange={(e) => onChange(f.key, readInput(f, e.target.value))}
+              onKeyDown={onEnterField && f.focusOnPick ? (e) => {
+                if (e.key !== "Enter" || e.shiftKey) return;
+                e.preventDefault();
+                e.stopPropagation();
+                onEnterField(f.key);
+              } : undefined}
               placeholder={locked ? "—" : f.defaultValue ? String(f.defaultValue) : isText ? "" : "0"}
               title={locked ? `${f.label} — set on the item` : f.unit ? `${f.label} — ${f.unit}` : f.label}
               style={cellInput({

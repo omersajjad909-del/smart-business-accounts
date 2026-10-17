@@ -22,7 +22,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, itemGroupKey, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { itemNameWithoutSpec, computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, itemGroupKey, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -748,7 +748,7 @@ export default function PurchaseOrderPage() {
             ]}
             rows={filledRows.map((r, i) => ({
               no: i + 1,
-              name: r.name,
+              name: rfActive ? itemNameWithoutSpec(r.name) : r.name,
               ...(rfActive ? rateFormulaPrintValues(rf, r.meta) : {}),
               qty: r.qty,
               unit: (r as any).unit || "—",

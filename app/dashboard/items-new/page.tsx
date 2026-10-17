@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import { RateFormulaMobileFields, type RateFormulaMeta } from "@/components/RateFormulaCells";
-import { emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, type RateFormulaValue } from "@/lib/rateFormula";
+import { emptyRateFormulaMeta, itemGroupKey, itemMetaWithName, itemNameWithoutSpec, itemSpecRole, type RateFormulaValue } from "@/lib/rateFormula";
 import { getCurrentUser } from "@/lib/auth";
 import ImageUpload from "@/components/ImageUpload";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -185,6 +185,41 @@ export default function ItemsNewPage() {
     const matchCat = filterCat === "ALL" || i.category === filterCat;
     return matchSearch && matchCat;
   });
+
+  // One product, one row. The same B2 BLUE 10G 50in L50 bought at PHR 24, 26,
+  // 28 and 30 is four catalogue rows but one thing to look at, so the table
+  // lists it once — the PHR 30 row standing for the group, or the first row
+  // when the group has no 30. Searching a specific code ("285-24") filters
+  // before grouping, so a hidden PHR variant is still reachable by its code.
+  const phrKey = rfActive ? rf.fields.find(f => itemSpecRole(f) === "phr")?.key : undefined;
+  const phrOf = (i: Item): number | null => {
+    if (!phrKey) return null;
+    const v = itemMetaWithName(rf, i.meta, `${i.name || ""} ${i.description || ""}`)[phrKey];
+    const n = Number(v);
+    return v === "" || v === undefined || !Number.isFinite(n) ? null : n;
+  };
+  const DEFAULT_PHR = 30;
+  const { rows, hiddenByRow } = (() => {
+    if (!phrKey) return { rows: filtered, hiddenByRow: new Map<string, number[]>() };
+    const groupOf = itemGroupKey(rf);
+    const groups = new Map<string, Item[]>();
+    for (const i of filtered) {
+      const k = groupOf(i);
+      const g = groups.get(k);
+      if (g) g.push(i); else groups.set(k, [i]);
+    }
+    const rows: Item[] = [];
+    const hiddenByRow = new Map<string, number[]>();
+    for (const i of filtered) {
+      const g = groups.get(groupOf(i))!;
+      const rep = g.find(x => phrOf(x) === DEFAULT_PHR) ?? g[0];
+      if (rep !== i) continue;
+      rows.push(i);
+      const others = g.filter(x => x !== rep).map(phrOf).filter((n): n is number => n !== null).sort((a, b) => a - b);
+      if (others.length) hiddenByRow.set(i.id, others);
+    }
+    return { rows, hiddenByRow };
+  })();
 
   // ── Margin % helper ─────────────────────────────────────────────────────────
   function margin(item: Item) {
@@ -434,11 +469,11 @@ export default function ItemsNewPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {rows.length === 0 ? (
               <tr><td colSpan={12 + specFields.length} style={{ padding:"40px", textAlign:"center", color:MUTED }}>
                 No items found. Add your first item above.
               </td></tr>
-            ) : filtered.map((item, idx) => {
+            ) : rows.map((item, idx) => {
               const mgn = margin(item);
               return (
                 <tr key={item.id}
@@ -459,7 +494,11 @@ export default function ItemsNewPage() {
                     return specFields.map(f => {
                       const v = known[f.key];
                       const has = v !== "" && v !== undefined && !(f.kind === "number" && Number(v) === 0);
-                      return <td key={f.key} style={{ padding:"10px 14px", textAlign: f.kind === "number" ? "right" : "left", whiteSpace:"nowrap" }}>{has ? String(v) : <span style={{color:MUTED}}>—</span>}</td>;
+                      const more = f.key === phrKey ? hiddenByRow.get(item.id) : undefined;
+                      return <td key={f.key} style={{ padding:"10px 14px", textAlign: f.kind === "number" ? "right" : "left", whiteSpace:"nowrap" }}>
+                        {has ? String(v) : <span style={{color:MUTED}}>—</span>}
+                        {more && <div title={`Also registered at PHR ${more.join(", ")} — search the code to edit one`} style={{ fontSize:10, color:MUTED }}>+{more.length} PHR</div>}
+                      </td>;
                     });
                   })()}
                   <td style={{ padding:"10px 14px" }}><CatPill value={item.category || "TRADING"} /></td>
@@ -509,9 +548,9 @@ export default function ItemsNewPage() {
         </table>
       </div>
 
-      {filtered.length > 0 && (
+      {rows.length > 0 && (
         <div style={{ textAlign:"right", fontSize:12, color:MUTED, marginTop:12 }}>
-          Showing {filtered.length} of {items.length} items
+          Showing {rows.length} of {items.length} items
         </div>
       )}
     </div>

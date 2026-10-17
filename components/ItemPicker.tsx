@@ -78,6 +78,8 @@ type Props = {
 
   /** Rows with the same key list once — the first one stands for the group. */
   groupKey?: (item: PickerItem) => string;
+  /** Within a group, a row this accepts stands for the group instead of the first. */
+  groupPrefer?: (item: PickerItem) => boolean;
 };
 
 export function ItemPicker({
@@ -97,6 +99,7 @@ export function ItemPicker({
   stockValues,
   defaultInStockOnly = true,
   groupKey,
+  groupPrefer,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -251,7 +254,7 @@ export function ItemPicker({
     const wanted = query.trim();
 
     const out: PickerItem[] = [];
-    const seen = new Set<string>();
+    const seen = new Map<string, { idx: number; pref: boolean }>();
 
     for (const row of indexed) {
       if (!keep(row.item)) continue;
@@ -265,8 +268,16 @@ export function ItemPicker({
 
       if (groupKey) {
         const k = groupKey(row.item);
-        if (seen.has(k)) continue;
-        seen.add(k);
+        const pref = groupPrefer ? groupPrefer(row.item) : false;
+        const prior = seen.get(k);
+        if (prior) {
+          if (!prior.pref && pref) {
+            out[prior.idx] = row.item;
+            prior.pref = true;
+          }
+          continue;
+        }
+        seen.set(k, { idx: out.length, pref });
       }
 
       out.push(row.item);
@@ -283,6 +294,7 @@ export function ItemPicker({
     stockFilterOn,
     stockMap,
     groupKey,
+    groupPrefer,
   ]);
 
   // ------------------------------------------------------------
