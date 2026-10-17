@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useRateFormula } from "@/hooks/useRateFormula";
 import { RateFormulaMobileFields, type RateFormulaMeta } from "@/components/RateFormulaCells";
-import { emptyRateFormulaMeta, itemMetaWithName, type RateFormulaValue } from "@/lib/rateFormula";
+import { emptyRateFormulaMeta, itemMetaWithName, itemNameWithoutSpec, type RateFormulaValue } from "@/lib/rateFormula";
 import { getCurrentUser } from "@/lib/auth";
 import ImageUpload from "@/components/ImageUpload";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -80,6 +80,9 @@ export default function ItemsNewPage() {
   // every line. Empty for companies with no rate formula, which is everyone
   // who has not set one up.
   const { settings: rf, active: rfActive } = useRateFormula("items");
+  // Only a company running the rate formula sees its spec in its own columns;
+  // everyone else keeps the plain name column.
+  const specFields = rfActive ? rf.fields.filter(f => ["gauge","width","length","phr","shade"].includes(f.key)) : [];
   const [meta,        setMeta]        = useState<RateFormulaMeta>({});
   // The item being edited is held whole, not just its meta: the settings
   // arrive one request after the first render, and Edit clicked before they
@@ -423,7 +426,7 @@ export default function ItemsNewPage() {
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:`1px solid ${BORDER}` }}>
-              {["","Code","Name","Category","Unit","Sale Rate","Purchase Rate","Margin","Tax %","Min Stock","Barcode","Actions"].map(h => (
+              {["","Code","Name",...specFields.map(f => f.label),"Category","Unit","Sale Rate","Purchase Rate","Margin","Tax %","Min Stock","Barcode","Actions"].map(h => (
                 <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontSize:11,
                   fontWeight:700, color:MUTED, textTransform:"uppercase", letterSpacing:".06em",
                   whiteSpace:"nowrap" }}>{h}</th>
@@ -432,7 +435,7 @@ export default function ItemsNewPage() {
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={12} style={{ padding:"40px", textAlign:"center", color:MUTED }}>
+              <tr><td colSpan={12 + specFields.length} style={{ padding:"40px", textAlign:"center", color:MUTED }}>
                 No items found. Add your first item above.
               </td></tr>
             ) : filtered.map((item, idx) => {
@@ -450,7 +453,15 @@ export default function ItemsNewPage() {
                     }
                   </td>
                   <td style={{ padding:"10px 14px", fontFamily:"monospace", fontSize:12, color:ACCENT, fontWeight:700 }}>{item.code}</td>
-                  <td style={{ padding:"10px 14px", fontWeight:700 }}>{item.name}</td>
+                  <td style={{ padding:"10px 14px", fontWeight:700 }}>{specFields.length ? itemNameWithoutSpec(item.name) : item.name}</td>
+                  {specFields.length > 0 && (() => {
+                    const known = itemMetaWithName(rf, item.meta, `${item.name || ""} ${item.description || ""}`);
+                    return specFields.map(f => {
+                      const v = known[f.key];
+                      const has = v !== "" && v !== undefined && !(f.kind === "number" && Number(v) === 0);
+                      return <td key={f.key} style={{ padding:"10px 14px", textAlign: f.kind === "number" ? "right" : "left", whiteSpace:"nowrap" }}>{has ? String(v) : <span style={{color:MUTED}}>—</span>}</td>;
+                    });
+                  })()}
                   <td style={{ padding:"10px 14px" }}><CatPill value={item.category || "TRADING"} /></td>
                   <td style={{ padding:"10px 14px", color:MUTED }}>{item.unit}</td>
                   <td style={{ padding:"10px 14px", textAlign:"right", fontWeight:700 }}>
