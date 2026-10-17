@@ -27,7 +27,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemPickerLabel, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemPickerLabel, itemGroupKey, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -357,7 +357,7 @@ const [searchTerm, setSearchTerm] = useState("");
     } else {
       const newRow: Row = { ...emptyRow(), itemId: found.id, name: found.name, description: found.description || "", qty: 1, rate: rfActive ? "" : (found.purchaseRate || ""), unit: found.unit || "", sku: found.code || "" };
       if (rfActive) {
-        newRow.meta = metaFromItem(rf, (found as any).meta, newRow.meta, `${found.name || ""} ${found.description || ""}`);
+        newRow.meta = metaFromItem(rf, (found as any).meta, newRow.meta, `${found.name || ""} ${found.description || ""}`, true);
         const r = computeRateFromFormula(rf, newRow.meta);
         if (r.rate != null) newRow.rate = r.rate;
       }
@@ -1418,6 +1418,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                   </td>
                                   <td style={{ padding: "7px 8px", minWidth: 160 }}>
                                     <ItemPicker
+ groupKey={rfActive ? itemGroupKey(rf) : undefined}
                                       items={pickerItems as any}
                                       value={r.itemId}
                                       onChange={(__picked: string) => {
@@ -1430,7 +1431,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                         // the operator corrected the item.
                                         copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", ...(rfActive ? {} : { rate: item.purchaseRate || "" }) };
                                         if (rfActive) {
-                                          const meta = metaFromItem(rf, (item as any).meta, copy[i].meta, `${item.name || ""} ${item.description || ""}`);
+                                          const meta = metaFromItem(rf, (item as any).meta, copy[i].meta, `${item.name || ""} ${item.description || ""}`, true);
                                           lastPickedMeta.current = meta;
                                           copy[i].meta = meta;
                                           const r = computeRateFromFormula(rf, meta);

@@ -22,7 +22,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, itemGroupKey, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -462,6 +462,7 @@ export default function PurchaseOrderPage() {
                             </button>
                           </div>
                           <ItemPicker
+ groupKey={rfActive ? itemGroupKey(rf) : undefined}
                             items={items as any}
                             value={r.itemId}
                             onChange={(__picked: string) => {
@@ -470,7 +471,7 @@ export default function PurchaseOrderPage() {
                             const copy = [...rows];
                             copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                             if (rfActive) {
-                              const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`);
+                              const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`, true);
                               lastPickedMeta.current = meta;
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);
@@ -549,6 +550,7 @@ export default function PurchaseOrderPage() {
                               </td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 150 }}>
                                 <ItemPicker
+ groupKey={rfActive ? itemGroupKey(rf) : undefined}
                                   items={items as any}
                                   value={r.itemId}
                                   onChange={(__picked: string) => {
@@ -557,7 +559,7 @@ export default function PurchaseOrderPage() {
                                   const copy = [...rows];
                                   copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: rfActive ? copy[i].rate : String(it.purchaseRate || it.rate || ""), unit: it.unit || "", sku: it.code || "" };
                             if (rfActive) {
-                              const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`);
+                              const meta = metaFromItem(rf, it.meta, copy[i].meta, `${it.name || ""} ${it.description || ""}`, true);
                               lastPickedMeta.current = meta;
                               copy[i].meta = meta;
                               const r = computeRateFromFormula(rf, meta);

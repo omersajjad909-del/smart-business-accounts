@@ -637,11 +637,18 @@ export function metaFromItem(
   itemMeta: unknown,
   currentMeta: Record<string, RateFormulaValue> | undefined,
   /** The item's name, and its description — whatever the trade wrote the spec into. */
-  itemText?: string
+  itemText?: string,
+  /**
+   * A purchase picks a product, not a batch: the typed-per-document column
+   * (PHR) is the operator's to enter, so it is left empty even when the
+   * catalogue row the product was picked from happens to carry one.
+   */
+  blankTypedFields = false
 ): Record<string, RateFormulaValue> {
   const known = itemMetaWithName(settings, itemMeta, itemText);
   const out: Record<string, RateFormulaValue> = {};
   for (const f of settings.fields) {
+    if (blankTypedFields && f.focusOnPick) { out[f.key] = ""; continue; }
     const value = known[f.key];
     const itemKnows = value !== "" && value !== undefined;
     // The typed-per-document column is cleared rather than filled, so the
@@ -653,6 +660,20 @@ export function metaFromItem(
     out[f.key] = itemKnows ? value : (currentMeta?.[f.key] ?? "");
   }
   return out;
+}
+
+/**
+ * Ready to hand to <ItemPicker groupKey={…}>: two catalogue rows that differ
+ * only in the typed-per-document column (PHR) share a key, so a purchase lists
+ * the product once instead of once per PHR it has ever been bought at.
+ */
+export function itemGroupKey(settings: RateFormulaSettings) {
+  return (item: { name: string; code?: string | null; description?: string | null; meta?: unknown }): string => {
+    const known = itemMetaWithName(settings, item.meta, `${item.name || ""} ${item.description || ""}`);
+    const spec = settings.fields.filter((f) => !f.focusOnPick).map((f) => String(known[f.key] ?? "")).join("|");
+    const name = String(item.name ?? "").replace(/\bPHR\s*\d+(?:\.\d+)?/gi, "").replace(/\s+/g, " ").trim().toUpperCase();
+    return `${name}#${spec}`;
+  };
 }
 
 /** Ready to hand to <ItemPicker label={…}> on a formula document. */
