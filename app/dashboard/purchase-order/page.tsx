@@ -3,7 +3,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { ItemPicker } from "@/components/ItemPicker";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PrintActionBar } from "@/components/print/PrintActionBar";
@@ -22,7 +22,7 @@ import {
   rateFormulaEnterHandler,
   type RateFormulaMeta,
 } from "@/components/RateFormulaCells";
-import { itemNameWithoutSpec, computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, itemGroupKey, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
+import { itemNameWithoutSpec, computeRateFromFormula, emptyRateFormulaMeta, itemPickerLabel, itemGroupKey, itemIsDefaultPhr, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -93,6 +93,9 @@ export default function PurchaseOrderPage() {
   // Companies that price a line from a calculation get extra columns and a
   // computed rate. Everyone else gets exactly the grid that was here before.
   const { settings: rf, active: rfActive } = useRateFormula("purchaseOrder");
+  // Stable across renders: a new function each time re-ran the grouping in every open picker.
+  const pickerGroupKey = useMemo(() => (rfActive ? itemGroupKey(rf) : undefined), [rfActive, rf]);
+  const pickerGroupPrefer = useMemo(() => (rfActive ? itemIsDefaultPhr(rf, 30) : undefined), [rfActive, rf]);
   /**
    * What the line got from the item that was just picked. The picker fires
    * Enter straight after its onChange, before React has committed the new row,
@@ -462,7 +465,8 @@ export default function PurchaseOrderPage() {
                             </button>
                           </div>
                           <ItemPicker
- groupKey={rfActive ? itemGroupKey(rf) : undefined}
+ groupKey={pickerGroupKey}
+ groupPrefer={pickerGroupPrefer}
                             items={items as any}
                             value={r.itemId}
                             onChange={(__picked: string) => {
@@ -550,7 +554,8 @@ export default function PurchaseOrderPage() {
                               </td>
                               <td style={{ padding: isMobile ? "8px 8px" : "6px 7px", minWidth: 150 }}>
                                 <ItemPicker
- groupKey={rfActive ? itemGroupKey(rf) : undefined}
+ groupKey={pickerGroupKey}
+ groupPrefer={pickerGroupPrefer}
                                   items={items as any}
                                   value={r.itemId}
                                   onChange={(__picked: string) => {

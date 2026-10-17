@@ -11,6 +11,7 @@ import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useCompanyPrintHeader } from "@/hooks/useCompanyPrintHeader";
 import { useRateFormula } from "@/hooks/useRateFormula";
+import { resolvePhrVariants } from "@/lib/phrVariants";
 import {
   RateFormulaHeadCells,
   RateFormulaRowCells,
@@ -410,9 +411,18 @@ export default function GRNPage() {
     }
     setSaving(true);
     try {
+      // A direct receipt (no PO) is filed against the PHR actually typed. With a
+      // PO the lines keep the PO's own items, which the order tracks by id.
+      let lines = filledItems;
+      if (rfActive && !poId) {
+        const res = await resolvePhrVariants(rf, allItems as any, filledItems, bh());
+        if (!res) { setSaving(false); return; }
+        if (res.created.length) setAllItems((prev: any) => [...prev, ...res.created]);
+        lines = filledItems.map((r, i) => (res.targets[i] ? { ...r, itemId: res.targets[i]!.id, name: res.targets[i]!.name } : r));
+      }
       const res = await fetch("/api/grn", {
         method: "POST", headers: bh(),
-        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, partyBillNo, purchaseType, biltyNo, location, cargo, driver, vehicleNo, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks, meta: rfActive ? (r.meta || null) : null })) }),
+        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, partyBillNo, purchaseType, biltyNo, location, cargo, driver, vehicleNo, items: lines.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks, meta: rfActive ? (r.meta || null) : null })) }),
       });
       if (!res.ok) {
         const raw = await res.text();

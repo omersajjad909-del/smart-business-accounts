@@ -29,6 +29,7 @@ import {
 } from "@/components/RateFormulaCells";
 import { itemNameWithoutSpec, computeRateFromFormula, emptyRateFormulaMeta, itemMetaWithName, itemPickerLabel, itemGroupKey, itemIsDefaultPhr, itemSpecRole, metaFromItem, readRateFormulaMeta } from "@/lib/rateFormula";
 import type { RateFormulaValue } from "@/lib/rateFormula";
+import { resolvePhrVariants } from "@/lib/phrVariants";
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -820,74 +821,15 @@ const [searchTerm, setSearchTerm] = useState("");
   const netTotal = taxableAmount + totalTax + (Number(freight) || 0);
   const cur = companyInfo?.baseCurrency || "Rs.";
 
-  /**
-   * Stock is held per item, and a PHR is a different item: 647 at 30 PHR and
-   * 647 at 32 PHR are two catalogue rows (647-30, 647-32), which is how the
-   * import files them and what the sales picker lists. The purchase picker
-   * shows one row per product, so the line is saved against whichever row was
-   * picked — typing 32 on a line picked as 647-30 would put the 32 PHR rolls
-   * into the 30 PHR stock.
-   *
-   * So before saving, each line is pointed at the catalogue row whose PHR is
-   * the one typed, and that row is created when it does not exist yet. Returns
-   * null (after a toast) when one could not be created, so nothing half-saves.
-   */
-  async function resolvePhrVariants(lines: Row[]): Promise<Row[] | null> {
-    const phrKey = rf.fields.find((f) => itemSpecRole(f) === "phr")?.key;
-    if (!phrKey) return lines;
-    const groupOf = itemGroupKey(rf);
-    const phrOf = (it: InventoryItem): number | null => {
-      const v = itemMetaWithName(rf, (it as any).meta, `${it.name || ""} ${it.description || ""}`)[phrKey];
-      const n = Number(v);
-      return v === "" || v === undefined || !Number.isFinite(n) || n === 0 ? null : n;
-    };
-    const catalogue = [...allInventoryItems];
-    const created: InventoryItem[] = [];
-    const out: Row[] = [];
-    for (const line of lines) {
-      const typed = Number(line.meta?.[phrKey]);
-      const picked = catalogue.find((it) => it.id === line.itemId);
-      if (!picked || !Number.isFinite(typed) || typed <= 0 || phrOf(picked) === typed) { out.push(line); continue; }
-
-      const key = groupOf(picked as any);
-      let target = catalogue.find((it) => groupOf(it as any) === key && phrOf(it) === typed);
-      if (!target) {
-        const oldPhr = phrOf(picked);
-        const base = String(picked.code || "");
-        const code = !base ? "" : oldPhr && base.endsWith(`-${oldPhr}`) ? `${base.slice(0, -`-${oldPhr}`.length)}-${typed}` : `${base}-${typed}`;
-        const tag = `PHR${typed}`;
-        const name = /\bPHR\s*\d+(?:\.\d+)?/i.test(picked.name) ? picked.name.replace(/\bPHR\s*\d+(?:\.\d+)?/i, tag) : `${picked.name} ${tag}`;
-        const known = itemMetaWithName(rf, (picked as any).meta, `${picked.name || ""} ${picked.description || ""}`);
-        try {
-          const res = await fetch("/api/items-new", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", ...requestHeaders },
-            body: JSON.stringify({
-              code, name, unit: picked.unit || "", category: (picked as any).category || "TRADING",
-              purchaseRate: picked.purchaseRate ?? 0, description: picked.description || "",
-              meta: { ...known, [phrKey]: typed },
-            }),
-          });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) throw new Error(data?.error || "Could not create item");
-          target = {
-            id: data.id, name: data.name, barcode: data.barcode || "", purchaseRate: data.purchaseRate ?? 0, unit: data.unit || "",
-            code: data.code || "", description: data.description || "", meta: data.meta ?? null, stockIn: 0, stockOut: 0, stockBal: 0,
-          };
-          catalogue.push(target);
-          created.push(target);
-        } catch (e: any) {
-          toast.error(`PHR ${typed} item for ${picked.name} could not be created: ${e.message}`);
-          return null;
-        }
-      }
-      out.push({ ...line, itemId: target.id, name: target.name, sku: target.code || "", description: target.description || "" });
-    }
-    if (created.length) {
-      setAllInventoryItems((prev) => [...prev, ...created]);
-      toast.success(`New item${created.length > 1 ? "s" : ""} created: ${created.map((c) => c.code).join(", ")}`);
-    }
-    return out;
+  /** Points each line at the catalogue row for the PHR typed — see lib/phrVariants.ts. */
+  async function resolvePhrItems(lines: Row[]): Promise<Row[] | null> {
+    const res = await resolvePhrVariants(rf, allInventoryItems as any, lines, requestHeaders);
+    if (!res) return null;
+    if (res.created.length) setAllInventoryItems((prev) => [...prev, ...(res.created as any)]);
+    return lines.map((line, i) => {
+      const t = res.targets[i];
+      return t ? { ...line, itemId: t.id, name: t.name, sku: t.code || "", description: t.description || "" } : line;
+    });
   }
 
   async function saveInvoice() {
@@ -909,7 +851,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
     setSaving(true);
     try {
-      const lines = rfActive ? await resolvePhrVariants(clean) : clean;
+      const lines = rfActive ? await resolvePhrItems(clean) : clean;
       if (!lines) { setSaving(false); return; }
       const method = editing ? "PUT" : "POST";
       const baseBody = {

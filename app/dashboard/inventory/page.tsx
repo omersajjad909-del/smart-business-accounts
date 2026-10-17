@@ -126,13 +126,41 @@ export default function InventoryPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const enriched = useMemo(() => stock.map(s => ({
+  // One product, one row. The same roll bought at PHR 24, 26 and 30 is held as
+  // separate items so sales can pick by PHR, but stock here is read per
+  // product: the quantities add up and the PHR 30 row (else the first) names
+  // the group. Names with no PHR in them are never merged.
+  const grouped = useMemo(() => {
+    const PHR = /\bPHR\s*\d+(?:\.\d+)?/gi;
+    const phrOf = (n: string) => { const m = n.match(/\bPHR\s*(\d+(?:\.\d+)?)/i); return m ? Number(m[1]) : null; };
+    const groups = new Map<string, StockRow[]>();
+    for (const r of stock) {
+      const key = PHR.test(r.name) ? `${r.name.replace(PHR, "").replace(/\s+/g, " ").trim().toUpperCase()}|${r.unit || ""}` : `#${r.itemId}`;
+      PHR.lastIndex = 0;
+      const g = groups.get(key);
+      if (g) g.push(r); else groups.set(key, [r]);
+    }
+    return Array.from(groups.values()).map(g => {
+      if (g.length === 1) return { ...g[0], phrCount: 0 };
+      const rep = g.find(x => phrOf(x.name) === 30) ?? g[0];
+      return {
+        ...rep,
+        qty: g.reduce((t, x) => t + x.qty, 0),
+        minStock: g.reduce((t, x) => t + (x.minStock ?? 0), 0),
+        // Valued at what each PHR's stock is worth, shown back as one average rate.
+        rate: (() => { const q = g.reduce((t, x) => t + x.qty, 0); const v = g.reduce((t, x) => t + x.qty * (x.rate ?? 0), 0); return q ? v / q : rep.rate; })(),
+        phrCount: g.length - 1,
+      };
+    });
+  }, [stock]);
+
+  const enriched = useMemo(() => grouped.map(s => ({
     ...s,
     minStock: s.minStock ?? 0,
     rate:     s.rate     ?? 0,
     status:   getStatus(s.qty, s.minStock ?? 0),
     value:    s.qty * (s.rate ?? 0),
-  })), [stock]);
+  })), [grouped]);
 
   const filtered = useMemo(() => {
     let list = enriched;
@@ -306,6 +334,7 @@ export default function InventoryPage() {
                   <tr key={s.itemId} style={{ background: i % 2 === 1 ? "rgba(var(--ink),0.013)" : "transparent" }}>
                     <td style={td}>
                       <div style={{ fontWeight: 600 }}>{s.name}</div>
+                      {s.phrCount > 0 && <div style={{ fontSize: 10, color: "var(--text-muted)" }}>+{s.phrCount} more PHR · stock combined</div>}
                     </td>
                     <td style={{ ...td, fontFamily: "monospace", fontSize: 12, color: "var(--text-muted)" }}>{s.code || "—"}</td>
                     <td style={{ ...td }}>
