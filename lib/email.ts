@@ -37,20 +37,6 @@ const getEmailConfig = async (companyId?: string) => {
   };
 };
 
-/** True when the company has saved its own SMTP login (Settings → Email). */
-export async function isCompanyEmailConfigured(companyId: string): Promise<boolean> {
-  try {
-    const c = (await getCompanyCommsConfig(companyId)).email;
-    return Boolean(c.enabled && c.host && c.user && c.pass);
-  } catch {
-    return false;
-  }
-}
-
-export const EMAIL_NOT_CONFIGURED = "EMAIL_NOT_CONFIGURED";
-export const EMAIL_NOT_CONFIGURED_MESSAGE =
-  "Your email is not set up. Please set up your email (SMTP / app password) so messages are sent from your own address.";
-
 let transporter: nodemailer.Transporter | null = null;
 let lastConfig: any = null;
 
@@ -355,7 +341,7 @@ export const emailTemplates = {
       </table>
       ${invoice.notes ? `${sectionHeading("Notes")}<p style="margin:0;font-size:13px;color:#64748b;line-height:1.7;">${invoice.notes}</p>` : ""}
       ${invoice.termsConditions ? `${sectionHeading("Terms & Conditions")}<p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.7;">${invoice.termsConditions}</p>` : ""}
-      <p style="margin:28px 0 0;font-size:13px;color:#64748b;text-align:center;">Thank you for your business! 🙏</p>
+      <p style="margin:28px 0 0;font-size:13px;color:#64748b;text-align:center;">Thank you for your business!</p>
     `;
 
     return emailBase({ companyName: co, badgeText: "Sales Invoice", badgeColor: "#6366f1", content });
@@ -809,19 +795,7 @@ export async function sendEmail(options: {
   attachments?: Array<{ filename: string; content: string | Buffer }>;
   companyId?: string;
   replyTo?: string;
-  /**
-   * For mail a user or company sends to ITS OWN customers/suppliers. Without
-   * the company's own SMTP login the send is refused, instead of silently
-   * falling back to the platform's address — which made invoices arrive from
-   * FinovaOS rather than from the business that issued them.
-   */
-  requireCompanyConfig?: boolean;
-}): Promise<{ success: boolean; messageId?: string; error?: string; code?: string }> {
-  if (options.requireCompanyConfig) {
-    if (!options.companyId || !(await isCompanyEmailConfigured(options.companyId))) {
-      return { success: false, error: EMAIL_NOT_CONFIGURED_MESSAGE, code: EMAIL_NOT_CONFIGURED };
-    }
-  }
+}): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const toStr = Array.isArray(options.to) ? options.to.join(', ') : options.to;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
   let resendError: string | undefined;

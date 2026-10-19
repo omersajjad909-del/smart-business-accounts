@@ -329,119 +329,23 @@ export default function NotificationsPage() {
       {tab === "email" && (
         <div>
           <div style={card}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-              <div>
-                <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>Email / SMTP Configuration</div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px" }}>
-                  Configure your own SMTP server (Gmail, Outlook, custom) — credentials stored encrypted
-                </div>
-              </div>
-              <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{email.enabled ? "Enabled" : "Disabled"}</span>
-                <div
-                  onClick={() => setEmail(e => ({ ...e, enabled: !e.enabled }))}
-                  style={{
-                    width: "42px", height: "24px", borderRadius: "12px", cursor: "pointer",
-                    background: email.enabled ? "#0891b2" : "var(--border)",
-                    position: "relative", transition: "background .2s",
-                  }}
-                >
-                  <div style={{
-                    position: "absolute", top: "3px",
-                    left: email.enabled ? "21px" : "3px",
-                    width: "18px", height: "18px", borderRadius: "50%",
-                    background: "white", transition: "left .2s",
-                    boxShadow: "0 1px 4px rgba(0,0,0,.3)",
-                  }}/>
-                </div>
-              </label>
+            <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
+              Email / SMTP Configuration
             </div>
-
-            {/* Quick presets */}
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                Quick Presets
-              </div>
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                {[
-                  { label: "Gmail",   host: "smtp.gmail.com",   port: 587, secure: false },
-                  { label: "Outlook", host: "smtp.office365.com", port: 587, secure: false },
-                  { label: "Yahoo",   host: "smtp.mail.yahoo.com", port: 465, secure: true },
-                  { label: "Custom",  host: "", port: 587, secure: false },
-                ].map(preset => (
-                  <button
-                    key={preset.label}
-                    onClick={() => setEmail(e => ({ ...e, host: preset.host, port: preset.port, secure: preset.secure }))}
-                    style={{
-                      padding: "6px 14px", borderRadius: "20px", cursor: "pointer", fontSize: "12px", fontWeight: 600,
-                      background: email.host === preset.host && preset.host !== "" ? "rgba(8,145,178,0.15)" : "var(--app-bg)",
-                      border: `1px solid ${email.host === preset.host && preset.host !== "" ? "#0891b2" : "var(--border)"}`,
-                      color: email.host === preset.host && preset.host !== "" ? "#0891b2" : "var(--text-muted)",
-                    }}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
+            <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6 }}>
+              Your email login (SMTP / app password) is managed in one place: Email Settings. Invoices and documents
+              are sent from the address saved there.{" "}
+              <strong>{status.email ? "Your email is set up." : "Your email is not set up yet."}</strong>
             </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
-              <div>
-                <label style={labelStyle}>SMTP Host <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
-                <input style={inputStyle} value={email.host} onChange={e => setEmail(f => ({ ...f, host: e.target.value }))} placeholder="smtp.gmail.com" />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-                <div>
-                  <label style={labelStyle}>Port</label>
-                  <input style={inputStyle} type="number" value={email.port} onChange={e => setEmail(f => ({ ...f, port: Number(e.target.value) }))} placeholder="587" />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", paddingBottom: "10px" }}>
-                    <input type="checkbox" checked={email.secure} onChange={e => setEmail(f => ({ ...f, secure: e.target.checked }))} style={{ accentColor: "#0891b2" }} />
-                    <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>SSL/TLS</span>
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>SMTP Username (Email) <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
-                <input style={inputStyle} value={email.user} onChange={e => setEmail(f => ({ ...f, user: e.target.value }))} placeholder="you@gmail.com" />
-              </div>
-              <div>
-                <label style={labelStyle}>SMTP Password / App Password <span style={{ color: "var(--tx-ef4444, #ef4444)" }}>*</span></label>
-                <input style={inputStyle} type="password" value={email.pass} onChange={e => setEmail(f => ({ ...f, pass: e.target.value }))} placeholder="Gmail: use App Password, not account password" />
-              </div>
-              <div>
-                <label style={labelStyle}>From Email</label>
-                <input style={inputStyle} value={email.from} onChange={e => setEmail(f => ({ ...f, from: e.target.value }))} placeholder="noreply@yourcompany.com" />
-              </div>
-              <div>
-                <label style={labelStyle}>From Name</label>
-                <input style={inputStyle} value={email.fromName} onChange={e => setEmail(f => ({ ...f, fromName: e.target.value }))} placeholder="FinovaOS" />
-              </div>
-            </div>
-
-            {/* Gmail note */}
-            {email.host === "smtp.gmail.com" && (
-              <div style={{
-                padding: "10px 14px", borderRadius: "8px", marginBottom: "16px",
-                background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)",
-                fontSize: "12px", color: "var(--tx-fbbf24, #fbbf24)",
-              }}>
-                💡 <strong>Gmail tip:</strong> Use an <strong>App Password</strong> (not your Gmail password). Go to Google Account → Security → 2-Step Verification → App Passwords.
-              </div>
-            )}
-
-            <button
-              onClick={saveEmailConfig} disabled={savingEmail}
+            <a
+              href="/dashboard/email-settings"
               style={{
-                padding: "10px 20px", borderRadius: "8px", border: "none",
-                background: savingEmail ? "var(--border)" : "#0891b2",
-                color: savingEmail ? "var(--text-muted)" : "#fff",
-                fontWeight: 700, fontSize: "13px", cursor: savingEmail ? "not-allowed" : "pointer",
+                display: "inline-block", padding: "10px 22px", borderRadius: "8px", textDecoration: "none",
+                background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "#fff", fontWeight: 700, fontSize: "13px",
               }}
             >
-              {savingEmail ? "Saving…" : "Save Email Config"}
-            </button>
+              {status.email ? "Open Email Settings" : "Set up email"}
+            </a>
           </div>
 
           <TestDelivery
