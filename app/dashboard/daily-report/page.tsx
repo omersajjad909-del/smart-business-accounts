@@ -64,7 +64,7 @@ export default function DailyReportPage() {
         setS(d.settings);
         setPhones(d.settings.phones.join(", "));
         setEmails(d.settings.emails.join(", "));
-      } catch { toast.error("Settings load nahi ho saki (sirf Admin dekh sakta hai)."); }
+      } catch { toast.error("Could not load settings (Admin access only)."); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -85,9 +85,9 @@ export default function DailyReportPage() {
       setS((c) => ({ ...d.settings, lastSentDate: c?.lastSentDate ?? null, lastStatus: c?.lastStatus ?? null }));
       setPhones(d.settings.phones.join(", "));
       setEmails(d.settings.emails.join(", "));
-      toast.success("Daily report settings save ho gayin.");
+      toast.success("Daily report settings saved.");
       return true;
-    } catch { toast.error("Save nahi ho saka."); return false; }
+    } catch { toast.error("Could not save settings."); return false; }
     finally { setSaving(false); }
   }
 
@@ -100,12 +100,12 @@ export default function DailyReportPage() {
         body: JSON.stringify({ action: "test" }),
       });
       const d = await res.json();
-      if (!res.ok) return toast.error(d.error || "Test fail hua.");
+      if (!res.ok) return toast.error(d.error || "Test failed.");
       const ok = (d.results || []).filter((r: any) => r.ok).length;
       const bad = (d.results || []).filter((r: any) => !r.ok);
-      if (ok) toast.success(`${ok} message bhej diye gaye.`);
+      if (ok) toast.success(`${ok} message(s) sent.`);
       if (bad.length) toast.error(`${bad.length} fail: ${bad.map((b: any) => `${b.channel} (${b.error || "error"})`).join(", ")}`, { duration: 7000 });
-    } catch { toast.error("Test fail hua."); }
+    } catch { toast.error("Test failed."); }
     finally { setTesting(false); }
   }
 
@@ -115,7 +115,7 @@ export default function DailyReportPage() {
       const res = await fetch("/api/company/daily-report?preview=1", { headers: h(), cache: "no-store" });
       if (!res.ok) throw new Error();
       setPreview((await res.json()).text);
-    } catch { toast.error("Preview load nahi hua."); }
+    } catch { toast.error("Could not load preview."); }
     finally { setLoadingPreview(false); }
   }
 
@@ -127,22 +127,22 @@ export default function DailyReportPage() {
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "24px 16px", fontFamily: ff, color: "var(--ink-solid, #fff)" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📊 Daily Business Report</h1>
       <p style={{ color: MUTED, fontSize: 13, margin: "0 0 20px" }}>
-        Roz raat ko aap ke business ka poora summary — sales, received, expenses, profit, cash, receivable/payable aur stock — WhatsApp, SMS ya email par.
+        A full end-of-day summary of your business — sales, received, expenses, profit, cash, receivables/payables and stock — delivered every night by WhatsApp, SMS or email.
       </p>
 
       <div style={card}>
         <div style={row}>
           <div>
-            <div style={{ fontWeight: 700 }}>Daily report on karein</div>
+            <div style={{ fontWeight: 700 }}>Send the daily report</div>
             <div style={{ fontSize: 12, color: MUTED }}>
-              {s.lastSentDate ? `Aakhri report: ${s.lastSentDate} (${s.lastStatus || "—"})` : "Abhi tak koi report nahi bheji gayi."}
+              {s.lastSentDate ? `Last report: ${s.lastSentDate} (${s.lastStatus || "—"})` : "No report has been sent yet."}
             </div>
           </div>
           <Toggle on={s.enabled} onChange={() => patch({ enabled: !s.enabled })} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginTop: 8 }}>
           <div>
-            <label style={lbl}>Bhejne ka waqt</label>
+            <label style={lbl}>Send time</label>
             <input type="time" style={inp} value={s.sendTime} onChange={(e) => patch({ sendTime: e.target.value })} />
           </div>
           <div>
@@ -155,11 +155,11 @@ export default function DailyReportPage() {
       </div>
 
       <div style={card}>
-        <div style={{ fontWeight: 700, marginBottom: 4 }}>Kahan bhejna hai</div>
+        <div style={{ fontWeight: 700, marginBottom: 4 }}>Delivery channels</div>
         {([
-          ["whatsapp", "WhatsApp", "Poori formatted report. Company ki WhatsApp setup (Meta) zaroori hai."],
-          ["sms", "SMS", "Chhota summary. SMS provider (Twilio/SMS API) configured hona chahiye."],
-          ["email", "Email", "Poori report, table ke saath."],
+          ["whatsapp", "WhatsApp", "Full formatted report. Requires the company's WhatsApp (Meta) setup."],
+          ["sms", "SMS", "Short summary. Requires an SMS provider (Twilio / SMS API) to be configured."],
+          ["email", "Email", "Full report with tables."],
         ] as const).map(([k, name, desc]) => (
           <div key={k} style={row}>
             <div><div style={{ fontWeight: 600, fontSize: 14 }}>{name}</div><div style={{ fontSize: 12, color: MUTED }}>{desc}</div></div>
@@ -176,7 +176,7 @@ export default function DailyReportPage() {
             <input style={inp} placeholder="owner@business.com" value={emails} onChange={(e) => setEmails(e.target.value)} />
           </div>
         </div>
-        <div style={{ fontSize: 11, color: MUTED, marginTop: 8 }}>Ek se zyada numbers/emails comma se alag karein (max 10).</div>
+        <div style={{ fontSize: 11, color: MUTED, marginTop: 8 }}>Separate multiple numbers or emails with commas (max 10).</div>
       </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
@@ -186,17 +186,17 @@ export default function DailyReportPage() {
         </button>
         <button onClick={sendTest} disabled={testing || saving}
           style={{ padding: "10px 20px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontFamily: ff, background: "transparent", color: "inherit", border: `1px solid ${BORDER}`, opacity: testing ? .6 : 1 }}>
-          {testing ? "Bhej raha hoon…" : "Abhi test report bhejein"}
+          {testing ? "Sending…" : "Send test report now"}
         </button>
         <button onClick={loadPreview} disabled={loadingPreview}
           style={{ padding: "10px 20px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontFamily: ff, background: "transparent", color: "inherit", border: `1px solid ${BORDER}` }}>
-          {loadingPreview ? "Loading…" : "Aaj ki report dekhein"}
+          {loadingPreview ? "Loading…" : "Preview today's report"}
         </button>
       </div>
 
       {preview && (
         <div style={card}>
-          <div style={lbl}>Preview (aaj tak ka data)</div>
+          <div style={lbl}>Preview (data up to now)</div>
           <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: 13, lineHeight: 1.6, fontFamily: ff }}>{preview.replace(/\*/g, "")}</pre>
         </div>
       )}

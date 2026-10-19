@@ -201,7 +201,7 @@ const money = (v: number, cur: string) =>
 
 export function formatReportText(r: DailyReport): string {
   const m = (v: number) => money(v, r.currency);
-  const arrow = r.sales.changePct === null ? "" : ` (${r.sales.changePct >= 0 ? "▲" : "▼"} ${Math.abs(r.sales.changePct)}% vs kal)`;
+  const arrow = r.sales.changePct === null ? "" : ` (${r.sales.changePct >= 0 ? "▲" : "▼"} ${Math.abs(r.sales.changePct)}% vs yesterday)`;
   const lines = [
     `📊 *Daily Report — ${r.company}*`,
     `📅 ${r.date}`,
@@ -211,11 +211,11 @@ export function formatReportText(r: DailyReport): string {
     ...Object.entries(r.received.byMode).map(([k, v]) => `   • ${k}: ${m(v)}`),
     `🛒 *Purchases:* ${m(r.purchases.total)} (${r.purchases.count})`,
     `💸 *Expenses:* ${m(r.expenses.total)} (${r.expenses.count})`,
-    `📈 *Aaj ka profit:* ${m(r.profitToday)}`,
+    `📈 *Profit today:* ${m(r.profitToday)}`,
     ``,
     `🏦 *Cash/Bank balance:* ${m(r.position.cash)}`,
-    `⏳ *Receivable (lena):* ${m(r.position.receivables)}`,
-    `📤 *Payable (dena):* ${m(r.position.payables)}`,
+    `⏳ *Receivable (to collect):* ${m(r.position.receivables)}`,
+    `📤 *Payable (to pay):* ${m(r.position.payables)}`,
     `🚨 *Overdue:* ${m(r.position.overdue)} (${r.position.overdueCount})`,
     `📦 *Stock value:* ${m(r.position.stockValue)}`,
   ];
@@ -229,7 +229,7 @@ export function formatReportText(r: DailyReport): string {
     lines.push(``, `⚠️ *Low stock (${r.lowStock.count}):* ${r.lowStock.items.join(", ")}${r.lowStock.count > r.lowStock.items.length ? "…" : ""}`);
   }
   if (!r.sales.count && !r.received.count && !r.expenses.count && !r.purchases.count) {
-    lines.push(``, `ℹ️ Aaj koi transaction record nahi hui.`);
+    lines.push(``, `ℹ️ No transactions were recorded today.`);
   }
   lines.push(``, `— FinovaOS`);
   return lines.join("\n");

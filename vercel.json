@@ -13,10 +13,6 @@
     {
       "path": "/api/cron/fbr-retry",
       "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/daily-report",
-      "schedule": "30 16 * * *"
     }
   ]
 }

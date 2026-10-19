@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       const r = await runDailyReportForCompany(g.companyId!, { force: true });
       if ("skipped" in r) {
         return NextResponse.json(
-          { error: "Pehle kam az kam ek phone number ya email add karke save karein." },
+          { error: "Add at least one phone number or email address and save before sending a test." },
           { status: 400 },
         );
       }
