@@ -2833,6 +2833,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
               <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
               <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notification Settings</NavLink>
+              <NavLink href="/dashboard/daily-report" pathname={pathname}>📊 Daily Business Report</NavLink>
               <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>
               {/* <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}

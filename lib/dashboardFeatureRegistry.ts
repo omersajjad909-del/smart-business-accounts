@@ -2823,6 +2823,7 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   { id: "CORE_ADMIN_CONTROL", label: "Admin Control Center", route: "/dashboard/admin-control", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_BUSINESS_FEATURES", label: "Business Features", route: "/dashboard/business-features", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_NOTIFICATIONS_CONFIG", label: "Notification Settings", route: "/dashboard/notifications-config", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_DAILY_REPORT", label: "Daily Business Report", route: "/dashboard/daily-report", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_SHORTCUTS", label: "Keyboard Shortcuts", route: "/dashboard/shortcuts", section: "Admin", core: true, permKey: "VIEW_DASHBOARD", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_USERS", label: "Team", route: "/dashboard/users", section: "Admin", core: true, permKey: "MANAGE_USERS", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_USERS_LOGS", label: "System Logs", route: "/dashboard/users/logs", section: "Admin", core: true, permKey: "VIEW_LOGS", business: "service", businessLabel: "Core (all businesses)" },

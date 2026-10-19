@@ -772,6 +772,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/admin-control",
       "/dashboard/business-features",
       "/dashboard/notifications-config",
+      "/dashboard/daily-report",
       "/dashboard/shortcuts",
       "/dashboard/users",
       "/dashboard/users/logs",
