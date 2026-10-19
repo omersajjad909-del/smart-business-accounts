@@ -2988,7 +2988,7 @@ export default function DashboardContent() {
               </div>
               <Link
                 prefetch={false}
-                href="/dashboard/sales-invoice"
+                href="/dashboard/tasks"
                 style={{
                   fontSize: 11,
                   color: "var(--tx-818cf8, #818cf8)",

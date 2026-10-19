@@ -2800,6 +2800,7 @@ export const CORE_DASHBOARD_FEATURES: DashboardFeatureDefinition[] = [
   // ── Receivables & Payables ──
   { id: "CORE_REPORTS_AGEING", label: "Ageing Report", route: "/dashboard/reports/ageing", section: "Receivables & Payables", core: true, permKey: "VIEW_AGEING_REPORT", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_REPORTS_PAYMENT_HISTORY", label: "Payment History", route: "/dashboard/reports/payment-history", section: "Receivables & Payables", core: true, permKey: "VIEW_AGEING_REPORT", business: "service", businessLabel: "Core (all businesses)" },
+  { id: "CORE_UPCOMING_TASKS", label: "Upcoming Tasks", route: "/dashboard/tasks", section: "Receivables & Payables", core: true, permKey: "VIEW_DASHBOARD", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_PAYMENT_FOLLOWUP", label: "Payment Follow-up", route: "/dashboard/payment-followup", section: "Receivables & Payables", core: true, permKey: "VIEW_PROFIT_LOSS_REPORT", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_REPORTS_BAD_DEBTS", label: "Bad Debts", route: "/dashboard/reports/bad-debts", section: "Receivables & Payables", core: true, permKey: "VIEW_PROFIT_LOSS_REPORT", business: "service", businessLabel: "Core (all businesses)" },
   { id: "CORE_REPORTS_CREDIT_ANALYSIS", label: "Credit Analysis", route: "/dashboard/reports/credit-analysis", section: "Receivables & Payables", core: true, permKey: "VIEW_PROFIT_LOSS_REPORT", business: "service", businessLabel: "Core (all businesses)" },

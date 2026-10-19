@@ -745,6 +745,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     routes: [
       "/dashboard/reports/payment-history",
       "/dashboard/payment-followup",
+      "/dashboard/tasks",
       "/dashboard/reports/bad-debts",
       "/dashboard/reports/credit-analysis",
     ],

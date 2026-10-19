@@ -159,7 +159,7 @@ export default function PagePrefsPage() {
         placeholder="Find a page…"
         style={{
           width: "100%", marginTop: 18, padding: "10px 13px", borderRadius: 10,
-          background: bg, border: `1px solid ${border}`, color: "#fff",
+          background: bg, border: `1px solid ${border}`, color: "var(--ink-solid, #fff)",
           fontSize: 13.5, fontFamily: ff, boxSizing: "border-box", outline: "none",
         }}
       />
@@ -209,7 +209,7 @@ export default function PagePrefsPage() {
                           onChange={() => toggle(p.id)}
                         />
                         <span style={{ minWidth: 0 }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: on ? "#fff" : "rgba(var(--ink),var(--ta-45, .45))" }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: on ? "var(--ink-solid, #fff)" : "rgba(var(--ink),var(--ta-45, .45))" }}>
                             {p.label}
                           </span>
                           {p.description && (

@@ -2785,6 +2785,7 @@ export default function DashboardLayout({
                   and credit analysis are the Pro upgrade. */}
               <NavLink href="/dashboard/reports/payment-history" pathname={pathname}>Payment History</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
+              <NavLink href="/dashboard/tasks" pathname={pathname}>Upcoming Tasks</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/credit-analysis" pathname={pathname}>Credit Analysis</NavLink>}
             </NavGroup>
