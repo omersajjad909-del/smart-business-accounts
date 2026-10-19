@@ -267,6 +267,7 @@ function FloatingInput({
         color: focused ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-30, .3))",
       }}>
         {label}
+        {required && <span style={{ color:"var(--tx-f87171, #f87171)" }}> *</span>}
       </label>
     </div>
   );
@@ -561,6 +562,24 @@ export default function SignupByPlanPage() {
     [firstName, lastName, email, companyName, password, agreeTerms, agreePrivacy, effectiveBusinessType, isTrial, phone]
   );
 
+  // Powers the submit-button error message below — without this, clicking a
+  // disabled-looking button while a required field is missing did nothing
+  // visible at all (a "dead click" in session-recording terms), which is the
+  // single biggest drop-off point in the signup funnel.
+  const missingFields = useMemo(() => {
+    const missing: string[] = [];
+    if (!firstName) missing.push("First name");
+    if (!lastName) missing.push("Last name");
+    if (!email) missing.push("Work email");
+    if (!companyName) missing.push("Company name");
+    if (!effectiveBusinessType) missing.push("Business type");
+    if (isTrial && !phone) missing.push("Phone number");
+    if (!password) missing.push("Password");
+    if (!agreePrivacy) missing.push("Privacy Policy agreement");
+    if (!agreeTerms) missing.push("Terms of Service agreement");
+    return missing;
+  }, [firstName, lastName, email, companyName, effectiveBusinessType, isTrial, phone, password, agreePrivacy, agreeTerms]);
+
 
 
   function validateEmail(val: string) {
@@ -576,7 +595,18 @@ export default function SignupByPlanPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (disabled) return;
+    if (disabled) {
+      // Previously this just returned silently, leaving a visitor who missed
+      // one field (commonly the easy-to-miss trial phone number) clicking a
+      // button that never responds. Telling them exactly what's missing turns
+      // that dead click into a fixable error.
+      setError(
+        missingFields.length === 1
+          ? `${missingFields[0]} is required.`
+          : `A few things are still needed: ${missingFields.join(", ")}.`
+      );
+      return;
+    }
     validateEmail(email);
     setLoading(true);
 
@@ -1031,7 +1061,12 @@ export default function SignupByPlanPage() {
                     display:"block", fontSize:10, fontWeight:700,
                     letterSpacing:".08em", textTransform:"uppercase",
                     color:"rgba(var(--ink),var(--ta-30, .3))", marginBottom:6,
-                  }}>Phone number {isTrial ? "(required for the free trial)" : "(optional)"}</label>
+                  }}>
+                    Phone number{" "}
+                    {isTrial
+                      ? <span style={{ color:"var(--tx-f87171, #f87171)" }}>* (required for the free trial)</span>
+                      : <span style={{ fontWeight:400, textTransform:"none", color:"rgba(var(--ink),var(--ta-20, .2))" }}>(optional)</span>}
+                  </label>
                   <PhoneInput
                     dialCode={dialCode}
                     country={phoneCountry}
@@ -1289,14 +1324,28 @@ export default function SignupByPlanPage() {
                   />
                 </div>
 
+                {/* Submit-adjacent error — the form is long enough that the banner
+                    at the top of the page can be scrolled out of view by the time
+                    someone reaches this button, so the same message repeats here. */}
+                {error && (
+                  <div style={{
+                    padding:"10px 14px", borderRadius:10,
+                    background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.3)",
+                    color:"var(--tx-f87171, #f87171)", fontSize:12.5, fontWeight:500,
+                    display:"flex", alignItems:"flex-start", gap:8,
+                  }}>
+                    <span>!</span> {error}
+                  </div>
+                )}
+
                 {/* Submit */}
-                <button type="submit" disabled={loading || disabled} style={{
+                <button type="submit" disabled={loading} style={{
                   marginTop:4, width:"100%", padding:"14px 24px",
                   borderRadius:13, border:"none",
                   background: disabled ? "rgba(var(--ink),.06)" : `linear-gradient(135deg,${current.gradientFrom},${current.gradientTo})`,
                   color: disabled ? "rgba(var(--ink),var(--ta-22, .22))" : "white",
                   fontSize:15, fontWeight:700, letterSpacing:".01em",
-                  cursor: loading || disabled ? "not-allowed" : "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
                   display:"flex", alignItems:"center", justifyContent:"center", gap:8,
                   fontFamily:"inherit", transition:"all .3s",
                   boxShadow: disabled ? "none" : `0 6px 24px ${current.glow}`,
