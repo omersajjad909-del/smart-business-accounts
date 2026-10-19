@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import EmailSetupGuide from "@/components/EmailSetupGuide";
 
 export default function EmailSettingsPage() {
   const user = getCurrentUser();
@@ -17,7 +18,7 @@ export default function EmailSettingsPage() {
   const [smtpUser, setSmtpUser] = useState("");
   const [smtpPass, setSmtpPass] = useState("");
   const [smtpFrom, setSmtpFrom] = useState("");
-  const [fromName, setFromName] = useState("FinovaOS");
+  const [fromName, setFromName] = useState("");
   const [smtpSecure, setSmtpSecure] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -35,7 +36,8 @@ export default function EmailSettingsPage() {
         setSmtpUser(config.user || "");
         setSmtpPass(config.pass || "");
         setSmtpFrom(config.from || "");
-        setFromName(config.fromName || "FinovaOS");
+        // "FinovaOS" was the old default — it is ignored on send, so show it blank.
+        setFromName(config.fromName && config.fromName !== "FinovaOS" ? config.fromName : "");
         setSmtpSecure(Boolean(config.secure));
       })
       .catch(() => {});
@@ -97,13 +99,16 @@ export default function EmailSettingsPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Email Configuration</h1>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px] items-start">
+      <div>
 
       <div className="bg-yellow-50 border border-yellow-200 p-4 rounded mb-6">
         <p className="text-sm text-yellow-800">
           <strong>Important:</strong> Company email credentials are saved in encrypted company storage.
-          The global <code>.env</code> should only be used as a fallback or for system-level transport.
+          Invoices, quotations and reports are sent from the email address you save here.
         </p>
       </div>
 
@@ -167,6 +172,17 @@ export default function EmailSettingsPage() {
             <p>{testResult.message}</p>
           </div>
         )}
+      </div>
+      </div>
+
+      <EmailSetupGuide
+        onFillGmail={() => {
+          setSmtpHost("smtp.gmail.com");
+          setSmtpPort("587");
+          setSmtpSecure(false);
+          setEnabled(true);
+        }}
+      />
       </div>
     </div>
   );
