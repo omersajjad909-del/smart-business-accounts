@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendEmail, emailTemplates } from "@/lib/email";
+import { sendEmail, emailTemplates, EMAIL_NOT_CONFIGURED } from "@/lib/email";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
@@ -27,7 +27,9 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { type, invoiceId, to, subject, message, daysOverdue } = body;
+    const { type, to, subject, message, daysOverdue } = body;
+    // The quotation page sends its id as `quotationId`.
+    const invoiceId = body.invoiceId ?? body.quotationId;
 
     if (!type || !to) {
       return NextResponse.json(
@@ -159,6 +161,10 @@ export async function POST(req: NextRequest) {
       html = emailTemplates.paymentReminder(invoice, invoice.customer, overdue, companyName);
       emailSubject = subject || `Payment Reminder: Invoice ${invoice.invoiceNo}${companyName ? ` - ${companyName}` : ""}`;
 
+    } else if (type === "generic" && body.html) {
+      html = String(body.html);
+      emailSubject = subject || (companyName ? `Message from ${companyName}` : "Message");
+
     } else if (type === 'custom' && message) {
       const customTitle = subject || (companyName ? `Message from ${companyName}` : "Message");
       html = emailTemplates.report(customTitle, message, 'custom', companyName);
@@ -177,7 +183,12 @@ export async function POST(req: NextRequest) {
       subject: emailSubject,
       html,
       companyId,
+      requireCompanyConfig: true,
     });
+
+    if (result.code === EMAIL_NOT_CONFIGURED) {
+      return NextResponse.json({ error: result.error, code: EMAIL_NOT_CONFIGURED }, { status: 409 });
+    }
 
     if (!result.success) {
       await prisma.activityLog.create({

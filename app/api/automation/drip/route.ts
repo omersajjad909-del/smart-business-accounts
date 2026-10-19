@@ -242,6 +242,7 @@ async function handleTrigger(_req: NextRequest, companyId: string) {
       subject: (step.subject || campaign.subject || "").replace(/\{\{name\}\}/g, enrollment.name || "Customer"),
       html: bodyHtml,
       companyId,
+      requireCompanyConfig: true,
     });
 
     sent++;

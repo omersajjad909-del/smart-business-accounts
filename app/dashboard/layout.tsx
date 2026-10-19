@@ -30,6 +30,7 @@ import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/l
 import { dataUrlToFile } from "@/lib/dataUrl";
 import { PageCloseGuardCtx, type PageCloseGuard } from "@/components/PageCloseGuard";
 import ClientPageTracker from "@/components/ClientPageTracker";
+import EmailSetupPrompt from "@/components/EmailSetupPrompt";
 
 // Deferred out of the main dashboard bundle — each is only relevant in a rare
 // path (avatar cropping, demo-account sessions), not needed for first paint
@@ -1343,6 +1344,7 @@ export default function DashboardLayout({
       <ZeroFieldSelect />
       <DemoSessionTimer />
       <ClientPageTracker userId={currentUser.id} companyId={currentUser.companyId || ""} />
+      <EmailSetupPrompt />
 
       {/* ── Idle auto-logout warning modal ── */}
       {showIdleWarning && (

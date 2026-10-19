@@ -154,6 +154,7 @@ export async function POST(req: NextRequest) {
             subject: `A message for you, ${customer.customerName}`,
             html: `<p>${personalised.replace(/\n/g, "<br/>")}</p>`,
             companyId,
+            requireCompanyConfig: true,
           });
           if (result.success) sent++; else skipped++;
 

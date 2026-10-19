@@ -125,6 +125,7 @@ export async function POST(req: NextRequest) {
       subject: `FinovaOS — ${summary.periodLabel} business summary`,
       html,
       companyId,
+      requireCompanyConfig: true,
     });
     if (!result.success) return NextResponse.json({ error: result.error || "Send failed" }, { status: 500 });
 

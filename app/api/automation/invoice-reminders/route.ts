@@ -106,6 +106,7 @@ export async function POST(req: NextRequest) {
       subject: `Payment reminder — Invoice ${invoice.invoiceNo} (${daysOverdue} days overdue)`,
       html,
       companyId,
+      requireCompanyConfig: true,
     });
 
     if (!result.success) {
