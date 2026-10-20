@@ -14,21 +14,47 @@
 import { aiUrl } from "@/lib/aiGateway";
 import { generateMarketingText } from "@/lib/marketingAutopilotAI";
 
+// Neither provider fetch below had a timeout, so a stalled upstream (observed
+// with the Cloudflare AI Gateway route) hung the request indefinitely instead
+// of failing over to the next provider. A bounded timeout turns a hang into a
+// fast, catchable error so the fallback chain in generateProspectingText
+// actually runs.
+const PROVIDER_TIMEOUT_MS = 15_000;
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(`Request timed out after ${timeoutMs}ms.`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function generateViaGrok(prompt: string, maxTokens: number): Promise<string> {
   const key = process.env.XAI_API_KEY || process.env.GROK_API_KEY;
   if (!key) throw new Error("XAI_API_KEY / GROK_API_KEY not set.");
 
   // xAI is not one of the gateway's known providers (lib/aiGateway.ts), so this
   // always goes direct rather than through CF_AI_GATEWAY_*.
-  const res = await fetch("https://api.x.ai/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-    body: JSON.stringify({
-      model: process.env.GROK_MODEL || "grok-4-fast",
-      max_tokens: maxTokens,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
+  const res = await fetchWithTimeout(
+    "https://api.x.ai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: process.env.GROK_MODEL || "grok-4-fast",
+        max_tokens: maxTokens,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    },
+    PROVIDER_TIMEOUT_MS,
+  );
 
   if (!res.ok) {
     throw new Error(`Grok error ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
@@ -44,7 +70,7 @@ async function generateViaGemini(prompt: string, maxTokens: number): Promise<str
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY not set.");
 
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     aiUrl(
       "google-ai-studio",
       `v1beta/models/gemini-flash-latest:generateContent?key=${key}`,
@@ -58,6 +84,7 @@ async function generateViaGemini(prompt: string, maxTokens: number): Promise<str
         generationConfig: { temperature: 0.3, maxOutputTokens: maxTokens },
       }),
     },
+    PROVIDER_TIMEOUT_MS,
   );
 
   if (!res.ok) {
