@@ -3573,10 +3573,10 @@ export default function DashboardLayout({
               const ended = msLeft <= 0;
               const urgent = ended || daysLeft <= 3;
               return (
-                <div style={{ margin:"0 0 16px", padding:"12px 16px", borderRadius:12, display:"flex", alignItems:"center", gap:10, flexWrap:"wrap",
+                <div style={{ margin:"0 0 16px", padding:"12px 16px", borderRadius:12, display:"flex", alignItems:"center", gap:"8px 14px", flexWrap:"wrap",
                   background: urgent ? "rgba(249,115,22,.08)" : "rgba(52,211,153,.08)",
                   border: urgent ? "1px solid rgba(249,115,22,.25)" : "1px solid rgba(52,211,153,.25)" }}>
-                  <div style={{ fontSize:13, lineHeight:1.6, flex:1, minWidth:200 }}>
+                  <div style={{ fontSize:13, lineHeight:1.6, flex:"1 1 260px", minWidth:0, overflowWrap:"anywhere" }}>
                     {ended
                       ? <><strong>Your free trial has ended.</strong> Your data is safe. Choose a plan to keep creating records.</>
                       : <><strong>Free trial: {daysLeft} {daysLeft === 1 ? "day" : "days"} left.</strong> Everything is unlocked. No card needed until you choose a plan. <strong>Free setup included:</strong> set it up yourself in 2 minutes, or ask our team.</>}
