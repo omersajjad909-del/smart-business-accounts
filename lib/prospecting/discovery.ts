@@ -281,7 +281,8 @@ async function discoverViaPlaces(
           console.error(
             `[prospecting/discovery] Places searchText failed (HTTP ${res.status}): ${body.slice(0, 500)}`,
           );
-          break;
+          // Throw so discoverCompanies shows the real reason in the admin UI.
+          throw new Error(`HTTP ${res.status} ${body.slice(0, 200)}`.trim());
         }
         const data = (await res.json()) as { places?: PlacesResult[]; nextPageToken?: string };
 
