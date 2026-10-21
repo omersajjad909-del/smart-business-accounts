@@ -372,7 +372,12 @@ async function discoverViaApollo(
       }),
     });
 
-    if (!res.ok) break;
+    if (!res.ok) {
+      // Surface the real reason (bad key, free plan without API access, rate
+      // limit) instead of a silent "no results" — discoverCompanies shows it.
+      const detail = (await res.text().catch(() => "")).slice(0, 200);
+      throw new Error(`HTTP ${res.status} ${detail}`.trim());
+    }
     const data = (await res.json()) as { organizations?: ApolloOrg[]; accounts?: ApolloOrg[] };
     const orgs = [...(data.organizations || []), ...(data.accounts || [])];
     if (!orgs.length) break;
