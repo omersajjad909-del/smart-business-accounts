@@ -61,6 +61,22 @@ type Prospect = {
   source: string;
 };
 
+type FoundCompany = {
+  id: string;
+  name: string;
+  website: string | null;
+  industry: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  score: number | null;
+  tier: string | null;
+  status: string;
+  rejectReason: string | null;
+  source: string;
+  contactCount: number;
+};
+
 type OutreachEmail = {
   id: string;
   subject: string;
@@ -90,6 +106,8 @@ export default function AdminProspectingPage() {
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [emails, setEmails] = useState<OutreachEmail[] | null>(null);
+  const [companies, setCompanies] = useState<FoundCompany[] | null>(null);
+  const [companyTotal, setCompanyTotal] = useState(0);
   const [queueStatus, setQueueStatus] = useState("pending_review");
   const [tierFilter, setTierFilter] = useState("all");
 
@@ -134,7 +152,22 @@ export default function AdminProspectingPage() {
     }
   }, [selectedId, queueStatus, tierFilter]);
 
+  const loadCompanies = useCallback(async () => {
+    if (!selectedId) return setCompanies([]);
+    try {
+      const r = await api(`/api/admin/prospecting/prospects?campaignId=${selectedId}`);
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Could not load the companies");
+      setCompanies(data.prospects || []);
+      setCompanyTotal(data.total || 0);
+    } catch (e: any) {
+      setCompanies([]);
+      setNotice({ kind: "err", text: e.message });
+    }
+  }, [selectedId]);
+
   useEffect(() => { loadCampaigns(); }, [loadCampaigns]);
+  useEffect(() => { loadCompanies(); }, [loadCompanies]);
   useEffect(() => { loadQueue(); }, [loadQueue]);
 
   async function createCampaign() {
@@ -173,7 +206,7 @@ export default function AdminProspectingPage() {
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "The run failed");
       setNotice({ kind: "ok", text: data.message });
-      await Promise.all([loadCampaigns(), loadQueue()]);
+      await Promise.all([loadCampaigns(), loadQueue(), loadCompanies()]);
     } catch (e: any) {
       setNotice({ kind: "err", text: e.message });
     } finally {
@@ -340,6 +373,52 @@ export default function AdminProspectingPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="panel">
+        <div className="toolbar">
+          <h2 className="grow">Discovered companies{companies ? ` (${companyTotal})` : ""}</h2>
+        </div>
+        {!companies ? (
+          <div className="empty-state">Loading...</div>
+        ) : companies.length === 0 ? (
+          <div className="empty-state">No companies yet. Press Run one batch to start discovery.</div>
+        ) : (
+          <div className="found-wrap">
+            <table className="found-table">
+              <thead>
+                <tr>
+                  <th>Company</th><th>City</th><th>Phone</th><th>Website</th>
+                  <th>Source</th><th>Score</th><th>Status</th><th>Emails found</th>
+                </tr>
+              </thead>
+              <tbody>
+                {companies.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <strong>{c.name}</strong>
+                      {c.address && <small>{c.address}</small>}
+                    </td>
+                    <td>{c.city || "-"}</td>
+                    <td>{c.phone ? <a href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}>{c.phone}</a> : "-"}</td>
+                    <td>
+                      {c.website
+                        ? <a href={c.website} target="_blank" rel="noreferrer noopener">{c.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a>
+                        : "-"}
+                    </td>
+                    <td>{c.source}</td>
+                    <td>{c.score ?? "-"}{c.tier ? ` (${c.tier})` : ""}</td>
+                    <td>
+                      <span className="badge badge-slate">{c.status.replace(/_/g, " ")}</span>
+                      {c.rejectReason && <small>{c.rejectReason}</small>}
+                    </td>
+                    <td>{c.contactCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="panel">
@@ -581,6 +660,12 @@ textarea{resize:vertical;line-height:1.55}
 .badge-orange{background:rgba(251,146,60,.16);color:#fdba74}
 .badge-green{background:rgba(34,197,94,.16);color:#86efac}
 .badge-slate{background:rgba(148,163,184,.16);color:#cbd5e1}
+.found-wrap{overflow-x:auto}
+.found-table{width:100%;border-collapse:collapse;font-size:13px}
+.found-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(148,163,184,.72);padding:8px 10px;white-space:nowrap}
+.found-table td{padding:10px;border-top:1px solid rgba(148,163,184,.12);vertical-align:top}
+.found-table td small{display:block;margin-top:3px;font-size:11.5px;color:rgba(148,163,184,.75);max-width:280px}
+.found-table a{color:#93c5fd}
 @media (max-width: 1100px){.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.readiness-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width: 640px){
   .page-head h1{font-size:26px}
