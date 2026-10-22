@@ -8,7 +8,7 @@
  * part a human actually does, so it gets the screen.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 type Readiness = {
   discoveryProvider: string;
@@ -82,9 +82,35 @@ type FoundCompany = {
   instagram: string | null;
   whatsapp: string | null;
   contacts: Array<{ email: string; name: string | null; verifyStatus: string }>;
+  leadId: string | null;
+  lastActivity: { at: string; action: string; channel: string | null; note: string | null } | null;
 };
 
-const STATUS_LABELS: Record<string, string> = { phone_only: "Phone / WhatsApp" };
+type FunnelStage = { key: string; label: string; count: number; basis: string };
+type Funnel = { stages: FunnelStage[]; scope: string; caveat: string; truncated: boolean };
+
+const STATUS_LABELS: Record<string, string> = {
+  phone_only: "Phone / WhatsApp",
+  contacted: "Contacted",
+  replied: "Replied",
+  lost: "Not interested",
+  opted_out: "Do not contact",
+};
+
+/** value -> what the select shows, and the request it sends. */
+const OUTCOMES: Array<{ value: string; label: string; action: string; channel?: string; asksNote?: boolean; confirm?: string }> = [
+  { value: "called", label: "Called", action: "contacted", channel: "call", asksNote: true },
+  { value: "whatsapp", label: "Messaged on WhatsApp", action: "contacted", channel: "whatsapp" },
+  { value: "emailed", label: "Emailed by hand", action: "contacted", channel: "email" },
+  { value: "replied", label: "They replied", action: "replied", asksNote: true },
+  { value: "interested", label: "Interested - make a Lead", action: "interested", asksNote: true },
+  { value: "not_interested", label: "Not interested", action: "not_interested", asksNote: true },
+  { value: "dnc", label: "Do not contact again", action: "do_not_contact", asksNote: true, confirm: "Block this company's email addresses from every future campaign?" },
+];
+
+const ACTION_LABELS: Record<string, string> = {
+  contacted: "Contacted", replied: "Replied", interested: "Interested", not_interested: "Not interested", do_not_contact: "Do not contact",
+};
 
 /** wa.me wants country-code digits with no leading zero. Landlines have no WhatsApp. */
 function whatsappNumber(c: FoundCompany): string | null {
@@ -149,6 +175,10 @@ export default function AdminProspectingPage() {
   const [emails, setEmails] = useState<OutreachEmail[] | null>(null);
   const [companies, setCompanies] = useState<FoundCompany[] | null>(null);
   const [companyTotal, setCompanyTotal] = useState(0);
+  const [funnel, setFunnel] = useState<Funnel | null>(null);
+  const [funnelAll, setFunnelAll] = useState(false);
+  const [script, setScript] = useState<{ id: string; channel: string; text: string; loading: boolean } | null>(null);
+  const [actingId, setActingId] = useState<string | null>(null);
   const [queueStatus, setQueueStatus] = useState("pending_review");
   const [tierFilter, setTierFilter] = useState("all");
 
@@ -207,7 +237,69 @@ export default function AdminProspectingPage() {
     }
   }, [selectedId]);
 
+  const loadFunnel = useCallback(async () => {
+    try {
+      const params = funnelAll || !selectedId ? "" : `?campaignId=${selectedId}`;
+      const r = await api(`/api/admin/prospecting/funnel${params}`);
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Could not load the funnel");
+      setFunnel(data);
+    } catch (e: any) {
+      setFunnel(null);
+      setNotice({ kind: "err", text: e.message });
+    }
+  }, [selectedId, funnelAll]);
+
+  async function logOutcome(company: FoundCompany, outcomeValue: string) {
+    const outcome = OUTCOMES.find((o) => o.value === outcomeValue);
+    if (!outcome) return;
+    if (outcome.confirm && !window.confirm(outcome.confirm)) return;
+    const note = outcome.asksNote ? window.prompt(`Note about ${company.name} (optional)`) : null;
+    if (note === null && outcome.asksNote) {
+      // Cancel on the prompt means "do not log this at all".
+      return;
+    }
+
+    setActingId(company.id);
+    try {
+      const r = await api(`/api/admin/prospecting/prospects/${company.id}/action`, {
+        method: "POST",
+        body: JSON.stringify({ action: outcome.action, channel: outcome.channel, note }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Could not save that");
+      setNotice({
+        kind: "ok",
+        text: data.createdLead
+          ? `${company.name} is now a lead — open the Leads page to follow it up.`
+          : `Saved: ${ACTION_LABELS[outcome.action]} - ${company.name}.`,
+      });
+      await Promise.all([loadCompanies(), loadFunnel()]);
+    } catch (e: any) {
+      setNotice({ kind: "err", text: e.message });
+    } finally {
+      setActingId(null);
+    }
+  }
+
+  async function makeScript(company: FoundCompany, channel: "call" | "whatsapp") {
+    setScript({ id: company.id, channel, text: "", loading: true });
+    try {
+      const r = await api(`/api/admin/prospecting/prospects/${company.id}/script`, {
+        method: "POST",
+        body: JSON.stringify({ channel, language: "roman_ur" }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Could not write the script");
+      setScript({ id: company.id, channel, text: data.script, loading: false });
+    } catch (e: any) {
+      setScript(null);
+      setNotice({ kind: "err", text: e.message });
+    }
+  }
+
   useEffect(() => { loadCampaigns(); }, [loadCampaigns]);
+  useEffect(() => { loadFunnel(); }, [loadFunnel]);
   useEffect(() => { loadCompanies(); }, [loadCompanies]);
   useEffect(() => { loadQueue(); }, [loadQueue]);
 
@@ -247,7 +339,7 @@ export default function AdminProspectingPage() {
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "The run failed");
       setNotice({ kind: "ok", text: data.message });
-      await Promise.all([loadCampaigns(), loadQueue(), loadCompanies()]);
+      await Promise.all([loadCampaigns(), loadQueue(), loadCompanies(), loadFunnel()]);
     } catch (e: any) {
       setNotice({ kind: "err", text: e.message });
     } finally {
@@ -418,6 +510,35 @@ export default function AdminProspectingPage() {
 
       <section className="panel">
         <div className="toolbar">
+          <h2 className="grow">Outbound funnel</h2>
+          <select value={funnelAll ? "all" : "campaign"} onChange={(e) => setFunnelAll(e.target.value === "all")}>
+            <option value="campaign">This campaign</option>
+            <option value="all">All campaigns</option>
+          </select>
+        </div>
+        {!funnel ? (
+          <div className="empty-state">Loading...</div>
+        ) : (
+          <>
+            <div className="funnel-row">
+              {funnel.stages.map((stage, index) => {
+                const previous = index > 0 ? funnel.stages[index - 1].count : 0;
+                return (
+                  <article key={stage.key} className="funnel-step" title={stage.basis}>
+                    <span>{stage.label}</span>
+                    <strong>{stage.count}</strong>
+                    <small>{index > 0 && previous > 0 ? `${Math.round((stage.count / previous) * 100)}% of ${funnel.stages[index - 1].label.toLowerCase()}` : "\u00a0"}</small>
+                  </article>
+                );
+              })}
+            </div>
+            <p className="hint">Real counts only, from the database. Hover a step to see how it is counted. {funnel.caveat}</p>
+          </>
+        )}
+      </section>
+
+      <section className="panel">
+        <div className="toolbar">
           <h2 className="grow">Discovered companies{companies ? ` (${companyTotal})` : ""}</h2>
           {companies && companies.length > 0 && (
             <button className="btn" onClick={() => downloadCsv(companies)}>Export CSV</button>
@@ -433,14 +554,15 @@ export default function AdminProspectingPage() {
               <thead>
                 <tr>
                   <th>Company</th><th>City</th><th>Phone</th><th>Website</th>
-                  <th>Emails</th><th>Score</th><th>Status</th>
+                  <th>Emails</th><th>Score</th><th>Status</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {companies.map((c) => {
                   const wa = whatsappNumber(c);
                   return (
-                    <tr key={c.id}>
+                    <Fragment key={c.id}>
+                    <tr>
                       <td>
                         <strong>{c.name}</strong>
                         {c.rating != null && (
@@ -475,9 +597,66 @@ export default function AdminProspectingPage() {
                       <td>{c.score ?? "-"}{c.tier ? ` (${c.tier})` : ""}</td>
                       <td>
                         <span className="badge badge-slate">{STATUS_LABELS[c.status] || c.status.replace(/_/g, " ")}</span>
+                        {c.leadId && <small><a href="/admin/leads">Lead created</a></small>}
                         {c.rejectReason && <small>{c.rejectReason}</small>}
+                        {c.lastActivity && (
+                          <small>
+                            {ACTION_LABELS[c.lastActivity.action] || c.lastActivity.action}
+                            {c.lastActivity.channel ? ` (${c.lastActivity.channel})` : ""}
+                            {" · "}{new Date(c.lastActivity.at).toLocaleDateString()}
+                            {c.lastActivity.note ? ` - ${c.lastActivity.note}` : ""}
+                          </small>
+                        )}
+                      </td>
+                      <td className="actions-cell">
+                        {c.status !== "opted_out" && (
+                          <>
+                            <div className="row-btns">
+                              {c.phone && <button className="btn btn-mini" onClick={() => makeScript(c, "whatsapp")}>WhatsApp text</button>}
+                              {c.phone && <button className="btn btn-mini" onClick={() => makeScript(c, "call")}>Call script</button>}
+                            </div>
+                            <select
+                              value=""
+                              disabled={actingId === c.id}
+                              onChange={(e) => { const v = e.target.value; e.target.value = ""; logOutcome(c, v); }}
+                            >
+                              <option value="">Log an outcome...</option>
+                              {OUTCOMES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                            </select>
+                          </>
+                        )}
                       </td>
                     </tr>
+                    {script && script.id === c.id && (
+                      <tr className="script-row">
+                        <td colSpan={8}>
+                          {script.loading ? (
+                            <em>Writing the {script.channel === "call" ? "call script" : "WhatsApp message"}...</em>
+                          ) : (
+                            <div className="script-box">
+                              <strong>{script.channel === "call" ? "Call script" : "WhatsApp message"} (Roman Urdu, draft for you to edit)</strong>
+                              <textarea readOnly value={script.text} rows={script.channel === "call" ? 14 : 6} />
+                              <div className="row-btns">
+                                <button className="btn btn-mini" onClick={() => navigator.clipboard?.writeText(script.text)}>Copy</button>
+                                {script.channel === "whatsapp" && whatsappNumber(c) && (
+                                  <a
+                                    className="btn btn-mini"
+                                    href={`https://wa.me/${whatsappNumber(c)}?text=${encodeURIComponent(script.text)}`}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                  >
+                                    Open in WhatsApp
+                                  </a>
+                                )}
+                                <button className="btn btn-mini" onClick={() => setScript(null)}>Close</button>
+                              </div>
+                              <small>You send it yourself from your own phone, one at a time. Nothing is sent automatically.</small>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
                 })}
               </tbody>
@@ -725,6 +904,18 @@ textarea{resize:vertical;line-height:1.55}
 .badge-orange{background:rgba(251,146,60,.16);color:#fdba74}
 .badge-green{background:rgba(34,197,94,.16);color:#86efac}
 .badge-slate{background:rgba(148,163,184,.16);color:#cbd5e1}
+.funnel-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px}
+.funnel-step{border:1px solid rgba(148,163,184,.16);border-radius:16px;padding:12px;display:grid;gap:2px;background:rgba(15,23,42,.35);cursor:help}
+.funnel-step span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(148,163,184,.75)}
+.funnel-step strong{font-size:26px;line-height:1.1}
+.funnel-step small{font-size:11px;color:rgba(148,163,184,.7)}
+.actions-cell{min-width:170px}
+.actions-cell select{width:100%;margin-top:6px}
+.row-btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn-mini{padding:5px 9px;font-size:11.5px;border-radius:10px}
+.script-row td{background:rgba(15,23,42,.45)}
+.script-box{display:grid;gap:8px}
+.script-box textarea{width:100%;font:inherit;font-size:13px;line-height:1.55}
 .found-wrap{overflow-x:auto}
 .found-table{width:100%;border-collapse:collapse;font-size:13px}
 .found-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(148,163,184,.72);padding:8px 10px;white-space:nowrap}

@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
           id: true, name: true, website: true, domain: true, industry: true,
           phone: true, address: true, city: true, country: true,
           score: true, tier: true, status: true, rejectReason: true, source: true,
-          enrichment: true,
+          leadId: true, enrichment: true,
           contacts: { select: { email: true, name: true, verifyStatus: true }, orderBy: { isPrimary: "desc" } },
         },
       }),
@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
           facebook: e.socials?.facebook || null,
           instagram: e.socials?.instagram || null,
           whatsapp: Array.isArray(e.whatsapp) ? e.whatsapp[0] || null : null,
+          lastActivity: Array.isArray(e.activity) && e.activity.length ? e.activity[e.activity.length - 1] : null,
         };
       }),
     });

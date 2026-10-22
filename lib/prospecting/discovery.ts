@@ -48,7 +48,7 @@ export function normaliseDomain(input: string | null | undefined): string | null
   return cleaned.includes(".") ? cleaned : null;
 }
 
-const COUNTRY_NAMES: Record<string, string> = {
+export const COUNTRY_NAMES: Record<string, string> = {
   PK: "Pakistan", AE: "United Arab Emirates", SA: "Saudi Arabia", QA: "Qatar",
   OM: "Oman", BH: "Bahrain", KW: "Kuwait", IN: "India", BD: "Bangladesh",
   LK: "Sri Lanka", US: "United States", CA: "Canada", AU: "Australia",
