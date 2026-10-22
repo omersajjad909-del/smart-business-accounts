@@ -8,6 +8,7 @@ import {
   markDailyReportSent,
   type DailyReportSettings,
 } from "@/lib/dailyReportSettings";
+import { getMarketRates, type MarketRates } from "@/lib/marketRates";
 
 // ─── Time helpers ─────────────────────────────────────────────────────────────
 
@@ -199,13 +200,24 @@ export async function buildDailyReport(companyId: string, timezone: string, now 
 const money = (v: number, cur: string) =>
   `${cur} ${Math.round(v).toLocaleString("en-US")}`;
 
-export function formatReportText(r: DailyReport): string {
+function marketRatesLines(rates?: MarketRates | null): string[] {
+  if (!rates) return [];
+  const parts: string[] = [];
+  if (rates.usdPkr) parts.push(`USD/PKR ${rates.usdPkr.toFixed(1)}`);
+  if (rates.gold) parts.push(`Gold $${Math.round(rates.gold).toLocaleString("en-US")}/oz`);
+  if (rates.wtiOil) parts.push(`WTI Oil $${rates.wtiOil.toFixed(1)}/bbl`);
+  if (!parts.length) return [];
+  return [`🌍 *Markets:* ${parts.join(" · ")}`, ``];
+}
+
+export function formatReportText(r: DailyReport, rates?: MarketRates | null): string {
   const m = (v: number) => money(v, r.currency);
   const arrow = r.sales.changePct === null ? "" : ` (${r.sales.changePct >= 0 ? "▲" : "▼"} ${Math.abs(r.sales.changePct)}% vs yesterday)`;
   const lines = [
     `📊 *Daily Report — ${r.company}*`,
     `📅 ${r.date}`,
     ``,
+    ...marketRatesLines(rates),
     `💰 *Sales:* ${m(r.sales.total)} (${r.sales.count} invoices)${arrow}`,
     `📥 *Received:* ${m(r.received.total)} (${r.received.count} receipts)`,
     ...Object.entries(r.received.byMode).map(([k, v]) => `   • ${k}: ${m(v)}`),
@@ -247,7 +259,7 @@ export function formatReportSms(r: DailyReport): string {
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
-export function formatReportHtml(r: DailyReport): string {
+export function formatReportHtml(r: DailyReport, rates?: MarketRates | null): string {
   const m = (v: number) => esc(money(v, r.currency));
   const row = (label: string, value: string, sub = "") =>
     `<tr><td style="padding:9px 0;border-bottom:1px solid #eee;color:#555">${label}${sub ? `<div style="font-size:11px;color:#999">${sub}</div>` : ""}</td>` +
@@ -256,8 +268,17 @@ export function formatReportHtml(r: DailyReport): string {
     `<h3 style="margin:22px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#b45309">${t}</h3>`;
   const change = r.sales.changePct === null ? "" : `${r.sales.changePct >= 0 ? "▲" : "▼"} ${Math.abs(r.sales.changePct)}% vs yesterday`;
 
+  const marketParts: string[] = [];
+  if (rates?.usdPkr) marketParts.push(`USD/PKR <b>${rates.usdPkr.toFixed(1)}</b>`);
+  if (rates?.gold) marketParts.push(`Gold <b>$${Math.round(rates.gold).toLocaleString("en-US")}</b>/oz`);
+  if (rates?.wtiOil) marketParts.push(`WTI Oil <b>$${rates.wtiOil.toFixed(1)}</b>/bbl`);
+  const marketLine = marketParts.length
+    ? `<p style="margin:0 0 14px;padding:8px 12px;background:#f8f5f0;border-radius:6px;color:#555;font-size:13px">🌍 ${marketParts.join(" &nbsp;·&nbsp; ")}</p>`
+    : "";
+
   const body = `
     <p style="margin:0 0 4px;color:#555">End-of-day summary for <b>${esc(r.date)}</b></p>
+    ${marketLine}
     ${head("Today")}
     <table style="width:100%;border-collapse:collapse">
       ${row("Sales", m(r.sales.total), `${r.sales.count} invoices · ${change}`)}
@@ -291,7 +312,8 @@ export async function deliverDailyReport(
   report: DailyReport,
 ): Promise<DeliveryResult[]> {
   const out: DeliveryResult[] = [];
-  const text = formatReportText(report);
+  const rates = await getMarketRates().catch(() => null);
+  const text = formatReportText(report, rates);
 
   if (settings.whatsapp) {
     for (const to of settings.phones) {
@@ -310,7 +332,7 @@ export async function deliverDailyReport(
     const res = await sendEmail({
       to: settings.emails,
       subject: `📊 Daily Report ${report.date} — ${report.company}`,
-      html: formatReportHtml(report),
+      html: formatReportHtml(report, rates),
       text: text.replace(/\*/g, ""),
     });
     out.push({ channel: "email", to: settings.emails.join(", "), ok: res.success, error: res.error });
