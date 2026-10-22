@@ -119,30 +119,38 @@ async function auditGithubRepo(): Promise<GithubAudit> {
   };
 }
 
-// ─── Evergreen rotating content ─────────────────────────────────────────────
+// ─── Evergreen rotating content (Urdu) ──────────────────────────────────────
 // Picked by day-of-year so the email varies day to day without inventing facts.
 
 const BUSINESS_PROBLEMS = [
-  "Most SMEs still run bookkeeping on Excel or a paper register, so nobody actually knows the real cash position until month-end — by then, late payments and supplier bills have already piled up and decisions get made on gut feel instead of data.",
-  "A huge share of small trading businesses discover they're overdue on receivables only when a supplier chases them for payment — by then the cash gap is already a crisis, not a warning.",
-  "One-person accounting teams are the single point of failure in most SMEs: if that person is sick or leaves, nobody else can answer 'what do we owe, and what's owed to us?' for weeks.",
-  "Inventory that isn't tracked in real time quietly becomes dead stock — businesses keep reordering items they already have too much of, and run out of the ones that actually sell.",
-  "Manual invoicing means pricing mistakes and missed tax fields go unnoticed until a customer disputes an invoice or a tax filing gets rejected — automation catches both before they go out the door.",
+  "زیادہ تر چھوٹے اور درمیانے کاروبار (SMEs) اب بھی اپنی بہی کھاتہ داری (bookkeeping) کے لیے Excel شیٹس یا رجسٹر پر انحصار کرتے ہیں، جس کی وجہ سے مہینے کے آخر تک یہ پتا ہی نہیں چلتا کہ اصل کیش پوزیشن کیا ہے۔ نتیجتاً late payments اور supplier کے bills اکٹھے ہو جاتے ہیں، اور founder کو فیصلے گٹ فیلنگ پر لینے پڑتے ہیں، ڈیٹا پر نہیں۔",
+  "بہت سے چھوٹے trading کاروبار کو یہ پتا ہی اس وقت چلتا ہے کہ receivables overdue ہو چکے ہیں جب کوئی supplier خود پیسوں کا تقاضا کرے — اس وقت تک cash gap ایک warning نہیں رہتا، بحران بن جاتا ہے۔",
+  "ایک آدمی کی اکاؤنٹنگ ٹیم چھوٹے کاروبار کا single point of failure ہوتی ہے — اگر وہ شخص بیمار ہو جائے یا نوکری چھوڑ دے، تو ہفتوں تک کسی کو یہ جواب نہیں مل پاتا کہ 'ہم پر کتنا واجب ہے، اور ہمارا کتنا واجب ہے۔'",
+  "جو inventory real-time میں ٹریک نہیں ہوتی وہ خاموشی سے dead stock بن جاتی ہے — کاروبار ان آئٹمز کو دوبارہ آرڈر کرتے رہتے ہیں جو پہلے ہی زیادہ ہیں، اور وہ آئٹمز ختم ہو جاتے ہیں جو اصل میں بکتے ہیں۔",
+  "مینوئل invoicing کی وجہ سے pricing کی غلطیاں اور چھوٹے tax fields نظر انداز ہو جاتے ہیں — اور مسئلہ تب پتا چلتا ہے جب کوئی customer invoice پر dispute کرے یا tax filing reject ہو جائے۔ Automation یہ دونوں مسئلے بل جانے سے پہلے پکڑ لیتی ہے۔",
 ];
 
 const FOUNDER_LEARNINGS = [
-  "The most expensive mistake in early-stage B2B SaaS isn't building new features — it's keeping features alive that no customer actually uses. Every feature is an ongoing cost in support tickets, future bugs, and onboarding complexity. Once a week, look at actual usage and ask: is this still earning its keep? Fewer, heavily-used features beat many lightly-used ones.",
-  "Founders tend to price based on their own cost-plus math, not on what the customer's alternative actually costs them (a spreadsheet, an accountant's time, a missed deadline). Price against the alternative, not against your effort.",
-  "Churn almost never shows up as a single dramatic event — it shows up as declining usage weeks before the cancellation. The customers worth calling are the ones who've gone quiet, not the ones who've already cancelled.",
-  "A feature request from your biggest customer is data about one account, not a roadmap. Three unrelated customers asking for the same thing independently is a much stronger signal than one loud one.",
-  "Support tickets are free market research. The same question asked five times isn't five support tickets — it's one missing feature or one confusing screen.",
+  "early-stage B2B SaaS میں سب سے مہنگی غلطی نئے features بنانا نہیں، بلکہ ایسے features کو زندہ رکھنا ہے جن کا کوئی customer اصل میں استعمال نہیں کر رہا۔ ہر feature ایک ongoing لاگت ہے — support tickets، future bugs، اور onboarding کی پیچیدگی کی صورت میں۔ ہفتے میں ایک بار analytics دیکھ کر پوچھیں: 'کیا یہ feature ابھی بھی اپنی لاگت کے قابل ہے؟'",
+  "Founders اکثر اپنی قیمت اپنی لاگت کے حساب سے رکھتے ہیں، نہ کہ اس حساب سے کہ customer کا alternative (ایک spreadsheet، accountant کا وقت، یا ایک missed deadline) اصل میں کتنا مہنگا پڑتا ہے۔ قیمت alternative کے مقابلے میں رکھیں، اپنی کوشش کے مقابلے میں نہیں۔",
+  "Churn کبھی ایک اچانک واقعہ نہیں ہوتا — یہ کینسلیشن سے ہفتوں پہلے گرتے ہوئے usage کی صورت میں ظاہر ہوتا ہے۔ جن customers کو کال کرنی چاہیے وہ ہیں جو خاموش ہو گئے ہیں، نہ کہ وہ جو پہلے ہی چھوڑ چکے۔",
+  "آپ کے سب سے بڑے customer کی feature request صرف ایک اکاؤنٹ کا ڈیٹا ہے، roadmap نہیں۔ تین مختلف، غیر متعلقہ customers کا الگ الگ ایک ہی چیز مانگنا ایک اکیلے بلند آواز customer سے کہیں زیادہ مضبوط signal ہے۔",
+  "Support tickets مفت market research ہیں۔ ایک ہی سوال پانچ بار پوچھا جانا پانچ support tickets نہیں — ایک missing feature یا ایک confusing screen ہے۔",
 ];
 
-const MARKET_WATCH = [
-  "FBR's e-invoicing / POS integration push keeps expanding to more sectors — worth checking fbr.gov.pk periodically for whether your sector's compliance deadline has moved.",
-  "International accounting competitors (QuickBooks, Zoho Books, Xero) revise pricing periodically — a quarterly check on their current plans keeps your own positioning honest.",
-  "Pakistan's minimum-tax regime has been widening to cover more business categories over the past few cycles — worth a periodic check with your tax advisor on whether that now applies to you.",
-  "Buyers increasingly compare software not just on price but on local compliance support (FBR-ready invoicing, PKR pricing) — that's a real differentiator against international tools that treat Pakistan as an afterthought.",
+const MARKET_WATCH: string[][] = [
+  [
+    "FBR کا e-invoicing / POS integration والا framework مزید sectors تک بڑھ رہا ہے — periodically fbr.gov.pk چیک کریں کہ آپ کے sector کی deadline تو نہیں بدلی۔",
+    "Tax year کے لیے corporate income tax rate اور minimum tax regime وقتاً فوقتاً بدلتے رہتے ہیں — اپنے tax advisor سے سال میں ایک بار ضرور کنفرم کر لیں۔",
+  ],
+  [
+    "International accounting competitors (QuickBooks, Zoho Books, Xero) وقتاً فوقتاً اپنی pricing بدلتے ہیں — ہر quarter ان کے current plans چیک کرنا اپنی positioning کو honest رکھتا ہے۔",
+    "Buyers اب صرف قیمت نہیں بلکہ local compliance support (FBR-ready invoicing، PKR pricing) بھی دیکھ کر فیصلہ کرتے ہیں — یہ ان international tools کے مقابلے میں ایک حقیقی فرق ہے جو Pakistan کو afterthought سمجھتے ہیں۔",
+  ],
+  [
+    "Pakistan کا minimum-tax regime پچھلے کچھ عرصے میں مزید business categories تک پھیلا ہے — چیک کر لیں کہ کہیں یہ اب آپ پر بھی لاگو تو نہیں ہوتا۔",
+    "FBR کے نئے notifications کے تحت invoice issue ہونے کے بعد محدود وقت میں ہی correction ممکن ہوتا ہے، اس کے بعد صرف Commissioner کی منظوری سے — اپنی invoicing workflow اس حساب سے رکھیں۔",
+  ],
 ];
 
 function pickForToday<T>(arr: T[]): T {
@@ -152,6 +160,10 @@ function pickForToday<T>(arr: T[]): T {
   return arr[dayOfYear % arr.length];
 }
 
+// 1 troy oz = 31.1034768g, 1 tola = 11.6638038g.
+const GRAMS_PER_OZ = 31.1034768;
+const GRAMS_PER_TOLA = 11.6638038;
+
 // ─── Assembly ────────────────────────────────────────────────────────────────
 
 export type FounderBrief = {
@@ -159,7 +171,7 @@ export type FounderBrief = {
   rates: Awaited<ReturnType<typeof getMarketRates>>;
   businessProblem: string;
   founderLearning: string;
-  marketWatch: string;
+  marketWatch: string[];
   github: GithubAudit;
   statusReachable: { ok: boolean; status?: number };
   testimonialsReachable: { ok: boolean; status?: number };
@@ -188,63 +200,100 @@ export async function buildFounderBrief(): Promise<FounderBrief> {
   };
 }
 
-function githubFindings(g: GithubAudit): string[] {
-  const out: string[] = [];
+/** Prose explaining what was found, plus 2-3 concrete numbered actions — only for findings that actually hold. */
+function githubSection(g: GithubAudit): { intro: string; actions: string[] } {
+  const actions: string[] = [];
+  const noticed: string[] = [];
+
   if (g.branchProtected === false) {
-    out.push("main branch has no branch protection set up — anyone with write access can push directly, with no required PR review.");
+    noticed.push("main branch پر کوئی branch protection سیٹ نہیں ہے — یعنی write access رکھنے والا کوئی بھی شخص بغیر کسی required PR review کے براہِ راست main میں push کر سکتا ہے۔");
+    actions.push("main branch پر branch protection آن کریں (required PR review کے ساتھ) — چاہے آپ خود ہی review کریں، ہر تبدیلی ایک PR سے گزرے گی تو accidental regressions پکڑنا آسان ہو جائے گا۔");
   }
   if (g.repeatedMessage) {
-    out.push(`${g.repeatedMessage.count} of the last ${g.recentCommitCount} commits share the exact message "${g.repeatedMessage.text}" — specific, change-describing commit messages would make future debugging and changelogs much easier.`);
+    noticed.push(`حالیہ ${g.recentCommitCount} commits میں سے ${g.repeatedMessage.count} کا بالکل ایک جیسا message ہے: "${g.repeatedMessage.text}" — یہ pattern بار بار نظر آ رہا ہے۔`);
+    actions.push("Commit messages کو change-specific بنائیں — generic پیغام repeat ہونے سے future debugging اور changelog مشکل ہو جاتا ہے۔");
   }
   if (g.openIssues === 0 && g.openPRs === 0) {
-    out.push("0 open issues and 0 open PRs right now — if small bugs/ideas aren't tracked anywhere, they tend to stay invisible and get forgotten.");
+    noticed.push("فی الحال 0 open issues اور 0 open PRs ہیں۔");
+    actions.push("چھوٹے bugs/features بھی GitHub Issues میں لکھنا شروع کریں تاکہ کام invisible نہ رہے اور priorities واضح رہیں۔");
   }
-  return out;
+
+  if (!noticed.length) {
+    return { intro: "اس چیک میں کوئی قابلِ ذکر مسئلہ نظر نہیں آیا۔", actions: [] };
+  }
+  return { intro: noticed.join(" "), actions };
+}
+
+function gramsToTola(usdPerOz: number, usdPkr: number): number {
+  const pkrPerOz = usdPerOz * usdPkr;
+  const pkrPerGram = pkrPerOz / GRAMS_PER_OZ;
+  return pkrPerGram * GRAMS_PER_TOLA;
 }
 
 export function formatFounderBriefHtml(b: FounderBrief): string {
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
   const head = (t: string) =>
-    `<h3 style="margin:22px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#b45309">${esc(t)}</h3>`;
+    `<h3 dir="rtl" style="margin:22px 0 6px;font-size:13px;letter-spacing:.02em;color:#b45309;text-align:right">${esc(t)}</h3>`;
+  const p = (html: string) => `<p dir="rtl" style="margin:0 0 6px;color:#444;text-align:right;line-height:1.9">${html}</p>`;
 
   const r = b.rates;
-  const rateLine = (label: string, value: string | null) => (value ? `<div>${esc(label)}: <b>${esc(value)}</b></div>` : "");
-  const ratesBlock = `
-    ${rateLine("Gold", r.gold ? `$${Math.round(r.gold).toLocaleString("en-US")}/oz` : null)}
-    ${rateLine("USD/PKR", r.usdPkr ? r.usdPkr.toFixed(1) : null)}
-    ${rateLine("Brent Oil", r.brentOil ? `$${r.brentOil.toFixed(1)}/bbl` : null)}
-    ${rateLine("WTI Oil", r.wtiOil ? `$${r.wtiOil.toFixed(1)}/bbl` : null)}
-  `;
+  const goldTola = r.gold && r.usdPkr ? gramsToTola(r.gold, r.usdPkr) : null;
+  const ratesLines: string[] = [];
+  if (goldTola) {
+    ratesLines.push(`🥇 <b>سونا (Pakistan):</b> آج 24 قیراط سونا تقریباً <b>${Math.round(goldTola).toLocaleString("en-US")} روپے</b> فی تولہ کے قریب ہے (international spot rate سے approximate — مقامی مارکیٹ ریٹ میں چند ہزار روپے کا فرق ممکن ہے)۔`);
+  }
+  if (r.usdPkr) {
+    ratesLines.push(`💵 <b>USD/PKR:</b> تقریباً <b>${r.usdPkr.toFixed(1)} روپے</b> فی ڈالر (ایک عمومی market rate — interbank اور open market ریٹ میں چھوٹا فرق ہو سکتا ہے)۔`);
+  }
+  if (r.brentOil || r.wtiOil) {
+    const parts = [
+      r.brentOil ? `Brent crude تقریباً <b>${r.brentOil.toFixed(1)} امریکی ڈالر</b> فی بیرل` : "",
+      r.wtiOil ? `WTI crude تقریباً <b>${r.wtiOil.toFixed(1)} امریکی ڈالر</b> فی بیرل` : "",
+    ].filter(Boolean).join("، اور ");
+    ratesLines.push(`🛢️ <b>آئل (Oil):</b> ${parts} کی سطح پر ہے۔`);
+  }
+  const ratesBlock = ratesLines.length
+    ? ratesLines.map((l) => p(l)).join("") + p(`<span style="font-size:12px;color:#999">نوٹ: یہ تمام figures approximate اور latest-available ہیں، لائیو مارکیٹ ریٹ میں معمولی فرق ممکن ہے۔</span>`)
+    : p("آج ریٹس fetch نہیں ہو سکے — اگلی برِیف میں دوبارہ کوشش ہوگی۔");
 
-  const findings = githubFindings(b.github);
-  const githubBlock = findings.length
-    ? `<ul style="margin:4px 0;padding-left:20px;color:#555">${findings.map((f) => `<li style="margin-bottom:6px">${esc(f)}</li>`).join("")}</ul>`
-    : `<p style="margin:0;color:#555">No notable issues found in this check.</p>`;
+  const gh = githubSection(b.github);
+  const githubActionsHtml = gh.actions.length
+    ? `<div dir="rtl" style="text-align:right">${gh.actions.map((a, i) => p(`${["1️⃣", "2️⃣", "3️⃣", "4️⃣"][i] || "•"} ${esc(a)}`)).join("")}</div>`
+    : "";
 
-  const opsLines = [
-    `Status page (${APP_HOST}/status): ${b.statusReachable.ok ? "reachable" : "not reachable in this check"}`,
-    `Testimonials page: ${b.testimonialsReachable.ok ? "reachable" : "not reachable in this check"}`,
-    b.ssl
-      ? `SSL certificate: expires ${b.ssl.validTo} (${b.ssl.daysRemaining} days left)${b.ssl.daysRemaining <= 30 ? " ⚠️ renew soon" : ""}`
-      : `SSL certificate: could not be checked`,
-  ];
+  const opsNote = (ok: boolean, label: string) =>
+    ok
+      ? `✅ ${label} فیچ ہو گیا۔`
+      : `⚠️ ${label} اس چیک میں fetch نہیں ہو سکا — یہ environment کی کسی محدودیت (جیسے egress proxy) کی وجہ سے بھی ہو سکتا ہے، لازمی real outage نہیں۔`;
+
+  const sslLine = b.ssl
+    ? `🔒 <b>SSL Certificate:</b> ${APP_HOST} کا SSL certificate <b>${b.ssl.validTo}</b> کو expire ہو رہا ہے، یعنی آج سے تقریباً <b>${b.ssl.daysRemaining} دن</b> باقی ہیں۔${b.ssl.daysRemaining <= 30 ? " ⚠️ یہ 30 دن کی حد کے قریب ہے، renewal جلد چیک/schedule کر لیں۔" : ""}`
+    : `🔒 <b>SSL Certificate:</b> اس چیک میں expiry تاریخ معلوم نہیں ہو سکی۔`;
+
+  const marketWatchBlock = b.marketWatch.map((line) => p(`• ${esc(line)}`)).join("");
 
   const body = `
-    <p style="margin:0 0 4px;color:#555">Founder Daily Brief — <b>${esc(b.date)}</b></p>
-    ${head("Rates")}
-    <div style="color:#333">${ratesBlock}</div>
-    ${head("Today's business problem")}
-    <p style="margin:0;color:#555">${esc(b.businessProblem)}</p>
-    ${head("Repo health check (GitHub)")}
-    ${githubBlock}
-    ${head("Product & ops status")}
-    <div style="color:#555">${opsLines.map((l) => `<div style="margin-bottom:4px">${esc(l)}</div>`).join("")}</div>
-    ${head("Market & competition watch")}
-    <p style="margin:0;color:#555">${esc(b.marketWatch)}</p>
-    ${head("Founder learning")}
-    <p style="margin:0;color:#555">${esc(b.founderLearning)}</p>
-    ${head("Go deeper")}
-    <p style="margin:0;color:#555">Connect Sentry, Vercel, Stripe, GA/PostHog and Semrush/Ahrefs at <a href="https://claude.ai/customize/connectors">claude.ai/customize/connectors</a> for error monitoring, deploy status, revenue, traffic and SEO automation.</p>
+    <div dir="rtl" style="text-align:right;direction:rtl">
+    ${p(`<b>${esc(b.date)}</b>`)}
+    ${head("ریٹس (Rates)")}
+    ${ratesBlock}
+    ${head("آج کا بزنس مسئلہ")}
+    ${p(esc(b.businessProblem))}
+    ${head("بانی کا آج کا فوکس (GitHub ریپو کا جائزہ)")}
+    ${p(esc(gh.intro))}
+    ${githubActionsHtml}
+    ${head("پراڈکٹ اور آپریشنز کی صورتحال")}
+    ${p(opsNote(b.statusReachable.ok, `Status page (${APP_HOST}/status)`))}
+    ${p(sslLine)}
+    ${head("گروتھ چیک")}
+    ${p(opsNote(b.testimonialsReachable.ok, `Testimonials page (${APP_HOST}/testimonials)`) + " اسی طرح waitlist/signup کے numbers کا کوئی اندازہ نہیں لگایا جا رہا — ان کی درست رپورٹنگ کے لیے Supabase یا کوئی analytics tool connect کرنا ہوگا۔")}
+    ${head("مارکیٹ اور مقابلت پر نظر")}
+    ${marketWatchBlock}
+    ${head("💡 آج کا فاؤنڈر لرننگ")}
+    ${p(esc(b.founderLearning))}
+    ${head("🔌 مزید آٹومیشن")}
+    ${p(`پوری automation (error monitoring, deploy status, revenue, traffic, SEO rankings) unlock کرنے کے لیے <a href="https://claude.ai/customize/connectors">claude.ai/customize/connectors</a> پر connect کریں: Sentry, Vercel, Stripe, Google Analytics (یا PostHog), Semrush/Ahrefs۔`)}
+    </div>
   `;
   return emailBase({ companyName: "FinovaOS", badgeText: "Founder Brief", badgeColor: "#b45309", content: body });
 }
