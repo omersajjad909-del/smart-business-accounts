@@ -31,7 +31,8 @@ export async function GET(req: NextRequest) {
           id: true, name: true, website: true, domain: true, industry: true,
           phone: true, address: true, city: true, country: true,
           score: true, tier: true, status: true, rejectReason: true, source: true,
-          _count: { select: { contacts: true } },
+          enrichment: true,
+          contacts: { select: { email: true, name: true, verifyStatus: true }, orderBy: { isPrimary: "desc" } },
         },
       }),
       db.prospectCompany.count({ where: { campaignId } }),
@@ -39,7 +40,19 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       total,
-      prospects: prospects.map(({ _count, ...p }: any) => ({ ...p, contactCount: _count.contacts })),
+      prospects: prospects.map(({ enrichment, ...p }: any) => {
+        const e = (enrichment || {}) as Record<string, any>;
+        return {
+          ...p,
+          // Facts discovery and enrichment stored, flattened for the table.
+          rating: typeof e.rating === "number" ? e.rating : null,
+          reviewCount: typeof e.userRatingCount === "number" ? e.userRatingCount : null,
+          mapsUrl: typeof e.googleMapsUri === "string" ? e.googleMapsUri : null,
+          facebook: e.socials?.facebook || null,
+          instagram: e.socials?.instagram || null,
+          whatsapp: Array.isArray(e.whatsapp) ? e.whatsapp[0] || null : null,
+        };
+      }),
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

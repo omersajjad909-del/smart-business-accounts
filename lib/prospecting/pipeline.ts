@@ -31,6 +31,9 @@ const BATCH = {
   draft: 12,
 } as const;
 
+/** Companies enriched at the same time within one batch. */
+const ENRICH_CONCURRENCY = 4;
+
 /** Below this score we do not spend a model call writing an email. */
 const MIN_SCORE_TO_DRAFT = 55;
 
@@ -81,13 +84,15 @@ async function runDiscover(campaign: any): Promise<StageResult> {
             industry: company.industry, country: company.country, city: company.city,
             address: company.address, lat: company.lat, lng: company.lng, phone: company.phone,
             source: company.source, sourceRef: company.sourceRef,
+            enrichment: company.raw ?? undefined,
             status: "discovered",
           },
           update: { name: company.name, website: company.website, phone: company.phone },
         });
       } else {
-        // No domain means no email path either; keep the row for phone follow-up
-        // but it will never reach the drafting stage.
+        // No website from the directory. Keep the row in the pipeline anyway:
+        // enrichment tries to find one online, and if it cannot, the company is
+        // still a phone / WhatsApp lead rather than a dead end.
         await db.prospectCompany.create({
           data: {
             campaignId: campaign.id,
@@ -95,7 +100,8 @@ async function runDiscover(campaign: any): Promise<StageResult> {
             industry: company.industry, country: company.country, city: company.city,
             address: company.address, lat: company.lat, lng: company.lng, phone: company.phone,
             source: company.source, sourceRef: company.sourceRef,
-            status: "skipped", rejectReason: "No website or domain — cannot email.",
+            enrichment: company.raw ?? undefined,
+            status: "discovered",
           },
         });
       }
@@ -135,7 +141,7 @@ async function runEnrich(campaign: any): Promise<StageResult> {
   let done = 0;
   let failed = 0;
 
-  for (const row of rows) {
+  const processRow = async (row: any) => {
     try {
       const enrichment = await enrichCompany({
         name: row.name, domain: row.domain, website: row.website, industry: row.industry,
@@ -154,11 +160,30 @@ async function runEnrich(campaign: any): Promise<StageResult> {
           branches: enrichment.branches.length ? enrichment.branches : undefined,
           revenueBand: enrichment.revenueBand,
           currentSoftware: enrichment.currentSoftware,
-          enrichment: { notes: enrichment.notes, ...enrichment.raw },
+          // Keep what discovery stored (Maps rating, review count, ...) alongside
+          // what enrichment found, instead of overwriting it.
+          enrichment: {
+            ...((row.enrichment as Record<string, unknown>) || {}),
+            notes: enrichment.notes,
+            socials: enrichment.socials || {},
+            ...enrichment.raw,
+          },
           enrichedAt: new Date(),
           status: "enriched",
         },
       });
+
+      // A website we found ourselves. Separate update: the (campaign, domain)
+      // unique index can reject the domain, and that must not undo the rest.
+      if (enrichment.foundWebsite) {
+        await db.prospectCompany.update({
+          where: { id: row.id },
+          data: { website: enrichment.foundWebsite, domain: normaliseDomain(enrichment.foundWebsite) },
+        }).catch(() => db.prospectCompany.update({
+          where: { id: row.id },
+          data: { website: enrichment.foundWebsite },
+        }).catch(() => {}));
+      }
 
       for (const [index, contact] of enrichment.contacts.entries()) {
         const suppressed = await isSuppressed(contact.email);
@@ -184,6 +209,13 @@ async function runEnrich(campaign: any): Promise<StageResult> {
         data: { status: "enriched", enrichedAt: new Date(), enrichment: { error: "Enrichment failed" } },
       }).catch(() => {});
     }
+  };
+
+  // Each company is several page fetches plus a model call (~30s). Run them in
+  // small parallel groups so a full batch fits inside the function's time limit
+  // instead of taking 12 x 30s.
+  for (let i = 0; i < rows.length; i += ENRICH_CONCURRENCY) {
+    await Promise.all(rows.slice(i, i + ENRICH_CONCURRENCY).map(processRow));
   }
 
   await bumpProgress(campaign.id, { enriched: done });
@@ -218,7 +250,11 @@ async function runScore(campaign: any): Promise<StageResult> {
     try {
       const enrichment = (row.enrichment as { notes?: string | null }) || {};
       const result = await scoreProspect(
-        toScorable(row, { notes: enrichment.notes ?? null } as any),
+        toScorable(row, {
+          notes: enrichment.notes ?? null,
+          reviewCount: Number((enrichment as any).userRatingCount) || null,
+          rating: Number((enrichment as any).rating) || null,
+        } as any),
       );
 
       await db.prospectCompany.update({
@@ -274,14 +310,27 @@ async function runDraft(campaign: any): Promise<StageResult> {
   for (const row of rows) {
     // Below the bar, or no way to reach them — park it, do not pay for a draft.
     const contact = row.contacts.find((c: any) => c.verifyStatus !== "invalid") || null;
-    if ((row.score ?? 0) < MIN_SCORE_TO_DRAFT || !contact) {
+    if (!contact) {
+      // Nothing to email, but they have a phone number: keep them as a call /
+      // WhatsApp lead instead of discarding the company.
+      await db.prospectCompany.update({
+        where: { id: row.id },
+        data: {
+          status: "phone_only",
+          rejectReason: row.phone
+            ? "No email found — reach by phone / WhatsApp."
+            : "No email or phone found.",
+        },
+      });
+      skipped++;
+      continue;
+    }
+    if ((row.score ?? 0) < MIN_SCORE_TO_DRAFT) {
       await db.prospectCompany.update({
         where: { id: row.id },
         data: {
           status: "skipped",
-          rejectReason: !contact
-            ? "No usable contact email found."
-            : `Score ${row.score} is below the ${MIN_SCORE_TO_DRAFT} drafting threshold.`,
+          rejectReason: `Score ${row.score} is below the ${MIN_SCORE_TO_DRAFT} drafting threshold.`,
         },
       });
       skipped++;

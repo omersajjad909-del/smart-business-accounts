@@ -20,6 +20,7 @@ import { generateMarketingText } from "@/lib/marketingAutopilotAI";
 // fast, catchable error so the fallback chain in generateProspectingText
 // actually runs.
 const PROVIDER_TIMEOUT_MS = 15_000;
+const GROUNDED_TIMEOUT_MS = 30_000;
 
 async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
   const controller = new AbortController();
@@ -96,6 +97,50 @@ async function generateViaGemini(prompt: string, maxTokens: number): Promise<str
   };
   const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("").trim();
   if (!text) throw new Error("Gemini returned an empty response.");
+  return text;
+}
+
+/**
+ * Gemini with Google Search grounding: the model looks the thing up on the live
+ * web instead of answering from memory. Used only to *find a lead* (a company's
+ * website or social page) — never to state a fact we then rely on. Whatever it
+ * returns is checked against the real page before it is used.
+ *
+ * Grounding cannot be combined with a JSON response mode, so the caller parses
+ * the text itself. Throws when GEMINI_API_KEY is absent so callers can skip.
+ */
+export async function generateGroundedText(prompt: string, maxTokens: number): Promise<string> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new Error("GEMINI_API_KEY not set.");
+
+  const res = await fetchWithTimeout(
+    aiUrl(
+      "google-ai-studio",
+      `v1beta/models/gemini-flash-latest:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${key}`,
+    ),
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        tools: [{ google_search: {} }],
+        generationConfig: { temperature: 0, maxOutputTokens: maxTokens },
+      }),
+    },
+    // Grounded calls run a live search first, so they take longer than a plain one.
+    GROUNDED_TIMEOUT_MS,
+  );
+
+  if (!res.ok) {
+    throw new Error(`Gemini grounded error ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
+  }
+
+  const json = (await res.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
+  const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("").trim();
+  if (!text) throw new Error("Gemini grounded call returned an empty response.");
   return text;
 }
 

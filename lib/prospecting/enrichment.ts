@@ -16,10 +16,18 @@ import { generateProspectingText } from "./ai";
 import { SOFTWARE_GAP_SIGNALS, ENTRENCHED_SOFTWARE } from "./icp";
 import { bandForEmployees } from "./types";
 import type { DiscoveredCompany, EnrichmentResult } from "./types";
+import { fetchHtml, htmlToText, hostOf } from "./web";
+import { extractContactSignals, rankEmails, discoverContactLinks } from "./contactSignals";
+import type { EmailCandidate } from "./contactSignals";
+import { findOnlinePresence } from "./presence";
 
-const FETCH_TIMEOUT_MS = 12_000;
-const MAX_HTML_CHARS = 60_000;
+export { htmlToText };
+
 const MAX_TEXT_CHARS = 9_000;
+/** Successful page fetches per company — enough for home + contact + about. */
+const MAX_PAGES = 4;
+/** Fetch attempts per company, counting the 404s on guessed paths. */
+const MAX_ATTEMPTS = 10;
 
 const EMPTY: EnrichmentResult = {
   employeeCount: null,
@@ -34,69 +42,11 @@ const EMPTY: EnrichmentResult = {
   raw: {},
 };
 
-/** Pages most likely to carry staff counts, branch lists and contact details. */
-const CANDIDATE_PATHS = ["", "/about", "/about-us", "/contact", "/contact-us"];
+/** Contact pages come first: that is where the address and phone actually are. */
+const CONTACT_PATHS = ["/contact", "/contact-us", "/contactus", "/contact.html", "/contact-us.html", "/get-in-touch"];
+const ABOUT_PATHS = ["/about", "/about-us", "/aboutus", "/about.html"];
 
-async function fetchText(url: string): Promise<string | null> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      redirect: "follow",
-      headers: {
-        // Identify ourselves honestly; some hosts block unlabelled clients.
-        "User-Agent": "FinovaOS-Prospecting/1.0 (+https://finovaos.app)",
-        Accept: "text/html,application/xhtml+xml",
-      },
-    });
-    if (!res.ok) return null;
-    const type = res.headers.get("content-type") || "";
-    if (!type.includes("html") && !type.includes("text")) return null;
-    return (await res.text()).slice(0, MAX_HTML_CHARS);
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-/** Crude but dependency-free HTML to text. Good enough for an LLM to read. */
-export function htmlToText(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&#\d+;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi;
-
-/** Addresses that are never a decision maker and only dilute the score. */
-const ROLE_PREFIXES = [
-  "noreply", "no-reply", "donotreply", "postmaster", "abuse", "webmaster",
-  "privacy", "legal", "unsubscribe", "mailer-daemon",
-];
-
-function harvestEmails(text: string, domain: string | null): string[] {
-  const found = new Set<string>();
-  for (const match of text.match(EMAIL_RE) || []) {
-    const email = match.toLowerCase();
-    const local = email.split("@")[0];
-    if (ROLE_PREFIXES.some((p) => local.startsWith(p))) continue;
-    if (/\.(png|jpg|jpeg|gif|svg|webp)$/.test(email)) continue;
-    // Only trust an address on the company's own domain; anything else on the
-    // page is usually their web designer or a stock-photo licence.
-    if (domain && !email.endsWith(`@${domain}`)) continue;
-    found.add(email);
-  }
-  return [...found].slice(0, 5);
-}
+const isContactPath = (path: string) => /contact|get-in-touch|reach-us/i.test(path);
 
 function detectSoftware(text: string): string | null {
   const lower = text.toLowerCase();
@@ -253,25 +203,64 @@ export async function enrichCompany(company: DiscoveredCompany): Promise<Enrichm
     };
   }
 
-  const base = company.website || (company.domain ? `https://${company.domain}` : null);
-  if (!base) return { ...EMPTY, notes: "No website found — nothing to enrich from." };
+  let base = company.website || (company.domain ? `https://${company.domain}` : null);
+  let foundWebsite: string | null = null;
+  let socials: EnrichmentResult["socials"] = {};
 
-  const pages: string[] = [];
-  for (const path of CANDIDATE_PATHS) {
-    const html = await fetchText(`${base.replace(/\/$/, "")}${path}`);
-    if (html) pages.push(htmlToText(html));
-    if (pages.join(" ").length > MAX_TEXT_CHARS) break;
+  // The directory listing had no website. Try to find one (and any social
+  // page) before giving up on the email route.
+  if (!base) {
+    const presence = await findOnlinePresence(company);
+    socials = presence.socials;
+    if (presence.website) {
+      base = presence.website;
+      foundWebsite = presence.website;
+    }
   }
 
-  if (!pages.length) {
-    return { ...EMPTY, notes: "Website unreachable — scored on directory data only." };
+  if (!base) {
+    return { ...EMPTY, socials, notes: "No website found — nothing to enrich from." };
   }
 
-  const text = pages.join("\n\n").slice(0, MAX_TEXT_CHARS);
+  const root = base.replace(/\/$/, "");
+  const siteDomain = hostOf(base) || company.domain;
+
+  const texts: string[] = [];
+  const emailCandidates: EmailCandidate[] = [];
+  const phones = new Set<string>();
+  const whatsapp = new Set<string>();
+
+  const queue: string[] = ["", ...CONTACT_PATHS, ...ABOUT_PATHS];
+  let fetched = 0;
+  for (let i = 0; i < queue.length && i < MAX_ATTEMPTS && fetched < MAX_PAGES; i++) {
+    const path = queue[i];
+    const html = await fetchHtml(`${root}${path}`);
+    if (!html) continue;
+    fetched++;
+
+    const signals = extractContactSignals(html, isContactPath(path));
+    emailCandidates.push(...signals.emails);
+    signals.phones.forEach((n) => phones.add(n));
+    signals.whatsapp.forEach((n) => whatsapp.add(n));
+    texts.push(htmlToText(html));
+
+    // The home page tells us what this site actually calls its contact page.
+    if (path === "") {
+      for (const link of discoverContactLinks(html, root)) {
+        if (!queue.includes(link)) queue.splice(1, 0, link);
+      }
+    }
+  }
+
+  if (!fetched) {
+    return { ...EMPTY, socials, foundWebsite, notes: "Website unreachable — scored on directory data only." };
+  }
+
+  const text = texts.join("\n\n").slice(0, MAX_TEXT_CHARS);
   const facts = await extractFacts(company, text);
 
-  const scrapedEmails = harvestEmails(text, company.domain);
-  const hunterContacts = company.domain ? await findContactsViaHunter(company.domain) : [];
+  const scrapedEmails = rankEmails(emailCandidates, siteDomain);
+  const hunterContacts = siteDomain ? await findContactsViaHunter(siteDomain) : [];
 
   // Prefer a named contact from the provider; fall back to whatever the site
   // published. Deduplicate on the address itself.
@@ -313,6 +302,13 @@ export async function enrichCompany(company: DiscoveredCompany): Promise<Enrichm
       : detectSoftware(text),
     contacts: [...byEmail.values()].slice(0, 5),
     notes: facts.notes ? String(facts.notes).slice(0, 800) : null,
-    raw: { pagesFetched: pages.length, textLength: text.length },
+    foundWebsite,
+    socials,
+    raw: {
+      pagesFetched: fetched,
+      textLength: text.length,
+      sitePhones: [...phones].slice(0, 5),
+      whatsapp: [...whatsapp].slice(0, 3),
+    },
   };
 }

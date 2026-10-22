@@ -74,8 +74,49 @@ type FoundCompany = {
   status: string;
   rejectReason: string | null;
   source: string;
-  contactCount: number;
+  country: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  mapsUrl: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  whatsapp: string | null;
+  contacts: Array<{ email: string; name: string | null; verifyStatus: string }>;
 };
+
+const STATUS_LABELS: Record<string, string> = { phone_only: "Phone / WhatsApp" };
+
+/** wa.me wants country-code digits with no leading zero. Landlines have no WhatsApp. */
+function whatsappNumber(c: FoundCompany): string | null {
+  if (c.whatsapp) return c.whatsapp.replace(/\D/g, "");
+  if (!c.phone) return null;
+  let digits = c.phone.replace(/\D/g, "");
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  if (c.country === "PK") {
+    if (digits.startsWith("0")) digits = `92${digits.slice(1)}`;
+    return /^923\d{9}$/.test(digits) ? digits : null; // 03xx = mobile, 04x = landline
+  }
+  return digits.length >= 10 ? digits : null;
+}
+
+function downloadCsv(companies: FoundCompany[]) {
+  const cell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = [
+    ["Company", "City", "Phone", "WhatsApp", "Website", "Emails", "Rating", "Reviews", "Score", "Tier", "Status", "Note", "Address", "Maps"],
+    ...companies.map((c) => [
+      c.name, c.city, c.phone, whatsappNumber(c) ? `https://wa.me/${whatsappNumber(c)}` : "", c.website,
+      c.contacts.map((x) => x.email).join("; "), c.rating, c.reviewCount, c.score, c.tier,
+      c.status, c.rejectReason, c.address, c.mapsUrl,
+    ]),
+  ];
+  const blob = new Blob([rows.map((r) => r.map(cell).join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "prospect-companies.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 type OutreachEmail = {
   id: string;
@@ -378,6 +419,9 @@ export default function AdminProspectingPage() {
       <section className="panel">
         <div className="toolbar">
           <h2 className="grow">Discovered companies{companies ? ` (${companyTotal})` : ""}</h2>
+          {companies && companies.length > 0 && (
+            <button className="btn" onClick={() => downloadCsv(companies)}>Export CSV</button>
+          )}
         </div>
         {!companies ? (
           <div className="empty-state">Loading...</div>
@@ -389,32 +433,53 @@ export default function AdminProspectingPage() {
               <thead>
                 <tr>
                   <th>Company</th><th>City</th><th>Phone</th><th>Website</th>
-                  <th>Source</th><th>Score</th><th>Status</th><th>Emails found</th>
+                  <th>Emails</th><th>Score</th><th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                {companies.map((c) => (
-                  <tr key={c.id}>
-                    <td>
-                      <strong>{c.name}</strong>
-                      {c.address && <small>{c.address}</small>}
-                    </td>
-                    <td>{c.city || "-"}</td>
-                    <td>{c.phone ? <a href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}>{c.phone}</a> : "-"}</td>
-                    <td>
-                      {c.website
-                        ? <a href={c.website} target="_blank" rel="noreferrer noopener">{c.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a>
-                        : "-"}
-                    </td>
-                    <td>{c.source}</td>
-                    <td>{c.score ?? "-"}{c.tier ? ` (${c.tier})` : ""}</td>
-                    <td>
-                      <span className="badge badge-slate">{c.status.replace(/_/g, " ")}</span>
-                      {c.rejectReason && <small>{c.rejectReason}</small>}
-                    </td>
-                    <td>{c.contactCount}</td>
-                  </tr>
-                ))}
+                {companies.map((c) => {
+                  const wa = whatsappNumber(c);
+                  return (
+                    <tr key={c.id}>
+                      <td>
+                        <strong>{c.name}</strong>
+                        {c.rating != null && (
+                          <small>
+                            ★ {c.rating}{c.reviewCount != null ? ` · ${c.reviewCount} reviews` : ""}
+                            {c.mapsUrl && <> · <a href={c.mapsUrl} target="_blank" rel="noreferrer noopener">Maps</a></>}
+                          </small>
+                        )}
+                        {c.address && <small>{c.address}</small>}
+                      </td>
+                      <td>{c.city || "-"}</td>
+                      <td>
+                        {c.phone ? <a href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}>{c.phone}</a> : "-"}
+                        {wa && (
+                          <small>
+                            <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer noopener">WhatsApp</a>
+                          </small>
+                        )}
+                      </td>
+                      <td>
+                        {c.website
+                          ? <a href={c.website} target="_blank" rel="noreferrer noopener">{c.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a>
+                          : "-"}
+                        {c.facebook && <small><a href={c.facebook} target="_blank" rel="noreferrer noopener">Facebook</a></small>}
+                        {c.instagram && <small><a href={c.instagram} target="_blank" rel="noreferrer noopener">Instagram</a></small>}
+                      </td>
+                      <td>
+                        {c.contacts.length === 0 ? "-" : c.contacts.map((x) => (
+                          <div key={x.email}>{x.email}</div>
+                        ))}
+                      </td>
+                      <td>{c.score ?? "-"}{c.tier ? ` (${c.tier})` : ""}</td>
+                      <td>
+                        <span className="badge badge-slate">{STATUS_LABELS[c.status] || c.status.replace(/_/g, " ")}</span>
+                        {c.rejectReason && <small>{c.rejectReason}</small>}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

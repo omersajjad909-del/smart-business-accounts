@@ -3084,6 +3084,7 @@ model ProspectCompany {
 
   /// discovered | enriched | scored | drafted | pending_review | approved
   /// | rejected | queued | sent | replied | bounced | converted | skipped
+  /// | phone_only (no email found — call / WhatsApp lead)
   status       String  @default("discovered")
   rejectReason String?
   /// Set once this prospect answers and becomes a real Lead row.

@@ -237,6 +237,11 @@ type PlacesResult = {
   internationalPhoneNumber?: string;
   location?: { latitude?: number; longitude?: number };
   businessStatus?: string;
+  /** Google Maps rating, 1-5. */
+  rating?: number;
+  /** How many Maps reviews — the best size/activity signal a directory gives us. */
+  userRatingCount?: number;
+  googleMapsUri?: string;
 };
 
 async function discoverViaPlaces(
@@ -262,7 +267,7 @@ async function discoverViaPlaces(
             "Content-Type": "application/json",
             "X-Goog-Api-Key": key,
             "X-Goog-FieldMask":
-              "places.id,places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.internationalPhoneNumber,places.location,places.businessStatus,nextPageToken",
+              "places.id,places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.internationalPhoneNumber,places.location,places.businessStatus,places.rating,places.userRatingCount,places.googleMapsUri,nextPageToken",
           },
           body: JSON.stringify({
             textQuery: `${labelFor(industry)} company in ${city}, ${COUNTRY_NAMES[country] || country}`,

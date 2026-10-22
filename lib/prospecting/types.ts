@@ -62,6 +62,9 @@ export type EnrichmentResult = {
   }>;
   /** Free-text notes the scorer and the drafter both read. */
   notes: string | null;
+  /** A website we located ourselves (and verified) when discovery had none. */
+  foundWebsite?: string | null;
+  socials?: { facebook?: string | null; instagram?: string | null; linkedin?: string | null };
   raw: Record<string, unknown>;
 };
 

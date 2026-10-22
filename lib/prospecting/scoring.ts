@@ -25,11 +25,23 @@ export type ScorableProspect = {
   currentSoftware: string | null;
   contacts: Array<{ email: string; title?: string | null; verifyStatus?: string | null }>;
   notes: string | null;
+  /** Google Maps review count and rating, when discovery came from Places. */
+  reviewCount?: number | null;
+  rating?: number | null;
 };
 
 /** 0-15. Big enough to pay $49/month, small enough that SAP has not got there. */
-function sizeScore(employees: number | null): number {
-  if (employees == null) return 5; // unknown is not the same as bad
+function sizeScore(employees: number | null, reviewCount?: number | null): number {
+  if (employees == null) {
+    // No headcount, but a busy Maps listing is a decent proxy for a business
+    // that is trading, has customers, and is big enough to need real books.
+    if (reviewCount != null) {
+      if (reviewCount >= 100) return 9;
+      if (reviewCount >= 25) return 7;
+      if (reviewCount >= 5) return 6;
+    }
+    return 5; // unknown is not the same as bad
+  }
   if (employees < 3) return 1;
   if (employees < 10) return 7;
   if (employees <= 50) return 15; // the sweet spot
@@ -78,7 +90,7 @@ function reachabilityScore(contacts: ScorableProspect["contacts"]): number {
 export function deterministicScore(prospect: ScorableProspect): Omit<ScoreBreakdown, "aiJudgement"> {
   return {
     fit: icpFitScore(prospect.industry),
-    size: sizeScore(prospect.employeeCount),
+    size: sizeScore(prospect.employeeCount, prospect.reviewCount),
     multiLocation: multiLocationScore(prospect.warehouseCount, prospect.locationCount),
     softwareGap: softwareGapScore(prospect.currentSoftware),
     reachability: reachabilityScore(prospect.contacts),
@@ -105,6 +117,7 @@ Employees: ${prospect.employeeCount ?? "unknown"}
 Warehouses: ${prospect.warehouseCount ?? "unknown"}
 Other locations: ${prospect.locationCount ?? "unknown"}
 Software in use: ${prospect.currentSoftware || "none detected"}
+Google Maps: ${prospect.reviewCount != null ? `${prospect.reviewCount} reviews${prospect.rating ? `, rated ${prospect.rating}` : ""}` : "no listing data"}
 What their website says: ${prospect.notes || "no website text available"}
 
 A deterministic rubric already gave them ${Object.values(base).reduce((a, b) => a + b, 0)}/70 on industry fit, size, multi-location, software gap and reachability. Do not re-score those.
@@ -176,5 +189,7 @@ export function toScorable(
     currentSoftware: row.currentSoftware,
     contacts: row.contacts || [],
     notes: enrichment?.notes ?? null,
+    reviewCount: (enrichment as { reviewCount?: number | null } | null | undefined)?.reviewCount ?? null,
+    rating: (enrichment as { rating?: number | null } | null | undefined)?.rating ?? null,
   };
 }
