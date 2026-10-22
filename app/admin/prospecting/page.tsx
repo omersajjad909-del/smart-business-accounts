@@ -8,7 +8,7 @@
  * part a human actually does, so it gets the screen.
  */
 
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Readiness = {
   discoveryProvider: string;
@@ -237,14 +237,23 @@ export default function AdminProspectingPage() {
     }
   }, [selectedId]);
 
+  const funnelRequest = useRef(0);
+
   const loadFunnel = useCallback(async () => {
+    // "This campaign" with no campaign selected yet must not fall back to
+    // "every campaign" — that showed the all-campaigns total under the wrong label.
+    if (!funnelAll && !selectedId) return setFunnel(null);
+
+    // Responses can arrive out of order; only the latest request may write.
+    const request = ++funnelRequest.current;
     try {
-      const params = funnelAll || !selectedId ? "" : `?campaignId=${selectedId}`;
+      const params = funnelAll ? "" : `?campaignId=${selectedId}`;
       const r = await api(`/api/admin/prospecting/funnel${params}`);
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Could not load the funnel");
-      setFunnel(data);
+      if (request === funnelRequest.current) setFunnel(data);
     } catch (e: any) {
+      if (request !== funnelRequest.current) return;
       setFunnel(null);
       setNotice({ kind: "err", text: e.message });
     }
