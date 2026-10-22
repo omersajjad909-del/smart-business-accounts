@@ -54,6 +54,7 @@ const ICONS: Record<string, ReactNode> = {
   code:         <Svg><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></Svg>,
   spark:        <Svg><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></Svg>,
   archive:      <Svg><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" rx="1" /><line x1="10" y1="12" x2="14" y2="12" /></Svg>,
+  radar:        <Svg><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /><line x1="12" y1="12" x2="19" y2="5" /></Svg>,
 };
 
 function Svg({ children }: { children: ReactNode }) {
