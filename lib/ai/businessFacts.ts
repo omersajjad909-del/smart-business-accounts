@@ -74,7 +74,7 @@ export async function loadBusinessFacts(monthsBack = 12): Promise<BusinessFacts>
   const now = new Date();
   const from = new Date(now.getTime() - monthsBack * 31 * DAY);
 
-  const [invoices, subs, companies] = await Promise.all([
+  const [rawInvoices, rawSubs, companies, excludedRows] = await Promise.all([
     db.platformInvoice.findMany({
       where: { issuedAt: { gte: from } },
       select: {
@@ -98,9 +98,30 @@ export async function loadBusinessFacts(monthsBack = 12): Promise<BusinessFacts>
       select: { id: true, name: true, plan: true, country: true, createdAt: true, cancelledAt: true },
       take: 3000,
     }).catch(() => []),
+    // Demo sandboxes and internal test accounts. Only the company list used to
+    // be filtered, so a test subscription priced at $3,000 a month still landed
+    // in MRR and test payments in "lifetime billed". They are removed by id
+    // rather than by keeping only known companies, so a real customer whose
+    // company row was later deleted keeps its invoices.
+    db.company.findMany({
+      where: { OR: [{ isDemo: true }, { isInternalTest: true }] },
+      select: { id: true },
+      take: 5000,
+    }).catch(() => []),
   ]);
 
+  const excludedIds = new Set<string>(excludedRows.map((c: any) => c.id));
+  const invoices = rawInvoices.filter((i: any) => !excludedIds.has(i.companyId));
+  const subs = rawSubs.filter((s: any) => !excludedIds.has(s.companyId));
+
   const caveats: string[] = [];
+  const droppedSubs = rawSubs.length - subs.length;
+  const droppedInvoices = rawInvoices.length - invoices.length;
+  if (droppedSubs || droppedInvoices) {
+    caveats.push(
+      `Left out ${droppedSubs} subscription(s) and ${droppedInvoices} invoice(s) that belong to demo or internal-test companies.`,
+    );
+  }
 
   // Currency. These invoices can carry more than one, and adding PKR to USD
   // would produce a headline number that is simply wrong. If the data is mixed,
