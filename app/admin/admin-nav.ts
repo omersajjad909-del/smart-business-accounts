@@ -33,6 +33,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "audit-trail",      label: "Audit Trail",       href: "/admin/audit-trail",         group: "Analytics", short: "AT", icon: "list" },
   { id: "web",              label: "Web Metrics",       href: "/admin/web",                 group: "Analytics", short: "WB", icon: "monitor" },
   { id: "google-ads",       label: "Google Ads",        href: "/admin/google-ads",          group: "Analytics", short: "GA", icon: "target" },
+  { id: "meta-ads",         label: "Meta Ads",          href: "/admin/ads",                 group: "Analytics", short: "MA", icon: "target" },
 
   // ── AI ────────────────────────────────────────────────────────────────────
   // Grouped together rather than filed under the area each one serves. They
