@@ -49,23 +49,23 @@ const PLANS    = ["STARTER", "PRO", "ENTERPRISE", "CUSTOM"];
 const STATUSES = ["ACTIVE", "TRIALING", "PAST_DUE", "INACTIVE", "CANCELED"];
 
 const PLAN_COLORS: Record<string, { bg: string; text: string }> = {
-  STARTER:    { bg: "#38bdf820", text: "#38bdf8" },
-  PRO:        { bg: "#818cf820", text: "#818cf8" },
-  ENTERPRISE: { bg: "#c4b5fd20", text: "#c4b5fd" },
-  CUSTOM:     { bg: "#fbbf2420", text: "#fbbf24" },
+  STARTER:    { bg: "#38bdf820", text: "var(--tx-38bdf8, #38bdf8)" },
+  PRO:        { bg: "#818cf820", text: "var(--tx-818cf8, #818cf8)" },
+  ENTERPRISE: { bg: "#c4b5fd20", text: "var(--tx-c4b5fd, #c4b5fd)" },
+  CUSTOM:     { bg: "#fbbf2420", text: "var(--tx-fbbf24, #fbbf24)" },
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  ACTIVE:    { bg: "#22c55e20", text: "#22c55e" },
-  TRIALING:  { bg: "#06b6d420", text: "#06b6d4" },
-  PAST_DUE:  { bg: "#f9731620", text: "#f97316" },
-  INACTIVE:  { bg: "#64748b20", text: "#94a3b8" },
-  CANCELED:  { bg: "#ef444420", text: "#f87171" },
+  ACTIVE:    { bg: "#22c55e20", text: "var(--tx-22c55e, #22c55e)" },
+  TRIALING:  { bg: "#06b6d420", text: "var(--tx-06b6d4, #06b6d4)" },
+  PAST_DUE:  { bg: "#f9731620", text: "var(--tx-f97316, #f97316)" },
+  INACTIVE:  { bg: "#64748b20", text: "var(--tx-94a3b8, #94a3b8)" },
+  CANCELED:  { bg: "#ef444420", text: "var(--tx-f87171, #f87171)" },
 };
 
 function PlanBadge({ plan }: { plan?: string | null }) {
   const p = (plan || "STARTER").toUpperCase();
-  const c = PLAN_COLORS[p] ?? { bg: "#ffffff10", text: "#94a3b8" };
+  const c = PLAN_COLORS[p] ?? { bg: "#ffffff10", text: "var(--tx-94a3b8, #94a3b8)" };
   return (
     <span style={{ padding: "3px 10px", borderRadius: 20, background: c.bg, color: c.text, fontSize: 11, fontWeight: 800, letterSpacing: ".04em" }}>
       {p}
@@ -75,7 +75,7 @@ function PlanBadge({ plan }: { plan?: string | null }) {
 
 function StatusBadge({ status }: { status?: string | null }) {
   const s = (status || "ACTIVE").toUpperCase();
-  const c = STATUS_COLORS[s] ?? { bg: "#ffffff10", text: "#94a3b8" };
+  const c = STATUS_COLORS[s] ?? { bg: "#ffffff10", text: "var(--tx-94a3b8, #94a3b8)" };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 20, background: c.bg, color: c.text, fontSize: 11, fontWeight: 700 }}>
       <span style={{ width: 5, height: 5, borderRadius: "50%", background: c.text }} />
@@ -91,13 +91,13 @@ function AIScoreBadge({ score, health }: { score?: number; health?: string }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
       <svg width="28" height="28" viewBox="0 0 28 28">
-        <circle cx="14" cy="14" r="11" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="3" />
+        <circle cx="14" cy="14" r="11" fill="none" stroke="rgba(var(--ink),.08)" strokeWidth="3" />
         <circle cx="14" cy="14" r="11" fill="none" stroke={color} strokeWidth="3"
           strokeDasharray={`${(score / 100) * 69.1} 69.1`}
           strokeLinecap="round" transform="rotate(-90 14 14)" />
       </svg>
       <span style={{ fontSize: 12, fontWeight: 800, color }}>{score}</span>
-      <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)" }}>{label}</span>
+      <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{label}</span>
     </span>
   );
 }
@@ -139,49 +139,49 @@ function ChangePlanModal({ company, onClose, onSaved }: {
 
   const selectStyle: React.CSSProperties = {
     width: "100%", padding: "10px 12px", borderRadius: 10,
-    background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
-    color: "white", fontSize: 13, outline: "none", cursor: "pointer",
+    background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.12)",
+    color: "var(--ink-solid, white)", fontSize: 13, outline: "none", cursor: "pointer",
   };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.7)", backdropFilter: "blur(6px)" }} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 440, background: "#0f172a", border: "1px solid rgba(255,255,255,.12)", borderRadius: 20, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,.6)" }}>
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: 440, background: "var(--dk-0f172a, #0f172a)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 20, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,.6)" }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(var(--ink),.08)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "white" }}>Change Plan</h3>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink-solid, white)" }}>Change Plan</h3>
             <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b" }}>{company.name}</p>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
         </div>
         <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.06)", display: "flex", gap: 16, flexWrap: "wrap" }}>
             <div><div style={{ fontSize: 10, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>CURRENT PLAN</div><PlanBadge plan={company.plan} /></div>
             <div><div style={{ fontSize: 10, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>CURRENT STATUS</div><StatusBadge status={company.subscriptionStatus} /></div>
             <div><div style={{ fontSize: 10, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>AI SCORE</div><AIScoreBadge score={company.aiScore} health={company.aiHealth} /></div>
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>NEW PLAN</label>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-94a3b8, #94a3b8)", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>NEW PLAN</label>
             <select value={plan} onChange={e => setPlan(e.target.value)} style={selectStyle}>
               {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>NEW STATUS</label>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-94a3b8, #94a3b8)", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>NEW STATUS</label>
             <select value={status} onChange={e => setStatus(e.target.value)} style={selectStyle}>
               {STATUSES.map(s => <option key={s} value={s}>{s.replace("_"," ")}</option>)}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>INTERNAL NOTE (optional)</label>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-94a3b8, #94a3b8)", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>INTERNAL NOTE (optional)</label>
             <textarea value={note} onChange={e => setNote(e.target.value)} rows={2} placeholder="e.g. Sales override, trial extension..."
               style={{ ...selectStyle, resize: "none", height: "auto" }} />
           </div>
-          <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 12, color: "#fbbf24", lineHeight: 1.6 }}>
+          <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", lineHeight: 1.6 }}>
             ⚠️ This changes the plan immediately in the database. Gateway billing is not affected — handle billing separately.
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+            <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
             <button onClick={save} disabled={saving} style={{ flex: 2, padding: "11px", borderRadius: 12, background: saving ? "#4338ca" : "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer" }}>
               {saving ? "Saving..." : "Confirm Change"}
             </button>
@@ -218,7 +218,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
 
   return (
     <tr>
-      <td colSpan={11} style={{ background: "rgba(99,102,241,.04)", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <td colSpan={11} style={{ background: "rgba(99,102,241,.04)", borderBottom: "1px solid rgba(var(--ink),.06)" }}>
         <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
           {/* Fields grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px,1fr))", gap: 10 }}>
@@ -226,12 +226,12 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
               <div key={item.key} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em" }}>{item.label.toUpperCase()}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 13, color: item.mono ? "#38bdf8" : "#cbd5e1", fontFamily: item.mono ? "monospace" : "inherit", wordBreak: "break-all" }}>
+                  <span style={{ fontSize: 13, color: item.mono ? "var(--tx-38bdf8, #38bdf8)" : "var(--tx-cbd5e1, #cbd5e1)", fontFamily: item.mono ? "monospace" : "inherit", wordBreak: "break-all" }}>
                     {item.value}
                   </span>
                   {item.value !== "—" && (
                     <button onClick={() => copy(item.value, item.key)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: copied === item.key ? "#22c55e" : "#475569", fontSize: 11, padding: "2px 4px", flexShrink: 0 }}>
+                      style={{ background: "none", border: "none", cursor: "pointer", color: copied === item.key ? "var(--tx-22c55e, #22c55e)" : "#475569", fontSize: 11, padding: "2px 4px", flexShrink: 0 }}>
                       {copied === item.key ? "✓" : "⎘"}
                     </button>
                   )}
@@ -244,7 +244,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
           {company.aiScore !== undefined && (
             <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
               <AIScoreBadge score={company.aiScore} health={company.aiHealth} />
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.6 }}>
                 AI health score is based on subscription status, user engagement, plan tier, and login activity over the last 30 days.
               </div>
             </div>
@@ -253,14 +253,14 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
           {/* Impersonate */}
           <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(245,158,11,.05)", border: "1px solid rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#f59e0b", marginBottom: 4 }}>🔑 Login as Company User</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)", marginBottom: 4 }}>🔑 Login as Company User</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.6 }}>
                 Open the dashboard as the owner of this company. This action is logged in the audit trail.
               </div>
             </div>
             <button
               onClick={() => onImpersonate(company.id)}
-              style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}>
+              style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "var(--tx-f59e0b, #f59e0b)", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}>
               Open as Owner →
             </button>
           </div>
@@ -335,6 +335,31 @@ export default function AdminCompaniesPage() {
     setBusy(null);
   }
 
+  async function markTest(company: Row) {
+    const next = !company.isInternalTest;
+    if (next && !window.confirm(
+      `Mark "${company.name}" as one of your own test workspaces?\n\nIt will stop being counted as a customer in revenue, anomaly and funnel pages. You can undo this.`,
+    )) return;
+
+    setBusy(company.id);
+    try {
+      const r = await fetch(`/api/admin/companies/${company.id}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ isInternalTest: next }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { toast.error(j.error || "Failed"); }
+      else {
+        // Hidden unless "show test workspaces" is on, so it leaves the list straight away.
+        setRows(prev => prev
+          ?.map(c => c.id === company.id ? { ...c, isInternalTest: next } : c)
+          .filter(c => showTest || !c.isInternalTest) || null);
+        toast.success(next ? "Marked as a test workspace" : "No longer a test workspace");
+      }
+    } catch { toast.error("Something went wrong"); }
+    setBusy(null);
+  }
+
   async function impersonate(companyId: string) {
     setBusy(companyId);
     try {
@@ -398,23 +423,23 @@ export default function AdminCompaniesPage() {
   };
 
   return (
-    <div style={{ padding: "28px 24px", minHeight: "100vh", background: "#060918" }}>
+    <div style={{ padding: "28px 24px", minHeight: "100vh", background: "var(--dk-060918, #060918)" }}>
       <style>{`
-        select option { background: #0f172a; color: white; }
-        .hover-row:hover { background: rgba(255,255,255,.03) !important; }
+        select option { background: var(--dk-0f172a, #0f172a); color:var(--ink-solid, white); }
+        .hover-row:hover { background: rgba(var(--ink),.03) !important; }
       `}</style>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Companies</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)" }}>Companies</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#475569" }}>Manage subscriptions, plans, AI health scores, and company access</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <a href="/admin/audit-trail" style={{ padding: "9px 16px", borderRadius: 10, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.2)", color: "#f59e0b", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+          <a href="/admin/audit-trail" style={{ padding: "9px 16px", borderRadius: 10, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.2)", color: "var(--tx-f59e0b, #f59e0b)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
             📋 Audit Trail
           </a>
-          <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+          <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
             ↻ Refresh
           </button>
         </div>
@@ -423,15 +448,15 @@ export default function AdminCompaniesPage() {
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Total",       value: stats.total,      color: "#818cf8" },
-          { label: "Active",      value: stats.active,     color: "#22c55e" },
-          { label: "Trialing",    value: stats.trialing,   color: "#06b6d4" },
-          { label: "Past Due",    value: stats.pastDue,    color: "#f97316" },
-          { label: "Enterprise",  value: stats.enterprise, color: "#c4b5fd" },
-          { label: "AI: At Risk", value: stats.atRisk,     color: "#ef4444" },
-          { label: "Avg AI Score",value: loading ? "—" : avgScore, color: avgScore >= 75 ? "#10b981" : avgScore >= 50 ? "#f59e0b" : "#ef4444" },
+          { label: "Total",       value: stats.total,      color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",      value: stats.active,     color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Trialing",    value: stats.trialing,   color: "var(--tx-06b6d4, #06b6d4)" },
+          { label: "Past Due",    value: stats.pastDue,    color: "var(--tx-f97316, #f97316)" },
+          { label: "Enterprise",  value: stats.enterprise, color: "var(--tx-c4b5fd, #c4b5fd)" },
+          { label: "AI: At Risk", value: stats.atRisk,     color: "var(--tx-ef4444, #ef4444)" },
+          { label: "Avg AI Score",value: loading ? "—" : avgScore, color: avgScore >= 75 ? "var(--tx-10b981, #10b981)" : avgScore >= 50 ? "var(--tx-f59e0b, #f59e0b)" : "var(--tx-ef4444, #ef4444)" },
         ].map(s => (
-          <div key={s.label} style={{ padding: "13px 10px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
+          <div key={s.label} style={{ padding: "13px 10px", borderRadius: 14, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)" }}>
             <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{loading ? "—" : s.value}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700, marginTop: 2 }}>{s.label}</div>
           </div>
@@ -441,26 +466,26 @@ export default function AdminCompaniesPage() {
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company, #ID, email, country, billing ID..."
-          style={{ flex: 1, minWidth: 220, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
+          style={{ flex: 1, minWidth: 220, padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none" }} />
         <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All Plans</option>
           {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
         </select>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All Statuses</option>
           {STATUSES.map(s => <option key={s} value={s}>{s.replace("_"," ")}</option>)}
         </select>
         <select value={filterHealth} onChange={e => setFilterHealth(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All AI Health</option>
           <option value="Healthy">Healthy</option>
           <option value="At Risk">At Risk</option>
           <option value="Critical">Critical</option>
         </select>
         <select value={filterBizType} onChange={e => setFilterBizType(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All Business Types</option>
           {BUSINESS_TYPES.map(t => <option key={t} value={t}>{BIZ_LABELS[t] || t}</option>)}
         </select>
@@ -471,9 +496,9 @@ export default function AdminCompaniesPage() {
             title="Workspaces created from Dev Test. Hidden from this list and from all dashboard metrics."
             style={{
               padding: "9px 14px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
-              background: showTest ? "rgba(251,146,60,.16)" : "rgba(255,255,255,.05)",
-              border: `1px solid ${showTest ? "rgba(251,146,60,.4)" : "rgba(255,255,255,.1)"}`,
-              color: showTest ? "#fdba74" : "#94a3b8",
+              background: showTest ? "rgba(251,146,60,.16)" : "rgba(var(--ink),.05)",
+              border: `1px solid ${showTest ? "rgba(251,146,60,.4)" : "rgba(var(--ink),.1)"}`,
+              color: showTest ? "var(--tx-fdba74, #fdba74)" : "var(--tx-94a3b8, #94a3b8)",
             }}>
             {showTest ? "Hide" : "Show"} test workspaces ({testCount})
           </button>
@@ -481,12 +506,12 @@ export default function AdminCompaniesPage() {
       </div>
 
       {/* Table */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(var(--ink),.08)", overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", minWidth: 760, borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "rgba(255,255,255,.04)" }}>
+            <tr style={{ background: "rgba(var(--ink),.04)" }}>
               {["", "ID", "Company", "Business Type", "Country", "Plan", "Status", "AI Score", "Users", "Renewal", "Actions"].map(h => (
-                <th key={h} style={{ padding: "12px 10px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "12px 10px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(var(--ink),.07)" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
@@ -498,7 +523,7 @@ export default function AdminCompaniesPage() {
             ) : (
               filtered.map(c => (
                 <>
-                  <tr key={c.id} className="hover-row" style={{ borderBottom: "1px solid rgba(255,255,255,.05)", transition: "background .15s" }}>
+                  <tr key={c.id} className="hover-row" style={{ borderBottom: "1px solid rgba(var(--ink),.05)", transition: "background .15s" }}>
                     <td style={{ padding: "14px 8px 14px 16px", width: 32 }}>
                       <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", fontSize: 14, width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .15s", transform: expanded === c.id ? "rotate(90deg)" : "none" }}>
@@ -506,15 +531,15 @@ export default function AdminCompaniesPage() {
                       </button>
                     </td>
                     <td style={{ padding: "13px 10px", whiteSpace: "nowrap" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: "#38bdf8", fontFamily: "monospace", background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 6, padding: "3px 8px" }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-38bdf8, #38bdf8)", fontFamily: "monospace", background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 6, padding: "3px 8px" }}>
                         {formatCompanyNo(c.companyNo, c.id)}
                       </span>
                     </td>
                     <td style={{ padding: "13px 10px" }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: "white", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: "var(--ink-solid, white)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                         {c.name}
                         {c.isInternalTest && (
-                          <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(251,146,60,.16)", border: "1px solid rgba(251,146,60,.35)", color: "#fdba74", fontSize: 10, fontWeight: 800, letterSpacing: ".05em" }}>
+                          <span style={{ padding: "2px 8px", borderRadius: 20, background: "rgba(251,146,60,.16)", border: "1px solid rgba(251,146,60,.35)", color: "var(--tx-fdba74, #fdba74)", fontSize: 10, fontWeight: 800, letterSpacing: ".05em" }}>
                             TEST
                           </span>
                         )}
@@ -522,34 +547,39 @@ export default function AdminCompaniesPage() {
                       {c.ownerEmail && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{c.ownerEmail}</div>}
                     </td>
                     <td style={{ padding: "13px 10px" }}>
-                      <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#7dd3fc", fontSize: 11, fontWeight: 700 }}>
+                      <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "var(--tx-7dd3fc, #7dd3fc)", fontSize: 11, fontWeight: 700 }}>
                         {BIZ_LABELS[c.businessType || ""] || c.businessType || "Trading"}
                       </span>
                     </td>
-                    <td style={{ padding: "13px 10px", fontSize: 13, color: "#94a3b8" }}>{c.country || "—"}</td>
+                    <td style={{ padding: "13px 10px", fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)" }}>{c.country || "—"}</td>
                     <td style={{ padding: "13px 10px" }}><PlanBadge plan={c.plan} /></td>
                     <td style={{ padding: "13px 10px" }}><StatusBadge status={c.subscriptionStatus} /></td>
                     <td style={{ padding: "13px 10px" }}><AIScoreBadge score={c.aiScore} health={c.aiHealth} /></td>
-                    <td style={{ padding: "13px 10px", fontSize: 13, color: "#94a3b8", textAlign: "center" }}>{c.usersCount}</td>
+                    <td style={{ padding: "13px 10px", fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", textAlign: "center" }}>{c.usersCount}</td>
                     <td style={{ padding: "13px 10px", fontSize: 12, color: "#475569" }}>
                       {c.currentPeriodEnd ? new Date(c.currentPeriodEnd).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "—"}
                     </td>
                     <td style={{ padding: "13px 10px", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: 5, justifyContent: "flex-end" }}>
                         <a href={`/admin/companies/${companyRef(c)}`}
-                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#38bdf8", fontSize: 11, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "var(--tx-38bdf8, #38bdf8)", fontSize: 11, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
                           Details
                         </a>
                         <button onClick={() => setChanging(c)} disabled={busy === c.id}
-                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "var(--tx-818cf8, #818cf8)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           ✦ Plan
                         </button>
+                        <button onClick={() => markTest(c)} disabled={busy === c.id}
+                          title="Test workspaces are left out of revenue, anomaly and funnel numbers"
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(251,146,60,.1)", border: "1px solid rgba(251,146,60,.25)", color: "var(--tx-fdba74, #fdba74)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          {c.isInternalTest ? "Unmark test" : "Mark test"}
+                        </button>
                         <button onClick={() => toggleStatus(c)} disabled={busy === c.id}
-                          style={{ padding: "5px 9px", borderRadius: 8, background: c.isActive === false ? "rgba(34,197,94,.12)" : "rgba(245,158,11,.12)", border: `1px solid ${c.isActive === false ? "rgba(34,197,94,.25)" : "rgba(245,158,11,.25)"}`, color: c.isActive === false ? "#22c55e" : "#f59e0b", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: c.isActive === false ? "rgba(34,197,94,.12)" : "rgba(245,158,11,.12)", border: `1px solid ${c.isActive === false ? "rgba(34,197,94,.25)" : "rgba(245,158,11,.25)"}`, color: c.isActive === false ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f59e0b, #f59e0b)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           {busy === c.id ? "…" : c.isActive === false ? "Activate" : "Suspend"}
                         </button>
                         <button onClick={() => deleteCompany(c.id)} disabled={busy === c.id}
-                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "5px 9px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           {busy === c.id ? "…" : "Delete"}
                         </button>
                       </div>

@@ -128,13 +128,13 @@ export default function AdminCouponsPage() {
   const totalRedeems = items.reduce((s, c) => s + (c._count?.redemptions || 0), 0);
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Coupons</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Manage discount codes and targeted promotions.</p>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Manage discount codes and targeted promotions.</p>
         </div>
         <button className="cp-btn" onClick={() => setShowForm(!showForm)} style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white" }}>
           {showForm ? "Close" : "+ New Coupon"}
@@ -143,19 +143,19 @@ export default function AdminCouponsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Coupons", val: items.length, color: "#818cf8" },
-          { label: "Active",        val: active,       color: "#34d399" },
-          { label: "Redemptions",   val: totalRedeems, color: "#f472b6" },
+          { label: "Total Coupons", val: items.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",        val: active,       color: "var(--tx-34d399, #34d399)" },
+          { label: "Redemptions",   val: totalRedeems, color: "var(--tx-f472b6, #f472b6)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
 
       {showForm && (
-        <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 22, marginBottom: 22 }}>
+        <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 22, marginBottom: 22 }}>
           <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>New Coupon</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12 }}>
             <div>
@@ -214,10 +214,10 @@ export default function AdminCouponsPage() {
         </div>
       )}
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Code","Type","Value","Redemptions","Max","Expires","Status","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -229,30 +229,30 @@ export default function AdminCouponsPage() {
             ) : items.length === 0 ? (
               <tr><td colSpan={8} style={empty}>No coupons yet</td></tr>
             ) : items.map(c => (
-              <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+              <tr key={c.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                 <td style={{ ...td, fontFamily: "monospace", fontWeight: 700 }}>{c.code}</td>
                 <td style={td}>{c.type}</td>
                 <td style={td}>{c.type === "PERCENT" ? `${c.value}%` : c.value}</td>
                 <td style={td}>{c._count?.redemptions ?? 0}</td>
                 <td style={td}>{c.maxUses ?? "∞"}</td>
-                <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>
+                <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>
                   {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("en-GB") : "—"}
                 </td>
                 <td style={td}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
                     background: c.active ? "rgba(52,211,153,.15)" : "rgba(148,163,184,.15)",
-                    color: c.active ? "#34d399" : "#94a3b8" }}>
+                    color: c.active ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>
                     {c.active ? "ACTIVE" : "DISABLED"}
                   </span>
                 </td>
                 <td style={td}>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button className="cp-btn-sm" onClick={() => toggleActive(c.id, c.active)}
-                      style={{ background: c.active ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: c.active ? "#94a3b8" : "#34d399" }}>
+                      style={{ background: c.active ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: c.active ? "var(--tx-94a3b8, #94a3b8)" : "var(--tx-34d399, #34d399)" }}>
                       {c.active ? "Disable" : "Enable"}
                     </button>
                     <button className="cp-btn-sm" onClick={() => deleteCoupon(c.id, c.code)}
-                      style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Delete</button>
+                      style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>Delete</button>
                   </div>
                 </td>
               </tr>
@@ -264,14 +264,14 @@ export default function AdminCouponsPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
-const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 6 };
-const inp = { background: "rgba(255,255,255,.04)", border: "1.5px solid rgba(255,255,255,.1)", borderRadius: 10, padding: "10px 12px", color: "white", fontFamily: "inherit", fontSize: 13, outline: "none", width: "100%", boxSizing: "border-box" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
+const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", display: "block", marginBottom: 6 };
+const inp = { background: "rgba(var(--ink),.04)", border: "1.5px solid rgba(var(--ink),.1)", borderRadius: 10, padding: "10px 12px", color: "var(--ink-solid, white)", fontFamily: "inherit", fontSize: 13, outline: "none", width: "100%", boxSizing: "border-box" };
 
 const css = `
-  .cp-inp { width:100%; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:white; font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
+  .cp-inp { width:100%; background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:10px 12px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
   .cp-btn { border:none; border-radius:10px; padding:9px 20px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .cp-btn:disabled { opacity:.4; cursor:not-allowed; }
   .cp-btn:hover:not(:disabled) { opacity:.85; }

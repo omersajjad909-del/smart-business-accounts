@@ -25,11 +25,11 @@ function formatMoney(v: string | number | null) {
 
 function PlanBadge({ plan }: { plan: string }) {
   const colors: Record<string, { bg: string; text: string }> = {
-    STARTER:    { bg: "rgba(100,116,139,.2)", text: "#94a3b8" },
-    PRO:        { bg: "rgba(99,102,241,.2)",  text: "#818cf8" },
-    ENTERPRISE: { bg: "rgba(56,189,248,.18)", text: "#38bdf8" },
+    STARTER:    { bg: "rgba(100,116,139,.2)", text: "var(--tx-94a3b8, #94a3b8)" },
+    PRO:        { bg: "rgba(99,102,241,.2)",  text: "var(--tx-818cf8, #818cf8)" },
+    ENTERPRISE: { bg: "rgba(56,189,248,.18)", text: "var(--tx-38bdf8, #38bdf8)" },
   };
-  const c = colors[String(plan || "").toUpperCase()] ?? { bg: "rgba(255,255,255,.08)", text: "#94a3b8" };
+  const c = colors[String(plan || "").toUpperCase()] ?? { bg: "rgba(var(--ink),.08)", text: "var(--tx-94a3b8, #94a3b8)" };
   return (
     <span style={{ padding: "2px 9px", borderRadius: 20, fontSize: 10, fontWeight: 800, letterSpacing: ".05em", background: c.bg, color: c.text }}>
       {plan || "—"}
@@ -69,18 +69,18 @@ export default function AdminUsagePage() {
   }, []);
 
   const stats = [
-    { label: "Top Active",   value: active?.length       ?? 0, color: "#34d399", sub: "Last 7 days" },
-    { label: "At Risk",      value: risk?.length         ?? 0, color: "#f87171", sub: "No activity 14+ days" },
-    { label: "High Invoice", value: highInvoice?.length  ?? 0, color: "#fbbf24", sub: "30-day volume leaders" },
+    { label: "Top Active",   value: active?.length       ?? 0, color: "var(--tx-34d399, #34d399)", sub: "Last 7 days" },
+    { label: "At Risk",      value: risk?.length         ?? 0, color: "var(--tx-f87171, #f87171)", sub: "No activity 14+ days" },
+    { label: "High Invoice", value: highInvoice?.length  ?? 0, color: "var(--tx-fbbf24, #fbbf24)", sub: "30-day volume leaders" },
   ];
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 80px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 80px" }}>
       <style>{css}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Usage Insights</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Live activity, risky accounts, and invoice-heavy companies.
         </p>
       </div>
@@ -88,10 +88,10 @@ export default function AdminUsagePage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
         {stats.map(s => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={s.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 30, fontWeight: 800, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)", marginTop: 6 }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{s.sub}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),var(--ta-65, .65))", marginTop: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 3 }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -102,7 +102,7 @@ export default function AdminUsagePage() {
         <div style={card}>
           <div style={cardHead}>
             <span style={{ fontSize: 15, fontWeight: 800 }}>Top 10 Most Active (7d)</span>
-            <span style={{ fontSize: 11, color: "#a78bfa", fontWeight: 700 }}>REAL TRACES</span>
+            <span style={{ fontSize: 11, color: "var(--tx-a78bfa, #a78bfa)", fontWeight: 700 }}>REAL TRACES</span>
           </div>
           {!active ? (
             <div style={emptyState}>Loading…</div>
@@ -118,15 +118,15 @@ export default function AdminUsagePage() {
               <tbody>
                 {active.map((row, i) => (
                   <tr key={String(row.id || i)} className="u-row">
-                    <td style={{ ...tdStyle, color: "rgba(255,255,255,.3)", fontSize: 12, width: 28 }}>{i + 1}</td>
+                    <td style={{ ...tdStyle, color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 12, width: 28 }}>{i + 1}</td>
                     <td style={tdStyle}>
-                      <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "#818cf8", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                      <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
                         {String(row.name || "—")}
                       </a>
                     </td>
-                    <td style={{ ...tdStyle, fontSize: 12, color: "rgba(255,255,255,.5)" }}>{String(row.country || "—")}</td>
-                    <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "#34d399" }}>{String(row.activity ?? "—")}</td>
-                    <td style={{ ...tdStyle, textAlign: "right", color: "rgba(255,255,255,.5)" }}>{String(row.sessions7d ?? "—")}</td>
+                    <td style={{ ...tdStyle, fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{String(row.country || "—")}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>{String(row.activity ?? "—")}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", color: "rgba(var(--ink),var(--ta-50, .5))" }}>{String(row.sessions7d ?? "—")}</td>
                   </tr>
                 ))}
               </tbody>
@@ -138,7 +138,7 @@ export default function AdminUsagePage() {
         <div style={card}>
           <div style={cardHead}>
             <span style={{ fontSize: 15, fontWeight: 800 }}>At-Risk (no activity ≥ 14d)</span>
-            <span style={{ fontSize: 11, color: "#f87171", fontWeight: 700 }}>NEEDS ATTENTION</span>
+            <span style={{ fontSize: 11, color: "var(--tx-f87171, #f87171)", fontWeight: 700 }}>NEEDS ATTENTION</span>
           </div>
           {!risk ? (
             <div style={emptyState}>Loading…</div>
@@ -155,12 +155,12 @@ export default function AdminUsagePage() {
                 {risk.map((row, i) => (
                   <tr key={String(row.id || i)} className="u-row">
                     <td style={tdStyle}>
-                      <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "#f87171", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                      <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "var(--tx-f87171, #f87171)", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
                         {String(row.name || "—")}
                       </a>
                     </td>
                     <td style={tdStyle}><PlanBadge plan={String(row.plan || "")} /></td>
-                    <td style={{ ...tdStyle, fontSize: 12, color: "rgba(255,255,255,.45)" }}>
+                    <td style={{ ...tdStyle, fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
                       {formatDate(row.lastLogin as string | null)}
                     </td>
                   </tr>
@@ -175,7 +175,7 @@ export default function AdminUsagePage() {
       <div style={card}>
         <div style={cardHead}>
           <span style={{ fontSize: 15, fontWeight: 800 }}>High Invoice Volume (30d)</span>
-          <span style={{ fontSize: 11, color: "#fbbf24", fontWeight: 700 }}>BILLING LEADERS</span>
+          <span style={{ fontSize: 11, color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 700 }}>BILLING LEADERS</span>
         </div>
         {!highInvoice ? (
           <div style={emptyState}>Loading…</div>
@@ -192,13 +192,13 @@ export default function AdminUsagePage() {
               {highInvoice.map((row, i) => (
                 <tr key={String(row.id || i)} className="u-row">
                   <td style={tdStyle}>
-                    <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "#fbbf24", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                    <a href={`/admin/companies/${rowRef(row)}`} style={{ color: "var(--tx-fbbf24, #fbbf24)", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
                       {String(row.name || "—")}
                     </a>
                   </td>
-                  <td style={{ ...tdStyle, fontSize: 12, color: "rgba(255,255,255,.5)" }}>{String(row.country || "—")}</td>
+                  <td style={{ ...tdStyle, fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{String(row.country || "—")}</td>
                   <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700 }}>{String(row.invoices ?? "—")}</td>
-                  <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "#34d399" }}>
+                  <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "var(--tx-34d399, #34d399)" }}>
                     {formatMoney(row.amount as number | null)}
                   </td>
                 </tr>
@@ -212,8 +212,8 @@ export default function AdminUsagePage() {
 }
 
 const card: React.CSSProperties = {
-  background: "linear-gradient(160deg, rgba(19,27,50,.98), rgba(15,22,42,.98))",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "linear-gradient(160deg, rgba(var(--dkr-131b32, 19,27,50),0.98), rgba(var(--dkr-0f162a, 15,22,42),0.98))",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 20,
   padding: "20px 22px",
   boxShadow: "0 16px 40px rgba(3,8,21,.22)",
@@ -225,7 +225,7 @@ const cardHead: React.CSSProperties = {
   justifyContent: "space-between",
   marginBottom: 16,
   paddingBottom: 12,
-  borderBottom: "1px solid rgba(255,255,255,.06)",
+  borderBottom: "1px solid rgba(var(--ink),.06)",
 };
 
 const tableStyle: React.CSSProperties = {
@@ -237,7 +237,7 @@ const thStyle: React.CSSProperties = {
   padding: "0 0 10px",
   fontSize: 10,
   fontWeight: 700,
-  color: "rgba(148,163,184,.6)",
+  color: "rgba(var(--txr-94a3b8, 148,163,184),.6)",
   textTransform: "uppercase",
   letterSpacing: ".08em",
   textAlign: "left",
@@ -246,18 +246,18 @@ const thStyle: React.CSSProperties = {
 const tdStyle: React.CSSProperties = {
   padding: "10px 0",
   fontSize: 13,
-  borderBottom: "1px solid rgba(255,255,255,.05)",
+  borderBottom: "1px solid rgba(var(--ink),.05)",
 };
 
 const emptyState: React.CSSProperties = {
   padding: "24px 0",
   textAlign: "center",
-  color: "rgba(255,255,255,.3)",
+  color: "rgba(var(--ink),var(--ta-30, .3))",
   fontSize: 13,
 };
 
 const css = `
-  .u-row:hover td { background:rgba(255,255,255,.02); }
+  .u-row:hover td { background:rgba(var(--ink),.02); }
   .u-link:hover { text-decoration:underline !important; }
   @media(max-width:900px){ .u-grid { grid-template-columns:1fr !important; } }
 `;

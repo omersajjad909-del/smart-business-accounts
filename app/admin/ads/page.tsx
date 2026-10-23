@@ -57,32 +57,32 @@ export default function AdsPage() {
   const num = (v: number) => v.toLocaleString("en-US");
 
   const s = {
-    page: { minHeight: "100vh", background: "#070b14", color: "white", fontFamily: "'Outfit','DM Sans',sans-serif" },
-    header: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 28px", borderBottom: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.02)", flexWrap: "wrap" as const, gap: 12 },
+    page: { minHeight: "100vh", background: "var(--dk-070b14, #070b14)", color: "var(--ink-solid, white)", fontFamily: "'Outfit','DM Sans',sans-serif" },
+    header: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 28px", borderBottom: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.02)", flexWrap: "wrap" as const, gap: 12 },
     content: { padding: "28px 28px", maxWidth: 1100, margin: "0 auto" },
-    card: { borderRadius: 16, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", padding: "20px 24px", marginBottom: 16 },
-    label: { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase" as const, letterSpacing: ".05em" },
+    card: { borderRadius: 16, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", padding: "20px 24px", marginBottom: 16 },
+    label: { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase" as const, letterSpacing: ".05em" },
     statGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 16, marginBottom: 20 },
-    statCard: { borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", padding: "16px 18px" },
+    statCard: { borderRadius: 14, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", padding: "16px 18px" },
     pill: (color: string) => ({ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: `${color}22`, color }),
     rangeBtn: (active: boolean) => ({
-      padding: "8px 14px", borderRadius: 9, border: "1px solid " + (active ? "#6366f1" : "rgba(255,255,255,.1)"), cursor: "pointer",
+      padding: "8px 14px", borderRadius: 9, border: "1px solid " + (active ? "#6366f1" : "rgba(var(--ink),.1)"), cursor: "pointer",
       fontFamily: "inherit", fontSize: 12, fontWeight: 700,
-      background: active ? "rgba(99,102,241,.15)" : "transparent", color: active ? "#a5b4fc" : "rgba(255,255,255,.5)",
+      background: active ? "rgba(99,102,241,.15)" : "transparent", color: active ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-50, .5))",
     }),
   };
 
-  const statusColor = (status: string) => (status === "ACTIVE" ? "#22c55e" : status === "PAUSED" ? "#f59e0b" : "rgba(255,255,255,.4)");
+  const statusColor = (status: string) => (status === "ACTIVE" ? "#22c55e" : status === "PAUSED" ? "#f59e0b" : "rgba(var(--ink),.4)");
 
   function InsightRow({ insights }: { insights: AdInsight | null }) {
-    if (!insights) return <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>No data yet</span>;
+    if (!insights) return <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))" }}>No data yet</span>;
     return (
-      <div style={{ display: "flex", gap: 18, flexWrap: "wrap" as const, fontSize: 12, color: "rgba(255,255,255,.6)" }}>
-        <span><b style={{ color: "white" }}>{money(insights.spend)}</b> spend</span>
-        <span><b style={{ color: "white" }}>{num(insights.impressions)}</b> impressions</span>
-        <span><b style={{ color: "white" }}>{num(insights.clicks)}</b> clicks</span>
-        <span><b style={{ color: "white" }}>{insights.ctr.toFixed(2)}%</b> CTR</span>
-        <span><b style={{ color: "white" }}>{money(insights.cpc)}</b> CPC</span>
+      <div style={{ display: "flex", gap: 18, flexWrap: "wrap" as const, fontSize: 12, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
+        <span><b style={{ color: "var(--ink-solid, white)" }}>{money(insights.spend)}</b> spend</span>
+        <span><b style={{ color: "var(--ink-solid, white)" }}>{num(insights.impressions)}</b> impressions</span>
+        <span><b style={{ color: "var(--ink-solid, white)" }}>{num(insights.clicks)}</b> clicks</span>
+        <span><b style={{ color: "var(--ink-solid, white)" }}>{insights.ctr.toFixed(2)}%</b> CTR</span>
+        <span><b style={{ color: "var(--ink-solid, white)" }}>{money(insights.cpc)}</b> CPC</span>
       </div>
     );
   }
@@ -91,12 +91,12 @@ export default function AdsPage() {
     <div style={s.page}>
       <div style={s.header}>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <button onClick={() => router.push("/admin")} style={{ background: "none", border: "1px solid rgba(255,255,255,.12)", color: "rgba(255,255,255,.5)", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>
+          <button onClick={() => router.push("/admin")} style={{ background: "none", border: "1px solid rgba(var(--ink),.12)", color: "rgba(var(--ink),var(--ta-50, .5))", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>
             ← Admin
           </button>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "white" }}>Meta Ads</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Live campaign performance — no need to open Ads Manager</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink-solid, white)" }}>Meta Ads</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Live campaign performance — no need to open Ads Manager</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -109,13 +109,13 @@ export default function AdsPage() {
 
       <div style={s.content}>
         {error && (
-          <div style={{ ...s.card, borderColor: "rgba(239,68,68,.3)", color: "#fca5a5" }}>
+          <div style={{ ...s.card, borderColor: "rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)" }}>
             {error}
           </div>
         )}
 
         {loading ? (
-          <div style={{ color: "rgba(255,255,255,.4)", fontSize: 13, padding: 40, textAlign: "center" as const }}>Loading…</div>
+          <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13, padding: 40, textAlign: "center" as const }}>Loading…</div>
         ) : (
           <>
             <div style={s.statGrid}>
@@ -138,7 +138,7 @@ export default function AdsPage() {
             </div>
 
             {campaigns.length === 0 && !error && (
-              <div style={{ ...s.card, textAlign: "center" as const, color: "rgba(255,255,255,.4)" }}>No campaigns found.</div>
+              <div style={{ ...s.card, textAlign: "center" as const, color: "rgba(var(--ink),var(--ta-40, .4))" }}>No campaigns found.</div>
             )}
 
             {campaigns.map(c => (
@@ -149,14 +149,14 @@ export default function AdsPage() {
                       {c.name}
                       <span style={s.pill(statusColor(c.status))}>{c.status}</span>
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{c.objective} · {c.adSets.length} ad set{c.adSets.length === 1 ? "" : "s"}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>{c.objective} · {c.adSets.length} ad set{c.adSets.length === 1 ? "" : "s"}</div>
                   </div>
-                  <span style={{ fontSize: 18, color: "rgba(255,255,255,.4)" }}>{openCampaign === c.id ? "−" : "+"}</span>
+                  <span style={{ fontSize: 18, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{openCampaign === c.id ? "−" : "+"}</span>
                 </div>
                 <div style={{ marginTop: 10 }}><InsightRow insights={c.insights} /></div>
 
                 {openCampaign === c.id && (
-                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.07)" }}>
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(var(--ink),.07)" }}>
                     {c.adSets.map(as => (
                       <div key={as.id} style={{ marginBottom: 14, paddingLeft: 12, borderLeft: "2px solid rgba(99,102,241,.3)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }} onClick={() => setOpenAdSet(openAdSet === as.id ? null : as.id)}>
@@ -164,17 +164,17 @@ export default function AdsPage() {
                             <div style={{ fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
                               {as.name}
                               <span style={s.pill(statusColor(as.status))}>{as.status}</span>
-                              {as.dailyBudget != null && <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>${as.dailyBudget.toFixed(2)}/day</span>}
+                              {as.dailyBudget != null && <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>${as.dailyBudget.toFixed(2)}/day</span>}
                             </div>
                           </div>
-                          <span style={{ fontSize: 14, color: "rgba(255,255,255,.3)" }}>{openAdSet === as.id ? "−" : "+"}</span>
+                          <span style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{openAdSet === as.id ? "−" : "+"}</span>
                         </div>
                         <div style={{ marginTop: 6 }}><InsightRow insights={as.insights} /></div>
 
                         {openAdSet === as.id && (
                           <div style={{ marginTop: 10 }}>
                             {as.ads.map(a => (
-                              <div key={a.id} style={{ padding: "10px 0", borderTop: "1px solid rgba(255,255,255,.05)" }}>
+                              <div key={a.id} style={{ padding: "10px 0", borderTop: "1px solid rgba(var(--ink),.05)" }}>
                                 <div style={{ fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                                   {a.name}
                                   <span style={s.pill(statusColor(a.status))}>{a.status}</span>

@@ -81,7 +81,7 @@ export default function LeafletMap({ pins, color }: Props) {
         !!pin.visitedAt &&
         now - new Date(pin.visitedAt).getTime() < 30 * 60 * 1000;
 
-      const fillColor = exact ? color : "rgba(255,255,255,0.6)";
+      const fillColor = exact ? color : "rgba(var(--ink),0.6)";
       const radius    = exact ? 8 : 5;
 
       const circle = L.circleMarker([pin.lat, pin.lon], {
@@ -95,17 +95,17 @@ export default function LeafletMap({ pins, color }: Props) {
 
       const locationLine = [pin.city, pin.country].filter(Boolean).join(", ") || `${pin.lat.toFixed(2)}, ${pin.lon.toFixed(2)}`;
       const popupHtml = `
-        <div style="font-family:'Outfit',sans-serif;min-width:180px;color:#e2e8f0">
+        <div style="font-family:'Outfit',sans-serif;min-width:180px;color:var(--tx-e2e8f0, #e2e8f0)">
           <div style="font-size:13px;font-weight:700;margin-bottom:4px">${pin.label}</div>
           ${pin.subtitle ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${pin.subtitle}</div>` : ""}
           <div style="font-size:11px;color:#64748b">${locationLine}</div>
           ${pin.page ? `<div style="font-size:11px;color:#64748b;margin-top:3px">Page: ${pin.page}</div>` : ""}
           <div style="margin-top:6px;display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;
-            background:${exact ? "rgba(34,197,94,.2)" : "rgba(255,255,255,.1)"};
+            background:${exact ? "rgba(34,197,94,.2)" : "rgba(var(--ink),.1)"};
             color:${exact ? "#4ade80" : "#94a3b8"}">
             ${exact ? "Exact Pin" : "Country Fallback"}
           </div>
-          ${isLive ? `<div style="margin-top:4px;display:inline-block;margin-left:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(245,158,11,.2);color:#fbbf24">● Live</div>` : ""}
+          ${isLive ? `<div style="margin-top:4px;display:inline-block;margin-left:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(245,158,11,.2);color:var(--tx-fbbf24, #fbbf24)">● Live</div>` : ""}
         </div>
       `;
 
@@ -130,15 +130,15 @@ export default function LeafletMap({ pins, color }: Props) {
     <>
       <style>{`
         .finova-geo-popup .leaflet-popup-content-wrapper {
-          background: #0f172a;
-          border: 1px solid rgba(255,255,255,.12);
+          background: var(--dk-0f172a, #0f172a);
+          border: 1px solid rgba(var(--ink),.12);
           border-radius: 12px;
           box-shadow: 0 8px 32px rgba(0,0,0,.6);
           padding: 0;
         }
         .finova-geo-popup .leaflet-popup-content { margin: 12px 14px; }
-        .finova-geo-popup .leaflet-popup-tip { background: #0f172a; }
-        .leaflet-container { background: #060d1e; }
+        .finova-geo-popup .leaflet-popup-tip { background: var(--dk-0f172a, #0f172a); }
+        .leaflet-container { background: var(--dk-060d1e, #060d1e); }
         /* Dark basemap without a tile-provider key: invert OSM's light tiles,
            then rotate the hue back so water reads blue rather than orange.
            Applied to the tile layer only, so the pins keep their real colors. */

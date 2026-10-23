@@ -106,27 +106,27 @@ export default function AnomalyWatchPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "Needs attention", value: data.summary.high, color: data.summary.high ? "#f87171" : "#34d399", sub: "Affects the numbers" },
-            { label: "Findings", value: data.summary.total, color: "#fbbf24", sub: "All severities" },
-            { label: "Customers affected", value: `${data.summary.companiesAffected} / ${data.summary.companiesScanned}`, color: "#c4b5fd", sub: "Of those scanned" },
+            { label: "Needs attention", value: data.summary.high, color: data.summary.high ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", sub: "Affects the numbers" },
+            { label: "Findings", value: data.summary.total, color: "var(--tx-fbbf24, #fbbf24)", sub: "All severities" },
+            { label: "Customers affected", value: `${data.summary.companiesAffected} / ${data.summary.companiesScanned}`, color: "var(--tx-c4b5fd, #c4b5fd)", sub: "Of those scanned" },
           ]} />
 
           {data.summary.byCheck && Object.keys(data.summary.byCheck).length ? (
             <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
               <button onClick={() => setCheckFilter("all")} style={{
                 padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                background: checkFilter === "all" ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-                border: checkFilter === "all" ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-                color: checkFilter === "all" ? "#818cf8" : "rgba(255,255,255,.4)",
+                background: checkFilter === "all" ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+                border: checkFilter === "all" ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+                color: checkFilter === "all" ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
               }}>
                 All ({data.summary.total})
               </button>
               {Object.entries(data.summary.byCheck).map(([k, v]) => (
                 <button key={k} onClick={() => setCheckFilter(k)} title={data.checks[k]?.why} style={{
                   padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                  background: checkFilter === k ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-                  border: checkFilter === k ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-                  color: checkFilter === k ? "#818cf8" : "rgba(255,255,255,.4)",
+                  background: checkFilter === k ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+                  border: checkFilter === k ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+                  color: checkFilter === k ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
                 }}>
                   {data.checks[k]?.label || k} ({v})
                 </button>
@@ -154,7 +154,7 @@ export default function AnomalyWatchPage() {
                       alignItems: "center", flexWrap: "wrap", marginBottom: 14,
                     }}>
                       <div style={{ display: "flex", gap: 9, alignItems: "center", flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: "#f8fafc" }}>{g.name}</span>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)" }}>{g.name}</span>
                         {highs ? <Pill tone="red">{highs} affecting the numbers</Pill> : null}
                         <Pill tone="grey">{g.items.length} finding{g.items.length === 1 ? "" : "s"}</Pill>
                       </div>
@@ -170,28 +170,28 @@ export default function AnomalyWatchPage() {
                         <div key={`${a.check}-${a.reference}-${i}`} style={{
                           display: "grid", gridTemplateColumns: "auto minmax(0,1fr) auto", gap: 11,
                           alignItems: "center", padding: "9px 12px", borderRadius: 10,
-                          background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.05)",
+                          background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.05)",
                         }}>
                           <Pill tone={SEVERITY_TONE[a.severity]}>{a.severity}</Pill>
                           <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: 12.5, color: "#e2e8f0" }}>
+                            <div style={{ fontSize: 12.5, color: "var(--tx-e2e8f0, #e2e8f0)" }}>
                               <strong style={{ fontWeight: 700 }}>{data.checks[a.check]?.label || a.check}</strong>
-                              <span style={{ color: "rgba(255,255,255,.3)" }}> · </span>
-                              <span style={{ fontFamily: "ui-monospace,monospace", fontSize: 11.5, color: "rgba(255,255,255,.6)" }}>
+                              <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}> · </span>
+                              <span style={{ fontFamily: "ui-monospace,monospace", fontSize: 11.5, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                                 {a.reference}
                               </span>
                             </div>
-                            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.42)", marginTop: 2 }}>
+                            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 2 }}>
                               {a.detail}
                             </div>
                           </div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-25, .25))", whiteSpace: "nowrap" }}>
                             {a.date ? fmtDate(a.date) : ""}
                           </div>
                         </div>
                       ))}
                       {g.items.length > 40 ? (
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", paddingLeft: 4 }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", paddingLeft: 4 }}>
                           …and {g.items.length - 40} more.
                         </div>
                       ) : null}
@@ -203,7 +203,7 @@ export default function AnomalyWatchPage() {
                         borderRadius: 14, padding: "16px 18px",
                       }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: "#93c5fd" }}>MESSAGE TO THE CUSTOMER</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>MESSAGE TO THE CUSTOMER</span>
                           <CopyButton text={notice} />
                         </div>
                         <Prose text={notice} />
@@ -224,14 +224,14 @@ export default function AnomalyWatchPage() {
             <div style={{ display: "grid", gap: 10 }}>
               {Object.entries(data.checks).map(([k, c]) => (
                 <div key={k} style={{ fontSize: 12.5, lineHeight: 1.65 }}>
-                  <span style={{ color: "#e2e8f0", fontWeight: 700 }}>{c.label}</span>
-                  <span style={{ color: "rgba(255,255,255,.45)" }}> — {c.why}</span>
+                  <span style={{ color: "var(--tx-e2e8f0, #e2e8f0)", fontWeight: 700 }}>{c.label}</span>
+                  <span style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}> — {c.why}</span>
                 </div>
               ))}
             </div>
           </Section>
 
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
             Scanned {fmtDate(data.generatedAt)}. Only document numbers, dates and the size of a
             discrepancy leave the database — no line items, party names or balances are shown here
             or sent to a model. Invoice-total checks allow a wide tolerance because per-line tax is

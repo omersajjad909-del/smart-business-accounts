@@ -23,8 +23,8 @@ type Incident = {
 type Summary = { DETECTED: number; NOTIFYING: number; NOTIFIED: number; RESOLVED: number };
 
 const F = "'Outfit','Inter',sans-serif";
-const CARD = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
+const CARD = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
 
 const SEVERITY_COLOR: Record<Incident["severity"], string> = {
   P1: "#f87171",
@@ -52,7 +52,7 @@ function hoursUntil(d: string): number {
 function StatBadge({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "14px 18px", flex: 1, minWidth: 140 }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.4)", textTransform: "uppercase", marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
     </div>
   );
@@ -95,16 +95,16 @@ export default function AdminSecurityIncidentsPage() {
     <div style={{ fontFamily: F, paddingBottom: 40 }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#e2e8f0", margin: 0 }}>Security Incidents</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: "6px 0 0", maxWidth: 620 }}>
-            Log and track data-breach or security incidents. The <code style={{ color: "#818cf8", background: "rgba(129,140,248,.1)", padding: "1px 6px", borderRadius: 4 }}>breach-notify</code> cron enforces our 72-hour notification commitment automatically.
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)", margin: 0 }}>Security Incidents</h1>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", margin: "6px 0 0", maxWidth: 620 }}>
+            Log and track data-breach or security incidents. The <code style={{ color: "var(--tx-818cf8, #818cf8)", background: "rgba(129,140,248,.1)", padding: "1px 6px", borderRadius: 4 }}>breach-notify</code> cron enforces our 72-hour notification commitment automatically.
           </p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
           style={{
             padding: "10px 18px", borderRadius: 10, fontWeight: 700, fontSize: 13,
-            background: showForm ? "rgba(255,255,255,.06)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
+            background: showForm ? "rgba(var(--ink),.06)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
             color: "white", border: showForm ? `1px solid ${BORDER}` : "none",
             cursor: "pointer", boxShadow: showForm ? "none" : "0 4px 14px rgba(99,102,241,.3)",
           }}
@@ -122,15 +122,15 @@ export default function AdminSecurityIncidentsPage() {
 
       {dueSoon.length > 0 && (
         <div style={{ background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 12, padding: "14px 18px", marginBottom: 20 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#f87171", marginBottom: 4 }}>⚠ {dueSoon.length} incident(s) approaching 72-hour deadline</div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>The breach-notify cron will fire notifications within the next hour.</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-f87171, #f87171)", marginBottom: 4 }}>⚠ {dueSoon.length} incident(s) approaching 72-hour deadline</div>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-55, .55))" }}>The breach-notify cron will fire notifications within the next hour.</div>
         </div>
       )}
 
       {showForm && <IncidentForm onDone={() => { setShowForm(false); load(); }} />}
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.4)", textTransform: "uppercase" }}>Filter:</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase" }}>Filter:</span>
         {["", "DETECTED", "NOTIFYING", "NOTIFIED", "RESOLVED"].map((s) => (
           <button
             key={s || "all"}
@@ -139,7 +139,7 @@ export default function AdminSecurityIncidentsPage() {
               padding: "5px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700,
               background: filterStatus === s ? "rgba(129,140,248,.15)" : "transparent",
               border: `1px solid ${filterStatus === s ? "rgba(129,140,248,.35)" : BORDER}`,
-              color: filterStatus === s ? "#a5b4fc" : "rgba(255,255,255,.55)",
+              color: filterStatus === s ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-55, .55))",
               cursor: "pointer",
             }}
           >
@@ -150,9 +150,9 @@ export default function AdminSecurityIncidentsPage() {
 
       <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.4)", fontSize: 13 }}>Loading incidents…</div>
+          <div style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13 }}>Loading incidents…</div>
         ) : incidents.length === 0 ? (
-          <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.4)", fontSize: 13 }}>No incidents recorded. That&apos;s a good thing.</div>
+          <div style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13 }}>No incidents recorded. That&apos;s a good thing.</div>
         ) : (
           incidents.map((i) => <IncidentRow key={i.id} incident={i} onChange={load} />)
         )}
@@ -192,10 +192,10 @@ function IncidentForm({ onDone }: { onDone: () => void }) {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "10px 12px", borderRadius: 8,
-    background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`,
-    color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none",
+    background: "rgba(var(--ink),.03)", border: `1px solid ${BORDER}`,
+    color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none",
   };
-  const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: ".06em", color: "rgba(255,255,255,.5)", textTransform: "uppercase", marginBottom: 6, display: "block" };
+  const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: ".06em", color: "rgba(var(--ink),var(--ta-50, .5))", textTransform: "uppercase", marginBottom: 6, display: "block" };
 
   return (
     <form onSubmit={submit} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 22, marginBottom: 22 }}>
@@ -235,7 +235,7 @@ function IncidentForm({ onDone }: { onDone: () => void }) {
         <button type="submit" disabled={busy} style={{ padding: "10px 20px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontWeight: 700, fontSize: 13, border: "none", cursor: busy ? "wait" : "pointer" }}>
           {busy ? "Logging…" : "Log Incident (starts 72h timer)"}
         </button>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>Notification will fire automatically before deadline.</span>
+        <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Notification will fire automatically before deadline.</span>
       </div>
     </form>
   );
@@ -250,7 +250,7 @@ function IncidentRow({ incident, onChange }: { incident: Incident; onChange: () 
   const deadlineText = hours < 0
     ? `${Math.round(-hours)}h overdue`
     : hours < 24 ? `${Math.round(hours)}h left` : `${Math.round(hours / 24)}d left`;
-  const deadlineColor = hours < 0 ? "#f87171" : hours < 24 ? "#fbbf24" : "rgba(255,255,255,.4)";
+  const deadlineColor = hours < 0 ? "#f87171" : hours < 24 ? "#fbbf24" : "rgba(var(--ink),.4)";
 
   async function updateStatus(status: Incident["status"], extra?: Record<string, unknown>) {
     setBusy(true);
@@ -286,8 +286,8 @@ function IncidentRow({ incident, onChange }: { incident: Incident; onChange: () 
           color: SEVERITY_COLOR[incident.severity], letterSpacing: ".04em", flexShrink: 0,
         }}>{incident.severity}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: "#e2e8f0" }}>{incident.title}</div>
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginTop: 3 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{incident.title}</div>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 3 }}>
             {incident.category.replace(/_/g, " ")} · Detected {fmt(incident.detectedAt)}
           </div>
         </div>
@@ -302,26 +302,26 @@ function IncidentRow({ incident, onChange }: { incident: Incident; onChange: () 
       {open && (
         <div style={{ padding: "0 20px 20px 20px", borderTop: `1px solid ${BORDER}` }}>
           <div style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: "10px 20px", padding: "16px 0", fontSize: 12.5 }}>
-            <div style={{ color: "rgba(255,255,255,.4)" }}>Summary</div>
-            <div style={{ color: "#e2e8f0", lineHeight: 1.7 }}>{incident.summary}</div>
-            <div style={{ color: "rgba(255,255,255,.4)" }}>Affected scope</div>
-            <div style={{ color: "#e2e8f0" }}>{incident.affectedScope || "—"}</div>
-            <div style={{ color: "rgba(255,255,255,.4)" }}>72h deadline</div>
-            <div style={{ color: "#e2e8f0" }}>{fmt(incident.deadlineAt)}</div>
-            <div style={{ color: "rgba(255,255,255,.4)" }}>Notified at</div>
-            <div style={{ color: "#e2e8f0" }}>
+            <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>Summary</div>
+            <div style={{ color: "var(--tx-e2e8f0, #e2e8f0)", lineHeight: 1.7 }}>{incident.summary}</div>
+            <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>Affected scope</div>
+            <div style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>{incident.affectedScope || "—"}</div>
+            <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>72h deadline</div>
+            <div style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>{fmt(incident.deadlineAt)}</div>
+            <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>Notified at</div>
+            <div style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>
               {fmt(incident.notifiedAt)}
               {incident.notifiedAt && ` · ${incident.notificationCount} recipient(s)`}
-              {incident.lastNotifyError && <span style={{ color: "#f87171", marginLeft: 8 }}>· last error: {incident.lastNotifyError}</span>}
+              {incident.lastNotifyError && <span style={{ color: "var(--tx-f87171, #f87171)", marginLeft: 8 }}>· last error: {incident.lastNotifyError}</span>}
             </div>
             {incident.resolvedAt && (
               <>
-                <div style={{ color: "rgba(255,255,255,.4)" }}>Resolved at</div>
-                <div style={{ color: "#e2e8f0" }}>{fmt(incident.resolvedAt)}</div>
+                <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>Resolved at</div>
+                <div style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>{fmt(incident.resolvedAt)}</div>
               </>
             )}
-            <div style={{ color: "rgba(255,255,255,.4)" }}>Reference ID</div>
-            <div style={{ color: "#94a3b8", fontFamily: "monospace", fontSize: 11 }}>{incident.id}</div>
+            <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>Reference ID</div>
+            <div style={{ color: "var(--tx-94a3b8, #94a3b8)", fontFamily: "monospace", fontSize: 11 }}>{incident.id}</div>
           </div>
 
           {incident.status !== "RESOLVED" && (
@@ -332,14 +332,14 @@ function IncidentRow({ incident, onChange }: { incident: Incident; onChange: () 
                 placeholder="Resolution notes (optional)"
                 style={{
                   flex: 1, minWidth: 260, padding: "8px 12px", borderRadius: 8,
-                  background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`,
-                  color: "#e2e8f0", fontSize: 12.5, fontFamily: F, outline: "none",
+                  background: "rgba(var(--ink),.03)", border: `1px solid ${BORDER}`,
+                  color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 12.5, fontFamily: F, outline: "none",
                 }}
               />
               <button
                 disabled={busy}
                 onClick={() => updateStatus("RESOLVED", { resolution })}
-                style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.35)", color: "#34d399", fontWeight: 700, fontSize: 12, cursor: "pointer" }}
+                style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.35)", color: "var(--tx-34d399, #34d399)", fontWeight: 700, fontSize: 12, cursor: "pointer" }}
               >
                 Mark Resolved
               </button>

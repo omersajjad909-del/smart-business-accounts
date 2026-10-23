@@ -25,10 +25,10 @@ function authHeaders(): Record<string, string> {
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  pending:   { bg: "rgba(251,191,36,.15)", color: "#fbbf24" },
-  converted: { bg: "rgba(129,140,248,.15)", color: "#818cf8" },
-  rewarded:  { bg: "rgba(52,211,153,.15)",  color: "#34d399" },
-  expired:   { bg: "rgba(148,163,184,.15)", color: "#94a3b8" },
+  pending:   { bg: "rgba(251,191,36,.15)", color: "var(--tx-fbbf24, #fbbf24)" },
+  converted: { bg: "rgba(129,140,248,.15)", color: "var(--tx-818cf8, #818cf8)" },
+  rewarded:  { bg: "rgba(52,211,153,.15)",  color: "var(--tx-34d399, #34d399)" },
+  expired:   { bg: "rgba(148,163,184,.15)", color: "var(--tx-94a3b8, #94a3b8)" },
 };
 
 export default function AdminReferralsPage() {
@@ -97,26 +97,26 @@ export default function AdminReferralsPage() {
   };
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Referrals</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Track referral invitations, mark conversions, and issue rewards.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Referrals", val: kpis.total,     color: "#818cf8" },
-          { label: "Converted",       val: kpis.converted, color: "#818cf8" },
-          { label: "Rewarded",        val: kpis.rewarded,  color: "#34d399" },
-          { label: "Pending",         val: kpis.pending,   color: "#fbbf24" },
+          { label: "Total Referrals", val: kpis.total,     color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Converted",       val: kpis.converted, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Rewarded",        val: kpis.rewarded,  color: "var(--tx-34d399, #34d399)" },
+          { label: "Pending",         val: kpis.pending,   color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -129,10 +129,10 @@ export default function AdminReferralsPage() {
         <input className="rf-inp" placeholder="Search email or referrer ID…" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Referee Email","Referrer ID","Status","Reward","Referred","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -146,31 +146,31 @@ export default function AdminReferralsPage() {
             ) : filtered.map(r => {
               const st = STATUS_STYLE[r.status] || STATUS_STYLE.pending;
               return (
-                <tr key={r.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <tr key={r.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={{ ...td, fontWeight: 700 }}>{r.refereeEmail}</td>
-                  <td style={{ ...td, fontFamily: "monospace", fontSize: 12, color: "rgba(255,255,255,.5)" }}>{r.referrerId.slice(0, 12)}…</td>
+                  <td style={{ ...td, fontFamily: "monospace", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{r.referrerId.slice(0, 12)}…</td>
                   <td style={td}>
                     <select className="rf-sel-sm" value={r.status} onChange={e => updateReferral(r.id, { status: e.target.value })} style={{ background: st.bg, color: st.color, borderColor: "transparent" }}>
-                      {STATUSES.map(s => <option key={s} value={s} style={{ background: "#0f1629", color: "white" }}>{s}</option>)}
+                      {STATUSES.map(s => <option key={s} value={s} style={{ background: "var(--dk-0f1629, #0f1629)", color: "var(--ink-solid, white)" }}>{s}</option>)}
                     </select>
                   </td>
                   <td style={td}>
                     {editingId === r.id ? (
                       <div style={{ display: "flex", gap: 4 }}>
                         <input className="rf-inp-sm" type="number" value={rewardVal} onChange={e => setRewardVal(e.target.value)} placeholder="0.00" />
-                        <button className="rf-btn" onClick={() => saveReward(r.id)} style={{ background: "rgba(52,211,153,.15)", color: "#34d399" }}>Save</button>
-                        <button className="rf-btn" onClick={() => { setEditingId(null); setRewardVal(""); }} style={{ background: "rgba(148,163,184,.15)", color: "#94a3b8" }}>Cancel</button>
+                        <button className="rf-btn" onClick={() => saveReward(r.id)} style={{ background: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)" }}>Save</button>
+                        <button className="rf-btn" onClick={() => { setEditingId(null); setRewardVal(""); }} style={{ background: "rgba(148,163,184,.15)", color: "var(--tx-94a3b8, #94a3b8)" }}>Cancel</button>
                       </div>
                     ) : (
-                      <button className="rf-btn" onClick={() => { setEditingId(r.id); setRewardVal(String(r.reward ?? "")); }} style={{ background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.6)" }}>
+                      <button className="rf-btn" onClick={() => { setEditingId(r.id); setRewardVal(String(r.reward ?? "")); }} style={{ background: "rgba(var(--ink),.05)", color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                         {r.reward ? `$${Number(r.reward).toFixed(2)}` : "Set reward"}
                       </button>
                     )}
                   </td>
-                  <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>{new Date(r.createdAt).toLocaleDateString("en-GB")}</td>
+                  <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>{new Date(r.createdAt).toLocaleDateString("en-GB")}</td>
                   <td style={td}>
                     {r.status !== "rewarded" && (
-                      <button className="rf-btn" onClick={() => updateReferral(r.id, { status: "rewarded" })} style={{ background: "rgba(52,211,153,.15)", color: "#34d399" }}>Mark Rewarded</button>
+                      <button className="rf-btn" onClick={() => updateReferral(r.id, { status: "rewarded" })} style={{ background: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)" }}>Mark Rewarded</button>
                     )}
                   </td>
                 </tr>
@@ -183,12 +183,12 @@ export default function AdminReferralsPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
 
 const css = `
-  .rf-sel, .rf-inp, .rf-sel-sm, .rf-inp-sm { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; }
+  .rf-sel, .rf-inp, .rf-sel-sm, .rf-inp-sm { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; }
   .rf-inp { min-width:260px; }
   .rf-sel-sm { padding:5px 10px; font-size:11px; font-weight:700; border-radius:20px; }
   .rf-inp-sm { padding:5px 8px; font-size:12px; border-radius:6px; width:70px; }

@@ -25,7 +25,7 @@ type FunnelData = {
 const PLAN_COLORS: Record<string, string> = {
   STARTER:    "#64748b",
   PRO:        "#6366f1",
-  ENTERPRISE: "#38bdf8",
+  ENTERPRISE: "var(--tx-38bdf8, #38bdf8)",
 };
 
 export default function AdminFunnelPage() {
@@ -53,14 +53,14 @@ export default function AdminFunnelPage() {
   const maxCount = data ? Math.max(...data.funnel.map(s => s.count), 1) : 1;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 80px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 80px" }}>
       <style>{css}</style>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Funnel Analysis</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
             Visitor → Signup → Subscription → Payment — full journey conversion.
           </p>
         </div>
@@ -68,9 +68,9 @@ export default function AdminFunnelPage() {
           {[7, 30, 60, 90].map(d => (
             <button key={d} onClick={() => setDays(d)} style={{
               padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-              background: days === d ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-              border: days === d ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-              color: days === d ? "#818cf8" : "rgba(255,255,255,.4)",
+              background: days === d ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+              border: days === d ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+              color: days === d ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
             }}>
               {d}d
             </button>
@@ -79,23 +79,23 @@ export default function AdminFunnelPage() {
       </div>
 
       {loading ? (
-        <div style={{ padding: 80, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading funnel data…</div>
+        <div style={{ padding: 80, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Loading funnel data…</div>
       ) : !data ? (
-        <div style={{ padding: 80, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Failed to load</div>
+        <div style={{ padding: 80, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Failed to load</div>
       ) : (
         <>
           {/* ── Summary KPIs ── */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 28 }}>
             {[
-              { label: "Overall Conversion", val: `${data.conversions.overallConversion}%`, color: "#fbbf24", sub: "Visitor → Paid" },
-              { label: "Total Revenue",       val: `$${data.summary.totalRevenue.toLocaleString()}`, color: "#34d399", sub: "All time payments" },
-              { label: "Churn Rate",          val: `${data.summary.churnRate}%`, color: "#f87171", sub: `${data.summary.cancelled} cancelled` },
-              { label: "Period",              val: `${days} days`, color: "#818cf8", sub: `Since ${new Date(data.period.since).toLocaleDateString("en-GB")}` },
+              { label: "Overall Conversion", val: `${data.conversions.overallConversion}%`, color: "var(--tx-fbbf24, #fbbf24)", sub: "Visitor → Paid" },
+              { label: "Total Revenue",       val: `$${data.summary.totalRevenue.toLocaleString()}`, color: "var(--tx-34d399, #34d399)", sub: "All time payments" },
+              { label: "Churn Rate",          val: `${data.summary.churnRate}%`, color: "var(--tx-f87171, #f87171)", sub: `${data.summary.cancelled} cancelled` },
+              { label: "Period",              val: `${days} days`, color: "var(--tx-818cf8, #818cf8)", sub: `Since ${new Date(data.period.since).toLocaleDateString("en-GB")}` },
             ].map(k => (
-              <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+              <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "18px 20px" }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: k.color }}>{k.val}</div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.55)", marginTop: 5 }}>{k.label}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", marginTop: 2 }}>{k.sub}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-55, .55))", marginTop: 5 }}>{k.label}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", marginTop: 2 }}>{k.sub}</div>
               </div>
             ))}
           </div>
@@ -119,11 +119,11 @@ export default function AdminFunnelPage() {
                     {/* Drop-off arrow */}
                     {i > 0 && (
                       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "6px 0 6px 16px" }}>
-                        <div style={{ fontSize: 16, color: "rgba(255,255,255,.15)" }}>▼</div>
-                        <div style={{ fontSize: 12, color: "#f87171", fontWeight: 700 }}>
+                        <div style={{ fontSize: 16, color: "rgba(var(--ink),var(--ta-15, .15))" }}>▼</div>
+                        <div style={{ fontSize: 12, color: "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                           {dropOff}% dropped
                         </div>
-                        <div style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>
+                        <div style={{ fontSize: 12, color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>
                           {convRate}% converted
                         </div>
                       </div>
@@ -138,10 +138,10 @@ export default function AdminFunnelPage() {
                         </div>
                         <div style={{ textAlign: "right" }}>
                           <span style={{ fontSize: 20, fontWeight: 800, color: step.color }}>{step.count.toLocaleString()}</span>
-                          <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginLeft: 6 }}>total</span>
+                          <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginLeft: 6 }}>total</span>
                         </div>
                       </div>
-                      <div style={{ height: 36, borderRadius: 8, background: "rgba(255,255,255,.05)", overflow: "hidden", position: "relative" }}>
+                      <div style={{ height: 36, borderRadius: 8, background: "rgba(var(--ink),.05)", overflow: "hidden", position: "relative" }}>
                         <div style={{
                           width: `${widthPct}%`,
                           height: "100%",
@@ -152,7 +152,7 @@ export default function AdminFunnelPage() {
                         }}>
                           <div style={{
                             position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                            fontSize: 12, fontWeight: 800, color: "white",
+                            fontSize: 12, fontWeight: 800, color: "var(--ink-solid, white)",
                             opacity: widthPct > 15 ? 1 : 0,
                           }}>
                             {Math.round(widthPct)}%
@@ -166,17 +166,17 @@ export default function AdminFunnelPage() {
             </div>
 
             {/* Conversion rate summary */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,.06)" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(var(--ink),.06)" }}>
               {[
                 { label: "Visitor → Signup",       val: data.conversions.visitorToSignup  },
                 { label: "Signup → Active",         val: data.conversions.signupToActive   },
                 { label: "Active → Paid",           val: data.conversions.activeToPaid     },
               ].map(c => (
-                <div key={c.label} style={{ textAlign: "center", padding: "12px 8px", background: "rgba(255,255,255,.03)", borderRadius: 10 }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: c.val >= 50 ? "#34d399" : c.val >= 20 ? "#fbbf24" : "#f87171" }}>
+                <div key={c.label} style={{ textAlign: "center", padding: "12px 8px", background: "rgba(var(--ink),.03)", borderRadius: 10 }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: c.val >= 50 ? "var(--tx-34d399, #34d399)" : c.val >= 20 ? "var(--tx-fbbf24, #fbbf24)" : "var(--tx-f87171, #f87171)" }}>
                     {c.val}%
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{c.label}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{c.label}</div>
                 </div>
               ))}
             </div>
@@ -196,20 +196,20 @@ export default function AdminFunnelPage() {
               <div style={cardHead}>Referral Sources — Signup vs Paid</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
                 {data.referralSources.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: 20, color: "rgba(255,255,255,.3)", fontSize: 13 }}>No data yet</div>
+                  <div style={{ textAlign: "center", padding: 20, color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>No data yet</div>
                 ) : data.referralSources.map(r => {
                   const convPct = r.signups > 0 ? Math.round((r.paid / r.signups) * 100) : 0;
                   return (
                     <div key={r.source}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                        <span style={{ fontWeight: 600, color: "rgba(255,255,255,.8)" }}>{r.source}</span>
+                        <span style={{ fontWeight: 600, color: "rgba(var(--ink),.8)" }}>{r.source}</span>
                         <div style={{ display: "flex", gap: 10 }}>
-                          <span style={{ color: "#818cf8" }}>{r.signups} signups</span>
-                          <span style={{ color: "#34d399" }}>{r.paid} paid</span>
-                          <span style={{ color: convPct >= 50 ? "#34d399" : "#fbbf24", fontWeight: 700 }}>{convPct}%</span>
+                          <span style={{ color: "var(--tx-818cf8, #818cf8)" }}>{r.signups} signups</span>
+                          <span style={{ color: "var(--tx-34d399, #34d399)" }}>{r.paid} paid</span>
+                          <span style={{ color: convPct >= 50 ? "var(--tx-34d399, #34d399)" : "var(--tx-fbbf24, #fbbf24)", fontWeight: 700 }}>{convPct}%</span>
                         </div>
                       </div>
-                      <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
+                      <div style={{ height: 6, borderRadius: 99, background: "rgba(var(--ink),.07)", overflow: "hidden" }}>
                         <div style={{
                           width: `${convPct}%`, height: "100%", borderRadius: 99,
                           background: convPct >= 50 ? "#34d399" : "#fbbf24",
@@ -226,19 +226,19 @@ export default function AdminFunnelPage() {
               <div style={cardHead}>Active Plan Distribution</div>
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
                 {data.planDistribution.length === 0 ? (
-                  <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No active plans yet</div>
+                  <div style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>No active plans yet</div>
                 ) : data.planDistribution.map(p => {
                   const color = PLAN_COLORS[p.plan] || "#64748b";
                   const total = data.planDistribution.reduce((s, x) => s + x.count, 0);
                   const pct   = total > 0 ? Math.round((p.count / total) * 100) : 0;
                   return (
-                    <div key={p.plan} style={{ flex: 1, minWidth: 140, background: "rgba(255,255,255,.03)", border: `1px solid ${color}33`, borderRadius: 14, padding: "16px 18px" }}>
+                    <div key={p.plan} style={{ flex: 1, minWidth: 140, background: "rgba(var(--ink),.03)", border: `1px solid ${color}33`, borderRadius: 14, padding: "16px 18px" }}>
                       <div style={{ fontSize: 28, fontWeight: 800, color }}>{p.count}</div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)", marginTop: 4 }}>{p.plan}</div>
-                      <div style={{ marginTop: 10, height: 4, borderRadius: 99, background: "rgba(255,255,255,.07)" }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-60, .6))", marginTop: 4 }}>{p.plan}</div>
+                      <div style={{ marginTop: 10, height: 4, borderRadius: 99, background: "rgba(var(--ink),.07)" }}>
                         <div style={{ width: `${pct}%`, height: "100%", borderRadius: 99, background: color }} />
                       </div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 5 }}>{pct}% of active</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 5 }}>{pct}% of active</div>
                     </div>
                   );
                 })}
@@ -294,11 +294,11 @@ function MonthlyChart({ trend }: { trend: TrendMonth[] }) {
       </svg>
       <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
         {[
-          { label: "Signups", color: "#34d399" },
-          { label: "Active",  color: "#818cf8" },
-          { label: "Paid",    color: "#fbbf24" },
+          { label: "Signups", color: "var(--tx-34d399, #34d399)" },
+          { label: "Active",  color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Paid",    color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(l => (
-          <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "rgba(255,255,255,.5)" }}>
+          <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "rgba(var(--ink),var(--ta-50, .5))" }}>
             <div style={{ width: 10, height: 3, borderRadius: 99, background: l.color }} />
             {l.label}
           </div>
@@ -309,8 +309,8 @@ function MonthlyChart({ trend }: { trend: TrendMonth[] }) {
 }
 
 const card: React.CSSProperties = {
-  background: "linear-gradient(160deg, rgba(19,27,50,.98), rgba(15,22,42,.98))",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "linear-gradient(160deg, rgba(var(--dkr-131b32, 19,27,50),0.98), rgba(var(--dkr-0f162a, 15,22,42),0.98))",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 20,
   padding: "20px 22px",
   marginBottom: 0,
@@ -321,8 +321,8 @@ const cardHead: React.CSSProperties = {
   fontWeight: 800,
   marginBottom: 18,
   paddingBottom: 12,
-  borderBottom: "1px solid rgba(255,255,255,.06)",
-  color: "#f8fafc",
+  borderBottom: "1px solid rgba(var(--ink),.06)",
+  color: "var(--tx-f8fafc, #f8fafc)",
 };
 
 const css = `

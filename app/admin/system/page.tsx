@@ -23,8 +23,8 @@ const GATEWAY_LABELS: Record<string, string> = {
 };
 
 const F = "'Outfit','Inter',sans-serif";
-const CARD = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
+const CARD = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
 
 function fmt(d: string | null) {
   if (!d) return "—";
@@ -34,24 +34,24 @@ function fmt(d: string | null) {
 function MetricCard({ label, value, sub, color = "#e2e8f0" }: { label: string; value: React.ReactNode; sub?: string; color?: string }) {
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 20px" }}>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.35)", textTransform: "uppercase", marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-35, .35))", textTransform: "uppercase", marginBottom: 8 }}>{label}</div>
       <div style={{ fontSize: 26, fontWeight: 800, color, lineHeight: 1.1 }}>{value}</div>
-      {sub && <div style={{ marginTop: 6, fontSize: 11, color: "rgba(255,255,255,.3)" }}>{sub}</div>}
+      {sub && <div style={{ marginTop: 6, fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{sub}</div>}
     </div>
   );
 }
 
 function ServiceRow({ name, status, detail }: { name: string; status: "ok" | "warn" | "error"; detail: string }) {
-  const colors: Record<string, string> = { ok: "#22c55e", warn: "#fbbf24", error: "#f87171" };
+  const colors: Record<string, string> = { ok: "var(--tx-22c55e, #22c55e)", warn: "var(--tx-fbbf24, #fbbf24)", error: "var(--tx-f87171, #f87171)" };
   const c = colors[status];
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 16, padding: "14px 0", borderBottom: `1px solid ${BORDER}` }}>
-      <span style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{name}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{name}</span>
       <span style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: 20, background: `${c}18`, border: `1px solid ${c}40`, fontSize: 12, fontWeight: 700, color: c }}>
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: c, boxShadow: status === "ok" ? `0 0 6px ${c}` : "none" }} />
         {status === "ok" ? "Online" : status === "warn" ? "Degraded" : "Offline"}
       </span>
-      <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)", textAlign: "right" }}>{detail}</span>
+      <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", textAlign: "right" }}>{detail}</span>
     </div>
   );
 }
@@ -91,15 +91,15 @@ export default function AdminSystemPage() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "#e2e8f0" }}>System Health</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)" }}>System Health</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
             Live platform metrics — auto-refreshes every 30s.
             {lastRefresh && <span style={{ marginLeft: 8 }}>Last: {lastRefresh.toLocaleTimeString()}</span>}
           </p>
         </div>
         <button
           onClick={() => { setLoading(true); load(); }}
-          style={{ padding: "10px 18px", borderRadius: 12, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+          style={{ padding: "10px 18px", borderRadius: 12, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
         >
           ↻ Refresh
         </button>
@@ -115,10 +115,10 @@ export default function AdminSystemPage() {
         }}>
           <span style={{ fontSize: 18 }}>{isHealthy ? "✅" : "⚠️"}</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: isHealthy ? "#22c55e" : "#fbbf24" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: isHealthy ? "var(--tx-22c55e, #22c55e)" : "var(--tx-fbbf24, #fbbf24)" }}>
               {isHealthy ? "All Systems Operational" : "Degraded Performance Detected"}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 2 }}>
               {isHealthy ? "No issues detected in the last 24 hours." : "Review the metrics below for details."}
             </div>
           </div>
@@ -178,9 +178,9 @@ export default function AdminSystemPage() {
 
       {/* Services table */}
       <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "20px 22px" }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0", marginBottom: 4 }}>Services Status</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 16 }}>Real-time service availability</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, fontSize: 11, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", textTransform: "uppercase", paddingBottom: 10, borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)", marginBottom: 4 }}>Services Status</div>
+        <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 16 }}>Real-time service availability</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, fontSize: 11, fontWeight: 800, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase", paddingBottom: 10, borderBottom: `1px solid ${BORDER}` }}>
           <span>Service</span><span style={{ textAlign: "center" }}>Status</span><span style={{ textAlign: "right" }}>Detail</span>
         </div>
         {/* Every row below reports a measured value. Nothing here is allowed to
@@ -225,7 +225,7 @@ export default function AdminSystemPage() {
                   : "")
           }
         />
-        <div style={{ paddingTop: 10, fontSize: 12, color: "rgba(255,255,255,.25)", textAlign: "right" }}>
+        <div style={{ paddingTop: 10, fontSize: 12, color: "rgba(var(--ink),var(--ta-25, .25))", textAlign: "right" }}>
           Updated: {lastRefresh.toLocaleTimeString()}
         </div>
       </div>

@@ -17,11 +17,11 @@ type Update = {
 const TYPES = ["feature", "improvement", "fix", "security", "announcement"] as const;
 
 const TYPE_STYLE: Record<string, { bg: string; color: string }> = {
-  feature:      { bg: "rgba(129,140,248,.15)", color: "#818cf8" },
-  improvement:  { bg: "rgba(52,211,153,.15)",  color: "#34d399" },
-  fix:          { bg: "rgba(251,191,36,.15)",  color: "#fbbf24" },
-  security:     { bg: "rgba(248,113,113,.15)", color: "#f87171" },
-  announcement: { bg: "rgba(244,114,182,.15)", color: "#f472b6" },
+  feature:      { bg: "rgba(129,140,248,.15)", color: "var(--tx-818cf8, #818cf8)" },
+  improvement:  { bg: "rgba(52,211,153,.15)",  color: "var(--tx-34d399, #34d399)" },
+  fix:          { bg: "rgba(251,191,36,.15)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  security:     { bg: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" },
+  announcement: { bg: "rgba(244,114,182,.15)", color: "var(--tx-f472b6, #f472b6)" },
 };
 
 function authHeaders(): Record<string, string> {
@@ -132,13 +132,13 @@ export default function AdminUpdatesPage() {
   }
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Product Updates</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
             Publish changelog entries, feature announcements, and product news.
           </p>
         </div>
@@ -150,19 +150,19 @@ export default function AdminUpdatesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Updates", val: items.length,                             color: "#818cf8" },
-          { label: "Published",     val: items.filter(u => u.published).length,   color: "#34d399" },
-          { label: "Drafts",        val: items.filter(u => !u.published).length,  color: "#94a3b8" },
+          { label: "Total Updates", val: items.length,                             color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Published",     val: items.filter(u => u.published).length,   color: "var(--tx-34d399, #34d399)" },
+          { label: "Drafts",        val: items.filter(u => !u.published).length,  color: "var(--tx-94a3b8, #94a3b8)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
 
       {showForm && (
-        <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 22, marginBottom: 22 }}>
+        <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 22, marginBottom: 22 }}>
           <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>{editingId ? "Edit Update" : "New Update"}</h3>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div>
@@ -192,15 +192,15 @@ export default function AdminUpdatesPage() {
             <button className="up-btn" onClick={save} disabled={saving} style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white" }}>
               {saving ? "Saving…" : editingId ? "Save Changes" : "Publish"}
             </button>
-            <button className="up-btn" onClick={resetForm} style={{ background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.6)" }}>Cancel</button>
+            <button className="up-btn" onClick={resetForm} style={{ background: "rgba(var(--ink),.07)", color: "rgba(var(--ink),var(--ta-60, .6))" }}>Cancel</button>
           </div>
         </div>
       )}
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Title","Type","Version","Published","Date","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -214,10 +214,10 @@ export default function AdminUpdatesPage() {
             ) : items.map(u => {
               const st = TYPE_STYLE[u.type] || TYPE_STYLE.feature;
               return (
-                <tr key={u.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <tr key={u.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={{ ...td, fontWeight: 700, maxWidth: 320 }}>
                     <div>{u.title}</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", fontWeight: 400, marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 400, marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {u.body.slice(0, 90)}
                     </div>
                   </td>
@@ -228,19 +228,19 @@ export default function AdminUpdatesPage() {
                   <td style={td}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
                       background: u.published ? "rgba(52,211,153,.15)" : "rgba(148,163,184,.15)",
-                      color: u.published ? "#34d399" : "#94a3b8" }}>
+                      color: u.published ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>
                       {u.published ? "PUBLISHED" : "DRAFT"}
                     </span>
                   </td>
-                  <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>{new Date(u.createdAt).toLocaleDateString("en-GB")}</td>
+                  <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>{new Date(u.createdAt).toLocaleDateString("en-GB")}</td>
                   <td style={td}>
                     <div style={{ display: "flex", gap: 6 }}>
-                      <button className="up-btn-sm" onClick={() => beginEdit(u)} style={{ background: "rgba(129,140,248,.15)", color: "#818cf8" }}>Edit</button>
+                      <button className="up-btn-sm" onClick={() => beginEdit(u)} style={{ background: "rgba(129,140,248,.15)", color: "var(--tx-818cf8, #818cf8)" }}>Edit</button>
                       <button className="up-btn-sm" onClick={() => togglePublish(u)}
-                        style={{ background: u.published ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: u.published ? "#94a3b8" : "#34d399" }}>
+                        style={{ background: u.published ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: u.published ? "var(--tx-94a3b8, #94a3b8)" : "var(--tx-34d399, #34d399)" }}>
                         {u.published ? "Unpublish" : "Publish"}
                       </button>
-                      <button className="up-btn-sm" onClick={() => deleteUpdate(u)} style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Delete</button>
+                      <button className="up-btn-sm" onClick={() => deleteUpdate(u)} style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -253,13 +253,13 @@ export default function AdminUpdatesPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
-const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 6 };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
+const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", display: "block", marginBottom: 6 };
 
 const css = `
-  .up-inp { width:100%; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:white; font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
+  .up-inp { width:100%; background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:10px 12px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
   .up-btn { border:none; border-radius:10px; padding:9px 20px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .up-btn:disabled { opacity:.4; cursor:not-allowed; }
   .up-btn:hover:not(:disabled) { opacity:.85; }

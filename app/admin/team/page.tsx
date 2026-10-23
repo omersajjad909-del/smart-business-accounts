@@ -182,26 +182,26 @@ export default function AdminTeamPage() {
             onClick={() => onChange(GRANTABLE_PAGES.map((i) => i.id))}>Select all</button>
           <button type="button" className="tm-btn-sm" style={pickBtn}
             onClick={() => onChange([])}>Clear</button>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", alignSelf: "center" }}>
+          <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", alignSelf: "center" }}>
             {value.length} of {GRANTABLE_PAGES.length} selected
           </span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 14 }}>
           {grouped.map(({ group, items: gItems }) => (
             <div key={group}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", marginBottom: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 6 }}>
                 {group.toUpperCase()}
               </div>
               {gItems.map((item) => (
                 <label key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", fontSize: 12, cursor: "pointer" }}>
                   <input type="checkbox" checked={value.includes(item.id)} onChange={() => toggle(item.id)} />
-                  <span style={{ color: value.includes(item.id) ? "white" : "rgba(255,255,255,.5)" }}>{item.label}</span>
+                  <span style={{ color: value.includes(item.id) ? "white" : "rgba(var(--ink),var(--ta-50, .5))" }}>{item.label}</span>
                 </label>
               ))}
             </div>
           ))}
         </div>
-        <p style={{ margin: "10px 0 0", fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+        <p style={{ margin: "10px 0 0", fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
           Team, API Keys, Backup &amp; Restore and Dev Test are super-admin only and cannot be granted here.
         </p>
       </div>
@@ -213,13 +213,13 @@ export default function AdminTeamPage() {
     : items;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Admin Team</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
             Every admin account lives here — team members and platform admins alike.
             Platform admins are view-only; they're never listed under Companies or Users,
             and can't be deleted or disabled from anywhere in the admin panel.
@@ -232,19 +232,19 @@ export default function AdminTeamPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Members", val: items.length,                       color: "#818cf8" },
-          { label: "Active",        val: items.filter(m => m.active).length, color: "#34d399" },
-          { label: "Super Admins",  val: items.filter(m => m.isSuperAdmin).length, color: "#f472b6" },
+          { label: "Total Members", val: items.length,                       color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",        val: items.filter(m => m.active).length, color: "var(--tx-34d399, #34d399)" },
+          { label: "Super Admins",  val: items.filter(m => m.isSuperAdmin).length, color: "var(--tx-f472b6, #f472b6)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
 
       {showForm && (
-        <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 22, marginBottom: 22 }}>
+        <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: 22, marginBottom: 22 }}>
           <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>New Team Member</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
             <div>
@@ -264,7 +264,7 @@ export default function AdminTeamPage() {
               <input className="tm-inp" value={team} onChange={e => setTeam(e.target.value)} placeholder="Support, Ops, Growth…" />
             </div>
           </div>
-          <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.06)" }}>
+          <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(var(--ink),.06)" }}>
             <label style={{ ...label, marginBottom: 10 }}>Pages this member can open</label>
             <PagePicker value={newPages} onChange={setNewPages} />
           </div>
@@ -282,10 +282,10 @@ export default function AdminTeamPage() {
         <input className="tm-inp" placeholder="Search name or email…" value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 280 }} />
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Name","Email","Team","Pages","Status","Last Login","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -297,16 +297,16 @@ export default function AdminTeamPage() {
             ) : filtered.length === 0 ? (
               <tr><td colSpan={7} style={empty}>No team members yet</td></tr>
             ) : filtered.flatMap(m => [
-              <tr key={m.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+              <tr key={m.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                 <td style={{ ...td, fontWeight: 700 }}>
                   {m.name}
-                  {m.isSuperAdmin && <span style={{ marginLeft: 8, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "rgba(244,114,182,.15)", color: "#f472b6" }}>SUPER</span>}
+                  {m.isSuperAdmin && <span style={{ marginLeft: 8, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "rgba(244,114,182,.15)", color: "var(--tx-f472b6, #f472b6)" }}>SUPER</span>}
                 </td>
-                <td style={{ ...td, color: "rgba(255,255,255,.6)" }}>{m.email}</td>
+                <td style={{ ...td, color: "rgba(var(--ink),var(--ta-60, .6))" }}>{m.email}</td>
                 <td style={td}>{m.team || "—"}</td>
                 <td style={td}>
                   {m.isSuperAdmin ? (
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>All pages</span>
+                    <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>All pages</span>
                   ) : (
                     <button className="tm-btn-sm" onClick={() => openPages(m)} style={pickBtn}>
                       {parsePages(m.allowedPages).length} pages
@@ -316,32 +316,32 @@ export default function AdminTeamPage() {
                 <td style={td}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
                     background: m.active ? "rgba(52,211,153,.15)" : "rgba(148,163,184,.15)",
-                    color: m.active ? "#34d399" : "#94a3b8" }}>
+                    color: m.active ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)" }}>
                     {m.active ? "ACTIVE" : "DISABLED"}
                   </span>
                 </td>
-                <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>
+                <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>
                   {m.lastLoginAt ? new Date(m.lastLoginAt).toLocaleDateString("en-GB") : "Never"}
                 </td>
                 <td style={td}>
                   <div style={{ display: "flex", gap: 6 }}>
                     {m.source === "platform" ? (
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", fontStyle: "italic" }}>View only</span>
+                      <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", fontStyle: "italic" }}>View only</span>
                     ) : (
                       <button className="tm-btn-sm" onClick={() => toggleActive(m)}
-                        style={{ background: m.active ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: m.active ? "#94a3b8" : "#34d399" }}>
+                        style={{ background: m.active ? "rgba(148,163,184,.15)" : "rgba(52,211,153,.15)", color: m.active ? "var(--tx-94a3b8, #94a3b8)" : "var(--tx-34d399, #34d399)" }}>
                         {m.active ? "Disable" : "Enable"}
                       </button>
                     )}
                     {!m.isSuperAdmin && (
                       <button className="tm-btn-sm" onClick={() => removeMember(m)}
-                        style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Remove</button>
+                        style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>Remove</button>
                     )}
                   </div>
                 </td>
               </tr>,
               editingId === m.id ? (
-                <tr key={m.id + "-pages"} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: "rgba(255,255,255,.02)" }}>
+                <tr key={m.id + "-pages"} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: "rgba(var(--ink),.02)" }}>
                   <td colSpan={7} style={{ padding: "18px 16px" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
                       Page access — {m.name}
@@ -353,7 +353,7 @@ export default function AdminTeamPage() {
                         {savingPages ? "Saving…" : "Save access"}
                       </button>
                       <button className="tm-btn" onClick={() => setEditingId(null)}
-                        style={{ background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.6)" }}>
+                        style={{ background: "rgba(var(--ink),.06)", color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                         Cancel
                       </button>
                     </div>
@@ -368,14 +368,14 @@ export default function AdminTeamPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
-const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 6 };
-const pickBtn: React.CSSProperties = { background: "rgba(129,140,248,.15)", color: "#a5b4fc" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
+const label: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", display: "block", marginBottom: 6 };
+const pickBtn: React.CSSProperties = { background: "rgba(129,140,248,.15)", color: "var(--tx-a5b4fc, #a5b4fc)" };
 
 const css = `
-  .tm-inp { width:100%; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:white; font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
+  .tm-inp { width:100%; background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:10px 12px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
   .tm-btn { border:none; border-radius:10px; padding:9px 20px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .tm-btn:disabled { opacity:.4; cursor:not-allowed; }
   .tm-btn:hover:not(:disabled) { opacity:.85; }

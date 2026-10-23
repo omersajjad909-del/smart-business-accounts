@@ -27,20 +27,20 @@ type OverrideLog = {
 };
 
 const PLAN_COLORS: Record<string, string> = {
-  STARTER: "#38bdf8", PRO: "#818cf8", ENTERPRISE: "#c4b5fd", CUSTOM: "#fbbf24",
+  STARTER: "var(--tx-38bdf8, #38bdf8)", PRO: "var(--tx-818cf8, #818cf8)", ENTERPRISE: "var(--tx-c4b5fd, #c4b5fd)", CUSTOM: "var(--tx-fbbf24, #fbbf24)",
 };
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  ACTIVE:    { bg: "rgba(34,197,94,.12)",  text: "#22c55e" },
-  TRIALING:  { bg: "rgba(6,182,212,.12)",  text: "#06b6d4" },
-  PAST_DUE:  { bg: "rgba(249,115,22,.12)", text: "#f97316" },
-  INACTIVE:  { bg: "rgba(100,116,139,.12)",text: "#94a3b8" },
-  CANCELED:  { bg: "rgba(239,68,68,.12)",  text: "#f87171" },
+  ACTIVE:    { bg: "rgba(34,197,94,.12)",  text: "var(--tx-22c55e, #22c55e)" },
+  TRIALING:  { bg: "rgba(6,182,212,.12)",  text: "var(--tx-06b6d4, #06b6d4)" },
+  PAST_DUE:  { bg: "rgba(249,115,22,.12)", text: "var(--tx-f97316, #f97316)" },
+  INACTIVE:  { bg: "rgba(100,116,139,.12)",text: "var(--tx-94a3b8, #94a3b8)" },
+  CANCELED:  { bg: "rgba(239,68,68,.12)",  text: "var(--tx-f87171, #f87171)" },
   PURGED:    { bg: "rgba(71,85,105,.12)",  text: "#475569" },
   // Written by the platform-dunning cron (app/api/cron/platform-dunning) —
   // before this, both rendered as the generic gray INACTIVE badge, so a
   // company auto-suspended for non-payment looked identical to one that had
   // simply gone inactive on its own.
-  READ_ONLY: { bg: "rgba(251,191,36,.14)", text: "#fbbf24" },
+  READ_ONLY: { bg: "rgba(251,191,36,.14)", text: "var(--tx-fbbf24, #fbbf24)" },
   SUSPENDED: { bg: "rgba(220,38,38,.16)",  text: "#dc2626" },
 };
 
@@ -221,16 +221,16 @@ function OverrideModal({ company, onClose, onDone }: {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "10px 12px", borderRadius: 10,
-    background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
-    color: "white", fontSize: 13, outline: "none",
+    background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
+    color: "var(--ink-solid, white)", fontSize: 13, outline: "none",
   };
 
   const ACTIONS: { key: ActionType; icon: string; label: string; desc: string; color: string }[] = [
-    { key: "EXTEND_TRIAL",      icon: "⏱️", label: "Extend Trial",       desc: "Set status to TRIALING + extend end date",          color: "#06b6d4" },
-    { key: "GRANT_FREE_ACCESS", icon: "🎁", label: "Grant Free Access",   desc: "Set ACTIVE + choose plan for N days, no charge",     color: "#22c55e" },
-    { key: "RESET_INTRO_OFFER", icon: "🔄", label: "Reset 50% Offer",     desc: "Let them use the intro offer again",                  color: "#fbbf24" },
-    { key: "SET_STATUS",        icon: "🔧", label: "Override Status",      desc: "Manually force any subscription status",             color: "#818cf8" },
-    { key: "SET_COUNTRY",       icon: "🌍", label: "Fix Country Code",     desc: "Correct the ISO code used for Pakistan/Safepay routing", color: "#f472b6" },
+    { key: "EXTEND_TRIAL",      icon: "⏱️", label: "Extend Trial",       desc: "Set status to TRIALING + extend end date",          color: "var(--tx-06b6d4, #06b6d4)" },
+    { key: "GRANT_FREE_ACCESS", icon: "🎁", label: "Grant Free Access",   desc: "Set ACTIVE + choose plan for N days, no charge",     color: "var(--tx-22c55e, #22c55e)" },
+    { key: "RESET_INTRO_OFFER", icon: "🔄", label: "Reset 50% Offer",     desc: "Let them use the intro offer again",                  color: "var(--tx-fbbf24, #fbbf24)" },
+    { key: "SET_STATUS",        icon: "🔧", label: "Override Status",      desc: "Manually force any subscription status",             color: "var(--tx-818cf8, #818cf8)" },
+    { key: "SET_COUNTRY",       icon: "🌍", label: "Fix Country Code",     desc: "Correct the ISO code used for Pakistan/Safepay routing", color: "var(--tx-f472b6, #f472b6)" },
     { key: "ADD_NOTE",          icon: "📝", label: "Add Internal Note",    desc: "Log a note to audit trail (no DB change)",           color: "#64748b" },
   ];
 
@@ -239,19 +239,19 @@ function OverrideModal({ company, onClose, onDone }: {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)" }} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 640, background: "#0a0f24", border: "1px solid rgba(255,255,255,.1)", borderRadius: 22, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,.7)", maxHeight: "90vh", overflowY: "auto" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: 640, background: "var(--dk-0a0f24, #0a0f24)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 22, overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,.7)", maxHeight: "90vh", overflowY: "auto" }}>
 
         {/* Header */}
-        <div style={{ padding: "20px 26px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "sticky", top: 0, background: "#0a0f24", zIndex: 1 }}>
+        <div style={{ padding: "20px 26px", borderBottom: "1px solid rgba(var(--ink),.07)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "sticky", top: 0, background: "var(--dk-0a0f24, #0a0f24)", zIndex: 1 }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "white" }}>Billing Override</h3>
+            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "var(--ink-solid, white)" }}>Billing Override</h3>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-              <span style={{ fontSize: 13, color: "#94a3b8" }}>{company.name}</span>
+              <span style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)" }}>{company.name}</span>
               <PlanBadge plan={company.plan} />
               <StatusBadge status={company.subscriptionStatus} />
             </div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
         </div>
 
         <div style={{ padding: "22px 26px", display: "flex", flexDirection: "column", gap: 20 }}>
@@ -262,7 +262,7 @@ function OverrideModal({ company, onClose, onDone }: {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {ACTIONS.map(a => (
                 <button key={a.key} onClick={() => setAction(a.key)}
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: `1px solid ${action === a.key ? `${a.color}50` : "rgba(255,255,255,.06)"}`, background: action === a.key ? `${a.color}12` : "rgba(255,255,255,.025)", cursor: "pointer", textAlign: "left", transition: "all .15s" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, border: `1px solid ${action === a.key ? `${a.color}50` : "rgba(var(--ink),.06)"}`, background: action === a.key ? `${a.color}12` : "rgba(var(--ink),.025)", cursor: "pointer", textAlign: "left", transition: "all .15s" }}>
                   <span style={{ fontSize: 20, flexShrink: 0 }}>{a.icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: action === a.key ? a.color : "white" }}>{a.label}</div>
@@ -276,7 +276,7 @@ function OverrideModal({ company, onClose, onDone }: {
 
           {/* Action-specific fields */}
           {(action === "EXTEND_TRIAL" || action === "GRANT_FREE_ACCESS") && (
-            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", display: "flex", flexDirection: "column", gap: 14 }}>
               {/* A trial is a length of time; a prepaid deal is a date in a
                   contract. They are asked for differently because they are
                   different things. */}
@@ -289,7 +289,7 @@ function OverrideModal({ company, onClose, onDone }: {
                       const on = until === iso;
                       return (
                         <button key={preset.label} onClick={() => setUntil(iso)}
-                          style={{ padding: "7px 14px", borderRadius: 10, border: `1px solid ${on ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: on ? "rgba(99,102,241,.2)" : "transparent", color: on ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                          style={{ padding: "7px 14px", borderRadius: 10, border: `1px solid ${on ? "#818cf8" : "rgba(var(--ink),.1)"}`, background: on ? "rgba(99,102,241,.2)" : "transparent", color: on ? "var(--tx-818cf8, #818cf8)" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                           {preset.label}
                         </button>
                       );
@@ -299,7 +299,7 @@ function OverrideModal({ company, onClose, onDone }: {
                     </div>
                   </div>
                   <div style={{ fontSize: 11, color: "#475569", marginTop: 8, lineHeight: 1.6 }}>
-                    Full access through <span style={{ color: "#94a3b8" }}>{isoToDisplay(until)}</span>, that whole day included.
+                    Full access through <span style={{ color: "var(--tx-94a3b8, #94a3b8)" }}>{isoToDisplay(until)}</span>, that whole day included.
                     After it, writing stops and read-only export stays open for 30 days.
                   </div>
                 </div>
@@ -309,7 +309,7 @@ function OverrideModal({ company, onClose, onDone }: {
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {[7, 14, 30, 60, 90].map(d => (
                       <button key={d} onClick={() => setDays(d)}
-                        style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${days === d ? "#818cf8" : "rgba(255,255,255,.1)"}`, background: days === d ? "rgba(99,102,241,.2)" : "transparent", color: days === d ? "#818cf8" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        style={{ padding: "7px 16px", borderRadius: 10, border: `1px solid ${days === d ? "#818cf8" : "rgba(var(--ink),.1)"}`, background: days === d ? "rgba(99,102,241,.2)" : "transparent", color: days === d ? "var(--tx-818cf8, #818cf8)" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                         {d}d
                       </button>
                     ))}
@@ -317,7 +317,7 @@ function OverrideModal({ company, onClose, onDone }: {
                       style={{ ...inputStyle, width: 80, textAlign: "center" }} />
                   </div>
                   <div style={{ fontSize: 11, color: "#475569", marginTop: 8 }}>
-                    New end date: <span style={{ color: "#94a3b8" }}>{(() => { const d = new Date(); d.setDate(d.getDate() + days); return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" }); })()}</span>
+                    New end date: <span style={{ color: "var(--tx-94a3b8, #94a3b8)" }}>{(() => { const d = new Date(); d.setDate(d.getDate() + days); return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" }); })()}</span>
                   </div>
                 </div>
               )}
@@ -336,12 +336,12 @@ function OverrideModal({ company, onClose, onDone }: {
                   customer's billing page falls back to the plan's USD list
                   price, which is not what they were charged. */}
               {action === "GRANT_FREE_ACCESS" && (
-                <div style={{ borderTop: "1px solid rgba(255,255,255,.07)", paddingTop: 14 }}>
+                <div style={{ borderTop: "1px solid rgba(var(--ink),.07)", paddingTop: 14 }}>
                   <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
                     <input type="checkbox" checked={recordInvoice} onChange={e => setRecordInvoice(e.target.checked)}
                       style={{ width: 15, height: 15, marginTop: 2, accentColor: "#22c55e", cursor: "pointer" }} />
                     <span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: recordInvoice ? "#22c55e" : "white" }}>Record an invoice for this deal</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: recordInvoice ? "var(--tx-22c55e, #22c55e)" : "white" }}>Record an invoice for this deal</span>
                       <span style={{ display: "block", fontSize: 11, color: "#475569", marginTop: 3, lineHeight: 1.6 }}>
                         Writes a real numbered invoice for the money actually received. The customer sees it on their
                         billing page and can download the PDF. Leave off for a genuinely free grant.
@@ -381,7 +381,7 @@ function OverrideModal({ company, onClose, onDone }: {
                           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                             {[0, 25, 50].map(p => (
                               <button key={p} onClick={() => setDiscountPct(p)}
-                                style={{ padding: "9px 12px", borderRadius: 10, border: `1px solid ${discountPct === p ? "#22c55e" : "rgba(255,255,255,.1)"}`, background: discountPct === p ? "rgba(34,197,94,.15)" : "transparent", color: discountPct === p ? "#22c55e" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                                style={{ padding: "9px 12px", borderRadius: 10, border: `1px solid ${discountPct === p ? "#22c55e" : "rgba(var(--ink),.1)"}`, background: discountPct === p ? "rgba(34,197,94,.15)" : "transparent", color: discountPct === p ? "var(--tx-22c55e, #22c55e)" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
                                 {p === 0 ? "None" : `${p}%`}
                               </button>
                             ))}
@@ -397,13 +397,13 @@ function OverrideModal({ company, onClose, onDone }: {
                       </div>
 
                       {/* The invoice as the customer will read it, line by line. */}
-                      <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)", fontSize: 11.5, color: "#64748b", lineHeight: 1.9 }}>
+                      <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)", fontSize: 11.5, color: "#64748b", lineHeight: 1.9 }}>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                           <span>{plan} subscription ({billingCycle.toLowerCase()})</span>
                           <span>{currency} {invoiceGross.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         {discountPct > 0 && (
-                          <div style={{ display: "flex", justifyContent: "space-between", color: "#22c55e" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", color: "var(--tx-22c55e, #22c55e)" }}>
                             <span>Discount ({discountPct}%)</span>
                             <span>− {currency} {invoiceDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
@@ -414,12 +414,12 @@ function OverrideModal({ company, onClose, onDone }: {
                             <span>{currency} {invoiceTax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
                         )}
-                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, paddingTop: 6, borderTop: "1px solid rgba(255,255,255,.07)", color: "white", fontWeight: 800 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, paddingTop: 6, borderTop: "1px solid rgba(var(--ink),.07)", color: "var(--ink-solid, white)", fontWeight: 800 }}>
                           <span>Total</span>
-                          <span style={{ color: "#22c55e" }}>{currency} {invoiceNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span style={{ color: "var(--tx-22c55e, #22c55e)" }}>{currency} {invoiceNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         <div style={{ marginTop: 8, fontSize: 11, color: "#475569" }}>
-                          Covers today through <span style={{ color: "#94a3b8" }}>{isoToDisplay(until)}</span>, marked PAID.
+                          Covers today through <span style={{ color: "var(--tx-94a3b8, #94a3b8)" }}>{isoToDisplay(until)}</span>, marked PAID.
                           {billingCycle === "MONTHLY" && " Nothing renews this automatically — repeat it next month."}
                         </div>
                       </div>
@@ -431,7 +431,7 @@ function OverrideModal({ company, onClose, onDone }: {
           )}
 
           {action === "SET_STATUS" && (
-            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
               <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>NEW STATUS</label>
               <select value={status} onChange={e => setStatus(e.target.value)} style={inputStyle}>
                 {["ACTIVE", "TRIALING", "PAST_DUE", "INACTIVE", "CANCELED"].map(s => (
@@ -442,7 +442,7 @@ function OverrideModal({ company, onClose, onDone }: {
           )}
 
           {action === "SET_COUNTRY" && (
-            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+            <div style={{ padding: "18px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
               <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>
                 ISO COUNTRY CODE (currently stored as "{company.country || "—"}")
               </label>
@@ -456,7 +456,7 @@ function OverrideModal({ company, onClose, onDone }: {
           )}
 
           {action === "RESET_INTRO_OFFER" && (
-            <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 13, color: "#fbbf24" }}>
+            <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)" }}>
               ⚠️ This will delete the BILLING_OFFER_CLAIM log for this company. They will be able to use the 50% intro offer again on their next checkout.
             </div>
           )}
@@ -471,7 +471,7 @@ function OverrideModal({ company, onClose, onDone }: {
 
           {/* Apply button */}
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={onClose} style={{ flex: 1, padding: "12px", borderRadius: 12, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#64748b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+            <button onClick={onClose} style={{ flex: 1, padding: "12px", borderRadius: 12, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "#64748b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
             <button onClick={apply} disabled={saving || (action === "ADD_NOTE" && !note.trim()) || (action === "SET_COUNTRY" && !/^[A-Z]{2}$/.test(countryCode)) || invoiceIncomplete}
               style={{ flex: 2, padding: "12px", borderRadius: 12, background: saving ? "#4338ca" : `linear-gradient(135deg,${selected.color},${selected.color}bb)`, border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : invoiceIncomplete ? "not-allowed" : "pointer", opacity: saving || invoiceIncomplete ? .55 : 1 }}>
               {saving ? "Applying…" : invoiceIncomplete ? "Enter the invoice amount" : `Apply — ${selected.label}`}
@@ -481,16 +481,16 @@ function OverrideModal({ company, onClose, onDone }: {
           {/* Override history */}
           {history.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#334155", letterSpacing: ".06em", marginBottom: 10, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.06)" }}>OVERRIDE HISTORY</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#334155", letterSpacing: ".06em", marginBottom: 10, paddingTop: 8, borderTop: "1px solid rgba(var(--ink),.06)" }}>OVERRIDE HISTORY</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {history.map(log => {
                   let parsed: any = {};
                   try { parsed = JSON.parse(log.details); } catch {}
                   return (
-                    <div key={log.id} style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)" }}>
+                    <div key={log.id} style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(var(--ink),.025)", border: "1px solid rgba(var(--ink),.06)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
                         <div>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: "#818cf8" }}>{parsed.action || "OVERRIDE"}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)" }}>{parsed.action || "OVERRIDE"}</span>
                           {parsed.note && <span style={{ fontSize: 11, color: "#475569", marginLeft: 8 }}>— {parsed.note}</span>}
                         </div>
                         <div style={{ fontSize: 10, color: "#334155", flexShrink: 0 }}>
@@ -502,7 +502,7 @@ function OverrideModal({ company, onClose, onDone }: {
                           next admin needs — spelled out rather than left inside
                           a JSON dump for someone to squint at. */}
                       {parsed.payload?.recordInvoice && (
-                        <div style={{ fontSize: 11, color: "#22c55e", marginTop: 4 }}>
+                        <div style={{ fontSize: 11, color: "var(--tx-22c55e, #22c55e)", marginTop: 4 }}>
                           🧾 Invoiced {parsed.payload.currency} {Number(parsed.payload.amount || 0).toLocaleString()}
                           {Number(parsed.payload.discountPercent) > 0 && ` · ${parsed.payload.discountPercent}% off`}
                           {Number(parsed.payload.taxRate) > 0 && ` · ${parsed.payload.taxRate}% tax`}
@@ -595,19 +595,19 @@ export default function AdminSubscriptionsPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060918", padding: "28px 24px 60px" }}>
-      <style>{`select option { background: #0f172a; color: white; }`}</style>
+    <div style={{ minHeight: "100vh", background: "var(--dk-060918, #060918)", padding: "28px 24px 60px" }}>
+      <style>{`select option { background: var(--dk-0f172a, #0f172a); color:var(--ink-solid, white); }`}</style>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Subscription Management</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)" }}>Subscription Management</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#475569" }}>Override billing, extend trials, grant access, reset offers</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>↻ Refresh</button>
+          <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>↻ Refresh</button>
           <button onClick={runCleanup} disabled={cleanupRunning}
-            style={{ padding: "9px 18px", borderRadius: 10, background: cleanupRunning ? "rgba(239,68,68,.08)" : "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: cleanupRunning ? "wait" : "pointer", opacity: cleanupRunning ? .6 : 1 }}>
+            style={{ padding: "9px 18px", borderRadius: 10, background: cleanupRunning ? "rgba(239,68,68,.08)" : "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: cleanupRunning ? "wait" : "pointer", opacity: cleanupRunning ? .6 : 1 }}>
             {cleanupRunning ? "Running…" : "🗑 Run Data Cleanup"}
           </button>
         </div>
@@ -617,11 +617,11 @@ export default function AdminSubscriptionsPage() {
       {needsAttention.length > 0 && (
         <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 14, background: "rgba(239,68,68,.06)", border: "1px solid rgba(239,68,68,.2)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>⚠️</span>
-          <div style={{ fontSize: 13, color: "#f87171" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-f87171, #f87171)" }}>
             <strong>{needsAttention.length} companies</strong> need attention (Past Due / Inactive / Canceled):&nbsp;
             {needsAttention.slice(0, 4).map(c => (
               <button key={c.id} onClick={() => setOverriding(c)}
-                style={{ background: "rgba(239,68,68,.15)", border: "1px solid rgba(239,68,68,.3)", color: "#fca5a5", padding: "2px 8px", borderRadius: 8, fontSize: 11, cursor: "pointer", marginRight: 4 }}>
+                style={{ background: "rgba(239,68,68,.15)", border: "1px solid rgba(239,68,68,.3)", color: "var(--tx-fca5a5, #fca5a5)", padding: "2px 8px", borderRadius: 8, fontSize: 11, cursor: "pointer", marginRight: 4 }}>
                 {c.name}
               </button>
             ))}
@@ -633,13 +633,13 @@ export default function AdminSubscriptionsPage() {
       {expiringSoon.length > 0 && (
         <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 14, background: "rgba(249,115,22,.06)", border: "1px solid rgba(249,115,22,.2)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 20 }}>⏰</span>
-          <div style={{ fontSize: 13, color: "#fb923c" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-fb923c, #fb923c)" }}>
             <strong>{expiringSoon.length} companies</strong> expire within 7 days:&nbsp;
             {expiringSoon.slice(0, 4).map(c => {
               const days = Math.ceil((new Date(c.currentPeriodEnd!).getTime() - Date.now()) / 86400000);
               return (
                 <button key={c.id} onClick={() => setOverriding(c)}
-                  style={{ background: "rgba(249,115,22,.15)", border: "1px solid rgba(249,115,22,.3)", color: "#fdba74", padding: "2px 8px", borderRadius: 8, fontSize: 11, cursor: "pointer", marginRight: 4 }}>
+                  style={{ background: "rgba(249,115,22,.15)", border: "1px solid rgba(249,115,22,.3)", color: "var(--tx-fdba74, #fdba74)", padding: "2px 8px", borderRadius: 8, fontSize: 11, cursor: "pointer", marginRight: 4 }}>
                   {c.name} ({days}d)
                 </button>
               );
@@ -652,7 +652,7 @@ export default function AdminSubscriptionsPage() {
       {cleanupResult && (
         <div style={{ marginBottom: 16, padding: "12px 18px", borderRadius: 12, background: cleanupResult.errors > 0 ? "rgba(249,115,22,.08)" : "rgba(34,197,94,.08)", border: `1px solid ${cleanupResult.errors > 0 ? "rgba(249,115,22,.3)" : "rgba(34,197,94,.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 18 }}>{cleanupResult.errors > 0 ? "⚠️" : "✅"}</span>
-          <span style={{ fontSize: 13, color: cleanupResult.errors > 0 ? "#fb923c" : "#4ade80" }}>
+          <span style={{ fontSize: 13, color: cleanupResult.errors > 0 ? "var(--tx-fb923c, #fb923c)" : "var(--tx-4ade80, #4ade80)" }}>
             Cleanup complete — <strong>{cleanupResult.purged}</strong> account(s) permanently purged
             {cleanupResult.errors > 0 && `, ${cleanupResult.errors} error(s)`}
           </span>
@@ -663,16 +663,16 @@ export default function AdminSubscriptionsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px,1fr))", gap: 12, marginBottom: 22 }}>
         {[
-          { label: "Total",     value: companies.length,                                                                                 color: "#818cf8" },
-          { label: "Active",    value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "ACTIVE").length,    color: "#22c55e" },
-          { label: "Trialing",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "TRIALING").length,  color: "#06b6d4" },
-          { label: "Past Due",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "PAST_DUE").length,  color: "#f97316" },
-          { label: "Canceled",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "CANCELED").length,  color: "#f87171" },
-          { label: "Read-Only", value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "READ_ONLY").length, color: "#fbbf24" },
+          { label: "Total",     value: companies.length,                                                                                 color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",    value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "ACTIVE").length,    color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Trialing",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "TRIALING").length,  color: "var(--tx-06b6d4, #06b6d4)" },
+          { label: "Past Due",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "PAST_DUE").length,  color: "var(--tx-f97316, #f97316)" },
+          { label: "Canceled",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "CANCELED").length,  color: "var(--tx-f87171, #f87171)" },
+          { label: "Read-Only", value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "READ_ONLY").length, color: "var(--tx-fbbf24, #fbbf24)" },
           { label: "Suspended", value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "SUSPENDED").length, color: "#dc2626" },
-          { label: "Expiring",  value: expiringSoon.length,                                                                              color: "#fbbf24" },
+          { label: "Expiring",  value: expiringSoon.length,                                                                              color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(s => (
-          <div key={s.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${s.color}20` }}>
+          <div key={s.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: `1px solid ${s.color}20` }}>
             <div style={{ fontSize: 24, fontWeight: 900, color: s.color }}>{loading ? "—" : s.value}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700 }}>{s.label}</div>
           </div>
@@ -682,9 +682,9 @@ export default function AdminSubscriptionsPage() {
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company or billing ID…"
-          style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
+          style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none" }} />
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All Statuses</option>
           {["ACTIVE","TRIALING","PAST_DUE","READ_ONLY","SUSPENDED","INACTIVE","CANCELED"].map(s => (
             <option key={s} value={s}>{s.replace("_"," ")}</option>
@@ -693,12 +693,12 @@ export default function AdminSubscriptionsPage() {
       </div>
 
       {/* Table */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(var(--ink),.07)", overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "rgba(255,255,255,.04)" }}>
+            <tr style={{ background: "rgba(var(--ink),.04)" }}>
               {["Company", "Plan", "Status", "Renewal / Retention", "Billing ID", "Actions"].map(h => (
-                <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(var(--ink),.07)" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
@@ -719,7 +719,7 @@ export default function AdminSubscriptionsPage() {
               const gracePeriodActive = retentionDaysLeft !== null && retentionDaysLeft > 60; // first 30 days
 
               return (
-                <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: expiring ? "rgba(249,115,22,.03)" : isOverdue ? "rgba(239,68,68,.04)" : "transparent" }}>
+                <tr key={c.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: expiring ? "rgba(249,115,22,.03)" : isOverdue ? "rgba(239,68,68,.04)" : "transparent" }}>
                   <td style={{ padding: "14px 16px" }}>
                     <div style={{ fontWeight: 700, fontSize: 13, color: isPurged ? "#475569" : "white" }}>{c.name}</div>
                     <div style={{ fontSize: 11, color: "#334155" }}>{c.country || "—"} · {c.usersCount} users</div>
@@ -729,11 +729,11 @@ export default function AdminSubscriptionsPage() {
                   <td style={{ padding: "14px 16px", fontSize: 12 }}>
                     {isCanceled && retentionDate ? (
                       <div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#f87171", letterSpacing: ".05em", marginBottom: 3 }}>DATA RETENTION</div>
-                        <div style={{ color: isOverdue ? "#f87171" : retentionDaysLeft! <= 14 ? "#f97316" : "#94a3b8" }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-f87171, #f87171)", letterSpacing: ".05em", marginBottom: 3 }}>DATA RETENTION</div>
+                        <div style={{ color: isOverdue ? "var(--tx-f87171, #f87171)" : retentionDaysLeft! <= 14 ? "var(--tx-f97316, #f97316)" : "var(--tx-94a3b8, #94a3b8)" }}>
                           {retentionDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                         </div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: isOverdue ? "#f87171" : retentionDaysLeft! <= 14 ? "#f97316" : "#475569", marginTop: 2 }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: isOverdue ? "var(--tx-f87171, #f87171)" : retentionDaysLeft! <= 14 ? "var(--tx-f97316, #f97316)" : "#475569", marginTop: 2 }}>
                           {isOverdue ? "⚠️ Overdue — run cleanup" : `${retentionDaysLeft}d until purge${gracePeriodActive ? " · read-only grace" : ""}`}
                         </div>
                       </div>
@@ -741,11 +741,11 @@ export default function AdminSubscriptionsPage() {
                       <span style={{ fontSize: 11, color: "#334155" }}>Data purged</span>
                     ) : periodEnd ? (
                       <div>
-                        <div style={{ color: expiring ? "#f97316" : "#94a3b8" }}>
+                        <div style={{ color: expiring ? "var(--tx-f97316, #f97316)" : "var(--tx-94a3b8, #94a3b8)" }}>
                           {periodEnd.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                         </div>
                         {daysLeft !== null && (
-                          <div style={{ fontSize: 10, color: expiring ? "#f97316" : "#334155", fontWeight: 700 }}>
+                          <div style={{ fontSize: 10, color: expiring ? "var(--tx-f97316, #f97316)" : "#334155", fontWeight: 700 }}>
                             {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Expires today" : "Expired"}
                           </div>
                         )}
@@ -760,7 +760,7 @@ export default function AdminSubscriptionsPage() {
                   </td>
                   <td style={{ padding: "14px 16px", textAlign: "right" }}>
                     <button onClick={() => setOverriding(c)}
-                      style={{ padding: "6px 14px", borderRadius: 9, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      style={{ padding: "6px 14px", borderRadius: 9, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "var(--tx-818cf8, #818cf8)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                       🔧 Override
                     </button>
                   </td>

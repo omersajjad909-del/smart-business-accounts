@@ -30,10 +30,10 @@ function authHeaders(): Record<string, string> {
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  PENDING:   { bg: "rgba(251,191,36,.15)", color: "#fbbf24" },
-  APPROVED:  { bg: "rgba(52,211,153,.15)", color: "#34d399" },
-  SUSPENDED: { bg: "rgba(148,163,184,.15)", color: "#94a3b8" },
-  REJECTED:  { bg: "rgba(248,113,113,.15)", color: "#f87171" },
+  PENDING:   { bg: "rgba(251,191,36,.15)", color: "var(--tx-fbbf24, #fbbf24)" },
+  APPROVED:  { bg: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)" },
+  SUSPENDED: { bg: "rgba(148,163,184,.15)", color: "var(--tx-94a3b8, #94a3b8)" },
+  REJECTED:  { bg: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" },
 };
 
 export default function AdminAffiliatesPage() {
@@ -90,26 +90,26 @@ export default function AdminAffiliatesPage() {
   };
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Affiliates</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Review affiliate applications, adjust tiers, and manage commission rates.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Affiliates", val: kpis.total, color: "#818cf8" },
-          { label: "Approved",         val: kpis.approved, color: "#34d399" },
-          { label: "Pending Review",   val: kpis.pending, color: "#fbbf24" },
-          { label: "Total Earnings",   val: `$${kpis.earnings.toFixed(2)}`, color: "#f472b6" },
+          { label: "Total Affiliates", val: kpis.total, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Approved",         val: kpis.approved, color: "var(--tx-34d399, #34d399)" },
+          { label: "Pending Review",   val: kpis.pending, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Total Earnings",   val: `$${kpis.earnings.toFixed(2)}`, color: "var(--tx-f472b6, #f472b6)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -122,10 +122,10 @@ export default function AdminAffiliatesPage() {
         <input className="af-inp" placeholder="Search name, email, code…" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Affiliate","Code","Status","Tier","Rate","Conversions","Payouts","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -139,10 +139,10 @@ export default function AdminAffiliatesPage() {
             ) : filtered.map(a => {
               const st = STATUS_STYLE[a.status] || STATUS_STYLE.PENDING;
               return (
-                <tr key={a.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <tr key={a.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={td}>
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{a.name || "—"}</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>{a.email || "—"}</div>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{a.email || "—"}</div>
                   </td>
                   <td style={{ ...td, fontFamily: "monospace", fontSize: 12 }}>{a.code}</td>
                   <td style={td}>
@@ -159,13 +159,13 @@ export default function AdminAffiliatesPage() {
                   <td style={td}>
                     <div style={{ display: "flex", gap: 6 }}>
                       {a.status !== "APPROVED" && (
-                        <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "APPROVED" })} style={{ background: "rgba(52,211,153,.15)", color: "#34d399" }}>Approve</button>
+                        <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "APPROVED" })} style={{ background: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)" }}>Approve</button>
                       )}
                       {a.status !== "SUSPENDED" && (
-                        <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "SUSPENDED" })} style={{ background: "rgba(148,163,184,.15)", color: "#94a3b8" }}>Suspend</button>
+                        <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "SUSPENDED" })} style={{ background: "rgba(148,163,184,.15)", color: "var(--tx-94a3b8, #94a3b8)" }}>Suspend</button>
                       )}
                       {a.status !== "REJECTED" && (
-                        <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "REJECTED" })} style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Reject</button>
+                        <button className="af-btn" onClick={() => updateAffiliate(a.id, { status: "REJECTED" })} style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>Reject</button>
                       )}
                     </div>
                   </td>
@@ -179,14 +179,14 @@ export default function AdminAffiliatesPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
 
 const css = `
-  .af-sel, .af-sel-sm { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; }
+  .af-sel, .af-sel-sm { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; }
   .af-sel-sm { padding:5px 8px; font-size:12px; border-radius:6px; }
-  .af-inp { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; min-width:260px; }
+  .af-inp { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; min-width:260px; }
   .af-btn { border:none; border-radius:6px; padding:5px 12px; font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .af-btn:hover { opacity:.75; }
 `;

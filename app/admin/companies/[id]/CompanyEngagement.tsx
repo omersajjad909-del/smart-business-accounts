@@ -12,9 +12,9 @@ type Usage = { modules: Module[]; pages: PageRow[]; daily: Daily[]; users: UserR
 
 export type Recipient = { id: string; name: string | null; email: string };
 
-const CARD = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
-const MUTED = "rgba(255,255,255,.35)";
+const CARD = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
+const MUTED = "rgba(var(--ink),var(--ta-35, .35))";
 
 // Customer-facing copy stays in English. {{name}} / {{company}} are filled server-side.
 const TEMPLATES: { id: string; label: string; subject: string; cta: string; message: string }[] = [
@@ -74,7 +74,7 @@ function SectionCard({ title, right, children }: { title: string; right?: React.
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "20px 22px", minWidth: 0 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, gap: 10 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0" }}>{title}</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{title}</div>
         {right}
       </div>
       {children}
@@ -83,7 +83,7 @@ function SectionCard({ title, right, children }: { title: string; right?: React.
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 13, color: "rgba(255,255,255,.3)", textAlign: "center", padding: "20px 0", lineHeight: 1.6 }}>{children}</div>;
+  return <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-30, .3))", textAlign: "center", padding: "20px 0", lineHeight: 1.6 }}>{children}</div>;
 }
 
 function BarList({ rows }: { rows: { label: string; value: number; sub?: string }[] }) {
@@ -93,10 +93,10 @@ function BarList({ rows }: { rows: { label: string; value: number; sub?: string 
       {rows.map((r) => (
         <div key={r.label}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4, gap: 10 }}>
-            <span style={{ color: "#cbd5e1", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
+            <span style={{ color: "var(--tx-cbd5e1, #cbd5e1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
             <span style={{ color: MUTED, whiteSpace: "nowrap" }}>{r.sub}</span>
           </div>
-          <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.06)" }}>
+          <div style={{ height: 6, borderRadius: 3, background: "rgba(var(--ink),.06)" }}>
             <div style={{ height: 6, borderRadius: 3, width: `${Math.max(2, (r.value / max) * 100)}%`, background: "linear-gradient(90deg,#4f46e5,#818cf8)" }} />
           </div>
         </div>
@@ -115,7 +115,7 @@ function ActivityStrip({ daily }: { daily: Daily[] }) {
           const total = d.logins + d.views;
           return (
             <div key={d.date} title={`${d.date}: ${d.logins} login(s), ${d.views} page view(s)`}
-              style={{ flex: 1, height: total ? `${Math.max(8, (total / max) * 100)}%` : 3, borderRadius: 3, background: total ? "#6366f1" : "rgba(255,255,255,.07)" }} />
+              style={{ flex: 1, height: total ? `${Math.max(8, (total / max) * 100)}%` : 3, borderRadius: 3, background: total ? "#6366f1" : "rgba(var(--ink),.07)" }} />
           );
         })}
       </div>
@@ -169,16 +169,16 @@ export function EmailComposer({ recipients, preselected, onClose, onSent, adminH
   }
 
   const input: React.CSSProperties = {
-    width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)",
-    color: "#e2e8f0", fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+    width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),.06)",
+    color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box",
   };
   const lbl: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: MUTED, display: "block", marginBottom: 6, letterSpacing: ".06em" };
 
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(2,6,23,.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 620, maxHeight: "90vh", overflowY: "auto", background: "#0f1225", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 24 }}>
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(var(--dkr-020617, 2,6,23),0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 620, maxHeight: "90vh", overflowY: "auto", background: "var(--dk-0f1225, #0f1225)", border: `1px solid ${BORDER}`, borderRadius: 16, padding: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#e2e8f0" }}>Email users</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)" }}>Email users</div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: MUTED, fontSize: 20, cursor: "pointer" }}>×</button>
         </div>
 
@@ -186,10 +186,10 @@ export function EmailComposer({ recipients, preselected, onClose, onSent, adminH
           <span style={lbl}>RECIPIENTS</span>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {recipients.map((u) => (
-              <label key={u.id} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "#cbd5e1", cursor: "pointer" }}>
+              <label key={u.id} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "var(--tx-cbd5e1, #cbd5e1)", cursor: "pointer" }}>
                 <input type="checkbox" checked={selected.includes(u.id)}
                   onChange={(e) => setSelected((s) => e.target.checked ? [...s, u.id] : s.filter((x) => x !== u.id))} />
-                {u.name || "—"} <span style={{ color: "#38bdf8", fontFamily: "monospace", fontSize: 12 }}>{u.email}</span>
+                {u.name || "—"} <span style={{ color: "var(--tx-38bdf8, #38bdf8)", fontFamily: "monospace", fontSize: 12 }}>{u.email}</span>
               </label>
             ))}
           </div>
@@ -202,7 +202,7 @@ export function EmailComposer({ recipients, preselected, onClose, onSent, adminH
               <button key={t.id} onClick={() => applyTemplate(t.id)} style={{
                 padding: "6px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer",
                 border: `1px solid ${tpl === t.id ? "#6366f1" : BORDER}`, background: tpl === t.id ? "rgba(99,102,241,.18)" : "transparent",
-                color: tpl === t.id ? "#c7d2fe" : "#94a3b8",
+                color: tpl === t.id ? "var(--tx-c7d2fe, #c7d2fe)" : "var(--tx-94a3b8, #94a3b8)",
               }}>{t.label}</button>
             ))}
           </div>
@@ -225,7 +225,7 @@ export function EmailComposer({ recipients, preselected, onClose, onSent, adminH
         </div>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ padding: "10px 18px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "transparent", color: "#cbd5e1", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+          <button onClick={onClose} style={{ padding: "10px 18px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "transparent", color: "var(--tx-cbd5e1, #cbd5e1)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
           <button onClick={send} disabled={sending} style={{ padding: "10px 22px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 700, cursor: sending ? "wait" : "pointer", opacity: sending ? 0.7 : 1 }}>
             {sending ? "Sending…" : `Send to ${selected.length}`}
           </button>
@@ -266,13 +266,13 @@ export default function CompanyEngagement({ companyRef, adminHeaders, lastLogin,
   return (
     <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#e2e8f0" }}>Usage &amp; Engagement</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)" }}>Usage &amp; Engagement</div>
         <button onClick={() => setComposeFor(allIds)} style={btn}>✉️ Email users</button>
       </div>
 
       {inactive && (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "14px 18px", borderRadius: 12, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.25)" }}>
-          <div style={{ fontSize: 13, color: "#fdba74" }}>
+          <div style={{ fontSize: 13, color: "var(--tx-fdba74, #fdba74)" }}>
             {daysInactive === null ? "No one from this company has logged in yet." : `No login for ${daysInactive} days.`} A short check-in email can bring them back.
           </div>
           <button onClick={() => setComposeFor(allIds)} style={{ ...btn, background: "#f97316" }}>Send check-in email</button>
@@ -306,22 +306,22 @@ export default function CompanyEngagement({ companyRef, adminHeaders, lastLogin,
                 <thead>
                   <tr>
                     {["User", "Last seen", "Logins (30d)", "Page views (30d)", "Total logins", ""].map((h) => (
-                      <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", textTransform: "uppercase", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
+                      <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {usage.users.map((u) => (
                     <tr key={u.id} style={{ borderBottom: `1px solid ${BORDER}` }}>
-                      <td style={{ padding: "10px", fontSize: 13, color: "#cbd5e1" }}>
-                        {u.name || "—"}<div style={{ fontSize: 11, color: "#38bdf8", fontFamily: "monospace" }}>{u.email}</div>
+                      <td style={{ padding: "10px", fontSize: 13, color: "var(--tx-cbd5e1, #cbd5e1)" }}>
+                        {u.name || "—"}<div style={{ fontSize: 11, color: "var(--tx-38bdf8, #38bdf8)", fontFamily: "monospace" }}>{u.email}</div>
                       </td>
-                      <td style={{ padding: "10px", fontSize: 12, color: "#cbd5e1" }}>{timeAgo(u.lastSeen)}</td>
-                      <td style={{ padding: "10px", fontSize: 12, color: "#cbd5e1" }}>{u.logins30}</td>
-                      <td style={{ padding: "10px", fontSize: 12, color: "#cbd5e1" }}>{u.views30}</td>
-                      <td style={{ padding: "10px", fontSize: 12, color: "#cbd5e1" }}>{u.totalLogins}</td>
+                      <td style={{ padding: "10px", fontSize: 12, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{timeAgo(u.lastSeen)}</td>
+                      <td style={{ padding: "10px", fontSize: 12, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{u.logins30}</td>
+                      <td style={{ padding: "10px", fontSize: 12, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{u.views30}</td>
+                      <td style={{ padding: "10px", fontSize: 12, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{u.totalLogins}</td>
                       <td style={{ padding: "10px", textAlign: "right" }}>
-                        <button onClick={() => setComposeFor([u.id])} style={{ padding: "5px 10px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: "#c7d2fe", fontSize: 12, cursor: "pointer" }}>✉️ Email</button>
+                        <button onClick={() => setComposeFor([u.id])} style={{ padding: "5px 10px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: "var(--tx-c7d2fe, #c7d2fe)", fontSize: 12, cursor: "pointer" }}>✉️ Email</button>
                       </td>
                     </tr>
                   ))}
@@ -338,8 +338,8 @@ export default function CompanyEngagement({ companyRef, adminHeaders, lastLogin,
                     <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                       <span style={{ width: 7, height: 7, borderRadius: "50%", background: a.action.startsWith("CLIENT_PAGE_VIEW:") ? "#38bdf8" : "#6366f1", marginTop: 5, flexShrink: 0 }} />
                       <div>
-                        <div style={{ fontSize: 12, color: "#cbd5e1" }}>{activityLabel(a.action)}</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{a.user ? `${a.user} · ` : ""}{timeAgo(a.createdAt)}</div>
+                        <div style={{ fontSize: 12, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{activityLabel(a.action)}</div>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>{a.user ? `${a.user} · ` : ""}{timeAgo(a.createdAt)}</div>
                       </div>
                     </div>
                   ))}
@@ -351,8 +351,8 @@ export default function CompanyEngagement({ companyRef, adminHeaders, lastLogin,
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {usage.emailsSent.map((e, i) => (
                     <div key={i} style={{ fontSize: 12 }}>
-                      <div style={{ color: "#cbd5e1", fontWeight: 600 }}>{e.subject}</div>
-                      <div style={{ color: "rgba(255,255,255,.3)", marginTop: 2 }}>to {e.to.join(", ") || "—"} · by {e.by} · {timeAgo(e.createdAt)}</div>
+                      <div style={{ color: "var(--tx-cbd5e1, #cbd5e1)", fontWeight: 600 }}>{e.subject}</div>
+                      <div style={{ color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>to {e.to.join(", ") || "—"} · by {e.by} · {timeAgo(e.createdAt)}</div>
                     </div>
                   ))}
                 </div>

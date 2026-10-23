@@ -34,8 +34,8 @@ const card: React.CSSProperties = {
   width: "100%",
   maxWidth: 420,
   padding: 40,
-  background: "rgba(255,255,255,.03)",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "rgba(var(--ink),.03)",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 24,
   textAlign: "center",
 };
@@ -44,7 +44,7 @@ const label: React.CSSProperties = {
   display: "block",
   fontSize: 12,
   fontWeight: 700,
-  color: "rgba(255,255,255,.4)",
+  color: "rgba(var(--ink),var(--ta-40, .4))",
   marginBottom: 8,
   textTransform: "uppercase",
   letterSpacing: ".05em",
@@ -54,9 +54,9 @@ const input: React.CSSProperties = {
   width: "100%",
   padding: "12px 16px",
   borderRadius: 12,
-  background: "rgba(255,255,255,.05)",
-  border: "1px solid rgba(255,255,255,.1)",
-  color: "white",
+  background: "rgba(var(--ink),.05)",
+  border: "1px solid rgba(var(--ink),.1)",
+  color: "var(--ink-solid, white)",
   outline: "none",
   transition: "all .2s",
 };
@@ -164,7 +164,7 @@ export default function AdminLoginPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#080c1e",
+        background: "var(--dk-080c1e, #080c1e)",
         fontFamily: "'Outfit',sans-serif",
         padding: 20,
       }}
@@ -176,10 +176,10 @@ export default function AdminLoginPage() {
             alt=""
             style={{ width: 72, height: 72, margin: "0 auto 16px", borderRadius: 12, display: "block" }}
           />
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", marginBottom: 8 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--ink-solid, white)", marginBottom: 8 }}>
             {step === "password" ? "Admin Login" : step === "enrol" ? "Set up your authenticator" : "Enter your code"}
           </h1>
-          <p style={{ color: "rgba(255,255,255,.4)", fontSize: 14, lineHeight: 1.5 }}>
+          <p style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 14, lineHeight: 1.5 }}>
             {step === "password"
               ? "Control Center Access"
               : step === "enrol"
@@ -195,7 +195,7 @@ export default function AdminLoginPage() {
               borderRadius: 12,
               background: "rgba(248,113,113,.1)",
               border: "1px solid rgba(248,113,113,.2)",
-              color: "#f87171",
+              color: "var(--tx-f87171, #f87171)",
               fontSize: 13,
               marginBottom: 20,
               textAlign: "left",
@@ -260,9 +260,9 @@ export default function AdminLoginPage() {
                       display: "block",
                       padding: "10px 14px",
                       borderRadius: 10,
-                      background: "rgba(255,255,255,.05)",
-                      border: "1px solid rgba(255,255,255,.1)",
-                      color: "rgba(255,255,255,.75)",
+                      background: "rgba(var(--ink),.05)",
+                      border: "1px solid rgba(var(--ink),.1)",
+                      color: "rgba(var(--ink),.75)",
                       fontSize: 13,
                       letterSpacing: ".08em",
                       wordBreak: "break-all",
@@ -301,7 +301,7 @@ export default function AdminLoginPage() {
                   alignItems: "center",
                   gap: 8,
                   fontSize: 12,
-                  color: "rgba(255,255,255,.35)",
+                  color: "rgba(var(--ink),var(--ta-35, .35))",
                 }}
               >
                 <span
@@ -310,7 +310,7 @@ export default function AdminLoginPage() {
                     flex: 1,
                     height: 3,
                     borderRadius: 3,
-                    background: "rgba(255,255,255,.08)",
+                    background: "rgba(var(--ink),.08)",
                     overflow: "hidden",
                   }}
                 >
@@ -347,7 +347,7 @@ export default function AdminLoginPage() {
               style={{
                 background: "none",
                 border: "none",
-                color: "rgba(255,255,255,.35)",
+                color: "rgba(var(--ink),var(--ta-35, .35))",
                 fontSize: 13,
                 cursor: "pointer",
               }}

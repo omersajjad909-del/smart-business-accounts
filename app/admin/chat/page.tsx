@@ -139,7 +139,7 @@ export default function AdminSupportInbox() {
               <button key={f} onClick={() => { setFilter(f); setSelected(null); setMessages([]); }} style={{
                 padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: "pointer",
                 background: filter === f ? "rgba(99,102,241,.18)" : "transparent",
-                color: filter === f ? "#818cf8" : "var(--text-muted)",
+                color: filter === f ? "var(--tx-818cf8, #818cf8)" : "var(--text-muted)",
                 border: filter === f ? "1px solid rgba(99,102,241,.3)" : "1px solid transparent",
               }}>
                 {f === "all" ? "All" : STATUS_LABEL[f]}
@@ -174,7 +174,7 @@ export default function AdminSupportInbox() {
                 <span style={{
                   fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
                   background: `${STATUS_COLOR[c.status] || "#888"}22`,
-                  color: STATUS_COLOR[c.status] || "#888",
+                  color: STATUS_COLOR[c.status] || "var(--tx-888888, #888888)",
                   border: `1px solid ${STATUS_COLOR[c.status] || "#888"}44`,
                 }}>
                   {STATUS_LABEL[c.status] || c.status}
@@ -202,7 +202,7 @@ export default function AdminSupportInbox() {
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
                 background: `${STATUS_COLOR[selected.status] || "#888"}22`,
-                color: STATUS_COLOR[selected.status] || "#888",
+                color: STATUS_COLOR[selected.status] || "var(--tx-888888, #888888)",
                 border: `1px solid ${STATUS_COLOR[selected.status] || "#888"}44`,
               }}>
                 {STATUS_LABEL[selected.status] || selected.status}
@@ -210,7 +210,7 @@ export default function AdminSupportInbox() {
               {selected.status !== "resolved" && (
                 <button onClick={() => updateStatus(selected.id, "resolved")} style={{
                   padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
-                  background: "rgba(52,211,153,.12)", color: "#34d399",
+                  background: "rgba(52,211,153,.12)", color: "var(--tx-34d399, #34d399)",
                   border: "1px solid rgba(52,211,153,.3)",
                 }}>
                   Mark Resolved
@@ -219,7 +219,7 @@ export default function AdminSupportInbox() {
               {selected.status === "resolved" && (
                 <button onClick={() => updateStatus(selected.id, "active")} style={{
                   padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
-                  background: "rgba(99,102,241,.1)", color: "#818cf8",
+                  background: "rgba(99,102,241,.1)", color: "var(--tx-818cf8, #818cf8)",
                   border: "1px solid rgba(99,102,241,.25)",
                 }}>
                   Reopen
@@ -236,7 +236,7 @@ export default function AdminSupportInbox() {
                 const isBot    = m.sender === "bot";
                 const isSystem = m.sender === "system";
                 if (isSystem) return (
-                  <div key={m.id} style={{ textAlign: "center", fontSize: 11, color: "#f59e0b", padding: "4px 12px", background: "rgba(245,158,11,.08)", borderRadius: 20, alignSelf: "center" }}>
+                  <div key={m.id} style={{ textAlign: "center", fontSize: 11, color: "var(--tx-f59e0b, #f59e0b)", padding: "4px 12px", background: "rgba(245,158,11,.08)", borderRadius: 20, alignSelf: "center" }}>
                     {m.text}
                   </div>
                 );
@@ -248,7 +248,7 @@ export default function AdminSupportInbox() {
                     <div style={{
                       maxWidth: "72%", padding: "10px 14px", borderRadius: isAgent ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
                       fontSize: 13, lineHeight: 1.55,
-                      background: isAgent ? "linear-gradient(135deg,#6366f1,#4f46e5)" : isBot ? "rgba(99,102,241,.1)" : "rgba(255,255,255,.06)",
+                      background: isAgent ? "linear-gradient(135deg,#6366f1,#4f46e5)" : isBot ? "rgba(99,102,241,.1)" : "rgba(var(--ink),.06)",
                       color: isAgent ? "white" : "var(--text)",
                       border: isAgent ? "none" : "1px solid var(--border)",
                     }}>
@@ -270,14 +270,14 @@ export default function AdminSupportInbox() {
                   placeholder="Type a reply… (Enter to send)"
                   style={{
                     flex: 1, padding: "10px 14px", borderRadius: 10, fontSize: 13,
-                    background: "var(--input-bg, rgba(255,255,255,.04))",
+                    background: "var(--input-bg, rgba(var(--ink),.04))",
                     border: "1px solid var(--border)", color: "var(--text)",
                     outline: "none", fontFamily: "inherit",
                   }}
                 />
                 <button onClick={sendReply} disabled={sending || !reply.trim()} style={{
                   padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
-                  background: reply.trim() ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.06)",
+                  background: reply.trim() ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(var(--ink),.06)",
                   color: reply.trim() ? "white" : "var(--text-muted)",
                   border: "none", transition: "all .2s",
                 }}>

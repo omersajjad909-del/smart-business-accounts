@@ -142,11 +142,11 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { plan, enabledModules, isActive, subscriptionStatus, extraSeats } = body;
+    const { plan, enabledModules, isActive, subscriptionStatus, extraSeats, isInternalTest } = body;
 
     const before = await prisma.company.findUnique({
       where: { id },
-      select: { name: true, plan: true, subscriptionStatus: true, isActive: true },
+      select: { name: true, plan: true, subscriptionStatus: true, isActive: true, isInternalTest: true },
     });
 
     const data: Record<string, unknown> = {};
@@ -156,6 +156,9 @@ export async function PATCH(
     }
     if (isActive !== undefined) data.isActive = isActive;
     if (subscriptionStatus !== undefined) data.subscriptionStatus = subscriptionStatus;
+    // Flags one of our own workspaces as a test, so the analytics and AI pages
+    // (revenue, anomalies, demo watchdog, funnel) stop counting it as a customer.
+    if (typeof isInternalTest === "boolean") data.isInternalTest = isInternalTest;
 
     const updated = await prisma.company.update({ where: { id }, data });
 

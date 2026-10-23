@@ -46,10 +46,10 @@ const MODULES = [
 ];
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  PENDING:  { bg: "rgba(251,191,36,.12)",  text: "#fbbf24" },
-  APPROVED: { bg: "rgba(34,197,94,.12)",   text: "#22c55e" },
-  REJECTED: { bg: "rgba(239,68,68,.12)",   text: "#f87171" },
-  ACTIVE:   { bg: "rgba(99,102,241,.12)",  text: "#818cf8" },
+  PENDING:  { bg: "rgba(251,191,36,.12)",  text: "var(--tx-fbbf24, #fbbf24)" },
+  APPROVED: { bg: "rgba(34,197,94,.12)",   text: "var(--tx-22c55e, #22c55e)" },
+  REJECTED: { bg: "rgba(239,68,68,.12)",   text: "var(--tx-f87171, #f87171)" },
+  ACTIVE:   { bg: "rgba(99,102,241,.12)",  text: "var(--tx-818cf8, #818cf8)" },
 };
 
 type PlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
@@ -76,19 +76,19 @@ function ScopeNote({ title, body, pk = false }: { title: string; body: string; p
   const accent = pk ? "5,150,105" : "79,70,229";
   return (
     <div style={{ padding: "13px 18px", borderRadius: 14, marginBottom: 18, background: `rgba(${accent},.08)`, border: `1px solid rgba(${accent},.25)` }}>
-      <div style={{ fontSize: 13, fontWeight: 800, color: pk ? "#6ee7b7" : "#c7d2fe", marginBottom: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 800, color: pk ? "var(--tx-6ee7b7, #6ee7b7)" : "var(--tx-c7d2fe, #c7d2fe)", marginBottom: 4 }}>
         {pk ? "🇵🇰 " : "🌍 "}{title}
       </div>
-      <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6 }}>{body}</div>
+      <div style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6 }}>{body}</div>
     </div>
   );
 }
 
 function Card({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
   return (
-    <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.025)", overflow: "hidden", marginBottom: 24 }}>
-      <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "white" }}>{title}</h2>
+    <div style={{ borderRadius: 18, border: "1px solid rgba(var(--ink),.07)", background: "rgba(var(--ink),.025)", overflow: "hidden", marginBottom: 24 }}>
+      <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(var(--ink),.06)" }}>
+        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)" }}>{title}</h2>
         {subtitle && <p style={{ margin: "3px 0 0", fontSize: 12, color: "#475569" }}>{subtitle}</p>}
       </div>
       <div style={{ padding: "22px 24px" }}>{children}</div>
@@ -463,8 +463,8 @@ export default function AdminPlansPage() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "10px 12px", borderRadius: 10,
-    background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
-    color: "white", fontSize: 14, outline: "none",
+    background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)",
+    color: "var(--ink-solid, white)", fontSize: 14, outline: "none",
   };
 
   const TABS: { key: TabKey; label: string; icon: string }[] = [
@@ -482,17 +482,17 @@ export default function AdminPlansPage() {
   const PLAN_COLORS: Record<string, string> = { starter: "#38bdf8", pro: "#818cf8", enterprise: "#c4b5fd" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060918", padding: "28px 24px 60px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--dk-060918, #060918)", padding: "28px 24px 60px" }}>
       <style>{`
         input[type=number]::-webkit-inner-spin-button { opacity:.4 }
-        select option { background: #0f172a; color: white; }
+        select option { background: var(--dk-0f172a, #0f172a); color:var(--ink-solid, white); }
         .perm-check:checked { accent-color: #6366f1; }
       `}</style>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Plans & Billing Config</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)" }}>Plans & Billing Config</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#475569" }}>Configure pricing, permissions, custom requests, and module pricing</p>
         </div>
         {/* Pages & Modules carries its own Save — this one writes plan-config
@@ -518,13 +518,13 @@ export default function AdminPlansPage() {
         {tab === "addon" && (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 11, color: "#475569" }}>Add-on price:</span>
-            <span style={{ fontSize: 18, fontWeight: 900, color: "#a78bfa" }}>$79<span style={{ fontSize: 12, fontWeight: 400, color: "#475569" }}>/mo</span></span>
+            <span style={{ fontSize: 18, fontWeight: 900, color: "var(--tx-a78bfa, #a78bfa)" }}>$79<span style={{ fontSize: 12, fontWeight: 400, color: "#475569" }}>/mo</span></span>
           </div>
         )}
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 28, padding: 5, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14 }}>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 28, padding: 5, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14 }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 18px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, transition: "all .15s",
@@ -556,7 +556,7 @@ export default function AdminPlansPage() {
                     {k === "starter" ? "🌱" : k === "pro" ? "🚀" : "🏆"}
                   </div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "white", textTransform: "capitalize" }}>{k}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)", textTransform: "capitalize" }}>{k}</div>
                     <div style={{ fontSize: 11, color: "#475569" }}>per company / month</div>
                   </div>
                 </div>
@@ -581,7 +581,7 @@ export default function AdminPlansPage() {
                   </div>
                   <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
                     Annual total: ${(pricing as any)[k].yearly * 12}/yr &nbsp;·&nbsp;
-                    <span style={{ color: "#22c55e" }}>
+                    <span style={{ color: "var(--tx-22c55e, #22c55e)" }}>
                       {(pricing as any)[k].monthly > 0 ? `${Math.round((1 - (pricing as any)[k].yearly / (pricing as any)[k].monthly) * 100)}% saving` : "—"}
                     </span>
                   </div>
@@ -593,8 +593,8 @@ export default function AdminPlansPage() {
           {/* Intro offer notice */}
           <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.15)", display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 22 }}>🎁</span>
-            <div style={{ fontSize: 13, color: "#fbbf24" }}>
-              <strong>50% intro offer</strong> is applied via the Lemon Squeezy coupon set in the <code style={{ background: "rgba(255,255,255,.06)", padding: "1px 6px", borderRadius: 4, fontSize: 11 }}>LEMONSQUEEZY_LAUNCH_DISCOUNT</code> env variable — not stored here.
+            <div style={{ fontSize: 13, color: "var(--tx-fbbf24, #fbbf24)" }}>
+              <strong>50% intro offer</strong> is applied via the Lemon Squeezy coupon set in the <code style={{ background: "rgba(var(--ink),.06)", padding: "1px 6px", borderRadius: 4, fontSize: 11 }}>LEMONSQUEEZY_LAUNCH_DISCOUNT</code> env variable — not stored here.
             </div>
           </div>
         </Card>
@@ -608,14 +608,14 @@ export default function AdminPlansPage() {
             body="Drives the comparison table on /pricing for every visitor outside Pakistan. Untick a permission on all three plans and its row disappears from the table entirely. Pakistan visitors read PKR Permissions instead."
           />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18, padding: "12px 16px", borderRadius: 12, background: "rgba(79,70,229,.08)", border: "1px solid rgba(79,70,229,.22)" }}>
-            <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
+            <div style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6, maxWidth: 620 }}>
               These lists are also the plan gate the dashboard enforces, so a feature you untick here is
-              both hidden on <span style={{ fontFamily: "monospace", fontSize: 11, color: "#c7d2fe" }}>/pricing</span>{" "}
+              both hidden on <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--tx-c7d2fe, #c7d2fe)" }}>/pricing</span>{" "}
               and locked in the app. Changes are live within a minute of saving — no deploy needed.
             </div>
             <button
               onClick={resetPlanPermissionsToDefaults}
-              style={{ flexShrink: 0, padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(148,163,184,.28)", background: "rgba(255,255,255,.04)", color: "#cbd5e1", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+              style={{ flexShrink: 0, padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(148,163,184,.28)", background: "rgba(var(--ink),.04)", color: "var(--tx-cbd5e1, #cbd5e1)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
             >
               ↺ Reset to recommended
             </button>
@@ -625,13 +625,13 @@ export default function AdminPlansPage() {
               const count = (planPermissions[pc] || []).length;
               const total = PERMISSION_CATEGORIES.reduce((sum, c) => sum + c.permissions.length, 0);
               return (
-                <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", overflow: "hidden" }}>
-                  <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "white", textTransform: "capitalize" }}>{pc.toLowerCase()}</div>
+                <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.03)", overflow: "hidden" }}>
+                  <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(var(--ink),.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink-solid, white)", textTransform: "capitalize" }}>{pc.toLowerCase()}</div>
                     <span style={{ fontSize: 11, color: "#475569" }}>{count}/{total}</span>
                   </div>
                   {/* Progress bar */}
-                  <div style={{ height: 3, background: "rgba(255,255,255,.06)" }}>
+                  <div style={{ height: 3, background: "rgba(var(--ink),.06)" }}>
                     <div style={{ height: "100%", width: `${total ? (count / total) * 100 : 0}%`, background: "linear-gradient(90deg,#4f46e5,#7c3aed)", transition: "width .3s" }} />
                   </div>
                   <div style={{ maxHeight: 320, overflowY: "auto", padding: "12px 16px" }}>
@@ -639,7 +639,7 @@ export default function AdminPlansPage() {
                       <div key={`${pc}-${cat.key}`} style={{ marginBottom: 12 }}>
                         <div style={{ fontSize: 9, fontWeight: 800, color: "#334155", letterSpacing: ".08em", marginBottom: 4, textTransform: "uppercase" }}>{cat.label}</div>
                         {cat.permissions.map(perm => (
-                          <label key={`${pc}-${perm}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: planPermissions[pc]?.includes(perm) ? "#94a3b8" : "#334155", padding: "3px 0", cursor: "pointer" }}>
+                          <label key={`${pc}-${perm}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: planPermissions[pc]?.includes(perm) ? "var(--tx-94a3b8, #94a3b8)" : "#334155", padding: "3px 0", cursor: "pointer" }}>
                             <input type="checkbox" className="perm-check"
                               checked={!!planPermissions[pc]?.includes(perm)}
                               onChange={() => togglePlanPermission(pc, perm)} />
@@ -690,10 +690,10 @@ export default function AdminPlansPage() {
           <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(5,150,105,.08)", border: "1px solid rgba(5,150,105,.25)", marginBottom: 24, display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 28 }}>🇵🇰</span>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399", marginBottom: 3 }}>Pakistani Rupee (PKR) Pricing</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-34d399, #34d399)", marginBottom: 3 }}>Pakistani Rupee (PKR) Pricing</div>
               <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.6 }}>
                 These prices are shown directly to Pakistani users (IP-detected). They override FX-converted USD rates.
-                Prices are in <strong style={{ color: "#94a3b8" }}>PKR (₨)</strong> — enter actual PKR amounts.
+                Prices are in <strong style={{ color: "var(--tx-94a3b8, #94a3b8)" }}>PKR (₨)</strong> — enter actual PKR amounts.
               </div>
             </div>
           </div>
@@ -701,7 +701,7 @@ export default function AdminPlansPage() {
           <Card title="PKR Plan Pricing" subtitle="Monthly and annual per-month prices in Pakistani Rupees">
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 }}>
               {(["starter", "pro", "enterprise"] as const).map(k => {
-                const COLORS: Record<string, string> = { starter: "#38bdf8", pro: "#818cf8", enterprise: "#c4b5fd" };
+                const COLORS: Record<string, string> = { starter: "var(--tx-38bdf8, #38bdf8)", pro: "var(--tx-818cf8, #818cf8)", enterprise: "var(--tx-c4b5fd, #c4b5fd)" };
                 const color = COLORS[k];
                 return (
                   <div key={k} style={{ borderRadius: 16, border: `1px solid ${color}30`, background: `${color}08`, padding: "22px" }}>
@@ -710,7 +710,7 @@ export default function AdminPlansPage() {
                         {k === "starter" ? "🌱" : k === "pro" ? "🚀" : "🏆"}
                       </div>
                       <div>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: "white", textTransform: "capitalize" }}>{k}</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)", textTransform: "capitalize" }}>{k}</div>
                         <div style={{ fontSize: 11, color: "#475569" }}>per company / month (PKR)</div>
                       </div>
                     </div>
@@ -721,7 +721,7 @@ export default function AdminPlansPage() {
                         <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12, fontWeight: 700 }}>₨</span>
                         <input type="number" min={0} value={(pkrPricing as any)[k].monthly}
                           onChange={e => setPkrPricing(p => ({ ...p, [k]: { ...p[k], monthly: Number(e.target.value) } }))}
-                          style={{ width: "100%", padding: "10px 12px 10px 28px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 14, outline: "none" }} />
+                          style={{ width: "100%", padding: "10px 12px 10px 28px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 14, outline: "none" }} />
                       </div>
                     </div>
 
@@ -731,11 +731,11 @@ export default function AdminPlansPage() {
                         <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12, fontWeight: 700 }}>₨</span>
                         <input type="number" min={0} value={(pkrPricing as any)[k].yearly}
                           onChange={e => setPkrPricing(p => ({ ...p, [k]: { ...p[k], yearly: Number(e.target.value) } }))}
-                          style={{ width: "100%", padding: "10px 12px 10px 28px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 14, outline: "none" }} />
+                          style={{ width: "100%", padding: "10px 12px 10px 28px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 14, outline: "none" }} />
                       </div>
                       <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
                         Annual total: ₨{(pkrPricing as any)[k].yearly * 12}/yr &nbsp;·&nbsp;
-                        <span style={{ color: "#22c55e" }}>
+                        <span style={{ color: "var(--tx-22c55e, #22c55e)" }}>
                           {(pkrPricing as any)[k].monthly > 0 ? `${Math.round((1 - (pkrPricing as any)[k].yearly / (pkrPricing as any)[k].monthly) * 100)}% saving` : "—"}
                         </span>
                       </div>
@@ -746,11 +746,11 @@ export default function AdminPlansPage() {
             </div>
 
             <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.15)" }}>
-              <div style={{ fontSize: 13, color: "#34d399", fontWeight: 700, marginBottom: 6 }}>Preview</div>
+              <div style={{ fontSize: 13, color: "var(--tx-34d399, #34d399)", fontWeight: 700, marginBottom: 6 }}>Preview</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
                 {(["starter", "pro", "enterprise"] as const).map(k => (
-                  <div key={k} style={{ fontSize: 12, color: "#94a3b8" }}>
-                    <strong style={{ color: "white", textTransform: "capitalize" }}>{k}</strong>
+                  <div key={k} style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)" }}>
+                    <strong style={{ color: "var(--ink-solid, white)", textTransform: "capitalize" }}>{k}</strong>
                     <br />Monthly: ₨{(pkrPricing as any)[k].monthly.toLocaleString()}
                     <br />Yearly: ₨{(pkrPricing as any)[k].yearly.toLocaleString()}/mo (₨{((pkrPricing as any)[k].yearly * 12).toLocaleString()}/yr)
                   </div>
@@ -769,7 +769,7 @@ export default function AdminPlansPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
                       <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(52,211,153,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{m.icon}</div>
                       <div>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: "white" }}>{m.label}</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)" }}>{m.label}</div>
                         <div style={{ fontSize: 11, color: "#475569" }}>per company / month (PKR)</div>
                       </div>
                     </div>
@@ -793,7 +793,7 @@ export default function AdminPlansPage() {
                           style={{ ...inputStyle, paddingLeft: 30 }} />
                       </div>
                       <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
-                        Billed <span style={{ color: "#34d399", fontWeight: 700 }}>₨{((modulePricesPkrYearly[m.id] || 0) * 12).toLocaleString()}</span>/yr
+                        Billed <span style={{ color: "var(--tx-34d399, #34d399)", fontWeight: 700 }}>₨{((modulePricesPkrYearly[m.id] || 0) * 12).toLocaleString()}</span>/yr
                       </div>
                     </div>
                   </div>
@@ -806,7 +806,7 @@ export default function AdminPlansPage() {
                 const entPkr = Number((pkrPricing as any)?.enterprise?.monthly) || 0;
                 const ok = totPkr > 0 && entPkr > 0 && totPkr < entPkr;
                 return (
-                  <div style={{ marginTop: 22, padding: "14px 18px", borderRadius: 14, background: ok ? "rgba(34,197,94,.08)" : "rgba(239,68,68,.08)", border: `1px solid ${ok ? "rgba(34,197,94,.25)" : "rgba(239,68,68,.3)"}`, fontSize: 12.5, color: ok ? "#22c55e" : "#f87171", fontWeight: 700 }}>
+                  <div style={{ marginTop: 22, padding: "14px 18px", borderRadius: 14, background: ok ? "rgba(34,197,94,.08)" : "rgba(239,68,68,.08)", border: `1px solid ${ok ? "rgba(34,197,94,.25)" : "rgba(239,68,68,.3)"}`, fontSize: 12.5, color: ok ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                     {ok ? "✓" : "⚠"} All six modules ₨{totPkr.toLocaleString()}/mo vs Enterprise ₨{entPkr.toLocaleString()}/mo
                     {!ok && " — Custom costs more than the plan that already includes it."}
                   </div>
@@ -823,7 +823,7 @@ export default function AdminPlansPage() {
           <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(5,150,105,.08)", border: "1px solid rgba(5,150,105,.25)", marginBottom: 24, display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 28 }}>🔒</span>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399", marginBottom: 3 }}>PKR User Permissions</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-34d399, #34d399)", marginBottom: 3 }}>PKR User Permissions</div>
               <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.6 }}>
                 Configure which features are available to Pakistani (PKR) users. Since PKR prices are lower,
                 you can restrict certain premium features here.
@@ -844,10 +844,10 @@ export default function AdminPlansPage() {
                 return (
                   <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(5,150,105,.2)", background: "rgba(5,150,105,.04)", overflow: "hidden" }}>
                     <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(5,150,105,.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "white", textTransform: "capitalize" }}>PKR · {pc.toLowerCase()}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink-solid, white)", textTransform: "capitalize" }}>PKR · {pc.toLowerCase()}</div>
                       <span style={{ fontSize: 11, color: "#475569" }}>{count}/{total}</span>
                     </div>
-                    <div style={{ height: 3, background: "rgba(255,255,255,.06)" }}>
+                    <div style={{ height: 3, background: "rgba(var(--ink),.06)" }}>
                       <div style={{ height: "100%", width: `${total ? (count / total) * 100 : 0}%`, background: "linear-gradient(90deg,#059669,#34d399)", transition: "width .3s" }} />
                     </div>
                     <div style={{ maxHeight: 320, overflowY: "auto", padding: "12px 16px" }}>
@@ -855,7 +855,7 @@ export default function AdminPlansPage() {
                         <div key={`pkr-${pc}-${cat.key}`} style={{ marginBottom: 12 }}>
                           <div style={{ fontSize: 9, fontWeight: 800, color: "#334155", letterSpacing: ".08em", marginBottom: 4, textTransform: "uppercase" }}>{cat.label}</div>
                           {cat.permissions.map(perm => (
-                            <label key={`pkr-${pc}-${perm}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: pkrPlanPermissions[pc]?.includes(perm) ? "#94a3b8" : "#334155", padding: "3px 0", cursor: "pointer" }}>
+                            <label key={`pkr-${pc}-${perm}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: pkrPlanPermissions[pc]?.includes(perm) ? "var(--tx-94a3b8, #94a3b8)" : "#334155", padding: "3px 0", cursor: "pointer" }}>
                               <input type="checkbox" className="perm-check"
                                 checked={!!pkrPlanPermissions[pc]?.includes(perm)}
                                 onChange={() => togglePkrPlanPermission(pc, perm)} />
@@ -875,9 +875,9 @@ export default function AdminPlansPage() {
               card only points at it — the two used to be one shared config. */}
           <Card title="PKR Dashboard Pages" subtitle="Now a tab of its own">
             <div style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(5,150,105,.07)", border: "1px solid rgba(5,150,105,.25)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-              <div style={{ fontSize: 12.5, color: "#94a3b8", lineHeight: 1.6, maxWidth: 620 }}>
+              <div style={{ fontSize: 12.5, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6, maxWidth: 620 }}>
                 Which dashboard pages a Pakistan company gets is set per business type in{" "}
-                <strong style={{ color: "#6ee7b7" }}>PKR Pages</strong>. It is saved separately
+                <strong style={{ color: "var(--tx-6ee7b7, #6ee7b7)" }}>PKR Pages</strong>. It is saved separately
                 from the world grid, so the two audiences can differ.
               </div>
               <button
@@ -897,7 +897,7 @@ export default function AdminPlansPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 24 }}>
             {["PENDING","APPROVED","REJECTED","ACTIVE"].map(s => {
               const cnt = requests.filter(r => r.status.toUpperCase() === s).length;
-              const c = STATUS_COLORS[s] ?? { bg: "rgba(255,255,255,.04)", text: "#94a3b8" };
+              const c = STATUS_COLORS[s] ?? { bg: "rgba(var(--ink),.04)", text: "var(--tx-94a3b8, #94a3b8)" };
               return (
                 <div key={s} style={{ padding: "14px 16px", borderRadius: 14, background: c.bg, border: `1px solid ${c.text}30` }}>
                   <div style={{ fontSize: 24, fontWeight: 900, color: c.text }}>{cnt}</div>
@@ -919,24 +919,24 @@ export default function AdminPlansPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {requests.map(req => {
                   const s = req.status.toUpperCase();
-                  const c = STATUS_COLORS[s] ?? { bg: "rgba(255,255,255,.04)", text: "#94a3b8" };
+                  const c = STATUS_COLORS[s] ?? { bg: "rgba(var(--ink),.04)", text: "var(--tx-94a3b8, #94a3b8)" };
                   const isExpanded = expandedReq === req.id;
                   return (
-                    <div key={req.id} style={{ borderRadius: 14, border: `1px solid ${c.text}25`, background: "rgba(255,255,255,.025)", overflow: "hidden" }}>
+                    <div key={req.id} style={{ borderRadius: 14, border: `1px solid ${c.text}25`, background: "rgba(var(--ink),.025)", overflow: "hidden" }}>
                       {/* Row */}
                       <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
                         <button onClick={() => setExpandedReq(isExpanded ? null : req.id)}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", fontSize: 12, transform: isExpanded ? "rotate(90deg)" : "none", transition: "transform .15s", flexShrink: 0 }}>▶</button>
 
                         <div style={{ flex: 1, minWidth: 160 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>{req.email || req.companyId || "Unknown"}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>{req.email || req.companyId || "Unknown"}</div>
                           <div style={{ fontSize: 11, color: "#475569" }}>{new Date(req.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</div>
                         </div>
 
                         {/* Modules requested */}
                         <div style={{ flex: 2, display: "flex", gap: 5, flexWrap: "wrap" }}>
                           {(req.modules ? req.modules.split(",") : []).map(m => (
-                            <span key={m} style={{ padding: "2px 8px", borderRadius: 10, background: "rgba(99,102,241,.15)", color: "#818cf8", fontSize: 10, fontWeight: 700 }}>{m.trim()}</span>
+                            <span key={m} style={{ padding: "2px 8px", borderRadius: 10, background: "rgba(99,102,241,.15)", color: "var(--tx-818cf8, #818cf8)", fontSize: 10, fontWeight: 700 }}>{m.trim()}</span>
                           ))}
                         </div>
 
@@ -948,18 +948,18 @@ export default function AdminPlansPage() {
                           {s === "PENDING" && (
                             <>
                               <button onClick={() => updateRequestStatus(req.id, "APPROVED")} disabled={updatingReq === req.id}
-                                style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.25)", color: "#22c55e", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.25)", color: "var(--tx-22c55e, #22c55e)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                                 {updatingReq === req.id ? "…" : "Approve"}
                               </button>
                               <button onClick={() => updateRequestStatus(req.id, "REJECTED")} disabled={updatingReq === req.id}
-                                style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                                style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-f87171, #f87171)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                                 {updatingReq === req.id ? "…" : "Reject"}
                               </button>
                             </>
                           )}
                           {s === "APPROVED" && (
                             <button onClick={() => updateRequestStatus(req.id, "ACTIVE")} disabled={updatingReq === req.id}
-                              style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                              style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", color: "var(--tx-818cf8, #818cf8)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                               {updatingReq === req.id ? "…" : "Set Active"}
                             </button>
                           )}
@@ -968,20 +968,20 @@ export default function AdminPlansPage() {
 
                       {/* Expanded detail */}
                       {isExpanded && (
-                        <div style={{ padding: "16px 20px 20px", borderTop: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.2)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                        <div style={{ padding: "16px 20px 20px", borderTop: "1px solid rgba(var(--ink),.06)", background: "rgba(0,0,0,.2)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                           <div>
                             <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", marginBottom: 6 }}>COMPANY / EMAIL</div>
-                            <div style={{ fontSize: 13, color: "#cbd5e1" }}>{req.email || "—"}</div>
+                            <div style={{ fontSize: 13, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{req.email || "—"}</div>
                             <div style={{ fontSize: 11, color: "#334155", fontFamily: "monospace", marginTop: 3 }}>{req.companyId || "—"}</div>
                           </div>
                           <div>
                             <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", marginBottom: 6 }}>REQUESTED MODULES</div>
-                            <div style={{ fontSize: 13, color: "#cbd5e1" }}>{req.modules || "Not specified"}</div>
+                            <div style={{ fontSize: 13, color: "var(--tx-cbd5e1, #cbd5e1)" }}>{req.modules || "Not specified"}</div>
                           </div>
                           {req.message && (
                             <div style={{ gridColumn: "1/-1" }}>
                               <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", marginBottom: 6 }}>MESSAGE</div>
-                              <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.7, padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)" }}>{req.message}</div>
+                              <div style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7, padding: "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)" }}>{req.message}</div>
                             </div>
                           )}
                         </div>
@@ -1001,10 +1001,10 @@ export default function AdminPlansPage() {
           {/* Stats row */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, marginBottom: 24 }}>
             {[
-              { label: "Companies Subscribed", value: addonStats.total, color: "#818cf8", icon: "🏢" },
-              { label: "Active Add-ons", value: addonStats.active, color: "#22c55e", icon: "⚡" },
-              { label: "Add-on MRR", value: `$${addonStats.mrr}/mo`, color: "#f59e0b", icon: "💰" },
-              { label: "Annual Revenue", value: `$${addonStats.mrr * 12}/yr`, color: "#38bdf8", icon: "📈" },
+              { label: "Companies Subscribed", value: addonStats.total, color: "var(--tx-818cf8, #818cf8)", icon: "🏢" },
+              { label: "Active Add-ons", value: addonStats.active, color: "var(--tx-22c55e, #22c55e)", icon: "⚡" },
+              { label: "Add-on MRR", value: `$${addonStats.mrr}/mo`, color: "var(--tx-f59e0b, #f59e0b)", icon: "💰" },
+              { label: "Annual Revenue", value: `$${addonStats.mrr * 12}/yr`, color: "var(--tx-38bdf8, #38bdf8)", icon: "📈" },
             ].map(s => (
               <div key={s.label} style={{ padding: "16px 18px", borderRadius: 14, background: `${s.color}10`, border: `1px solid ${s.color}30` }}>
                 <div style={{ fontSize: 24, marginBottom: 6 }}>{s.icon}</div>
@@ -1016,11 +1016,11 @@ export default function AdminPlansPage() {
 
           {/* What's included info card */}
           <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(167,139,250,.06)", border: "1px solid rgba(167,139,250,.2)", marginBottom: 24 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#a78bfa", marginBottom: 10 }}>⚡ Automation Add-on — $79/month per company</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-a78bfa, #a78bfa)", marginBottom: 10 }}>⚡ Automation Add-on — $79/month per company</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
               {["Overdue Invoice Reminders", "Low Stock Reorder Alerts", "Scheduled Financial Reports", "Zapier / Make Webhooks", "Google Sheets Sync"].map(f => (
-                <div key={f} style={{ fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: "#22c55e", fontSize: 10 }}>✓</span> {f}
+                <div key={f} style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)", display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ color: "var(--tx-22c55e, #22c55e)", fontSize: 10 }}>✓</span> {f}
                 </div>
               ))}
             </div>
@@ -1048,22 +1048,22 @@ export default function AdminPlansPage() {
                     const isEditing = addonEditId === c.id;
                     const isSaving  = savingAddon === c.id;
                     return (
-                      <div key={c.id} style={{ borderRadius: 14, border: `1px solid ${isActive ? "rgba(34,197,94,.2)" : "rgba(255,255,255,.06)"}`, background: isActive ? "rgba(34,197,94,.04)" : "rgba(255,255,255,.02)", overflow: "hidden" }}>
+                      <div key={c.id} style={{ borderRadius: 14, border: `1px solid ${isActive ? "rgba(34,197,94,.2)" : "rgba(var(--ink),.06)"}`, background: isActive ? "rgba(34,197,94,.04)" : "rgba(var(--ink),.02)", overflow: "hidden" }}>
                         {/* Main row */}
                         <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
                           {/* Company info */}
                           <div style={{ flex: 1, minWidth: 160 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{c.name || c.id}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink-solid, white)" }}>{c.name || c.id}</div>
                             <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
                               <span style={{ fontSize: 10, color: "#334155", fontFamily: "monospace" }}>{c.id.slice(0, 12)}…</span>
-                              <span style={{ padding: "1px 7px", borderRadius: 8, background: "rgba(99,102,241,.15)", color: "#818cf8", fontSize: 10, fontWeight: 700, textTransform: "uppercase" }}>{c.plan || "free"}</span>
+                              <span style={{ padding: "1px 7px", borderRadius: 8, background: "rgba(99,102,241,.15)", color: "var(--tx-818cf8, #818cf8)", fontSize: 10, fontWeight: 700, textTransform: "uppercase" }}>{c.plan || "free"}</span>
                             </div>
                           </div>
 
                           {/* Addon status */}
                           {c.addon && (
                             <div style={{ textAlign: "center" }}>
-                              <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? "#22c55e" : "#f87171" }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f87171, #f87171)" }}>
                                 {isActive ? "Active" : "Paused"}
                               </div>
                               <div style={{ fontSize: 10, color: "#475569" }}>
@@ -1088,7 +1088,7 @@ export default function AdminPlansPage() {
                                 {!c.addon && (
                                   <button
                                     onClick={() => { setAddonEditId(c.id); setAddonEditPrice(79); setAddonEditPlan("monthly"); setAddonEditNotes(""); }}
-                                    style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.3)", color: "#a78bfa", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                                    style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.3)", color: "var(--tx-a78bfa, #a78bfa)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                                     + Enable
                                   </button>
                                 )}
@@ -1097,18 +1097,18 @@ export default function AdminPlansPage() {
                                     <button
                                       onClick={() => saveAddon(c.id, !isActive, c.addon!.price, c.addon!.plan, c.addon!.notes ?? undefined)}
                                       disabled={isSaving}
-                                      style={{ padding: "6px 14px", borderRadius: 8, background: isActive ? "rgba(239,68,68,.1)" : "rgba(34,197,94,.1)", border: `1px solid ${isActive ? "rgba(239,68,68,.25)" : "rgba(34,197,94,.25)"}`, color: isActive ? "#f87171" : "#22c55e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                                      style={{ padding: "6px 14px", borderRadius: 8, background: isActive ? "rgba(239,68,68,.1)" : "rgba(34,197,94,.1)", border: `1px solid ${isActive ? "rgba(239,68,68,.25)" : "rgba(34,197,94,.25)"}`, color: isActive ? "var(--tx-f87171, #f87171)" : "var(--tx-22c55e, #22c55e)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                                       {isSaving ? "…" : isActive ? "Pause" : "Resume"}
                                     </button>
                                     <button
                                       onClick={() => { setAddonEditId(c.id); setAddonEditPrice(c.addon!.price || 79); setAddonEditPlan((c.addon!.plan as any) || "monthly"); setAddonEditNotes(c.addon!.notes || ""); }}
-                                      style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, cursor: "pointer" }}>
+                                      style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, cursor: "pointer" }}>
                                       Edit
                                     </button>
                                     <button
                                       onClick={() => removeAddon(c.id)}
                                       disabled={isSaving}
-                                      style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 12, cursor: "pointer" }}>
+                                      style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "var(--tx-f87171, #f87171)", fontSize: 12, cursor: "pointer" }}>
                                       ✕
                                     </button>
                                   </>
@@ -1116,7 +1116,7 @@ export default function AdminPlansPage() {
                               </>
                             ) : (
                               <button onClick={() => setAddonEditId(null)}
-                                style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, cursor: "pointer" }}>
+                                style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, cursor: "pointer" }}>
                                 Cancel
                               </button>
                             )}
@@ -1125,7 +1125,7 @@ export default function AdminPlansPage() {
 
                         {/* Edit form */}
                         {isEditing && (
-                          <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.2)", display: "grid", gridTemplateColumns: "1fr 1fr 2fr auto", gap: 12, alignItems: "end" }}>
+                          <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(var(--ink),.06)", background: "rgba(0,0,0,.2)", display: "grid", gridTemplateColumns: "1fr 1fr 2fr auto", gap: 12, alignItems: "end" }}>
                             <div>
                               <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>PRICE (USD/MO)</label>
                               <div style={{ position: "relative" }}>
@@ -1172,18 +1172,18 @@ export default function AdminPlansPage() {
           ) : (
             <>
               {/* Info banner */}
-              <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", marginBottom: 22, fontSize: 13, color: "#818cf8" }}>
+              <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", marginBottom: 22, fontSize: 13, color: "var(--tx-818cf8, #818cf8)" }}>
                 💡 These prices apply when a company is on the <strong>CUSTOM</strong> plan and selects individual modules. Set to <strong>0</strong> to include in base price.
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
                 {MODULES.map(m => (
-                  <div key={m.id} style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.025)", padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div key={m.id} style={{ borderRadius: 16, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.025)", padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
                     {/* Header */}
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(99,102,241,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{m.icon}</div>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>{m.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>{m.label}</div>
                         <div style={{ fontSize: 11, color: "#475569" }}>{m.desc}</div>
                       </div>
                     </div>
@@ -1208,13 +1208,13 @@ export default function AdminPlansPage() {
                           style={{ ...inputStyle, paddingLeft: 28 }} />
                       </div>
                       <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
-                        Billed <span style={{ color: "#22c55e", fontWeight: 700 }}>${((modulePricesYearly[m.id] || 0) * 12).toFixed(0)}</span>/yr
+                        Billed <span style={{ color: "var(--tx-22c55e, #22c55e)", fontWeight: 700 }}>${((modulePricesYearly[m.id] || 0) * 12).toFixed(0)}</span>/yr
                         {(modulePrices[m.id] || 0) > 0 && (modulePricesYearly[m.id] || 0) > 0 && (
                           <> · saves {Math.max(0, Math.round((1 - (modulePricesYearly[m.id] || 0) / (modulePrices[m.id] || 1)) * 100))}%</>
                         )}
                       </div>
                       <div style={{ fontSize: 10.5, color: "#334155", marginTop: 4 }}>
-                        🇵🇰 PKR rates for this module are on the <strong style={{ color: "#34d399" }}>PKR Pricing</strong> tab.
+                        🇵🇰 PKR rates for this module are on the <strong style={{ color: "var(--tx-34d399, #34d399)" }}>PKR Pricing</strong> tab.
                       </div>
                     </div>
                   </div>
@@ -1235,25 +1235,25 @@ export default function AdminPlansPage() {
                   <div style={{ marginTop: 22, padding: "16px 20px", borderRadius: 14, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>If all modules selected</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>If all modules selected</div>
                         <div style={{ fontSize: 12, color: "#475569" }}>Max custom plan value</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: 22, fontWeight: 900, color: "#818cf8" }}>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: "var(--tx-818cf8, #818cf8)" }}>
                           ${totUsd}<span style={{ fontSize: 13, fontWeight: 500, color: "#475569" }}>/mo</span>
                           <span style={{ color: "#334155", fontWeight: 400, margin: "0 8px" }}>·</span>
-                          <span style={{ color: "#34d399" }}>Rs {totPkr.toLocaleString()}</span><span style={{ fontSize: 13, fontWeight: 500, color: "#475569" }}>/mo</span>
+                          <span style={{ color: "var(--tx-34d399, #34d399)" }}>Rs {totPkr.toLocaleString()}</span><span style={{ fontSize: 13, fontWeight: 500, color: "#475569" }}>/mo</span>
                         </div>
-                        <div style={{ fontSize: 12, color: "#22c55e" }}>
+                        <div style={{ fontSize: 12, color: "var(--tx-22c55e, #22c55e)" }}>
                           ${(totUsd * 12).toFixed(0)}/yr · Rs {(totPkr * 12).toLocaleString()}/yr
                         </div>
                       </div>
                     </div>
-                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,.07)", display: "flex", gap: 18, flexWrap: "wrap", fontSize: 11.5 }}>
-                      <span style={{ color: usdOk ? "#22c55e" : "#f87171", fontWeight: 700 }}>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(var(--ink),.07)", display: "flex", gap: 18, flexWrap: "wrap", fontSize: 11.5 }}>
+                      <span style={{ color: usdOk ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                         {usdOk ? "✓" : "⚠"} World: ${totUsd} vs Enterprise ${entUsd}
                       </span>
-                      <span style={{ color: pkrOk ? "#22c55e" : "#f87171", fontWeight: 700 }}>
+                      <span style={{ color: pkrOk ? "var(--tx-22c55e, #22c55e)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>
                         {pkrOk ? "✓" : "⚠"} Pakistan: Rs {totPkr.toLocaleString()} vs Enterprise Rs {entPkr.toLocaleString()}
                       </span>
                     </div>

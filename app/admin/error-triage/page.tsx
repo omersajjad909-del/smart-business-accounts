@@ -126,9 +126,9 @@ export default function ErrorTriagePage() {
         {[1, 7, 14, 30].map((d) => (
           <button key={d} onClick={() => setDays(d)} style={{
             padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-            background: days === d ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-            border: days === d ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-            color: days === d ? "#818cf8" : "rgba(255,255,255,.4)",
+            background: days === d ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+            border: days === d ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+            color: days === d ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
           }}>
             {d === 1 ? "24 hours" : `${d} days`}
           </button>
@@ -147,14 +147,14 @@ export default function ErrorTriagePage() {
               border: `1px solid ${data.sentry.configured ? "rgba(248,113,113,.3)" : "rgba(251,191,36,.28)"}`,
               borderRadius: 14, padding: "14px 18px", marginBottom: 18,
               fontSize: 12.5, lineHeight: 1.7,
-              color: data.sentry.configured ? "#fca5a5" : "#fcd34d",
+              color: data.sentry.configured ? "var(--tx-fca5a5, #fca5a5)" : "var(--tx-fcd34d, #fcd34d)",
             }}>
               <strong style={{ display: "block", marginBottom: 4, fontSize: 13 }}>
                 Exceptions are not being shown
               </strong>
               {data.sentry.note}
               {!data.sentry.configured ? (
-                <div style={{ marginTop: 8, color: "rgba(252,211,77,.75)" }}>
+                <div style={{ marginTop: 8, color: "rgba(var(--txr-fcd34d, 252,211,77),.75)" }}>
                   Create a token in Sentry under Settings → Auth Tokens with <code>project:read</code>,
                   then set <code>SENTRY_AUTH_TOKEN</code>, <code>SENTRY_ORG</code> and
                   {" "}<code>SENTRY_PROJECT</code>. Everything below this banner works without it.
@@ -164,10 +164,10 @@ export default function ErrorTriagePage() {
           ) : null}
 
           <KpiRow items={[
-            { label: "Distinct problems", value: data.summary.distinct, color: data.summary.distinct ? "#f87171" : "#34d399", sub: `In the last ${data.days} day${data.days === 1 ? "" : "s"}` },
-            { label: "Occurrences", value: data.summary.occurrences, color: "#fbbf24", sub: "Total events" },
-            { label: "Subjects affected", value: data.summary.customersAffected, color: "#c4b5fd", sub: "Customers, addresses, incidents" },
-            { label: "Sources", value: Object.entries(data.summary.bySource).map(([k, v]) => `${k} ${v}`).join(" · ") || "—", color: "#93c5fd", sub: "Where they came from" },
+            { label: "Distinct problems", value: data.summary.distinct, color: data.summary.distinct ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", sub: `In the last ${data.days} day${data.days === 1 ? "" : "s"}` },
+            { label: "Occurrences", value: data.summary.occurrences, color: "var(--tx-fbbf24, #fbbf24)", sub: "Total events" },
+            { label: "Subjects affected", value: data.summary.customersAffected, color: "var(--tx-c4b5fd, #c4b5fd)", sub: "Customers, addresses, incidents" },
+            { label: "Sources", value: Object.entries(data.summary.bySource).map(([k, v]) => `${k} ${v}`).join(" · ") || "—", color: "var(--tx-93c5fd, #93c5fd)", sub: "Where they came from" },
           ]} />
 
           {rows.length === 0 ? (
@@ -191,19 +191,19 @@ export default function ErrorTriagePage() {
                         {v ? <Pill tone={SEVERITY_TONE[v.severity]}>{v.severity}</Pill> : null}
                         <Pill tone="grey">{p.count}×</Pill>
                         {p.affected > 0 ? <Pill tone="grey">{p.affected} affected</Pill> : null}
-                        <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+                        <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
                           last {fmtDate(p.lastSeen)}
                         </span>
                       </div>
                       <div style={{
-                        fontSize: 13.5, fontWeight: 700, color: "#f8fafc", lineHeight: 1.5,
+                        fontSize: 13.5, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)", lineHeight: 1.5,
                         wordBreak: "break-word",
                       }}>
                         {p.title}
                       </div>
                       {v ? (
                         <div style={{
-                          marginTop: 10, fontSize: 12.5, color: "rgba(255,255,255,.7)",
+                          marginTop: 10, fontSize: 12.5, color: "rgba(var(--ink),var(--ta-70, .7))",
                           borderLeft: "2px solid rgba(139,92,246,.5)", paddingLeft: 11, lineHeight: 1.65,
                         }}>
                           {v.plainEnglish}
@@ -221,7 +221,7 @@ export default function ErrorTriagePage() {
                               { k: "Next step", t: v.suggestedFix, c: "#6ee7b7" },
                             ].map((x) => (
                               <div key={x.k}>
-                                <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
+                                <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 4 }}>
                                   {x.k.toUpperCase()}
                                 </div>
                                 <div style={{ fontSize: 12.5, color: x.c, lineHeight: 1.65 }}>{x.t}</div>
@@ -232,20 +232,20 @@ export default function ErrorTriagePage() {
 
                         <div>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                            <span style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.3)" }}>RAW</span>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))" }}>RAW</span>
                             <CopyButton text={`${p.title}\n\n${p.detail}`} />
                           </div>
                           <pre style={{
                             margin: 0, padding: "12px 14px", borderRadius: 11,
-                            background: "rgba(0,0,0,.3)", border: "1px solid rgba(255,255,255,.06)",
-                            fontSize: 11.5, color: "rgba(255,255,255,.6)", lineHeight: 1.6,
+                            background: "rgba(0,0,0,.3)", border: "1px solid rgba(var(--ink),.06)",
+                            fontSize: 11.5, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.6,
                             whiteSpace: "pre-wrap", wordBreak: "break-word",
                             maxHeight: 260, overflowY: "auto",
                             fontFamily: "ui-monospace,SFMono-Regular,Menlo,monospace",
                           }}>
                             {p.detail}
                           </pre>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", marginTop: 7 }}>
+                          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))", marginTop: 7 }}>
                             First seen {fmtDate(p.firstSeen)} · last seen {fmtDate(p.lastSeen)} · {p.count} occurrence{p.count === 1 ? "" : "s"}
                           </div>
                         </div>
@@ -257,7 +257,7 @@ export default function ErrorTriagePage() {
             </div>
           )}
 
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
             Problems are grouped by message with ids, timestamps and long strings normalised out, so
             the same failure with a different invoice id counts once. &ldquo;Subjects affected&rdquo;
             means distinct recipients for email, distinct companies for billing, and distinct

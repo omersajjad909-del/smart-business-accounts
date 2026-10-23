@@ -111,9 +111,9 @@ export default function FeedbackMinerPage() {
         {WINDOWS.map((d) => (
           <button key={d} onClick={() => setDays(d)} style={{
             padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-            background: days === d ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-            border: days === d ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-            color: days === d ? "#818cf8" : "rgba(255,255,255,.4)",
+            background: days === d ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+            border: days === d ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+            color: days === d ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
           }}>
             {d < 365 ? `${d} days` : "1 year"}
           </button>
@@ -127,9 +127,9 @@ export default function FeedbackMinerPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "Messages", value: corpus.corpusSize, color: "#818cf8", sub: `Last ${corpus.days} days` },
-            { label: "Average rating", value: corpus.averageRating ?? "—", color: "#fbbf24", sub: corpus.ratingCount ? `${corpus.ratingCount} rated` : "Nobody has rated yet" },
-            { label: "Sources", value: Object.keys(corpus.byKind).length, color: "#c4b5fd", sub: Object.entries(corpus.byKind).map(([k, v]) => `${k} ${v}`).join(" · ") || "None" },
+            { label: "Messages", value: corpus.corpusSize, color: "var(--tx-818cf8, #818cf8)", sub: `Last ${corpus.days} days` },
+            { label: "Average rating", value: corpus.averageRating ?? "—", color: "var(--tx-fbbf24, #fbbf24)", sub: corpus.ratingCount ? `${corpus.ratingCount} rated` : "Nobody has rated yet" },
+            { label: "Sources", value: Object.keys(corpus.byKind).length, color: "var(--tx-c4b5fd, #c4b5fd)", sub: Object.entries(corpus.byKind).map(([k, v]) => `${k} ${v}`).join(" · ") || "None" },
           ]} />
 
           {corpus.corpusSize === 0 ? (
@@ -145,7 +145,7 @@ export default function FeedbackMinerPage() {
 
           {result?.note ? (
             <Section>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>{result.note}</div>
+              <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.7 }}>{result.note}</div>
             </Section>
           ) : null}
 
@@ -161,7 +161,7 @@ export default function FeedbackMinerPage() {
                       <div style={{ flex: 1, minWidth: 240 }}>
                         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 7 }}>
                           <span style={{
-                            fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.25)",
+                            fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-25, .25))",
                             width: 22, display: "inline-block",
                           }}>
                             {String(i + 1).padStart(2, "0")}
@@ -170,15 +170,15 @@ export default function FeedbackMinerPage() {
                           <Pill tone="grey">{t.mentions} mention{t.mentions === 1 ? "" : "s"}</Pill>
                           <Pill tone="grey">{EFFORT_LABEL[t.effortGuess] ?? "Size unclear"}</Pill>
                         </div>
-                        <div style={{ fontSize: 15, fontWeight: 800, color: "#f8fafc", marginBottom: 5 }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", marginBottom: 5 }}>
                           {t.theme}
                         </div>
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.65 }}>
+                        <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-65, .65))", lineHeight: 1.65 }}>
                           {t.whatTheyWant}
                         </div>
                       </div>
                       <div style={{ minWidth: 150 }}>
-                        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.35)", fontWeight: 700, marginBottom: 5 }}>
+                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, marginBottom: 5 }}>
                           IMPACT
                         </div>
                         <ScoreBar value={t.impact} tone={t.impact >= 60 ? "violet" : "blue"} />
@@ -188,24 +188,24 @@ export default function FeedbackMinerPage() {
                     <div style={{
                       background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.2)",
                       borderRadius: 11, padding: "11px 14px", marginBottom: 14,
-                      fontSize: 12.5, color: "#c7d2fe", lineHeight: 1.6,
+                      fontSize: 12.5, color: "var(--tx-c7d2fe, #c7d2fe)", lineHeight: 1.6,
                     }}>
                       <strong style={{ fontWeight: 800 }}>Recommendation:</strong> {t.recommendation}
                     </div>
 
                     {t.evidence.length > 0 ? (
                       <div>
-                        <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.32)", marginBottom: 8 }}>
+                        <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-32, .32))", marginBottom: 8 }}>
                           WHAT THEY ACTUALLY WROTE
                         </div>
                         <div style={{ display: "grid", gap: 7 }}>
                           {t.evidence.map((e) => (
                             <div key={e.id} style={{
-                              fontSize: 12, color: "rgba(255,255,255,.6)", lineHeight: 1.6,
-                              borderLeft: "2px solid rgba(255,255,255,.15)", paddingLeft: 11,
+                              fontSize: 12, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.6,
+                              borderLeft: "2px solid rgba(var(--ink),.15)", paddingLeft: 11,
                             }}>
                               &ldquo;{e.quote}&rdquo;
-                              <span style={{ color: "rgba(255,255,255,.22)", marginLeft: 7, fontSize: 10.5 }}>
+                              <span style={{ color: "rgba(var(--ink),var(--ta-22, .22))", marginLeft: 7, fontSize: 10.5 }}>
                                 {e.id.slice(0, 8)}
                               </span>
                             </div>
@@ -213,7 +213,7 @@ export default function FeedbackMinerPage() {
                         </div>
                       </div>
                     ) : (
-                      <div style={{ fontSize: 11.5, color: "rgba(251,191,36,.7)" }}>
+                      <div style={{ fontSize: 11.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.7)" }}>
                         No verifiable quotes survived the id check for this theme — treat it with
                         suspicion.
                       </div>
@@ -222,7 +222,7 @@ export default function FeedbackMinerPage() {
                 ))}
               </div>
 
-              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
                 Read {result.analysedCount} of {result.corpusSize} messages, {result.days} day window,
                 {" "}{fmtDate(result.generatedAt)}. Quotes whose source id was not in the batch are
                 stripped before this page renders, so anything shown above can be traced back to a

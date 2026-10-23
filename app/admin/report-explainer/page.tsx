@@ -84,7 +84,7 @@ export default function ReportExplainerPage() {
       <Section title="Pick a customer and a report">
         <div style={{ display: "grid", gap: 14 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               CUSTOMER
             </div>
             {(config?.companies.length ?? 0) > 8 ? (
@@ -96,7 +96,7 @@ export default function ReportExplainerPage() {
               />
             ) : null}
             {companies.length === 0 ? (
-              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)" }}>
+              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                 {config ? "No customer companies to explain." : "Loading…"}
               </div>
             ) : (
@@ -107,12 +107,12 @@ export default function ReportExplainerPage() {
                     <button key={c.id} onClick={() => { setCompanyId(c.id); setResult(null); }} style={{
                       padding: "9px 14px", borderRadius: 11, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
                       textAlign: "left",
-                      background: on ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.03)",
-                      border: on ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.08)",
-                      color: on ? "#c7d2fe" : "rgba(255,255,255,.6)",
+                      background: on ? "rgba(99,102,241,.18)" : "rgba(var(--ink),.03)",
+                      border: on ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.08)",
+                      color: on ? "var(--tx-c7d2fe, #c7d2fe)" : "rgba(var(--ink),var(--ta-60, .6))",
                     }}>
                       {c.name}
-                      <span style={{ display: "block", fontSize: 10.5, color: "rgba(255,255,255,.3)", fontWeight: 500, marginTop: 2 }}>
+                      <span style={{ display: "block", fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))", fontWeight: 500, marginTop: 2 }}>
                         {c.businessType} · {c.baseCurrency}
                       </span>
                     </button>
@@ -123,7 +123,7 @@ export default function ReportExplainerPage() {
           </div>
 
           <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               REPORT
             </div>
             <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
@@ -132,9 +132,9 @@ export default function ReportExplainerPage() {
                 return (
                   <button key={r.id} onClick={() => { setReport(r.id); setResult(null); }} title={r.blurb} style={{
                     padding: "8px 14px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
-                    background: on ? "rgba(139,92,246,.2)" : "rgba(255,255,255,.03)",
-                    border: on ? "1px solid #8b5cf6" : "1px solid rgba(255,255,255,.08)",
-                    color: on ? "#c4b5fd" : "rgba(255,255,255,.5)",
+                    background: on ? "rgba(139,92,246,.2)" : "rgba(var(--ink),.03)",
+                    border: on ? "1px solid #8b5cf6" : "1px solid rgba(var(--ink),.08)",
+                    color: on ? "var(--tx-c4b5fd, #c4b5fd)" : "rgba(var(--ink),var(--ta-50, .5))",
                   }}>
                     {r.name}
                   </button>
@@ -142,14 +142,14 @@ export default function ReportExplainerPage() {
               })}
             </div>
             {activeReport ? (
-              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", marginTop: 8 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-32, .32))", marginTop: 8 }}>
                 {activeReport.blurb}
               </div>
             ) : null}
           </div>
 
           <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               LANGUAGE
             </div>
             <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
@@ -158,9 +158,9 @@ export default function ReportExplainerPage() {
                 return (
                   <button key={l.id} onClick={() => { setLanguage(l.id); setResult(null); }} style={{
                     padding: "8px 14px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
-                    background: on ? "rgba(52,211,153,.16)" : "rgba(255,255,255,.03)",
-                    border: on ? "1px solid #34d399" : "1px solid rgba(255,255,255,.08)",
-                    color: on ? "#6ee7b7" : "rgba(255,255,255,.5)",
+                    background: on ? "rgba(52,211,153,.16)" : "rgba(var(--ink),.03)",
+                    border: on ? "1px solid #34d399" : "1px solid rgba(var(--ink),.08)",
+                    color: on ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),var(--ta-50, .5))",
                   }}>
                     {l.name}
                   </button>
@@ -175,7 +175,7 @@ export default function ReportExplainerPage() {
                 {result ? "Explain again" : "Explain it"}
               </Button>
             ) : (
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                 Set GROQ_API_KEY or OPENAI_API_KEY to explain reports.
               </div>
             )}
@@ -194,7 +194,7 @@ export default function ReportExplainerPage() {
             <div style={{ direction: result.language === "ur" ? "rtl" : "ltr" }}>
               <Prose text={result.explanation} size={14} />
             </div>
-            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
               Generated {fmtDate(result.generatedAt)}. Every figure quoted comes from the panel
               beside this one — nothing was computed by the model. Check the numbers before you read
               any of this out to the customer.
@@ -203,7 +203,7 @@ export default function ReportExplainerPage() {
 
           <Section title="The figures it read" right={<CopyButton text={result.facts} label="Copy figures" />}>
             <pre style={{
-              margin: 0, fontSize: 11.5, color: "rgba(255,255,255,.6)", lineHeight: 1.75,
+              margin: 0, fontSize: 11.5, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.75,
               whiteSpace: "pre-wrap", wordBreak: "break-word",
               maxHeight: 620, overflowY: "auto",
               fontFamily: "ui-monospace,SFMono-Regular,Menlo,monospace",

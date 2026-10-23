@@ -40,9 +40,9 @@ function getAuthHeaders(): Record<string, string> {
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<TicketStatus, { bg: string; color: string; label: string }> = {
-  open:     { bg: "rgba(249,115,22,0.12)",  color: "#f97316", label: "Open" },
-  answered: { bg: "rgba(99,102,241,0.12)",  color: "#818cf8", label: "Answered" },
-  closed:   { bg: "rgba(100,116,139,0.12)", color: "#94a3b8", label: "Closed" },
+  open:     { bg: "rgba(249,115,22,0.12)",  color: "var(--tx-f97316, #f97316)", label: "Open" },
+  answered: { bg: "rgba(99,102,241,0.12)",  color: "var(--tx-818cf8, #818cf8)", label: "Answered" },
+  closed:   { bg: "rgba(100,116,139,0.12)", color: "var(--tx-94a3b8, #94a3b8)", label: "Closed" },
 };
 
 function StatusBadge({ status }: { status: TicketStatus }) {
@@ -70,8 +70,8 @@ function Skeleton() {
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {[1, 2, 3, 4, 5].map(i => (
         <div key={i} style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "rgba(var(--ink),0.03)",
+          border: "1px solid rgba(var(--ink),0.06)",
           borderRadius: 14,
           padding: "20px 24px",
           display: "flex",
@@ -81,11 +81,11 @@ function Skeleton() {
           animationDelay: `${i * 0.1}s`,
         }}>
           <div style={{ flex: 1 }}>
-            <div style={{ height: 14, width: "40%", background: "rgba(255,255,255,0.06)", borderRadius: 6, marginBottom: 10 }} />
-            <div style={{ height: 11, width: "25%", background: "rgba(255,255,255,0.04)", borderRadius: 6 }} />
+            <div style={{ height: 14, width: "40%", background: "rgba(var(--ink),0.06)", borderRadius: 6, marginBottom: 10 }} />
+            <div style={{ height: 11, width: "25%", background: "rgba(var(--ink),0.04)", borderRadius: 6 }} />
           </div>
-          <div style={{ height: 22, width: 64, background: "rgba(255,255,255,0.05)", borderRadius: 20 }} />
-          <div style={{ height: 11, width: 56, background: "rgba(255,255,255,0.04)", borderRadius: 6 }} />
+          <div style={{ height: 22, width: 64, background: "rgba(var(--ink),0.05)", borderRadius: 20 }} />
+          <div style={{ height: 11, width: 56, background: "rgba(var(--ink),0.04)", borderRadius: 6 }} />
         </div>
       ))}
     </div>
@@ -134,8 +134,8 @@ function ReplyModal({
       }}
     >
       <div style={{
-        background: "#0d1526",
-        border: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--dk-0d1526, #0d1526)",
+        border: "1px solid rgba(var(--ink),0.1)",
         borderRadius: 20,
         padding: 32,
         width: "100%",
@@ -149,20 +149,20 @@ function ReplyModal({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div>
             <StatusBadge status={ticket.status} />
-            <h2 style={{ margin: "10px 0 0", fontSize: 17, fontWeight: 800, color: "#e2e8f0", lineHeight: 1.35 }}>
+            <h2 style={{ margin: "10px 0 0", fontSize: 17, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)", lineHeight: 1.35 }}>
               {ticket.subject}
             </h2>
           </div>
           <button
             onClick={onClose}
-            style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 22, cursor: "pointer", lineHeight: 1, padding: 4, marginLeft: 12 }}
+            style={{ background: "transparent", border: "none", color: "rgba(var(--ink),var(--ta-40, 0.4))", fontSize: 22, cursor: "pointer", lineHeight: 1, padding: 4, marginLeft: 12 }}
           >
             ✕
           </button>
         </div>
 
         {/* Ticket meta */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 18, flexWrap: "wrap", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+        <div style={{ display: "flex", gap: 16, marginBottom: 18, flexWrap: "wrap", fontSize: 12, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>
           <span>{ticket.companyName}</span>
           <span>{ticket.userEmail}</span>
           <span>{timeAgo(ticket.createdAt)}</span>
@@ -171,23 +171,23 @@ function ReplyModal({
 
         {/* Original message */}
         <div style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.07)",
+          background: "rgba(var(--ink),0.03)",
+          border: "1px solid rgba(var(--ink),0.07)",
           borderRadius: 12,
           padding: "16px 18px",
           marginBottom: 22,
         }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: ".07em", marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-30, 0.3))", letterSpacing: ".07em", marginBottom: 10 }}>
             ORIGINAL MESSAGE
           </div>
-          <p style={{ margin: 0, fontSize: 13.5, color: "rgba(255,255,255,0.7)", lineHeight: 1.75 }}>
+          <p style={{ margin: 0, fontSize: 13.5, color: "rgba(var(--ink),var(--ta-70, 0.7))", lineHeight: 1.75 }}>
             {ticket.message}
           </p>
         </div>
 
         {/* Reply textarea */}
         <div style={{ marginBottom: 18 }}>
-          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: ".07em", marginBottom: 8 }}>
+          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, 0.35))", letterSpacing: ".07em", marginBottom: 8 }}>
             YOUR REPLY
           </label>
           <textarea
@@ -199,11 +199,11 @@ function ReplyModal({
             style={{
               width: "100%",
               boxSizing: "border-box",
-              background: "rgba(255,255,255,0.04)",
-              border: "1.5px solid rgba(255,255,255,0.1)",
+              background: "rgba(var(--ink),0.04)",
+              border: "1.5px solid rgba(var(--ink),0.1)",
               borderRadius: 10,
               padding: "12px 14px",
-              color: "#e2e8f0",
+              color: "var(--tx-e2e8f0, #e2e8f0)",
               fontFamily: "'Outfit','Inter',sans-serif",
               fontSize: 13.5,
               outline: "none",
@@ -211,7 +211,7 @@ function ReplyModal({
               transition: "border-color .2s",
             }}
             onFocus={e => (e.target.style.borderColor = "rgba(99,102,241,0.5)")}
-            onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+            onBlur={e => (e.target.style.borderColor = "rgba(var(--ink),0.1)")}
           />
         </div>
 
@@ -222,9 +222,9 @@ function ReplyModal({
             style={{
               padding: "9px 20px",
               borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid rgba(var(--ink),0.1)",
               background: "transparent",
-              color: "rgba(255,255,255,0.5)",
+              color: "rgba(var(--ink),var(--ta-50, 0.5))",
               fontFamily: "'Outfit','Inter',sans-serif",
               fontSize: 13,
               fontWeight: 600,
@@ -360,18 +360,18 @@ export default function AdminTicketsPage() {
   // ─── Render ────────────────────────────────────────────────────────────────
 
   const cardStyle = (accent?: string): React.CSSProperties => ({
-    background: "rgba(255,255,255,0.04)",
-    border: `1px solid ${accent ? `${accent}22` : "rgba(255,255,255,0.08)"}`,
+    background: "rgba(var(--ink),0.04)",
+    border: `1px solid ${accent ? `${accent}22` : "rgba(var(--ink),0.08)"}`,
     borderRadius: 14,
     padding: "20px 24px",
   });
 
   return (
-    <div style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "#e2e8f0", padding: "0 0 72px" }}>
+    <div style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "var(--tx-e2e8f0, #e2e8f0)", padding: "0 0 72px" }}>
       <style>{`
         @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
         @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:0.45} }
-        .tk-row:hover { background:rgba(255,255,255,0.025)!important; }
+        .tk-row:hover { background:rgba(var(--ink),0.025)!important; }
         .tk-tab-btn { border:none; cursor:pointer; font-family:inherit; font-weight:600; font-size:13px; padding:7px 16px; border-radius:9px; transition:all .18s; }
         .tk-action-btn { border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:12px; padding:6px 14px; border-radius:8px; transition:opacity .18s; }
         .tk-action-btn:hover { opacity:0.82; }
@@ -381,7 +381,7 @@ export default function AdminTicketsPage() {
       {/* ── Header ── */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 5px", fontSize: 26, fontWeight: 800, letterSpacing: "-.3px" }}>Support Tickets</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>
           Customer support requests and replies
         </p>
       </div>
@@ -389,16 +389,16 @@ export default function AdminTicketsPage() {
       {/* ── Summary cards ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total",    val: total,     color: "#818cf8" },
-          { label: "Open",     val: openCnt,   color: "#f97316" },
-          { label: "Answered", val: answCnt,   color: "#818cf8" },
-          { label: "Closed",   val: closedCnt, color: "#94a3b8" },
+          { label: "Total",    val: total,     color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Open",     val: openCnt,   color: "var(--tx-f97316, #f97316)" },
+          { label: "Answered", val: answCnt,   color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Closed",   val: closedCnt, color: "var(--tx-94a3b8, #94a3b8)" },
         ].map(k => (
           <div key={k.label} style={{ ...cardStyle(), padding: "18px 22px" }}>
             <div style={{ fontSize: 30, fontWeight: 800, color: k.color, lineHeight: 1 }}>
               {loading ? "—" : k.val}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 6, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, 0.4))", marginTop: 6, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -411,8 +411,8 @@ export default function AdminTicketsPage() {
             className="tk-tab-btn"
             onClick={() => setFilter(tab.key)}
             style={{
-              background: filter === tab.key ? "rgba(99,102,241,0.18)" : "rgba(255,255,255,0.05)",
-              color: filter === tab.key ? "#818cf8" : "rgba(255,255,255,0.5)",
+              background: filter === tab.key ? "rgba(99,102,241,0.18)" : "rgba(var(--ink),0.05)",
+              color: filter === tab.key ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-50, 0.5))",
               border: filter === tab.key ? "1px solid rgba(99,102,241,0.35)" : "1px solid transparent",
             }}
           >
@@ -423,8 +423,8 @@ export default function AdminTicketsPage() {
                 fontSize: 10,
                 padding: "1px 6px",
                 borderRadius: 10,
-                background: "rgba(255,255,255,0.08)",
-                color: "rgba(255,255,255,0.45)",
+                background: "rgba(var(--ink),0.08)",
+                color: "rgba(var(--ink),var(--ta-45, 0.45))",
               }}>
                 {tab.key === "open" ? openCnt : tab.key === "answered" ? answCnt : closedCnt}
               </span>
@@ -448,8 +448,8 @@ export default function AdminTicketsPage() {
           gap: 12,
         }}>
           <div style={{ fontSize: 40, opacity: 0.35 }}>💬</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.5)" }}>No tickets yet</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.25)" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(var(--ink),var(--ta-50, 0.5))" }}>No tickets yet</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-25, 0.25))" }}>
             {filter === "all"
               ? "No support tickets have been submitted."
               : `No ${filter} tickets at the moment.`}
@@ -473,13 +473,13 @@ export default function AdminTicketsPage() {
             >
               {/* Subject + meta */}
               <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#e2e8f0", marginBottom: 5, lineHeight: 1.35 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)", marginBottom: 5, lineHeight: 1.35 }}>
                   {ticket.subject}
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.55)", marginBottom: 3 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--ink),var(--ta-55, 0.55))", marginBottom: 3 }}>
                   {ticket.companyName}
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, 0.35))" }}>
                   {ticket.userEmail}
                 </div>
               </div>
@@ -487,12 +487,12 @@ export default function AdminTicketsPage() {
               {/* Replies badge */}
               <div style={{
                 fontSize: 11,
-                color: "rgba(255,255,255,0.35)",
+                color: "rgba(var(--ink),var(--ta-35, 0.35))",
                 whiteSpace: "nowrap",
                 minWidth: 52,
                 textAlign: "center",
               }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(255,255,255,0.45)", lineHeight: 1 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(var(--ink),var(--ta-45, 0.45))", lineHeight: 1 }}>
                   {ticket.replies}
                 </div>
                 <div>replies</div>
@@ -502,7 +502,7 @@ export default function AdminTicketsPage() {
               <StatusBadge status={ticket.status} />
 
               {/* Time ago */}
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", whiteSpace: "nowrap", minWidth: 72, textAlign: "right" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, 0.35))", whiteSpace: "nowrap", minWidth: 72, textAlign: "right" }}>
                 {timeAgo(ticket.createdAt)}
               </div>
 
@@ -511,7 +511,7 @@ export default function AdminTicketsPage() {
                 <button
                   className="tk-action-btn"
                   onClick={() => setReplyTarget(ticket)}
-                  style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.25)" }}
+                  style={{ background: "rgba(99,102,241,0.15)", color: "var(--tx-818cf8, #818cf8)", border: "1px solid rgba(99,102,241,0.25)" }}
                 >
                   Reply
                 </button>
@@ -520,7 +520,7 @@ export default function AdminTicketsPage() {
                     className="tk-action-btn"
                     onClick={() => handleClose(ticket)}
                     disabled={closingId === ticket.id}
-                    style={{ background: "rgba(100,116,139,0.12)", color: "#94a3b8", border: "1px solid rgba(100,116,139,0.2)" }}
+                    style={{ background: "rgba(100,116,139,0.12)", color: "var(--tx-94a3b8, #94a3b8)", border: "1px solid rgba(100,116,139,0.2)" }}
                   >
                     {closingId === ticket.id ? "…" : "Close"}
                   </button>

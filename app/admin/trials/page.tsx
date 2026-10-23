@@ -130,22 +130,22 @@ export default function AdminTrialsPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "Trials started", value: data.summary.total, color: "#fb923c" },
-            { label: "In trial now", value: data.summary.active, color: "#34d399" },
-            { label: "Activated", value: `${data.summary.activationRate}%`, color: "#fbbf24", sub: `${data.summary.activated} recorded a real transaction` },
-            { label: "Converted to paid", value: `${data.summary.conversionRate}%`, color: "#60a5fa", sub: `${data.summary.converted} paying` },
+            { label: "Trials started", value: data.summary.total, color: "var(--tx-fb923c, #fb923c)" },
+            { label: "In trial now", value: data.summary.active, color: "var(--tx-34d399, #34d399)" },
+            { label: "Activated", value: `${data.summary.activationRate}%`, color: "var(--tx-fbbf24, #fbbf24)", sub: `${data.summary.activated} recorded a real transaction` },
+            { label: "Converted to paid", value: `${data.summary.conversionRate}%`, color: "var(--tx-60a5fa, #60a5fa)", sub: `${data.summary.converted} paying` },
           ]} />
 
           {data.openRequests.length > 0 ? (
             <Section title={`Setup help requested (${data.openRequests.length})`}>
               {data.openRequests.map((r) => (
-                <div key={r.companyId} style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: "10px 0", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                <div key={r.companyId} style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: "10px 0", borderTop: "1px solid rgba(var(--ink),.06)" }}>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{r.name}</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>
+                    <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))" }}>
                       {fmtDate(r.at)}{[r.email, r.phone].filter(Boolean).map((x) => ` · ${x}`).join("")}
                     </div>
-                    <div style={{ fontSize: 13, color: r.note ? "#fbbf24" : "rgba(255,255,255,.35)", marginTop: 4 }}>
+                    <div style={{ fontSize: 13, color: r.note ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>
                       {r.note ? `Needs help with: ${r.note}` : "No details given. Contact them to ask what they need."}
                     </div>
                   </div>
@@ -155,7 +155,7 @@ export default function AdminTrialsPage() {
                         Open their account
                       </Button>
                     ) : (
-                      <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", maxWidth: 220, textAlign: "right" }}>
+                      <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))", maxWidth: 220, textAlign: "right" }}>
                         Support access not allowed yet. Ask them to press "Allow support access".
                       </span>
                     )}
@@ -165,7 +165,7 @@ export default function AdminTrialsPage() {
                   </div>
                 </div>
               ))}
-              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 10 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 10 }}>
                 A request does not give you access to the company's data. Ask the customer to share their file or screen.
               </div>
             </Section>
@@ -178,9 +178,9 @@ export default function AdminTrialsPage() {
             ] as const).map(([f, label]) => (
               <button key={f} onClick={() => setFilter(f)} style={{
                 padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                background: filter === f ? "rgba(251,146,60,.2)" : "rgba(255,255,255,.05)",
-                border: filter === f ? "1px solid #fb923c" : "1px solid rgba(255,255,255,.1)",
-                color: filter === f ? "#fb923c" : "rgba(255,255,255,.4)",
+                background: filter === f ? "rgba(251,146,60,.2)" : "rgba(var(--ink),.05)",
+                border: filter === f ? "1px solid #fb923c" : "1px solid rgba(var(--ink),.1)",
+                color: filter === f ? "var(--tx-fb923c, #fb923c)" : "rgba(var(--ink),var(--ta-40, .4))",
               }}>
                 {label}
               </button>
@@ -195,35 +195,35 @@ export default function AdminTrialsPage() {
                 <div key={r.companyId} style={{
                   display: "grid", gridTemplateColumns: "minmax(180px,2fr) 110px 90px 130px minmax(120px,1fr) 190px",
                   gap: 12, alignItems: "center", padding: "14px 18px",
-                  borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.06)", fontSize: 13,
+                  borderTop: i === 0 ? "none" : "1px solid rgba(var(--ink),.06)", fontSize: 13,
                 }}>
                   <div>
                     <div style={{ fontWeight: 700 }}>{r.name}</div>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)" }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                       {r.email || "—"}{r.phone ? ` · ${r.phone}` : ""}
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 2 }}>
                       {[r.businessType, r.plan, r.createdAt ? `signed up ${fmtDate(r.createdAt)}` : null].filter(Boolean).join(" · ")}
                     </div>
                     {r.supportAccessUntil ? (
-                      <div style={{ fontSize: 11, color: "#34d399", marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: "var(--tx-34d399, #34d399)", marginTop: 2 }}>
                         Support access allowed until {fmtDate(r.supportAccessUntil)}
                       </div>
                     ) : null}
                   </div>
                   <div><Pill tone={STAGES[r.stage].tone}>{STAGES[r.stage].label}</Pill></div>
-                  <div style={{ color: "rgba(255,255,255,.7)" }}>
+                  <div style={{ color: "rgba(var(--ink),var(--ta-70, .7))" }}>
                     {r.stage === "active" ? `${r.daysLeft}d left` : fmtDate(r.trialEndsAt)}
                   </div>
                   <div>
                     {r.activated
                       ? <Pill tone="green">{r.invoices} inv · {r.receipts} pay</Pill>
                       : <Pill tone="grey">No transaction</Pill>}
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4 }}>
                       {r.items} item{r.items === 1 ? "" : "s"} added
                     </div>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>{r.source || "—"} · {r.country || "—"}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{r.source || "—"} · {r.country || "—"}</div>
                   <div style={{ textAlign: "right", display: "flex", gap: 6, justifyContent: "flex-end" }}>
                     {r.supportAccessUntil ? (
                       <Button tone="primary" busy={busy === `open:${r.companyId}`} onClick={() => openAccount(r.companyId)} title="Open this customer's dashboard (they allowed support access)">

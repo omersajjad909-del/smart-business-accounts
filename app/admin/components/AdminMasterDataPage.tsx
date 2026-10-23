@@ -154,14 +154,14 @@ const masterStyles = `
   font-size: 11px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color:var(--text-muted);
   font-weight: 700;
 }
 .master-metric-value {
   margin-top: 8px;
   font-size: 34px;
   font-weight: 800;
-  color: #a78bfa;
+  color:var(--tx-a78bfa, #a78bfa);
 }
 .master-table-wrap {
   background: var(--panel);
@@ -179,7 +179,7 @@ const masterStyles = `
   font-weight: 800;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color:var(--text-muted);
   white-space: nowrap;
 }
 .master-row {
@@ -195,27 +195,27 @@ const masterStyles = `
 .master-td {
   padding: 14px 16px;
   font-size: 13px;
-  color: var(--text-soft);
+  color:var(--text-soft);
   white-space: nowrap;
 }
 .master-state-cell {
   padding: 44px 20px;
   text-align: center;
-  color: var(--text-muted);
+  color:var(--text-muted);
   font-size: 13px;
 }
 .master-error-cell {
-  color: #fda4af;
+  color:var(--tx-fda4af, #fda4af);
 }
 .master-empty-title {
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-soft);
+  color:var(--text-soft);
   margin-bottom: 6px;
 }
 .master-empty-hint {
   font-size: 12px;
-  color: var(--text-muted);
+  color:var(--text-muted);
 }
 .master-loading-dots::after {
   content: '...';

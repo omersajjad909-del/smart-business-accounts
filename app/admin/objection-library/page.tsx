@@ -200,9 +200,9 @@ export default function ObjectionLibraryPage() {
       {error ? <ErrorNote onDismiss={() => setError(null)}>{error}</ErrorNote> : null}
 
       <KpiRow items={[
-        { label: "Objections stored", value: data?.objections.length ?? 0, color: "#818cf8", sub: "In the library" },
-        { label: "With an answer", value: answered, color: answered ? "#34d399" : "#fbbf24", sub: "Ready to use on a call" },
-        { label: "Flagged", value: flagged, color: flagged ? "#f87171" : "#34d399", sub: "Answer contains a claim we cannot make" },
+        { label: "Objections stored", value: data?.objections.length ?? 0, color: "var(--tx-818cf8, #818cf8)", sub: "In the library" },
+        { label: "With an answer", value: answered, color: answered ? "var(--tx-34d399, #34d399)" : "var(--tx-fbbf24, #fbbf24)", sub: "Ready to use on a call" },
+        { label: "Flagged", value: flagged, color: flagged ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", sub: "Answer contains a claim we cannot make" },
       ]} />
 
       <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
@@ -213,9 +213,9 @@ export default function ObjectionLibraryPage() {
         ] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} style={{
             padding: "8px 16px", borderRadius: 10, fontSize: 12.5, fontWeight: 700, cursor: "pointer",
-            background: tab === id ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-            border: tab === id ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-            color: tab === id ? "#818cf8" : "rgba(255,255,255,.4)",
+            background: tab === id ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+            border: tab === id ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+            color: tab === id ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
           }}>
             {label}
           </button>
@@ -228,7 +228,7 @@ export default function ObjectionLibraryPage() {
           <Section title={draftObjection ? "Edit" : "Add an objection"}>
             <div style={{ display: "grid", gap: 11 }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
                   WHAT THEY SAY
                 </div>
                 <input
@@ -239,7 +239,7 @@ export default function ObjectionLibraryPage() {
                 />
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
                   CATEGORY
                 </div>
                 <select value={draftCategory} onChange={(e) => setDraftCategory(e.target.value)} style={{ ...inputStyle, cursor: "pointer" }}>
@@ -248,7 +248,7 @@ export default function ObjectionLibraryPage() {
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)" }}>THE ANSWER</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))" }}>THE ANSWER</span>
                   {data?.aiConfigured ? (
                     <Button tone="ghost" onClick={generateAnswer} busy={busy === "answer"} disabled={!draftObjection.trim()}>
                       {draftAnswer.trim() ? "Improve it" : "Draft one"}
@@ -267,7 +267,7 @@ export default function ObjectionLibraryPage() {
               {draftFlags.length ? (
                 <div style={{
                   background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)",
-                  borderRadius: 11, padding: "11px 14px", fontSize: 12.5, color: "#fca5a5", lineHeight: 1.7,
+                  borderRadius: 11, padding: "11px 14px", fontSize: 12.5, color: "var(--tx-fca5a5, #fca5a5)", lineHeight: 1.7,
                 }}>
                   <strong style={{ display: "block", marginBottom: 4 }}>This answer makes a claim we cannot make</strong>
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
@@ -277,7 +277,7 @@ export default function ObjectionLibraryPage() {
               ) : null}
 
               {draftEvidence.length ? (
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.7 }}>
                   Carrying {draftEvidence.length} quote{draftEvidence.length === 1 ? "" : "s"} from real messages.
                 </div>
               ) : null}
@@ -320,7 +320,7 @@ export default function ObjectionLibraryPage() {
                           {d.flags?.length ? <Pill tone="red">Check this answer</Pill> : null}
                           {!d.answer?.trim() ? <Pill tone="amber">No answer yet</Pill> : null}
                         </div>
-                        <div style={{ fontSize: 14.5, fontWeight: 700, color: "#f8fafc", lineHeight: 1.5 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)", lineHeight: 1.5 }}>
                           &ldquo;{d.objection}&rdquo;
                         </div>
                       </div>
@@ -339,27 +339,27 @@ export default function ObjectionLibraryPage() {
                         <Prose text={d.answer} />
                       </div>
                     ) : (
-                      <div style={{ fontSize: 12.5, color: "rgba(251,191,36,.7)" }}>
+                      <div style={{ fontSize: 12.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.7)" }}>
                         Nobody has written the answer yet. That is the objection most worth spending
                         ten minutes on.
                       </div>
                     )}
 
                     {d.flags?.length ? (
-                      <div style={{ fontSize: 11.5, color: "#fca5a5", marginTop: 10, lineHeight: 1.6 }}>
+                      <div style={{ fontSize: 11.5, color: "var(--tx-fca5a5, #fca5a5)", marginTop: 10, lineHeight: 1.6 }}>
                         {d.flags.join(" · ")}
                       </div>
                     ) : null}
 
                     {d.evidence?.length ? (
                       <div style={{ marginTop: 12 }}>
-                        <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.28)", marginBottom: 6 }}>
+                        <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-28, .28))", marginBottom: 6 }}>
                           HEARD IT HERE
                         </div>
                         {d.evidence.map((e) => (
                           <div key={e.id} style={{
-                            fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.6,
-                            borderLeft: "2px solid rgba(255,255,255,.13)", paddingLeft: 10, marginBottom: 5,
+                            fontSize: 11.5, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.6,
+                            borderLeft: "2px solid rgba(var(--ink),.13)", paddingLeft: 10, marginBottom: 5,
                           }}>
                             &ldquo;{e.quote}&rdquo;
                           </div>
@@ -367,7 +367,7 @@ export default function ObjectionLibraryPage() {
                       </div>
                     ) : null}
 
-                    <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.22)", marginTop: 10 }}>
+                    <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-22, .22))", marginTop: 10 }}>
                       Updated {fmtDate(d.updatedAt || o.createdAt)}
                     </div>
                   </div>
@@ -382,7 +382,7 @@ export default function ObjectionLibraryPage() {
       {tab === "mine" ? (
         <>
           <Section title="Pull objections out of what people have already said">
-            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", lineHeight: 1.75, marginBottom: 14 }}>
+            <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.75, marginBottom: 14 }}>
               Reads chat transcripts, enquiry messages, complaints and waitlist entries from the
               last six months and finds the reasons people gave for not proceeding. Nothing is saved
               automatically — you decide which ones are real, then add them.
@@ -390,12 +390,12 @@ export default function ObjectionLibraryPage() {
             {data?.aiConfigured ? (
               <Button onClick={mine} busy={busy === "mine"}>Mine the conversations</Button>
             ) : (
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                 Set GROQ_API_KEY or OPENAI_API_KEY to mine conversations.
               </div>
             )}
             {mineNote ? (
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 12, lineHeight: 1.7 }}>{mineNote}</div>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 12, lineHeight: 1.7 }}>{mineNote}</div>
             ) : null}
           </Section>
 
@@ -420,7 +420,7 @@ export default function ObjectionLibraryPage() {
                         <Pill tone={CATEGORY_TONE[m.category] || "grey"}>{m.category}</Pill>
                         <Pill tone="grey">{m.count} time{m.count === 1 ? "" : "s"}</Pill>
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#f8fafc", lineHeight: 1.5 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)", lineHeight: 1.5 }}>
                         &ldquo;{m.objection}&rdquo;
                       </div>
                     </div>
@@ -440,15 +440,15 @@ export default function ObjectionLibraryPage() {
                     <div>
                       {m.evidence.map((e) => (
                         <div key={e.id} style={{
-                          fontSize: 12, color: "rgba(255,255,255,.55)", lineHeight: 1.65,
-                          borderLeft: "2px solid rgba(255,255,255,.14)", paddingLeft: 11, marginBottom: 6,
+                          fontSize: 12, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.65,
+                          borderLeft: "2px solid rgba(var(--ink),.14)", paddingLeft: 11, marginBottom: 6,
                         }}>
                           &ldquo;{e.quote}&rdquo;
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 11.5, color: "rgba(251,191,36,.65)" }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.65)" }}>
                       No verifiable quote survived the id check — treat this one with suspicion.
                     </div>
                   )}
@@ -463,7 +463,7 @@ export default function ObjectionLibraryPage() {
       {tab === "brief" ? (
         <>
           <Section title="Before the call">
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               WHO ARE YOU TALKING TO?
             </div>
             <textarea
@@ -473,7 +473,7 @@ export default function ObjectionLibraryPage() {
               placeholder="PVC pipe wholesaler in Faisalabad, 12 staff, two godowns, currently on Excel plus a munshi. Owner is 55, his son pushed for this. Was quoted by Zoho last month."
               style={{ ...inputStyle, resize: "vertical" }}
             />
-            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", margin: "10px 0 14px", lineHeight: 1.65 }}>
+            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-32, .32))", margin: "10px 0 14px", lineHeight: 1.65 }}>
               The more specific this is, the better the brief. The library is read as part of it, so
               anything you have already answered comes back in the prospect&apos;s terms.
             </div>
@@ -482,7 +482,7 @@ export default function ObjectionLibraryPage() {
                 Build the brief
               </Button>
             ) : (
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                 Set GROQ_API_KEY or OPENAI_API_KEY to build briefs.
               </div>
             )}
@@ -507,10 +507,10 @@ export default function ObjectionLibraryPage() {
                 <div style={{ display: "grid", gap: 16 }}>
                   {(brief.likelyObjections || []).map((o, i) => (
                     <div key={i}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "#f8fafc", marginBottom: 4 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)", marginBottom: 4 }}>
                         &ldquo;{o.objection}&rdquo;
                       </div>
-                      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>
+                      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 8 }}>
                         {o.why}
                       </div>
                       <div style={{
@@ -525,13 +525,13 @@ export default function ObjectionLibraryPage() {
               </Section>
 
               <Section title="Ask them">
-                <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "rgba(255,255,255,.72)", lineHeight: 1.9 }}>
+                <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.9 }}>
                   {(brief.askThem || []).map((q) => <li key={q}>{q}</li>)}
                 </ul>
               </Section>
 
               <Section title="Walk away if">
-                <div style={{ fontSize: 13, color: "#fcd34d", lineHeight: 1.7 }}>{brief.walkAwayIf}</div>
+                <div style={{ fontSize: 13, color: "var(--tx-fcd34d, #fcd34d)", lineHeight: 1.7 }}>{brief.walkAwayIf}</div>
                 <ReviewNotice>
                   A brief is a preparation, not a script. The answers come from your library plus
                   what you typed about this prospect — nothing here knows them.

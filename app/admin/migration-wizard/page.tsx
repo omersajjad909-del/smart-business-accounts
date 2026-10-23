@@ -116,8 +116,8 @@ export default function MigrationWizardPage() {
           <label style={{
             display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer",
             padding: "9px 16px", borderRadius: 10, fontSize: 12.5, fontWeight: 700,
-            background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.12)",
-            color: "rgba(255,255,255,.6)",
+            background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.12)",
+            color: "rgba(var(--ink),var(--ta-60, .6))",
           }}>
             Choose a file
             <input
@@ -127,13 +127,13 @@ export default function MigrationWizardPage() {
               style={{ display: "none" }}
             />
           </label>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>
+          <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
             or paste below · {lineCount ? `${lineCount.toLocaleString()} lines loaded` : "nothing loaded"}
           </span>
           {csv ? (
             <button onClick={() => { setCsv(""); setResult(null); }} style={{
               background: "none", border: "none", cursor: "pointer",
-              color: "rgba(255,255,255,.3)", fontSize: 11.5, padding: 0,
+              color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 11.5, padding: 0,
             }}>
               Clear
             </button>
@@ -153,7 +153,7 @@ export default function MigrationWizardPage() {
 
         <div className="ai-two" style={{ marginTop: 14 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               WHAT IS THIS FILE? (OPTIONAL)
             </div>
             <select
@@ -168,7 +168,7 @@ export default function MigrationWizardPage() {
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               ANYTHING THAT WOULD HELP (OPTIONAL)
             </div>
             <input
@@ -186,7 +186,7 @@ export default function MigrationWizardPage() {
               {result ? "Analyse again" : "Read this file"}
             </Button>
           ) : (
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
               Set GROQ_API_KEY or OPENAI_API_KEY to use the wizard.
             </div>
           )}
@@ -207,11 +207,11 @@ export default function MigrationWizardPage() {
               <Pill tone="grey">{result.source.headers.length} columns</Pill>
               <Pill tone="grey">delimiter {JSON.stringify(result.source.delimiter)}</Pill>
             </div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.7)", lineHeight: 1.7 }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))", lineHeight: 1.7 }}>
               {result.analysis.notes}
             </div>
             {result.dataType ? (
-              <div style={{ fontSize: 12, color: "rgba(129,140,248,.7)", marginTop: 10, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--txr-818cf8, 129,140,248),.7)", marginTop: 10, lineHeight: 1.6 }}>
                 {result.dataType.why}
               </div>
             ) : null}
@@ -226,10 +226,10 @@ export default function MigrationWizardPage() {
               background: "rgba(248,113,113,.06)", borderColor: "rgba(248,113,113,.28)",
               marginBottom: 18,
             }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "#fca5a5", marginBottom: 11 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-fca5a5, #fca5a5)", marginBottom: 11 }}>
                 Deal with these before you import
               </div>
-              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "rgba(252,165,165,.9)", lineHeight: 1.85 }}>
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "rgba(var(--txr-fca5a5, 252,165,165),.9)", lineHeight: 1.85 }}>
                 {result.warnings.missingRequired.map((f) => (
                   <li key={`req-${f}`}>
                     <strong>{f}</strong> is required and nothing maps to it — every row would be
@@ -257,7 +257,7 @@ export default function MigrationWizardPage() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
                 <thead>
-                  <tr style={{ color: "rgba(255,255,255,.35)", textAlign: "left" }}>
+                  <tr style={{ color: "rgba(var(--ink),var(--ta-35, .35))", textAlign: "left" }}>
                     <th style={{ padding: "7px 10px", fontWeight: 700 }}>Their column</th>
                     <th style={{ padding: "7px 10px", fontWeight: 700 }}>→</th>
                     <th style={{ padding: "7px 10px", fontWeight: 700 }}>Our field</th>
@@ -266,27 +266,27 @@ export default function MigrationWizardPage() {
                 </thead>
                 <tbody>
                   {result.analysis.mappings.map((m) => (
-                    <tr key={m.sourceColumn} style={{ borderTop: "1px solid rgba(255,255,255,.05)" }}>
+                    <tr key={m.sourceColumn} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                       <td style={{
-                        padding: "9px 10px", color: "#e2e8f0",
+                        padding: "9px 10px", color: "var(--tx-e2e8f0, #e2e8f0)",
                         fontFamily: "ui-monospace,monospace", fontSize: 11.5,
                       }}>
                         {m.sourceColumn}
                       </td>
-                      <td style={{ padding: "9px 10px", color: "rgba(255,255,255,.2)" }}>→</td>
+                      <td style={{ padding: "9px 10px", color: "rgba(var(--ink),var(--ta-20, .2))" }}>→</td>
                       <td style={{ padding: "9px 10px" }}>
                         {m.targetField ? (
                           <span style={{ display: "inline-flex", gap: 7, alignItems: "center" }}>
-                            <span style={{ color: "#6ee7b7", fontWeight: 700, fontFamily: "ui-monospace,monospace", fontSize: 11.5 }}>
+                            <span style={{ color: "var(--tx-6ee7b7, #6ee7b7)", fontWeight: 700, fontFamily: "ui-monospace,monospace", fontSize: 11.5 }}>
                               {m.targetField}
                             </span>
                             <Pill tone={CONF_TONE[m.confidence]}>{m.confidence}</Pill>
                           </span>
                         ) : (
-                          <span style={{ color: "rgba(255,255,255,.28)", fontStyle: "italic" }}>dropped</span>
+                          <span style={{ color: "rgba(var(--ink),var(--ta-28, .28))", fontStyle: "italic" }}>dropped</span>
                         )}
                       </td>
-                      <td style={{ padding: "9px 10px", color: "rgba(255,255,255,.45)", fontSize: 11.5 }}>
+                      <td style={{ padding: "9px 10px", color: "rgba(var(--ink),var(--ta-45, .45))", fontSize: 11.5 }}>
                         {m.reason}
                       </td>
                     </tr>
@@ -296,7 +296,7 @@ export default function MigrationWizardPage() {
             </div>
 
             {result.warnings.unmappedHeadings.length ? (
-              <div style={{ fontSize: 11.5, color: "rgba(251,191,36,.7)", marginTop: 12, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.7)", marginTop: 12, lineHeight: 1.6 }}>
                 {result.warnings.unmappedHeadings.length} heading(s) were not mentioned in the
                 mapping at all and carry nothing into the output:{" "}
                 {result.warnings.unmappedHeadings.join(", ")}
@@ -317,7 +317,7 @@ export default function MigrationWizardPage() {
                 <div style={{ overflowX: "auto", marginBottom: 12 }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11.5 }}>
                     <thead>
-                      <tr style={{ color: "#6ee7b7", textAlign: "left" }}>
+                      <tr style={{ color: "var(--tx-6ee7b7, #6ee7b7)", textAlign: "left" }}>
                         {result.converted.headers.map((h) => (
                           <th key={h} style={{ padding: "7px 10px", fontWeight: 700, whiteSpace: "nowrap" }}>{h}</th>
                         ))}
@@ -325,13 +325,13 @@ export default function MigrationWizardPage() {
                     </thead>
                     <tbody>
                       {result.converted.preview.map((row, i) => (
-                        <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,.05)" }}>
+                        <tr key={i} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
                           {row.map((cell, j) => (
                             <td key={j} style={{
-                              padding: "7px 10px", color: "rgba(255,255,255,.62)",
+                              padding: "7px 10px", color: "rgba(var(--ink),var(--ta-62, .62))",
                               maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                             }}>
-                              {cell || <span style={{ color: "rgba(255,255,255,.15)" }}>—</span>}
+                              {cell || <span style={{ color: "rgba(var(--ink),var(--ta-15, .15))" }}>—</span>}
                             </td>
                           ))}
                         </tr>
@@ -341,16 +341,16 @@ export default function MigrationWizardPage() {
                 </div>
 
                 <div style={{
-                  fontSize: 12.5, color: "rgba(255,255,255,.55)", lineHeight: 1.75,
+                  fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.75,
                   padding: "12px 15px", borderRadius: 11,
                   background: "rgba(52,211,153,.05)", border: "1px solid rgba(52,211,153,.2)",
                 }}>
-                  <strong style={{ color: "#6ee7b7" }}>Next:</strong> copy this CSV, open the
+                  <strong style={{ color: "var(--tx-6ee7b7, #6ee7b7)" }}>Next:</strong> copy this CSV, open the
                   customer&apos;s Import Wizard, pick{" "}
                   <strong>{result.dataType?.name || "the matching data type"}</strong> and run it as a
                   dry run first. The dry run shows every row already interpreted, and writes nothing
                   until it is approved.
-                  <div style={{ marginTop: 7, color: "rgba(255,255,255,.4)" }}>
+                  <div style={{ marginTop: 7, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                     Showing the first {result.converted.preview.length} of{" "}
                     {result.converted.rowCount.toLocaleString()} rows. Every cell above is copied
                     unchanged from the source file — no value was rewritten by a model.
@@ -360,7 +360,7 @@ export default function MigrationWizardPage() {
             )}
           </Section>
 
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", lineHeight: 1.7 }}>
             Analysed {fmtDate(result.generatedAt)}. The model saw the headings and the first{" "}
             {result.source.sample.length} rows only; the remaining{" "}
             {Math.max(0, result.source.rowCount - result.source.sample.length).toLocaleString()} rows

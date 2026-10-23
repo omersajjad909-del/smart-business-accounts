@@ -13,8 +13,8 @@ type Flag = {
 };
 
 const F = "'Outfit','Inter',sans-serif";
-const CARD = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
+const CARD = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
 
 function adminHdrs(): Record<string, string> {
   const u = getCurrentUser();
@@ -46,7 +46,7 @@ function Toggle({ enabled, onChange, disabled }: { enabled: boolean; onChange: (
       aria-label="Toggle flag"
       style={{
         width: 40, height: 22, borderRadius: 11, flexShrink: 0,
-        background: enabled ? "#6366f1" : "rgba(255,255,255,0.12)",
+        background: enabled ? "#6366f1" : "rgba(var(--ink),0.12)",
         border: "none", cursor: disabled ? "not-allowed" : "pointer",
         position: "relative", transition: "background 0.2s", opacity: disabled ? 0.5 : 1,
       }}
@@ -131,7 +131,7 @@ export default function AdminFeatureFlagsPage() {
 
   const statCard = (label: string, val: string | number, color = "#e2e8f0") => (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 20px" }}>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.4)", textTransform: "uppercase", marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", marginBottom: 8 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, color }}>{flags === null ? "—" : val}</div>
     </div>
   );
@@ -141,8 +141,8 @@ export default function AdminFeatureFlagsPage() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "#e2e8f0" }}>Feature Flags</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Enable or disable features globally or per rollout percentage.</p>
+          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)" }}>Feature Flags</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Enable or disable features globally or per rollout percentage.</p>
         </div>
         <button
           onClick={() => setShowCreate(v => !v)}
@@ -162,40 +162,40 @@ export default function AdminFeatureFlagsPage() {
       {/* Create form */}
       {showCreate && (
         <div style={{ background: CARD, border: `1px solid rgba(99,102,241,.3)`, borderRadius: 14, padding: "20px 22px", marginBottom: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#e2e8f0", marginBottom: 16 }}>New Feature Flag</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-e2e8f0, #e2e8f0)", marginBottom: 16 }}>New Feature Flag</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", display: "block", marginBottom: 6 }}>FLAG NAME *</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", display: "block", marginBottom: 6 }}>FLAG NAME *</label>
               <input
                 value={form.name}
                 onChange={e => setForm(p => ({ ...p, name: e.target.value.replace(/\s+/g, "_").toLowerCase() }))}
                 placeholder="e.g. new_dashboard"
-                style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: "monospace", outline: "none", boxSizing: "border-box" }}
               />
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", display: "block", marginBottom: 6 }}>ROLLOUT %</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", display: "block", marginBottom: 6 }}>ROLLOUT %</label>
               <input
                 type="number" min={0} max={100}
                 value={form.rollout}
                 onChange={e => setForm(p => ({ ...p, rollout: Math.min(100, Math.max(0, Number(e.target.value))) }))}
-                style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, outline: "none", boxSizing: "border-box" }}
               />
             </div>
           </div>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", display: "block", marginBottom: 6 }}>DESCRIPTION</label>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-40, .4))", display: "block", marginBottom: 6 }}>DESCRIPTION</label>
             <input
               value={form.description}
               onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
               placeholder="What does this flag control?"
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, outline: "none", boxSizing: "border-box" }}
             />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16, justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Toggle enabled={form.enabled} onChange={() => setForm(p => ({ ...p, enabled: !p.enabled }))} />
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Enabled by default</span>
+              <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))" }}>Enabled by default</span>
             </div>
             <button
               onClick={handleCreate}
@@ -211,7 +211,7 @@ export default function AdminFeatureFlagsPage() {
       {/* Flags list */}
       <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
         {/* Table header */}
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr 90px 80px 120px 80px", gap: 14, padding: "12px 18px", borderBottom: `1px solid ${BORDER}`, fontSize: 11, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", textTransform: "uppercase" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr 90px 80px 120px 80px", gap: 14, padding: "12px 18px", borderBottom: `1px solid ${BORDER}`, fontSize: 11, fontWeight: 800, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-30, .3))", textTransform: "uppercase" }}>
           <span>Flag Name</span><span>Description</span><span>Enabled</span><span>Rollout</span><span>Created</span><span></span>
         </div>
 
@@ -219,14 +219,14 @@ export default function AdminFeatureFlagsPage() {
         {flags === null && Array.from({ length: 5 }).map((_, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 3fr 90px 80px 120px 80px", gap: 14, padding: "16px 18px", borderBottom: `1px solid ${BORDER}`, alignItems: "center" }}>
             {[120, 200, 40, 40, 90, 60].map((w, j) => (
-              <div key={j} style={{ height: 12, borderRadius: 6, background: "rgba(255,255,255,.06)", width: w, animation: "pulse 1.5s ease-in-out infinite" }} />
+              <div key={j} style={{ height: 12, borderRadius: 6, background: "rgba(var(--ink),.06)", width: w, animation: "pulse 1.5s ease-in-out infinite" }} />
             ))}
           </div>
         ))}
 
         {/* Empty state */}
         {flags !== null && flags.length === 0 && (
-          <div style={{ padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 14 }}>
+          <div style={{ padding: "48px 24px", textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 14 }}>
             No feature flags yet — create one above.
           </div>
         )}
@@ -234,17 +234,17 @@ export default function AdminFeatureFlagsPage() {
         {/* Flag rows */}
         {flags?.map((flag, i) => (
           <div key={flag.id} style={{ display: "grid", gridTemplateColumns: "2fr 3fr 90px 80px 120px 80px", gap: 14, padding: "16px 18px", borderBottom: i < flags.length - 1 ? `1px solid ${BORDER}` : "none", alignItems: "center" }}>
-            <span style={{ fontFamily: "monospace", fontSize: 13, color: "#e2e8f0", fontWeight: 600, wordBreak: "break-all" }}>{flag.name}</span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)", fontStyle: flag.description ? "normal" : "italic" }}>{flag.description || "No description"}</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, color: "var(--tx-e2e8f0, #e2e8f0)", fontWeight: 600, wordBreak: "break-all" }}>{flag.name}</span>
+            <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", fontStyle: flag.description ? "normal" : "italic" }}>{flag.description || "No description"}</span>
             <div>
               <Toggle enabled={flag.enabled} onChange={() => handleToggle(flag)} disabled={toggling === flag.id} />
             </div>
             <div><RolloutBadge rollout={flag.rollout} /></div>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>{formatDate(flag.createdAt)}</span>
+            <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{formatDate(flag.createdAt)}</span>
             <button
               onClick={() => handleDelete(flag)}
               disabled={deleting === flag.id}
-              style={{ padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: deleting === flag.id ? "wait" : "pointer", opacity: deleting === flag.id ? 0.5 : 1 }}
+              style={{ padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: deleting === flag.id ? "wait" : "pointer", opacity: deleting === flag.id ? 0.5 : 1 }}
             >
               {deleting === flag.id ? "…" : "Delete"}
             </button>

@@ -17,10 +17,10 @@ type Module = {
 };
 
 const PHASE_LABELS: Record<number, { label: string; color: string; bg: string }> = {
-  1: { label: "Phase 1 — Live",        color: "#34d399", bg: "rgba(52,211,153,.12)"  },
-  2: { label: "Phase 2 — Commerce+",   color: "#60a5fa", bg: "rgba(96,165,250,.12)"  },
-  3: { label: "Phase 3 — Services",    color: "#a78bfa", bg: "rgba(167,139,250,.12)" },
-  4: { label: "Phase 4 — Specialised", color: "#f59e0b", bg: "rgba(245,158,11,.12)"  },
+  1: { label: "Phase 1 — Live",        color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,.12)"  },
+  2: { label: "Phase 2 — Commerce+",   color: "var(--tx-60a5fa, #60a5fa)", bg: "rgba(96,165,250,.12)"  },
+  3: { label: "Phase 3 — Services",    color: "var(--tx-a78bfa, #a78bfa)", bg: "rgba(167,139,250,.12)" },
+  4: { label: "Phase 4 — Specialised", color: "var(--tx-f59e0b, #f59e0b)", bg: "rgba(245,158,11,.12)"  },
 };
 
 function headers() {
@@ -139,9 +139,9 @@ export default function BusinessModulesPage() {
 
   const s = {
     page:   { padding: "28px 32px", maxWidth: 1200, margin: "0 auto" } as React.CSSProperties,
-    card:   { background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px" } as React.CSSProperties,
-    th:     { padding: "10px 14px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase" as const, letterSpacing: ".06em", borderBottom: "1px solid rgba(255,255,255,.07)" },
-    td:     { padding: "13px 14px", fontSize: 13, color: "rgba(255,255,255,.8)", borderBottom: "1px solid rgba(255,255,255,.05)" } as React.CSSProperties,
+    card:   { background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, padding: "18px 20px" } as React.CSSProperties,
+    th:     { padding: "10px 14px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", textTransform: "uppercase" as const, letterSpacing: ".06em", borderBottom: "1px solid rgba(var(--ink),.07)" },
+    td:     { padding: "13px 14px", fontSize: 13, color: "rgba(var(--ink),.8)", borderBottom: "1px solid rgba(var(--ink),.05)" } as React.CSSProperties,
   };
 
   return (
@@ -149,14 +149,14 @@ export default function BusinessModulesPage() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "white", margin: 0 }}>Business Modules</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)", margin: 0 }}>Business Modules</h1>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4 }}>
             Enable or disable business types globally. Enabled types appear live on the website & unlock dashboard modules.
           </p>
         </div>
         <button
           onClick={resetAll}
-          style={{ padding: "9px 18px", borderRadius: 9, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.5)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+          style={{ padding: "9px 18px", borderRadius: 9, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-50, .5))", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
         >
           Reset All Overrides
         </button>
@@ -166,13 +166,13 @@ export default function BusinessModulesPage() {
       <style>{`.bm-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}@media(max-width:767px){.bm-kpi{grid-template-columns:repeat(2,1fr)!important}}`}</style>
       <div className="bm-kpi">
         {[
-          { label: "Total Types",   val: modules.length,                          color: "#818cf8" },
-          { label: "Live",          val: totalLive,                               color: "#34d399" },
-          { label: "Coming Soon",   val: modules.length - totalLive,              color: "#fbbf24" },
-          { label: "Admin Overrides", val: modules.filter(m=>m.adminOverride).length, color: "#f87171" },
+          { label: "Total Types",   val: modules.length,                          color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Live",          val: totalLive,                               color: "var(--tx-34d399, #34d399)" },
+          { label: "Coming Soon",   val: modules.length - totalLive,              color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Admin Overrides", val: modules.filter(m=>m.adminOverride).length, color: "var(--tx-f87171, #f87171)" },
         ].map(k => (
           <div key={k.label} style={s.card}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em" }}>{k.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em" }}>{k.label}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color, marginTop: 6 }}>{k.val}</div>
           </div>
         ))}
@@ -184,24 +184,24 @@ export default function BusinessModulesPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search business type..."
-          style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: 13, outline: "none", width: 220 }}
+          style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.05)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none", width: 220 }}
         />
         {(["all","live","coming_soon"] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: "8px 16px", borderRadius: 9, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "1px solid",
-            borderColor: filter === f ? "#6366f1" : "rgba(255,255,255,.1)",
-            background:  filter === f ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.04)",
-            color:       filter === f ? "#a5b4fc" : "rgba(255,255,255,.4)",
+            borderColor: filter === f ? "#6366f1" : "rgba(var(--ink),.1)",
+            background:  filter === f ? "rgba(99,102,241,.2)" : "rgba(var(--ink),.04)",
+            color:       filter === f ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-40, .4))",
           }}>
             {f === "all" ? "All" : f === "live" ? "🟢 Live" : "⏳ Coming Soon"}
           </button>
         ))}
-        {msg && <span style={{ fontSize: 12, color: "#34d399", fontWeight: 600, marginLeft: 8 }}>{msg}</span>}
+        {msg && <span style={{ fontSize: 12, color: "var(--tx-34d399, #34d399)", fontWeight: 600, marginLeft: 8 }}>{msg}</span>}
       </div>
 
       {/* Tables per phase */}
       {loading ? (
-        <div style={{ padding: 60, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading…</div>
+        <div style={{ padding: 60, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Loading…</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           {([1,2,3,4] as const).map(phase => {
@@ -215,7 +215,7 @@ export default function BusinessModulesPage() {
                   <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: ph.bg, color: ph.color, border: `1px solid ${ph.color}30` }}>
                     {ph.label}
                   </span>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>
+                  <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-25, .25))" }}>
                     {rows.filter(r=>r.enabled).length}/{rows.length} enabled
                   </span>
                   {rows.some(r => !r.enabled) && (
@@ -238,7 +238,7 @@ export default function BusinessModulesPage() {
                 </div>
 
                 {/* Table */}
-                <div style={{ border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflowX: "auto", overflowY: "hidden" }}>
+                <div style={{ border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflowX: "auto", overflowY: "hidden" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
@@ -251,42 +251,42 @@ export default function BusinessModulesPage() {
                       {rows.map(m => (
                         <tr key={m.id}
                           style={{ background: m.enabled ? "rgba(52,211,153,.02)" : "transparent" }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.025)")}
+                          onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.025)")}
                           onMouseLeave={e => (e.currentTarget.style.background = m.enabled ? "rgba(52,211,153,.02)" : "transparent")}
                         >
                           <td style={{ ...s.td, fontSize: 22, width: 48 }}>{m.emoji}</td>
                           <td style={s.td}>
-                            <div style={{ fontWeight: 700, color: "white" }}>{m.label}</div>
-                            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{m.description}</div>
+                            <div style={{ fontWeight: 700, color: "var(--ink-solid, white)" }}>{m.label}</div>
+                            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>{m.description}</div>
                           </td>
-                          <td style={{ ...s.td, color: "rgba(255,255,255,.45)", fontSize: 12 }}>{m.category}</td>
+                          <td style={{ ...s.td, color: "rgba(var(--ink),var(--ta-45, .45))", fontSize: 12 }}>{m.category}</td>
                           <td style={s.td}>
                             <span style={{
                               padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
                               background: m.enabled ? "rgba(52,211,153,.15)" : "rgba(251,191,36,.1)",
-                              color:      m.enabled ? "#34d399"              : "#fbbf24",
+                              color:      m.enabled ? "var(--tx-34d399, #34d399)"              : "var(--tx-fbbf24, #fbbf24)",
                               border:     `1px solid ${m.enabled ? "rgba(52,211,153,.3)" : "rgba(251,191,36,.25)"}`,
                             }}>
                               {m.enabled ? "🟢 Live" : "⏳ Coming Soon"}
                             </span>
                           </td>
-                          <td style={{ ...s.td, fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                          <td style={{ ...s.td, fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                             {m.defaultStatus === "live" ? "🟢 Live" : "⏳ Coming Soon"}
                           </td>
                           <td style={{ ...s.td, fontSize: 12 }}>
                             {m.adminOverride ? (
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <span style={{ color: "#f87171", fontWeight: 600 }}>Modified</span>
+                                <span style={{ color: "var(--tx-f87171, #f87171)", fontWeight: 600 }}>Modified</span>
                                 <button
                                   onClick={() => resetOverride(m.id)}
                                   disabled={saving === m.id + "_reset"}
-                                  style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(248,113,113,.3)", background: "transparent", color: "#f87171", cursor: "pointer" }}
+                                  style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(248,113,113,.3)", background: "transparent", color: "var(--tx-f87171, #f87171)", cursor: "pointer" }}
                                 >
                                   Reset
                                 </button>
                               </div>
                             ) : (
-                              <span style={{ color: "rgba(255,255,255,.2)" }}>—</span>
+                              <span style={{ color: "rgba(var(--ink),var(--ta-20, .2))" }}>—</span>
                             )}
                           </td>
                           <td style={s.td}>
@@ -297,7 +297,7 @@ export default function BusinessModulesPage() {
                               style={{
                                 width: 48, height: 26, borderRadius: 13,
                                 border: "none", cursor: saving === m.id ? "not-allowed" : "pointer",
-                                background: m.enabled ? "#10b981" : "rgba(255,255,255,.1)",
+                                background: m.enabled ? "#10b981" : "rgba(var(--ink),.1)",
                                 position: "relative", transition: "background .2s",
                                 opacity: saving === m.id ? .6 : 1,
                               }}
@@ -324,12 +324,12 @@ export default function BusinessModulesPage() {
 
       {/* Legend */}
       <div style={{ marginTop: 32, padding: "16px 20px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc", marginBottom: 8 }}>How it works</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
-          • <strong style={{ color: "rgba(255,255,255,.65)" }}>Toggle ON</strong> → Business type appears as "Live" on the website. Companies of this type see all their dashboard modules.<br/>
-          • <strong style={{ color: "rgba(255,255,255,.65)" }}>Toggle OFF</strong> → Shows "Coming Soon" on website. Dashboard still works for existing companies but won't be marketed.<br/>
-          • <strong style={{ color: "rgba(255,255,255,.65)" }}>Reset</strong> → Removes admin override and goes back to the default phase setting from the codebase.<br/>
-          • To enable specific modules for a company → go to <strong style={{ color: "#a5b4fc" }}>Companies</strong> page and change their Business Type.
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-a5b4fc, #a5b4fc)", marginBottom: 8 }}>How it works</div>
+        <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.7 }}>
+          • <strong style={{ color: "rgba(var(--ink),var(--ta-65, .65))" }}>Toggle ON</strong> → Business type appears as "Live" on the website. Companies of this type see all their dashboard modules.<br/>
+          • <strong style={{ color: "rgba(var(--ink),var(--ta-65, .65))" }}>Toggle OFF</strong> → Shows "Coming Soon" on website. Dashboard still works for existing companies but won't be marketed.<br/>
+          • <strong style={{ color: "rgba(var(--ink),var(--ta-65, .65))" }}>Reset</strong> → Removes admin override and goes back to the default phase setting from the codebase.<br/>
+          • To enable specific modules for a company → go to <strong style={{ color: "var(--tx-a5b4fc, #a5b4fc)" }}>Companies</strong> page and change their Business Type.
         </div>
       </div>
     </div>

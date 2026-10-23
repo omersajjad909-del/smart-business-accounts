@@ -179,7 +179,7 @@ const pageStyles = `
 .ws-label{font-size:12px;font-weight:700;color:var(--text-soft);letter-spacing:.04em;}
 .ws-input{
   padding:11px 14px;border-radius:12px;
-  border:1px solid var(--border);background:var(--bg-soft,rgba(255,255,255,.03));
+  border:1px solid var(--border);background:var(--bg-soft,rgba(var(--ink),.03));
   color:var(--text);font:inherit;font-size:13px;outline:none;
   transition:border-color .14s;
 }
@@ -212,7 +212,7 @@ const pageStyles = `
   display:inline-flex;align-items:center;gap:7px;
   padding:7px 12px;border-radius:999px;
   background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.24);
-  color:#c4b5fd;font-size:12px;font-weight:600;
+  color:var(--tx-c4b5fd, #c4b5fd);font-size:12px;font-weight:600;
 }
 .ws-chip-dot{width:7px;height:7px;border-radius:50%;background:#8b5cf6;flex-shrink:0;}
 .ws-empty{font-size:13px;color:var(--text-muted);margin:0;}

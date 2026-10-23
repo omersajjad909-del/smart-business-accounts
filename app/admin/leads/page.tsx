@@ -171,30 +171,30 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: "purple" |
 const styles = `
 .leads-page{display:grid;gap:18px}
 .page-head h1{margin:0;font-size:34px;font-weight:800;letter-spacing:-.05em}
-.page-head p{margin:6px 0 0;color:rgba(203,213,225,.72);font-size:14px}
+.page-head p{margin:6px 0 0;color:rgba(var(--txr-cbd5e1, 203,213,225),.72);font-size:14px}
 .cards-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.panel,.info-card{border-radius:22px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg, rgba(19,27,46,.98), rgba(15,22,39,.96));box-shadow:0 24px 70px rgba(3,6,18,.22)}
+.panel,.info-card{border-radius:22px;border:1px solid rgba(var(--ink),.08);background:linear-gradient(180deg, rgba(var(--dkr-131b2e, 19,27,46),.98), rgba(var(--dkr-0f1627, 15,22,39),.96));box-shadow:0 24px 70px rgba(3,6,18,.22)}
 .info-card{padding:18px}
-.info-card span{color:rgba(203,213,225,.72);font-size:13px}
+.info-card span{color:rgba(var(--txr-cbd5e1, 203,213,225),.72);font-size:13px}
 .info-card strong{display:block;margin-top:10px;font-size:34px;line-height:1}
-.tone-purple strong{color:#c4b5fd}.tone-orange strong{color:#fdba74}.tone-green strong{color:#86efac}.tone-blue strong{color:#93c5fd}
+.tone-purple strong{color:var(--tx-c4b5fd, #c4b5fd)}.tone-orange strong{color:var(--tx-fdba74, #fdba74)}.tone-green strong{color:var(--tx-86efac, #86efac)}.tone-blue strong{color:var(--tx-93c5fd, #93c5fd)}
 .panel{padding:18px}
 .toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.toolbar input,.toolbar select{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px 13px;color:white;font:inherit}
+.toolbar input,.toolbar select{background:rgba(var(--ink),.04);border:1px solid rgba(var(--ink),.1);border-radius:12px;padding:11px 13px;color:var(--ink-solid, white);font:inherit}
 .toolbar input{min-width:260px;flex:1}
-.empty-state{padding:26px 6px;color:rgba(148,163,184,.72);font-size:13px}
+.empty-state{padding:26px 6px;color:rgba(var(--txr-94a3b8, 148,163,184),.72);font-size:13px}
 .table-wrap{overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:760px}
-th,td{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;font-size:13px;color:#e2e8f0}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(148,163,184,.72)}
+th,td{padding:12px 0;border-bottom:1px solid rgba(var(--ink),.06);text-align:left;font-size:13px;color:var(--tx-e2e8f0, #e2e8f0)}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--txr-94a3b8, 148,163,184),.72)}
 td strong{display:block}
-td span{display:block;margin-top:4px;color:rgba(148,163,184,.72);font-size:12px}
+td span{display:block;margin-top:4px;color:rgba(var(--txr-94a3b8, 148,163,184),.72);font-size:12px}
 .badge{display:inline-flex;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:capitalize}
-.badge-purple{background:rgba(124,58,237,.18);color:#d8ccff}
-.badge-orange{background:rgba(251,146,60,.16);color:#fdba74}
-.badge-green{background:rgba(34,197,94,.16);color:#86efac}
-.badge-blue{background:rgba(59,130,246,.16);color:#93c5fd}
-.badge-slate{background:rgba(148,163,184,.16);color:#cbd5e1}
+.badge-purple{background:rgba(124,58,237,.18);color:var(--tx-d8ccff, #d8ccff)}
+.badge-orange{background:rgba(251,146,60,.16);color:var(--tx-fdba74, #fdba74)}
+.badge-green{background:rgba(34,197,94,.16);color:var(--tx-86efac, #86efac)}
+.badge-blue{background:rgba(59,130,246,.16);color:var(--tx-93c5fd, #93c5fd)}
+.badge-slate{background:rgba(148,163,184,.16);color:var(--tx-cbd5e1, #cbd5e1)}
 @media (max-width: 1100px){.cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width: 640px){.page-head h1{font-size:26px}.cards-grid{grid-template-columns:1fr}.panel,.info-card{border-radius:18px;padding:14px}.toolbar input,.toolbar select{width:100%;min-width:0}}
 `;

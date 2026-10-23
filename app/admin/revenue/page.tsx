@@ -55,16 +55,16 @@ export default function AdminRevenuePage() {
     : 0;
 
   const kpis = [
-    { label: "MRR",            val: fmtMoney(finance?.mrr ?? 0),   color: "#34d399", sub: "This month" },
-    { label: "ARR",            val: fmtMoney(finance?.arr ?? 0),   color: "#818cf8", sub: "Annualized" },
-    { label: "Active Accounts",val: String(totalActive),            color: "#38bdf8", sub: "Paid subscriptions" },
-    { label: "Enterprise",     val: String(finance?.active.enterprise ?? 0), color: "#fbbf24", sub: "Top-tier" },
+    { label: "MRR",            val: fmtMoney(finance?.mrr ?? 0),   color: "var(--tx-34d399, #34d399)", sub: "This month" },
+    { label: "ARR",            val: fmtMoney(finance?.arr ?? 0),   color: "var(--tx-818cf8, #818cf8)", sub: "Annualized" },
+    { label: "Active Accounts",val: String(totalActive),            color: "var(--tx-38bdf8, #38bdf8)", sub: "Paid subscriptions" },
+    { label: "Enterprise",     val: String(finance?.active.enterprise ?? 0), color: "var(--tx-fbbf24, #fbbf24)", sub: "Top-tier" },
   ];
 
   const planBars = [
-    { label: "Starter",    value: data?.planDistribution.starter    ?? 0, color: "#6d7c97" },
-    { label: "Pro",        value: data?.planDistribution.pro        ?? 0, color: "#6b63ff" },
-    { label: "Enterprise", value: data?.planDistribution.enterprise ?? 0, color: "#1fa0de" },
+    { label: "Starter",    value: data?.planDistribution.starter    ?? 0, color: "var(--tx-6d7c97, #6d7c97)" },
+    { label: "Pro",        value: data?.planDistribution.pro        ?? 0, color: "var(--tx-6b63ff, #6b63ff)" },
+    { label: "Enterprise", value: data?.planDistribution.enterprise ?? 0, color: "var(--tx-1fa0de, #1fa0de)" },
   ];
   const maxPlan = Math.max(...planBars.map(b => b.value), 1);
 
@@ -74,17 +74,17 @@ export default function AdminRevenuePage() {
 
       <div className="revenue-shell">
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "#f8fafc" }}>Revenue Analytics</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Live revenue trends, plan distribution, and billing overview.</p>
+          <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)" }}>Revenue Analytics</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Live revenue trends, plan distribution, and billing overview.</p>
         </div>
 
         {/* KPI Row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 28 }}>
           {kpis.map(k => (
-            <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+            <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
               <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{loading ? "—" : k.val}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.55)", marginTop: 4 }}>{k.label}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{k.sub}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-55, .55))", marginTop: 4 }}>{k.label}</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>{k.sub}</div>
             </div>
           ))}
         </div>
@@ -105,10 +105,10 @@ export default function AdminRevenuePage() {
               {planBars.map(item => (
                 <div key={item.label} style={{ marginBottom: 18 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7, fontSize: 13 }}>
-                    <span style={{ fontWeight: 700, color: "#fffaf0" }}>{item.label}</span>
-                    <span style={{ color: "rgba(255,255,255,.5)", fontWeight: 600 }}>{loading ? "—" : item.value} accounts</span>
+                    <span style={{ fontWeight: 700, color: "var(--tx-fffaf0, #fffaf0)" }}>{item.label}</span>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-50, .5))", fontWeight: 600 }}>{loading ? "—" : item.value} accounts</span>
                   </div>
-                  <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
+                  <div style={{ height: 10, borderRadius: 999, background: "rgba(var(--ink),.07)", overflow: "hidden" }}>
                     <div style={{
                       width: loading ? "0%" : `${Math.max((item.value / maxPlan) * 100, item.value > 0 ? 8 : 0)}%`,
                       height: "100%",
@@ -121,10 +121,10 @@ export default function AdminRevenuePage() {
               ))}
 
               {/* Summary totals */}
-              <div style={{ marginTop: 24, padding: "14px 16px", background: "rgba(255,255,255,.03)", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", marginBottom: 10 }}>TOTAL ACTIVE</div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{loading ? "—" : totalActive}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3 }}>paid subscriptions</div>
+              <div style={{ marginTop: 24, padding: "14px 16px", background: "rgba(var(--ink),.03)", borderRadius: 12, border: "1px solid rgba(var(--ink),.06)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em", marginBottom: 10 }}>TOTAL ACTIVE</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{loading ? "—" : totalActive}</div>
+                <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 3 }}>paid subscriptions</div>
               </div>
             </div>
           </section>
@@ -170,7 +170,7 @@ function RevenueLineChart({ rows, loading }: { rows: { label: string; value: num
       {[0.25, 0.5, 0.75, 1].map(p => {
         const y = PT + cH - p * cH * 0.82;
         return (
-          <line key={p} x1={PX} y1={y} x2={W - PX} y2={y} stroke="rgba(255,255,255,.06)" strokeWidth="1" />
+          <line key={p} x1={PX} y1={y} x2={W - PX} y2={y} stroke="rgba(var(--ink),.06)" strokeWidth="1" />
         );
       })}
 
@@ -185,7 +185,7 @@ function RevenueLineChart({ rows, loading }: { rows: { label: string; value: num
         <g key={i}>
           <circle cx={p.x} cy={p.y} r="4.5" fill="#6366f1" stroke="#0a0f1e" strokeWidth="2" />
           {p.value > 0 && (
-            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="11" fill="rgba(255,255,255,.7)" fontWeight="700">
+            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="11" fill="rgba(var(--ink),.7)" fontWeight="700">
               {fmtMoney(p.value)}
             </text>
           )}
@@ -196,11 +196,11 @@ function RevenueLineChart({ rows, loading }: { rows: { label: string; value: num
       ))}
 
       {loading && (
-        <text x={PX + 10} y={PT + 20} fontSize="13" fill="rgba(255,255,255,.4)">Loading…</text>
+        <text x={PX + 10} y={PT + 20} fontSize="13" fill="rgba(var(--ink),.4)">Loading…</text>
       )}
 
       {!loading && max === 1 && (
-        <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="13" fill="rgba(255,255,255,.25)">
+        <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="13" fill="rgba(var(--ink),.25)">
           No payment events recorded yet
         </text>
       )}
@@ -209,7 +209,7 @@ function RevenueLineChart({ rows, loading }: { rows: { label: string; value: num
 }
 
 const styles = `
-.revenue-page { min-height:100%; font-family:'Outfit','DM Sans',sans-serif; color:white; }
+.revenue-page { min-height:100%; font-family:'Outfit','DM Sans',sans-serif; color:var(--ink-solid, white); }
 .revenue-shell { max-width:1520px; margin:0 auto; padding:0 0 80px; }
 .revenue-grid {
   display:grid;
@@ -219,13 +219,13 @@ const styles = `
 .revenue-card {
   padding:24px;
   border-radius:20px;
-  background:linear-gradient(160deg, rgba(22,32,60,.98), rgba(18,26,50,.98));
-  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(160deg, rgba(var(--dkr-16203c, 22,32,60),.98), rgba(var(--dkr-121a32, 18,26,50),.98));
+  border:1px solid rgba(var(--ink),.08);
   box-shadow:0 16px 40px rgba(3,8,21,.28);
 }
 .revenue-card h2 {
   margin:0 0 20px;
-  color:#fffaf0;
+  color:var(--tx-fffaf0, #fffaf0);
   font-size:16px;
   font-weight:800;
   letter-spacing:-.02em;

@@ -123,7 +123,7 @@ export default function SeoEnginePage() {
       <Section title="Write a page">
         <div style={{ display: "grid", gap: 11 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
               WHAT ARE THEY SEARCHING FOR?
             </div>
             <input
@@ -135,7 +135,7 @@ export default function SeoEnginePage() {
           </div>
           <div className="ai-two">
             <div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
                 WHO IS SEARCHING IT (OPTIONAL)
               </div>
               <input
@@ -146,7 +146,7 @@ export default function SeoEnginePage() {
               />
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
                 ANGLE (OPTIONAL)
               </div>
               <input
@@ -165,22 +165,22 @@ export default function SeoEnginePage() {
               {draft ? "Write again" : "Write the brief"}
             </Button>
           ) : (
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
               Set GROQ_API_KEY or OPENAI_API_KEY to write briefs.
             </div>
           )}
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 8 }}>
             IDEAS
           </div>
           <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
             {IDEAS.map((k) => (
               <button key={k} onClick={() => setKeyword(k)} style={{
                 fontSize: 11.5, padding: "6px 12px", borderRadius: 999, cursor: "pointer",
-                background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)",
-                color: "rgba(255,255,255,.55)",
+                background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.09)",
+                color: "rgba(var(--ink),var(--ta-55, .55))",
               }}>
                 {k}
               </button>
@@ -214,20 +214,20 @@ export default function SeoEnginePage() {
               ].map((f) => (
                 <div key={f.k}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.3)" }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
                       {f.k.toUpperCase()}
                     </span>
                     {f.count !== undefined ? (
                       <span style={{
                         fontSize: 10.5, fontWeight: 700,
-                        color: f.count > (f.limit || 999) ? "#fca5a5" : "rgba(255,255,255,.3)",
+                        color: f.count > (f.limit || 999) ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),var(--ta-30, .3))",
                       }}>
                         {f.count} / {f.limit}
                       </span>
                     ) : null}
                   </div>
                   <div style={{
-                    fontSize: 13, color: "#e2e8f0", lineHeight: 1.6,
+                    fontSize: 13, color: "var(--tx-e2e8f0, #e2e8f0)", lineHeight: 1.6,
                     fontFamily: f.mono ? "ui-monospace,monospace" : "inherit",
                   }}>
                     {f.v}
@@ -236,7 +236,7 @@ export default function SeoEnginePage() {
               ))}
               {draft.keywordsCovered.length ? (
                 <div>
-                  <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 6 }}>
                     SEARCHES THIS SHOULD COVER
                   </div>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -251,7 +251,7 @@ export default function SeoEnginePage() {
             <div style={{ display: "grid", gap: 20 }}>
               {draft.sections.map((s, i) => (
                 <div key={i}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "#f8fafc", marginBottom: 8 }}>{s.heading}</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", marginBottom: 8 }}>{s.heading}</div>
                   <Prose text={s.body} />
                 </div>
               ))}
@@ -259,7 +259,7 @@ export default function SeoEnginePage() {
           </Section>
 
           <Section title={`FAQ — the part answer engines quote (${draft.faq.length})`}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", lineHeight: 1.7, marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", lineHeight: 1.7, marginBottom: 16 }}>
               Each answer is written to stand on its own, because that is how it will be quoted —
               lifted out of the page, with nothing around it. If an answer only makes sense in
               context, it will be paraphrased into something we did not say.
@@ -269,15 +269,15 @@ export default function SeoEnginePage() {
                 const words = f.answer.trim().split(/\s+/).length;
                 return (
                   <div key={i}>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#c7d2fe", marginBottom: 5 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--tx-c7d2fe, #c7d2fe)", marginBottom: 5 }}>
                       {f.question}
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.72)", lineHeight: 1.75 }}>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.75 }}>
                       {f.answer}
                     </div>
                     <div style={{
                       fontSize: 10.5, marginTop: 4,
-                      color: words < 35 || words > 80 ? "rgba(251,191,36,.7)" : "rgba(255,255,255,.22)",
+                      color: words < 35 || words > 80 ? "rgba(var(--txr-fbbf24, 251,191,36),.7)" : "rgba(var(--ink),var(--ta-22, .22))",
                     }}>
                       {words} words{words < 35 ? " — short for a quotable answer" : words > 80 ? " — long for a quotable answer" : ""}
                     </div>
@@ -289,15 +289,15 @@ export default function SeoEnginePage() {
             {draft.jsonLd ? (
               <div style={{ marginTop: 18 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-                  <span style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.3)" }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
                     FAQPAGE JSON-LD — PASTE INTO THE PAGE HEAD
                   </span>
                   <CopyButton text={draft.jsonLd} label="Copy JSON-LD" />
                 </div>
                 <pre style={{
                   margin: 0, padding: "12px 14px", borderRadius: 11,
-                  background: "rgba(0,0,0,.3)", border: "1px solid rgba(255,255,255,.06)",
-                  fontSize: 11, color: "rgba(255,255,255,.55)", lineHeight: 1.6,
+                  background: "rgba(0,0,0,.3)", border: "1px solid rgba(var(--ink),.06)",
+                  fontSize: 11, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.6,
                   maxHeight: 260, overflowY: "auto", whiteSpace: "pre-wrap",
                   fontFamily: "ui-monospace,SFMono-Regular,Menlo,monospace",
                 }}>
@@ -311,15 +311,15 @@ export default function SeoEnginePage() {
             <div style={{ display: "grid", gap: 10 }}>
               {draft.internalLinks.map((l) => (
                 <div key={l.href} style={{ fontSize: 12.5, lineHeight: 1.6 }}>
-                  <span style={{ fontFamily: "ui-monospace,monospace", color: "#6ee7b7" }}>{l.href}</span>
-                  <span style={{ color: "rgba(255,255,255,.3)" }}> · </span>
-                  <span style={{ color: "#e2e8f0" }}>&ldquo;{l.anchor}&rdquo;</span>
-                  <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{l.why}</div>
+                  <span style={{ fontFamily: "ui-monospace,monospace", color: "var(--tx-6ee7b7, #6ee7b7)" }}>{l.href}</span>
+                  <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}> · </span>
+                  <span style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>&ldquo;{l.anchor}&rdquo;</span>
+                  <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>{l.why}</div>
                 </div>
               ))}
             </div>
             {droppedLinks.length ? (
-              <div style={{ fontSize: 11.5, color: "rgba(251,191,36,.7)", marginTop: 12, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.7)", marginTop: 12, lineHeight: 1.6 }}>
                 {droppedLinks.length} proposed link(s) pointed at routes that do not exist and were
                 removed: {droppedLinks.join(", ")}
               </div>
@@ -342,11 +342,11 @@ export default function SeoEnginePage() {
               <div key={s.id} style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 gap: 12, padding: "11px 14px", borderRadius: 11,
-                background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)",
+                background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)",
               }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f8fafc" }}>{s.title}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 2 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)" }}>{s.title}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))", marginTop: 2 }}>
                     /{s.data?.slug} · {s.data?.faq?.length ?? 0} FAQ · saved {fmtDate(s.createdAt)}
                     {s.data?.flags?.length ? " · flagged" : ""}
                   </div>

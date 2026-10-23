@@ -72,7 +72,7 @@ export default function AdminWaitlistPage() {
           <div key={id} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 18px", minWidth: 200 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{cfg.emoji} {cfg.label}</div>
             <div style={{ fontSize: 20, fontWeight: 900 }}>{counts[id]?.total ?? 0}</div>
-            <div style={{ fontSize: 11, color: "#888", marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: "var(--tx-888888, #888)", marginBottom: 10 }}>
               {counts[id]?.unnotified ?? 0} not yet notified
             </div>
             <button
@@ -81,7 +81,7 @@ export default function AdminWaitlistPage() {
               style={{
                 padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer",
                 border: "none", background: (counts[id]?.unnotified > 0) ? "#4f46e5" : "#e5e7eb",
-                color: (counts[id]?.unnotified > 0) ? "white" : "#999",
+                color: (counts[id]?.unnotified > 0) ? "white" : "var(--tx-999999, #999999)",
               }}
             >
               {notifying ? "Sending…" : "Notify all"}
@@ -112,21 +112,21 @@ export default function AdminWaitlistPage() {
 
       {/* Table */}
       <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 1.2fr 1fr", padding: "10px 16px", fontSize: 11, fontWeight: 800, color: "#888", textTransform: "uppercase", borderBottom: "1px solid #e5e7eb" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 1.2fr 1fr", padding: "10px 16px", fontSize: 11, fontWeight: 800, color: "var(--tx-888888, #888)", textTransform: "uppercase", borderBottom: "1px solid #e5e7eb" }}>
           <span>Email</span><span>Name</span><span>List</span><span>Joined</span><span>Notified</span>
         </div>
         {loading ? (
-          <div style={{ padding: 24, textAlign: "center", color: "#999", fontSize: 13 }}>Loading…</div>
+          <div style={{ padding: 24, textAlign: "center", color: "var(--tx-999999, #999)", fontSize: 13 }}>Loading…</div>
         ) : items.length === 0 ? (
-          <div style={{ padding: 24, textAlign: "center", color: "#999", fontSize: 13 }}>No one has joined this waitlist yet.</div>
+          <div style={{ padding: 24, textAlign: "center", color: "var(--tx-999999, #999)", fontSize: 13 }}>No one has joined this waitlist yet.</div>
         ) : (
           items.map(item => (
             <div key={item.id} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 1.2fr 1fr", padding: "10px 16px", fontSize: 13, borderBottom: "1px solid #f1f1f4", alignItems: "center" }}>
               <span>{item.email}</span>
               <span style={{ color: "#666" }}>{item.name || "—"}</span>
               <span>{lists[item.businessType]?.emoji} {lists[item.businessType]?.label || item.businessType}</span>
-              <span style={{ color: "#888" }}>{new Date(item.createdAt).toLocaleDateString()}</span>
-              <span style={{ color: item.notified ? "#059669" : "#999" }}>{item.notified ? "✓ Notified" : "—"}</span>
+              <span style={{ color: "var(--tx-888888, #888)" }}>{new Date(item.createdAt).toLocaleDateString()}</span>
+              <span style={{ color: item.notified ? "var(--tx-059669, #059669)" : "var(--tx-999999, #999)" }}>{item.notified ? "✓ Notified" : "—"}</span>
             </div>
           ))
         )}

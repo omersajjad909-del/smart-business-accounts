@@ -20,10 +20,10 @@ type GdprRequest = {
 const STATUSES = ["PENDING", "PROCESSING", "COMPLETED", "REJECTED", "ALL"] as const;
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  PENDING:    { bg: "rgba(251,191,36,.15)",  color: "#fbbf24" },
-  PROCESSING: { bg: "rgba(129,140,248,.15)", color: "#818cf8" },
-  COMPLETED:  { bg: "rgba(52,211,153,.15)",  color: "#34d399" },
-  REJECTED:   { bg: "rgba(248,113,113,.15)", color: "#f87171" },
+  PENDING:    { bg: "rgba(251,191,36,.15)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  PROCESSING: { bg: "rgba(129,140,248,.15)", color: "var(--tx-818cf8, #818cf8)" },
+  COMPLETED:  { bg: "rgba(52,211,153,.15)",  color: "var(--tx-34d399, #34d399)" },
+  REJECTED:   { bg: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" },
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -98,10 +98,10 @@ export default function AdminGdprPage() {
   };
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>GDPR / Data Requests</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Right-to-export, right-to-erasure, restriction and portability requests. Approving a Right to Erasure
           request permanently anonymizes the user's personal data — financial and tax records are retained per
           GDPR Art. 17(3).
@@ -110,12 +110,12 @@ export default function AdminGdprPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Pending",    val: counts.pending,    color: "#fbbf24" },
-          { label: "Processing", val: counts.processing, color: "#818cf8" },
+          { label: "Pending",    val: counts.pending,    color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Processing", val: counts.processing, color: "var(--tx-818cf8, #818cf8)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -126,10 +126,10 @@ export default function AdminGdprPage() {
         </select>
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Company","User","Type","Status","Requested","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -144,33 +144,33 @@ export default function AdminGdprPage() {
               const st = STATUS_STYLE[r.status] || STATUS_STYLE.PENDING;
               const actionable = r.status === "PENDING" || r.status === "PROCESSING";
               return (
-                <tr key={r.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <tr key={r.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                   <td style={{ ...td, fontWeight: 600 }}>{r.company?.name || "—"}</td>
                   <td style={td}>
                     <div>{r.user?.name || "—"}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{r.user?.email}</div>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{r.user?.email}</div>
                   </td>
                   <td style={td}>{TYPE_LABEL[r.type] || r.type}</td>
                   <td style={td}>
                     <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: st.bg, color: st.color }}>{r.status}</span>
                   </td>
-                  <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>{new Date(r.requestedAt).toLocaleString("en-GB")}</td>
+                  <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>{new Date(r.requestedAt).toLocaleString("en-GB")}</td>
                   <td style={td}>
                     {actionable ? (
                       <div style={{ display: "flex", gap: 8 }}>
                         <button
                           disabled={busyId === r.id}
                           onClick={() => act(r.id, "APPROVE")}
-                          style={{ ...btn, background: "rgba(52,211,153,.15)", color: "#34d399", opacity: busyId === r.id ? 0.5 : 1 }}
+                          style={{ ...btn, background: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)", opacity: busyId === r.id ? 0.5 : 1 }}
                         >{busyId === r.id ? "…" : "Approve"}</button>
                         <button
                           disabled={busyId === r.id}
                           onClick={() => act(r.id, "REJECT")}
-                          style={{ ...btn, background: "rgba(248,113,113,.15)", color: "#f87171", opacity: busyId === r.id ? 0.5 : 1 }}
+                          style={{ ...btn, background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)", opacity: busyId === r.id ? 0.5 : 1 }}
                         >Reject</button>
                       </div>
                     ) : (
-                      <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>{r.adminNote || "—"}</span>
+                      <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{r.adminNote || "—"}</span>
                     )}
                   </td>
                 </tr>
@@ -185,11 +185,11 @@ export default function AdminGdprPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
 const btn: React.CSSProperties = { border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" };
 
 const css = `
-  .gdpr-sel { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; }
+  .gdpr-sel { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; }
 `;

@@ -20,8 +20,8 @@ import { CSSProperties, ReactNode, useCallback, useEffect, useState } from "reac
 /* ── shared surfaces ─────────────────────────────────────────────────────── */
 
 export const card: CSSProperties = {
-  background: "linear-gradient(160deg, rgba(19,27,50,.98), rgba(15,22,42,.98))",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "linear-gradient(160deg, rgba(var(--dkr-131b32, 19,27,50),0.98), rgba(var(--dkr-0f162a, 15,22,42),0.98))",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 20,
   padding: "20px 22px",
 };
@@ -31,13 +31,13 @@ export const cardHead: CSSProperties = {
   fontWeight: 800,
   marginBottom: 18,
   paddingBottom: 12,
-  borderBottom: "1px solid rgba(255,255,255,.06)",
-  color: "#f8fafc",
+  borderBottom: "1px solid rgba(var(--ink),.06)",
+  color: "var(--tx-f8fafc, #f8fafc)",
 };
 
 export const pageStyle: CSSProperties = {
   fontFamily: "'Outfit','DM Sans',sans-serif",
-  color: "white",
+  color: "var(--ink-solid, white)",
   padding: "0 0 80px",
 };
 
@@ -45,9 +45,9 @@ export const inputStyle: CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 10,
-  background: "rgba(255,255,255,.04)",
-  border: "1px solid rgba(255,255,255,.1)",
-  color: "white",
+  background: "rgba(var(--ink),.04)",
+  border: "1px solid rgba(var(--ink),.1)",
+  color: "var(--ink-solid, white)",
   fontSize: 13,
   fontFamily: "inherit",
   outline: "none",
@@ -56,8 +56,8 @@ export const inputStyle: CSSProperties = {
 export const aiKitCss = `
   button { font-family: inherit; }
   input, textarea, select { font-family: inherit; }
-  input::placeholder, textarea::placeholder { color: rgba(255,255,255,.25); }
-  .ai-row:hover { background: rgba(255,255,255,.03); }
+  input::placeholder, textarea::placeholder { color:rgba(var(--ink),var(--ta-25, .25)); }
+  .ai-row:hover { background: rgba(var(--ink),.03); }
   @keyframes ai-spin { to { transform: rotate(360deg); } }
 
   /* Two-column layouts (an answer beside the figures it came from). Inline
@@ -147,7 +147,7 @@ export function PageHeader({
     }}>
       <div style={{ maxWidth: 680 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>{title}</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.55 }}>{subtitle}</p>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.55 }}>{subtitle}</p>
       </div>
       {right ? <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{right}</div> : null}
     </div>
@@ -168,10 +168,10 @@ export function Button({
   title?: string;
 }) {
   const tones: Record<string, CSSProperties> = {
-    primary: { background: "rgba(99,102,241,.25)", border: "1px solid #6366f1", color: "#c7d2fe" },
-    good: { background: "rgba(52,211,153,.18)", border: "1px solid #34d399", color: "#6ee7b7" },
-    danger: { background: "rgba(248,113,113,.15)", border: "1px solid rgba(248,113,113,.5)", color: "#fca5a5" },
-    ghost: { background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.12)", color: "rgba(255,255,255,.6)" },
+    primary: { background: "rgba(99,102,241,.25)", border: "1px solid #6366f1", color: "var(--tx-c7d2fe, #c7d2fe)" },
+    good: { background: "rgba(52,211,153,.18)", border: "1px solid #34d399", color: "var(--tx-6ee7b7, #6ee7b7)" },
+    danger: { background: "rgba(248,113,113,.15)", border: "1px solid rgba(248,113,113,.5)", color: "var(--tx-fca5a5, #fca5a5)" },
+    ghost: { background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.12)", color: "rgba(var(--ink),var(--ta-60, .6))" },
   };
   const off = disabled || busy;
   return (
@@ -198,7 +198,7 @@ function Spinner() {
   return (
     <span style={{
       width: 12, height: 12, borderRadius: "50%",
-      border: "2px solid rgba(255,255,255,.25)", borderTopColor: "currentColor",
+      border: "2px solid rgba(var(--ink),.25)", borderTopColor: "currentColor",
       display: "inline-block", animation: "ai-spin .7s linear infinite",
     }} />
   );
@@ -208,7 +208,7 @@ function Spinner() {
 
 export function Loading({ label = "Analysing…" }: { label?: string }) {
   return (
-    <div style={{ padding: 70, textAlign: "center", color: "rgba(255,255,255,.35)", fontSize: 13 }}>
+    <div style={{ padding: 70, textAlign: "center", color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 13 }}>
       <Spinner /> <span style={{ marginLeft: 8 }}>{label}</span>
     </div>
   );
@@ -217,7 +217,7 @@ export function Loading({ label = "Analysing…" }: { label?: string }) {
 export function Empty({ children }: { children: ReactNode }) {
   return (
     <div style={{
-      padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,.3)",
+      padding: "48px 24px", textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))",
       fontSize: 13, lineHeight: 1.6,
     }}>
       {children}
@@ -230,12 +230,12 @@ export function ErrorNote({ children, onDismiss }: { children: ReactNode; onDism
     <div style={{
       background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)",
       borderRadius: 12, padding: "12px 16px", marginBottom: 16,
-      fontSize: 12.5, color: "#fca5a5", display: "flex", justifyContent: "space-between", gap: 12,
+      fontSize: 12.5, color: "var(--tx-fca5a5, #fca5a5)", display: "flex", justifyContent: "space-between", gap: 12,
     }}>
       <div style={{ lineHeight: 1.6 }}>{children}</div>
       {onDismiss ? (
         <button onClick={onDismiss} style={{
-          background: "none", border: "none", color: "#fca5a5", cursor: "pointer", fontSize: 16, lineHeight: 1,
+          background: "none", border: "none", color: "var(--tx-fca5a5, #fca5a5)", cursor: "pointer", fontSize: 16, lineHeight: 1,
         }}>×</button>
       ) : null}
     </div>
@@ -254,7 +254,7 @@ export function AiNotConfigured() {
     <div style={{
       ...card,
       borderColor: "rgba(251,191,36,.3)", background: "rgba(251,191,36,.06)",
-      fontSize: 13, color: "#fcd34d", lineHeight: 1.65,
+      fontSize: 13, color: "var(--tx-fcd34d, #fcd34d)", lineHeight: 1.65,
     }}>
       <strong style={{ display: "block", marginBottom: 6, fontSize: 14 }}>No AI provider configured</strong>
       This page needs a model to run. Set <code style={codeStyle}>GROQ_API_KEY</code> (or any
@@ -274,12 +274,12 @@ const codeStyle: CSSProperties = {
 export type Tone = "red" | "amber" | "green" | "blue" | "grey" | "violet";
 
 const TONE_COLORS: Record<Tone, { fg: string; bg: string; bd: string }> = {
-  red: { fg: "#fca5a5", bg: "rgba(248,113,113,.14)", bd: "rgba(248,113,113,.35)" },
-  amber: { fg: "#fcd34d", bg: "rgba(251,191,36,.14)", bd: "rgba(251,191,36,.35)" },
-  green: { fg: "#6ee7b7", bg: "rgba(52,211,153,.14)", bd: "rgba(52,211,153,.35)" },
-  blue: { fg: "#93c5fd", bg: "rgba(56,189,248,.14)", bd: "rgba(56,189,248,.35)" },
-  violet: { fg: "#c4b5fd", bg: "rgba(139,92,246,.16)", bd: "rgba(139,92,246,.35)" },
-  grey: { fg: "rgba(255,255,255,.55)", bg: "rgba(255,255,255,.06)", bd: "rgba(255,255,255,.12)" },
+  red: { fg: "var(--tx-fca5a5, #fca5a5)", bg: "rgba(248,113,113,.14)", bd: "rgba(248,113,113,.35)" },
+  amber: { fg: "var(--tx-fcd34d, #fcd34d)", bg: "rgba(251,191,36,.14)", bd: "rgba(251,191,36,.35)" },
+  green: { fg: "var(--tx-6ee7b7, #6ee7b7)", bg: "rgba(52,211,153,.14)", bd: "rgba(52,211,153,.35)" },
+  blue: { fg: "var(--tx-93c5fd, #93c5fd)", bg: "rgba(56,189,248,.14)", bd: "rgba(56,189,248,.35)" },
+  violet: { fg: "var(--tx-c4b5fd, #c4b5fd)", bg: "rgba(139,92,246,.16)", bd: "rgba(139,92,246,.35)" },
+  grey: { fg: "rgba(var(--ink),var(--ta-55, .55))", bg: "rgba(var(--ink),.06)", bd: "rgba(var(--ink),var(--ta-12, .12))" },
 };
 
 export function Pill({ children, tone = "grey" }: { children: ReactNode; tone?: Tone }) {
@@ -302,7 +302,7 @@ export function ScoreBar({ value, tone }: { value: number; tone?: Tone }) {
   const c = TONE_COLORS[tone ?? auto];
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 9, minWidth: 120 }}>
-      <div style={{ flex: 1, height: 6, borderRadius: 99, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 6, borderRadius: 99, background: "rgba(var(--ink),.07)", overflow: "hidden" }}>
         <div style={{ width: `${v}%`, height: "100%", background: c.fg, borderRadius: 99 }} />
       </div>
       <span style={{ fontSize: 12, fontWeight: 800, color: c.fg, width: 26, textAlign: "right" }}>{v}</span>
@@ -320,12 +320,12 @@ export function KpiRow({ items }: {
     }}>
       {items.map((k) => (
         <div key={k.label} style={{
-          background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+          background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
           borderRadius: 16, padding: "16px 18px",
         }}>
-          <div style={{ fontSize: 21, fontWeight: 800, color: k.color || "#818cf8" }}>{k.value}</div>
-          <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.55)", marginTop: 5 }}>{k.label}</div>
-          {k.sub ? <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.28)", marginTop: 2 }}>{k.sub}</div> : null}
+          <div style={{ fontSize: 21, fontWeight: 800, color: k.color || "var(--tx-818cf8, #818cf8)" }}>{k.value}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(var(--ink),var(--ta-55, .55))", marginTop: 5 }}>{k.label}</div>
+          {k.sub ? <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-28, .28))", marginTop: 2 }}>{k.sub}</div> : null}
         </div>
       ))}
     </div>
@@ -343,7 +343,7 @@ export function KpiRow({ items }: {
 export function Prose({ text, size = 13 }: { text: string; size?: number }) {
   const blocks = text.trim().split(/\n{2,}/);
   return (
-    <div style={{ fontSize: size, lineHeight: 1.75, color: "rgba(255,255,255,.8)" }}>
+    <div style={{ fontSize: size, lineHeight: 1.75, color: "rgba(var(--ink),.8)" }}>
       {blocks.map((block, bi) => {
         const lines = block.split("\n");
         const isList = lines.every((l) => /^\s*[-*•]\s+/.test(l) || /^\s*\d+[.)]\s+/.test(l));
@@ -359,7 +359,7 @@ export function Prose({ text, size = 13 }: { text: string; size?: number }) {
         const heading = block.match(/^#{1,4}\s+(.*)$/);
         if (heading) {
           return (
-            <div key={bi} style={{ fontSize: size + 2, fontWeight: 800, color: "#f8fafc", margin: "16px 0 8px" }}>
+            <div key={bi} style={{ fontSize: size + 2, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", margin: "16px 0 8px" }}>
               {heading[1]}
             </div>
           );
@@ -374,7 +374,7 @@ function bold(line: string): ReactNode {
   const parts = line.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((p, i) =>
     p.startsWith("**") && p.endsWith("**")
-      ? <strong key={i} style={{ color: "#f8fafc", fontWeight: 700 }}>{p.slice(2, -2)}</strong>
+      ? <strong key={i} style={{ color: "var(--tx-f8fafc, #f8fafc)", fontWeight: 700 }}>{p.slice(2, -2)}</strong>
       : <span key={i}>{p}</span>
   );
 }
@@ -433,9 +433,9 @@ export function Section({
 export function ReviewNotice({ children }: { children?: ReactNode }) {
   return (
     <div style={{
-      fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.6,
+      fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", lineHeight: 1.6,
       padding: "10px 14px", borderRadius: 10,
-      background: "rgba(255,255,255,.025)", border: "1px dashed rgba(255,255,255,.1)",
+      background: "rgba(var(--ink),.025)", border: "1px dashed rgba(var(--ink),.1)",
       marginTop: 14,
     }}>
       {children || "Drafted by a model from your live data. Read it before it goes anywhere — nothing here sends itself."}

@@ -107,19 +107,19 @@ export default function MarketScannerPage() {
         <div style={{
           background: "rgba(129,140,248,.08)", border: "1px solid rgba(129,140,248,.25)",
           borderRadius: 12, padding: "12px 16px", marginBottom: 16, fontSize: 12.5,
-          color: "rgba(199,210,254,.9)",
+          color: "rgba(var(--txr-c7d2fe, 199,210,254),.9)",
         }}>
           {scanResult}
         </div>
       ) : null}
 
       <Section title="How to use this">
-        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.55)", lineHeight: 1.8 }}>
-          <strong style={{ color: "rgba(255,255,255,.8)" }}>Tier A</strong> mentions both the industry
+        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))", lineHeight: 1.8 }}>
+          <strong style={{ color: "rgba(var(--ink),.8)" }}>Tier A</strong> mentions both the industry
           (PVC/plastics/injection molding) and a software complaint — reply first.{" "}
-          <strong style={{ color: "rgba(255,255,255,.8)" }}>Tier B</strong> mentions industry and a
+          <strong style={{ color: "rgba(var(--ink),.8)" }}>Tier B</strong> mentions industry and a
           costing/BOM/scrap pain, no software complaint yet.{" "}
-          <strong style={{ color: "rgba(255,255,255,.8)" }}>Tier C</strong> is a software complaint with
+          <strong style={{ color: "rgba(var(--ink),.8)" }}>Tier C</strong> is a software complaint with
           industry not confirmed — check the post before replying. A daily cron runs this
           automatically; "Run scan now" is for testing or an out-of-cycle check.
         </div>
@@ -141,24 +141,24 @@ export default function MarketScannerPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                   <Pill tone={TIER_TONE[s.tier]}>Tier {s.tier}</Pill>
-                  <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>{TIER_LABEL[s.tier]}</span>
+                  <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{TIER_LABEL[s.tier]}</span>
                   {s.status !== "new" ? <Pill tone="grey">{s.status}</Pill> : null}
                 </div>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
                   r/{s.subreddit} · {fmtDate(s.createdAt)}
                 </span>
               </div>
 
-              <a href={s.url} target="_blank" rel="noreferrer" style={{ fontSize: 15, fontWeight: 800, color: "#f8fafc", textDecoration: "none" }}>
+              <a href={s.url} target="_blank" rel="noreferrer" style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", textDecoration: "none" }}>
                 {s.title}
               </a>
-              {s.author ? <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 3 }}>by u/{s.author}</div> : null}
+              {s.author ? <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 3 }}>by u/{s.author}</div> : null}
 
               {s.snippet ? (
                 <div style={{
-                  marginTop: 10, padding: "10px 13px", background: "rgba(255,255,255,.03)",
-                  border: "1px solid rgba(255,255,255,.07)", borderRadius: 10,
-                  fontSize: 12.5, color: "rgba(255,255,255,.6)", lineHeight: 1.7,
+                  marginTop: 10, padding: "10px 13px", background: "rgba(var(--ink),.03)",
+                  border: "1px solid rgba(var(--ink),.07)", borderRadius: 10,
+                  fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.7,
                   maxHeight: 120, overflow: "hidden",
                 }}>
                   {s.snippet}
@@ -181,7 +181,7 @@ export default function MarketScannerPage() {
         </div>
       )}
 
-      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
         Source: Reddit's public RSS feed, not the JSON API — the JSON endpoints now redirect
         unauthenticated server requests to a login wall. Never send an unsolicited DM off a Tier A/B/C
         row; reply on the post itself first, per docs/growth/manual-lead-round.md.

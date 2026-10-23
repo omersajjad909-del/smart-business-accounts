@@ -72,8 +72,8 @@ export default function AdminUnlockGate({
         style={{
           width: "100%",
           maxWidth: 400,
-          background: "rgba(255,255,255,.03)",
-          border: "1px solid rgba(255,255,255,.08)",
+          background: "rgba(var(--ink),.03)",
+          border: "1px solid rgba(var(--ink),.08)",
           borderRadius: 20,
           padding: 32,
           textAlign: "center",
@@ -82,10 +82,10 @@ export default function AdminUnlockGate({
         <div style={{ fontSize: 34, marginBottom: 12 }} aria-hidden>
           🔒
         </div>
-        <h2 style={{ margin: "0 0 6px", fontSize: 19, fontWeight: 800, color: "white" }}>
+        <h2 style={{ margin: "0 0 6px", fontSize: 19, fontWeight: 800, color: "var(--ink-solid, white)" }}>
           {pageLabel} is protected
         </h2>
-        <p style={{ margin: "0 0 22px", fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.6 }}>
+        <p style={{ margin: "0 0 22px", fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.6 }}>
           Enter the page password to continue. It locks again as soon as you leave.
         </p>
 
@@ -96,7 +96,7 @@ export default function AdminUnlockGate({
               borderRadius: 10,
               background: "rgba(248,113,113,.1)",
               border: "1px solid rgba(248,113,113,.2)",
-              color: "#f87171",
+              color: "var(--tx-f87171, #f87171)",
               fontSize: 13,
               marginBottom: 16,
             }}
@@ -116,9 +116,9 @@ export default function AdminUnlockGate({
             width: "100%",
             padding: "12px 16px",
             borderRadius: 12,
-            background: "rgba(255,255,255,.05)",
-            border: "1px solid rgba(255,255,255,.1)",
-            color: "white",
+            background: "rgba(var(--ink),.05)",
+            border: "1px solid rgba(var(--ink),.1)",
+            color: "var(--ink-solid, white)",
             outline: "none",
             fontFamily: "inherit",
             fontSize: 14,
@@ -155,7 +155,7 @@ export default function AdminUnlockGate({
             marginTop: 14,
             background: "none",
             border: "none",
-            color: "rgba(255,255,255,.35)",
+            color: "rgba(var(--ink),var(--ta-35, .35))",
             fontSize: 13,
             fontFamily: "inherit",
             cursor: "pointer",

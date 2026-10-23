@@ -105,11 +105,11 @@ export default function CompetitorWatchPage() {
           display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap",
         }}>
           <div style={{ flex: "1 1 180px", minWidth: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>NAME</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>NAME</div>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Xero" style={inputStyle} />
           </div>
           <div style={{ flex: "2 1 300px", minWidth: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>PRICING PAGE URL</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>PRICING PAGE URL</div>
             <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://www.xero.com/pk/pricing-plans/" style={inputStyle} />
           </div>
           <Button onClick={check} busy={busy} disabled={!data?.aiConfigured || !name.trim() || (!url.trim() && !pastedText.trim())}>
@@ -120,7 +120,7 @@ export default function CompetitorWatchPage() {
         <div style={{ marginTop: 12 }}>
           <button onClick={() => setShowPaste((v) => !v)} style={{
             background: "none", border: "none", cursor: "pointer", padding: 0,
-            color: "rgba(129,140,248,.8)", fontSize: 12,
+            color: "rgba(var(--txr-818cf8, 129,140,248),.8)", fontSize: 12,
           }}>
             {showPaste ? "Use the URL instead" : "The site blocks us — paste the page text instead"}
           </button>
@@ -139,15 +139,15 @@ export default function CompetitorWatchPage() {
         ) : null}
 
         <div style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 8 }}>
             WORTH WATCHING
           </div>
           <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
             {(data?.suggested || []).map((s) => (
               <button key={s.name} onClick={() => { setName(s.name); setUrl(s.url); }} style={{
                 fontSize: 11.5, padding: "6px 12px", borderRadius: 999, cursor: "pointer",
-                background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)",
-                color: "rgba(255,255,255,.55)",
+                background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.09)",
+                color: "rgba(var(--ink),var(--ta-55, .55))",
               }}>
                 {s.name}
               </button>
@@ -180,18 +180,18 @@ export default function CompetitorWatchPage() {
                 }}>
                   <div>
                     <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: "#f8fafc" }}>{snap.competitor}</span>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)" }}>{snap.competitor}</span>
                       <Pill tone={snap.method === "fetched" ? "blue" : "grey"}>{snap.method}</Pill>
                       {snap.changes.length ? <Pill tone="amber">{snap.changes.length} change{snap.changes.length === 1 ? "" : "s"}</Pill> : null}
                     </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 4 }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>
                       Captured {fmtDate(snap.capturedAt)}
-                      {snap.url ? <> · <a href={snap.url} target="_blank" rel="noreferrer" style={{ color: "rgba(129,140,248,.75)" }}>source</a></> : null}
+                      {snap.url ? <> · <a href={snap.url} target="_blank" rel="noreferrer" style={{ color: "rgba(var(--txr-818cf8, 129,140,248),.75)" }}>source</a></> : null}
                     </div>
                   </div>
                   <button onClick={() => remove(s.id)} style={{
                     background: "none", border: "none", cursor: "pointer",
-                    color: "rgba(255,255,255,.25)", fontSize: 11.5,
+                    color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 11.5,
                   }}>
                     Remove
                   </button>
@@ -202,10 +202,10 @@ export default function CompetitorWatchPage() {
                     background: "rgba(251,191,36,.07)", border: "1px solid rgba(251,191,36,.28)",
                     borderRadius: 12, padding: "13px 16px", marginBottom: 14,
                   }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "#fcd34d", marginBottom: 7 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--tx-fcd34d, #fcd34d)", marginBottom: 7 }}>
                       CHANGED SINCE LAST CHECK
                     </div>
-                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "rgba(252,211,77,.9)", lineHeight: 1.8 }}>
+                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "rgba(var(--txr-fcd34d, 252,211,77),.9)", lineHeight: 1.8 }}>
                       {snap.changes.map((c) => <li key={c}>{c}</li>)}
                     </ul>
                   </div>
@@ -218,19 +218,19 @@ export default function CompetitorWatchPage() {
                   }}>
                     {snap.plans.map((p) => (
                       <div key={p.name} style={{
-                        background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
+                        background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)",
                         borderRadius: 12, padding: "13px 15px",
                       }}>
-                        <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.55)" }}>{p.name}</div>
-                        <div style={{ fontSize: 19, fontWeight: 800, color: "#f8fafc", margin: "4px 0 2px" }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(var(--ink),var(--ta-55, .55))" }}>{p.name}</div>
+                        <div style={{ fontSize: 19, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", margin: "4px 0 2px" }}>
                           {p.currency && p.currency !== "not stated" ? `${p.currency} ` : ""}{p.price}
-                          <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", fontWeight: 600 }}>
+                          <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 600 }}>
                             {p.period && p.period !== "not stated" ? ` / ${p.period}` : ""}
                           </span>
                         </div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>{p.seats}</div>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 8 }}>{p.seats}</div>
                         {p.highlights?.length ? (
-                          <ul style={{ margin: 0, paddingLeft: 15, fontSize: 11.5, color: "rgba(255,255,255,.5)", lineHeight: 1.6 }}>
+                          <ul style={{ margin: 0, paddingLeft: 15, fontSize: 11.5, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.6 }}>
                             {p.highlights.map((h) => <li key={h}>{h}</li>)}
                           </ul>
                         ) : null}
@@ -238,25 +238,25 @@ export default function CompetitorWatchPage() {
                     ))}
                   </div>
                 ) : (
-                  <div style={{ fontSize: 12.5, color: "rgba(251,191,36,.7)", marginBottom: 14 }}>
+                  <div style={{ fontSize: 12.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.7)", marginBottom: 14 }}>
                     No plans were found on that page.
                   </div>
                 )}
 
-                <div style={{ display: "grid", gap: 10, fontSize: 12.5, color: "rgba(255,255,255,.6)", lineHeight: 1.7 }}>
+                <div style={{ display: "grid", gap: 10, fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.7 }}>
                   {snap.positioning ? (
                     <div>
-                      <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 800, fontSize: 10.5 }}>POSITIONING </span>
+                      <span style={{ color: "rgba(var(--ink),var(--ta-32, .32))", fontWeight: 800, fontSize: 10.5 }}>POSITIONING </span>
                       {snap.positioning}
                     </div>
                   ) : null}
                   <div>
-                    <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 800, fontSize: 10.5 }}>GETS YOU STARTED WITH </span>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-32, .32))", fontWeight: 800, fontSize: 10.5 }}>GETS YOU STARTED WITH </span>
                     {snap.freeTrial}
                   </div>
                   {snap.notableClaims?.length ? (
                     <div>
-                      <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 800, fontSize: 10.5 }}>CLAIMS </span>
+                      <span style={{ color: "rgba(var(--ink),var(--ta-32, .32))", fontWeight: 800, fontSize: 10.5 }}>CLAIMS </span>
                       {snap.notableClaims.join(" · ")}
                     </div>
                   ) : null}
@@ -267,7 +267,7 @@ export default function CompetitorWatchPage() {
         </div>
       )}
 
-      <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+      <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
         Prices are copied from the page character for character and never converted between
         currencies — a competitor showing PKR to a Pakistani visitor and USD to us is a difference
         worth seeing, not one to normalise away. Re-checking a competitor replaces its snapshot and

@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 import { ADMIN_NAV_GROUP_ORDER, ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
 import { canOpenPage, useAdminSession } from "@/app/admin/admin-session";
+import { useTheme } from "next-themes";
 import { ALLOW_LIGHT_THEME } from "@/lib/themeConfig";
 
 type AdminNotification = {
@@ -111,16 +112,29 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickOpen,  setQuickOpen]  = useState(false);
 
-  // ── Fix: always start "dark" (SSR-safe), sync from localStorage in effect ──
-  // The admin panel keeps its own theme key, so it needs the same policy check
-  // the rest of the app got — otherwise an admin who had switched to light
-  // stayed on the unfinished light palette while every other screen was dark.
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  // The theme is the app's one theme (next-themes, `.dark` on <html>), the same
+  // one the website and dashboard use. The admin used to keep a private
+  // "admin-theme-v2" key, so its page content — styled for `.dark` / not-dark —
+  // and its shell could disagree. The shell's own palette below still keys off
+  // data-admin-theme, which is now just derived from the shared theme.
+  const { resolvedTheme, setTheme: applyTheme } = useTheme();
+  const [themeReady, setThemeReady] = useState(false);
   useEffect(() => {
-    if (!ALLOW_LIGHT_THEME) return;
-    const stored = window.localStorage.getItem("admin-theme-v2");
-    if (stored === "light") setTheme("light");
+    setThemeReady(true);
+    // Carry an admin's earlier choice over once, then drop the private key.
+    try {
+      const legacy = window.localStorage.getItem("admin-theme-v2");
+      if (legacy && !window.localStorage.getItem("theme")) {
+        applyTheme(legacy === "light" ? "light" : "dark");
+      }
+      window.localStorage.removeItem("admin-theme-v2");
+    } catch {
+      // Storage can be blocked; the shared theme still works without it.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // SSR-safe: dark until mounted, so server and first client render agree.
+  const theme: "dark" | "light" = ALLOW_LIGHT_THEME && themeReady && resolvedTheme === "light" ? "light" : "dark";
 
   const [notifOpen,   setNotifOpen]   = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -159,7 +173,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.adminTheme = theme;
-    window.localStorage.setItem("admin-theme-v2", theme);
   }, [theme]);
 
   // Close dropdowns on outside click
@@ -426,7 +439,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   promise a palette the app does not have yet. */}
               {ALLOW_LIGHT_THEME && (
               <button type="button" className="fin-admin-iconButton" aria-label="Toggle theme"
-                onClick={() => setTheme((c) => (c === "dark" ? "light" : "dark"))}>
+                onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}>
                 {theme === "dark" ? (
                   <Svg><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></Svg>
                 ) : (
@@ -971,4 +984,34 @@ const shellStyles = `
     box-shadow:0 4px 16px rgba(109,40,217,.3);
   }
 }
+
+/* ── Light theme overrides ───────────────────────────────────────────────
+   The shell was written for a dark page: white tints for surfaces and pale
+   lilac / mint for text. On a light panel those vanish, so each is restated
+   here. Dark mode never reads this block. */
+:root[data-admin-theme="light"] .fin-admin-brandTitle,
+:root[data-admin-theme="light"] .fin-admin-mobileBrandTitle{color:var(--text);}
+:root[data-admin-theme="light"] .fin-admin-closeBtn,
+:root[data-admin-theme="light"] .fin-admin-menuBtn,
+:root[data-admin-theme="light"] .fin-admin-userCard,
+:root[data-admin-theme="light"] .fin-admin-iconButton,
+:root[data-admin-theme="light"] .fin-admin-profile,
+:root[data-admin-theme="light"] .fin-admin-dropdownItem,
+:root[data-admin-theme="light"] .fin-admin-linkRow,
+:root[data-admin-theme="light"] .fin-admin-fabAction{background:rgba(15,23,42,.035);}
+:root[data-admin-theme="light"] .fin-admin-navLink:hover,
+:root[data-admin-theme="light"] .fin-admin-iconButton:hover,
+:root[data-admin-theme="light"] .fin-admin-linkRow:hover{background:rgba(15,23,42,.06);}
+:root[data-admin-theme="light"] .fin-admin-navLink.is-active{
+  background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(124,58,237,.07));
+  color:#4c1d95;border-color:rgba(124,58,237,.38);
+}
+:root[data-admin-theme="light"] .fin-admin-navIcon,
+:root[data-admin-theme="light"] .fin-search-result-icon{background:rgba(124,58,237,.09);color:#6d28d9;}
+:root[data-admin-theme="light"] .fin-admin-navLink.is-active .fin-admin-navIcon{background:rgba(124,58,237,.16);color:#4c1d95;}
+:root[data-admin-theme="light"] .fin-admin-navBadge{background:rgba(22,163,74,.12);color:#15803d;}
+:root[data-admin-theme="light"] .fin-admin-dropdownHead button{color:#6d28d9;}
+:root[data-admin-theme="light"] .fin-admin-linkRow--danger{color:#be123c;background:rgba(244,63,94,.08);}
+:root[data-admin-theme="light"] .fin-admin-mobileLink.is-active{color:#6d28d9;}
+
 `;

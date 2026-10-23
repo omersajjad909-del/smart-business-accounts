@@ -273,10 +273,10 @@ export default function BackupRestorePage() {
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading...</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: "center", padding: 32, color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 13 }}>Loading...</td></tr>
               )}
               {!loading && visibleRows.length === 0 && (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.3)", fontSize: 13 }}>No backup records available.</td></tr>
+                <tr><td colSpan={8} style={{ textAlign: "center", padding: 32, color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>No backup records available.</td></tr>
               )}
               {visibleRows.map((backup) => (
                 <tr key={backup.id}>
@@ -350,13 +350,13 @@ const pageStyles = `
 }
 .bk-stat-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
 .bk-stat-value{margin-top:8px;font-size:30px;font-weight:800;color:var(--text);}
-.bk-stat-value--green{color:#4ade80;}
+.bk-stat-value--green{color:var(--tx-4ade80, #4ade80);}
 .bk-stat-sub{margin-top:4px;font-size:12px;color:var(--text-muted);}
 .bk-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:16px;}
 .bk-storage-card{margin-bottom:16px;}
 .bk-storage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
 .bk-section-title{font-size:15px;font-weight:700;color:var(--text);}
-.bk-storage-pct{font-size:13px;font-weight:700;color:#a78bfa;}
+.bk-storage-pct{font-size:13px;font-weight:700;color:var(--tx-a78bfa, #a78bfa);}
 .bk-storage-track{height:10px;border-radius:999px;background:var(--border);overflow:hidden;margin-bottom:10px;}
 .bk-storage-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6d28d9,#8b5cf6);}
 .bk-storage-legend{display:flex;gap:16px;font-size:12px;color:var(--text-muted);}
@@ -371,7 +371,7 @@ const pageStyles = `
   background:var(--bg-soft);color:var(--text-soft);font-size:12px;font-weight:700;
   cursor:pointer;transition:opacity .12s,border-color .12s,color .12s;
 }
-.bk-toggle-btn:hover:not(:disabled){border-color:#8b5cf6;color:#a78bfa;}
+.bk-toggle-btn:hover:not(:disabled){border-color:#8b5cf6;color:var(--tx-a78bfa, #a78bfa);}
 .bk-toggle-btn:disabled{opacity:.5;cursor:not-allowed;}
 .bk-table-wrap{overflow-x:auto;}
 .bk-table{width:100%;border-collapse:collapse;min-width:940px;}
@@ -396,22 +396,22 @@ const pageStyles = `
   color:var(--text-soft);cursor:pointer;white-space:nowrap;
   transition:border-color .12s,color .12s;
 }
-.bk-cid:hover{border-color:#8b5cf6;color:#a78bfa;}
+.bk-cid:hover{border-color:#8b5cf6;color:var(--tx-a78bfa, #a78bfa);}
 .bk-size{color:var(--text-muted);}
 .bk-date{color:var(--text-muted);}
 .bk-type-badge{
   display:inline-flex;padding:3px 9px;border-radius:999px;
   font-size:11px;font-weight:700;
 }
-.bk-type-badge--full{background:rgba(99,102,241,.16);color:#818cf8;}
-.bk-type-badge--incremental{background:rgba(20,184,166,.14);color:#2dd4bf;}
-.bk-type-badge--safety{background:rgba(251,191,36,.14);color:#fbbf24;}
+.bk-type-badge--full{background:rgba(99,102,241,.16);color:var(--tx-818cf8, #818cf8);}
+.bk-type-badge--incremental{background:rgba(20,184,166,.14);color:var(--tx-2dd4bf, #2dd4bf);}
+.bk-type-badge--safety{background:rgba(251,191,36,.14);color:var(--tx-fbbf24, #fbbf24);}
 .bk-status-badge{
   display:inline-flex;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;
 }
-.bk-status-badge--complete{background:rgba(34,197,94,.14);color:#4ade80;}
-.bk-status-badge--running{background:rgba(251,191,36,.14);color:#fbbf24;}
-.bk-status-badge--failed{background:rgba(248,113,113,.14);color:#f87171;}
+.bk-status-badge--complete{background:rgba(34,197,94,.14);color:var(--tx-4ade80, #4ade80);}
+.bk-status-badge--running{background:rgba(251,191,36,.14);color:var(--tx-fbbf24, #fbbf24);}
+.bk-status-badge--failed{background:rgba(248,113,113,.14);color:var(--tx-f87171, #f87171);}
 .bk-restore-btn{
   padding:6px 12px;border-radius:10px;border:1px solid var(--border);
   background:transparent;color:var(--text-soft);font-size:12px;font-weight:700;

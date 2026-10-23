@@ -56,17 +56,23 @@ function sessionMinutes(startedAt: Date | null, endedAt: Date | null): number | 
 async function loadLeads(days: number): Promise<DemoLead[]> {
   const since = new Date(Date.now() - days * DAY);
 
-  const [bookings, sandboxes, pending, signedUpUsers] = await Promise.all([
+  const [bookings, sessionRows, pending, signedUpUsers] = await Promise.all([
     db.demoBooking.findMany({
       where: { createdAt: { gte: since } },
       orderBy: { createdAt: "desc" },
       take: 200,
     }).catch(() => []),
-    db.company.findMany({
-      where: { isDemo: true, createdAt: { gte: since } },
-      select: { id: true, name: true, businessType: true, createdAt: true, demoExpiresAt: true },
-      orderBy: { createdAt: "desc" },
-      take: 200,
+    // A sandbox counts as a visit only when somebody actually signed into it.
+    // The cleanup cron keeps a shelf of pre-seeded, unclaimed sandboxes per
+    // business type; they are isDemo companies too, and listing every isDemo
+    // company filled this page with companies nobody had ever opened. The
+    // session is created at the moment a visitor claims one, so the first
+    // session is also "when they arrived".
+    db.session.findMany({
+      where: { createdAt: { gte: since }, company: { isDemo: true } },
+      select: { companyId: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
+      take: 3000,
     }).catch(() => []),
     db.pendingSignup.findMany({
       where: { createdAt: { gte: since } },
@@ -82,20 +88,46 @@ async function loadLeads(days: number): Promise<DemoLead[]> {
     }).catch(() => []),
   ]);
 
+  const visitStart = new Map<string, Date>();
+  for (const row of sessionRows) {
+    if (!visitStart.has(row.companyId)) visitStart.set(row.companyId, new Date(row.createdAt));
+  }
+
+  // A booked demo runs in its own sandbox. That visit is already a "booking"
+  // lead below, so listing the sandbox too would count the same person twice.
+  const bookedSandboxIds = new Set<string>(bookings.map((b: any) => b.demoCompanyId).filter(Boolean));
+  const visitedIds = [...visitStart.keys()].filter((id) => !bookedSandboxIds.has(id));
+
+  const sandboxes: Array<{ id: string; name: string; businessType: string | null; createdAt: Date; visitedAt: Date }> =
+    visitedIds.length
+      ? (await db.company.findMany({
+          where: { id: { in: visitedIds }, isDemo: true },
+          select: { id: true, name: true, businessType: true, createdAt: true },
+        }).catch(() => []))
+          .map((c: any) => ({ ...c, visitedAt: visitStart.get(c.id) as Date }))
+          .sort((x: any, y: any) => y.visitedAt.getTime() - x.visitedAt.getTime())
+          .slice(0, 200)
+      : [];
+
   const converted = new Set<string>(
     signedUpUsers.map((u: any) => String(u.email || "").toLowerCase()).filter(Boolean),
   );
 
-  // What each demo sandbox actually contains. One grouped query rather than one
-  // per sandbox — the page loads a hundred of them on a busy month.
-  const sandboxIds: string[] = sandboxes.map((s: any) => s.id);
-  const scope = { companyId: { in: sandboxIds } };
+  // What each visitor actually wrote. Every sandbox is seeded with the same
+  // golden dataset (about ten invoices and forty vouchers), so counting rows
+  // outright scored every sandbox as "used properly". Only rows created after
+  // the visitor arrived are theirs. One grouped query per table, not one per
+  // sandbox — the page loads a hundred of them on a busy month.
+  const sandboxIds: string[] = sandboxes.map((s) => s.id);
+  const wroteScope = {
+    OR: sandboxes.map((s) => ({ companyId: s.id, createdAt: { gt: s.visitedAt } })),
+  };
   const [inv, vou, acc, items] = sandboxIds.length
     ? await Promise.all([
-        db.salesInvoice.groupBy({ by: ["companyId"], where: scope, _count: { _all: true } }).catch(() => []),
-        db.voucher.groupBy({ by: ["companyId"], where: scope, _count: { _all: true } }).catch(() => []),
-        db.account.groupBy({ by: ["companyId"], where: scope, _count: { _all: true } }).catch(() => []),
-        db.itemNew.groupBy({ by: ["companyId"], where: scope, _count: { _all: true } }).catch(() => []),
+        db.salesInvoice.groupBy({ by: ["companyId"], where: wroteScope, _count: { _all: true } }).catch(() => []),
+        db.voucher.groupBy({ by: ["companyId"], where: wroteScope, _count: { _all: true } }).catch(() => []),
+        db.account.groupBy({ by: ["companyId"], where: wroteScope, _count: { _all: true } }).catch(() => []),
+        db.itemNew.groupBy({ by: ["companyId"], where: wroteScope, _count: { _all: true } }).catch(() => []),
       ])
     : [[], [], [], []];
 
@@ -151,9 +183,8 @@ async function loadLeads(days: number): Promise<DemoLead[]> {
     if (accounts) activity.push(`Created ${accounts} ledger account${accounts === 1 ? "" : "s"}`);
     if (stock) activity.push(`Added ${stock} stock item${stock === 1 ? "" : "s"}`);
 
-    // The sandbox arrives seeded with a golden dataset, so a visitor who only
-    // looked around has counts too. Depth is driven by whether they wrote
-    // anything themselves, which is what the invoice and voucher counts tell us.
+    // The counts above already exclude the seeded dataset, so any invoice or
+    // voucher here was written by the visitor.
     const wrote = invoices + vouchers;
     leads.push({
       id: s.id,
@@ -162,7 +193,7 @@ async function loadLeads(days: number): Promise<DemoLead[]> {
       email: null,
       company: s.name,
       businessType: s.businessType || null,
-      createdAt: new Date(s.createdAt).toISOString(),
+      createdAt: s.visitedAt.toISOString(),
       stage: wrote > 0
         ? `Used the sandbox properly — ${wrote} document${wrote === 1 ? "" : "s"} created`
         : "Opened a sandbox, only looked around",

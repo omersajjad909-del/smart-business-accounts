@@ -185,7 +185,7 @@ export default function AdminDashboardPage() {
         <article className="dash-card system-card">
           <h2>System Health</h2>
           <div className="gauge-wrap">
-            <div className="gauge" style={{ background: `conic-gradient(#4ad37a 0 ${(data?.systemHealth.percent || 0) * 3.6}deg, rgba(255,255,255,.08) ${(data?.systemHealth.percent || 0) * 3.6}deg 360deg)` }}>
+            <div className="gauge" style={{ background: `conic-gradient(#4ad37a 0 ${(data?.systemHealth.percent || 0) * 3.6}deg, rgba(var(--ink),.08) ${(data?.systemHealth.percent || 0) * 3.6}deg 360deg)` }}>
               <div className="gauge-inner">
                 <strong>{loading ? "—" : `${data?.systemHealth.percent || 0}%`}</strong>
                 <span>Healthy</span>
@@ -323,13 +323,13 @@ export default function AdminDashboardPage() {
               <span className="platform-label">Activity Logs</span>
             </div>
             <div className="platform-stat">
-              <span className="platform-val" style={{ color: loading ? undefined : (data?.platformSummary?.apiErrors24h ?? 0) > 0 ? "#fca5a5" : "#4ad37a" }}>
+              <span className="platform-val" style={{ color: loading ? undefined : (data?.platformSummary?.apiErrors24h ?? 0) > 0 ? "var(--tx-fca5a5, #fca5a5)" : "var(--tx-4ad37a, #4ad37a)" }}>
                 {loading ? "—" : (data?.platformSummary?.apiErrors24h ?? 0)}
               </span>
               <span className="platform-label">API Errors (24h)</span>
             </div>
             <div className="platform-stat">
-              <span className="platform-val" style={{ color: loading ? undefined : (data?.platformSummary?.failedLogins24h ?? 0) >= 10 ? "#fb923c" : "#4ad37a" }}>
+              <span className="platform-val" style={{ color: loading ? undefined : (data?.platformSummary?.failedLogins24h ?? 0) >= 10 ? "var(--tx-fb923c, #fb923c)" : "var(--tx-4ad37a, #4ad37a)" }}>
                 {loading ? "—" : (data?.platformSummary?.failedLogins24h ?? 0)}
               </span>
               <span className="platform-label">Login Failures (24h)</span>
@@ -429,9 +429,9 @@ function OverviewChart({ rows }: { rows: DashboardPayload["overview"] }) {
   const W = 760; const H = 280; const pad = 28;
   const max = Math.max(1, ...rows.flatMap((r) => [r.newCompanies, r.newUsers, r.activeSubscriptions]));
   const series = [
-    { key: "newCompanies" as const,       color: "#9b5cff" },
-    { key: "newUsers" as const,           color: "#4d8dff" },
-    { key: "activeSubscriptions" as const, color: "#4ad37a" },
+    { key: "newCompanies" as const,       color: "var(--tx-9b5cff, #9b5cff)" },
+    { key: "newUsers" as const,           color: "var(--tx-4d8dff, #4d8dff)" },
+    { key: "activeSubscriptions" as const, color: "var(--tx-4ad37a, #4ad37a)" },
   ];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="overview-chart" aria-hidden="true">
@@ -504,8 +504,8 @@ const dashboardStyles = `
 }
 .dash-card{
   border-radius:22px;
-  border:1px solid var(--border, rgba(255,255,255,.08));
-  background:var(--panel, linear-gradient(180deg,rgba(19,27,46,.98),rgba(15,22,39,.96)));
+  border:1px solid var(--border, rgba(var(--ink),.08));
+  background:var(--panel, linear-gradient(180deg,rgba(var(--dkr-131b2e, 19,27,46),.98),rgba(var(--dkr-0f1627, 15,22,39),.96)));
   box-shadow:var(--card-shadow, 0 24px 70px rgba(3,6,18,.28));
 }
 .dash-header{
@@ -530,7 +530,7 @@ const dashboardStyles = `
 }
 .error-card{padding:18px;color:var(--text);}
 .error-card h2{margin:0 0 8px;font-size:16px;}
-.error-card p{margin:0;color:#fca5a5;}
+.error-card p{margin:0;color:var(--tx-fca5a5, #fca5a5);}
 
 /* ── Stats ─────────────────────────────────────────────────────── */
 .stats-grid{
@@ -545,10 +545,10 @@ const dashboardStyles = `
   width:40px;height:40px;border-radius:13px;
   display:grid;place-items:center;flex-shrink:0;
 }
-.tone-purple .stat-icon{background:rgba(139,92,246,.22);color:#c4b5fd;}
-.tone-blue   .stat-icon{background:rgba(79,124,255,.22);color:#93c5fd;}
-.tone-green  .stat-icon{background:rgba(34,197,94,.22);color:#86efac;}
-.tone-orange .stat-icon{background:rgba(251,146,60,.22);color:#fdba74;}
+.tone-purple .stat-icon{background:rgba(139,92,246,.22);color:var(--tx-c4b5fd, #c4b5fd);}
+.tone-blue   .stat-icon{background:rgba(79,124,255,.22);color:var(--tx-93c5fd, #93c5fd);}
+.tone-green  .stat-icon{background:rgba(34,197,94,.22);color:var(--tx-86efac, #86efac);}
+.tone-orange .stat-icon{background:rgba(251,146,60,.22);color:var(--tx-fdba74, #fdba74);}
 .stat-info{flex:1;min-width:0;}
 .stat-title{font-size:13px;color:var(--text-soft);}
 .stat-value{margin-top:5px;font-size:32px;line-height:1;font-weight:800;letter-spacing:-.05em;color:var(--text);}
@@ -558,7 +558,7 @@ const dashboardStyles = `
 }
 .stat-growth{
   display:inline-flex;align-items:center;gap:4px;
-  font-size:11px;font-weight:700;color:#4ad37a;
+  font-size:11px;font-weight:700;color:var(--tx-4ad37a, #4ad37a);
 }
 .growth-arrow{font-size:10px;}
 
@@ -571,12 +571,12 @@ const dashboardStyles = `
   display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;
 }
 .card-head h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.03em;color:var(--text);}
-.view-all{color:#bca9ff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
+.view-all{color:var(--tx-bca9ff, #bca9ff);text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
 .legend-row{margin-top:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
 .legend-item{display:inline-flex;align-items:center;gap:7px;color:var(--text-soft);font-size:12px;}
 .legend-item i{width:8px;height:8px;border-radius:999px;display:inline-block;flex-shrink:0;}
 .chip{
-  padding:8px 12px;border-radius:12px;background:var(--panel-2,rgba(255,255,255,.04));
+  padding:8px 12px;border-radius:12px;background:var(--panel-2,rgba(var(--ink),.04));
   border:1px solid var(--border);color:var(--text-soft);font-size:12px;
   cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;
 }
@@ -590,7 +590,7 @@ const dashboardStyles = `
 }
 .gauge::after{
   content:"";width:118px;height:118px;border-radius:50%;
-  background:var(--panel,#0f1729);position:absolute;
+  background:var(--panel,var(--dk-0f1729, #0f1729));position:absolute;
 }
 .gauge-inner{position:relative;z-index:1;display:grid;gap:2px;text-align:center;}
 .gauge-inner strong{font-size:30px;line-height:1;color:var(--text);}
@@ -600,8 +600,8 @@ const dashboardStyles = `
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   color:var(--text-soft);font-size:13px;
 }
-.ok-mark{color:#4ad37a;font-size:14px;}
-.warn-mark{color:#f59e0b;font-size:14px;}
+.ok-mark{color:var(--tx-4ad37a, #4ad37a);font-size:14px;}
+.warn-mark{color:var(--tx-f59e0b, #f59e0b);font-size:14px;}
 .system-meta{
   margin-top:12px;display:grid;gap:6px;
   color:var(--text-muted);font-size:12px;
@@ -611,7 +611,7 @@ const dashboardStyles = `
   display:block;margin-top:14px;padding:10px 14px;border-radius:14px;
   background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(90,61,248,.18));
   border:1px solid rgba(143,110,255,.3);
-  color:#c4b5fd;text-decoration:none;font-size:13px;font-weight:700;
+  color:var(--tx-c4b5fd, #c4b5fd);text-decoration:none;font-size:13px;font-weight:700;
   text-align:center;transition:background .15s ease;
 }
 .system-health-btn:hover{background:linear-gradient(135deg,rgba(124,58,237,.38),rgba(90,61,248,.28));}
@@ -635,7 +635,7 @@ tbody tr:last-child td{border-bottom:none;}
 .empty-cell{color:var(--text-muted);text-align:center;padding:24px 0;border-bottom:none!important;}
 .status-pill{
   display:inline-flex;padding:4px 10px;border-radius:999px;
-  background:rgba(34,197,94,.16);color:#86efac;font-size:11px;font-weight:700;
+  background:rgba(34,197,94,.16);color:var(--tx-86efac, #86efac);font-size:11px;font-weight:700;
 }
 .status-pill--muted{background:rgba(148,163,184,.12);color:var(--text-soft);}
 .row-menu{
@@ -700,7 +700,7 @@ tbody tr:last-child td{border-bottom:none;}
 .platform-stat{
   display:flex;flex-direction:column;gap:3px;
   padding:10px 12px;border-radius:12px;
-  background:var(--bg-soft,rgba(255,255,255,.04));
+  background:var(--bg-soft,rgba(var(--ink),.04));
   border:1px solid var(--border);
 }
 .platform-val{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;}
@@ -710,7 +710,7 @@ tbody tr:last-child td{border-bottom:none;}
   text-align:center;padding:10px 14px;border-radius:14px;
   background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(90,61,248,.18));
   border:1px solid rgba(143,110,255,.3);
-  color:#c4b5fd;text-decoration:none;font-size:13px;font-weight:700;
+  color:var(--tx-c4b5fd, #c4b5fd);text-decoration:none;font-size:13px;font-weight:700;
   transition:background .14s ease;
 }
 .platform-btn:hover{background:linear-gradient(135deg,rgba(124,58,237,.38),rgba(90,61,248,.28));}

@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
+import "./admin-light-text.css";
 import AdminShell from "@/app/admin/components/AdminShell";
 import AdminUnlockGate from "@/app/admin/components/AdminUnlockGate";
 import { ADMIN_NAV_ITEMS } from "@/app/admin/admin-nav";
@@ -118,11 +119,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div
         style={{
           minHeight: "100vh",
-          background: "#080c1e",
+          background: "var(--dk-080c1e, #080c1e)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "rgba(255,255,255,.5)",
+          color: "rgba(var(--ink),var(--ta-50, .5))",
           fontFamily: "'Outfit',sans-serif",
           fontSize: 14,
         }}

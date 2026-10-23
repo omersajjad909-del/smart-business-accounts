@@ -28,8 +28,8 @@ type Snapshot = {
 type Data = { latest: Snapshot | null; snapshots: Snapshot[]; connected: boolean };
 
 const F = "'Outfit','Inter',sans-serif";
-const CARD = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
+const CARD = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
 
 function fmtDate(d: string): string {
   return new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
@@ -41,21 +41,21 @@ function fmtDateTime(d: string): string {
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "14px 18px", flex: 1, minWidth: 140 }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.4)", textTransform: "uppercase", marginBottom: 6 }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", marginBottom: 6 }}>
         {label}
       </div>
-      <div style={{ fontSize: 22, fontWeight: 800, color: "white" }}>{value}</div>
-      {sub ? <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{sub}</div> : null}
+      <div style={{ fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)" }}>{value}</div>
+      {sub ? <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>{sub}</div> : null}
     </div>
   );
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`, borderRadius: 8,
-  padding: "9px 11px", color: "white", fontFamily: F, fontSize: 13,
+  width: "100%", background: "rgba(var(--ink),.03)", border: `1px solid ${BORDER}`, borderRadius: 8,
+  padding: "9px 11px", color: "var(--ink-solid, white)", fontFamily: F, fontSize: 13,
 };
 const labelStyle: React.CSSProperties = {
-  fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.45)", marginBottom: 5, display: "block",
+  fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 5, display: "block",
 };
 
 export default function AdminGoogleAdsPage() {
@@ -158,11 +158,11 @@ export default function AdminGoogleAdsPage() {
   const latest = data?.latest ?? null;
 
   return (
-    <div style={{ fontFamily: F, color: "white", padding: "28px 24px", maxWidth: 1180 }}>
+    <div style={{ fontFamily: F, color: "var(--ink-solid, white)", padding: "28px 24px", maxWidth: 1180 }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Google Ads</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.45)", margin: "6px 0 0", maxWidth: 560 }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "6px 0 0", maxWidth: 560 }}>
             {data?.connected
               ? "Connected — click \"Sync now\" to pull the latest 30-day numbers straight from the Google Ads API."
               : "No live API connection yet — connect your Google Ads account, or keep logging numbers by hand from ads.google.com."}
@@ -198,7 +198,7 @@ export default function AdminGoogleAdsPage() {
             style={{
               padding: "9px 16px", borderRadius: 9, cursor: "pointer", fontFamily: F,
               fontSize: 13, fontWeight: 700, background: "rgba(99,102,241,.18)",
-              border: "1px solid rgba(99,102,241,.45)", color: "#a5b4fc", whiteSpace: "nowrap",
+              border: "1px solid rgba(99,102,241,.45)", color: "var(--tx-a5b4fc, #a5b4fc)", whiteSpace: "nowrap",
             }}
           >
             {showForm ? "Cancel" : "+ Log a snapshot"}
@@ -262,9 +262,9 @@ export default function AdminGoogleAdsPage() {
       )}
 
       {loading && !data ? (
-        <div style={{ color: "rgba(255,255,255,.4)", fontSize: 14, padding: "40px 0" }}>Loading…</div>
+        <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 14, padding: "40px 0" }}>Loading…</div>
       ) : !data || !latest ? (
-        <div style={{ padding: "40px 22px", textAlign: "center", border: `1px dashed ${BORDER}`, borderRadius: 14, color: "rgba(255,255,255,.4)", fontSize: 13 }}>
+        <div style={{ padding: "40px 22px", textAlign: "center", border: `1px dashed ${BORDER}`, borderRadius: 14, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13 }}>
           No snapshots recorded yet. Click "+ Log a snapshot" and copy the numbers from ads.google.com.
         </div>
       ) : (
@@ -276,7 +276,7 @@ export default function AdminGoogleAdsPage() {
             <Stat label="Cost" value={`PKR ${latest.costPkr.toLocaleString()}`} />
             <Stat label="Conversions" value={String(latest.conversions)} />
           </div>
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginBottom: 22 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 22 }}>
             {latest.campaignName} · {fmtDate(latest.dateRangeFrom)} – {fmtDate(latest.dateRangeTo)} · recorded {fmtDateTime(latest.recordedAt)}
             {latest.note ? ` · ${latest.note}` : ""}
           </div>
@@ -290,7 +290,7 @@ export default function AdminGoogleAdsPage() {
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
                     {["Campaign", "Range", "Impressions", "Clicks", "CTR", "Cost", "Conversions", "Recorded"].map((h) => (
-                      <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(255,255,255,.35)" }}>
+                      <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                         {h}
                       </th>
                     ))}
@@ -298,19 +298,19 @@ export default function AdminGoogleAdsPage() {
                 </thead>
                 <tbody>
                   {data.snapshots.map((s, i) => (
-                    <tr key={s.id} style={{ borderBottom: i < data.snapshots.length - 1 ? "1px solid rgba(255,255,255,.04)" : "none" }}>
+                    <tr key={s.id} style={{ borderBottom: i < data.snapshots.length - 1 ? "1px solid rgba(var(--ink),.04)" : "none" }}>
                       <td style={{ padding: "12px 16px", fontSize: 12.5, fontWeight: 600 }}>{s.campaignName}</td>
-                      <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+                      <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>
                         {fmtDate(s.dateRangeFrom)} – {fmtDate(s.dateRangeTo)}
                       </td>
                       <td style={{ padding: "12px 16px", fontSize: 12.5 }}>{s.impressions.toLocaleString()}</td>
                       <td style={{ padding: "12px 16px", fontSize: 12.5 }}>{s.clicks.toLocaleString()}</td>
                       <td style={{ padding: "12px 16px", fontSize: 12.5 }}>{s.ctr}%</td>
                       <td style={{ padding: "12px 16px", fontSize: 12.5 }}>PKR {s.costPkr.toLocaleString()}</td>
-                      <td style={{ padding: "12px 16px", fontSize: 12.5, fontWeight: 700, color: s.conversions > 0 ? "#34d399" : "rgba(255,255,255,.5)" }}>
+                      <td style={{ padding: "12px 16px", fontSize: 12.5, fontWeight: 700, color: s.conversions > 0 ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-50, .5))" }}>
                         {s.conversions}
                       </td>
-                      <td style={{ padding: "12px 16px", fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>{fmtDateTime(s.recordedAt)}</td>
+                      <td style={{ padding: "12px 16px", fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{fmtDateTime(s.recordedAt)}</td>
                     </tr>
                   ))}
                 </tbody>

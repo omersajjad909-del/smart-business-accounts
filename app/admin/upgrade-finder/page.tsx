@@ -95,9 +95,9 @@ export default function UpgradeFinderPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "Ready to pitch", value: data.summary.candidates, color: "#34d399", sub: "Engaged and over-using" },
-            { label: "At a hard limit", value: data.summary.hardBlocked, color: "#fbbf24", sub: "Plan blocks them today" },
-            { label: "Too quiet to ask", value: data.summary.parked, color: "rgba(255,255,255,.45)", sub: "Qualify, but not now" },
+            { label: "Ready to pitch", value: data.summary.candidates, color: "var(--tx-34d399, #34d399)", sub: "Engaged and over-using" },
+            { label: "At a hard limit", value: data.summary.hardBlocked, color: "var(--tx-fbbf24, #fbbf24)", sub: "Plan blocks them today" },
+            { label: "Too quiet to ask", value: data.summary.parked, color: "rgba(var(--ink),var(--ta-45, .45))", sub: "Qualify, but not now" },
           ]} />
 
           {data.candidates.length === 0 ? (
@@ -120,20 +120,20 @@ export default function UpgradeFinderPage() {
                     }}>
                       <div>
                         <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: "#f8fafc" }}>{c.name}</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)" }}>{c.name}</span>
                           <Pill tone="grey">{c.currentPlan}</Pill>
-                          <span style={{ color: "rgba(255,255,255,.25)", fontSize: 13 }}>→</span>
+                          <span style={{ color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13 }}>→</span>
                           <Pill tone="violet">{c.suggestedPlan}</Pill>
                           {c.hardBlock ? <Pill tone="amber">At plan limit</Pill> : null}
                         </div>
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginTop: 5 }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 5 }}>
                           {c.country || "—"} · {c.ageDays}d on platform · last seen{" "}
                           {c.daysSinceLogin === null ? "never" : `${c.daysSinceLogin}d ago`} ·
                           currently ${c.pricePerMonth}/mo
                         </div>
                       </div>
                       <div style={{ minWidth: 150 }}>
-                        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.35)", fontWeight: 700, marginBottom: 5 }}>
+                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, marginBottom: 5 }}>
                           UPGRADE FIT
                         </div>
                         <ScoreBar value={c.fit} tone={c.fit >= 60 ? "green" : "blue"} />
@@ -153,16 +153,16 @@ export default function UpgradeFinderPage() {
                         { k: "Items", v: c.itemCount },
                       ].map((x) => (
                         <div key={x.k} style={{
-                          background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)",
+                          background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)",
                           borderRadius: 10, padding: "8px 11px",
                         }}>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: "#e2e8f0" }}>{x.v}</div>
-                          <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 600 }}>{x.k}</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-e2e8f0, #e2e8f0)" }}>{x.v}</div>
+                          <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 600 }}>{x.k}</div>
                         </div>
                       ))}
                     </div>
 
-                    <ul style={{ margin: "0 0 14px", paddingLeft: 18, fontSize: 12.5, color: "rgba(255,255,255,.7)", lineHeight: 1.8 }}>
+                    <ul style={{ margin: "0 0 14px", paddingLeft: 18, fontSize: 12.5, color: "rgba(var(--ink),var(--ta-70, .7))", lineHeight: 1.8 }}>
                       {c.reasons.map((r) => <li key={r}>{r}</li>)}
                     </ul>
 
@@ -172,7 +172,7 @@ export default function UpgradeFinderPage() {
                         borderRadius: 14, padding: "16px 18px",
                       }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 10 }}>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: "#c4b5fd" }}>PITCH</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-c4b5fd, #c4b5fd)" }}>PITCH</span>
                           <div style={{ display: "flex", gap: 6 }}>
                             <CopyButton text={p.pitch} />
                             <Button tone="ghost" onClick={() => pitch(c.companyId)} busy={busy === c.companyId}>Redraft</Button>
@@ -186,7 +186,7 @@ export default function UpgradeFinderPage() {
                         Build the pitch
                       </Button>
                     ) : (
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                         Set GROQ_API_KEY or OPENAI_API_KEY to draft pitches here.
                       </div>
                     )}
@@ -198,7 +198,7 @@ export default function UpgradeFinderPage() {
 
           {data.parked.length > 0 ? (
             <Section title="Qualify on usage, too quiet to approach" style={{ marginTop: 18 }}>
-              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", lineHeight: 1.8, marginBottom: 12 }}>
+              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.8, marginBottom: 12 }}>
                 These customers hit the usage bar but have gone quiet. An upgrade ask to someone
                 who is drifting is how a renewal becomes a cancellation — deal with the silence
                 first, in Churn Radar, and they will reappear above on their own.
@@ -207,8 +207,8 @@ export default function UpgradeFinderPage() {
                 {data.parked.map((p) => (
                   <span key={p.companyId} style={{
                     fontSize: 12, padding: "6px 12px", borderRadius: 999,
-                    background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)",
-                    color: "rgba(255,255,255,.5)",
+                    background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.09)",
+                    color: "rgba(var(--ink),var(--ta-50, .5))",
                   }}>
                     {p.name} · {p.daysSinceLogin === null ? "never logged in" : `${p.daysSinceLogin}d quiet`}
                   </span>
@@ -217,7 +217,7 @@ export default function UpgradeFinderPage() {
             </Section>
           ) : null}
 
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
             Computed {fmtDate(data.generatedAt)}. Seat limits read from lib/planLimits.ts; branch
             limits are the numbers on the pricing page (1 / 3 / 10) and are not yet enforced in the
             product, so treat a branch flag as a sales signal rather than a blocked customer.

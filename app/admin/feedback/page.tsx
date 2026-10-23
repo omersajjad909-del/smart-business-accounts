@@ -23,7 +23,7 @@ function Stars({ value, size = 13 }: { value: number; size?: number }) {
       {[1, 2, 3, 4, 5].map(n => (
         <svg key={n} width={size} height={size} viewBox="0 0 24 24"
           fill={n <= value ? "#fbbf24" : "none"}
-          stroke={n <= value ? "#fbbf24" : "rgba(255,255,255,.22)"}
+          stroke={n <= value ? "#fbbf24" : "rgba(var(--ink),.22)"}
           strokeWidth="1.8" strokeLinejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
@@ -130,23 +130,23 @@ export default function AdminFeedbackPage() {
   const resolvedCount= stats.find((s:any) => s.status === "resolved")?._count?.id || 0;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{`
         @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-        .fb-row:hover { background:rgba(255,255,255,.03)!important; cursor:pointer; }
-        .fb-sel { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; }
+        .fb-row:hover { background:rgba(var(--ink),.03)!important; cursor:pointer; }
+        .fb-sel { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; }
         .fb-btn { border:none; border-radius:10px; padding:8px 18px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
         .fb-btn:hover { opacity:.85; }
         .overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; display:flex; align-items:center; justify-content:center; padding:24px; }
-        .modal { background:#0f1629; border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:32px; width:100%; max-width:540px; max-height:85vh; overflow-y:auto; }
-        .fb-textarea { width:100%; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:12px; color:white; font-family:inherit; font-size:13px; outline:none; resize:vertical; box-sizing:border-box; }
+        .modal { background:var(--dk-0f1629, #0f1629); border:1px solid rgba(var(--ink),.1); border-radius:20px; padding:32px; width:100%; max-width:540px; max-height:85vh; overflow-y:auto; }
+        .fb-textarea { width:100%; background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:12px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; resize:vertical; box-sizing:border-box; }
         .fb-textarea:focus { border-color:rgba(99,102,241,.4); }
       `}</style>
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>{scopeMeta.title}</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           {scopeMeta.subtitle}
         </p>
       </div>
@@ -154,14 +154,14 @@ export default function AdminFeedbackPage() {
       {/* KPI cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Open",      val: openCount,     color: "#f87171" },
-          { label: "In Review", val: reviewCount,   color: "#fbbf24" },
-          { label: "Resolved",  val: resolvedCount, color: "#34d399" },
-          { label: "Total",     val: total,          color: "#818cf8" },
+          { label: "Open",      val: openCount,     color: "var(--tx-f87171, #f87171)" },
+          { label: "In Review", val: reviewCount,   color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Resolved",  val: resolvedCount, color: "var(--tx-34d399, #34d399)" },
+          { label: "Total",     val: total,          color: "var(--tx-818cf8, #818cf8)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -170,7 +170,7 @@ export default function AdminFeedbackPage() {
       {!scope && (
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
         {byType.map((t: any) => (
-          <div key={t.type} style={{ padding: "6px 14px", borderRadius: 20, background: `${TYPE_COLORS[t.type] || "#818cf8"}15`, border: `1px solid ${TYPE_COLORS[t.type] || "#818cf8"}30`, fontSize: 12, fontWeight: 700, color: TYPE_COLORS[t.type] || "#818cf8" }}>
+          <div key={t.type} style={{ padding: "6px 14px", borderRadius: 20, background: `${TYPE_COLORS[t.type] || "#818cf8"}15`, border: `1px solid ${TYPE_COLORS[t.type] || "#818cf8"}30`, fontSize: 12, fontWeight: 700, color: TYPE_COLORS[t.type] || "var(--tx-818cf8, #818cf8)" }}>
             {t.type}: {t._count.id}
           </div>
         ))}
@@ -204,30 +204,30 @@ export default function AdminFeedbackPage() {
       </div>
 
       {/* Table */}
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Type","Subject","From","Priority","Status","Date"].map(h => (
-                <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" }}>{h.toUpperCase()}</th>
+                <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 14 }}>Loading...</td></tr>
+              <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 14 }}>Loading...</td></tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 14 }}>
+                <td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 14 }}>
                   No feedback found.
                 </td>
               </tr>
             ) : items.map((fb: any) => (
               <tr key={fb.id} className="fb-row" onClick={() => { setSelected(fb); setNote(fb.adminNote || ""); }}
-                style={{ borderBottom: "1px solid rgba(255,255,255,.04)", transition: "background .15s" }}>
+                style={{ borderBottom: "1px solid rgba(var(--ink),.04)", transition: "background .15s" }}>
                 <td style={{ padding: "14px 16px" }}>
-                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${TYPE_COLORS[fb.type] || "#818cf8"}18`, color: TYPE_COLORS[fb.type] || "#818cf8" }}>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${TYPE_COLORS[fb.type] || "#818cf8"}18`, color: TYPE_COLORS[fb.type] || "var(--tx-818cf8, #818cf8)" }}>
                     {fb.type}
                   </span>
                 </td>
@@ -237,12 +237,12 @@ export default function AdminFeedbackPage() {
                     <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
                       <Stars value={fb.rating} size={11} />
                       {fb.testimonialId && (
-                        <span style={{ fontSize: 9, fontWeight: 800, color: "#34d399", letterSpacing: ".04em" }}>PUBLISHED</span>
+                        <span style={{ fontSize: 9, fontWeight: 800, color: "var(--tx-34d399, #34d399)", letterSpacing: ".04em" }}>PUBLISHED</span>
                       )}
                     </div>
                   ) : null}
                 </td>
-                <td style={{ padding: "14px 16px", fontSize: 12, color: "rgba(255,255,255,.5)" }}>{fb.name || fb.email || "—"}</td>
+                <td style={{ padding: "14px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{fb.name || fb.email || "—"}</td>
                 <td style={{ padding: "14px 16px" }}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: `${PRIORITY_COLORS[fb.priority]}18`, color: PRIORITY_COLORS[fb.priority] }}>
                     {fb.priority}
@@ -253,7 +253,7 @@ export default function AdminFeedbackPage() {
                     {fb.status.replace("_"," ")}
                   </span>
                 </td>
-                <td style={{ padding: "14px 16px", fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+                <td style={{ padding: "14px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                   {new Date(fb.createdAt).toLocaleDateString()}
                 </td>
               </tr>
@@ -267,12 +267,12 @@ export default function AdminFeedbackPage() {
       {total > 25 && (
         <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 20 }}>
           <button className="fb-btn" disabled={page === 1} onClick={() => setPage(p => p - 1)}
-            style={{ background: "rgba(255,255,255,.07)", color: "white", opacity: page === 1 ? .3 : 1 }}>Previous</button>
-          <span style={{ padding: "8px 16px", fontSize: 13, color: "rgba(255,255,255,.5)" }}>
+            style={{ background: "rgba(var(--ink),.07)", color: "var(--ink-solid, white)", opacity: page === 1 ? .3 : 1 }}>Previous</button>
+          <span style={{ padding: "8px 16px", fontSize: 13, color: "rgba(var(--ink),var(--ta-50, .5))" }}>
             Page {page} of {Math.ceil(total / 25)}
           </span>
           <button className="fb-btn" disabled={page >= Math.ceil(total / 25)} onClick={() => setPage(p => p + 1)}
-            style={{ background: "rgba(255,255,255,.07)", color: "white", opacity: page >= Math.ceil(total / 25) ? .3 : 1 }}>Next</button>
+            style={{ background: "rgba(var(--ink),.07)", color: "var(--ink-solid, white)", opacity: page >= Math.ceil(total / 25) ? .3 : 1 }}>Next</button>
         </div>
       )}
 
@@ -292,12 +292,12 @@ export default function AdminFeedbackPage() {
                 </div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{selected.subject}</h2>
               </div>
-              <button onClick={() => setSelected(null)} style={{ background: "transparent", border: "none", color: "rgba(255,255,255,.4)", fontSize: 20, cursor: "pointer", padding: 4 }}>✕</button>
+              <button onClick={() => setSelected(null)} style={{ background: "transparent", border: "none", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 20, cursor: "pointer", padding: 4 }}>✕</button>
             </div>
 
-            <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "16px", marginBottom: 20 }}>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>MESSAGE</div>
-              <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.7)", lineHeight: 1.8 }}>{selected.message}</p>
+            <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 12, padding: "16px", marginBottom: 20 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 8 }}>MESSAGE</div>
+              <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))", lineHeight: 1.8 }}>{selected.message}</p>
             </div>
 
             {/* Rated review — the only kind that can become a testimonial. */}
@@ -308,17 +308,17 @@ export default function AdminFeedbackPage() {
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
                   <Stars value={selected.rating} size={16} />
-                  <span style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24" }}>{selected.rating} / 5</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>{selected.rating} / 5</span>
                   {selected.testimonialId ? (
-                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(52,211,153,.15)", color: "#34d399" }}>
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)" }}>
                       LIVE ON TESTIMONIALS
                     </span>
                   ) : selected.publishConsent ? (
-                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(56,189,248,.15)", color: "#38bdf8" }}>
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(56,189,248,.15)", color: "var(--tx-38bdf8, #38bdf8)" }}>
                       CONSENT GIVEN
                     </span>
                   ) : (
-                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(248,113,113,.15)", color: "#f87171" }}>
+                    <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 800, background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>
                       NO CONSENT — CANNOT PUBLISH
                     </span>
                   )}
@@ -327,7 +327,7 @@ export default function AdminFeedbackPage() {
                 {selected.testimonialId ? (
                   <button className="fb-btn" disabled={saving}
                     onClick={() => update(selected.id, { action: "unpublish_testimonial", adminNote: note })}
-                    style={{ background: "rgba(248,113,113,.15)", color: "#f87171", border: "1px solid rgba(248,113,113,.3)", width: "100%" }}>
+                    style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)", border: "1px solid rgba(248,113,113,.3)", width: "100%" }}>
                     {saving ? "..." : "Remove from public testimonials"}
                   </button>
                 ) : (
@@ -335,14 +335,14 @@ export default function AdminFeedbackPage() {
                     <button className="fb-btn" disabled={saving || !selected.publishConsent || !selected.name}
                       onClick={() => update(selected.id, { action: "publish_testimonial", adminNote: note })}
                       style={{
-                        background: "rgba(52,211,153,.15)", color: "#34d399",
+                        background: "rgba(52,211,153,.15)", color: "var(--tx-34d399, #34d399)",
                         border: "1px solid rgba(52,211,153,.3)", width: "100%",
                         opacity: (!selected.publishConsent || !selected.name) ? .35 : 1,
                         cursor: (!selected.publishConsent || !selected.name) ? "not-allowed" : "pointer",
                       }}>
                       {saving ? "..." : "Approve & publish as testimonial"}
                     </button>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 8, lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 8, lineHeight: 1.6 }}>
                       {!selected.name
                         ? "This submission has no reviewer name, so it cannot be published."
                         : !selected.publishConsent
@@ -355,7 +355,7 @@ export default function AdminFeedbackPage() {
             ) : null}
 
             {(selected.name || selected.email) && (
-              <div style={{ display: "flex", gap: 16, marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+              <div style={{ display: "flex", gap: 16, marginBottom: 20, fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                 {selected.name && <span>👤 {selected.name}{selected.role ? ` · ${selected.role}` : ""}</span>}
                 {selected.email && <span>✉️ {selected.email}</span>}
                 <span>📅 {new Date(selected.createdAt).toLocaleString()}</span>
@@ -364,7 +364,7 @@ export default function AdminFeedbackPage() {
 
             {/* Admin note */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>ADMIN NOTE (INTERNAL)</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", display: "block", marginBottom: 8 }}>ADMIN NOTE (INTERNAL)</label>
               <textarea className="fb-textarea" rows={3} value={note} onChange={e => setNote(e.target.value)} placeholder="Internal note visible to admins only..." />
             </div>
 
@@ -378,14 +378,14 @@ export default function AdminFeedbackPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
               {(isReview
                 ? [
-                    { label: "Mark as Read",  status: "closed", color: "#34d399" },
+                    { label: "Mark as Read",  status: "closed", color: "var(--tx-34d399, #34d399)" },
                     { label: "Move Back",     status: "open",   color: "#64748b" },
                   ]
                 : [
-                    { label: "Mark In Review", status: "in_review", color: "#fbbf24" },
-                    { label: "Mark Resolved",  status: "resolved",  color: "#34d399" },
+                    { label: "Mark In Review", status: "in_review", color: "var(--tx-fbbf24, #fbbf24)" },
+                    { label: "Mark Resolved",  status: "resolved",  color: "var(--tx-34d399, #34d399)" },
                     { label: "Close",          status: "closed",    color: "#64748b" },
-                    { label: "Re-open",        status: "open",      color: "#f87171" },
+                    { label: "Re-open",        status: "open",      color: "var(--tx-f87171, #f87171)" },
                   ]
               ).map(a => (
                 <button key={a.status} className="fb-btn" onClick={() => update(selected.id, { status: a.status, adminNote: note })}
@@ -399,7 +399,7 @@ export default function AdminFeedbackPage() {
             {/* Priority — a queue position, which a review does not have. */}
             {!isReview && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", alignSelf: "center" }}>Priority:</span>
+              <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", alignSelf: "center" }}>Priority:</span>
               {["low","normal","high","urgent"].map(p => (
                 <button key={p} className="fb-btn" onClick={() => update(selected.id, { priority: p, adminNote: note })}
                   disabled={saving || selected.priority === p}

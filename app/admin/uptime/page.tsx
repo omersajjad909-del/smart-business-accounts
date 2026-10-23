@@ -41,8 +41,8 @@ type Data = {
 };
 
 const F = "'Outfit','Inter',sans-serif";
-const CARD = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
+const CARD = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
 
 const SERVICE_LABEL: Record<string, string> = {
   web: "Website",
@@ -79,7 +79,7 @@ function agoText(d: string | null): string {
 
 /** Green only above 99.9%, amber where an SLA conversation starts, red below 99%. */
 function uptimeColor(pct: number | null): string {
-  if (pct === null) return "rgba(255,255,255,.35)";
+  if (pct === null) return "rgba(var(--ink),.35)";
   if (pct >= 99.9) return "#34d399";
   if (pct >= 99) return "#fbbf24";
   return "#f87171";
@@ -88,11 +88,11 @@ function uptimeColor(pct: number | null): string {
 function Stat({ label, value, color, sub }: { label: string; value: string; color: string; sub?: string }) {
   return (
     <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "14px 18px", flex: 1, minWidth: 150 }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".08em", color: "rgba(255,255,255,.4)", textTransform: "uppercase", marginBottom: 6 }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-40, .4))", textTransform: "uppercase", marginBottom: 6 }}>
         {label}
       </div>
       <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
-      {sub ? <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{sub}</div> : null}
+      {sub ? <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>{sub}</div> : null}
     </div>
   );
 }
@@ -124,11 +124,11 @@ export default function AdminUptimePage() {
     : true;
 
   return (
-    <div style={{ fontFamily: F, color: "white", padding: "28px 24px", maxWidth: 1180 }}>
+    <div style={{ fontFamily: F, color: "var(--ink-solid, white)", padding: "28px 24px", maxWidth: 1180 }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Uptime</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.45)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "6px 0 0" }}>
             What the probe has recorded — the same data the public status page shows
           </p>
         </div>
@@ -142,7 +142,7 @@ export default function AdminUptimePage() {
                 fontSize: 12, fontWeight: 700,
                 background: windowKey === w.key ? "rgba(99,102,241,.18)" : CARD,
                 border: `1px solid ${windowKey === w.key ? "rgba(99,102,241,.45)" : BORDER}`,
-                color: windowKey === w.key ? "#a5b4fc" : "rgba(255,255,255,.5)",
+                color: windowKey === w.key ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-50, .5))",
               }}
             >
               {w.label}
@@ -152,7 +152,7 @@ export default function AdminUptimePage() {
       </div>
 
       {loading && !data ? (
-        <div style={{ color: "rgba(255,255,255,.4)", fontSize: 14, padding: "40px 0" }}>Loading…</div>
+        <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 14, padding: "40px 0" }}>Loading…</div>
       ) : !data ? null : (
         <>
           {proveStale && (
@@ -160,8 +160,8 @@ export default function AdminUptimePage() {
               background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.28)",
               borderRadius: 12, padding: "13px 16px", marginBottom: 18, fontSize: 13, lineHeight: 1.6,
             }}>
-              <strong style={{ color: "#f87171" }}>Probe is not running.</strong>{" "}
-              <span style={{ color: "rgba(255,255,255,.6)" }}>
+              <strong style={{ color: "var(--tx-f87171, #f87171)" }}>Probe is not running.</strong>{" "}
+              <span style={{ color: "rgba(var(--ink),var(--ta-60, .6))" }}>
                 Last check {data.lastRunAt ? fmt(data.lastRunAt) : "never recorded"}. Until the
                 cron at <code>/api/cron/uptime-probe</code> runs again, everything below is stale —
                 a green row here does not mean the service is up.
@@ -196,7 +196,7 @@ export default function AdminUptimePage() {
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
                     {["Service", "Now", `Uptime (${data.window})`, "Checks", "Failures", "Avg latency", "Peak", "Last checked"].map((h) => (
-                      <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(255,255,255,.35)" }}>
+                      <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                         {h}
                       </th>
                     ))}
@@ -204,18 +204,18 @@ export default function AdminUptimePage() {
                 </thead>
                 <tbody>
                   {data.services.map((s, i) => (
-                    <tr key={s.serviceId} style={{ borderBottom: i < data.services.length - 1 ? `1px solid rgba(255,255,255,.04)` : "none" }}>
+                    <tr key={s.serviceId} style={{ borderBottom: i < data.services.length - 1 ? `1px solid rgba(var(--ink),.04)` : "none" }}>
                       <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600 }}>
                         {SERVICE_LABEL[s.serviceId] || s.serviceId}
                         {s.lastError ? (
-                          <div style={{ fontSize: 11, color: "#f87171", marginTop: 3, maxWidth: 260 }}>{s.lastError}</div>
+                          <div style={{ fontSize: 11, color: "var(--tx-f87171, #f87171)", marginTop: 3, maxWidth: 260 }}>{s.lastError}</div>
                         ) : null}
                       </td>
                       <td style={{ padding: "13px 16px" }}>
                         <span style={{
                           fontSize: 10.5, fontWeight: 800, padding: "3px 9px", borderRadius: 20, whiteSpace: "nowrap",
                           background: s.currentlyOk === null ? "rgba(148,163,184,.12)" : s.currentlyOk ? "rgba(52,211,153,.13)" : "rgba(248,113,113,.13)",
-                          color: s.currentlyOk === null ? "#94a3b8" : s.currentlyOk ? "#34d399" : "#f87171",
+                          color: s.currentlyOk === null ? "var(--tx-94a3b8, #94a3b8)" : s.currentlyOk ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)",
                         }}>
                           {s.currentlyOk === null ? "NO DATA" : s.currentlyOk ? "UP" : "DOWN"}
                         </span>
@@ -223,15 +223,15 @@ export default function AdminUptimePage() {
                       <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 700, color: uptimeColor(s.uptimePct) }}>
                         {s.uptimePct === null ? "—" : `${s.uptimePct}%`}
                       </td>
-                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: "rgba(255,255,255,.55)" }}>{s.checks}</td>
-                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: s.failures > 0 ? "#f87171" : "rgba(255,255,255,.35)" }}>{s.failures}</td>
-                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: "rgba(255,255,255,.55)" }}>
+                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))" }}>{s.checks}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: s.failures > 0 ? "var(--tx-f87171, #f87171)" : "rgba(var(--ink),var(--ta-35, .35))" }}>{s.failures}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-55, .55))" }}>
                         {s.avgLatencyMs === null ? "—" : `${s.avgLatencyMs} ms`}
                       </td>
-                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: "rgba(255,255,255,.35)" }}>
+                      <td style={{ padding: "13px 16px", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                         {s.maxLatencyMs === null ? "—" : `${s.maxLatencyMs} ms`}
                       </td>
-                      <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(255,255,255,.4)" }}>{agoText(s.lastCheckedAt)}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{agoText(s.lastCheckedAt)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -242,12 +242,12 @@ export default function AdminUptimePage() {
           {/* Recent failures — deliberately not limited to the selected window. */}
           <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Recent failures</div>
-            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", marginBottom: 14 }}>
+            <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 14 }}>
               Last 50 failed checks, regardless of the window above
             </div>
 
             {data.recentFailures.length === 0 ? (
-              <div style={{ padding: "22px", textAlign: "center", border: `1px dashed ${BORDER}`, borderRadius: 10, color: "rgba(255,255,255,.35)", fontSize: 13 }}>
+              <div style={{ padding: "22px", textAlign: "center", border: `1px dashed ${BORDER}`, borderRadius: 10, color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 13 }}>
                 No failed checks recorded.
               </div>
             ) : (
@@ -258,13 +258,13 @@ export default function AdminUptimePage() {
                     padding: "11px 14px", borderRadius: 10,
                     background: "rgba(248,113,113,.05)", border: "1px solid rgba(248,113,113,.16)",
                   }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#f87171", minWidth: 78 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-f87171, #f87171)", minWidth: 78 }}>
                       {SERVICE_LABEL[f.serviceId] || f.serviceId}
                     </span>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.6)", flex: 1, minWidth: 200 }}>
+                    <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-60, .6))", flex: 1, minWidth: 200 }}>
                       {f.error || "Check failed without an error message"}
                     </span>
-                    <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", whiteSpace: "nowrap" }}>
                       {fmt(f.checkedAt)}
                     </span>
                   </div>

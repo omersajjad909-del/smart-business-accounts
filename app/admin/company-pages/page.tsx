@@ -42,8 +42,8 @@ type Payload = {
 };
 
 const FONT = "'Outfit','DM Sans',sans-serif";
-const BORDER = "rgba(255,255,255,.1)";
-const PANEL = "rgba(255,255,255,.03)";
+const BORDER = "rgba(var(--ink),.1)";
+const PANEL = "rgba(var(--ink),.03)";
 
 function headers() {
   const u = getCurrentUser();
@@ -77,8 +77,8 @@ const inputStyle: React.CSSProperties = {
   padding: "9px 14px",
   borderRadius: 10,
   border: "1.5px solid " + BORDER,
-  background: "rgba(255,255,255,.04)",
-  color: "white",
+  background: "rgba(var(--ink),.04)",
+  color: "var(--ink-solid, white)",
   fontSize: 13,
   outline: "none",
   fontFamily: "inherit",
@@ -184,15 +184,15 @@ export default function CompanyPagesAdmin() {
     : null;
 
   return (
-    <div style={{ fontFamily: FONT, color: "white", padding: "0 0 80px" }}>
+    <div style={{ fontFamily: FONT, color: "var(--ink-solid, white)", padding: "0 0 80px" }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px" }}>Company Pages</h1>
-      <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.45)", margin: "0 0 22px", maxWidth: 720, lineHeight: 1.6 }}>
-        Exceptions for one company. The plan still decides the default in <strong style={{ color: "rgba(255,255,255,.7)" }}>Plans → Pages &amp; Modules</strong>;
+      <p style={{ fontSize: 13.5, color: "rgba(var(--ink),var(--ta-45, .45))", margin: "0 0 22px", maxWidth: 720, lineHeight: 1.6 }}>
+        Exceptions for one company. The plan still decides the default in <strong style={{ color: "rgba(var(--ink),var(--ta-70, .7))" }}>Plans → Pages &amp; Modules</strong>;
         anything switched here applies to this company alone and leaves every other company on the same plan untouched.
       </p>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-        <select value={companyRef} onChange={e => setCompanyRef(e.target.value)} style={{ ...inputStyle, background: "#0f1628", minWidth: 300, cursor: "pointer" }}>
+        <select value={companyRef} onChange={e => setCompanyRef(e.target.value)} style={{ ...inputStyle, background: "var(--dk-0f1628, #0f1628)", minWidth: 300, cursor: "pointer" }}>
           <option value="">Select a company…</option>
           {companies.map(c => (
             <option key={c.id} value={String(c.companyNo ?? c.id)}>
@@ -202,13 +202,13 @@ export default function CompanyPagesAdmin() {
         </select>
         {data && (
           <button onClick={resetAll} disabled={busyId === "__reset__" || (counts!.on === 0 && counts!.off === 0)}
-            style={{ ...inputStyle, cursor: "pointer", borderColor: "rgba(248,113,113,.35)", color: "#f87171", opacity: counts!.on === 0 && counts!.off === 0 ? .4 : 1 }}>
+            style={{ ...inputStyle, cursor: "pointer", borderColor: "rgba(248,113,113,.35)", color: "var(--tx-f87171, #f87171)", opacity: counts!.on === 0 && counts!.off === 0 ? .4 : 1 }}>
             Clear all exceptions
           </button>
         )}
       </div>
 
-      {loading && <div style={{ color: "rgba(255,255,255,.4)", fontSize: 13 }}>Loading…</div>}
+      {loading && <div style={{ color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 13 }}>Loading…</div>}
 
       {data && !loading && (
         <>
@@ -217,18 +217,18 @@ export default function CompanyPagesAdmin() {
               { label: "Business type", value: data.company.businessType || "—" },
               { label: "Plan", value: data.company.plan },
               { label: "Pages visible", value: `${counts!.visible} / ${counts!.total}` },
-              { label: "Forced on", value: String(counts!.on), color: "#34d399" },
-              { label: "Forced off", value: String(counts!.off), color: "#f87171" },
+              { label: "Forced on", value: String(counts!.on), color: "var(--tx-34d399, #34d399)" },
+              { label: "Forced off", value: String(counts!.off), color: "var(--tx-f87171, #f87171)" },
             ].map(t => (
               <div key={t.label} style={{ background: PANEL, border: "1px solid " + BORDER, borderRadius: 12, padding: "12px 14px" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(255,255,255,.35)" }}>{t.label}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-35, .35))" }}>{t.label}</div>
                 <div style={{ fontSize: 17, fontWeight: 800, marginTop: 4, color: t.color || "white" }}>{t.value}</div>
               </div>
             ))}
           </div>
 
           {!data.planGridSaved && (
-            <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.3)", borderRadius: 10, padding: "12px 15px", marginBottom: 18, fontSize: 12.5, lineHeight: 1.6, color: "rgba(255,255,255,.75)" }}>
+            <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.3)", borderRadius: 10, padding: "12px 15px", marginBottom: 18, fontSize: 12.5, lineHeight: 1.6, color: "rgba(var(--ink),.75)" }}>
               No page grid has been saved for this plan yet, so every page is open by default. Switching one <strong>off</strong> here
               will pin this company to the pages its business type owns — that is the only way an exception can be expressed
               against an open default.
@@ -240,25 +240,25 @@ export default function CompanyPagesAdmin() {
               style={{ ...inputStyle, flex: 1, minWidth: 220 }} />
             {(["all", "overridden", "on", "off"] as const).map(f => (
               <button key={f} onClick={() => setOnly(f)}
-                style={{ ...inputStyle, cursor: "pointer", background: only === f ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.04)", borderColor: only === f ? "#818cf8" : BORDER, color: only === f ? "#a5b4fc" : "rgba(255,255,255,.45)", fontWeight: 700, textTransform: "capitalize" }}>
+                style={{ ...inputStyle, cursor: "pointer", background: only === f ? "rgba(99,102,241,.2)" : "rgba(var(--ink),.04)", borderColor: only === f ? "#818cf8" : BORDER, color: only === f ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-45, .45))", fontWeight: 700, textTransform: "capitalize" }}>
                 {f}
               </button>
             ))}
           </div>
 
-          {grouped.length === 0 && <div style={{ color: "rgba(255,255,255,.35)", fontSize: 13, padding: 20 }}>Nothing matches.</div>}
+          {grouped.length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 13, padding: 20 }}>Nothing matches.</div>}
 
           {grouped.map(([section, list]) => (
             <div key={section} style={{ marginBottom: 22 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.3)", marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 8 }}>
                 {section}
               </div>
               <div style={{ border: "1px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
                 {list.map((f, i) => (
                   <div key={f.id} style={{
                     display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
-                    padding: "11px 14px", background: i % 2 ? "rgba(255,255,255,.015)" : "transparent",
-                    borderTop: i ? "1px solid rgba(255,255,255,.05)" : "none",
+                    padding: "11px 14px", background: i % 2 ? "rgba(var(--ink),.015)" : "transparent",
+                    borderTop: i ? "1px solid rgba(var(--ink),.05)" : "none",
                   }}>
                     <div style={{ flex: 1, minWidth: 200 }}>
                       <div style={{ fontSize: 13.5, fontWeight: 700, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -266,15 +266,15 @@ export default function CompanyPagesAdmin() {
                         {f.core && <Tag color="#60a5fa">core</Tag>}
                         {f.globallyHidden && <Tag color="#f87171">hidden everywhere</Tag>}
                       </div>
-                      <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.22)", fontFamily: "monospace", marginTop: 2 }}>{f.route}</div>
+                      <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-22, .22))", fontFamily: "monospace", marginTop: 2 }}>{f.route}</div>
                     </div>
 
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", minWidth: 92 }}>
-                      Plan: <span style={{ color: f.allowedByPlan ? "#34d399" : "#f87171", fontWeight: 700 }}>{f.allowedByPlan ? "on" : "off"}</span>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", minWidth: 92 }}>
+                      Plan: <span style={{ color: f.allowedByPlan ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontWeight: 700 }}>{f.allowedByPlan ? "on" : "off"}</span>
                     </div>
 
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", minWidth: 96 }}>
-                      Sees: <span style={{ color: f.effective ? "#34d399" : "rgba(255,255,255,.35)", fontWeight: 700 }}>{f.effective ? "yes" : "no"}</span>
+                    <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", minWidth: 96 }}>
+                      Sees: <span style={{ color: f.effective ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700 }}>{f.effective ? "yes" : "no"}</span>
                     </div>
 
                     <div style={{ display: "flex", gap: 5 }}>
@@ -290,7 +290,7 @@ export default function CompanyPagesAdmin() {
                               cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? .35 : 1,
                               border: "1px solid " + (active ? tone : BORDER),
                               background: active ? tone + "26" : "transparent",
-                              color: active ? tone : "rgba(255,255,255,.4)",
+                              color: active ? tone : "rgba(var(--ink),var(--ta-40, .4))",
                             }}>
                             {s === "default" ? "plan" : s}
                           </button>

@@ -83,13 +83,13 @@ export default function AdminBusinessTypesPage() {
   }, [filtered]);
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Business Types</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
             Control which business types are live on signup. Toggle and save.
           </p>
         </div>
@@ -101,13 +101,13 @@ export default function AdminBusinessTypesPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Types", val: items.length,              color: "#818cf8" },
-          { label: "Live",        val: liveIds.size,              color: "#34d399" },
-          { label: "Hidden",      val: items.length - liveIds.size, color: "#94a3b8" },
+          { label: "Total Types", val: items.length,              color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Live",        val: liveIds.size,              color: "var(--tx-34d399, #34d399)" },
+          { label: "Hidden",      val: items.length - liveIds.size, color: "var(--tx-94a3b8, #94a3b8)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -124,18 +124,18 @@ export default function AdminBusinessTypesPage() {
       </div>
 
       {loading ? (
-        <div style={{ padding: 60, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading…</div>
+        <div style={{ padding: 60, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Loading…</div>
       ) : byCategory.map(([cat, list]) => (
         <div key={cat} style={{ marginBottom: 22 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.5)", letterSpacing: ".08em", marginBottom: 10, textTransform: "uppercase" }}>{cat}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(var(--ink),var(--ta-50, .5))", letterSpacing: ".08em", marginBottom: 10, textTransform: "uppercase" }}>{cat}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 12 }}>
             {list.map(b => {
               const live = liveIds.has(b.id);
               return (
                 <div key={b.id} onClick={() => toggle(b.id)}
                   style={{
-                    background: live ? "rgba(52,211,153,.06)" : "rgba(255,255,255,.02)",
-                    border: `1px solid ${live ? "rgba(52,211,153,.35)" : "rgba(255,255,255,.07)"}`,
+                    background: live ? "rgba(52,211,153,.06)" : "rgba(var(--ink),.02)",
+                    border: `1px solid ${live ? "rgba(52,211,153,.35)" : "rgba(var(--ink),.07)"}`,
                     borderRadius: 14, padding: "14px 16px", cursor: "pointer", transition: "all .2s",
                   }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
@@ -143,12 +143,12 @@ export default function AdminBusinessTypesPage() {
                     <span style={{
                       padding: "2px 9px", borderRadius: 20, fontSize: 10, fontWeight: 700,
                       background: live ? "rgba(52,211,153,.15)" : "rgba(148,163,184,.15)",
-                      color: live ? "#34d399" : "#94a3b8",
+                      color: live ? "var(--tx-34d399, #34d399)" : "var(--tx-94a3b8, #94a3b8)",
                     }}>{live ? "LIVE" : "HIDDEN"}</span>
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 700, marginTop: 6 }}>{b.label}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", marginTop: 4, lineHeight: 1.4 }}>{b.description}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 8 }}>Phase {b.phase}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-50, .5))", marginTop: 4, lineHeight: 1.4 }}>{b.description}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 8 }}>Phase {b.phase}</div>
                 </div>
               );
             })}
@@ -160,7 +160,7 @@ export default function AdminBusinessTypesPage() {
 }
 
 const css = `
-  .bt-sel, .bt-inp { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; }
+  .bt-sel, .bt-inp { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; }
   .bt-inp { min-width:260px; }
   .bt-btn { border:none; border-radius:10px; padding:9px 20px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .bt-btn:disabled { opacity:.4; cursor:not-allowed; }

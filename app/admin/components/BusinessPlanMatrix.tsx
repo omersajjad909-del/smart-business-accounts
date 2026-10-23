@@ -13,9 +13,9 @@ const PLANS = ["STARTER", "PRO", "ENTERPRISE"] as const;
 type Plan = typeof PLANS[number];
 
 const PLAN_META: Record<Plan, { label: string; color: string; bg: string; border: string; desc: string }> = {
-  STARTER:    { label: "Starter",    color: "#818cf8", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.3)", desc: "Basic features" },
-  PRO:        { label: "Pro",        color: "#38bdf8", bg: "rgba(56,189,248,0.08)",  border: "rgba(56,189,248,0.3)",  desc: "Advanced features" },
-  ENTERPRISE: { label: "Enterprise", color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.3)", desc: "Full access" },
+  STARTER:    { label: "Starter",    color: "var(--tx-818cf8, #818cf8)", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.3)", desc: "Basic features" },
+  PRO:        { label: "Pro",        color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,0.08)",  border: "rgba(56,189,248,0.3)",  desc: "Advanced features" },
+  ENTERPRISE: { label: "Enterprise", color: "var(--tx-34d399, #34d399)", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.3)", desc: "Full access" },
 };
 
 /**
@@ -315,16 +315,16 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
 
   return (
     <div style={embedded
-      ? { fontFamily: FONT, color: "white" }
-      : { minHeight: "100vh", background: "var(--app-bg, #0f1117)", padding: "32px 28px", fontFamily: FONT, color: "white" }}>
+      ? { fontFamily: FONT, color: "var(--ink-solid, white)" }
+      : { minHeight: "100vh", background: "var(--app-bg, var(--dk-0f1117, #0f1117))", padding: "32px 28px", fontFamily: FONT, color: "var(--ink-solid, white)" }}>
 
       {/* Header — the host page supplies its own when embedded */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           {!embedded && (
             <>
-              <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 4px", color: "white" }}>Plan Permissions</h1>
-              <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 4px", color: "var(--ink-solid, white)" }}>Plan Permissions</h1>
+              <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>
                 Select a business type → assign every module and every page to Starter / Pro / Enterprise
               </p>
             </>
@@ -332,12 +332,12 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {saved && (
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#34d399", padding: "8px 14px", borderRadius: 8, background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)" }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--tx-34d399, #34d399)", padding: "8px 14px", borderRadius: 8, background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)" }}>
               ✓ Saved
             </span>
           )}
           {saveError && (
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#f87171", padding: "8px 14px", borderRadius: 8, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)" }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-f87171, #f87171)", padding: "8px 14px", borderRadius: 8, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)" }}>
               ✕ {saveError}
             </span>
           )}
@@ -359,14 +359,14 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
       <div style={{ display: "grid", gridTemplateColumns: selected ? "280px 1fr" : "1fr", gap: 20, alignItems: "start" }}>
 
         {/* ── LEFT: Business Types ── */}
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>
+        <div style={{ background: "rgba(var(--ink),0.03)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(var(--ink),0.07)" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, 0.35))", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>
               {enabledIds ? `${filtered.length} of ${enabledIds.size} Enabled` : "Loading…"} Business Types
             </div>
             {orphanIds.length > 0 && (
               <div style={{
-                fontSize: 11, lineHeight: 1.6, color: "#fbbf24", marginBottom: 10,
+                fontSize: 11, lineHeight: 1.6, color: "var(--tx-fbbf24, #fbbf24)", marginBottom: 10,
                 background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.25)",
                 borderRadius: 8, padding: "8px 10px",
               }}>
@@ -380,8 +380,8 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
               onChange={e => setSearch(e.target.value)}
               placeholder="Search business..."
               style={{
-                width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 8, padding: "8px 12px", color: "white", fontSize: 13,
+                width: "100%", background: "rgba(var(--ink),0.05)", border: "1px solid rgba(var(--ink),0.1)",
+                borderRadius: 8, padding: "8px 12px", color: "var(--ink-solid, white)", fontSize: 13,
                 fontFamily: FONT, outline: "none", boxSizing: "border-box",
               }}
             />
@@ -389,10 +389,10 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
 
           <div style={{ maxHeight: selected ? "calc(100vh - 200px)" : "auto", overflowY: "auto" }}>
             {enabledIds === null && (
-              <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>Loading…</div>
+              <div style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, 0.3))", fontSize: 13 }}>Loading…</div>
             )}
             {enabledIds !== null && filtered.length === 0 && (
-              <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>No enabled business types found.</div>
+              <div style={{ padding: 24, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, 0.3))", fontSize: 13 }}>No enabled business types found.</div>
             )}
             {enabledIds !== null && !selected && (
               // Grid view when nothing selected
@@ -406,16 +406,16 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                       title={`${b.label} — ${packLabels[b.id] ?? ""}`}
                       style={{
                         padding: "14px 12px", borderRadius: 12, cursor: "pointer",
-                        background: "rgba(255,255,255,0.03)",
-                        border: `1px solid ${hasCustom ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.08)"}`,
+                        background: "rgba(var(--ink),0.03)",
+                        border: `1px solid ${hasCustom ? "rgba(99,102,241,0.4)" : "rgba(var(--ink),0.08)"}`,
                         transition: "all .15s", textAlign: "center",
                       }}
                     >
                       <div style={{ fontSize: 24, marginBottom: 6 }}>{b.icon}</div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "white", marginBottom: 2 }}>{b.label}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{pageCounts[b.id] ?? 0} pages</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-solid, white)", marginBottom: 2 }}>{b.label}</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, 0.35))" }}>{pageCounts[b.id] ?? 0} pages</div>
                       {hasCustom && (
-                        <div style={{ marginTop: 6, fontSize: 9, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                        <div style={{ marginTop: 6, fontSize: 9, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textTransform: "uppercase", letterSpacing: 0.5 }}>
                           Customized
                         </div>
                       )}
@@ -436,7 +436,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                     onClick={() => setSelected(b)}
                     style={{
                       padding: "11px 16px", cursor: "pointer",
-                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      borderBottom: "1px solid rgba(var(--ink),0.05)",
                       background: isActive ? "rgba(99,102,241,0.12)" : "transparent",
                       borderLeft: `3px solid ${isActive ? "#6366f1" : "transparent"}`,
                       display: "flex", alignItems: "center", gap: 10,
@@ -445,14 +445,14 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                   >
                     <span style={{ fontSize: 18, flexShrink: 0 }}>{b.icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: "white" }}>{b.label}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{pageCounts[b.id] ?? 0} pages</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: "var(--ink-solid, white)" }}>{b.label}</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, 0.35))" }}>{pageCounts[b.id] ?? 0} pages</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-25, 0.25))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {packLabels[b.id] ?? ""}
                       </div>
                     </div>
                     {hasCustom && (
-                      <span style={{ fontSize: 9, fontWeight: 700, color: "#818cf8", textTransform: "uppercase", background: "rgba(99,102,241,0.15)", padding: "1px 5px", borderRadius: 4 }}>Custom</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", textTransform: "uppercase", background: "rgba(99,102,241,0.15)", padding: "1px 5px", borderRadius: 4 }}>Custom</span>
                     )}
                   </div>
                 );
@@ -466,15 +466,15 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
           <div>
             {/* Business header */}
             <div style={{
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(var(--ink),0.03)", border: "1px solid rgba(var(--ink),0.08)",
               borderRadius: 14, padding: "16px 20px", marginBottom: 16,
               display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span style={{ fontSize: 32 }}>{selected.icon}</span>
                 <div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: "white" }}>{selected.label}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: "var(--ink-solid, white)" }}>{selected.label}</div>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, 0.4))", marginTop: 2 }}>
                     {pageFeatures.length} pages available
                   </div>
                 </div>
@@ -491,22 +491,22 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                 >
                   {expandedGroups.size === pageGroups.length ? "Collapse All" : "Expand All"}
                 </button>
-                <button onClick={() => setSelected(null)} style={{ ...presetBtn, color: "rgba(255,255,255,0.4)" }}>← Back</button>
+                <button onClick={() => setSelected(null)} style={{ ...presetBtn, color: "rgba(var(--ink),var(--ta-40, 0.4))" }}>← Back</button>
               </div>
             </div>
 
             {/* ── Pages: every screen this business type owns ────────── */}
             {pageGroups.length === 0 && (
-              <div style={{ padding: 28, textAlign: "center", fontSize: 13, color: "rgba(255,255,255,.35)", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12 }}>
+              <div style={{ padding: 28, textAlign: "center", fontSize: 13, color: "rgba(var(--ink),var(--ta-35, .35))", background: "rgba(var(--ink),0.02)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 12 }}>
                 No dashboard pages are registered for this business type yet.
               </div>
             )}
             {pageGroups.length > 0 && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", margin: "18px 0 10px" }}>
-                  <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "white" }}>Pages ({pageFeatures.length})</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(var(--ink),0.03)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 12, overflow: "hidden", margin: "18px 0 10px" }}>
+                  <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(var(--ink),0.06)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-solid, white)" }}>Pages ({pageFeatures.length})</div>
+                    <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>
                       Every screen in the sidebar for this business type
                     </div>
                   </div>
@@ -514,36 +514,36 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                     const meta = PLAN_META[plan];
                     const count = planPages[plan].length;
                     return (
-                      <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                      <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(var(--ink),0.06)", textAlign: "center" }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{meta.label}</div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 7 }}>{count}/{pageFeatures.length} enabled</div>
+                        <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 7 }}>{count}/{pageFeatures.length} enabled</div>
                         <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
                           <button onClick={() => setPlanPages(plan, pageFeatures.map(f => f.id))}
                             style={{ padding: "3px 8px", borderRadius: 5, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>All ON</button>
                           <button onClick={() => setPlanPages(plan, [])}
-                            style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>None</button>
+                            style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(var(--ink),.1)", background: "transparent", color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>None</button>
                         </div>
                       </div>
                     );
                   })}
                 </div>
 
-                <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
+                <div style={{ background: "rgba(var(--ink),0.02)", border: "1px solid rgba(var(--ink),0.08)", borderRadius: 12, overflow: "hidden" }}>
                   {pageGroups.map((group, gi) => {
                     const isExpanded = expandedGroups.has(group.id);
                     const isLast = gi === pageGroups.length - 1;
                     const ids = group.items.map(i => i.id);
 
                     return (
-                      <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
+                      <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(var(--ink),0.05)" }}>
                         <div
                           onClick={() => setExpandedGroups(prev => { const n = new Set(prev); n.has(group.id) ? n.delete(group.id) : n.add(group.id); return n; })}
-                          style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(255,255,255,0.035)", cursor: "pointer", userSelect: "none" }}
+                          style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(var(--ink),0.035)", cursor: "pointer", userSelect: "none" }}
                         >
                           <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                            <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>{group.label}</span>
-                            <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>({group.items.length})</span>
+                            <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-solid, white)" }}>{group.label}</span>
+                            <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-25, .25))" }}>({group.items.length})</span>
                           </div>
                           {PLANS.map(plan => {
                             const meta = PLAN_META[plan];
@@ -551,7 +551,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                             const allOn = onCount === ids.length;
                             return (
                               <div key={plan} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }} onClick={e => e.stopPropagation()}>
-                                <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(255,255,255,.3)", minWidth: 28, textAlign: "right" }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(var(--ink),var(--ta-30, .3))", minWidth: 28, textAlign: "right" }}>
                                   {onCount}/{ids.length}
                                 </span>
                                 <button
@@ -561,7 +561,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                                     else ids.forEach(id => cur.add(id));
                                     setPlanPages(plan, Array.from(cur));
                                   }}
-                                  style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "#f87171" : meta.color, fontFamily: FONT }}
+                                  style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "var(--tx-f87171, #f87171)" : meta.color, fontFamily: FONT }}
                                 >
                                   {allOn ? "All OFF" : "All ON"}
                                 </button>
@@ -571,9 +571,9 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                         </div>
 
                         {isExpanded && group.items.map((item, ii) => (
-                          <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: ii % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                          <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(var(--ink),0.03)", background: ii % 2 === 0 ? "transparent" : "rgba(var(--ink),0.01)" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                              <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{item.label}</span>
+                              <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-65, .65))" }}>{item.label}</span>
                             </div>
                             {PLANS.map(plan => {
                               const meta = PLAN_META[plan];
@@ -581,7 +581,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
                               return (
                                 <div key={plan} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                   <div onClick={() => togglePage(plan, item.id)}
-                                    style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(255,255,255,0.1)", cursor: "pointer", flexShrink: 0 }}>
+                                    style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(var(--ink),0.1)", cursor: "pointer", flexShrink: 0 }}>
                                     <div style={{ position: "absolute", top: 2.5, left: isOn ? 17 : 2.5, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}/>
                                   </div>
                                 </div>
@@ -599,10 +599,10 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
             {/* Save */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end", gap: 10 }}>
               {saved && (
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#34d399", alignSelf: "center" }}>✓ Saved</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--tx-34d399, #34d399)", alignSelf: "center" }}>✓ Saved</span>
               )}
               {saveError && (
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#f87171", alignSelf: "center" }}>✕ {saveError}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-f87171, #f87171)", alignSelf: "center" }}>✕ {saveError}</span>
               )}
               <button
                 onClick={save} disabled={saving}
@@ -624,7 +624,7 @@ export default function BusinessPlanMatrix({ embedded = false, scope = "WORLD" }
 }
 
 const presetBtn: React.CSSProperties = {
-  padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.6)",
+  padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(var(--ink),0.12)",
+  background: "rgba(var(--ink),0.05)", color: "rgba(var(--ink),var(--ta-60, 0.6))",
   fontSize: 12, fontWeight: 600, cursor: "pointer",
 };

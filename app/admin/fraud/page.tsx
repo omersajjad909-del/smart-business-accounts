@@ -35,9 +35,9 @@ type Summary = { total: number; high: number; medium: number; low: number; flagg
 
 /* ── Constants ──────────────────────────────────────────── */
 const RISK_COLORS: Record<string, { bg: string; text: string; border: string; glow: string }> = {
-  HIGH:   { bg: "rgba(239,68,68,.12)",   text: "#f87171", border: "rgba(239,68,68,.3)",   glow: "rgba(239,68,68,.15)"   },
-  MEDIUM: { bg: "rgba(249,115,22,.12)",  text: "#fb923c", border: "rgba(249,115,22,.3)",  glow: "rgba(249,115,22,.1)"  },
-  LOW:    { bg: "rgba(251,191,36,.12)",  text: "#fbbf24", border: "rgba(251,191,36,.3)",  glow: "rgba(251,191,36,.08)" },
+  HIGH:   { bg: "rgba(239,68,68,.12)",   text: "var(--tx-f87171, #f87171)", border: "rgba(239,68,68,.3)",   glow: "rgba(239,68,68,.15)"   },
+  MEDIUM: { bg: "rgba(249,115,22,.12)",  text: "var(--tx-fb923c, #fb923c)", border: "rgba(249,115,22,.3)",  glow: "rgba(249,115,22,.1)"  },
+  LOW:    { bg: "rgba(251,191,36,.12)",  text: "var(--tx-fbbf24, #fbbf24)", border: "rgba(251,191,36,.3)",  glow: "rgba(251,191,36,.08)" },
   NONE:   { bg: "rgba(100,116,139,.08)", text: "#64748b", border: "rgba(100,116,139,.2)", glow: "transparent"          },
 };
 const SEV_COLORS: Record<string, string> = { high: "#f87171", medium: "#fb923c", low: "#fbbf24" };
@@ -98,15 +98,15 @@ function FlagModal({ company, onClose, onDone }: { company: Company; onClose: ()
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 400, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)" }} />
-      <div style={{ position: "relative", width: "100%", maxWidth: 480, background: "#0a0f24", border: "1px solid rgba(255,255,255,.1)", borderRadius: 20, padding: 28, boxShadow: "0 40px 100px rgba(0,0,0,.7)" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: 480, background: "var(--dk-0a0f24, #0a0f24)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 20, padding: 28, boxShadow: "0 40px 100px rgba(0,0,0,.7)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "white" }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink-solid, white)" }}>
               {isCurrentlyFlagged ? "Update / Clear Flag" : "Flag as Suspicious"}
             </h3>
             <p style={{ margin: "4px 0 0", fontSize: 12, color: "#475569" }}>{company.name}</p>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
+          <button onClick={onClose} style={{ background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
         </div>
 
         <div style={{ marginBottom: 16 }}>
@@ -116,20 +116,20 @@ function FlagModal({ company, onClose, onDone }: { company: Company; onClose: ()
             onChange={e => setNote(e.target.value)}
             rows={4}
             placeholder="e.g. User submitted invoices for non-existent goods. IPs from sanctioned region. Multiple accounts sharing same VAT number..."
-            style={{ width: "100%", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none", resize: "none", lineHeight: 1.6, boxSizing: "border-box" }}
+            style={{ width: "100%", padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none", resize: "none", lineHeight: 1.6, boxSizing: "border-box" }}
           />
         </div>
 
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#64748b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+          <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "#64748b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
           {isCurrentlyFlagged && (
             <button onClick={() => submit("CLEAR")} disabled={saving}
-              style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.3)", color: "#4ade80", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.3)", color: "var(--tx-4ade80, #4ade80)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               ✓ Clear Flag
             </button>
           )}
           <button onClick={() => submit("FLAG")} disabled={saving}
-            style={{ flex: 2, padding: "11px", borderRadius: 12, background: saving ? "rgba(239,68,68,.15)" : "rgba(239,68,68,.2)", border: "1px solid rgba(239,68,68,.4)", color: "#f87171", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", opacity: saving ? .6 : 1 }}>
+            style={{ flex: 2, padding: "11px", borderRadius: 12, background: saving ? "rgba(239,68,68,.15)" : "rgba(239,68,68,.2)", border: "1px solid rgba(239,68,68,.4)", color: "var(--tx-f87171, #f87171)", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", opacity: saving ? .6 : 1 }}>
             {saving ? "Saving…" : "🚩 Flag Company"}
           </button>
         </div>
@@ -149,7 +149,7 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
       <tr
         onClick={() => setExpanded(x => !x)}
         style={{
-          borderBottom: expanded ? "none" : "1px solid rgba(255,255,255,.04)",
+          borderBottom: expanded ? "none" : "1px solid rgba(var(--ink),.04)",
           background: expanded ? `${riskC.glow}` : c.fraudRisk !== "NONE" ? `${riskC.glow}` : "transparent",
           cursor: "pointer",
           transition: "background .15s",
@@ -160,7 +160,7 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 16 }}>{expanded ? "▾" : "▸"}</span>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: "white" }}>{c.name}</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: "var(--ink-solid, white)" }}>{c.name}</div>
               <div style={{ fontSize: 11, color: "#334155" }}>{c.country || "—"} · {c.businessType || "—"}</div>
             </div>
             {isFlagged && <span style={{ fontSize: 14 }}>🚩</span>}
@@ -210,7 +210,7 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
               padding: "5px 14px", borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: "pointer",
               background: isFlagged ? "rgba(34,197,94,.1)" : "rgba(239,68,68,.1)",
               border: `1px solid ${isFlagged ? "rgba(34,197,94,.3)" : "rgba(239,68,68,.3)"}`,
-              color: isFlagged ? "#4ade80" : "#f87171",
+              color: isFlagged ? "var(--tx-4ade80, #4ade80)" : "var(--tx-f87171, #f87171)",
             }}>
             {isFlagged ? "✓ Flagged" : "🚩 Flag"}
           </button>
@@ -219,7 +219,7 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
 
       {/* Expanded detail */}
       {expanded && (
-        <tr style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: `${riskC.glow}` }}>
+        <tr style={{ borderBottom: "1px solid rgba(var(--ink),.04)", background: `${riskC.glow}` }}>
           <td colSpan={6} style={{ padding: "0 16px 16px 48px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 
@@ -257,8 +257,8 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
                     { label: "Peak Tx / Day", value: c.stats.maxTxPerDay },
                     { label: "Account Age", value: `${c.stats.accountAgeDays}d` },
                   ].map(st => (
-                    <div key={st.label} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)" }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>{st.value}</div>
+                    <div key={st.label} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)" }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink-solid, white)" }}>{st.value}</div>
                       <div style={{ fontSize: 10, color: "#475569", marginTop: 2 }}>{st.label}</div>
                     </div>
                   ))}
@@ -267,8 +267,8 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
                 {/* Flag note */}
                 {c.flagNote && (
                   <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,.06)", border: "1px solid rgba(239,68,68,.2)" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#f87171", marginBottom: 4 }}>ADMIN FLAG NOTE</div>
-                    <div style={{ fontSize: 12, color: "#fca5a5", lineHeight: 1.5 }}>{c.flagNote}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx-f87171, #f87171)", marginBottom: 4 }}>ADMIN FLAG NOTE</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)", lineHeight: 1.5 }}>{c.flagNote}</div>
                     {c.flaggedAt && <div style={{ fontSize: 10, color: "#475569", marginTop: 4 }}>Flagged {new Date(c.flaggedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</div>}
                   </div>
                 )}
@@ -325,26 +325,26 @@ export default function FraudMonitorPage() {
   const s = data?.summary;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060918", padding: "28px 24px 60px", fontFamily: "'Outfit','Inter',sans-serif" }}>
-      <style>{`select option { background:#0f172a; color:white; } * { box-sizing: border-box; }`}</style>
+    <div style={{ minHeight: "100vh", background: "var(--dk-060918, #060918)", padding: "28px 24px 60px", fontFamily: "'Outfit','Inter',sans-serif" }}>
+      <style>{`select option { background:var(--dk-0f172a, #0f172a); color:var(--ink-solid, white); } * { box-sizing: border-box; }`}</style>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
             <span style={{ fontSize: 26 }}>🛡️</span>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Fraud & Risk Monitor</h1>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)" }}>Fraud & Risk Monitor</h1>
           </div>
           <p style={{ margin: 0, fontSize: 13, color: "#475569" }}>
             Auto-detects suspicious activity patterns · Manual flagging · Real-time risk scoring
           </p>
         </div>
-        <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>↻ Refresh</button>
+        <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>↻ Refresh</button>
       </div>
 
       {/* How it works explainer */}
       <div style={{ marginBottom: 22, padding: "14px 20px", borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)" }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".07em", marginBottom: 8 }}>HOW DETECTION WORKS</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", letterSpacing: ".07em", marginBottom: 8 }}>HOW DETECTION WORKS</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
           {[
             { icon: "🌍", label: "Geo-Hopping", desc: "3+ countries in 7 days" },
@@ -354,9 +354,9 @@ export default function FraudMonitorPage() {
             { icon: "🔁", label: "Rapid Logins", desc: ">20 sessions in 1 hour" },
             { icon: "🚩", label: "Manual Flag", desc: "Admin-flagged" },
           ].map(sig => (
-            <div key={sig.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
+            <div key={sig.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.07)" }}>
               <span style={{ fontSize: 14 }}>{sig.icon}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8" }}>{sig.label}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-94a3b8, #94a3b8)" }}>{sig.label}</span>
               <span style={{ fontSize: 10, color: "#334155" }}>{sig.desc}</span>
             </div>
           ))}
@@ -366,13 +366,13 @@ export default function FraudMonitorPage() {
       {/* Summary stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px,1fr))", gap: 12, marginBottom: 22 }}>
         {[
-          { label: "Total Companies", value: s?.total,   color: "#818cf8" },
-          { label: "High Risk",       value: s?.high,    color: "#f87171" },
-          { label: "Medium Risk",     value: s?.medium,  color: "#fb923c" },
-          { label: "Low Risk",        value: s?.low,     color: "#fbbf24" },
-          { label: "Manually Flagged",value: s?.flagged, color: "#f43f5e" },
+          { label: "Total Companies", value: s?.total,   color: "var(--tx-818cf8, #818cf8)" },
+          { label: "High Risk",       value: s?.high,    color: "var(--tx-f87171, #f87171)" },
+          { label: "Medium Risk",     value: s?.medium,  color: "var(--tx-fb923c, #fb923c)" },
+          { label: "Low Risk",        value: s?.low,     color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Manually Flagged",value: s?.flagged, color: "var(--tx-f43f5e, #f43f5e)" },
         ].map(st => (
-          <div key={st.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${st.color}20` }}>
+          <div key={st.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: `1px solid ${st.color}20` }}>
             <div style={{ fontSize: 26, fontWeight: 900, color: st.color }}>{loading ? "—" : st.value ?? 0}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700 }}>{st.label}</div>
           </div>
@@ -382,27 +382,27 @@ export default function FraudMonitorPage() {
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company…"
-          style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
+          style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none" }} />
         <select value={filterRisk} onChange={e => setFilterRisk(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="ALL">All Risk Levels</option>
           {["HIGH", "MEDIUM", "LOW", "NONE", "FLAGGED"].map(r => <option key={r} value={r}>{r}</option>)}
         </select>
       </div>
 
       {error ? (
-        <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12, fontWeight: 700 }}>
+        <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12, fontWeight: 700 }}>
           {error}
         </div>
       ) : null}
 
       {/* Table */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(var(--ink),.07)", overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "rgba(255,255,255,.04)" }}>
+            <tr style={{ background: "rgba(var(--ink),.04)" }}>
               {["Company", "Risk Level", "Signals", "Activity", "Age", "Actions"].map(h => (
-                <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+                <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(var(--ink),.07)" }}>
                   {h.toUpperCase()}
                 </th>
               ))}

@@ -34,7 +34,7 @@ type GeoResponse = {
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
   loading: () => (
-    <div style={{ width: "100%", height: 480, borderRadius: 16, background: "#060d1e", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>
+    <div style={{ width: "100%", height: 480, borderRadius: 16, background: "var(--dk-060d1e, #060d1e)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>
       Loading map…
     </div>
   ),
@@ -43,9 +43,9 @@ const LeafletMap = dynamic(() => import("./LeafletMap"), {
 type Tab = "companies" | "branches" | "visitors";
 
 const TAB_CONFIG: { key: Tab; label: string; color: string; accent: string }[] = [
-  { key: "companies", label: "Companies", color: "#6366f1", accent: "rgba(99,102,241,.18)" },
-  { key: "branches",  label: "Branches",  color: "#22c55e", accent: "rgba(34,197,94,.15)"  },
-  { key: "visitors",  label: "Visitors",  color: "#38bdf8", accent: "rgba(56,189,248,.15)" },
+  { key: "companies", label: "Companies", color: "var(--tx-6366f1, #6366f1)", accent: "rgba(99,102,241,.18)" },
+  { key: "branches",  label: "Branches",  color: "var(--tx-22c55e, #22c55e)", accent: "rgba(34,197,94,.15)"  },
+  { key: "visitors",  label: "Visitors",  color: "var(--tx-38bdf8, #38bdf8)", accent: "rgba(56,189,248,.15)" },
 ];
 
 function fmtTime(val: string | null | undefined) {
@@ -88,16 +88,16 @@ export default function GeoAnalyticsPage() {
   const visiblePins = showAll ? filteredPins : filteredPins.slice(0, LIMIT);;
 
   const statCards = [
-    { label: "Companies", value: data?.stats.companies ?? 0, sub: `${data?.stats.exactCompanies ?? 0} exact pins`,   color: "#6366f1" },
-    { label: "Branches",  value: data?.stats.branches  ?? 0, sub: `${data?.stats.exactBranches  ?? 0} exact pins`,   color: "#22c55e" },
-    { label: "Visitors",  value: data?.stats.visitors  ?? 0, sub: `${data?.stats.exactVisitors  ?? 0} precise pins`, color: "#38bdf8" },
+    { label: "Companies", value: data?.stats.companies ?? 0, sub: `${data?.stats.exactCompanies ?? 0} exact pins`,   color: "var(--tx-6366f1, #6366f1)" },
+    { label: "Branches",  value: data?.stats.branches  ?? 0, sub: `${data?.stats.exactBranches  ?? 0} exact pins`,   color: "var(--tx-22c55e, #22c55e)" },
+    { label: "Visitors",  value: data?.stats.visitors  ?? 0, sub: `${data?.stats.exactVisitors  ?? 0} precise pins`, color: "var(--tx-38bdf8, #38bdf8)" },
   ];
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 80px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 80px" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Geo Analytics</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Live world map — company locations, branches, and visitor activity.
         </p>
       </div>
@@ -105,10 +105,10 @@ export default function GeoAnalyticsPage() {
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
         {statCards.map(s => (
-          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".1em", marginBottom: 8 }}>{s.label.toUpperCase()}</div>
+          <div key={s.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "18px 20px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".1em", marginBottom: 8 }}>{s.label.toUpperCase()}</div>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{loading ? "—" : s.value.toLocaleString()}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{s.sub}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>{s.sub}</div>
           </div>
         ))}
       </div>
@@ -125,9 +125,9 @@ export default function GeoAnalyticsPage() {
               fontSize: 13,
               fontWeight: 700,
               cursor: "pointer",
-              border: tab === t.key ? `1px solid ${t.color}` : "1px solid rgba(255,255,255,.1)",
-              background: tab === t.key ? t.accent : "rgba(255,255,255,.04)",
-              color: tab === t.key ? "white" : "rgba(255,255,255,.45)",
+              border: tab === t.key ? `1px solid ${t.color}` : "1px solid rgba(var(--ink),.1)",
+              background: tab === t.key ? t.accent : "rgba(var(--ink),.04)",
+              color: tab === t.key ? "white" : "rgba(var(--ink),var(--ta-45, .45))",
               transition: "all .2s",
             }}
           >
@@ -144,11 +144,11 @@ export default function GeoAnalyticsPage() {
           placeholder={tab === "visitors" ? "Search by country, city, page, or device…" : "Search by name, country, city…"}
           style={{
             width: "100%",
-            background: "rgba(255,255,255,.04)",
-            border: "1.5px solid rgba(255,255,255,.1)",
+            background: "rgba(var(--ink),.04)",
+            border: "1.5px solid rgba(var(--ink),.1)",
             borderRadius: 12,
             padding: "10px 16px",
-            color: "white",
+            color: "var(--ink-solid, white)",
             fontSize: 13,
             outline: "none",
             boxSizing: "border-box",
@@ -160,62 +160,62 @@ export default function GeoAnalyticsPage() {
       {/* Map + list */}
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 0.6fr", gap: 16 }}>
         {/* Map */}
-        <div style={{ background: "#060d1e", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, overflow: "hidden", padding: 6 }}>
+        <div style={{ background: "var(--dk-060d1e, #060d1e)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 20, overflow: "hidden", padding: 6 }}>
           <LeafletMap pins={filteredPins} color={tabConf.color} />
         </div>
 
         {/* Pin list */}
-        <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 20, padding: "18px 16px", overflowY: "auto", maxHeight: 540 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".1em", marginBottom: 14 }}>
+        <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 20, padding: "18px 16px", overflowY: "auto", maxHeight: 540 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".1em", marginBottom: 14 }}>
             {tab === "companies" ? "TOP COMPANIES" : tab === "branches" ? "BRANCH PINS" : "RECENT VISITORS"}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {visiblePins.map((pin, i) => (
               <div key={`${pin.type}-${pin.label}-${i}`} style={{
-                background: "rgba(255,255,255,.03)",
-                border: "1px solid rgba(255,255,255,.07)",
+                background: "rgba(var(--ink),.03)",
+                border: "1px solid rgba(var(--ink),.07)",
                 borderRadius: 12,
                 padding: "12px 14px",
               }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>{pin.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>{pin.label}</div>
                   <span style={{
                     padding: "2px 8px", borderRadius: 20, fontSize: 9, fontWeight: 800, letterSpacing: ".08em", flexShrink: 0,
-                    background: pin.precision === "exact" ? "rgba(34,197,94,.15)" : "rgba(255,255,255,.08)",
-                    color: pin.precision === "exact" ? "#4ade80" : "rgba(255,255,255,.4)",
+                    background: pin.precision === "exact" ? "rgba(34,197,94,.15)" : "rgba(var(--ink),.08)",
+                    color: pin.precision === "exact" ? "var(--tx-4ade80, #4ade80)" : "rgba(var(--ink),var(--ta-40, .4))",
                   }}>
                     {pin.precision.toUpperCase()}
                   </span>
                 </div>
-                {pin.subtitle && <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 4 }}>{pin.subtitle}</div>}
+                {pin.subtitle && <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 4 }}>{pin.subtitle}</div>}
                 {(pin.address || pin.city) && (
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                     {[pin.city, pin.address, pin.country].filter(Boolean).join(", ")}
                   </div>
                 )}
                 {pin.country && !pin.city && !pin.address && (
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{pin.country}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{pin.country}</div>
                 )}
                 {pin.page && (
-                  <div style={{ fontSize: 10, color: "rgba(99,102,241,.7)", marginTop: 4 }}>📄 {pin.page}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--txr-6366f1, 99,102,241),.7)", marginTop: 4 }}>📄 {pin.page}</div>
                 )}
                 {pin.device && (
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>
                     {pin.device === "mobile" ? "📱" : pin.device === "tablet" ? "🖥️" : "💻"} {pin.device}
                   </div>
                 )}
                 {pin.visitedAt && (
-                  <div style={{ fontSize: 10, color: "rgba(56,189,248,.6)", marginTop: 4 }}>
+                  <div style={{ fontSize: 10, color: "rgba(var(--txr-38bdf8, 56,189,248),.6)", marginTop: 4 }}>
                     🕐 {fmtTime(pin.visitedAt)}
                   </div>
                 )}
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.15)", marginTop: 4, fontFamily: "monospace" }}>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-15, .15))", marginTop: 4, fontFamily: "monospace" }}>
                   {pin.lat.toFixed(4)}, {pin.lon.toFixed(4)}
                 </div>
               </div>
             ))}
             {filteredPins.length === 0 && (
-              <div style={{ padding: "30px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
+              <div style={{ padding: "30px 0", textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13 }}>
                 No pins for this filter.
               </div>
             )}
@@ -225,7 +225,7 @@ export default function GeoAnalyticsPage() {
                 style={{
                   width: "100%", padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700,
                   background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)",
-                  color: "#818cf8", cursor: "pointer",
+                  color: "var(--tx-818cf8, #818cf8)", cursor: "pointer",
                 }}
               >
                 Show all {filteredPins.length} visitors
@@ -236,8 +236,8 @@ export default function GeoAnalyticsPage() {
                 onClick={() => setShowAll(false)}
                 style={{
                   width: "100%", padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700,
-                  background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)",
-                  color: "rgba(255,255,255,.4)", cursor: "pointer",
+                  background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)",
+                  color: "rgba(var(--ink),var(--ta-40, .4))", cursor: "pointer",
                 }}
               >
                 Show less

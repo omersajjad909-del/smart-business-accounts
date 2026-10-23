@@ -164,19 +164,19 @@ export default function SupportCopilotPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "Waiting", value: data.summary.total, color: data.summary.total ? "#818cf8" : "#34d399", sub: "Across all three inboxes" },
-            { label: "Over 24 hours", value: data.summary.over24h, color: data.summary.over24h ? "#f87171" : "#34d399", sub: "Answer these first" },
-            { label: "Oldest", value: data.summary.oldestHours >= 24 ? `${Math.floor(data.summary.oldestHours / 24)}d` : `${data.summary.oldestHours}h`, color: "#fbbf24", sub: "Longest anyone has waited" },
-            { label: "Mix", value: `${data.summary.tickets}/${data.summary.chats}/${data.summary.feedback}`, color: "#c4b5fd", sub: "Tickets / chats / complaints" },
+            { label: "Waiting", value: data.summary.total, color: data.summary.total ? "var(--tx-818cf8, #818cf8)" : "var(--tx-34d399, #34d399)", sub: "Across all three inboxes" },
+            { label: "Over 24 hours", value: data.summary.over24h, color: data.summary.over24h ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", sub: "Answer these first" },
+            { label: "Oldest", value: data.summary.oldestHours >= 24 ? `${Math.floor(data.summary.oldestHours / 24)}d` : `${data.summary.oldestHours}h`, color: "var(--tx-fbbf24, #fbbf24)", sub: "Longest anyone has waited" },
+            { label: "Mix", value: `${data.summary.tickets}/${data.summary.chats}/${data.summary.feedback}`, color: "var(--tx-c4b5fd, #c4b5fd)", sub: "Tickets / chats / complaints" },
           ]} />
 
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
             {(["all", "ticket", "chat", "feedback"] as const).map((f) => (
               <button key={f} onClick={() => setSourceFilter(f)} style={{
                 padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                background: sourceFilter === f ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-                border: sourceFilter === f ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-                color: sourceFilter === f ? "#818cf8" : "rgba(255,255,255,.4)",
+                background: sourceFilter === f ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+                border: sourceFilter === f ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+                color: sourceFilter === f ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
               }}>
                 {f === "all" ? "All" : SOURCE_LABEL[f]}
               </button>
@@ -210,24 +210,24 @@ export default function SupportCopilotPage() {
                         {t ? <Pill tone={URGENCY_TONE[t.urgency]}>{t.urgency}</Pill> : null}
                         {t ? <Pill tone="violet">{t.category}</Pill> : null}
                         {it.companyName ? (
-                          <span style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)" }}>{it.companyName}</span>
+                          <span style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{it.companyName}</span>
                         ) : null}
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#f8fafc", marginBottom: 4 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)", marginBottom: 4 }}>
                         {it.subject}
                       </div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+                      <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
                         {it.from}
                         {it.messageCount ? ` · ${it.messageCount} messages` : ""}
                       </div>
                       {t ? (
                         <div style={{
-                          marginTop: 10, fontSize: 12.5, color: "rgba(255,255,255,.65)",
+                          marginTop: 10, fontSize: 12.5, color: "rgba(var(--ink),var(--ta-65, .65))",
                           borderLeft: "2px solid rgba(139,92,246,.5)", paddingLeft: 11, lineHeight: 1.6,
                         }}>
-                          <strong style={{ color: "#c4b5fd" }}>{t.summary}</strong>
+                          <strong style={{ color: "var(--tx-c4b5fd, #c4b5fd)" }}>{t.summary}</strong>
                           <br />
-                          <span style={{ color: "rgba(255,255,255,.45)" }}>Next: {t.action}</span>
+                          <span style={{ color: "rgba(var(--ink),var(--ta-45, .45))" }}>Next: {t.action}</span>
                         </div>
                       ) : null}
                     </div>
@@ -235,12 +235,12 @@ export default function SupportCopilotPage() {
                     {isOpen ? (
                       <div style={{ marginTop: 16, display: "grid", gap: 14 }}>
                         <div style={{
-                          background: "rgba(0,0,0,.22)", border: "1px solid rgba(255,255,255,.06)",
+                          background: "rgba(0,0,0,.22)", border: "1px solid rgba(var(--ink),.06)",
                           borderRadius: 12, padding: "14px 16px",
-                          fontSize: 12.5, color: "rgba(255,255,255,.72)",
+                          fontSize: 12.5, color: "rgba(var(--ink),var(--ta-72, .72))",
                           whiteSpace: "pre-wrap", lineHeight: 1.7, maxHeight: 320, overflowY: "auto",
                         }}>
-                          {it.message || <span style={{ color: "rgba(255,255,255,.3)" }}>No message body.</span>}
+                          {it.message || <span style={{ color: "rgba(var(--ink),var(--ta-30, .3))" }}>No message body.</span>}
                         </div>
 
                         {reply ? (
@@ -249,7 +249,7 @@ export default function SupportCopilotPage() {
                             borderRadius: 14, padding: "16px 18px",
                           }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 10 }}>
-                              <span style={{ fontSize: 12, fontWeight: 800, color: "#6ee7b7" }}>DRAFT REPLY</span>
+                              <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-6ee7b7, #6ee7b7)" }}>DRAFT REPLY</span>
                               <div style={{ display: "flex", gap: 6 }}>
                                 <CopyButton text={reply} />
                                 <Button tone="ghost" onClick={() => draftReply(it.id)} busy={replying === it.id}>Redraft</Button>
@@ -280,7 +280,7 @@ export default function SupportCopilotPage() {
           {!data.aiConfigured ? (
             <div style={{ marginTop: 18 }}>
               <Section>
-                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.45)", lineHeight: 1.7 }}>
+                <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.7 }}>
                   The queue above is live and needs no model. Triage and reply drafting need one —
                   set GROQ_API_KEY or OPENAI_API_KEY to turn them on.
                 </div>

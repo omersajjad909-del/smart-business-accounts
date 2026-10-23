@@ -122,9 +122,9 @@ export default function CaseStudyGeneratorPage() {
       <div style={{
         ...card,
         background: "rgba(251,191,36,.05)", borderColor: "rgba(251,191,36,.25)",
-        marginBottom: 18, fontSize: 12.5, color: "rgba(252,211,77,.85)", lineHeight: 1.75,
+        marginBottom: 18, fontSize: 12.5, color: "rgba(var(--txr-fcd34d, 252,211,77),.85)", lineHeight: 1.75,
       }}>
-        <strong style={{ display: "block", marginBottom: 5, fontSize: 13, color: "#fcd34d" }}>
+        <strong style={{ display: "block", marginBottom: 5, fontSize: 13, color: "var(--tx-fcd34d, #fcd34d)" }}>
           Nothing here is publishable as it stands
         </strong>
         A draft is a draft plus a list of permissions. The customer has to agree to be named, the
@@ -156,14 +156,14 @@ export default function CaseStudyGeneratorPage() {
                       }}
                       style={{
                         textAlign: "left", padding: "13px 16px", borderRadius: 12, cursor: "pointer",
-                        background: on ? "rgba(99,102,241,.14)" : "rgba(255,255,255,.03)",
-                        border: on ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.07)",
+                        background: on ? "rgba(99,102,241,.14)" : "rgba(var(--ink),.03)",
+                        border: on ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.07)",
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                         <div>
                           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
-                            <span style={{ fontSize: 13.5, fontWeight: 700, color: "#f8fafc" }}>{c.name}</span>
+                            <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)" }}>{c.name}</span>
                             <Pill tone="grey">{c.businessType}</Pill>
                             {c.consentedQuotes.length ? (
                               <Pill tone="green">{c.consentedQuotes.length} consented quote{c.consentedQuotes.length === 1 ? "" : "s"}</Pill>
@@ -171,7 +171,7 @@ export default function CaseStudyGeneratorPage() {
                               <Pill tone="amber">No quote on file</Pill>
                             )}
                           </div>
-                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)" }}>
+                          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))" }}>
                             {c.monthsActive} month{c.monthsActive === 1 ? "" : "s"} · {c.invoicesTotal} invoices ·
                             {" "}{c.vouchersTotal} vouchers · {c.itemCount} items · {c.userCount} users ·
                             {" "}{c.country || "—"}
@@ -191,7 +191,7 @@ export default function CaseStudyGeneratorPage() {
               <div style={{ marginTop: 18 }}>
                 {chosen.consentedQuotes.length ? (
                   <div style={{ marginBottom: 16 }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 8 }}>
                       QUOTES THIS CUSTOMER HAS CONSENTED TO PUBLISH
                     </div>
                     <div style={{ display: "grid", gap: 8 }}>
@@ -201,8 +201,8 @@ export default function CaseStudyGeneratorPage() {
                           <label key={q.id} style={{
                             display: "flex", gap: 10, alignItems: "flex-start", cursor: "pointer",
                             padding: "11px 14px", borderRadius: 11,
-                            background: on ? "rgba(52,211,153,.06)" : "rgba(255,255,255,.03)",
-                            border: on ? "1px solid rgba(52,211,153,.3)" : "1px solid rgba(255,255,255,.06)",
+                            background: on ? "rgba(52,211,153,.06)" : "rgba(var(--ink),.03)",
+                            border: on ? "1px solid rgba(52,211,153,.3)" : "1px solid rgba(var(--ink),.06)",
                           }}>
                             <input
                               type="checkbox"
@@ -212,10 +212,10 @@ export default function CaseStudyGeneratorPage() {
                               style={{ accentColor: "#34d399", marginTop: 3 }}
                             />
                             <div>
-                              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)", lineHeight: 1.65 }}>
+                              <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.65 }}>
                                 &ldquo;{q.text}&rdquo;
                               </div>
-                              <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 4 }}>
+                              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))", marginTop: 4 }}>
                                 {[q.name, q.role, q.source, q.rating ? `${q.rating}★` : null].filter(Boolean).join(" · ")}
                               </div>
                             </div>
@@ -226,7 +226,7 @@ export default function CaseStudyGeneratorPage() {
                   </div>
                 ) : (
                   <div style={{
-                    fontSize: 12.5, color: "rgba(251,191,36,.75)", lineHeight: 1.7, marginBottom: 16,
+                    fontSize: 12.5, color: "rgba(var(--txr-fbbf24, 251,191,36),.75)", lineHeight: 1.7, marginBottom: 16,
                     padding: "12px 15px", borderRadius: 11,
                     background: "rgba(251,191,36,.05)", border: "1px solid rgba(251,191,36,.2)",
                   }}>
@@ -236,7 +236,7 @@ export default function CaseStudyGeneratorPage() {
                   </div>
                 )}
 
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.35)", marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 6 }}>
                   WHAT YOU KNOW THAT THE DATA DOES NOT
                 </div>
                 <textarea
@@ -252,7 +252,7 @@ export default function CaseStudyGeneratorPage() {
                     {study ? "Draft again" : `Draft the case study for ${chosen.name}`}
                   </Button>
                 ) : (
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                  <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
                     Set GROQ_API_KEY or OPENAI_API_KEY to draft case studies.
                   </div>
                 )}
@@ -275,7 +275,7 @@ export default function CaseStudyGeneratorPage() {
 
               {study.beforePublishing.length ? (
                 <Section title="Before this can be published">
-                  <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "#fcd34d", lineHeight: 1.9 }}>
+                  <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "var(--tx-fcd34d, #fcd34d)", lineHeight: 1.9 }}>
                     {study.beforePublishing.map((b) => <li key={b}>{b}</li>)}
                   </ul>
                 </Section>
@@ -290,16 +290,16 @@ export default function CaseStudyGeneratorPage() {
                   </div>
                 }
               >
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#f8fafc", marginBottom: 10, lineHeight: 1.35 }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", marginBottom: 10, lineHeight: 1.35 }}>
                   {study.headline}
                 </div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.72)", lineHeight: 1.75, marginBottom: 22 }}>
+                <div style={{ fontSize: 14, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.75, marginBottom: 22 }}>
                   {study.summary}
                 </div>
                 <div style={{ display: "grid", gap: 20 }}>
                   {study.sections.map((s, i) => (
                     <div key={i}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#f8fafc", marginBottom: 8 }}>{s.heading}</div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)", marginBottom: 8 }}>{s.heading}</div>
                       <Prose text={s.body} />
                     </div>
                   ))}
@@ -308,7 +308,7 @@ export default function CaseStudyGeneratorPage() {
 
               {study.quoteSlots.length ? (
                 <Section title={`Quotes to get from the customer (${study.quoteSlots.length})`}>
-                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.45)", lineHeight: 1.7, marginBottom: 16 }}>
+                  <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-45, .45))", lineHeight: 1.7, marginBottom: 16 }}>
                     These are the points in the story where a customer sentence belongs. Send them
                     the questions; use their words exactly as they come back.
                   </div>
@@ -317,10 +317,10 @@ export default function CaseStudyGeneratorPage() {
                       <div key={i} style={{
                         borderLeft: "2px solid rgba(139,92,246,.5)", paddingLeft: 14,
                       }}>
-                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.6)", marginBottom: 5 }}>
+                        <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))", marginBottom: 5 }}>
                           {q.placement}
                         </div>
-                        <div style={{ fontSize: 13.5, color: "#c4b5fd", lineHeight: 1.6 }}>
+                        <div style={{ fontSize: 13.5, color: "var(--tx-c4b5fd, #c4b5fd)", lineHeight: 1.6 }}>
                           &ldquo;{q.askThem}&rdquo;
                         </div>
                       </div>
@@ -340,11 +340,11 @@ export default function CaseStudyGeneratorPage() {
                   <div style={{ display: "grid", gap: 12 }}>
                     {study.realQuotes.map((q) => (
                       <div key={q.id} style={{
-                        fontSize: 13, color: "rgba(255,255,255,.72)", lineHeight: 1.7,
+                        fontSize: 13, color: "rgba(var(--ink),var(--ta-72, .72))", lineHeight: 1.7,
                         borderLeft: "2px solid rgba(52,211,153,.5)", paddingLeft: 14,
                       }}>
                         &ldquo;{q.text}&rdquo;
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 4 }}>
+                        <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))", marginTop: 4 }}>
                           {[q.name, q.role, q.source].filter(Boolean).join(" · ")} — verbatim, not edited
                         </div>
                       </div>
@@ -358,16 +358,16 @@ export default function CaseStudyGeneratorPage() {
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
                     <tbody>
                       {study.metricsUsed.map((m) => (
-                        <tr key={m.label} style={{ borderTop: "1px solid rgba(255,255,255,.05)" }}>
-                          <td style={{ padding: "8px 10px", color: "rgba(255,255,255,.55)" }}>{m.label}</td>
-                          <td style={{ padding: "8px 10px", color: "#e2e8f0", fontWeight: 700 }}>{m.value}</td>
-                          <td style={{ padding: "8px 10px", color: "rgba(255,255,255,.3)", fontSize: 11.5 }}>{m.source}</td>
+                        <tr key={m.label} style={{ borderTop: "1px solid rgba(var(--ink),.05)" }}>
+                          <td style={{ padding: "8px 10px", color: "rgba(var(--ink),var(--ta-55, .55))" }}>{m.label}</td>
+                          <td style={{ padding: "8px 10px", color: "var(--tx-e2e8f0, #e2e8f0)", fontWeight: 700 }}>{m.value}</td>
+                          <td style={{ padding: "8px 10px", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 11.5 }}>{m.source}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 12, lineHeight: 1.7 }}>
+                <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 12, lineHeight: 1.7 }}>
                   No percentage improvement, time saved or cost reduction appears anywhere in this
                   draft, because none of it has been measured. If the customer tells you one, that is
                   a quote and it belongs to them.
@@ -383,11 +383,11 @@ export default function CaseStudyGeneratorPage() {
                   <div key={s.id} style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     gap: 12, padding: "11px 14px", borderRadius: 11,
-                    background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)",
+                    background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)",
                   }}>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#f8fafc" }}>{s.title}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)", marginTop: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-f8fafc, #f8fafc)" }}>{s.title}</div>
+                      <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))", marginTop: 2 }}>
                         {s.data?.companyName} · {s.data?.quoteSlots?.length ?? 0} quote slot(s) ·
                         {" "}saved {fmtDate(s.createdAt)}
                         {s.data?.flags?.length ? " · flagged" : ""}

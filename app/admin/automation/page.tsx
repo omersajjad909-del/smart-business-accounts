@@ -17,9 +17,9 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 const F = "'Outfit','Inter',sans-serif";
-const BG = "#070b14";
-const PANEL = "rgba(255,255,255,0.04)";
-const BORDER = "rgba(255,255,255,0.08)";
+const BG = "var(--dk-070b14, #070b14)";
+const PANEL = "rgba(var(--ink),0.04)";
+const BORDER = "rgba(var(--ink),0.08)";
 
 type Tab = "whatsapp" | "drip" | "content" | "social" | "leads" | "webhooks" | "chatbot" | "analytics";
 
@@ -43,8 +43,8 @@ function Card({ children, style = {} }: { children: React.ReactNode; style?: Rea
 function Inp({ label, ...p }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>{label}</label>
-      <input {...p} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", boxSizing: "border-box", ...p.style }} />
+      <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, 0.5))", marginBottom: 5 }}>{label}</label>
+      <input {...p} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),0.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none", boxSizing: "border-box", ...p.style }} />
     </div>
   );
 }
@@ -52,8 +52,8 @@ function Inp({ label, ...p }: { label: string } & React.InputHTMLAttributes<HTML
 function Txta({ label, ...p }: { label: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>{label}</label>
-      <textarea {...p} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", resize: "vertical", boxSizing: "border-box", ...p.style }} />
+      <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, 0.5))", marginBottom: 5 }}>{label}</label>
+      <textarea {...p} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),0.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none", resize: "vertical", boxSizing: "border-box", ...p.style }} />
     </div>
   );
 }
@@ -64,8 +64,8 @@ function Btn({ children, variant = "primary", loading = false, ...p }: {
   return (
     <button {...p} disabled={loading || p.disabled} style={{
       padding: "8px 18px", borderRadius: 8, border: variant === "danger" ? "1px solid rgba(239,68,68,.3)" : "none",
-      background: variant === "primary" ? "linear-gradient(135deg,#7c3aed,#2563eb)" : variant === "danger" ? "rgba(239,68,68,.12)" : "rgba(255,255,255,.07)",
-      color: variant === "danger" ? "#f87171" : "#fff",
+      background: variant === "primary" ? "linear-gradient(135deg,#7c3aed,#2563eb)" : variant === "danger" ? "rgba(239,68,68,.12)" : "rgba(var(--ink),.07)",
+      color: variant === "danger" ? "var(--tx-f87171, #f87171)" : "#fff",
       fontSize: 13, fontFamily: F, fontWeight: 600, cursor: "pointer",
       opacity: (loading || p.disabled) ? 0.55 : 1, ...p.style,
     }}>{loading ? "..." : children}</button>
@@ -78,7 +78,7 @@ function Toast({ msg, ok }: { msg: string; ok: boolean }) {
       position: "fixed", bottom: 24, right: 24, zIndex: 9999,
       background: ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)",
       border: `1px solid ${ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`,
-      color: ok ? "#34d399" : "#f87171",
+      color: ok ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)",
       padding: "10px 18px", borderRadius: 10, fontSize: 13, fontFamily: F,
     }}>{msg}</div>
   );
@@ -108,18 +108,18 @@ export default function AdminAutomationPage() {
   if (!ready) return <div style={{ minHeight: "100vh", background: BG }} />;
 
   const tabs: { id: Tab; label: string; icon: string; color: string }[] = [
-    { id: "whatsapp",  label: "WhatsApp Blasts",   icon: "💬", color: "#22c55e" },
-    { id: "drip",      label: "Email Drip",        icon: "📧", color: "#38bdf8" },
-    { id: "content",   label: "AI Content",        icon: "✍️", color: "#fbbf24" },
-    { id: "social",    label: "Social Media",      icon: "📱", color: "#f472b6" },
-    { id: "leads",     label: "Lead Management",   icon: "🎯", color: "#fb923c" },
-    { id: "webhooks",  label: "Webhooks",          icon: "🔗", color: "#a78bfa" },
-    { id: "chatbot",   label: "Website Chatbot",   icon: "🤖", color: "#38bdf8" },
-    { id: "analytics", label: "Analytics",         icon: "📊", color: "#34d399" },
+    { id: "whatsapp",  label: "WhatsApp Blasts",   icon: "💬", color: "var(--tx-22c55e, #22c55e)" },
+    { id: "drip",      label: "Email Drip",        icon: "📧", color: "var(--tx-38bdf8, #38bdf8)" },
+    { id: "content",   label: "AI Content",        icon: "✍️", color: "var(--tx-fbbf24, #fbbf24)" },
+    { id: "social",    label: "Social Media",      icon: "📱", color: "var(--tx-f472b6, #f472b6)" },
+    { id: "leads",     label: "Lead Management",   icon: "🎯", color: "var(--tx-fb923c, #fb923c)" },
+    { id: "webhooks",  label: "Webhooks",          icon: "🔗", color: "var(--tx-a78bfa, #a78bfa)" },
+    { id: "chatbot",   label: "Website Chatbot",   icon: "🤖", color: "var(--tx-38bdf8, #38bdf8)" },
+    { id: "analytics", label: "Analytics",         icon: "📊", color: "var(--tx-34d399, #34d399)" },
   ];
 
   return (
-    <div style={{ fontFamily: F, color: "var(--text, #e2e8f0)", paddingBottom: 40, width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ fontFamily: F, color: "var(--text, var(--tx-e2e8f0, #e2e8f0))", paddingBottom: 40, width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
       <style>{`
         .aut-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
         .aut-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:28px 0 24px}
@@ -129,11 +129,11 @@ export default function AdminAutomationPage() {
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
           <div style={{ fontSize: 28 }}>⚡</div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, background: "linear-gradient(135deg,#a78bfa,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, background: "linear-gradient(135deg,var(--tx-a78bfa, #a78bfa),var(--tx-38bdf8, #38bdf8))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             Business Automation
           </h1>
         </div>
-        <p style={{ margin: 0, color: "rgba(255,255,255,.4)", fontSize: 14 }}>
+        <p style={{ margin: 0, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 14 }}>
           FinovaOS business automation — WhatsApp workflows, email sequences, AI content, lead management
         </p>
       </div>
@@ -147,7 +147,7 @@ export default function AdminAutomationPage() {
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             padding: "8px 16px", borderRadius: 9, border: "none", cursor: "pointer", fontSize: 13, fontFamily: F,
             background: tab === t.id ? "linear-gradient(135deg,#7c3aed,#2563eb)" : PANEL,
-            color: tab === t.id ? "#fff" : "rgba(255,255,255,.55)",
+            color: tab === t.id ? "#fff" : "rgba(var(--ink),var(--ta-55, .55))",
             fontWeight: tab === t.id ? 700 : 400,
             borderBottom: tab === t.id ? "none" : `1px solid ${BORDER}`,
           }}>
@@ -180,10 +180,10 @@ function AdminAutomationStats() {
   }, []);
 
   const items = [
-    { label: "Total Leads", value: stats.leads, color: "#fb923c", icon: "🎯" },
-    { label: "Chat Messages", value: stats.chatMessages, color: "#38bdf8", icon: "💬" },
-    { label: "Webhook Hits", value: stats.webhookHits, color: "#a78bfa", icon: "🔗" },
-    { label: "Content Generated", value: stats.contentGenerated, color: "#fbbf24", icon: "✍️" },
+    { label: "Total Leads", value: stats.leads, color: "var(--tx-fb923c, #fb923c)", icon: "🎯" },
+    { label: "Chat Messages", value: stats.chatMessages, color: "var(--tx-38bdf8, #38bdf8)", icon: "💬" },
+    { label: "Webhook Hits", value: stats.webhookHits, color: "var(--tx-a78bfa, #a78bfa)", icon: "🔗" },
+    { label: "Content Generated", value: stats.contentGenerated, color: "var(--tx-fbbf24, #fbbf24)", icon: "✍️" },
   ];
 
   return (
@@ -192,7 +192,7 @@ function AdminAutomationStats() {
         <Card key={s.label} style={{ padding: "16px 18px" }}>
           <div style={{ fontSize: 20, marginBottom: 8 }}>{s.icon}</div>
           <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 3 }}>{s.label}</div>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 3 }}>{s.label}</div>
         </Card>
       ))}
     </div>
@@ -265,31 +265,31 @@ function WhatsAppBlastTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Bulk WhatsApp Blast</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 0, marginBottom: 16 }}>
           Send a message to multiple numbers at once. Pakistani format supported: 03001234567
         </p>
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-            <label style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Phone Numbers (one per line or comma-separated)</label>
-            <label style={{ fontSize: 11, color: "#38bdf8", cursor: "pointer", padding: "3px 10px", borderRadius: 6, border: "1px solid rgba(56,189,248,.3)", background: "rgba(56,189,248,.06)" }}>
+            <label style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>Phone Numbers (one per line or comma-separated)</label>
+            <label style={{ fontSize: 11, color: "var(--tx-38bdf8, #38bdf8)", cursor: "pointer", padding: "3px 10px", borderRadius: 6, border: "1px solid rgba(56,189,248,.3)", background: "rgba(56,189,248,.06)" }}>
               📂 Import CSV
               <input type="file" accept=".csv,.txt" onChange={handleCSV} style={{ display: "none" }} />
             </label>
           </div>
           <textarea value={phones} onChange={e => setPhones(e.target.value)} rows={5}
             placeholder={"03001234567\n03211234567\n923001234567"}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(var(--ink),.06)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
         </div>
         <Txta label="Message" value={msg} onChange={e => setMsg(e.target.value)} rows={4} placeholder="Hello! FinovaOS..." />
         <Btn onClick={sendBlast} loading={loading}>Send Blast ({phones.split(/[\n,]/).filter(p => p.trim()).length} numbers)</Btn>
 
         {results.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>Results:</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 8 }}>Results:</div>
             {results.map((r, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "5px 0", borderBottom: `1px solid ${BORDER}` }}>
-                <span style={{ color: "rgba(255,255,255,.6)" }}>{r.phone}</span>
-                <span style={{ color: r.success ? "#34d399" : "#f87171" }}>{r.success ? "✓ Sent" : `✗ ${r.error}`}</span>
+                <span style={{ color: "rgba(var(--ink),var(--ta-60, .6))" }}>{r.phone}</span>
+                <span style={{ color: r.success ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>{r.success ? "✓ Sent" : `✗ ${r.error}`}</span>
               </div>
             ))}
           </div>
@@ -298,23 +298,23 @@ function WhatsAppBlastTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Auto-Reply (AI)</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 0, marginBottom: 16 }}>
           When someone messages on WhatsApp, AI automatically replies on your behalf.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>Auto-Reply</span>
+          <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>Auto-Reply</span>
           <div onClick={() => setAutoReply(c => ({ ...c, enabled: !c.enabled }))} style={{
             width: 40, height: 22, borderRadius: 11, cursor: "pointer",
-            background: autoReply.enabled ? "#22c55e" : "rgba(255,255,255,.15)", position: "relative", transition: "background .2s",
+            background: autoReply.enabled ? "#22c55e" : "rgba(var(--ink),.15)", position: "relative", transition: "background .2s",
           }}>
             <div style={{ position: "absolute", top: 3, left: autoReply.enabled ? 21 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
           </div>
         </div>
         <Txta label="AI System Prompt" value={autoReply.systemPrompt} onChange={e => setAutoReply(c => ({ ...c, systemPrompt: e.target.value }))} rows={5}
           placeholder="You are FinovaOS support assistant. Answer customer questions in Urdu or English..." />
-        <div style={{ marginBottom: 16, padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,.03)", fontSize: 11, color: "rgba(255,255,255,.35)" }}>
+        <div style={{ marginBottom: 16, padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),.03)", fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
           Webhook URL (add in Meta Business Manager):<br />
-          <span style={{ color: "#a78bfa" }}>{typeof window !== "undefined" ? window.location.origin : ""}/api/whatsapp/webhook</span>
+          <span style={{ color: "var(--tx-a78bfa, #a78bfa)" }}>{typeof window !== "undefined" ? window.location.origin : ""}/api/whatsapp/webhook</span>
         </div>
         <Btn onClick={saveAutoReply} loading={cfgLoading}>Save Config</Btn>
       </Card>
@@ -363,8 +363,8 @@ function DripTab() {
         <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Create Campaign</h3>
         <Inp label="Campaign Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="FinovaOS Welcome Series" />
         {form.steps.map((step, i) => (
-          <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 10, padding: 12, marginBottom: 10, border: `1px solid ${BORDER}` }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 8 }}>Step {i + 1}</div>
+          <div key={i} style={{ background: "rgba(var(--ink),.03)", borderRadius: 10, padding: 12, marginBottom: 10, border: `1px solid ${BORDER}` }}>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 8 }}>Step {i + 1}</div>
             <div style={{ display: "grid", gridTemplateColumns: "80px 1fr", gap: 10 }}>
               <Inp label="Delay (days)" type="number" value={step.delayDays}
                 onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, delayDays: +e.target.value } : s) }))} />
@@ -374,7 +374,7 @@ function DripTab() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <input type="checkbox" checked={step.useAI} onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, useAI: e.target.checked } : s) }))} />
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Generate body with AI</span>
+              <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))" }}>Generate body with AI</span>
             </div>
             {step.useAI
               ? <Inp label="AI Prompt" value={step.aiPrompt} onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, aiPrompt: e.target.value } : s) }))} placeholder="Welcome email for a new FinovaOS user..." />
@@ -392,11 +392,11 @@ function DripTab() {
         <Card>
           <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Enroll a Lead</h3>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Campaign</label>
+            <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 5 }}>Campaign</label>
             <select value={enroll.campaignId} onChange={e => setEnroll(v => ({ ...v, campaignId: e.target.value }))}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
-              <option value="" style={{ background:"#0d1117", color:"#e2e8f0" }}>Select...</option>
-              {campaigns.map(c => <option key={c.id} value={c.id} style={{ background:"#0d1117", color:"#e2e8f0" }}>{c.name}</option>)}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "var(--dk-0d1117, #0d1117)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+              <option value="" style={{ background:"var(--dk-0d1117, #0d1117)", color:"var(--tx-e2e8f0, #e2e8f0)" }}>Select...</option>
+              {campaigns.map(c => <option key={c.id} value={c.id} style={{ background:"var(--dk-0d1117, #0d1117)", color:"var(--tx-e2e8f0, #e2e8f0)" }}>{c.name}</option>)}
             </select>
           </div>
           <Inp label="Email" value={enroll.email} onChange={e => setEnroll(v => ({ ...v, email: e.target.value }))} placeholder="lead@email.com" />
@@ -406,14 +406,14 @@ function DripTab() {
 
         <Card>
           <h3 style={{ margin: "0 0 14px", fontSize: 16, fontWeight: 700 }}>Campaigns ({campaigns.length})</h3>
-          {campaigns.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No campaigns yet</p>}
+          {campaigns.length === 0 && <p style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>No campaigns yet</p>}
           {campaigns.map(c => (
-            <div key={c.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
+            <div key={c.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(var(--ink),.04)", marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{c.name}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>{c.steps?.length || 0} steps</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))" }}>{c.steps?.length || 0} steps</div>
               </div>
-              <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 6, height: "fit-content", background: c.active ? "rgba(34,197,94,.15)" : "rgba(255,255,255,.05)", color: c.active ? "#22c55e" : "#888" }}>
+              <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 6, height: "fit-content", background: c.active ? "rgba(34,197,94,.15)" : "rgba(var(--ink),.05)", color: c.active ? "var(--tx-22c55e, #22c55e)" : "var(--tx-888888, #888888)" }}>
                 {c.active ? "Active" : "Paused"}
               </span>
             </div>
@@ -454,13 +454,13 @@ function ContentTab() {
         <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>FinovaOS Marketing Content</h3>
 
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Content Type</label>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 5 }}>Content Type</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {types.map(t => (
               <button key={t} onClick={() => setForm(f => ({ ...f, type: t }))} style={{
                 padding: "5px 12px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontFamily: F,
-                background: form.type === t ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,.07)",
-                color: form.type === t ? "#fff" : "rgba(255,255,255,.55)",
+                background: form.type === t ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(var(--ink),.07)",
+                color: form.type === t ? "#fff" : "rgba(var(--ink),var(--ta-55, .55))",
               }}>{t.replace(/_/g, " ")}</button>
             ))}
           </div>
@@ -471,18 +471,18 @@ function ContentTab() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Tone</label>
+            <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 5 }}>Tone</label>
             <select value={form.tone} onChange={e => setForm(f => ({ ...f, tone: e.target.value }))}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
-              {["professional", "casual", "persuasive", "informative", "friendly"].map(t => <option key={t} value={t} style={{ background:"#0d1117", color:"#e2e8f0" }}>{t}</option>)}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "var(--dk-0d1117, #0d1117)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+              {["professional", "casual", "persuasive", "informative", "friendly"].map(t => <option key={t} value={t} style={{ background:"var(--dk-0d1117, #0d1117)", color:"var(--tx-e2e8f0, #e2e8f0)" }}>{t}</option>)}
             </select>
           </div>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Language</label>
+            <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 5 }}>Language</label>
             <select value={form.language} onChange={e => setForm(f => ({ ...f, language: e.target.value }))}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
-              <option value="en" style={{ background:"#0d1117", color:"#e2e8f0" }}>English</option>
-              <option value="ur" style={{ background:"#0d1117", color:"#e2e8f0" }}>Urdu / Roman Urdu</option>
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "var(--dk-0d1117, #0d1117)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+              <option value="en" style={{ background:"var(--dk-0d1117, #0d1117)", color:"var(--tx-e2e8f0, #e2e8f0)" }}>English</option>
+              <option value="ur" style={{ background:"var(--dk-0d1117, #0d1117)", color:"var(--tx-e2e8f0, #e2e8f0)" }}>Urdu / Roman Urdu</option>
             </select>
           </div>
         </div>
@@ -500,10 +500,10 @@ function ContentTab() {
             <Btn variant="ghost" onClick={() => { navigator.clipboard?.writeText(result); show("Copied!", true); }} style={{ padding: "5px 12px", fontSize: 12 }}>Copy</Btn>
           )}
         </div>
-        {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,.3)" }}>✍️ Generating...</div>}
-        {!loading && !result && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,.2)", fontSize: 13 }}>Fill the form and click Generate</div>}
+        {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-30, .3))" }}>✍️ Generating...</div>}
+        {!loading && !result && <div style={{ textAlign: "center", padding: 40, color: "rgba(var(--ink),var(--ta-20, .2))", fontSize: 13 }}>Fill the form and click Generate</div>}
         {result && (
-          <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,.85)", padding: 16, borderRadius: 10, background: "rgba(255,255,255,.04)", border: `1px solid ${BORDER}` }}>
+          <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.7, color: "rgba(var(--ink),.85)", padding: 16, borderRadius: 10, background: "rgba(var(--ink),.04)", border: `1px solid ${BORDER}` }}>
             {result}
           </div>
         )}
@@ -556,10 +556,10 @@ function LeadsTab() {
         <Inp label="Email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="ahmed@company.com" />
         <Inp label="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="03001234567" />
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Source</label>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 5 }}>Source</label>
           <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
-            {["manual", "website", "facebook", "whatsapp", "referral", "google_ads"].map(s => <option key={s} value={s} style={{ background:"#0d1117", color:"#e2e8f0" }}>{s.replace(/_/g, " ")}</option>)}
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "var(--dk-0d1117, #0d1117)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+            {["manual", "website", "facebook", "whatsapp", "referral", "google_ads"].map(s => <option key={s} value={s} style={{ background:"var(--dk-0d1117, #0d1117)", color:"var(--tx-e2e8f0, #e2e8f0)" }}>{s.replace(/_/g, " ")}</option>)}
           </select>
         </div>
         <Txta label="Notes" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} />
@@ -575,30 +575,30 @@ function LeadsTab() {
             <thead>
               <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
                 {["Name", "Email", "Phone", "Source", "Status", "Date", ""].map(h => (
-                  <th key={h} style={{ padding: "8px 10px", textAlign: "left", color: "rgba(255,255,255,.4)", fontWeight: 500 }}>{h}</th>
+                  <th key={h} style={{ padding: "8px 10px", textAlign: "left", color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 500 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {leads.map(l => (
-                <tr key={l.id} style={{ borderBottom: `1px solid rgba(255,255,255,.04)` }}>
+                <tr key={l.id} style={{ borderBottom: `1px solid rgba(var(--ink),.04)` }}>
                   <td style={{ padding: "8px 10px", fontWeight: 500 }}>{l.name || "—"}</td>
-                  <td style={{ padding: "8px 10px", color: "rgba(255,255,255,.6)" }}>{l.email || "—"}</td>
-                  <td style={{ padding: "8px 10px", color: "rgba(255,255,255,.6)" }}>{l.phone || "—"}</td>
-                  <td style={{ padding: "8px 10px" }}><span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, background: "rgba(255,255,255,.07)" }}>{l.source}</span></td>
+                  <td style={{ padding: "8px 10px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>{l.email || "—"}</td>
+                  <td style={{ padding: "8px 10px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>{l.phone || "—"}</td>
+                  <td style={{ padding: "8px 10px" }}><span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, background: "rgba(var(--ink),.07)" }}>{l.source}</span></td>
                   <td style={{ padding: "8px 10px" }}>
                     <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
-                      style={{ background: "#0d1117", border: "none", color: STATUS_COLOR[l.status] || "#888", fontSize: 12, fontFamily: F, cursor: "pointer", colorScheme: "dark" }}>
-                      {Object.keys(STATUS_COLOR).map(s => <option key={s} value={s} style={{ background:"#0d1117", color: STATUS_COLOR[s] || "#888" }}>{s}</option>)}
+                      style={{ background: "var(--dk-0d1117, #0d1117)", border: "none", color: STATUS_COLOR[l.status] || "var(--tx-888888, #888)", fontSize: 12, fontFamily: F, cursor: "pointer", colorScheme: "dark" }}>
+                      {Object.keys(STATUS_COLOR).map(s => <option key={s} value={s} style={{ background:"var(--dk-0d1117, #0d1117)", color: STATUS_COLOR[s] || "var(--tx-888888, #888)" }}>{s}</option>)}
                     </select>
                   </td>
-                  <td style={{ padding: "8px 10px", color: "rgba(255,255,255,.3)", fontSize: 11 }}>{new Date(l.createdAt).toLocaleDateString()}</td>
+                  <td style={{ padding: "8px 10px", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 11 }}>{new Date(l.createdAt).toLocaleDateString()}</td>
                   <td style={{ padding: "8px 10px" }}>
-                    <button onClick={() => deleteLead(l.id)} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 13 }}>✕</button>
+                    <button onClick={() => deleteLead(l.id)} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 13 }}>✕</button>
                   </td>
                 </tr>
               ))}
-              {leads.length === 0 && <tr><td colSpan={7} style={{ textAlign: "center", padding: 30, color: "rgba(255,255,255,.2)" }}>No leads yet</td></tr>}
+              {leads.length === 0 && <tr><td colSpan={7} style={{ textAlign: "center", padding: 30, color: "rgba(var(--ink),var(--ta-20, .2))" }}>No leads yet</td></tr>}
             </tbody>
           </table>
         </div>
@@ -648,19 +648,19 @@ function WebhooksTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Outbound Webhooks</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>Send FinovaOS events to Zapier / Make</p>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 0, marginBottom: 16 }}>Send FinovaOS events to Zapier / Make</p>
         <Inp label="Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Zapier Lead Notifier" />
         <Inp label="URL" value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://hooks.zapier.com/..." />
         <Inp label="Events (* for all)" value={form.events} onChange={e => setForm(f => ({ ...f, events: e.target.value }))} placeholder="lead.created, *" />
         <Btn onClick={create} loading={loading}>Add Webhook</Btn>
         <div style={{ marginTop: 16 }}>
           {hooks.map(h => (
-            <div key={h.id} style={{ padding: "9px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", marginBottom: 8 }}>
+            <div key={h.id} style={{ padding: "9px 12px", borderRadius: 8, background: "rgba(var(--ink),.04)", marginBottom: 8 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{h.name}</span>
-                <span style={{ fontSize: 11, color: h.active ? "#22c55e" : "#888" }}>{h.active ? "Active" : "Off"}</span>
+                <span style={{ fontSize: 11, color: h.active ? "var(--tx-22c55e, #22c55e)" : "var(--tx-888888, #888)" }}>{h.active ? "Active" : "Off"}</span>
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{h.url?.slice(0, 55)}...</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 2 }}>{h.url?.slice(0, 55)}...</div>
             </div>
           ))}
         </div>
@@ -668,19 +668,19 @@ function WebhooksTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Inbound Tokens</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>Receive data from Zapier / Make</p>
+        <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 0, marginBottom: 16 }}>Receive data from Zapier / Make</p>
         <Btn onClick={createToken} loading={loading}>+ New Token</Btn>
         <div style={{ marginTop: 16 }}>
           {tokens.map(t => (
-            <div key={t.id} style={{ padding: "9px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", marginBottom: 8 }}>
+            <div key={t.id} style={{ padding: "9px 12px", borderRadius: 8, background: "rgba(var(--ink),.04)", marginBottom: 8 }}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{t.name}</div>
-              <div style={{ fontSize: 10, color: "#a78bfa", wordBreak: "break-all" }}>
+              <div style={{ fontSize: 10, color: "var(--tx-a78bfa, #a78bfa)", wordBreak: "break-all" }}>
                 {typeof window !== "undefined" ? window.location.origin : ""}/api/automation/webhooks/inbound?token={t.token}
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 3 }}>Hits: {t.hitCount}</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 3 }}>Hits: {t.hitCount}</div>
             </div>
           ))}
-          {tokens.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No tokens yet</p>}
+          {tokens.length === 0 && <p style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>No tokens yet</p>}
         </div>
       </Card>
     </div>
@@ -720,8 +720,8 @@ function ChatbotTab() {
           placeholder="You are FinovaOS AI assistant. FinovaOS is Pakistan's leading business software. Explain features, pricing, and onboarding to prospects..." />
         <Inp label="Color" type="color" value={cfg.primaryColor} onChange={e => setCfg(c => ({ ...c, primaryColor: e.target.value }))} style={{ height: 40 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>Active</span>
-          <div onClick={() => setCfg(c => ({ ...c, active: !c.active }))} style={{ width: 40, height: 22, borderRadius: 11, cursor: "pointer", background: cfg.active ? "#22c55e" : "rgba(255,255,255,.15)", position: "relative", transition: "background .2s" }}>
+          <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>Active</span>
+          <div onClick={() => setCfg(c => ({ ...c, active: !c.active }))} style={{ width: 40, height: 22, borderRadius: 11, cursor: "pointer", background: cfg.active ? "#22c55e" : "rgba(var(--ink),.15)", position: "relative", transition: "background .2s" }}>
             <div style={{ position: "absolute", top: 3, left: cfg.active ? 21 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
           </div>
         </div>
@@ -731,11 +731,11 @@ function ChatbotTab() {
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Card>
           <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700 }}>Embed on Your Website</h3>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 12 }}>
-            Paste this script tag before <code style={{ color: "#a78bfa" }}>&lt;/body&gt;</code> on your website.
+          <p style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 0, marginBottom: 12 }}>
+            Paste this script tag before <code style={{ color: "var(--tx-a78bfa, #a78bfa)" }}>&lt;/body&gt;</code> on your website.
           </p>
           <div style={{ position: "relative" }}>
-            <pre style={{ background: "rgba(0,0,0,.5)", borderRadius: 10, padding: 14, fontSize: 11, color: "#a78bfa", overflowX: "auto", border: `1px solid ${BORDER}`, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+            <pre style={{ background: "rgba(0,0,0,.5)", borderRadius: 10, padding: 14, fontSize: 11, color: "var(--tx-a78bfa, #a78bfa)", overflowX: "auto", border: `1px solid ${BORDER}`, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
               {embed}
             </pre>
             <Btn variant="ghost" onClick={() => { navigator.clipboard?.writeText(embed); show("Copied!", true); }}
@@ -745,7 +745,7 @@ function ChatbotTab() {
 
         <Card>
           <h3 style={{ margin: "0 0 10px", fontSize: 15, fontWeight: 700 }}>Widget Token</h3>
-          <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,.3)", fontFamily: "monospace", fontSize: 12, color: "#38bdf8", wordBreak: "break-all" }}>
+          <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,.3)", fontFamily: "monospace", fontSize: 12, color: "var(--tx-38bdf8, #38bdf8)", wordBreak: "break-all" }}>
             {cfg.widgetToken || "Loading..."}
           </div>
         </Card>
@@ -845,8 +845,8 @@ function SocialTab() {
   }
 
   const PLATFORMS = [
-    { id: "facebook",  label: "Facebook",  color: "#1877f2", icon: "📘" },
-    { id: "instagram", label: "Instagram", color: "#e1306c", icon: "📸" },
+    { id: "facebook",  label: "Facebook",  color: "var(--tx-1877f2, #1877f2)", icon: "📘" },
+    { id: "instagram", label: "Instagram", color: "var(--tx-e1306c, #e1306c)", icon: "📸" },
     { id: "linkedin",  label: "LinkedIn",  color: "#0a66c2", icon: "💼" },
   ];
 
@@ -862,26 +862,26 @@ function SocialTab() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
           {/* Facebook */}
           <div style={{ padding: "16px", borderRadius: 12, background: "rgba(24,119,242,.06)", border: "1px solid rgba(24,119,242,.2)" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#60a5fa", marginBottom: 12 }}>📘 Facebook Page</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-60a5fa, #60a5fa)", marginBottom: 12 }}>📘 Facebook Page</div>
             <Inp label="Page Access Token" value={creds.fbToken} onChange={e => setCreds(c => ({ ...c, fbToken: e.target.value }))} placeholder="EAAxxxxx..." type="password" />
             <Inp label="Page ID" value={creds.fbPageId} onChange={e => setCreds(c => ({ ...c, fbPageId: e.target.value }))} placeholder="123456789" />
           </div>
           {/* Instagram */}
           <div style={{ padding: "16px", borderRadius: 12, background: "rgba(225,48,108,.06)", border: "1px solid rgba(225,48,108,.2)" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#f472b6", marginBottom: 12 }}>📸 Instagram Business</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-f472b6, #f472b6)", marginBottom: 12 }}>📸 Instagram Business</div>
             <Inp label="Access Token" value={creds.igToken} onChange={e => setCreds(c => ({ ...c, igToken: e.target.value }))} placeholder="EAAxxxxx..." type="password" />
             <Inp label="Instagram Account ID" value={creds.igAccountId} onChange={e => setCreds(c => ({ ...c, igAccountId: e.target.value }))} placeholder="17841400000000" />
           </div>
           {/* LinkedIn */}
           <div style={{ padding: "16px", borderRadius: 12, background: "rgba(10,102,194,.06)", border: "1px solid rgba(10,102,194,.2)" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#60a5fa", marginBottom: 12 }}>💼 LinkedIn</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-60a5fa, #60a5fa)", marginBottom: 12 }}>💼 LinkedIn</div>
             <Inp label="Access Token" value={creds.liToken} onChange={e => setCreds(c => ({ ...c, liToken: e.target.value }))} placeholder="AQVxx..." type="password" />
             <Inp label="Organization URN / ID" value={creds.liOrgId} onChange={e => setCreds(c => ({ ...c, liOrgId: e.target.value }))} placeholder="urn:li:organization:12345" />
           </div>
         </div>
         <div style={{ marginTop: 16 }}>
           <Btn onClick={saveCreds} loading={savingCreds}>Save Credentials</Btn>
-          <p style={{ margin: "8px 0 0", fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+          <p style={{ margin: "8px 0 0", fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>
             Credentials are encrypted and stored securely. Get the Page Access Token from Meta Business Manager for Facebook/Instagram.
           </p>
         </div>
@@ -893,13 +893,13 @@ function SocialTab() {
 
         {/* Platform toggles */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>POST TO</label>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", marginBottom: 8 }}>POST TO</label>
           <div style={{ display: "flex", gap: 8 }}>
             {PLATFORMS.map(pl => (
               <button key={pl.id} onClick={() => togglePlatform(pl.id)} style={{
-                padding: "7px 16px", borderRadius: 20, border: `2px solid ${platforms.includes(pl.id) ? pl.color : "rgba(255,255,255,.1)"}`,
+                padding: "7px 16px", borderRadius: 20, border: `2px solid ${platforms.includes(pl.id) ? pl.color : "rgba(var(--ink),.1)"}`,
                 background: platforms.includes(pl.id) ? `${pl.color}22` : "transparent",
-                color: platforms.includes(pl.id) ? "#fff" : "rgba(255,255,255,.4)",
+                color: platforms.includes(pl.id) ? "#fff" : "rgba(var(--ink),var(--ta-40, .4))",
                 fontSize: 13, fontFamily: F, cursor: "pointer", fontWeight: 600, transition: "all .15s",
               }}>{pl.icon} {pl.label}</button>
             ))}
@@ -921,21 +921,21 @@ function SocialTab() {
       <Card>
         <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>📋 Post History</h3>
         {loadingPosts ? (
-          <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading...</div>
+          <div style={{ color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>Loading...</div>
         ) : posts.length === 0 ? (
-          <div style={{ padding: "32px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No posts yet</div>
+          <div style={{ padding: "32px 0", textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13 }}>No posts yet</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {posts.map((p: any) => (
-              <div key={p.id} style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: `1px solid rgba(255,255,255,.07)`, display: "flex", gap: 14, alignItems: "flex-start" }}>
+              <div key={p.id} style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: `1px solid rgba(var(--ink),.07)`, display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, color: "#e2e8f0", marginBottom: 6, lineHeight: 1.5 }}>{p.text?.slice(0, 120)}{p.text?.length > 120 ? "…" : ""}</div>
+                  <div style={{ fontSize: 13, color: "var(--tx-e2e8f0, #e2e8f0)", marginBottom: 6, lineHeight: 1.5 }}>{p.text?.slice(0, 120)}{p.text?.length > 120 ? "…" : ""}</div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                     {(p.platforms || []).map((pl: string) => (
-                      <span key={pl} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.5)", fontWeight: 600, textTransform: "capitalize" }}>{pl}</span>
+                      <span key={pl} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "rgba(var(--ink),.07)", color: "rgba(var(--ink),var(--ta-50, .5))", fontWeight: 600, textTransform: "capitalize" }}>{pl}</span>
                     ))}
-                    <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: `${STATUS_COLOR[p.status] || "#94a3b8"}22`, color: STATUS_COLOR[p.status] || "#94a3b8", fontWeight: 700, textTransform: "uppercase" }}>{p.status}</span>
-                    {p.scheduledAt && <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>📅 {new Date(p.scheduledAt).toLocaleString()}</span>}
+                    <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: `${STATUS_COLOR[p.status] || "#94a3b8"}22`, color: STATUS_COLOR[p.status] || "var(--tx-94a3b8, #94a3b8)", fontWeight: 700, textTransform: "uppercase" }}>{p.status}</span>
+                    {p.scheduledAt && <span style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))" }}>📅 {new Date(p.scheduledAt).toLocaleString()}</span>}
                   </div>
                 </div>
                 {p.status === "scheduled" && (
@@ -972,14 +972,14 @@ function AnalyticsTab() {
   }, [range]);
 
   const kpis = stats ? [
-    { label: "Total Leads",        value: stats.leads            ?? 0, color: "#fb923c", icon: "🎯" },
-    { label: "WhatsApp Sent",      value: stats.whatsappSent     ?? 0, color: "#22c55e", icon: "💬" },
-    { label: "Emails Sent",        value: stats.emailsSent       ?? 0, color: "#38bdf8", icon: "📧" },
-    { label: "Drip Campaigns",     value: stats.dripCampaigns    ?? 0, color: "#a78bfa", icon: "📋" },
-    { label: "Content Generated",  value: stats.contentGenerated ?? 0, color: "#fbbf24", icon: "✍️" },
-    { label: "Social Posts",       value: stats.socialPosts      ?? 0, color: "#f472b6", icon: "📱" },
-    { label: "Webhook Hits",       value: stats.webhookHits      ?? 0, color: "#a78bfa", icon: "🔗" },
-    { label: "Chat Messages",      value: stats.chatMessages     ?? 0, color: "#38bdf8", icon: "🤖" },
+    { label: "Total Leads",        value: stats.leads            ?? 0, color: "var(--tx-fb923c, #fb923c)", icon: "🎯" },
+    { label: "WhatsApp Sent",      value: stats.whatsappSent     ?? 0, color: "var(--tx-22c55e, #22c55e)", icon: "💬" },
+    { label: "Emails Sent",        value: stats.emailsSent       ?? 0, color: "var(--tx-38bdf8, #38bdf8)", icon: "📧" },
+    { label: "Drip Campaigns",     value: stats.dripCampaigns    ?? 0, color: "var(--tx-a78bfa, #a78bfa)", icon: "📋" },
+    { label: "Content Generated",  value: stats.contentGenerated ?? 0, color: "var(--tx-fbbf24, #fbbf24)", icon: "✍️" },
+    { label: "Social Posts",       value: stats.socialPosts      ?? 0, color: "var(--tx-f472b6, #f472b6)", icon: "📱" },
+    { label: "Webhook Hits",       value: stats.webhookHits      ?? 0, color: "var(--tx-a78bfa, #a78bfa)", icon: "🔗" },
+    { label: "Chat Messages",      value: stats.chatMessages     ?? 0, color: "var(--tx-38bdf8, #38bdf8)", icon: "🤖" },
   ] : [];
 
   return (
@@ -988,26 +988,26 @@ function AnalyticsTab() {
 
       <Card style={{ padding: "14px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)", fontWeight: 600 }}>Period:</span>
+          <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-60, .6))", fontWeight: 600 }}>Period:</span>
           {[{ v: "7", l: "Last 7 days" }, { v: "30", l: "Last 30 days" }, { v: "90", l: "Last 90 days" }].map(opt => (
             <button key={opt.v} onClick={() => setRange(opt.v)} style={{
               padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontFamily: F,
-              background: range === opt.v ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,.07)",
-              color: range === opt.v ? "#fff" : "rgba(255,255,255,.5)", fontWeight: range === opt.v ? 700 : 400,
+              background: range === opt.v ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(var(--ink),.07)",
+              color: range === opt.v ? "#fff" : "rgba(var(--ink),var(--ta-50, .5))", fontWeight: range === opt.v ? 700 : 400,
             }}>{opt.l}</button>
           ))}
         </div>
       </Card>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,.3)" }}>Loading analytics…</div>
+        <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Loading analytics…</div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 14 }}>
           {kpis.map(k => (
             <Card key={k.label} style={{ padding: "18px 20px", background: `${k.color}0d`, border: `1px solid ${k.color}30` }}>
               <div style={{ fontSize: 22, marginBottom: 10 }}>{k.icon}</div>
               <div style={{ fontSize: 28, fontWeight: 900, color: k.color, lineHeight: 1 }}>{k.value.toLocaleString()}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 6, fontWeight: 600 }}>{k.label}</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 6, fontWeight: 600 }}>{k.label}</div>
             </Card>
           ))}
         </div>
@@ -1020,18 +1020,18 @@ function AnalyticsTab() {
             <thead>
               <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
                 {["Campaign", "Enrolled", "Emails Sent", "Status"].map(h => (
-                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", color: "rgba(255,255,255,.4)", fontWeight: 500, fontSize: 11 }}>{h.toUpperCase()}</th>
+                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 500, fontSize: 11 }}>{h.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {stats.campaigns.map((c: any) => (
-                <tr key={c.id} style={{ borderBottom: `1px solid rgba(255,255,255,.04)` }}>
+                <tr key={c.id} style={{ borderBottom: `1px solid rgba(var(--ink),.04)` }}>
                   <td style={{ padding: "10px 12px", fontWeight: 600 }}>{c.name}</td>
-                  <td style={{ padding: "10px 12px", color: "rgba(255,255,255,.6)" }}>{c.enrolledCount ?? 0}</td>
-                  <td style={{ padding: "10px 12px", color: "#38bdf8" }}>{c.sentCount ?? 0}</td>
+                  <td style={{ padding: "10px 12px", color: "rgba(var(--ink),var(--ta-60, .6))" }}>{c.enrolledCount ?? 0}</td>
+                  <td style={{ padding: "10px 12px", color: "var(--tx-38bdf8, #38bdf8)" }}>{c.sentCount ?? 0}</td>
                   <td style={{ padding: "10px 12px" }}>
-                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 5, background: c.active ? "rgba(34,197,94,.12)" : "rgba(255,255,255,.06)", color: c.active ? "#22c55e" : "#888" }}>
+                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 5, background: c.active ? "rgba(34,197,94,.12)" : "rgba(var(--ink),.06)", color: c.active ? "var(--tx-22c55e, #22c55e)" : "var(--tx-888888, #888888)" }}>
                       {c.active ? "Active" : "Paused"}
                     </span>
                   </td>
@@ -1049,14 +1049,14 @@ function AnalyticsTab() {
             {Object.entries(stats.leadsByStage as Record<string, number>).map(([stage, count]) => {
               const total = Object.values(stats.leadsByStage as Record<string, number>).reduce((a: number, b: number) => a + b, 0);
               const pct = total ? Math.round((count / total) * 100) : 0;
-              const colors: Record<string, string> = { new: "#818cf8", contacted: "#38bdf8", qualified: "#22c55e", lost: "#f87171", won: "#fbbf24" };
+              const colors: Record<string, string> = { new: "var(--tx-818cf8, #818cf8)", contacted: "var(--tx-38bdf8, #38bdf8)", qualified: "var(--tx-22c55e, #22c55e)", lost: "var(--tx-f87171, #f87171)", won: "var(--tx-fbbf24, #fbbf24)" };
               return (
                 <div key={stage}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                    <span style={{ color: "rgba(255,255,255,.7)", textTransform: "capitalize" }}>{stage}</span>
-                    <span style={{ color: "rgba(255,255,255,.4)" }}>{count} ({pct}%)</span>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-70, .7))", textTransform: "capitalize" }}>{stage}</span>
+                    <span style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>{count} ({pct}%)</span>
                   </div>
-                  <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.06)", overflow: "hidden" }}>
+                  <div style={{ height: 6, borderRadius: 3, background: "rgba(var(--ink),.06)", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${pct}%`, background: colors[stage] || "#818cf8", borderRadius: 3 }} />
                   </div>
                 </div>

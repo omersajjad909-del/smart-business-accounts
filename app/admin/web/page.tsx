@@ -44,13 +44,13 @@ export default function WebMetricsPage() {
   const activePaid = finance ? finance.active.pro + finance.active.enterprise : null;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 80px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 80px" }}>
       <style>{css}</style>
 
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, letterSpacing: "-.02em" }}>Web Metrics</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Live overview of traffic, signups, and revenue across finovaos.app
         </p>
       </div>
@@ -90,13 +90,13 @@ export default function WebMetricsPage() {
               <a key={l.href} href={l.href} className="wm-link" style={{
                 display: "flex", alignItems: "flex-start", gap: 12,
                 padding: "13px 14px", borderRadius: 12,
-                background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.06)",
+                background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.06)",
                 textDecoration: "none", transition: "background .15s",
               }}>
                 <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>{l.icon}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.9)" }}>{l.label}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>{l.desc}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink),.9)" }}>{l.label}</div>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 2 }}>{l.desc}</div>
                 </div>
               </a>
             ))}
@@ -112,23 +112,23 @@ export default function WebMetricsPage() {
             {visitors ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
-                  { label: "Desktop", val: visitors.deviceBreakdown.desktop, color: "#818cf8", icon: "🖥️" },
-                  { label: "Mobile",  val: visitors.deviceBreakdown.mobile,  color: "#34d399", icon: "📱" },
-                  { label: "Tablet",  val: visitors.deviceBreakdown.tablet,  color: "#fbbf24", icon: "📟" },
+                  { label: "Desktop", val: visitors.deviceBreakdown.desktop, color: "var(--tx-818cf8, #818cf8)", icon: "🖥️" },
+                  { label: "Mobile",  val: visitors.deviceBreakdown.mobile,  color: "var(--tx-34d399, #34d399)", icon: "📱" },
+                  { label: "Tablet",  val: visitors.deviceBreakdown.tablet,  color: "var(--tx-fbbf24, #fbbf24)", icon: "📟" },
                 ].map(d => (
                   <div key={d.label}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                      <span style={{ color: "rgba(255,255,255,.7)", fontWeight: 600 }}>{d.icon} {d.label}</span>
+                      <span style={{ color: "rgba(var(--ink),var(--ta-70, .7))", fontWeight: 600 }}>{d.icon} {d.label}</span>
                       <span style={{ color: d.color, fontWeight: 800 }}>{d.val}%</span>
                     </div>
-                    <div style={{ height: 5, borderRadius: 99, background: "rgba(255,255,255,.06)" }}>
+                    <div style={{ height: 5, borderRadius: 99, background: "rgba(var(--ink),.06)" }}>
                       <div style={{ width: `${d.val}%`, height: "100%", borderRadius: 99, background: d.color, transition: "width .6s ease" }} />
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div style={{ color: "rgba(255,255,255,.25)", fontSize: 13, textAlign: "center", padding: "20px 0" }}>Loading…</div>
+              <div style={{ color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13, textAlign: "center", padding: "20px 0" }}>Loading…</div>
             )}
           </div>
 
@@ -139,16 +139,16 @@ export default function WebMetricsPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {visitors.topPages.slice(0, 6).map((p, i) => (
                   <div key={p.page} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.2)", width: 14, textAlign: "right", flexShrink: 0 }}>{i + 1}</span>
-                    <div style={{ flex: 1, fontSize: 11, color: "rgba(255,255,255,.6)", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(var(--ink),var(--ta-20, .2))", width: 14, textAlign: "right", flexShrink: 0 }}>{i + 1}</span>
+                    <div style={{ flex: 1, fontSize: 11, color: "rgba(var(--ink),var(--ta-60, .6))", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {p.page}
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#818cf8", flexShrink: 0 }}>{p.visits}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-818cf8, #818cf8)", flexShrink: 0 }}>{p.visits}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div style={{ color: "rgba(255,255,255,.25)", fontSize: 13, textAlign: "center", padding: "20px 0" }}>
+              <div style={{ color: "rgba(var(--ink),var(--ta-25, .25))", fontSize: 13, textAlign: "center", padding: "20px 0" }}>
                 {visitors ? "No data yet" : "Loading…"}
               </div>
             )}
@@ -161,18 +161,18 @@ export default function WebMetricsPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[
                   { label: "Starter",    val: finance.active.starter,    color: "#64748b" },
-                  { label: "Pro",        val: finance.active.pro,        color: "#6366f1" },
-                  { label: "Enterprise", val: finance.active.enterprise,  color: "#38bdf8" },
+                  { label: "Pro",        val: finance.active.pro,        color: "var(--tx-6366f1, #6366f1)" },
+                  { label: "Enterprise", val: finance.active.enterprise,  color: "var(--tx-38bdf8, #38bdf8)" },
                 ].map(p => {
                   const total = finance.active.starter + finance.active.pro + finance.active.enterprise || 1;
                   const pct = Math.round((p.val / total) * 100);
                   return (
                     <div key={p.label}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                        <span style={{ color: "rgba(255,255,255,.7)", fontWeight: 600 }}>{p.label}</span>
-                        <span style={{ color: "rgba(255,255,255,.4)" }}>{p.val} <span style={{ color: p.color, fontWeight: 700 }}>({pct}%)</span></span>
+                        <span style={{ color: "rgba(var(--ink),var(--ta-70, .7))", fontWeight: 600 }}>{p.label}</span>
+                        <span style={{ color: "rgba(var(--ink),var(--ta-40, .4))" }}>{p.val} <span style={{ color: p.color, fontWeight: 700 }}>({pct}%)</span></span>
                       </div>
-                      <div style={{ height: 5, borderRadius: 99, background: "rgba(255,255,255,.06)" }}>
+                      <div style={{ height: 5, borderRadius: 99, background: "rgba(var(--ink),.06)" }}>
                         <div style={{ width: `${pct}%`, height: "100%", borderRadius: 99, background: p.color }} />
                       </div>
                     </div>
@@ -192,7 +192,7 @@ function KpiCard({ label, val, color, icon, isCurrency }: {
 }) {
   const display = val === null ? "—" : isCurrency ? fmt(val) : val.toLocaleString();
   return (
-    <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+    <div style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "18px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <span style={{ fontSize: 18 }}>{icon}</span>
         <div style={{ width: 28, height: 28, borderRadius: 8, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -200,31 +200,31 @@ function KpiCard({ label, val, color, icon, isCurrency }: {
         </div>
       </div>
       <div style={{ fontSize: 28, fontWeight: 800, color, lineHeight: 1 }}>
-        {val === null ? <span style={{ fontSize: 20, color: "rgba(255,255,255,.15)" }}>—</span> : display}
+        {val === null ? <span style={{ fontSize: 20, color: "rgba(var(--ink),var(--ta-15, .15))" }}>—</span> : display}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.38)", marginTop: 6, letterSpacing: ".03em" }}>{label.toUpperCase()}</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(var(--ink),var(--ta-38, .38))", marginTop: 6, letterSpacing: ".03em" }}>{label.toUpperCase()}</div>
     </div>
   );
 }
 
 const card: React.CSSProperties = {
-  background: "linear-gradient(160deg,rgba(19,27,50,.98),rgba(15,22,42,.98))",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "linear-gradient(160deg,rgba(var(--dkr-131b32, 19,27,50),0.98),rgba(var(--dkr-0f162a, 15,22,42),0.98))",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 20,
   padding: "20px 22px",
 };
 
 const cardHead: React.CSSProperties = {
-  fontSize: 14, fontWeight: 800, color: "#f8fafc",
+  fontSize: 14, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)",
   marginBottom: 16, paddingBottom: 12,
-  borderBottom: "1px solid rgba(255,255,255,.06)",
+  borderBottom: "1px solid rgba(var(--ink),.06)",
 };
 
 const sectionLabel: React.CSSProperties = {
   fontSize: 10, fontWeight: 700, letterSpacing: ".1em",
-  color: "rgba(255,255,255,.3)", marginBottom: 10, textTransform: "uppercase",
+  color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 10, textTransform: "uppercase",
 };
 
 const css = `
-  .wm-link:hover { background: rgba(255,255,255,.06) !important; border-color: rgba(255,255,255,.12) !important; }
+  .wm-link:hover { background: rgba(var(--ink),.06) !important; border-color: rgba(var(--ink),.12) !important; }
 `;

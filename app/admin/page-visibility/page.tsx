@@ -36,12 +36,12 @@ function getHeaders() {
 }
 
 const BIZ_COLORS: Record<string, string> = {
-  trading: "#818cf8", retail: "#34d399", distribution: "#f59e0b",
-  wholesale: "#06b6d4", trade: "#a78bfa", transport: "#f97316",
-  salon: "#f87171", gym: "#60a5fa", pharmacy: "#10b981",
-  hotel: "#fbbf24", restaurant: "#ef4444", manufacturing: "#8b5cf6",
-  construction: "#d97706", real_estate: "#0ea5e9", school: "#ec4899",
-  healthcare: "#14b8a6",
+  trading: "var(--tx-818cf8, #818cf8)", retail: "var(--tx-34d399, #34d399)", distribution: "var(--tx-f59e0b, #f59e0b)",
+  wholesale: "var(--tx-06b6d4, #06b6d4)", trade: "var(--tx-a78bfa, #a78bfa)", transport: "var(--tx-f97316, #f97316)",
+  salon: "var(--tx-f87171, #f87171)", gym: "var(--tx-60a5fa, #60a5fa)", pharmacy: "var(--tx-10b981, #10b981)",
+  hotel: "var(--tx-fbbf24, #fbbf24)", restaurant: "var(--tx-ef4444, #ef4444)", manufacturing: "#8b5cf6",
+  construction: "var(--tx-d97706, #d97706)", real_estate: "var(--tx-0ea5e9, #0ea5e9)", school: "var(--tx-ec4899, #ec4899)",
+  healthcare: "var(--tx-14b8a6, #14b8a6)",
 };
 function bizColor(b: string) { return BIZ_COLORS[b] || "#94a3b8"; }
 
@@ -54,7 +54,7 @@ function Toggle({ on, loading, onToggle }: { on: boolean; loading: boolean; onTo
       style={{
         position: "relative", width: 44, height: 24, borderRadius: 99,
         border: "none", cursor: loading ? "not-allowed" : "pointer",
-        background: on ? "#34d399" : "rgba(255,255,255,.12)",
+        background: on ? "#34d399" : "rgba(var(--ink),.12)",
         transition: "background .25s",
         flexShrink: 0,
         opacity: loading ? .6 : 1,
@@ -159,15 +159,15 @@ export default function PageVisibilityPage() {
   const visibleCount  = features.length - hiddenCount;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 80px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 80px" }}>
       <style>{css}</style>
 
       {/* Toast */}
       {toast && (
         <div style={{
           position: "fixed", top: 20, right: 24, zIndex: 9999,
-          background: "rgba(20,30,60,.97)", border: "1px solid rgba(52,211,153,.4)",
-          color: "#34d399", fontSize: 13, fontWeight: 700,
+          background: "rgba(var(--dkr-141e3c, 20,30,60),0.97)", border: "1px solid rgba(52,211,153,.4)",
+          color: "var(--tx-34d399, #34d399)", fontSize: 13, fontWeight: 700,
           padding: "10px 20px", borderRadius: 12,
           boxShadow: "0 8px 30px rgba(0,0,0,.4)",
           animation: "slideIn .2s ease",
@@ -180,7 +180,7 @@ export default function PageVisibilityPage() {
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Page Visibility</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)", maxWidth: 560 }}>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", maxWidth: 560 }}>
             Toggle any dashboard page on or off globally. Hidden pages disappear from all users' navigation instantly — no code change needed.
           </p>
         </div>
@@ -189,7 +189,7 @@ export default function PageVisibilityPage() {
           disabled={saving === "RESET" || hiddenCount === 0}
           style={{
             padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: hiddenCount === 0 ? "not-allowed" : "pointer",
-            border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.08)", color: "#f87171",
+            border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.08)", color: "var(--tx-f87171, #f87171)",
             opacity: hiddenCount === 0 ? .4 : 1, transition: "opacity .2s",
           }}
         >
@@ -200,14 +200,14 @@ export default function PageVisibilityPage() {
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14, marginBottom: 24 }}>
         {[
-          { label: "Total Pages",   val: features.length, color: "#818cf8" },
-          { label: "Visible",       val: visibleCount,    color: "#34d399" },
-          { label: "Hidden",        val: hiddenCount,     color: "#f87171" },
-          { label: "Phase 1 Pages", val: features.filter(isPhase1).length, color: "#fbbf24" },
+          { label: "Total Pages",   val: features.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Visible",       val: visibleCount,    color: "var(--tx-34d399, #34d399)" },
+          { label: "Hidden",        val: hiddenCount,     color: "var(--tx-f87171, #f87171)" },
+          { label: "Phase 1 Pages", val: features.filter(isPhase1).length, color: "var(--tx-fbbf24, #fbbf24)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "18px 20px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.38)", marginTop: 5, letterSpacing: ".05em" }}>{k.label.toUpperCase()}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-38, .38))", marginTop: 5, letterSpacing: ".05em" }}>{k.label.toUpperCase()}</div>
           </div>
         ))}
       </div>
@@ -216,8 +216,8 @@ export default function PageVisibilityPage() {
       {hiddenCount > 0 && (
         <div style={{ marginBottom: 20, padding: "12px 18px", borderRadius: 12, background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.25)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 16 }}>⚠️</span>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>
-            <strong style={{ color: "#f87171" }}>{hiddenCount} page{hiddenCount > 1 ? "s" : ""}</strong> are currently hidden from all users' dashboards.
+          <span style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-70, .7))" }}>
+            <strong style={{ color: "var(--tx-f87171, #f87171)" }}>{hiddenCount} page{hiddenCount > 1 ? "s" : ""}</strong> are currently hidden from all users' dashboards.
           </span>
         </div>
       )}
@@ -227,40 +227,40 @@ export default function PageVisibilityPage() {
         <input
           placeholder="Search pages, routes, sections…"
           value={search} onChange={e => setSearch(e.target.value)}
-          style={{ flex: 1, minWidth: 220, padding: "9px 14px", borderRadius: 10, border: "1.5px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "white", fontSize: 13, outline: "none", fontFamily: "inherit" }}
+          style={{ flex: 1, minWidth: 220, padding: "9px 14px", borderRadius: 10, border: "1.5px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none", fontFamily: "inherit" }}
         />
         <select value={bizFilter} onChange={e => setBizFilter(e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, border: "1.5px solid rgba(255,255,255,.1)", background: "#0f1628", color: "white", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, border: "1.5px solid rgba(var(--ink),.1)", background: "var(--dk-0f1628, #0f1628)", color: "var(--ink-solid, white)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
           <option value="all">All Modules</option>
           {allBusinesses.map(([biz, label]) => <option key={biz} value={biz}>{label}</option>)}
         </select>
-        <div style={{ display: "flex", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, overflow: "hidden" }}>
+        <div style={{ display: "flex", background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.1)", borderRadius: 10, overflow: "hidden" }}>
           {(["all", "visible", "hidden"] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{
                 padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none",
                 background: statusFilter === s ? "rgba(99,102,241,.3)" : "transparent",
-                color: statusFilter === s ? "#818cf8" : "rgba(255,255,255,.4)",
+                color: statusFilter === s ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
                 transition: "all .15s", fontFamily: "inherit",
               }}>
               {s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", fontSize: 13, color: phase1Only ? "#fbbf24" : "rgba(255,255,255,.4)", fontWeight: 600, userSelect: "none" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", fontSize: 13, color: phase1Only ? "var(--tx-fbbf24, #fbbf24)" : "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 600, userSelect: "none" }}>
           <input type="checkbox" checked={phase1Only} onChange={e => setPhase1Only(e.target.checked)} style={{ accentColor: "#fbbf24", width: 14, height: 14 }} />
           Phase 1 Only
         </label>
-        <span style={{ fontSize: 12, color: "rgba(255,255,255,.28)", whiteSpace: "nowrap" }}>
+        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-28, .28))", whiteSpace: "nowrap" }}>
           {filtered.length} / {features.length}
         </span>
       </div>
 
       {/* Content */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: 80, color: "rgba(255,255,255,.25)" }}>Loading pages…</div>
+        <div style={{ textAlign: "center", padding: 80, color: "rgba(var(--ink),var(--ta-25, .25))" }}>Loading pages…</div>
       ) : grouped.length === 0 ? (
-        <div style={{ textAlign: "center", padding: 80, color: "rgba(255,255,255,.25)" }}>No pages match your filters.</div>
+        <div style={{ textAlign: "center", padding: 80, color: "rgba(var(--ink),var(--ta-25, .25))" }}>No pages match your filters.</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {grouped.map(([biz, { label, color, features: bizFeatures }]) => {
@@ -272,25 +272,25 @@ export default function PageVisibilityPage() {
             });
 
             return (
-              <div key={biz} style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 18, overflow: "hidden" }}>
+              <div key={biz} style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 18, overflow: "hidden" }}>
                 {/* Module header */}
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,.06)",
+                  padding: "14px 20px", borderBottom: "1px solid rgba(var(--ink),.06)",
                   background: `linear-gradient(90deg,${color}14,transparent)`,
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 4, height: 22, borderRadius: 99, background: color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 15, fontWeight: 800, color: "white" }}>{label}</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)" }}>{label}</span>
                     {PHASE1_BUSINESSES.has(biz) && (
-                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", background: "rgba(251,191,36,.12)", border: "1px solid rgba(251,191,36,.3)", color: "#fbbf24", borderRadius: 6, padding: "2px 8px" }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".06em", background: "rgba(251,191,36,.12)", border: "1px solid rgba(251,191,36,.3)", color: "var(--tx-fbbf24, #fbbf24)", borderRadius: 6, padding: "2px 8px" }}>
                         PHASE 1
                       </span>
                     )}
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)" }}>{bizFeatures.length} pages</span>
+                    <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-28, .28))" }}>{bizFeatures.length} pages</span>
                   </div>
                   {hiddenInGroup > 0 && (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#f87171", background: "rgba(248,113,113,.1)", padding: "3px 10px", borderRadius: 20 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--tx-f87171, #f87171)", background: "rgba(248,113,113,.1)", padding: "3px 10px", borderRadius: 20 }}>
                       {hiddenInGroup} hidden
                     </span>
                   )}
@@ -300,7 +300,7 @@ export default function PageVisibilityPage() {
                 <div style={{ padding: "12px 16px 16px" }}>
                   {Object.entries(sections).map(([section, sFeatures]) => (
                     <div key={section} style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.22)", letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink),var(--ta-22, .22))", letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
                         {section}
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 6 }}>
@@ -308,21 +308,21 @@ export default function PageVisibilityPage() {
                           <div key={f.id} className="pv-item" style={{
                             display: "flex", alignItems: "center", justifyContent: "space-between",
                             padding: "10px 14px", borderRadius: 12, gap: 12,
-                            background: f.hidden ? "rgba(248,113,113,.05)" : "rgba(255,255,255,.03)",
-                            border: `1px solid ${f.hidden ? "rgba(248,113,113,.18)" : "rgba(255,255,255,.06)"}`,
+                            background: f.hidden ? "rgba(248,113,113,.05)" : "rgba(var(--ink),.03)",
+                            border: `1px solid ${f.hidden ? "rgba(248,113,113,.18)" : "rgba(var(--ink),.06)"}`,
                             transition: "border-color .2s, background .2s",
                           }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 13, fontWeight: 600, color: f.hidden ? "rgba(248,113,113,.65)" : "rgba(255,255,255,.88)", marginBottom: 2, display: "flex", alignItems: "center", gap: 7 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: f.hidden ? "rgba(var(--txr-f87171, 248,113,113),.65)" : "rgba(var(--ink),.88)", marginBottom: 2, display: "flex", alignItems: "center", gap: 7 }}>
                                 {f.hidden && <span style={{ fontSize: 10 }}>🚫</span>}
                                 {f.label}
                               </div>
-                              <div style={{ fontSize: 10, color: "rgba(255,255,255,.22)", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-22, .22))", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                 {f.route}
                               </div>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: f.hidden ? "#f87171" : "#34d399" }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: f.hidden ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)" }}>
                                 {f.hidden ? "OFF" : "ON"}
                               </span>
                               <Toggle on={!f.hidden} loading={saving === f.id} onToggle={() => toggle(f.id, f.hidden)} />
@@ -344,7 +344,7 @@ export default function PageVisibilityPage() {
 
 const css = `
   @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-  .pv-item:hover { border-color: rgba(255,255,255,.12) !important; }
+  .pv-item:hover { border-color: rgba(var(--ink),.12) !important; }
   button { font-family: inherit; }
-  select option { background: #0f1628; }
+  select option { background: var(--dk-0f1628, #0f1628); }
 `;

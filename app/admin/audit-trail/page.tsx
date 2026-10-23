@@ -17,17 +17,17 @@ type LogEntry = {
 };
 
 const ACTION_COLORS: Record<string, { bg: string; text: string }> = {
-  IMPERSONATE_USER:       { bg: "rgba(245,158,11,.12)",  text: "#f59e0b" },
-  CHANGE_PLAN:            { bg: "rgba(99,102,241,.12)",  text: "#818cf8" },
-  CANCEL_SUBSCRIPTION:    { bg: "rgba(239,68,68,.12)",   text: "#f87171" },
-  ACTIVATE_SUBSCRIPTION:  { bg: "rgba(34,197,94,.12)",   text: "#22c55e" },
-  UPDATE_COMPANY:         { bg: "rgba(56,189,248,.12)",  text: "#38bdf8" },
-  DELETE_USER:            { bg: "rgba(239,68,68,.15)",   text: "#ef4444" },
-  ADMIN_LOGIN:            { bg: "rgba(167,139,250,.12)", text: "#a78bfa" },
+  IMPERSONATE_USER:       { bg: "rgba(245,158,11,.12)",  text: "var(--tx-f59e0b, #f59e0b)" },
+  CHANGE_PLAN:            { bg: "rgba(99,102,241,.12)",  text: "var(--tx-818cf8, #818cf8)" },
+  CANCEL_SUBSCRIPTION:    { bg: "rgba(239,68,68,.12)",   text: "var(--tx-f87171, #f87171)" },
+  ACTIVATE_SUBSCRIPTION:  { bg: "rgba(34,197,94,.12)",   text: "var(--tx-22c55e, #22c55e)" },
+  UPDATE_COMPANY:         { bg: "rgba(56,189,248,.12)",  text: "var(--tx-38bdf8, #38bdf8)" },
+  DELETE_USER:            { bg: "rgba(239,68,68,.15)",   text: "var(--tx-ef4444, #ef4444)" },
+  ADMIN_LOGIN:            { bg: "rgba(167,139,250,.12)", text: "var(--tx-a78bfa, #a78bfa)" },
 };
 
 function ActionBadge({ action }: { action: string }) {
-  const c = ACTION_COLORS[action] ?? { bg: "rgba(255,255,255,.08)", text: "#94a3b8" };
+  const c = ACTION_COLORS[action] ?? { bg: "rgba(var(--ink),.08)", text: "var(--tx-94a3b8, #94a3b8)" };
   return (
     <span style={{ padding: "3px 10px", borderRadius: 20, background: c.bg, color: c.text, fontSize: 11, fontWeight: 800, letterSpacing: ".04em", whiteSpace: "nowrap" }}>
       {action.replace(/_/g, " ")}
@@ -77,34 +77,34 @@ export default function AdminAuditTrailPage() {
   const COMMON_ACTIONS = ["IMPERSONATE_USER", "CHANGE_PLAN", "CANCEL_SUBSCRIPTION", "ACTIVATE_SUBSCRIPTION", "UPDATE_COMPANY"];
 
   return (
-    <div style={{ padding: "28px 24px", minHeight: "100vh", background: "#060918" }}>
+    <div style={{ padding: "28px 24px", minHeight: "100vh", background: "var(--dk-060918, #060918)" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
             <a href="/admin/companies" style={{ color: "#475569", textDecoration: "none", fontSize: 13 }}>← Companies</a>
           </div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Admin Audit Trail</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "var(--ink-solid, white)" }}>Admin Audit Trail</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#475569" }}>
             Every action taken by admin team members — {total} total entries
           </p>
         </div>
-        <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+        <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(var(--ink),.06)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
           ↻ Refresh
         </button>
       </div>
 
       {pending && (
         <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.3)", marginBottom: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b", marginBottom: 8 }}>Migration Required — Table Not Yet Created</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.8 }}>
-            The <code style={{ background: "rgba(255,255,255,.08)", padding: "2px 6px", borderRadius: 4, fontFamily: "monospace" }}>AdminActionLog</code> table does not exist in your database yet.<br />
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-f59e0b, #f59e0b)", marginBottom: 8 }}>Migration Required — Table Not Yet Created</div>
+          <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-65, .65))", lineHeight: 1.8 }}>
+            The <code style={{ background: "rgba(var(--ink),.08)", padding: "2px 6px", borderRadius: 4, fontFamily: "monospace" }}>AdminActionLog</code> table does not exist in your database yet.<br />
             Run the SQL file below in your <strong>Supabase SQL Editor</strong> to enable this feature:
           </div>
-          <div style={{ marginTop: 12, background: "rgba(0,0,0,.3)", borderRadius: 10, padding: "10px 14px", fontFamily: "monospace", fontSize: 12, color: "#fbbf24", border: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ marginTop: 12, background: "rgba(0,0,0,.3)", borderRadius: 10, padding: "10px 14px", fontFamily: "monospace", fontSize: 12, color: "var(--tx-fbbf24, #fbbf24)", border: "1px solid rgba(var(--ink),.08)" }}>
             prisma/manual_admin_action_log.sql
           </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+          <div style={{ marginTop: 10, fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
             After running the SQL, new admin actions (plan changes, impersonation, etc.) will automatically appear here.
           </div>
         </div>
@@ -114,9 +114,9 @@ export default function AdminAuditTrailPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         <input value={filterAdmin} onChange={e => { setFilterAdmin(e.target.value); setPage(1); }}
           placeholder="🔍  Filter by admin email..."
-          style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
+          style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--ink-solid, white)", fontSize: 13, outline: "none" }} />
         <select value={filterAction} onChange={e => { setFilterAction(e.target.value); setPage(1); }}
-          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 13, outline: "none", cursor: "pointer" }}>
           <option value="">All Actions</option>
           {COMMON_ACTIONS.map(a => <option key={a} value={a}>{a.replace(/_/g, " ")}</option>)}
         </select>
@@ -137,7 +137,7 @@ export default function AdminAuditTrailPage() {
             let parsedDetails: any = null;
             try { if (log.details) parsedDetails = JSON.parse(log.details); } catch {}
             return (
-              <div key={log.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden", transition: "border-color .15s" }}>
+              <div key={log.id} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 14, overflow: "hidden", transition: "border-color .15s" }}>
                 {/* Main row */}
                 <div
                   style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", cursor: parsedDetails ? "pointer" : "default" }}
@@ -147,7 +147,7 @@ export default function AdminAuditTrailPage() {
                   <ActionBadge action={log.action} />
                   {/* Target */}
                   <div style={{ flex: 1, minWidth: 140 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)" }}>
                       {log.targetLabel || log.targetId || log.targetType}
                     </div>
                     <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>
@@ -156,7 +156,7 @@ export default function AdminAuditTrailPage() {
                   </div>
                   {/* Admin */}
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 12, color: "#94a3b8" }}>{log.adminEmail}</div>
+                    <div style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)" }}>{log.adminEmail}</div>
                     <div style={{ fontSize: 11, color: "#334155", marginTop: 2 }}>{timeAgo(log.createdAt)}</div>
                   </div>
                   {parsedDetails && (
@@ -165,13 +165,13 @@ export default function AdminAuditTrailPage() {
                 </div>
                 {/* Expanded detail */}
                 {isExpanded && parsedDetails && (
-                  <div style={{ padding: "12px 18px 16px", borderTop: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.2)" }}>
+                  <div style={{ padding: "12px 18px 16px", borderTop: "1px solid rgba(var(--ink),.06)", background: "rgba(0,0,0,.2)" }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#475569", marginBottom: 10, letterSpacing: ".06em" }}>ACTION DETAILS</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
                       {Object.entries(parsedDetails).map(([k, v]) => (
                         <div key={k}>
                           <div style={{ fontSize: 10, fontWeight: 700, color: "#334155", letterSpacing: ".05em", marginBottom: 3 }}>{k.replace(/([A-Z])/g, " $1").toUpperCase()}</div>
-                          <div style={{ fontSize: 12, color: "#94a3b8", wordBreak: "break-all" }}>
+                          <div style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)", wordBreak: "break-all" }}>
                             {v === null || v === undefined ? "—" : typeof v === "object" ? JSON.stringify(v) : String(v)}
                           </div>
                         </div>
@@ -192,12 +192,12 @@ export default function AdminAuditTrailPage() {
       {pages > 1 && (
         <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 24 }}>
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
-            style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: page <= 1 ? "not-allowed" : "pointer" }}>
+            style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 700, cursor: page <= 1 ? "not-allowed" : "pointer" }}>
             ← Prev
           </button>
           <span style={{ padding: "8px 16px", fontSize: 12, color: "#475569" }}>Page {page} of {pages}</span>
           <button onClick={() => setPage(p => Math.min(pages, p + 1))} disabled={page >= pages}
-            style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: page >= pages ? "not-allowed" : "pointer" }}>
+            style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.1)", color: "var(--tx-94a3b8, #94a3b8)", fontSize: 12, fontWeight: 700, cursor: page >= pages ? "not-allowed" : "pointer" }}>
             Next →
           </button>
         </div>

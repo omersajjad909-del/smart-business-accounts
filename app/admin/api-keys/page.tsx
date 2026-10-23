@@ -68,25 +68,25 @@ export default function AdminApiKeysPage() {
   const revoked = items.filter(k => k.status === "revoked").length;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>API Keys</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Manage all API keys issued to companies. Revoke immediately when compromised.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Keys", val: items.length,       color: "#818cf8" },
-          { label: "Active",     val: active,             color: "#34d399" },
-          { label: "Revoked",    val: revoked,            color: "#f87171" },
+          { label: "Total Keys", val: items.length,       color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Active",     val: active,             color: "var(--tx-34d399, #34d399)" },
+          { label: "Revoked",    val: revoked,            color: "var(--tx-f87171, #f87171)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -95,10 +95,10 @@ export default function AdminApiKeysPage() {
         <input className="ak-inp" placeholder="Search company…" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Company","Key","Status","Last Used","Created","Actions"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -110,7 +110,7 @@ export default function AdminApiKeysPage() {
             ) : filtered.length === 0 ? (
               <tr><td colSpan={6} style={empty}>No API keys found</td></tr>
             ) : filtered.map(k => (
-              <tr key={k.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+              <tr key={k.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
                 <td style={{ ...td, fontWeight: 700 }}>{k.companyName}</td>
                 <td style={{ ...td, fontFamily: "monospace", fontSize: 12 }}>
                   <span style={{ userSelect: "all" }}>{revealed[k.id] ? k.key : k.keyPreview}</span>
@@ -121,19 +121,19 @@ export default function AdminApiKeysPage() {
                 <td style={td}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
                     background: k.status === "active" ? "rgba(52,211,153,.15)" : "rgba(248,113,113,.15)",
-                    color: k.status === "active" ? "#34d399" : "#f87171" }}>
+                    color: k.status === "active" ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)" }}>
                     {k.status}
                   </span>
                 </td>
-                <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>
+                <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>
                   {k.lastUsed ? new Date(k.lastUsed).toLocaleDateString("en-GB") : "—"}
                 </td>
-                <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>
+                <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>
                   {new Date(k.createdAt).toLocaleDateString("en-GB")}
                 </td>
                 <td style={td}>
                   {k.status === "active" && (
-                    <button className="ak-btn" onClick={() => revoke(k.id)} style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>Revoke</button>
+                    <button className="ak-btn" onClick={() => revoke(k.id)} style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>Revoke</button>
                   )}
                 </td>
               </tr>
@@ -145,14 +145,14 @@ export default function AdminApiKeysPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
 
 const css = `
-  .ak-inp { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; min-width:280px; }
+  .ak-inp { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; min-width:280px; }
   .ak-btn { border:none; border-radius:6px; padding:5px 12px; font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .ak-btn:hover { opacity:.75; }
-  .ak-link { background:none; border:none; color:#818cf8; cursor:pointer; font-size:11px; font-family:inherit; padding:0; }
+  .ak-link { background:none; border:none; color:var(--tx-818cf8, #818cf8); cursor:pointer; font-size:11px; font-family:inherit; padding:0; }
   .ak-link:hover { text-decoration:underline; }
 `;

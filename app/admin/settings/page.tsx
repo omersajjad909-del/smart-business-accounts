@@ -32,8 +32,8 @@ function announceProfile(detail: { name?: string; email?: string; avatar?: strin
 }
 
 const cardStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,.03)",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "rgba(var(--ink),.03)",
+  border: "1px solid rgba(var(--ink),.08)",
   borderRadius: 20,
   padding: 24,
 };
@@ -42,9 +42,9 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
   borderRadius: 12,
-  background: "rgba(255,255,255,.04)",
-  border: "1px solid rgba(255,255,255,.1)",
-  color: "white",
+  background: "rgba(var(--ink),.04)",
+  border: "1px solid rgba(var(--ink),.1)",
+  color: "var(--ink-solid, white)",
   fontSize: 14,
   outline: "none",
   boxSizing: "border-box",
@@ -231,7 +231,7 @@ export default function AdminSettingsPage() {
     .split(" ").map((p) => p[0] || "").join("").slice(0, 2).toUpperCase();
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", paddingBottom: 40 }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", paddingBottom: 40 }}>
       <ImageAdjusterModal
         open={!!pendingPhoto}
         file={pendingPhoto}
@@ -244,7 +244,7 @@ export default function AdminSettingsPage() {
 
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Admin Settings</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.46)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-46, .46))" }}>
           Update your admin photo, profile details and login password.
         </p>
       </div>
@@ -253,13 +253,13 @@ export default function AdminSettingsPage() {
         <section style={cardStyle}>
           <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Profile Details</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
               This controls the admin photo, name and email shown in the admin panel.
             </div>
           </div>
 
-          {profileError ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12, fontWeight: 700 }}>{profileError}</div> : null}
-          {profileMessage ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)", color: "#86efac", fontSize: 12, fontWeight: 700 }}>{profileMessage}</div> : null}
+          {profileError ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12, fontWeight: 700 }}>{profileError}</div> : null}
+          {profileMessage ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)", color: "var(--tx-86efac, #86efac)", fontSize: 12, fontWeight: 700 }}>{profileMessage}</div> : null}
 
           {/* Photo. Saves on confirm, so it is deliberately outside the form
               below — pressing Enter in Full Name must not resubmit it. */}
@@ -271,11 +271,11 @@ export default function AdminSettingsPage() {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700 }}>{name || email || "Admin"}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))", marginTop: 4 }}>
                 Shows in the sidebar and top bar. PNG or JPG, under 2MB.
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
-                <label style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.12)", color: "#c7d2fe", fontSize: 13, fontWeight: 800, cursor: loading || uploadingPhoto ? "not-allowed" : "pointer", opacity: loading || uploadingPhoto ? 0.65 : 1 }}>
+                <label style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.12)", color: "var(--tx-c7d2fe, #c7d2fe)", fontSize: 13, fontWeight: 800, cursor: loading || uploadingPhoto ? "not-allowed" : "pointer", opacity: loading || uploadingPhoto ? 0.65 : 1 }}>
                   {uploadingPhoto ? "Saving..." : avatar ? "Change Photo" : "Upload Photo"}
                   <input
                     type="file"
@@ -289,7 +289,7 @@ export default function AdminSettingsPage() {
                   type="button"
                   disabled={!avatar || uploadingPhoto}
                   onClick={() => savePhoto(null)}
-                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,.12)", background: "transparent", color: "rgba(255,255,255,.8)", fontSize: 13, fontWeight: 700, cursor: !avatar || uploadingPhoto ? "not-allowed" : "pointer", opacity: !avatar || uploadingPhoto ? 0.55 : 1 }}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(var(--ink),.12)", background: "transparent", color: "rgba(var(--ink),.8)", fontSize: 13, fontWeight: 700, cursor: !avatar || uploadingPhoto ? "not-allowed" : "pointer", opacity: !avatar || uploadingPhoto ? 0.55 : 1 }}
                 >
                   Remove
                 </button>
@@ -300,22 +300,22 @@ export default function AdminSettingsPage() {
           <form onSubmit={handleProfileSubmit}>
             <div style={{ display: "grid", gap: 14 }}>
               <label>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Full Name</div>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-36, .36))", marginBottom: 8 }}>Full Name</div>
                 <input value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} placeholder="Admin name" disabled={loading || savingProfile} />
               </label>
 
               <label>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Email</div>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-36, .36))", marginBottom: 8 }}>Email</div>
                 <input value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} placeholder="admin@example.com" disabled={loading || savingProfile} />
               </label>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>Role</div>
+                <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)" }}>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-36, .36))", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>Role</div>
                   <div style={{ fontSize: 13, fontWeight: 700 }}>{role || "-"}</div>
                 </div>
-                <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>Joined</div>
+                <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)" }}>
+                  <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-36, .36))", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>Joined</div>
                   <div style={{ fontSize: 13, fontWeight: 700 }}>{joined ? new Date(joined).toLocaleDateString() : "-"}</div>
                 </div>
               </div>
@@ -330,13 +330,13 @@ export default function AdminSettingsPage() {
         <section style={cardStyle}>
           <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Change Password</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)" }}>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
               Use your current password first, then set a new secure password.
             </div>
           </div>
 
-          {passwordError ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12, fontWeight: 700 }}>{passwordError}</div> : null}
-          {passwordMessage ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)", color: "#86efac", fontSize: 12, fontWeight: 700 }}>{passwordMessage}</div> : null}
+          {passwordError ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "var(--tx-fca5a5, #fca5a5)", fontSize: 12, fontWeight: 700 }}>{passwordError}</div> : null}
+          {passwordMessage ? <div style={{ marginBottom: 14, padding: "11px 12px", borderRadius: 12, background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.25)", color: "var(--tx-86efac, #86efac)", fontSize: 12, fontWeight: 700 }}>{passwordMessage}</div> : null}
 
           <form onSubmit={handlePasswordSubmit}>
             {/* The autocomplete hints below are what make the browser's password
@@ -359,21 +359,21 @@ export default function AdminSettingsPage() {
               />
 
               <label>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Current Password</div>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-36, .36))", marginBottom: 8 }}>Current Password</div>
                 <input type="password" autoComplete="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} style={inputStyle} placeholder="Enter current password" disabled={savingPassword} />
               </label>
 
               <label>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>New Password</div>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-36, .36))", marginBottom: 8 }}>New Password</div>
                 <input type="password" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={inputStyle} placeholder="Enter new password" disabled={savingPassword} />
               </label>
 
               <label>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Confirm Password</div>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-36, .36))", marginBottom: 8 }}>Confirm Password</div>
                 <input type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} placeholder="Confirm new password" disabled={savingPassword} />
               </label>
 
-              <button type="submit" disabled={savingPassword} style={{ marginTop: 4, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(56,189,248,.3)", background: "rgba(56,189,248,.14)", color: "#7dd3fc", fontSize: 14, fontWeight: 800, cursor: "pointer", opacity: savingPassword ? 0.65 : 1 }}>
+              <button type="submit" disabled={savingPassword} style={{ marginTop: 4, padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(56,189,248,.3)", background: "rgba(56,189,248,.14)", color: "var(--tx-7dd3fc, #7dd3fc)", fontSize: 14, fontWeight: 800, cursor: "pointer", opacity: savingPassword ? 0.65 : 1 }}>
                 {savingPassword ? "Updating..." : "Change Password"}
               </button>
             </div>

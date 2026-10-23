@@ -96,9 +96,9 @@ export default function RevenueAnalystPage() {
             {[6, 12, 24].map((m) => (
               <button key={m} onClick={() => setMonths(m)} style={{
                 padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                background: months === m ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-                border: months === m ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-                color: months === m ? "#818cf8" : "rgba(255,255,255,.4)",
+                background: months === m ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+                border: months === m ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+                color: months === m ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
               }}>
                 {m}m
               </button>
@@ -116,10 +116,10 @@ export default function RevenueAnalystPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "MRR", value: `${f.currency} ${f.mrr.toLocaleString()}`, color: "#34d399", sub: `${f.activeSubscriptions} active subscription${f.activeSubscriptions === 1 ? "" : "s"}` },
-            { label: "Lifetime billed", value: `${f.currency} ${f.lifetimeRevenue.toLocaleString()}`, color: "#818cf8", sub: f.refundedLifetime ? `${f.refundedLifetime.toLocaleString()} refunded` : "Nothing refunded" },
-            { label: "Paying companies", value: `${f.payingCompanies} / ${f.totalCompanies}`, color: "#c4b5fd", sub: "Have ever paid / total" },
-            { label: "Past due", value: f.pastDue, color: f.pastDue ? "#f87171" : "#34d399", sub: "Subscriptions behind" },
+            { label: "MRR", value: `${f.currency} ${f.mrr.toLocaleString()}`, color: "var(--tx-34d399, #34d399)", sub: `${f.activeSubscriptions} active subscription${f.activeSubscriptions === 1 ? "" : "s"}` },
+            { label: "Lifetime billed", value: `${f.currency} ${f.lifetimeRevenue.toLocaleString()}`, color: "var(--tx-818cf8, #818cf8)", sub: f.refundedLifetime ? `${f.refundedLifetime.toLocaleString()} refunded` : "Nothing refunded" },
+            { label: "Paying companies", value: `${f.payingCompanies} / ${f.totalCompanies}`, color: "var(--tx-c4b5fd, #c4b5fd)", sub: "Have ever paid / total" },
+            { label: "Past due", value: f.pastDue, color: f.pastDue ? "var(--tx-f87171, #f87171)" : "var(--tx-34d399, #34d399)", sub: "Subscriptions behind" },
           ]} />
 
           {f.caveats.length ? (
@@ -127,10 +127,10 @@ export default function RevenueAnalystPage() {
               background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.25)",
               borderRadius: 14, padding: "14px 18px", marginBottom: 18,
             }}>
-              <div style={{ fontSize: 11.5, fontWeight: 800, color: "#fcd34d", marginBottom: 8 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: "var(--tx-fcd34d, #fcd34d)", marginBottom: 8 }}>
                 READ THESE BEFORE YOU TRUST THE NUMBERS
               </div>
-              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "rgba(252,211,77,.85)", lineHeight: 1.75 }}>
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "rgba(var(--txr-fcd34d, 252,211,77),.85)", lineHeight: 1.75 }}>
                 {f.caveats.map((c) => <li key={c}>{c}</li>)}
               </ul>
             </div>
@@ -139,22 +139,22 @@ export default function RevenueAnalystPage() {
           <div className="ai-split">
             {/* ── conversation ── */}
             <div style={{ ...card, display: "flex", flexDirection: "column", minHeight: 460 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 16, color: "#f8fafc" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 16, color: "var(--tx-f8fafc, #f8fafc)" }}>
                 Ask
               </div>
 
               <div style={{ flex: 1, overflowY: "auto", maxHeight: 560, paddingRight: 4 }}>
                 {turns.length === 0 ? (
                   <div>
-                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.4)", marginBottom: 14, lineHeight: 1.7 }}>
+                    <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 14, lineHeight: 1.7 }}>
                       Nothing asked yet. These are the questions the fact sheet can actually answer:
                     </div>
                     <div style={{ display: "grid", gap: 7 }}>
                       {(data?.suggestions || []).map((s) => (
                         <button key={s} onClick={() => ask(s)} disabled={!data?.aiConfigured || asking} style={{
                           textAlign: "left", padding: "11px 14px", borderRadius: 11,
-                          background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
-                          color: "rgba(255,255,255,.65)", fontSize: 12.5, cursor: data?.aiConfigured ? "pointer" : "not-allowed",
+                          background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)",
+                          color: "rgba(var(--ink),var(--ta-65, .65))", fontSize: 12.5, cursor: data?.aiConfigured ? "pointer" : "not-allowed",
                           lineHeight: 1.5,
                         }}>
                           {s}
@@ -167,7 +167,7 @@ export default function RevenueAnalystPage() {
                     {turns.map((t, i) => (
                       <div key={i}>
                         <div style={{
-                          fontSize: 13, fontWeight: 700, color: "#c7d2fe", marginBottom: 9,
+                          fontSize: 13, fontWeight: 700, color: "var(--tx-c7d2fe, #c7d2fe)", marginBottom: 9,
                           borderLeft: "2px solid #6366f1", paddingLeft: 11, lineHeight: 1.55,
                         }}>
                           {t.q}
@@ -200,7 +200,7 @@ export default function RevenueAnalystPage() {
               {turns.length > 0 ? (
                 <button onClick={() => setTurns([])} style={{
                   marginTop: 10, background: "none", border: "none", cursor: "pointer",
-                  color: "rgba(255,255,255,.3)", fontSize: 11.5, textAlign: "left", padding: 0,
+                  color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 11.5, textAlign: "left", padding: 0,
                 }}>
                   Clear conversation
                 </button>
@@ -213,7 +213,7 @@ export default function RevenueAnalystPage() {
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11.5 }}>
                     <thead>
-                      <tr style={{ color: "rgba(255,255,255,.35)", textAlign: "right" }}>
+                      <tr style={{ color: "rgba(var(--ink),var(--ta-35, .35))", textAlign: "right" }}>
                         <th style={{ textAlign: "left", padding: "6px 8px", fontWeight: 700 }}>Month</th>
                         <th style={{ padding: "6px 8px", fontWeight: 700 }}>Net</th>
                         <th style={{ padding: "6px 8px", fontWeight: 700 }}>Inv</th>
@@ -223,14 +223,14 @@ export default function RevenueAnalystPage() {
                     </thead>
                     <tbody>
                       {f.months.map((m) => (
-                        <tr key={m.month} style={{ borderTop: "1px solid rgba(255,255,255,.05)", textAlign: "right" }}>
-                          <td style={{ textAlign: "left", padding: "7px 8px", color: "rgba(255,255,255,.55)" }}>{m.month}</td>
-                          <td style={{ padding: "7px 8px", color: m.net > 0 ? "#6ee7b7" : "rgba(255,255,255,.25)", fontWeight: 700 }}>
+                        <tr key={m.month} style={{ borderTop: "1px solid rgba(var(--ink),.05)", textAlign: "right" }}>
+                          <td style={{ textAlign: "left", padding: "7px 8px", color: "rgba(var(--ink),var(--ta-55, .55))" }}>{m.month}</td>
+                          <td style={{ padding: "7px 8px", color: m.net > 0 ? "var(--tx-6ee7b7, #6ee7b7)" : "rgba(var(--ink),var(--ta-25, .25))", fontWeight: 700 }}>
                             {m.net.toLocaleString()}
                           </td>
-                          <td style={{ padding: "7px 8px", color: "rgba(255,255,255,.5)" }}>{m.invoices}</td>
-                          <td style={{ padding: "7px 8px", color: m.newCompanies ? "#93c5fd" : "rgba(255,255,255,.2)" }}>{m.newCompanies}</td>
-                          <td style={{ padding: "7px 8px", color: m.cancellations ? "#fca5a5" : "rgba(255,255,255,.2)" }}>{m.cancellations}</td>
+                          <td style={{ padding: "7px 8px", color: "rgba(var(--ink),var(--ta-50, .5))" }}>{m.invoices}</td>
+                          <td style={{ padding: "7px 8px", color: m.newCompanies ? "var(--tx-93c5fd, #93c5fd)" : "rgba(var(--ink),var(--ta-20, .2))" }}>{m.newCompanies}</td>
+                          <td style={{ padding: "7px 8px", color: m.cancellations ? "var(--tx-fca5a5, #fca5a5)" : "rgba(var(--ink),var(--ta-20, .2))" }}>{m.cancellations}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -243,11 +243,11 @@ export default function RevenueAnalystPage() {
                   <div style={{ display: "grid", gap: 8 }}>
                     {f.topCustomers.map((c) => (
                       <div key={c.name} style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12.5 }}>
-                        <span style={{ color: "rgba(255,255,255,.7)" }}>
+                        <span style={{ color: "rgba(var(--ink),var(--ta-70, .7))" }}>
                           {c.name}
-                          <span style={{ color: "rgba(255,255,255,.28)", marginLeft: 7 }}>{c.plan} · {c.country || "?"}</span>
+                          <span style={{ color: "rgba(var(--ink),var(--ta-28, .28))", marginLeft: 7 }}>{c.plan} · {c.country || "?"}</span>
                         </span>
-                        <span style={{ color: "#6ee7b7", fontWeight: 700 }}>{c.lifetime.toLocaleString()}</span>
+                        <span style={{ color: "var(--tx-6ee7b7, #6ee7b7)", fontWeight: 700 }}>{c.lifetime.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
@@ -261,19 +261,19 @@ export default function RevenueAnalystPage() {
                   ["Countries", f.countryMix],
                 ] as const).map(([label, mix]) => (
                   <div key={label} style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(255,255,255,.3)", marginBottom: 6 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 6 }}>
                       {label.toUpperCase()}
                     </div>
                     <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
                       {Object.entries(mix).length === 0 ? (
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>None</span>
+                        <span style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-25, .25))" }}>None</span>
                       ) : Object.entries(mix).map(([k, v]) => (
                         <span key={k} style={{
                           fontSize: 11.5, padding: "5px 10px", borderRadius: 8,
-                          background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
-                          color: "rgba(255,255,255,.6)",
+                          background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)",
+                          color: "rgba(var(--ink),var(--ta-60, .6))",
                         }}>
-                          {k} <strong style={{ color: "#e2e8f0" }}>{v}</strong>
+                          {k} <strong style={{ color: "var(--tx-e2e8f0, #e2e8f0)" }}>{v}</strong>
                         </span>
                       ))}
                     </div>
@@ -285,8 +285,8 @@ export default function RevenueAnalystPage() {
                 <Section title="Cancelled in the last 90 days">
                   <div style={{ display: "grid", gap: 8 }}>
                     {f.cancelledLast90.map((c) => (
-                      <div key={`${c.name}-${c.when}`} style={{ fontSize: 12.5, color: "rgba(255,255,255,.6)" }}>
-                        <strong style={{ color: "#fca5a5" }}>{c.name}</strong> · {c.plan} · left {c.when} after
+                      <div key={`${c.name}-${c.when}`} style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))" }}>
+                        <strong style={{ color: "var(--tx-fca5a5, #fca5a5)" }}>{c.name}</strong> · {c.plan} · left {c.when} after
                         about {c.monthsHeld} month{c.monthsHeld === 1 ? "" : "s"}
                       </div>
                     ))}
@@ -296,7 +296,7 @@ export default function RevenueAnalystPage() {
             </div>
           </div>
 
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
             Fact sheet computed {fmtDate(f.generatedAt)} from platform invoices, subscriptions and
             company records. Rebuilt on every question, so an answer is never stale — but it can
             only ever be as good as the table beside it.

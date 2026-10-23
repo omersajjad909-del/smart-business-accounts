@@ -106,9 +106,9 @@ export default function DemoWatchdogPage() {
         {WINDOWS.map((d) => (
           <button key={d} onClick={() => setDays(d)} style={{
             padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-            background: days === d ? "rgba(99,102,241,.25)" : "rgba(255,255,255,.05)",
-            border: days === d ? "1px solid #6366f1" : "1px solid rgba(255,255,255,.1)",
-            color: days === d ? "#818cf8" : "rgba(255,255,255,.4)",
+            background: days === d ? "rgba(99,102,241,.25)" : "rgba(var(--ink),.05)",
+            border: days === d ? "1px solid #6366f1" : "1px solid rgba(var(--ink),.1)",
+            color: days === d ? "var(--tx-818cf8, #818cf8)" : "rgba(var(--ink),var(--ta-40, .4))",
           }}>
             {d} days
           </button>
@@ -117,9 +117,9 @@ export default function DemoWatchdogPage() {
         {(["all", "sandbox", "booking", "abandoned-signup"] as const).map((k) => (
           <button key={k} onClick={() => setKindFilter(k)} style={{
             padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer",
-            background: kindFilter === k ? "rgba(139,92,246,.22)" : "rgba(255,255,255,.05)",
-            border: kindFilter === k ? "1px solid #8b5cf6" : "1px solid rgba(255,255,255,.1)",
-            color: kindFilter === k ? "#c4b5fd" : "rgba(255,255,255,.4)",
+            background: kindFilter === k ? "rgba(139,92,246,.22)" : "rgba(var(--ink),.05)",
+            border: kindFilter === k ? "1px solid #8b5cf6" : "1px solid rgba(var(--ink),.1)",
+            color: kindFilter === k ? "var(--tx-c4b5fd, #c4b5fd)" : "rgba(var(--ink),var(--ta-40, .4))",
           }}>
             {k === "all" ? "All routes" : KIND_LABEL[k]}
           </button>
@@ -133,15 +133,15 @@ export default function DemoWatchdogPage() {
       ) : (
         <>
           <KpiRow items={[
-            { label: "Warm and open", value: data.summary.hotOpen, color: "#f87171", sub: "Did real work, never signed up" },
-            { label: "Sandboxes", value: data.summary.sandboxes, color: "#c4b5fd", sub: "Self-serve demos opened" },
-            { label: "Booked demos", value: data.summary.bookings, color: "#93c5fd", sub: "Slots requested" },
-            { label: "Abandoned signups", value: data.summary.abandoned, color: "#fbbf24", sub: "Never entered the code" },
-            { label: "Converted", value: data.summary.converted, color: "#34d399", sub: "Became a real account" },
+            { label: "Warm and open", value: data.summary.hotOpen, color: "var(--tx-f87171, #f87171)", sub: "Did real work, never signed up" },
+            { label: "Sandboxes", value: data.summary.sandboxes, color: "var(--tx-c4b5fd, #c4b5fd)", sub: "Self-serve demos opened" },
+            { label: "Booked demos", value: data.summary.bookings, color: "var(--tx-93c5fd, #93c5fd)", sub: "Slots requested" },
+            { label: "Abandoned signups", value: data.summary.abandoned, color: "var(--tx-fbbf24, #fbbf24)", sub: "Never entered the code" },
+            { label: "Converted", value: data.summary.converted, color: "var(--tx-34d399, #34d399)", sub: "Became a real account" },
           ]} />
 
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 12, color: "rgba(255,255,255,.45)", display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <label style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-45, .45))", display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
               <input
                 type="checkbox"
                 checked={showConverted}
@@ -179,20 +179,20 @@ export default function DemoWatchdogPage() {
                           {l.converted ? <Pill tone="green">Converted</Pill> : null}
                           {l.businessType ? <Pill tone="grey">{l.businessType}</Pill> : null}
                         </div>
-                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#f8fafc" }}>{l.name}</div>
-                        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", marginTop: 3 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--tx-f8fafc, #f8fafc)" }}>{l.name}</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-38, .38))", marginTop: 3 }}>
                           {[l.company, l.email, fmtDate(l.createdAt)].filter(Boolean).join(" · ")}
                         </div>
                       </div>
                       <div style={{ minWidth: 140 }}>
-                        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.35)", fontWeight: 700, marginBottom: 5 }}>
+                        <div style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, marginBottom: 5 }}>
                           HOW FAR IN
                         </div>
                         <ScoreBar value={l.depth} tone={l.depth >= 65 ? "violet" : "blue"} />
                       </div>
                     </div>
 
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.72)", marginBottom: l.activity.length ? 10 : 14 }}>
+                    <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-72, .72))", marginBottom: l.activity.length ? 10 : 14 }}>
                       {l.stage}
                     </div>
 
@@ -201,8 +201,8 @@ export default function DemoWatchdogPage() {
                         {l.activity.map((a) => (
                           <span key={a} style={{
                             fontSize: 11.5, padding: "5px 11px", borderRadius: 8,
-                            background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
-                            color: "rgba(255,255,255,.6)",
+                            background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.08)",
+                            color: "rgba(var(--ink),var(--ta-60, .6))",
                           }}>
                             {a}
                           </span>
@@ -216,7 +216,7 @@ export default function DemoWatchdogPage() {
                         borderRadius: 14, padding: "16px 18px",
                       }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 10 }}>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: "#93c5fd" }}>FOLLOW-UP</span>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--tx-93c5fd, #93c5fd)" }}>FOLLOW-UP</span>
                           <div style={{ display: "flex", gap: 6 }}>
                             <CopyButton text={hook} />
                             <Button tone="ghost" onClick={() => draftHook(l.id)} busy={busy === l.id}>Redraft</Button>
@@ -232,7 +232,7 @@ export default function DemoWatchdogPage() {
                     ) : null}
 
                     {l.kind === "sandbox" && !l.email ? (
-                      <div style={{ fontSize: 11, color: "rgba(251,191,36,.6)", marginTop: 10, lineHeight: 1.6 }}>
+                      <div style={{ fontSize: 11, color: "rgba(var(--txr-fbbf24, 251,191,36),.6)", marginTop: 10, lineHeight: 1.6 }}>
                         A sandbox is anonymous — there is no email on this row. The draft is
                         something to say if you can work out who they were, from the chat log or a
                         booking around the same time.
@@ -244,7 +244,7 @@ export default function DemoWatchdogPage() {
             </div>
           )}
 
-          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.3)", marginTop: 16, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-30, .3))", marginTop: 16, lineHeight: 1.7 }}>
             A lead counts as converted when a registered user shares their email address. Sandboxes
             are anonymous and can never be marked converted, so treat that number as a floor.
             Abandoned signups are only counted an hour after they started, to leave room for someone

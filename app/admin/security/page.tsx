@@ -143,16 +143,16 @@ export default function AdminSecurityPage() {
   }
 
   if (loading) {
-    return <div style={{ padding: 40, color: "rgba(255,255,255,.4)" }}>Loading…</div>;
+    return <div style={{ padding: 40, color: "rgba(var(--ink),var(--ta-40, .4))" }}>Loading…</div>;
   }
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Admin Security</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)", maxWidth: 680, lineHeight: 1.6 }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))", maxWidth: 680, lineHeight: 1.6 }}>
           A second password, inside the console — like an app lock on a phone. Tick the
           pages that should ask for it: even an admin who is already signed in has to type
           it before those pages open, and they lock again the moment the page is left or
@@ -166,8 +166,8 @@ export default function AdminSecurityPage() {
           display: "flex",
           alignItems: "center",
           gap: 14,
-          background: cfg?.enabled ? "rgba(52,211,153,.08)" : "rgba(255,255,255,.03)",
-          border: `1px solid ${cfg?.enabled ? "rgba(52,211,153,.25)" : "rgba(255,255,255,.07)"}`,
+          background: cfg?.enabled ? "rgba(52,211,153,.08)" : "rgba(var(--ink),.03)",
+          border: `1px solid ${cfg?.enabled ? "rgba(52,211,153,.25)" : "rgba(var(--ink),.07)"}`,
           borderRadius: 16,
           padding: "18px 22px",
           marginBottom: 22,
@@ -175,16 +175,16 @@ export default function AdminSecurityPage() {
         }}
       >
         <div style={{ flex: 1, minWidth: 240 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: cfg?.enabled ? "#34d399" : "rgba(255,255,255,.75)" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: cfg?.enabled ? "var(--tx-34d399, #34d399)" : "rgba(var(--ink),.75)" }}>
             {cfg?.enabled ? `Lock is ON — ${cfg.pages.length} page${cfg.pages.length === 1 ? "" : "s"} protected` : "Lock is OFF"}
           </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", marginTop: 4 }}>
             {cfg?.passwordSet ? "A password is set." : "No password set yet."}
             {cfg?.updatedByEmail ? ` Last changed by ${cfg.updatedByEmail}.` : ""}
           </div>
         </div>
         {cfg?.enabled && (
-          <button className="as-btn" onClick={relockNow} style={{ background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.7)" }}>
+          <button className="as-btn" onClick={relockNow} style={{ background: "rgba(var(--ink),.07)", color: "rgba(var(--ink),var(--ta-70, .7))" }}>
             Lock now
           </button>
         )}
@@ -247,13 +247,13 @@ export default function AdminSecurityPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 16, marginTop: 16 }}>
           {grouped.map(({ group, items }) => (
             <div key={group}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.3)", marginBottom: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-30, .3))", marginBottom: 6 }}>
                 {group.toUpperCase()}
               </div>
               {items.map((item) => (
                 <label key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0", fontSize: 12, cursor: "pointer" }}>
                   <input type="checkbox" checked={pages.includes(item.id)} onChange={() => toggle(item.id)} />
-                  <span style={{ color: pages.includes(item.id) ? "white" : "rgba(255,255,255,.5)" }}>{item.label}</span>
+                  <span style={{ color: pages.includes(item.id) ? "white" : "rgba(var(--ink),var(--ta-50, .5))" }}>{item.label}</span>
                 </label>
               ))}
             </div>
@@ -286,7 +286,7 @@ export default function AdminSecurityPage() {
               borderRadius: 10,
               padding: "10px 14px",
               fontSize: 12,
-              color: "#fbbf24",
+              color: "var(--tx-fbbf24, #fbbf24)",
               lineHeight: 1.6,
             }}
           >
@@ -306,7 +306,7 @@ export default function AdminSecurityPage() {
             {saving ? "Saving…" : "Save"}
           </button>
           {cfg?.passwordSet && (
-            <button className="as-btn" onClick={removeLock} disabled={saving} style={{ background: "rgba(248,113,113,.15)", color: "#f87171" }}>
+            <button className="as-btn" onClick={removeLock} disabled={saving} style={{ background: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" }}>
               Remove lock &amp; password
             </button>
           )}
@@ -317,25 +317,25 @@ export default function AdminSecurityPage() {
 }
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,.02)",
-  border: "1px solid rgba(255,255,255,.07)",
+  background: "rgba(var(--ink),.02)",
+  border: "1px solid rgba(var(--ink),.07)",
   borderRadius: 16,
   padding: 22,
   marginBottom: 18,
 };
 const cardTitle: React.CSSProperties = { margin: "0 0 4px", fontSize: 16, fontWeight: 700 };
-const hint: React.CSSProperties = { margin: 0, fontSize: 12, color: "rgba(255,255,255,.35)", lineHeight: 1.6 };
+const hint: React.CSSProperties = { margin: 0, fontSize: 12, color: "rgba(var(--ink),var(--ta-35, .35))", lineHeight: 1.6 };
 const label: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
-  color: "rgba(255,255,255,.35)",
+  color: "rgba(var(--ink),var(--ta-35, .35))",
   display: "block",
   marginBottom: 6,
 };
-const pick: React.CSSProperties = { background: "rgba(129,140,248,.15)", color: "#a5b4fc" };
+const pick: React.CSSProperties = { background: "rgba(129,140,248,.15)", color: "var(--tx-a5b4fc, #a5b4fc)" };
 
 const css = `
-  .as-inp { width:100%; background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; color:white; font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
+  .as-inp { width:100%; background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:10px 12px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; box-sizing:border-box; }
   .as-inp:focus { border-color:rgba(129,140,248,.5); }
   .as-btn { border:none; border-radius:10px; padding:10px 22px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
   .as-btn:disabled { opacity:.4; cursor:not-allowed; }

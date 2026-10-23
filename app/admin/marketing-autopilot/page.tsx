@@ -14,9 +14,9 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 const F   = "'Outfit','Inter',sans-serif";
-const BG  = "#070b14";
-const PNL = "rgba(255,255,255,.04)";
-const BDR = "rgba(255,255,255,.08)";
+const BG  = "var(--dk-070b14, #070b14)";
+const PNL = "rgba(var(--ink),.04)";
+const BDR = "rgba(var(--ink),.08)";
 
 type Tab = "calendar" | "ads" | "outreach" | "pipeline";
 
@@ -39,8 +39,8 @@ function Btn({ children, loading = false, variant = "primary", ...p }: { childre
   return (
     <button {...p} disabled={loading || p.disabled} style={{
       padding: "9px 20px", borderRadius: 9, border: variant === "ghost" ? `1px solid ${BDR}` : "none",
-      background: variant === "primary" ? "linear-gradient(135deg,#7c3aed,#2563eb)" : variant === "danger" ? "rgba(239,68,68,.12)" : "rgba(255,255,255,.07)",
-      color: variant === "danger" ? "#f87171" : "#fff", fontSize: 13, fontFamily: F, fontWeight: 600,
+      background: variant === "primary" ? "linear-gradient(135deg,#7c3aed,#2563eb)" : variant === "danger" ? "rgba(239,68,68,.12)" : "rgba(var(--ink),.07)",
+      color: variant === "danger" ? "var(--tx-f87171, #f87171)" : "#fff", fontSize: 13, fontFamily: F, fontWeight: 600,
       cursor: "pointer", opacity: (loading || p.disabled) ? .55 : 1, whiteSpace: "nowrap" as const, ...p.style,
     }}>{loading ? "Generating…" : children}</button>
   );
@@ -48,9 +48,9 @@ function Btn({ children, loading = false, variant = "primary", ...p }: { childre
 function Sel({ label, options, value, onChange }: { label: string; options: { v: string; l: string }[]; value: string; onChange: (v: string) => void }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 5, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase" as const }}>{label}</label>
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BDR}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", colorScheme: "dark" }}>
-        {options.map(o => <option key={o.v} value={o.v} style={{ background: "#0d1117", color: "#e2e8f0" }}>{o.l}</option>)}
+      <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 5, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase" as const }}>{label}</label>
+      <select value={value} onChange={e => onChange(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BDR}`, background: "var(--dk-0d1117, #0d1117)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none", colorScheme: "dark" }}>
+        {options.map(o => <option key={o.v} value={o.v} style={{ background: "var(--dk-0d1117, #0d1117)", color: "var(--tx-e2e8f0, #e2e8f0)" }}>{o.l}</option>)}
       </select>
     </div>
   );
@@ -77,14 +77,14 @@ export default function MarketingAutopilotPage() {
   if (!ready) return <div style={{ minHeight: "100vh", background: BG }} />;
 
   const TABS: { id: Tab; icon: string; label: string; desc: string; color: string }[] = [
-    { id: "calendar",  icon: "📅", label: "Content Calendar",   desc: "AI-generated posts for your niche",          color: "#818cf8" },
-    { id: "ads",       icon: "🎯", label: "Ad Copy Generator",  desc: "Facebook & Instagram ad copy + targeting",  color: "#f472b6" },
-    { id: "outreach",  icon: "📨", label: "Outreach Builder",   desc: "WhatsApp & Email cold outreach scripts",    color: "#34d399" },
-    { id: "pipeline",  icon: "💼", label: "Lead Pipeline",      desc: "Track prospects from lead to paid customer", color: "#fbbf24" },
+    { id: "calendar",  icon: "📅", label: "Content Calendar",   desc: "AI-generated posts for your niche",          color: "var(--tx-818cf8, #818cf8)" },
+    { id: "ads",       icon: "🎯", label: "Ad Copy Generator",  desc: "Facebook & Instagram ad copy + targeting",  color: "var(--tx-f472b6, #f472b6)" },
+    { id: "outreach",  icon: "📨", label: "Outreach Builder",   desc: "WhatsApp & Email cold outreach scripts",    color: "var(--tx-34d399, #34d399)" },
+    { id: "pipeline",  icon: "💼", label: "Lead Pipeline",      desc: "Track prospects from lead to paid customer", color: "var(--tx-fbbf24, #fbbf24)" },
   ];
 
   return (
-    <div style={{ fontFamily: F, color: "var(--text, #e2e8f0)", paddingBottom: 40, width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
+    <div style={{ fontFamily: F, color: "var(--text, var(--tx-e2e8f0, #e2e8f0))", paddingBottom: 40, width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
       <style>{`
         .map-tabs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
         @media(max-width:767px){.map-tabs-grid{grid-template-columns:repeat(2,1fr)!important}}
@@ -94,10 +94,10 @@ export default function MarketingAutopilotPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#f472b6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🤖</div>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, background: "linear-gradient(135deg,#a78bfa,#f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, background: "linear-gradient(135deg,var(--tx-a78bfa, #a78bfa),var(--tx-f472b6, #f472b6))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Marketing Autopilot
             </h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,.35)", fontSize: 13 }}>AI-powered client acquisition engine for FinovaOS</p>
+            <p style={{ margin: 0, color: "rgba(var(--ink),var(--ta-35, .35))", fontSize: 13 }}>AI-powered client acquisition engine for FinovaOS</p>
           </div>
         </div>
       </div>
@@ -111,8 +111,8 @@ export default function MarketingAutopilotPage() {
             cursor: "pointer", textAlign: "left" as const, fontFamily: F, transition: "all .15s",
           }}>
             <div style={{ fontSize: 22, marginBottom: 6 }}>{t.icon}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: tab === t.id ? t.color : "rgba(255,255,255,.8)", marginBottom: 3 }}>{t.label}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", lineHeight: 1.4 }}>{t.desc}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: tab === t.id ? t.color : "rgba(var(--ink),.8)", marginBottom: 3 }}>{t.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", lineHeight: 1.4 }}>{t.desc}</div>
           </button>
         ))}
       </div>
@@ -210,7 +210,7 @@ function ContentCalendarTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "#34d399" : "#f87171", fontSize: 13 }}>{t.msg}</div>}
+      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontSize: 13 }}>{t.msg}</div>}
 
       <Card>
         <h3 style={{ margin: "0 0 18px", fontSize: 16, fontWeight: 700 }}>📅 Generate Content Calendar</h3>
@@ -223,7 +223,7 @@ function ContentCalendarTab() {
 
         {/* What AI will generate */}
         <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(129,140,248,.06)", border: "1px solid rgba(129,140,248,.15)", marginBottom: 18 }}>
-          <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, marginBottom: 8 }}>AI will generate content for: {NICHES.find(n => n.v === niche)?.l}</div>
+          <div style={{ fontSize: 12, color: "var(--tx-818cf8, #818cf8)", fontWeight: 700, marginBottom: 8 }}>AI will generate content for: {NICHES.find(n => n.v === niche)?.l}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 6 }}>
             {[
               "Pain point posts (manual work, errors, time waste)",
@@ -234,8 +234,8 @@ function ContentCalendarTab() {
               "Call-to-action posts (get started today)",
               "Motivational business tips with FinovaOS hook",
             ].map(item => (
-              <div key={item} style={{ fontSize: 11, color: "rgba(255,255,255,.4)", display: "flex", gap: 6, alignItems: "flex-start" }}>
-                <span style={{ color: "#22c55e", flexShrink: 0 }}>✓</span> {item}
+              <div key={item} style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", display: "flex", gap: 6, alignItems: "flex-start" }}>
+                <span style={{ color: "var(--tx-22c55e, #22c55e)", flexShrink: 0 }}>✓</span> {item}
               </div>
             ))}
           </div>
@@ -247,30 +247,30 @@ function ContentCalendarTab() {
       {/* Generated posts */}
       {posts.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{posts.length} posts generated — review and publish directly:</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),var(--ta-60, .6))" }}>{posts.length} posts generated — review and publish directly:</div>
           {posts.map((p, i) => (
             <Card key={i} style={{ borderLeft: `3px solid ${PLATFORM_COLOR[p.platform] || "#818cf8"}` }}>
               <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
 
                 {/* Image preview / placeholder */}
-                <div style={{ flexShrink: 0, width: 120, height: 120, borderRadius: 10, overflow: "hidden", background: "rgba(255,255,255,.04)", border: `1px solid ${BDR}`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" as const }}>
+                <div style={{ flexShrink: 0, width: 120, height: 120, borderRadius: 10, overflow: "hidden", background: "rgba(var(--ink),.04)", border: `1px solid ${BDR}`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" as const }}>
                   {p.imageLoading ? (
                     <div style={{ textAlign: "center" as const, padding: 8 }}>
                       <div style={{ fontSize: 22, marginBottom: 4 }}>⏳</div>
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", lineHeight: 1.4 }}>Generating…</div>
+                      <div style={{ fontSize: 9, color: "rgba(var(--ink),var(--ta-30, .3))", lineHeight: 1.4 }}>Generating…</div>
                     </div>
                   ) : p.imageUrl ? (
                     <>
                       <img src={p.imageUrl} alt="post visual" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       <a href={p.imageUrl} target="_blank" rel="noreferrer"
-                        style={{ position: "absolute" as const, bottom: 4, right: 4, padding: "3px 7px", borderRadius: 6, background: "rgba(0,0,0,.7)", color: "white", fontSize: 9, textDecoration: "none", fontWeight: 700 }}>
+                        style={{ position: "absolute" as const, bottom: 4, right: 4, padding: "3px 7px", borderRadius: 6, background: "rgba(0,0,0,.7)", color: "var(--ink-solid, white)", fontSize: 9, textDecoration: "none", fontWeight: 700 }}>
                         ↗ Open
                       </a>
                     </>
                   ) : (
                     <button onClick={() => generateImage(i)} style={{ background: "none", border: "none", cursor: "pointer", textAlign: "center" as const, padding: 8 }}>
                       <div style={{ fontSize: 22, marginBottom: 4 }}>🎨</div>
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,.4)", lineHeight: 1.4 }}>Generate<br/>Image</div>
+                      <div style={{ fontSize: 9, color: "rgba(var(--ink),var(--ta-40, .4))", lineHeight: 1.4 }}>Generate<br/>Image</div>
                     </button>
                   )}
                 </div>
@@ -279,9 +279,9 @@ function ContentCalendarTab() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 8, flexWrap: "wrap" as const }}>
                     <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" as const }}>
-                      <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: `${PLATFORM_COLOR[p.platform] || "#818cf8"}22`, color: PLATFORM_COLOR[p.platform] || "#818cf8", fontWeight: 700, textTransform: "capitalize" as const }}>{p.platform}</span>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{p.type}</span>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>⏰ {p.bestTime}</span>
+                      <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: `${PLATFORM_COLOR[p.platform] || "#818cf8"}22`, color: PLATFORM_COLOR[p.platform] || "var(--tx-818cf8, #818cf8)", fontWeight: 700, textTransform: "capitalize" as const }}>{p.platform}</span>
+                      <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>{p.type}</span>
+                      <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))" }}>⏰ {p.bestTime}</span>
                     </div>
                     <div style={{ display: "flex", gap: 6 }}>
                       {!p.imageUrl && !p.imageLoading && (
@@ -299,8 +299,8 @@ function ContentCalendarTab() {
                       </Btn>
                     </div>
                   </div>
-                  <p style={{ fontSize: 13, color: "#e2e8f0", lineHeight: 1.7, margin: "0 0 6px", whiteSpace: "pre-wrap" as const }}>{p.text}</p>
-                  <div style={{ fontSize: 11, color: "#818cf8" }}>{p.hashtags}</div>
+                  <p style={{ fontSize: 13, color: "var(--tx-e2e8f0, #e2e8f0)", lineHeight: 1.7, margin: "0 0 6px", whiteSpace: "pre-wrap" as const }}>{p.text}</p>
+                  <div style={{ fontSize: 11, color: "var(--tx-818cf8, #818cf8)" }}>{p.hashtags}</div>
                 </div>
               </div>
             </Card>
@@ -341,11 +341,11 @@ function AdCopyTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "#34d399" : "#f87171", fontSize: 13 }}>{t.msg}</div>}
+      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontSize: 13 }}>{t.msg}</div>}
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>🎯 Facebook & Instagram Ad Copy</h3>
-        <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           AI generates complete ad sets for your budget and niche — headline, copy, CTA, targeting, and budget split included.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 18 }}>
@@ -374,16 +374,16 @@ function AdCopyTab() {
 
         {/* Budget breakdown */}
         <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(244,114,182,.06)", border: "1px solid rgba(244,114,182,.15)", marginBottom: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#f472b6", marginBottom: 10 }}>💡 ${budget}/month Budget Distribution (AI suggestion):</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-f472b6, #f472b6)", marginBottom: 10 }}>💡 ${budget}/month Budget Distribution (AI suggestion):</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
             {[
-              { label: "Awareness / Cold", pct: 40, color: "#818cf8" },
-              { label: "Retargeting", pct: 35, color: "#f472b6" },
-              { label: "Lookalike Audience", pct: 25, color: "#34d399" },
+              { label: "Awareness / Cold", pct: 40, color: "var(--tx-818cf8, #818cf8)" },
+              { label: "Retargeting", pct: 35, color: "var(--tx-f472b6, #f472b6)" },
+              { label: "Lookalike Audience", pct: 25, color: "var(--tx-34d399, #34d399)" },
             ].map(b => (
-              <div key={b.label} style={{ textAlign: "center" as const, padding: "10px", borderRadius: 8, background: "rgba(255,255,255,.03)" }}>
+              <div key={b.label} style={{ textAlign: "center" as const, padding: "10px", borderRadius: 8, background: "rgba(var(--ink),.03)" }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color: b.color }}>${Math.round(Number(budget) * b.pct / 100)}</div>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{b.label}</div>
+                <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 2 }}>{b.label}</div>
                 <div style={{ fontSize: 10, color: b.color }}>{b.pct}%</div>
               </div>
             ))}
@@ -396,33 +396,33 @@ function AdCopyTab() {
       {/* Generated ads */}
       {ads.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{ads.length} ad sets ready — copy and paste into Facebook Ads Manager:</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(var(--ink),var(--ta-60, .6))" }}>{ads.length} ad sets ready — copy and paste into Facebook Ads Manager:</div>
           {ads.map((ad, i) => (
             <Card key={i}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#f472b6", padding: "3px 10px", borderRadius: 20, background: "rgba(244,114,182,.12)", border: "1px solid rgba(244,114,182,.2)" }}>Ad Set {i + 1} — {ad.objective}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--tx-f472b6, #f472b6)", padding: "3px 10px", borderRadius: 20, background: "rgba(244,114,182,.12)", border: "1px solid rgba(244,114,182,.2)" }}>Ad Set {i + 1} — {ad.objective}</span>
                 <Btn variant="ghost" style={{ fontSize: 11, padding: "4px 12px" }} onClick={() => { navigator.clipboard?.writeText(`Headline: ${ad.headline}\n\nPrimary Text:\n${ad.primaryText}\n\nCTA: ${ad.cta}\n\nTargeting: ${ad.targeting}`); show("Copied!", true); }}>📋 Copy All</Btn>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>HEADLINE</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "white", marginBottom: 14 }}>{ad.headline}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>PRIMARY TEXT</div>
-                  <div style={{ fontSize: 13, color: "#cbd5e1", lineHeight: 1.7, whiteSpace: "pre-wrap" as const }}>{ad.primaryText}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>HEADLINE</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink-solid, white)", marginBottom: 14 }}>{ad.headline}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>PRIMARY TEXT</div>
+                  <div style={{ fontSize: 13, color: "var(--tx-cbd5e1, #cbd5e1)", lineHeight: 1.7, whiteSpace: "pre-wrap" as const }}>{ad.primaryText}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>CTA BUTTON</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399", marginBottom: 14 }}>{ad.cta}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>TARGETING</div>
-                  <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, marginBottom: 14 }}>{ad.targeting}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>CTA BUTTON</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--tx-34d399, #34d399)", marginBottom: 14 }}>{ad.cta}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", fontWeight: 700, letterSpacing: ".06em", marginBottom: 4 }}>TARGETING</div>
+                  <div style={{ fontSize: 12, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.6, marginBottom: 14 }}>{ad.targeting}</div>
                   <div style={{ display: "flex", gap: 10 }}>
                     <div style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.2)" }}>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", marginBottom: 2 }}>DAILY BUDGET</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "#fbbf24" }}>{ad.dailyBudget}</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 2 }}>DAILY BUDGET</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-fbbf24, #fbbf24)" }}>{ad.dailyBudget}</div>
                     </div>
                     <div style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)" }}>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", marginBottom: 2 }}>EST. REACH</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>{ad.estimatedReach}</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-35, .35))", marginBottom: 2 }}>EST. REACH</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-34d399, #34d399)" }}>{ad.estimatedReach}</div>
                     </div>
                   </div>
                 </div>
@@ -465,11 +465,11 @@ function OutreachTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "#34d399" : "#f87171", fontSize: 13 }}>{t.msg}</div>}
+      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontSize: 13 }}>{t.msg}</div>}
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>📨 Cold Outreach Scripts</h3>
-        <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           AI generates niche-specific WhatsApp and Email cold scripts — with follow-up messages included. Use directly or upload to WhatsApp Blast.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 18 }}>
@@ -497,8 +497,8 @@ function OutreachTab() {
           ]} value={tone} onChange={setTone} />
         </div>
 
-        <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", marginBottom: 18, fontSize: 12, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-          <strong style={{ color: "#34d399" }}>Pro tip:</strong> For WhatsApp outreach, collect numbers from business directories (JustDial, Rozee, LinkedIn) first. Then upload a CSV in the WhatsApp Blasts tab to send in bulk.
+        <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", marginBottom: 18, fontSize: 12, color: "rgba(var(--ink),var(--ta-50, .5))", lineHeight: 1.7 }}>
+          <strong style={{ color: "var(--tx-34d399, #34d399)" }}>Pro tip:</strong> For WhatsApp outreach, collect numbers from business directories (JustDial, Rozee, LinkedIn) first. Then upload a CSV in the WhatsApp Blasts tab to send in bulk.
         </div>
 
         <Btn onClick={generate} loading={loading}>🤖 Generate Outreach Scripts</Btn>
@@ -510,20 +510,20 @@ function OutreachTab() {
             <Card key={i} style={{ borderLeft: `3px solid ${s.channel === "email" ? "#38bdf8" : "#22c55e"}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: s.channel === "email" ? "rgba(56,189,248,.12)" : "rgba(34,197,94,.12)", color: s.channel === "email" ? "#38bdf8" : "#22c55e", fontWeight: 700, textTransform: "capitalize" as const }}>{s.channel === "email" ? "📧 Email" : "💬 WhatsApp"}</span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>⏰ {s.bestTime}</span>
+                  <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: s.channel === "email" ? "rgba(56,189,248,.12)" : "rgba(34,197,94,.12)", color: s.channel === "email" ? "var(--tx-38bdf8, #38bdf8)" : "var(--tx-22c55e, #22c55e)", fontWeight: 700, textTransform: "capitalize" as const }}>{s.channel === "email" ? "📧 Email" : "💬 WhatsApp"}</span>
+                  <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-35, .35))" }}>⏰ {s.bestTime}</span>
                 </div>
                 <Btn variant="ghost" style={{ fontSize: 11, padding: "4px 12px" }} onClick={() => { navigator.clipboard?.writeText(s.body); show("Copied!", true); }}>📋 Copy</Btn>
               </div>
-              {s.subject && <div style={{ fontSize: 12, color: "#38bdf8", fontWeight: 700, marginBottom: 8 }}>Subject: {s.subject}</div>}
-              <div style={{ fontSize: 13, color: "#cbd5e1", lineHeight: 1.8, whiteSpace: "pre-wrap" as const, padding: "12px 14px", borderRadius: 8, background: "rgba(0,0,0,.25)", marginBottom: s.followUp ? 12 : 0 }}>{s.body}</div>
+              {s.subject && <div style={{ fontSize: 12, color: "var(--tx-38bdf8, #38bdf8)", fontWeight: 700, marginBottom: 8 }}>Subject: {s.subject}</div>}
+              <div style={{ fontSize: 13, color: "var(--tx-cbd5e1, #cbd5e1)", lineHeight: 1.8, whiteSpace: "pre-wrap" as const, padding: "12px 14px", borderRadius: 8, background: "rgba(0,0,0,.25)", marginBottom: s.followUp ? 12 : 0 }}>{s.body}</div>
               {s.followUp && (
                 <div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, margin: "10px 0 6px", letterSpacing: ".06em" }}>FOLLOW-UP (if no reply in 3 days)</div>
-                  <div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.7, whiteSpace: "pre-wrap" as const, padding: "10px 12px", borderRadius: 8, background: "rgba(0,0,0,.2)", borderLeft: "2px solid rgba(255,255,255,.08)" }}>{s.followUp}</div>
+                  <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-30, .3))", fontWeight: 700, margin: "10px 0 6px", letterSpacing: ".06em" }}>FOLLOW-UP (if no reply in 3 days)</div>
+                  <div style={{ fontSize: 13, color: "var(--tx-94a3b8, #94a3b8)", lineHeight: 1.7, whiteSpace: "pre-wrap" as const, padding: "10px 12px", borderRadius: 8, background: "rgba(0,0,0,.2)", borderLeft: "2px solid rgba(var(--ink),.08)" }}>{s.followUp}</div>
                 </div>
               )}
-              <div style={{ marginTop: 10, padding: "8px 12px", borderRadius: 8, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.12)", fontSize: 11, color: "#fbbf24" }}>
+              <div style={{ marginTop: 10, padding: "8px 12px", borderRadius: 8, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.12)", fontSize: 11, color: "var(--tx-fbbf24, #fbbf24)" }}>
                 💡 {s.tipPK}
               </div>
             </Card>
@@ -588,19 +588,19 @@ function PipelineTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "#34d399" : "#f87171", fontSize: 13 }}>{t.msg}</div>}
+      {t && <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, padding: "10px 18px", borderRadius: 10, background: t.ok ? "rgba(52,211,153,.12)" : "rgba(239,68,68,.12)", border: `1px solid ${t.ok ? "rgba(52,211,153,.3)" : "rgba(239,68,68,.3)"}`, color: t.ok ? "var(--tx-34d399, #34d399)" : "var(--tx-f87171, #f87171)", fontSize: 13 }}>{t.msg}</div>}
 
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12 }}>
         {[
-          { label: "Total Leads", value: totalLeads, color: "#818cf8" },
-          { label: "In Progress", value: leads.filter(l => !["Won","Lost","New Lead"].includes((l.stage||(l as any).status)||"New Lead")).length, color: "#fbbf24" },
-          { label: "Won", value: wonCount, color: "#22c55e" },
-          { label: "Conversion", value: totalLeads ? `${Math.round(wonCount/totalLeads*100)}%` : "0%", color: "#f472b6" },
+          { label: "Total Leads", value: totalLeads, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "In Progress", value: leads.filter(l => !["Won","Lost","New Lead"].includes((l.stage||(l as any).status)||"New Lead")).length, color: "var(--tx-fbbf24, #fbbf24)" },
+          { label: "Won", value: wonCount, color: "var(--tx-22c55e, #22c55e)" },
+          { label: "Conversion", value: totalLeads ? `${Math.round(wonCount/totalLeads*100)}%` : "0%", color: "var(--tx-f472b6, #f472b6)" },
         ].map(s => (
           <div key={s.label} style={{ padding: "14px 16px", borderRadius: 12, background: `${s.color}10`, border: `1px solid ${s.color}30` }}>
             <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", fontWeight: 600 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -620,14 +620,14 @@ function PipelineTab() {
               { label: "Email", key: "email", placeholder: "ahmed@khantraders.com" },
             ].map(f => (
               <div key={f.key}>
-                <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 4 }}>{f.label}</label>
+                <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 4 }}>{f.label}</label>
                 <input value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder}
-                  style={{ width: "100%", padding: "8px 10px", borderRadius: 7, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.05)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", boxSizing: "border-box" as const }} />
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 7, border: `1px solid ${BDR}`, background: "rgba(var(--ink),.05)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none", boxSizing: "border-box" as const }} />
               </div>
             ))}
             <div>
-              <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 4 }}>SOURCE</label>
-              <select value={form.source} onChange={e => setForm(p => ({ ...p, source: e.target.value }))} style={{ width: "100%", padding: "8px 10px", borderRadius: 7, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.05)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none" }}>
+              <label style={{ display: "block", fontSize: 11, color: "rgba(var(--ink),var(--ta-45, .45))", marginBottom: 4 }}>SOURCE</label>
+              <select value={form.source} onChange={e => setForm(p => ({ ...p, source: e.target.value }))} style={{ width: "100%", padding: "8px 10px", borderRadius: 7, border: `1px solid ${BDR}`, background: "rgba(var(--ink),.05)", color: "var(--tx-e2e8f0, #e2e8f0)", fontSize: 13, fontFamily: F, outline: "none" }}>
                 {["manual","whatsapp","facebook_ad","instagram_ad","linkedin","referral","website","other"].map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
@@ -640,25 +640,25 @@ function PipelineTab() {
 
       {/* Kanban pipeline */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "40px 0", color: "rgba(255,255,255,.3)" }}>Loading pipeline…</div>
+        <div style={{ textAlign: "center", padding: "40px 0", color: "rgba(var(--ink),var(--ta-30, .3))" }}>Loading pipeline…</div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 12, overflowX: "auto" }}>
           {byStage.map(({ stage, items }) => (
             <div key={stage}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: STAGE_COLORS[stage] || "#94a3b8", textTransform: "uppercase" as const, letterSpacing: ".06em" }}>{stage}</span>
-                <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", background: "rgba(255,255,255,.06)", padding: "1px 7px", borderRadius: 10 }}>{items.length}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: STAGE_COLORS[stage] || "var(--tx-94a3b8, #94a3b8)", textTransform: "uppercase" as const, letterSpacing: ".06em" }}>{stage}</span>
+                <span style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-30, .3))", background: "rgba(var(--ink),.06)", padding: "1px 7px", borderRadius: 10 }}>{items.length}</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, minHeight: 60 }}>
                 {items.map(lead => (
                   <div key={lead.id} style={{ padding: "10px 12px", borderRadius: 10, background: PNL, border: `1px solid ${STAGE_COLORS[stage] || BDR}30` }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 2 }}>{lead.name}</div>
-                    {lead.business && <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{lead.business}</div>}
-                    {lead.source && <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginBottom: 8, textTransform: "capitalize" as const }}>{lead.source}</div>}
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-solid, white)", marginBottom: 2 }}>{lead.name}</div>
+                    {lead.business && <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", marginBottom: 6 }}>{lead.business}</div>}
+                    {lead.source && <div style={{ fontSize: 10, color: "rgba(var(--ink),var(--ta-25, .25))", marginBottom: 8, textTransform: "capitalize" as const }}>{lead.source}</div>}
                     {/* Move to next stage */}
                     {STAGES.indexOf(stage) < STAGES.length - 1 && stage !== "Won" && stage !== "Lost" && (
                       <button disabled={movingId === lead.id} onClick={() => moveStage(lead.id, STAGES[STAGES.indexOf(stage) + 1])}
-                        style={{ width: "100%", padding: "4px 8px", borderRadius: 6, border: "none", background: `${STAGE_COLORS[STAGES[STAGES.indexOf(stage)+1]]}22`, color: STAGE_COLORS[STAGES[STAGES.indexOf(stage)+1]] || "#94a3b8", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: F }}>
+                        style={{ width: "100%", padding: "4px 8px", borderRadius: 6, border: "none", background: `${STAGE_COLORS[STAGES[STAGES.indexOf(stage)+1]]}22`, color: STAGE_COLORS[STAGES[STAGES.indexOf(stage)+1]] || "var(--tx-94a3b8, #94a3b8)", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: F }}>
                         → {STAGES[STAGES.indexOf(stage) + 1]}
                       </button>
                     )}

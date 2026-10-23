@@ -59,11 +59,11 @@ type CurrencyTotal = {
 };
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  PAID:                { bg: "rgba(52,211,153,.12)",  color: "#34d399", label: "Paid" },
-  REFUNDED:            { bg: "rgba(248,113,113,.12)", color: "#f87171", label: "Refunded" },
-  PARTIALLY_REFUNDED:  { bg: "rgba(251,191,36,.12)",  color: "#fbbf24", label: "Part. refunded" },
-  OPEN:                { bg: "rgba(251,191,36,.12)",  color: "#fbbf24", label: "Open" },
-  VOID:                { bg: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.4)", label: "Void" },
+  PAID:                { bg: "rgba(52,211,153,.12)",  color: "var(--tx-34d399, #34d399)", label: "Paid" },
+  REFUNDED:            { bg: "rgba(248,113,113,.12)", color: "var(--tx-f87171, #f87171)", label: "Refunded" },
+  PARTIALLY_REFUNDED:  { bg: "rgba(251,191,36,.12)",  color: "var(--tx-fbbf24, #fbbf24)", label: "Part. refunded" },
+  OPEN:                { bg: "rgba(251,191,36,.12)",  color: "var(--tx-fbbf24, #fbbf24)", label: "Open" },
+  VOID:                { bg: "rgba(var(--ink),.06)", color: "rgba(var(--ink),var(--ta-40, .4))", label: "Void" },
 };
 
 const PROVIDER_LABEL: Record<string, string> = {
@@ -220,33 +220,33 @@ export default function AdminInvoicesPage() {
   }
 
   const inp: React.CSSProperties = {
-    padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)",
-    background: "rgba(255,255,255,.04)", color: "white", fontSize: 13,
+    padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(var(--ink),.1)",
+    background: "rgba(var(--ink),.04)", color: "var(--ink-solid, white)", fontSize: 13,
     outline: "none", fontFamily: "inherit",
   };
   const th: React.CSSProperties = {
     padding: "11px 14px", textAlign: "left", fontSize: 10, fontWeight: 700,
-    color: "rgba(255,255,255,.32)", letterSpacing: ".06em", textTransform: "uppercase",
-    borderBottom: "1px solid rgba(255,255,255,.07)", whiteSpace: "nowrap",
+    color: "rgba(var(--ink),var(--ta-32, .32))", letterSpacing: ".06em", textTransform: "uppercase",
+    borderBottom: "1px solid rgba(var(--ink),.07)", whiteSpace: "nowrap",
   };
   const td: React.CSSProperties = {
-    padding: "12px 14px", fontSize: 12.5, color: "rgba(255,255,255,.72)",
-    borderBottom: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap",
+    padding: "12px 14px", fontSize: 12.5, color: "rgba(var(--ink),var(--ta-72, .72))",
+    borderBottom: "1px solid rgba(var(--ink),.04)", whiteSpace: "nowrap",
   };
 
   return (
-    <div style={{ padding: "32px 28px 80px", minHeight: "100vh", background: "#0b0f24", color: "white", fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ padding: "32px 28px 80px", minHeight: "100vh", background: "var(--dk-0b0f24, #0b0f24)", color: "var(--ink-solid, white)", fontFamily: "'Outfit', sans-serif" }}>
       <style>{`
-        .inv-row:hover{background:rgba(255,255,255,.03)!important}
+        .inv-row:hover{background:rgba(var(--ink),.03)!important}
         .inv-input:focus{border-color:rgba(99,102,241,.6)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important}
-        .inv-input option{background:#12172f;color:white}
+        .inv-input option{background:var(--dk-12172f, #12172f);color:var(--ink-solid, white)}
       `}</style>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 25, fontWeight: 800, letterSpacing: "-0.6px" }}>Invoices</h1>
-          <p style={{ margin: "5px 0 0", fontSize: 13, color: "rgba(255,255,255,.42)" }}>
+          <p style={{ margin: "5px 0 0", fontSize: 13, color: "rgba(var(--ink),var(--ta-42, .42))" }}>
             Every subscription payment FinovaOS has collected — permanent, numbered records for accounting and tax.
           </p>
         </div>
@@ -263,8 +263,8 @@ export default function AdminInvoicesPage() {
 
       {migrationRequired && (
         <div style={{ marginBottom: 20, padding: "15px 18px", borderRadius: 14, background: "rgba(251,191,36,.09)", border: "1px solid rgba(251,191,36,.28)" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#fcd34d", marginBottom: 5 }}>Ledger table not created yet</div>
-          <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.6)", lineHeight: 1.65 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--tx-fcd34d, #fcd34d)", marginBottom: 5 }}>Ledger table not created yet</div>
+          <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-60, .6))", lineHeight: 1.65 }}>
             Run <code style={{ background: "rgba(0,0,0,.3)", padding: "2px 6px", borderRadius: 5 }}>prisma/migrations/manual_platform_invoices.sql</code>{" "}
             against the database, then{" "}
             <code style={{ background: "rgba(0,0,0,.3)", padding: "2px 6px", borderRadius: 5 }}>node scripts/backfill-platform-invoices.js --commit</code>{" "}
@@ -278,19 +278,19 @@ export default function AdminInvoicesPage() {
           PKR, and one blended number would be meaningless on a tax return. */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(215px,1fr))", gap: 13, marginBottom: 22 }}>
         {totals.length === 0 ? (
-          <div style={{ padding: "17px 19px", borderRadius: 15, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", fontSize: 13, color: "rgba(255,255,255,.35)" }}>
+          <div style={{ padding: "17px 19px", borderRadius: 15, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", fontSize: 13, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
             No revenue in this selection
           </div>
         ) : totals.map((t) => (
-          <div key={t.currency} style={{ padding: "16px 19px", borderRadius: 15, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+          <div key={t.currency} style={{ padding: "16px 19px", borderRadius: 15, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(255,255,255,.34)" }}>{t.currency} REVENUE</span>
-              <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)" }}>{t.count} inv</span>
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", color: "rgba(var(--ink),var(--ta-34, .34))" }}>{t.currency} REVENUE</span>
+              <span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))" }}>{t.count} inv</span>
             </div>
             <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-0.5px" }}>{money(t.net, t.currency)}</div>
-            <div style={{ display: "flex", gap: 14, marginTop: 9, fontSize: 11, color: "rgba(255,255,255,.4)", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 14, marginTop: 9, fontSize: 11, color: "rgba(var(--ink),var(--ta-40, .4))", flexWrap: "wrap" }}>
               <span>Gross {money(t.gross, t.currency)}</span>
-              {t.refunded > 0 && <span style={{ color: "#f87171" }}>Refunded {money(t.refunded, t.currency)}</span>}
+              {t.refunded > 0 && <span style={{ color: "var(--tx-f87171, #f87171)" }}>Refunded {money(t.refunded, t.currency)}</span>}
               <span>Tax {money(t.tax, t.currency)}</span>
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function AdminInvoicesPage() {
       </div>
 
       {/* ── Filters ── */}
-      <div style={{ padding: "15px 17px", borderRadius: 16, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", marginBottom: 18 }}>
+      <div style={{ padding: "15px 17px", borderRadius: 16, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", marginBottom: 18 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))", gap: 11 }}>
           <input className="inv-input" style={inp} placeholder="Invoice #, company, email, order ref…" value={q} onChange={(e) => setQ(e.target.value)} />
           <select className="inv-input" style={{ ...inp, cursor: "pointer" }} value={provider} onChange={(e) => setProvider(e.target.value)}>
@@ -322,23 +322,23 @@ export default function AdminInvoicesPage() {
               labelled — otherwise the pair is indistinguishable. */}
           <DateRangeField label="From" value={from} onChange={setFrom} style={inp} />
           <DateRangeField label="To" value={to} onChange={setTo} style={inp} />
-          <button onClick={resetFilters} style={{ ...inp, cursor: "pointer", color: "rgba(255,255,255,.5)", fontWeight: 600 }}>Clear</button>
+          <button onClick={resetFilters} style={{ ...inp, cursor: "pointer", color: "rgba(var(--ink),var(--ta-50, .5))", fontWeight: 600 }}>Clear</button>
         </div>
-        <div style={{ marginTop: 11, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+        <div style={{ marginTop: 11, fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))" }}>
           {loading ? "Loading…" : `${invoices.length} invoice${invoices.length === 1 ? "" : "s"} · ${companyCount} compan${companyCount === 1 ? "y" : "ies"}`}
-          {truncated && <span style={{ color: "#fbbf24" }}> · showing the first 200 only — narrow the date range for complete totals</span>}
+          {truncated && <span style={{ color: "var(--tx-fbbf24, #fbbf24)" }}> · showing the first 200 only — narrow the date range for complete totals</span>}
         </div>
       </div>
 
       {/* ── Ledger ── */}
-      <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.02)", overflow: "hidden" }}>
+      <div style={{ borderRadius: 18, border: "1px solid rgba(var(--ink),.08)", background: "rgba(var(--ink),.02)", overflow: "hidden" }}>
         {loading ? (
-          <div style={{ padding: "56px 24px", textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading ledger…</div>
+          <div style={{ padding: "56px 24px", textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))", fontSize: 13 }}>Loading ledger…</div>
         ) : invoices.length === 0 ? (
           <div style={{ padding: "56px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 38, marginBottom: 11 }}>🧾</div>
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 5 }}>No invoices found</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,.34)" }}>
+            <div style={{ fontSize: 13, color: "rgba(var(--ink),var(--ta-34, .34))" }}>
               {migrationRequired ? "Create the ledger table to start recording payments." : "Try widening the filters above."}
             </div>
           </div>
@@ -357,7 +357,7 @@ export default function AdminInvoicesPage() {
                   const s = STATUS_STYLE[i.status] || STATUS_STYLE.OPEN;
                   return (
                     <tr key={i.id} className="inv-row" style={{ cursor: "pointer" }} onClick={() => { setSelected(i); setTaxIdDraft(i.customerTaxId || ""); }}>
-                      <td style={{ ...td, fontFamily: "monospace", fontWeight: 700, color: "rgba(255,255,255,.9)" }}>{i.number}</td>
+                      <td style={{ ...td, fontFamily: "monospace", fontWeight: 700, color: "rgba(var(--ink),.9)" }}>{i.number}</td>
                       <td style={td}>{fmtDate(i.issuedAt)}</td>
                       {/* The company's name as it is today. The name captured at
                           the time of sale is still stored on the row and shown in
@@ -366,32 +366,32 @@ export default function AdminInvoicesPage() {
                           The raw companyId is never printed here — `companyNo` is
                           the readable reference. */}
                       <td style={{ ...td, maxWidth: 230, whiteSpace: "normal" }}>
-                        <div style={{ color: "rgba(255,255,255,.85)", fontWeight: 600 }}>
+                        <div style={{ color: "rgba(var(--ink),.85)", fontWeight: 600 }}>
                           {i.currentCompanyName || i.companyName || "—"}
                           {i.companyNo != null && (
-                            <span style={{ fontSize: 10.5, fontWeight: 600, color: "rgba(255,255,255,.28)" }}> · #{i.companyNo}</span>
+                            <span style={{ fontSize: 10.5, fontWeight: 600, color: "rgba(var(--ink),var(--ta-28, .28))" }}> · #{i.companyNo}</span>
                           )}
                         </div>
                         {i.customerEmail && (
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.32)" }}>{i.customerEmail}</div>
+                          <div style={{ fontSize: 11, color: "rgba(var(--ink),var(--ta-32, .32))" }}>{i.customerEmail}</div>
                         )}
                       </td>
                       <td style={td}>
                         {i.plan}
-                        <span style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)" }}> · {i.billingCycle.toLowerCase()}</span>
+                        <span style={{ fontSize: 10.5, color: "rgba(var(--ink),var(--ta-30, .3))" }}> · {i.billingCycle.toLowerCase()}</span>
                       </td>
                       <td style={{ ...td, fontSize: 11.5 }}>{PROVIDER_LABEL[i.provider] || i.provider}</td>
                       <td style={td}>{money(i.subtotal, i.currency)}</td>
-                      <td style={{ ...td, color: i.discount > 0 ? "#a5b4fc" : "rgba(255,255,255,.25)" }}>
+                      <td style={{ ...td, color: i.discount > 0 ? "var(--tx-a5b4fc, #a5b4fc)" : "rgba(var(--ink),var(--ta-25, .25))" }}>
                         {i.discount > 0 ? `−${money(i.discount, i.currency)}` : "—"}
                       </td>
-                      <td style={{ ...td, color: i.taxAmount > 0 ? "rgba(255,255,255,.72)" : "rgba(255,255,255,.25)" }}>
+                      <td style={{ ...td, color: i.taxAmount > 0 ? "rgba(var(--ink),var(--ta-72, .72))" : "rgba(var(--ink),var(--ta-25, .25))" }}>
                         {i.taxAmount > 0 ? money(i.taxAmount, i.currency) : "—"}
                       </td>
-                      <td style={{ ...td, fontWeight: 800, color: "white" }}>
+                      <td style={{ ...td, fontWeight: 800, color: "var(--ink-solid, white)" }}>
                         {money(i.total, i.currency)}
                         {i.refundedAmount > 0 && (
-                          <div style={{ fontSize: 10.5, fontWeight: 600, color: "#f87171" }}>−{money(i.refundedAmount, i.currency)}</div>
+                          <div style={{ fontSize: 10.5, fontWeight: 600, color: "var(--tx-f87171, #f87171)" }}>−{money(i.refundedAmount, i.currency)}</div>
                         )}
                       </td>
                       <td style={td}>
@@ -403,7 +403,7 @@ export default function AdminInvoicesPage() {
                       <td style={td} onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => window.open(`/api/admin/invoices/pdf?id=${encodeURIComponent(i.id)}`, "_blank")}
-                          style={{ padding: "4px 11px", borderRadius: 8, border: "1px solid rgba(255,255,255,.09)", background: "rgba(255,255,255,.04)", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.5)", cursor: "pointer", fontFamily: "inherit" }}
+                          style={{ padding: "4px 11px", borderRadius: 8, border: "1px solid rgba(var(--ink),.09)", background: "rgba(var(--ink),.04)", fontSize: 11, fontWeight: 600, color: "rgba(var(--ink),var(--ta-50, .5))", cursor: "pointer", fontFamily: "inherit" }}
                         >
                           ⬇ PDF
                         </button>
@@ -421,15 +421,15 @@ export default function AdminInvoicesPage() {
       {selected && (
         <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", justifyContent: "flex-end" }}>
           <div onClick={() => setSelected(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.66)", backdropFilter: "blur(4px)" }} />
-          <div style={{ position: "relative", width: "100%", maxWidth: 540, height: "100%", overflowY: "auto", background: "#101733", borderLeft: "1px solid rgba(255,255,255,.09)", padding: "26px 28px 60px" }}>
+          <div style={{ position: "relative", width: "100%", maxWidth: 540, height: "100%", overflowY: "auto", background: "var(--dk-101733, #101733)", borderLeft: "1px solid rgba(var(--ink),.09)", padding: "26px 28px 60px" }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 22 }}>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 900, fontFamily: "monospace" }}>{selected.number}</div>
-                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
+                <div style={{ fontSize: 12.5, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4 }}>
                   Issued {fmtDate(selected.issuedAt)} · {PROVIDER_LABEL[selected.provider] || selected.provider}
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} style={{ width: 32, height: 32, borderRadius: 9, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.5)", cursor: "pointer", fontSize: 15 }}>✕</button>
+              <button onClick={() => setSelected(null)} style={{ width: 32, height: 32, borderRadius: 9, border: "1px solid rgba(var(--ink),.1)", background: "rgba(var(--ink),.04)", color: "rgba(var(--ink),var(--ta-50, .5))", cursor: "pointer", fontSize: 15 }}>✕</button>
             </div>
 
             <Section title="Billed to">
@@ -482,7 +482,7 @@ export default function AdminInvoicesPage() {
                 registration at checkout yet, so it is filled in here when a
                 customer asks for a tax-compliant invoice. */}
             <Section title="Tax registration">
-              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.35)", lineHeight: 1.6, marginBottom: 10 }}>
+              <div style={{ fontSize: 11.5, color: "rgba(var(--ink),var(--ta-35, .35))", lineHeight: 1.6, marginBottom: 10 }}>
                 NTN / VAT / GST number for this buyer. Not collected at checkout — add it here when requested.
               </div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -499,8 +499,8 @@ export default function AdminInvoicesPage() {
                   style={{
                     padding: "9px 17px", borderRadius: 10, border: "none", fontSize: 13, fontWeight: 700, fontFamily: "inherit",
                     cursor: savingTaxId || taxIdDraft === (selected.customerTaxId || "") ? "not-allowed" : "pointer",
-                    background: savingTaxId || taxIdDraft === (selected.customerTaxId || "") ? "rgba(255,255,255,.06)" : "linear-gradient(135deg,#6366f1,#7c3aed)",
-                    color: savingTaxId || taxIdDraft === (selected.customerTaxId || "") ? "rgba(255,255,255,.3)" : "white",
+                    background: savingTaxId || taxIdDraft === (selected.customerTaxId || "") ? "rgba(var(--ink),.06)" : "linear-gradient(135deg,#6366f1,#7c3aed)",
+                    color: savingTaxId || taxIdDraft === (selected.customerTaxId || "") ? "rgba(var(--ink),var(--ta-30, .3))" : "white",
                   }}
                 >
                   {savingTaxId ? "Saving…" : "Save"}
@@ -529,7 +529,7 @@ function DateRangeField({ label, value, onChange, style }: {
 }) {
   return (
     <div style={{ position: "relative" }}>
-      <span style={{ position: "absolute", top: -7, left: 10, padding: "0 5px", background: "#12172f", fontSize: 9.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,.38)" }}>
+      <span style={{ position: "absolute", top: -7, left: 10, padding: "0 5px", background: "var(--dk-12172f, #12172f)", fontSize: 9.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-38, .38))" }}>
         {label}
       </span>
       <DateInput value={value} onChange={onChange} style={{ ...style, width: "100%" }} />
@@ -539,8 +539,8 @@ function DateRangeField({ label, value, onChange, style }: {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 22, padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
-      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.32)", marginBottom: 12 }}>{title}</div>
+    <div style={{ marginBottom: 22, padding: "16px 18px", borderRadius: 14, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)" }}>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(var(--ink),var(--ta-32, .32))", marginBottom: 12 }}>{title}</div>
       {children}
     </div>
   );
@@ -549,9 +549,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Row({ label, value, mono, strong }: { label: string; value: string; mono?: boolean; strong?: boolean }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: 16, padding: "6px 0", fontSize: 12.5 }}>
-      <span style={{ color: "rgba(255,255,255,.42)", flexShrink: 0 }}>{label}</span>
+      <span style={{ color: "rgba(var(--ink),var(--ta-42, .42))", flexShrink: 0 }}>{label}</span>
       <span style={{
-        color: strong ? "white" : "rgba(255,255,255,.82)",
+        color: strong ? "white" : "rgba(var(--ink),.82)",
         fontWeight: strong ? 800 : 600,
         fontFamily: mono ? "monospace" : "inherit",
         fontSize: mono ? 11.5 : undefined,

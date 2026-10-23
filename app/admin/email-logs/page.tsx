@@ -17,10 +17,10 @@ type EmailLog = {
 const STATUSES = ["sent", "failed", "queued", "bounced"] as const;
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  sent:    { bg: "rgba(52,211,153,.15)",  color: "#34d399" },
-  failed:  { bg: "rgba(248,113,113,.15)", color: "#f87171" },
-  queued:  { bg: "rgba(251,191,36,.15)",  color: "#fbbf24" },
-  bounced: { bg: "rgba(244,114,182,.15)", color: "#f472b6" },
+  sent:    { bg: "rgba(52,211,153,.15)",  color: "var(--tx-34d399, #34d399)" },
+  failed:  { bg: "rgba(248,113,113,.15)", color: "var(--tx-f87171, #f87171)" },
+  queued:  { bg: "rgba(251,191,36,.15)",  color: "var(--tx-fbbf24, #fbbf24)" },
+  bounced: { bg: "rgba(244,114,182,.15)", color: "var(--tx-f472b6, #f472b6)" },
 };
 
 function authHeaders(): Record<string, string> {
@@ -64,25 +64,25 @@ export default function AdminEmailLogsPage() {
   const failed = items.filter(l => l.status === "failed").length;
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 60px" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--ink-solid, white)", padding: "0 0 60px" }}>
       <style>{css}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Email Logs</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(var(--ink),var(--ta-40, .4))" }}>
           Delivery status for all system emails. Filter by status or search recipient.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Total Logs", val: items.length, color: "#818cf8" },
-          { label: "Sent",       val: sent,         color: "#34d399" },
-          { label: "Failed",     val: failed,       color: "#f87171" },
+          { label: "Total Logs", val: items.length, color: "var(--tx-818cf8, #818cf8)" },
+          { label: "Sent",       val: sent,         color: "var(--tx-34d399, #34d399)" },
+          { label: "Failed",     val: failed,       color: "var(--tx-f87171, #f87171)" },
         ].map(k => (
-          <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+          <div key={k.label} style={{ background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, padding: "20px 22px" }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.val}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink),var(--ta-40, .4))", marginTop: 4, fontWeight: 600 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -101,10 +101,10 @@ export default function AdminEmailLogsPage() {
         <input className="el-inp" placeholder="Search recipient or subject…" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ background: "rgba(var(--ink),.02)", border: "1px solid rgba(var(--ink),.07)", borderRadius: 16, overflowX: "auto", overflowY: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
+            <tr style={{ borderBottom: "1px solid rgba(var(--ink),.07)" }}>
               {["Recipient","Subject","Status","Provider","Sent At"].map(h => (
                 <th key={h} style={th}>{h.toUpperCase()}</th>
               ))}
@@ -120,19 +120,19 @@ export default function AdminEmailLogsPage() {
               const isExpanded = expanded === l.id;
               return (
                 <>
-                  <tr key={l.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", cursor: l.error ? "pointer" : "default" }}
+                  <tr key={l.id} style={{ borderBottom: "1px solid rgba(var(--ink),.04)", cursor: l.error ? "pointer" : "default" }}
                     onClick={() => l.error && setExpanded(isExpanded ? null : l.id)}>
                     <td style={{ ...td, fontWeight: 600 }}>{l.to}</td>
                     <td style={{ ...td, maxWidth: 340, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.subject}</td>
                     <td style={td}>
                       <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: st.bg, color: st.color }}>{l.status}</span>
                     </td>
-                    <td style={{ ...td, color: "rgba(255,255,255,.5)" }}>{l.provider || "—"}</td>
-                    <td style={{ ...td, color: "rgba(255,255,255,.4)", fontSize: 12 }}>{new Date(l.createdAt).toLocaleString("en-GB")}</td>
+                    <td style={{ ...td, color: "rgba(var(--ink),var(--ta-50, .5))" }}>{l.provider || "—"}</td>
+                    <td style={{ ...td, color: "rgba(var(--ink),var(--ta-40, .4))", fontSize: 12 }}>{new Date(l.createdAt).toLocaleString("en-GB")}</td>
                   </tr>
                   {isExpanded && l.error && (
-                    <tr key={`${l.id}-err`} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                      <td colSpan={5} style={{ padding: "10px 20px", background: "rgba(248,113,113,.05)", fontSize: 12, fontFamily: "monospace", color: "#f87171", whiteSpace: "pre-wrap" }}>
+                    <tr key={`${l.id}-err`} style={{ borderBottom: "1px solid rgba(var(--ink),.04)" }}>
+                      <td colSpan={5} style={{ padding: "10px 20px", background: "rgba(248,113,113,.05)", fontSize: 12, fontFamily: "monospace", color: "var(--tx-f87171, #f87171)", whiteSpace: "pre-wrap" }}>
                         {l.error}
                       </td>
                     </tr>
@@ -147,11 +147,11 @@ export default function AdminEmailLogsPage() {
   );
 }
 
-const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" };
+const th: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(var(--ink),var(--ta-35, .35))", letterSpacing: ".07em" };
 const td: React.CSSProperties = { padding: "13px 16px", fontSize: 13 };
-const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" };
+const empty: React.CSSProperties = { padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-30, .3))" };
 
 const css = `
-  .el-sel, .el-inp { background:rgba(255,255,255,.04); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; padding:8px 14px; color:white; font-family:inherit; font-size:13px; outline:none; }
+  .el-sel, .el-inp { background:rgba(var(--ink),.04); border:1.5px solid rgba(var(--ink),.1); border-radius:10px; padding:8px 14px; color:var(--ink-solid, white); font-family:inherit; font-size:13px; outline:none; }
   .el-inp { min-width:260px; }
 `;
