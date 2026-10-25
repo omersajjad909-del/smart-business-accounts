@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
+import { getPublicBusinessTypes } from "@/lib/publicBusinessTypes";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -23,6 +24,25 @@ export async function generateMetadata({
   if (!config) return { title: "Industry not found", robots: { index: false, follow: false } };
 
   const url = `${BASE}/for/${industry}`;
+  // 54 of these 66 industry pages are still "coming_soon" — every plan on
+  // them shows "Coming Soon" instead of a price, so there is no real offer
+  // for a visitor to act on yet. Google agreed: nearly all of them showed up
+  // in Search Console as Soft 404 or "crawled/discovered — currently not
+  // indexed", which is the correct call for a page with no working CTA.
+  // Indexing them anyway just spreads thin/duplicate-feeling signal across
+  // dozens of near-identical pages instead of concentrating it on the ones
+  // that are actually live. noindex here, flip automatically the day a
+  // module's status becomes "live" — nothing to remember to undo by hand.
+  //
+  // Must match the *effective* status the page itself renders — admin can
+  // override an industry's status in the database (see
+  // getPublicBusinessTypes), and the page reads that override, not the
+  // static config directly. Reading only `config.status` here missed exactly
+  // that case: retail is "live" in the static file but was overridden to
+  // coming_soon in the database, so the rendered page showed "Coming Soon"
+  // everywhere while this layout would have indexed it anyway.
+  const publicTypes = await getPublicBusinessTypes();
+  const isLive = publicTypes.find((t) => t.id === industry)?.isLive ?? config.status === "live";
   // Bare title — the root layout's "%s | FinovaOS" template appends the brand
   // for the <title> tag. OG/Twitter titles aren't templated, so they get the
   // brand suffix spelled out explicitly.
@@ -67,6 +87,10 @@ export async function generateMetadata({
       images: [`${BASE}/icon.png`],
     },
     alternates: { canonical: url },
+    // follow: true so internal links on the page (to /pricing, /for/retail
+    // from a "live" module's cross-sell, etc.) still get crawled — only
+    // indexing this specific not-yet-real page is what's being declined.
+    robots: isLive ? undefined : { index: false, follow: true },
   };
 }
 
