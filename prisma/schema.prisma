@@ -2222,11 +2222,19 @@ model SiteVisit {
   lon         Float?
   duration    Int? // seconds on page
   visitedAt   DateTime @default(now())
+  // null = looked like a real visitor. Non-null = why /api/track/visit
+  // flagged it (e.g. "bot_ua:curl/8.1", "no_user_agent",
+  // "datacenter_city:Ashburn") — kept as free text so the reason stays
+  // readable without a lookup table, and dashboards filter on
+  // `botReason IS NULL` rather than trusting a single isBot boolean that
+  // would hide which heuristic actually fired.
+  botReason   String?
 
   @@index([sessionId])
   @@index([visitedAt])
   @@index([country])
   @@index([page])
+  @@index([botReason])
 }
 
 // ─── Leads ────────────────────────────────────────────────────────────────────

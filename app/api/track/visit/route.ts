@@ -69,6 +69,44 @@ function detectBrowser(ua: string): string {
   return "Other";
 }
 
+// Automation / scraping tools and headless browsers. Real browsers never send
+// these tokens, so a match here is a strong signal — unlike the city check
+// below, which is circumstantial.
+const BOT_UA_PATTERN =
+  /bot|spider|crawl|slurp|headless|phantomjs|puppeteer|playwright|selenium|python-requests|python-urllib|scrapy|curl\/|wget\/|go-http-client|okhttp|axios\/|node-fetch|libwww-perl|java\/|ruby|lighthouse|pingdom|uptimerobot|datadog|monitor/i;
+
+// A visit genuinely sent from a residential or mobile connection resolves to
+// a city where people live. A cloud region resolves here too, but nobody's
+// home address is "Ashburn, Virginia" or "The Dalles, Oregon" — those are
+// AWS/Google/Microsoft datacenter seats, so traffic landing on them is a
+// server, not a visitor. Short list on purpose: only entries confirmed
+// against this site's own traffic (see the FB-referred-traffic investigation
+// this flag came out of) or well-known as a single provider's primary
+// region, to keep false positives on real nearby residents low.
+const DATACENTER_CITIES = new Set([
+  "ashburn", "boardman", "the dalles", "council bluffs", "moses lake",
+  "north charleston", "san antonio", "des moines",
+]);
+
+/**
+ * Returns why a visit looks automated, or null if it looks like a real
+ * visitor. Checked in order of confidence: a bot UA or missing UA is decided
+ * on its own; the datacenter-city check only fires for requests that passed
+ * those first, since city alone is weaker evidence (see DATACENTER_CITIES).
+ */
+function detectBotReason(ua: string, city: string): string | null {
+  if (!ua.trim()) return "no_user_agent";
+
+  const uaMatch = ua.match(BOT_UA_PATTERN);
+  if (uaMatch) return `bot_ua:${uaMatch[0].toLowerCase()}`;
+
+  if (city && DATACENTER_CITIES.has(city.trim().toLowerCase())) {
+    return `datacenter_city:${city}`;
+  }
+
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { page, referrer, sessionId } = await req.json();
@@ -126,6 +164,7 @@ export async function POST(req: NextRequest) {
       referrer: referrer || "",
       sessionId: sessionId || "",
       visitedAt: new Date(),
+      botReason: detectBotReason(ua, geo.city),
     };
 
     try {

@@ -29,6 +29,9 @@ export type SiteVisitRow = {
   lat: number | null;
   lon: number | null;
   visitedAt: Date;
+  // null = looked like a real visitor. See detectBotReason in
+  // app/api/track/visit/route.ts for what sets this and why.
+  botReason: string | null;
 };
 
 const num = (v: unknown): number | null => {
@@ -59,15 +62,29 @@ const str = (v: unknown): string | null => {
  *
  * `take` caps each source before merging, so a large backlog in one cannot
  * starve the other out of the result.
+ *
+ * `excludeBots` defaults to false — existing callers that haven't been
+ * updated to think about bot traffic keep seeing every row, exactly as
+ * before this field existed. Pass true from a surface that's meant to report
+ * genuine visitor numbers (Web Metrics, funnel conversion rates) rather than
+ * raw request volume.
  */
-export async function readSiteVisits(since: Date, take = 5000): Promise<SiteVisitRow[]> {
+export async function readSiteVisits(
+  since: Date,
+  take = 5000,
+  excludeBots = false,
+): Promise<SiteVisitRow[]> {
   const [fromTable, fromLogs] = await Promise.all([
     (prisma as any).siteVisit
       .findMany({
-        where: { visitedAt: { gte: since } },
+        where: {
+          visitedAt: { gte: since },
+          ...(excludeBots ? { botReason: null } : {}),
+        },
         select: {
           sessionId: true, page: true, country: true, countryName: true, city: true,
           flag: true, device: true, browser: true, lat: true, lon: true, visitedAt: true,
+          botReason: true,
         },
         orderBy: { visitedAt: "desc" },
         take,
@@ -94,12 +111,18 @@ export async function readSiteVisits(since: Date, take = 5000): Promise<SiteVisi
     browser:     str(v.browser),
     ...coords(v.lat, v.lon),
     visitedAt:   v.visitedAt,
+    botReason:   str(v.botReason),
   }));
 
   for (const log of fromLogs) {
     if (!log.details) continue;
     try {
       const d = JSON.parse(log.details);
+      const botReason = str(d.botReason);
+      // ActivityLog entries predate this field entirely, so most will have
+      // no botReason recorded either way — only drop one here if it was
+      // actually flagged, never because the field is simply absent.
+      if (excludeBots && botReason) continue;
       rows.push({
         sessionId:   str(d.sessionId),
         page:        str(d.page),
@@ -113,6 +136,7 @@ export async function readSiteVisits(since: Date, take = 5000): Promise<SiteVisi
         // The logged payload carries its own visitedAt; createdAt is the same
         // moment and is the reliable fallback if the JSON is malformed.
         visitedAt:   d.visitedAt ? new Date(d.visitedAt) : log.createdAt,
+        botReason,
       });
     } catch {
       /* a row we cannot parse is a row we cannot count */
