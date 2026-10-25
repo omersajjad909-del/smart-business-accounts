@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import HelpfulWidgetClient from "./HelpfulWidget";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -1355,7 +1356,7 @@ export default async function HelpArticlePage({
         </div>
 
         {/* Was this helpful */}
-        <HelpfulWidget />
+        <HelpfulWidgetClient />
 
         {/* Related articles */}
         {article.related.length > 0 && (
@@ -1399,22 +1400,3 @@ export default async function HelpArticlePage({
   );
 }
 
-/* ─── Client component for helpful widget ─── */
-// Isko alag file mein rakh sakte ho: components/HelpfulWidget.tsx
-// Ya inline "use client" ke saath use karo
-function HelpfulWidget() {
-  // Server component mein useState nahi chalta
-  // Isko alag client component mein move karo:
-  // "use client"
-  // import { useState } from "react"
-  // export default function HelpfulWidget() { ... }
-  return (
-    <div style={{ borderRadius:16, padding:"20px 22px", background:"rgba(var(--ink),.03)", border:"1px solid rgba(var(--ink),.07)", marginBottom:32, display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:14 }}>
-      <span style={{ fontSize:14, fontWeight:600, color:"rgba(var(--ink),var(--ta-45, .45))" }}>Was this article helpful?</span>
-      <div style={{ display:"flex", gap:8 }}>
-        <a href="?helpful=yes" style={{ padding:"8px 18px", borderRadius:10, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.25)", color:"var(--tx-34d399, #34d399)", fontSize:13, fontWeight:600, textDecoration:"none" }}>👍 Yes</a>
-        <a href="?helpful=no"  style={{ padding:"8px 18px", borderRadius:10, background:"rgba(248,113,113,.08)", border:"1.5px solid rgba(248,113,113,.2)",  color:"var(--tx-f87171, #f87171)", fontSize:13, fontWeight:600, textDecoration:"none" }}>👎 No</a>
-      </div>
-    </div>
-  );
-}

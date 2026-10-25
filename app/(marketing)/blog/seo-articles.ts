@@ -70,9 +70,9 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
   // ---------------------------------------------------------------------
   "best-business-management-software-small-business": {
     id: "best-business-management-software-small-business",
-    title: "Best Business Management Software for Small Businesses in 2026",
+    title: "Best Business Management Software for Small Businesses (2026): A Vendor-by-Vendor Breakdown",
     excerpt:
-      "A vendor-by-vendor breakdown of what small businesses actually run on, who should avoid each, and how to evaluate without losing months.",
+      "We compared the software small businesses actually run on in 2026 — who each one suits, who should avoid it, and how to decide without losing months.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-818cf8, #818cf8)",
@@ -188,9 +188,9 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
   // ---------------------------------------------------------------------
   "best-odoo-alternatives": {
     id: "best-odoo-alternatives",
-    title: "Best Odoo Alternatives for Small Businesses in 2026",
+    title: "5 Best Odoo Alternatives for Small Businesses in 2026 (Honest Comparison)",
     excerpt:
-      "Odoo is powerful and genuinely hard to run without help. Here are the realistic alternatives and what each one trades away.",
+      "Odoo alternatives ranked by what's actually failing you — cost, complexity, or your implementation partner. Five real options, no vendor fluff.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-34d399, #34d399)",
@@ -1029,9 +1029,9 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
   // ---------------------------------------------------------------------
   "should-you-combine-inventory-and-accounting": {
     id: "should-you-combine-inventory-and-accounting",
-    title: "Should a Small Business Combine Inventory and Accounting Into One System?",
+    title: "Should You Combine Inventory and Accounting? Yes — If You Pass This One Test",
     excerpt:
-      "For most goods-based businesses, yes — but not automatically. Here's the actual test and when staying separate is better.",
+      "The real test isn't whether you have inventory — it's whether a single sale needs to touch both stock and your books at once. Here's how to tell, plus when staying separate is genuinely fine.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-818cf8, #818cf8)",
