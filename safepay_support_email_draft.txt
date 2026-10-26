@@ -1,0 +1,39 @@
+To: support@getsafepay.com
+Subject: Clarification needed — Fee/Tax breakdown discrepancy on Transaction #068100
+
+Hello Safepay Support Team,
+
+I'm writing regarding a transaction processed on October 26, 2026 (Reference Code: 068100), for a charge amount of PKR 4,000.00. I have two questions about the fee and tax breakdown shown for this transaction.
+
+1. Discrepancy between notification email and transaction details page
+
+The payment notification email I received states:
+"Your customer just paid you PKR 3710.64"
+
+However, the transaction details page for the same transaction shows:
+- Total Fees (inclusive of all taxes): PKR 409.36
+- Net amount: PKR 3,590.64
+
+These two figures don't match — there is a PKR 120.00 difference between the two numbers. When I reconcile the itemized fees shown on the transaction page myself:
+- MDR (2.9% + PKR 30): PKR 146.00
+- Sales Tax on MDR (16%): PKR 23.36
+- Withholding Income Tax (1%): PKR 40.00
+- Withholding Sales Tax (2%): PKR 80.00
+- Total: PKR 289.36
+
+PKR 4,000.00 − PKR 289.36 = PKR 3,710.64, which matches the amount stated in the notification email, not the "Net amount" shown on the transaction details page.
+
+Could you please confirm which figure is correct, and clarify why the "Total Fees" and "Net amount" fields on the transaction details page don't match the itemized breakdown or the amount stated in the notification email?
+
+2. Basis for Withholding Sales Tax
+
+I am not currently registered for Sales Tax. Could you clarify the legal basis (section/rule) under which the "Withholding Sales Tax" (PKR 80.00, 2% of the charge amount) is being deducted on this transaction, regardless of my registration status?
+
+Additionally, if this is being withheld on my behalf against a tax liability, will I be issued a withholding tax certificate for this and future transactions, so I can reflect it in my own tax filings?
+
+I'd appreciate a clear explanation of both points at your earliest convenience.
+
+Thank you,
+Sajjad Waseem
+sajjadenterprises909@yahoo.com
++92 300 8653693
