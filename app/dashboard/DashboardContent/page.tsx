@@ -14,6 +14,7 @@ import {
 import { CURRENCY_SYMBOL } from "@/lib/currency-client";
 import DemoBusinessShowcase from "./DemoBusinessShowcase";
 import { useResponsive } from "@/hooks/useResponsive";
+import { ModeToggle } from "@/components/mode-toggle";
 import {
   LineChart,
   Line,
@@ -1487,6 +1488,8 @@ export default function DashboardContent() {
             </Link>
           </div>
         </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <ModeToggle />
         {/* Notification bell — real count, navigates to notifications */}
         <Link
           prefetch={false}
@@ -1544,10 +1547,13 @@ export default function DashboardContent() {
             </span>
           )}
         </Link>
+        </div>
       </div>
 
+      {/* Fixed dark gradient, so it keeps the dark palette in light theme too —
+          otherwise the --ink text flips to near-black and vanishes on it. */}
       <div
-        className="db-mo"
+        className="db-mo mk-force-dark"
         style={{
           borderRadius: 22,
           padding: "24px 20px 20px",

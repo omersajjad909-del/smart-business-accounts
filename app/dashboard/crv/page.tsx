@@ -616,8 +616,8 @@ export default function CRVPage() {
 
         {/* Entry table */}
         <div style={{ border:"1px solid rgba(var(--ink),.08)", borderRadius:10, overflow:"hidden", marginBottom:14 }}>
-          <table style={{ width:"100%", borderCollapse:"collapse" }}>
-            <thead>
+          <table style={{ width:"100%", borderCollapse:"collapse", ...(isMobile && { display:"block" }) }}>
+            <thead style={isMobile ? { display:"none" } : undefined}>
               <tr style={{ background:"rgba(var(--ink),.05)", borderBottom:"1px solid rgba(var(--ink),.1)" }}>
                 <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", width:36 }}>#</th>
                 <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(var(--ink),var(--ta-40, .4))", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:120 }}>A/c Code</th>
@@ -627,14 +627,14 @@ export default function CRVPage() {
                 <th style={{ padding:"9px 10px", width:70 }}></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody style={isMobile ? { display:"block" } : undefined}>
               {entries.map((row, i) => (
-                <tr key={row.id} style={{ borderBottom:"1px solid rgba(var(--ink),.04)" }}
+                <tr key={row.id} style={{ borderBottom:"1px solid rgba(var(--ink),.04)", ...(isMobile && { display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, padding:"10px 8px", borderBottom:"1px solid rgba(var(--ink),.12)" }) }}
                   onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.015)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                 >
-                  <td style={{ padding:"5px 10px", fontSize:11, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
-                  <td style={{ padding:"4px 6px", width:120 }}>
+                  <td style={{ ...(isMobile ? {display:"none"} : {}), padding:"5px 10px", fontSize:11, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
+                  <td style={{ ...(isMobile ? {gridColumn:"1",gridRow:"1",width:"auto"} : {}), padding:"4px 6px", width:120 }}>
                     <input
                       id={`crv-code-${row.id}`}
                       value={row.accountCode}
@@ -644,7 +644,7 @@ export default function CRVPage() {
                       style={{ ...clickInp, fontSize:12, fontFamily:"monospace", letterSpacing:".03em" }}
                     />
                   </td>
-                  <td style={{ padding:"4px 6px" }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"2"} : {}), padding:"4px 6px" }}>
                     <input
                       value={row.accountName}
                       placeholder="Click to select account…"
@@ -653,7 +653,7 @@ export default function CRVPage() {
                       style={{ ...clickInp, fontSize:12 }}
                     />
                   </td>
-                  <td style={{ padding:"4px 6px" }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"3"} : {}), padding:"4px 6px" }}>
                     <input
                       id={`crv-nar-${row.id}`}
                       value={row.narration}
@@ -663,7 +663,7 @@ export default function CRVPage() {
                       onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); document.getElementById(`crv-amt-${row.id}`)?.focus(); } }}
                     />
                   </td>
-                  <td style={{ padding:"4px 6px" }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"2",gridRow:"1"} : {}), padding:"4px 6px" }}>
                     <input
                       id={`crv-amt-${row.id}`}
                       value={row.amount}
@@ -689,7 +689,7 @@ export default function CRVPage() {
                       }}
                     />
                   </td>
-                  <td style={{ padding:"4px 8px", textAlign:"center" }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"4",textAlign:"right"} : {}), padding:"4px 8px", textAlign:"center" }}>
                     <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
                       <button
                         type="button"
