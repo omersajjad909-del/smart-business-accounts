@@ -387,7 +387,7 @@ export default function CPVPage() {
       {/* ── CHART OF ACCOUNT MODAL ── */}
       {pickerOpen && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.78)", zIndex:2000, display:"flex", alignItems:"center", justifyContent:"center" }} onClick={closePicker}>
-          <div style={{ background:"var(--dk-0c0e1a, #0c0e1a)", border:"1px solid rgba(var(--ink),.15)", borderRadius:14, width:640, maxHeight:580, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.9)" }} onClick={e => e.stopPropagation()}>
+          <div style={{ background:"var(--dk-0c0e1a, #0c0e1a)", border:"1px solid rgba(var(--ink),.15)", borderRadius:14, width:"min(640px, 94vw)", maxHeight:580, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.9)" }} onClick={e => e.stopPropagation()}>
             <div style={{ padding: isMobile ? "12px 10px" : "14px 20px", borderBottom:"1px solid rgba(var(--ink),.1)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <span style={{ fontWeight:800, fontSize:15, color:"rgba(var(--ink),.9)", letterSpacing:".05em" }}>CHART OF ACCOUNT</span>
               <span style={{ fontSize:11, color:"rgba(var(--ink),var(--ta-35, .35))" }}>Choices in list: {filteredPickerAccts.length}</span>
@@ -526,7 +526,7 @@ export default function CPVPage() {
       )}
 
       {/* ── FORM ── */}
-      <div style={{ background:"rgba(var(--ink),.03)", border:`1px solid ${editing ? "rgba(250,204,21,.35)" : "rgba(var(--ink),.08)"}`, borderRadius:16, padding:24, marginBottom:24, display: queryMode ? "none" : undefined }}>
+      <div style={{ background:"rgba(var(--ink),.03)", border:`1px solid ${editing ? "rgba(250,204,21,.35)" : "rgba(var(--ink),.08)"}`, borderRadius:16, padding: isMobile ? 12 : 24, marginBottom:24, display: queryMode ? "none" : undefined }}>
         {editing && (
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:10, marginBottom:18, padding:"9px 14px", borderRadius:10, background:"rgba(250,204,21,.07)", border:"1px solid rgba(250,204,21,.25)" }}>
             <span style={{ fontSize:12, color:"var(--tx-facc15, #facc15)", fontWeight:700 }}>
@@ -575,22 +575,22 @@ export default function CPVPage() {
             </thead>
             <tbody style={isMobile ? { display:"block" } : undefined}>
               {entries.map((row, i) => (
-                <tr key={row.id} style={{ borderBottom:"1px solid rgba(var(--ink),.04)", ...(isMobile && { display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, padding:"10px 8px", borderBottom:"1px solid rgba(var(--ink),.12)" }) }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(var(--ink),.015)")}
+                <tr key={row.id} style={{ borderBottom:"1px solid rgba(var(--ink),.04)", ...(isMobile && { display:"grid", gridTemplateColumns:"1fr auto", gap:8, padding:"12px 10px", borderBottom:"1px solid rgba(var(--ink),.12)", alignItems:"center" }) }}
+                  onMouseEnter={e => { if (!isMobile) e.currentTarget.style.background = "rgba(var(--ink),.015)"; }}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <td style={{ ...(isMobile ? {display:"none"} : {}), padding:"5px 10px", fontSize:11, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
-                  <td style={{ ...(isMobile ? {gridColumn:"1",gridRow:"1",width:"auto"} : {}), padding:"4px 6px", width:120 }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"1",gridRow:"1",textAlign:"left",padding:0,fontSize:11,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:"rgba(var(--ink),.45)"} : {padding:"5px 10px", fontSize:11, color:"rgba(var(--ink),var(--ta-28, .28))", fontWeight:600, textAlign:"center"}) }}>{isMobile ? `Entry ${i + 1}` : i + 1}</td>
+                  <td style={{ ...(isMobile ? {display:"none"} : {}), padding:"4px 6px", width:120 }}>
                     <input id={`cpv-code-${row.id}`} value={row.accountCode} placeholder="—" readOnly onClick={() => openPicker(row.id)} style={{ ...clickInp, fontSize:12, fontFamily:"monospace", letterSpacing:".03em" }} />
                   </td>
-                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"2"} : {}), padding:"4px 6px" }}>
-                    <input value={row.accountName} placeholder="Click to select account…" readOnly onClick={() => openPicker(row.id)} style={{ ...clickInp, fontSize:12 }} />
+                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"2",padding:0} : {}), padding:"4px 6px" }}>
+                    <input value={isMobile && row.accountCode ? `${row.accountCode} — ${row.accountName}` : row.accountName} placeholder={isMobile ? "Tap to select account…" : "Click to select account…"} readOnly onClick={() => openPicker(row.id)} style={{ ...clickInp, fontSize:12 }} />
                   </td>
-                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"3"} : {}), padding:"4px 6px" }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"3",padding:0} : {}), padding:"4px 6px" }}>
                     <input id={`cpv-nar-${row.id}`} value={row.narration} onChange={e => setEntryField(row.id, "narration", e.target.value)} placeholder="Narration…" style={{ ...inp, fontSize:12 }}
                       onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); document.getElementById(`cpv-amt-${row.id}`)?.focus(); } }} />
                   </td>
-                  <td style={{ ...(isMobile ? {gridColumn:"2",gridRow:"1"} : {}), padding:"4px 6px" }}>
-                    <input id={`cpv-amt-${row.id}`} value={row.amount} onChange={e => setEntryField(row.id, "amount", e.target.value)} placeholder="0.00" type="number" min="0"
+                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"4",padding:0} : {}), padding:"4px 6px" }}>
+                    <input id={`cpv-amt-${row.id}`} value={row.amount} onChange={e => setEntryField(row.id, "amount", e.target.value)} placeholder={isMobile ? "Amount (0.00)" : "0.00"} type="number" min="0"
                       style={{ ...inp, fontSize:13, fontWeight:700, textAlign:"right" as const, color:BLUE }}
                       onKeyDown={e => {
                         if (e.key === "Enter") {
@@ -602,7 +602,7 @@ export default function CPVPage() {
                         }
                       }} />
                   </td>
-                  <td style={{ ...(isMobile ? {gridColumn:"1 / 3",gridRow:"4",textAlign:"right"} : {}), padding:"4px 8px", textAlign:"center" }}>
+                  <td style={{ ...(isMobile ? {gridColumn:"2",gridRow:"1",padding:0} : {}), padding:"4px 8px", textAlign:"center" }}>
                     <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
                       <button type="button" title="Print Receipt" onClick={() => row.accountId && printVoucher([row], previewVoucherNo, date, modeLabel, Number(row.amount), company, row.narration)}
                         disabled={!row.accountId || !Number(row.amount)}

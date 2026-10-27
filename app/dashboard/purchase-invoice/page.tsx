@@ -309,6 +309,31 @@ const [searchTerm, setSearchTerm] = useState("");
     ...(rfActive ? { meta: emptyRateFormulaMeta(rf) } : {}),
   });
 
+  const pickRowItem = (i: number, __picked: string) => {
+                                      const item = allInventoryItems.find(it => it.id === __picked);
+                                      if (item) {
+                                        const copy = [...rows];
+                                        // With a formula running, the rate belongs to the
+                                        // formula — pulling the item's stored purchase rate in
+                                        // here would overwrite a computed line rate the moment
+                                        // the operator corrected the item.
+                                        copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", ...(rfActive ? {} : { rate: item.purchaseRate || "" }) };
+                                        if (rfActive) {
+                                          const meta = metaFromItem(rf, (item as any).meta, copy[i].meta, `${item.name || ""} ${item.description || ""}`, true);
+                                          lastPickedMeta.current = meta;
+                                          copy[i].meta = meta;
+                                          const r = computeRateFromFormula(rf, meta);
+                                          if (r.rate != null) copy[i].rate = r.rate;
+                                        }
+                                        if (i === copy.length - 1) copy.push(emptyRow());
+                                        setRows(copy);
+                                      } else {
+                                        const copy = [...rows];
+                                        copy[i] = { ...copy[i], itemId: "", name: "", sku: "", unit: "" };
+                                        setRows(copy);
+                                      }
+  };
+
   /* Where Enter goes after an item is picked.
   
      With a rate formula on, it goes to whichever column the company nominated
@@ -1479,9 +1504,29 @@ const [searchTerm, setSearchTerm] = useState("");
                       <div style={{ padding: "10px 14px" }}>
                         {rows.map((r, i) => (
                           <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: "uppercase" as const }}>Item {i + 1}</div>
-                            <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>{r.name || <span style={{ color: MUTED, fontStyle: "italic" }}>—</span>}</div>
-                            {r.sku && <div style={{ fontSize: 10, color: ACCENT, fontFamily: "monospace", marginBottom: 6 }}>{r.sku}</div>}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const }}>Item {i + 1}</div>
+                              <button type="button" onClick={() => setRows(rows.length > 1 ? rows.filter((_, idx) => idx !== i) : [emptyRow()])} style={{ background: "none", border: "none", color: "var(--tx-f87171, #f87171)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", padding: 2 }}>✕ Remove</button>
+                            </div>
+                            <div style={{ marginBottom: 8 }}>
+                              <ItemPicker
+                                groupKey={pickerGroupKey}
+                                groupPrefer={pickerGroupPrefer}
+                                items={pickerItems as any}
+                                value={r.itemId}
+                                onChange={(__picked: string) => pickRowItem(i, __picked)}
+                                onKeyDown={onPickerEnter(i)}
+                                label={rfActive ? itemPickerLabel : undefined}
+                                previewFields={rfActive ? pickerPreviewFields : []}
+                                previewValues={rfActive ? itemPreviewValues : undefined}
+                                stockValues={itemStockValues}
+                                defaultInStockOnly={false}
+                                note={grnRemainingNote}
+                                style={{ ...inp({ padding: "9px 10px", fontSize: 13 }), fontWeight: r.itemId ? 600 : 400 }}
+                                allowManual={false}
+                              />
+                              {r.sku && <div style={{ fontSize: 10, color: ACCENT, fontFamily: "monospace", marginTop: 4 }}>{r.sku}</div>}
+                            </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                               {rfActive && (
                                 <RateFormulaMobileFields
@@ -1536,30 +1581,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                       groupPrefer={pickerGroupPrefer}
                                       items={pickerItems as any}
                                       value={r.itemId}
-                                      onChange={(__picked: string) => {
-                                      const item = allInventoryItems.find(it => it.id === __picked);
-                                      if (item) {
-                                        const copy = [...rows];
-                                        // With a formula running, the rate belongs to the
-                                        // formula — pulling the item's stored purchase rate in
-                                        // here would overwrite a computed line rate the moment
-                                        // the operator corrected the item.
-                                        copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", ...(rfActive ? {} : { rate: item.purchaseRate || "" }) };
-                                        if (rfActive) {
-                                          const meta = metaFromItem(rf, (item as any).meta, copy[i].meta, `${item.name || ""} ${item.description || ""}`, true);
-                                          lastPickedMeta.current = meta;
-                                          copy[i].meta = meta;
-                                          const r = computeRateFromFormula(rf, meta);
-                                          if (r.rate != null) copy[i].rate = r.rate;
-                                        }
-                                        if (i === copy.length - 1) copy.push(emptyRow());
-                                        setRows(copy);
-                                      } else {
-                                        const copy = [...rows];
-                                        copy[i] = { ...copy[i], itemId: "", name: "", sku: "", unit: "" };
-                                        setRows(copy);
-                                      }
-                                    }}
+                                      onChange={(__picked: string) => pickRowItem(i, __picked)}
                                       onKeyDown={onPickerEnter(i)}
                                       label={rfActive ? itemPickerLabel : undefined}
                                       previewFields={rfActive ? pickerPreviewFields : []}
