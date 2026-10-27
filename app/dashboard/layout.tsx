@@ -1052,6 +1052,10 @@ export default function DashboardLayout({
       // Core pages belong to every trade that runs that kind of paperwork, so
       // the core pack is the test — hiding the link is not enough on its own,
       // a travel agency typing /dashboard/grn has to land back on /dashboard.
+      // Job Work is the one core page whose answer is not the business type's:
+      // the server decides (/api/job-work/status), the page shows a locked panel
+      // when the answer is no, so there is nothing for this guard to add.
+      if (feature.id === "JOB_WORK") return;
       if (!isCustomPlan && !businessOwnsCoreFeature(businessType, feature.id)) {
         router.replace("/dashboard");
       }

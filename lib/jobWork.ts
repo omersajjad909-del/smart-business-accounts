@@ -110,6 +110,21 @@ export const JOB_WORK_ACCOUNTS = {
 export const JOB_WORK_FEATURE_ID = "JOB_WORK";
 
 /**
+ * Companies that get Job Work although their business type is not a production
+ * one, and without a plan having been ticked for it.
+ *
+ * Bin Mumtaz Plastic is a trading company: it buys PVC rolls, sends them to a
+ * job worker (Qasim) and takes finished pieces back. It should keep the trading
+ * module it already uses, so its business type stays "trading" — only this one
+ * page is opened for it. Trading companies in general still do not get Job Work
+ * (see JOB_WORK_BUSINESS_TYPES in lib/corePack.ts); this is a single-company
+ * exception, not a rule.
+ */
+export const JOB_WORK_EXTRA_COMPANY_IDS: ReadonlySet<string> = new Set([
+  "719ec501-bf4e-4ebf-8f6e-2bb330071f0d", // Bin Mumtaz Plastic (companyNo 100030)
+]);
+
+/**
  * Only a production business type gets Job Work at all — see
  * JOB_WORK_BUSINESS_TYPES in lib/corePack.ts. Within those, three ways in, and
  * no fourth.
@@ -126,6 +141,8 @@ export const JOB_WORK_FEATURE_ID = "JOB_WORK";
  * opens a page whose API then refuses the company.
  */
 export async function isJobWorkEnabled(companyId: string): Promise<boolean> {
+  // A named exception, ahead of the business-type and plan checks below.
+  if (JOB_WORK_EXTRA_COMPANY_IDS.has(companyId)) return true;
   const company = await prisma.company.findUnique({
     where: { id: companyId },
     select: { isInternalTest: true, isDemo: true, businessType: true },

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
+import { shrinkImage } from "@/lib/shrinkImage";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -67,24 +68,6 @@ export default function OpeningBalancesPage() {
   };
 
   // ── Scan a ledger register photo ─────────────────────────────────────────
-  // Phone photos run 4–8 MB; the model reads handwriting fine at ~1800px, and the
-  // smaller upload is far kinder to mobile data and the request size limit.
-  const shrinkImage = (file: File): Promise<Blob> => new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const scale = Math.min(1, 1800 / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(url);
-      canvas.toBlob(b => (b ? resolve(b) : reject(new Error("Could not process the photo"))), "image/jpeg", 0.85);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not open this image")); };
-    img.src = url;
-  });
-
   // Pages are read one request each — a single call carrying many photos would
   // blow the request size limit and lose every page if one failed. A page that
   // fails is reported by number and the rest still land in the review table.

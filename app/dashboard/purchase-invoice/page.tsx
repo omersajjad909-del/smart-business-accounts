@@ -11,6 +11,8 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
+import { canScanPurchaseInvoice } from "@/lib/purchaseInvoiceScan";
+import { shrinkImage } from "@/lib/shrinkImage";
 
 import { QRCodeSVG } from "qrcode.react";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -251,6 +253,9 @@ const [searchTerm, setSearchTerm] = useState("");
   const [origin, setOrigin] = useState("");
   const [allInventoryItems, setAllInventoryItems] = useState<InventoryItem[]>([]);
   const [scanCode, setScanCode] = useState("");
+  const [invScanning, setInvScanning] = useState(false);
+  const [invScanProgress, setInvScanProgress] = useState("");
+  const [invScanReport, setInvScanReport] = useState<{ matched: number; total: number; supplier: string | null; notes: string[] } | null>(null);
   const [scanActive, setScanActive] = useState(false);
 
   useEffect(() => {
@@ -684,6 +689,88 @@ const [searchTerm, setSearchTerm] = useState("");
         ...(rfActive ? { meta: readRateFormulaMeta(rf, (pi as any).meta) } : {}),
       }))
       .filter((row) => row.qty > 0);
+  }
+
+  /**
+   * Fill the form from photos of a supplier's own invoice.
+   *
+   * Nothing is saved here — the form is filled and the operator reviews it and
+   * presses Save, as for any invoice typed by hand. Pages are read one request
+   * each so one bad photo does not lose the others. The supplier and any
+   * line's item are set only when the server matched them to a record in the
+   * lists this page sent; a line with no match keeps its quantity and rate and
+   * shows what the supplier wrote, so only the item has to be picked.
+   */
+  async function scanSupplierInvoice(files: File[]) {
+    setInvScanning(true); setInvScanReport(null);
+    try {
+      const supplierList = suppliers.map(s => ({ id: s.id, name: s.name }));
+      const itemList = allInventoryItems.map(i => ({ id: i.id, name: i.name, code: i.code || "" }));
+      const lines: Array<{ text: string; itemId: string | null; qty: number; rate: number; discountPercent: number; taxPercent: number }> = [];
+      const notes: string[] = [];
+      let sup: { id: string | null; name: string | null } | null = null;
+      let invNo: string | null = null;
+      let invDate: string | null = null;
+      let freightAmt = 0;
+
+      for (let p = 0; p < files.length; p++) {
+        setInvScanProgress(files.length > 1 ? `Reading page ${p + 1} of ${files.length}…` : "Reading the invoice…");
+        try {
+          const fd = new FormData();
+          fd.append("image", await shrinkImage(files[p]), "invoice.jpg");
+          fd.append("suppliers", JSON.stringify(supplierList));
+          fd.append("items", JSON.stringify(itemList));
+          const res = await fetch("/api/purchase-invoice/scan", { method: "POST", headers: requestHeaders, body: fd });
+          const d = await res.json();
+          if (!res.ok) { notes.push(`Page ${p + 1}: ${d.error || "scan failed"}`); continue; }
+          if (!sup && (d.supplierId || d.supplierName)) sup = { id: d.supplierId, name: d.supplierName };
+          invNo = invNo || d.invoiceNo; invDate = invDate || d.date;
+          freightAmt += Number(d.freight) || 0;
+          if (d.notes) notes.push(files.length > 1 ? `Page ${p + 1}: ${d.notes}` : d.notes);
+          lines.push(...(d.lines || []));
+        } catch (e: any) {
+          notes.push(`Page ${p + 1}: ${e.message || "scan failed"}`);
+        }
+      }
+      if (!lines.length) { toast.error(notes[0] || "No items found on this invoice"); return; }
+
+      if (sup?.id) {
+        const s = suppliers.find(x => x.id === sup!.id);
+        setSupplierId(sup.id);
+        setSupplierName(s?.name || "");
+        setSelectedPoId(""); setSelectedGrnId("");
+      } else if (sup?.name) {
+        notes.unshift(`Supplier "${sup.name}" was not found in your suppliers — select it above.`);
+      }
+      if (invDate) setDate(invDate);
+      if (invNo) setReference(`Supplier Inv: ${invNo}`);
+      if (freightAmt > 0) setFreight(freightAmt);
+
+      const built: Row[] = lines.map(l => {
+        const item = l.itemId ? allInventoryItems.find(it => it.id === l.itemId) : undefined;
+        const row: Row = emptyRow();
+        if (item) {
+          row.itemId = item.id; row.name = item.name; row.sku = item.code || ""; row.unit = item.unit || "";
+          row.description = item.description || "";
+          if (rfActive) {
+            const meta = metaFromItem(rf, (item as any).meta, row.meta, `${item.name || ""} ${item.description || ""}`, true);
+            row.meta = meta;
+            const r = computeRateFromFormula(rf, meta);
+            if (r.rate != null) row.rate = r.rate;
+          }
+        } else {
+          row.description = `📄 Invoice line: ${l.text}`;
+        }
+        row.qty = l.qty;
+        // With a formula running the rate belongs to the formula, as on a picked item.
+        if (!rfActive || !item) row.rate = l.rate || (item?.purchaseRate ?? "");
+        row.discountPercent = l.discountPercent || "";
+        row.taxPercent = l.taxPercent || "";
+        return row;
+      });
+      setRows([...built, emptyRow()]);
+      setInvScanReport({ matched: built.filter(r => r.itemId).length, total: built.length, supplier: sup?.id ? (suppliers.find(x => x.id === sup!.id)?.name || null) : null, notes });
+    } finally { setInvScanning(false); setInvScanProgress(""); }
   }
 
   function handleSupplierChange(id: string) {
@@ -1466,6 +1553,38 @@ const [searchTerm, setSearchTerm] = useState("");
                 </div>
               </div>
 
+              {/* ── SCAN SUPPLIER INVOICE (enabled per company) ── */}
+              {canScanPurchaseInvoice(user?.companyId) && (
+                <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 16px", marginBottom: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <div style={{ flex: 1, minWidth: 180 }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 800, color: TEXT }}>Scan supplier invoice</div>
+                      <div style={{ fontSize: 11, color: MUTED }}>Photo of the bill the supplier sent — the supplier and items are filled in for you to check.</div>
+                    </div>
+                    <label style={{ background: ACCENT, color: "#fff", borderRadius: 8, padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: invScanning ? "default" : "pointer", opacity: invScanning ? 0.6 : 1 }}>
+                      📷 Take photo
+                      <input type="file" accept="image/*" capture="environment" disabled={invScanning} style={{ display: "none" }}
+                        onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanSupplierInvoice(fl); }} />
+                    </label>
+                    <label style={{ border: `1px solid ${BORDER}`, color: TEXT, borderRadius: 8, padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: invScanning ? "default" : "pointer", opacity: invScanning ? 0.6 : 1 }}>
+                      🖼 Upload from gallery
+                      <input type="file" accept="image/*" multiple disabled={invScanning} style={{ display: "none" }}
+                        onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanSupplierInvoice(fl); }} />
+                    </label>
+                  </div>
+                  {invScanning && <div style={{ fontSize: 12, color: MUTED, marginTop: 8 }}>{invScanProgress}</div>}
+                  {invScanReport && !invScanning && (
+                    <div style={{ fontSize: 12, marginTop: 10, lineHeight: 1.7, color: TEXT }}>
+                      <strong>Check before saving.</strong>{" "}
+                      {invScanReport.supplier ? <>Supplier: <strong>{invScanReport.supplier}</strong>. </> : null}
+                      {invScanReport.matched} of {invScanReport.total} lines matched to an item
+                      {invScanReport.matched < invScanReport.total && <> — lines marked 📄 need their item picked; they are not saved until you do</>}.
+                      {invScanReport.notes.map((n, i) => <div key={i} style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>⚠ {n}</div>)}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* ── SCAN BAR ── */}
               <div onClick={() => setScanActive(true)} style={{ background: scanActive ? "rgba(99,102,241,.05)" : PANEL, border: `1.5px ${scanActive ? "solid" : "dashed"} ${scanActive ? ACCENT : BORDER}`, borderRadius: 12, padding: "12px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "text", marginBottom: 16, transition: "all .15s" }}>
                 <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -1526,6 +1645,7 @@ const [searchTerm, setSearchTerm] = useState("");
                                 allowManual={false}
                               />
                               {r.sku && <div style={{ fontSize: 10, color: ACCENT, fontFamily: "monospace", marginTop: 4 }}>{r.sku}</div>}
+                              {r.description && <div dir="auto" style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>{r.description}</div>}
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                               {rfActive && (
