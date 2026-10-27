@@ -30,6 +30,7 @@ export default function OpeningBalancesPage() {
   const [acSearch, setAcSearch]     = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
   const [scanning, setScanning]     = useState(false);
+  const [scanProgress, setScanProgress] = useState("");
   const [scanNotes, setScanNotes]   = useState<string | null>(null);
   const [scanDone, setScanDone]     = useState<{ total: number; matched: number } | null>(null);
 
@@ -84,34 +85,51 @@ export default function OpeningBalancesPage() {
     img.src = url;
   });
 
-  const scanRegister = async (file: File) => {
-    setScanning(true); setError(null); setResult(null); setScanNotes(null); setScanDone(null);
+  // Pages are read one request each — a single call carrying many photos would
+  // blow the request size limit and lose every page if one failed. A page that
+  // fails is reported by number and the rest still land in the review table.
+  // `append` keeps rows already on screen so a register can be added to page by page.
+  const scanRegister = async (files: File[], append = false) => {
+    setScanning(true); setError(null); setResult(null); setScanNotes(null); setScanProgress("");
     try {
-      const fd = new FormData();
-      fd.append("image", await shrinkImage(file), "register.jpg");
-      const res = await fetch("/api/opening-balances/scan", { method: "POST", credentials: "include", headers: getHeaders(), body: fd });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || "Scan failed"); return; }
-      const scanned: Array<{ rawName: string; nameRoman?: string | null; narration?: string | null; debit: number; credit: number; accountId?: string | null }> = data.rows || [];
-      if (!scanned.length) { setError("No balances were found on this photo. Try a clearer, well-lit shot of one page."); return; }
-      const next: BalanceRow[] = scanned.map(r => {
-        const acc = r.accountId ? accounts.find(a => a.id === r.accountId) : undefined;
-        return {
-          accountId: acc?.id || "", accountCode: acc?.code || "", accountName: acc?.name || "",
-          debit: r.debit || "", credit: r.credit || "",
-          scanName: r.nameRoman && r.nameRoman !== r.rawName ? `${r.rawName} (${r.nameRoman})` : r.rawName,
-          scanNarration: r.narration || undefined,
-        };
-      });
-      setRows(next);
-      setScanNotes(data.notes || null);
-      setScanDone({ total: next.length, matched: next.filter(r => r.accountId).length });
+      const collected: BalanceRow[] = [];
+      const notes: string[] = [];
+      const failed: string[] = [];
+      for (let p = 0; p < files.length; p++) {
+        setScanProgress(files.length > 1 ? `Reading page ${p + 1} of ${files.length}…` : "Reading the page…");
+        try {
+          const fd = new FormData();
+          fd.append("image", await shrinkImage(files[p]), "register.jpg");
+          const res = await fetch("/api/opening-balances/scan", { method: "POST", credentials: "include", headers: getHeaders(), body: fd });
+          const data = await res.json();
+          if (!res.ok) { failed.push(`Page ${p + 1}: ${data.error || "scan failed"}`); continue; }
+          const scanned: Array<{ rawName: string; nameRoman?: string | null; narration?: string | null; debit: number; credit: number; accountId?: string | null }> = data.rows || [];
+          if (!scanned.length) { failed.push(`Page ${p + 1}: no balances found`); continue; }
+          if (data.notes) notes.push(files.length > 1 ? `Page ${p + 1}: ${data.notes}` : data.notes);
+          for (const r of scanned) {
+            const acc = r.accountId ? accounts.find(a => a.id === r.accountId) : undefined;
+            collected.push({
+              accountId: acc?.id || "", accountCode: acc?.code || "", accountName: acc?.name || "",
+              debit: r.debit || "", credit: r.credit || "",
+              scanName: r.nameRoman && r.nameRoman !== r.rawName ? `${r.rawName} (${r.nameRoman})` : r.rawName,
+              scanNarration: r.narration || undefined,
+            });
+          }
+        } catch (e: any) {
+          failed.push(`Page ${p + 1}: ${e.message || "scan failed"}`);
+        }
+      }
+      if (failed.length) setError(failed.join(" · "));
+      if (!collected.length) return;
       // Nothing is saved yet — the rows land in the review table so the user
       // checks every name and amount before approving.
+      const base = append ? rows.filter(r => r.accountId || r.scanName || r.debit || r.credit) : [];
+      const all = [...base, ...collected];
+      setRows(all);
+      setScanNotes(notes.length ? notes.join(" | ") : null);
+      setScanDone({ total: all.length, matched: all.filter(r => r.accountId).length });
       setTab("manual");
-    } catch (e: any) {
-      setError(e.message || "Scan failed");
-    } finally { setScanning(false); }
+    } finally { setScanning(false); setScanProgress(""); }
   };
 
   // ── Totals ───────────────────────────────────────────────────────────────
@@ -246,12 +264,20 @@ export default function OpeningBalancesPage() {
             Take a clear photo of one page of your khata. Urdu, Roman Urdu or English — the AI reads it and matches each name to your accounts.
             <br />Nothing is saved until you check the rows and approve.
           </div>
-          <label style={{ display: "inline-block", background: "#6366f1", color: "#fff", borderRadius: 10, padding: "11px 28px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
-            {scanning ? "Reading the page…" : "Take photo / Choose image"}
-            <input type="file" accept="image/*" capture="environment" disabled={scanning} style={{ display: "none" }}
-              onChange={e => { const f = e.target.files?.[0]; e.target.value = ""; if (f) scanRegister(f); }} />
-          </label>
-          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 14 }}>Tip: one page per photo, good light, page flat, all columns in frame.</div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <label style={{ display: "inline-block", background: "#6366f1", color: "#fff", borderRadius: 10, padding: "11px 24px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+              📷 Take photo
+              <input type="file" accept="image/*" capture="environment" disabled={scanning} style={{ display: "none" }}
+                onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanRegister(fl); }} />
+            </label>
+            <label style={{ display: "inline-block", background: "transparent", color: "var(--text-primary)", border: "1px solid var(--border)", borderRadius: 10, padding: "11px 24px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+              🖼 Upload from gallery
+              <input type="file" accept="image/*" multiple disabled={scanning} style={{ display: "none" }}
+                onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanRegister(fl); }} />
+            </label>
+          </div>
+          {scanning && <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 14 }}>{scanProgress}</div>}
+          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 14 }}>Tip: one page per photo, good light, page flat, all columns in frame. Many pages? Photograph them all first, then select them together from the gallery.</div>
         </div>
       )}
 
@@ -261,6 +287,19 @@ export default function OpeningBalancesPage() {
           <strong>Review scanned rows.</strong> {scanDone.matched} of {scanDone.total} matched to an account.
           {scanDone.matched < scanDone.total && <> Rows with no account are <strong>not saved</strong> — pick an account for each, or remove the row.</>}
           {scanNotes && <div style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>AI note: {scanNotes}</div>}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8, alignItems: "center" }}>
+            <label style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+              📷 Add page
+              <input type="file" accept="image/*" capture="environment" disabled={scanning} style={{ display: "none" }}
+                onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanRegister(fl, true); }} />
+            </label>
+            <label style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+              🖼 Add from gallery
+              <input type="file" accept="image/*" multiple disabled={scanning} style={{ display: "none" }}
+                onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanRegister(fl, true); }} />
+            </label>
+            {scanning && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{scanProgress}</span>}
+          </div>
         </div>
       )}
       {tab === "manual" && (
