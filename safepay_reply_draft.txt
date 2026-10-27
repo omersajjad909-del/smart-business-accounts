@@ -1,0 +1,15 @@
+To: aliya@getsafepay.on.crisp.email
+Cc: support@getsafepay.com
+Subject: Re: Clarification needed — Fee/Tax breakdown discrepancy on Transaction #068100
+
+Hi Aliya,
+
+Thank you for clarifying that Withholding Sales Tax is not being deducted on my transactions, and that the dashboard figures are blended across merchants rather than specific to my account.
+
+Could you please send me the Settlement Report for Transaction #068100 (Reference Code: 068100, PKR 4,000.00, October 26, 2026)? I've only received the standard payment notification email so far, which just confirms the amount — I haven't received a separate settlement/reconciliation report showing the actual per-transaction fee and tax breakdown for my account.
+
+I'd also like to follow up on the other part of my original question, which wasn't addressed yet: could you confirm the basis for the Withholding Income Tax (PKR 40.00, 1% of the charge amount) shown for this transaction, and whether a withholding tax certificate is issued for this so I can reflect it in my own tax filings?
+
+Thank you,
+Muhammad Umar
++92 304 7653693

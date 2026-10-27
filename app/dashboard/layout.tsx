@@ -283,6 +283,7 @@ export default function DashboardLayout({
   const [openInvReports, setOpenInvReports] = useState(false);
   const [openPhase1, setOpenPhase1] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
   const [companyName, setCompanyName] = useState("US Traders");
   const [companyDetail, setCompanyDetail] = useState<any>(null);
   const [showCompanyModal, setShowCompanyModal] = useState(false);
@@ -3567,7 +3568,7 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {subInfo?.status?.toUpperCase() === "TRIALING" && subInfo.trialEndsAt && (() => {
+            {!trialBannerDismissed && subInfo?.status?.toUpperCase() === "TRIALING" && subInfo.trialEndsAt && (() => {
               const msLeft = new Date(subInfo.trialEndsAt).getTime() - Date.now();
               const daysLeft = Math.max(0, Math.ceil(msLeft / 86_400_000));
               const ended = msLeft <= 0;
@@ -3611,6 +3612,15 @@ export default function DashboardLayout({
                     </button>
                   )}
                   <Link href="/dashboard/billing" style={{ fontSize:13, fontWeight:600, textDecoration:"underline" }}>Choose a plan</Link>
+                  <button
+                    type="button"
+                    aria-label="Dismiss"
+                    title="Dismiss"
+                    onClick={() => setTrialBannerDismissed(true)}
+                    style={{ marginLeft:"auto", fontSize:18, lineHeight:1, background:"none", border:"none", cursor:"pointer", color:"inherit", padding:"0 4px", opacity:.7 }}
+                  >
+                    ×
+                  </button>
                   {!ended && setupOpen && !setupAsked && (
                     <div style={{ flexBasis:"100%", display:"flex", flexDirection:"column", gap:8, paddingTop:6 }}>
                       <div style={{ fontSize:13, fontWeight:600 }}>What do you need help with? (You can also <Link href="/dashboard/quick-setup" style={{ textDecoration:"underline" }}>set it up yourself right now</Link>.)</div>
