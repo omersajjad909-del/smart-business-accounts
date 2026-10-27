@@ -6,7 +6,7 @@ import { useResponsive } from "@/hooks/useResponsive";
 const FONT = "'Outfit','Inter',sans-serif";
 
 interface Account { id: string; code: string; name: string; type: string; }
-interface BalanceRow { accountId: string; accountCode: string; accountName: string; debit: number | string; credit: number | string; }
+interface BalanceRow { accountId: string; accountCode: string; accountName: string; debit: number | string; credit: number | string; scanName?: string; scanNarration?: string; }
 interface ImportResult { updated: number; skipped: number; errors?: string[]; difference?: number; }
 
 const BLANK_ROW = (): BalanceRow => ({ accountId: "", accountCode: "", accountName: "", debit: "", credit: "" });
@@ -19,7 +19,7 @@ const input: React.CSSProperties = {
 
 export default function OpeningBalancesPage() {
   const { isMobile } = useResponsive();
-  const [tab, setTab]               = useState<"manual" | "csv">("manual");
+  const [tab, setTab]               = useState<"manual" | "csv" | "scan">("manual");
   const [accounts, setAccounts]     = useState<Account[]>([]);
   const [rows, setRows]             = useState<BalanceRow[]>([BLANK_ROW()]);
   const [date, setDate]             = useState(() => new Date().toISOString().slice(0, 10));
@@ -29,6 +29,9 @@ export default function OpeningBalancesPage() {
   const [csv, setCsv]               = useState("code,debit,credit\nCASH001,10000,0\nAP001,0,2500");
   const [acSearch, setAcSearch]     = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
+  const [scanning, setScanning]     = useState(false);
+  const [scanNotes, setScanNotes]   = useState<string | null>(null);
+  const [scanDone, setScanDone]     = useState<{ total: number; matched: number } | null>(null);
 
   const getHeaders = useCallback((): Record<string, string> => {
     const user = getCurrentUser();
@@ -62,6 +65,55 @@ export default function OpeningBalancesPage() {
     return accounts.filter(a => a.name.toLowerCase().includes(q) || a.code.toLowerCase().includes(q)).slice(0, 12);
   };
 
+  // ── Scan a ledger register photo ─────────────────────────────────────────
+  // Phone photos run 4–8 MB; the model reads handwriting fine at ~1800px, and the
+  // smaller upload is far kinder to mobile data and the request size limit.
+  const shrinkImage = (file: File): Promise<Blob> => new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, 1800 / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(b => (b ? resolve(b) : reject(new Error("Could not process the photo"))), "image/jpeg", 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not open this image")); };
+    img.src = url;
+  });
+
+  const scanRegister = async (file: File) => {
+    setScanning(true); setError(null); setResult(null); setScanNotes(null); setScanDone(null);
+    try {
+      const fd = new FormData();
+      fd.append("image", await shrinkImage(file), "register.jpg");
+      const res = await fetch("/api/opening-balances/scan", { method: "POST", credentials: "include", headers: getHeaders(), body: fd });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Scan failed"); return; }
+      const scanned: Array<{ rawName: string; nameRoman?: string | null; narration?: string | null; debit: number; credit: number; accountId?: string | null }> = data.rows || [];
+      if (!scanned.length) { setError("No balances were found on this photo. Try a clearer, well-lit shot of one page."); return; }
+      const next: BalanceRow[] = scanned.map(r => {
+        const acc = r.accountId ? accounts.find(a => a.id === r.accountId) : undefined;
+        return {
+          accountId: acc?.id || "", accountCode: acc?.code || "", accountName: acc?.name || "",
+          debit: r.debit || "", credit: r.credit || "",
+          scanName: r.nameRoman && r.nameRoman !== r.rawName ? `${r.rawName} (${r.nameRoman})` : r.rawName,
+          scanNarration: r.narration || undefined,
+        };
+      });
+      setRows(next);
+      setScanNotes(data.notes || null);
+      setScanDone({ total: next.length, matched: next.filter(r => r.accountId).length });
+      // Nothing is saved yet — the rows land in the review table so the user
+      // checks every name and amount before approving.
+      setTab("manual");
+    } catch (e: any) {
+      setError(e.message || "Scan failed");
+    } finally { setScanning(false); }
+  };
+
   // ── Totals ───────────────────────────────────────────────────────────────
   const totalDebit  = rows.reduce((s, r) => s + (parseFloat(String(r.debit))  || 0), 0);
   const totalCredit = rows.reduce((s, r) => s + (parseFloat(String(r.credit)) || 0), 0);
@@ -88,6 +140,7 @@ export default function OpeningBalancesPage() {
       if (!res.ok) { setError(data.error || "Import failed"); return; }
       setResult(data);
       setRows([BLANK_ROW()]);
+      setScanDone(null); setScanNotes(null);
     } finally { setSaving(false); }
   };
 
@@ -132,13 +185,13 @@ export default function OpeningBalancesPage() {
 
       {/* Tabs */}
       <div style={{ display: "flex", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: 4, gap: 4, marginBottom: 24, width: "fit-content" }}>
-        {(["manual", "csv"] as const).map(t => (
+        {(["manual", "scan", "csv"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             background: tab === t ? "#6366f1" : "transparent",
             color: tab === t ? "#fff" : "var(--text-muted)",
             border: "none", borderRadius: 7, padding: "8px 22px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
           }}>
-            {t === "manual" ? "Manual Entry" : "CSV Import"}
+            {t === "manual" ? "Manual Entry" : t === "scan" ? "📷 Scan Register" : "CSV Import"}
           </button>
         ))}
       </div>
@@ -184,7 +237,32 @@ export default function OpeningBalancesPage() {
         </div>
       )}
 
+      {/* ── SCAN REGISTER ── */}
+      {tab === "scan" && (
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: isMobile ? "16px 14px" : "28px 32px", textAlign: "center" }}>
+          <div style={{ fontSize: 38, marginBottom: 8 }}>📷</div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Photo of your register / copy</div>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 20px" }}>
+            Take a clear photo of one page of your khata. Urdu, Roman Urdu or English — the AI reads it and matches each name to your accounts.
+            <br />Nothing is saved until you check the rows and approve.
+          </div>
+          <label style={{ display: "inline-block", background: "#6366f1", color: "#fff", borderRadius: 10, padding: "11px 28px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+            {scanning ? "Reading the page…" : "Take photo / Choose image"}
+            <input type="file" accept="image/*" capture="environment" disabled={scanning} style={{ display: "none" }}
+              onChange={e => { const f = e.target.files?.[0]; e.target.value = ""; if (f) scanRegister(f); }} />
+          </label>
+          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 14 }}>Tip: one page per photo, good light, page flat, all columns in frame.</div>
+        </div>
+      )}
+
       {/* ── MANUAL ENTRY ── */}
+      {tab === "manual" && scanDone && (
+        <div style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 12, padding: "12px 16px", marginBottom: 14, fontSize: 13, lineHeight: 1.7 }}>
+          <strong>Review scanned rows.</strong> {scanDone.matched} of {scanDone.total} matched to an account.
+          {scanDone.matched < scanDone.total && <> Rows with no account are <strong>not saved</strong> — pick an account for each, or remove the row.</>}
+          {scanNotes && <div style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>AI note: {scanNotes}</div>}
+        </div>
+      )}
       {tab === "manual" && (
         <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -211,6 +289,11 @@ export default function OpeningBalancesPage() {
                         setDropdownOpen(i);
                       }}
                     />
+                    {row.scanName && (
+                      <div dir="auto" style={{ fontSize: 12, marginTop: 5, color: row.accountId ? "var(--text-muted)" : "var(--tx-fbbf24, #fbbf24)" }}>
+                        📄 {row.scanName}{row.scanNarration ? ` · ${row.scanNarration}` : ""}{!row.accountId && " — pick account"}
+                      </div>
+                    )}
                     {dropdownOpen === i && filteredAccounts(i).length > 0 && (
                       <div style={{ position: "absolute", top: "100%", left: 12, right: 12, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 10, zIndex: 100, maxHeight: 200, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
                         {filteredAccounts(i).map(acc => (
