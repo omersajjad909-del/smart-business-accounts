@@ -604,16 +604,27 @@ export default function ChartOfAccounts() {
 
       {/* ── Filter Bar ── */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
-        <div style={{ position: "relative", flex: "0 0 auto" }}>
+        <div style={{ position: "relative", flex: isMobile ? "1 1 100%" : "0 0 auto" }}>
           <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: MUTED, fontSize: 14, pointerEvents: "none" }}>🔍</span>
           <input
             type="text"
             placeholder="Search name, code, city, NTN…"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            style={{ ...inp({ paddingLeft: 36, width: 280 }) }}
+            style={{ ...inp({ paddingLeft: 36, width: isMobile ? "100%" : 280 }) }}
           />
         </div>
+        {/* Thirteen pill buttons took half a phone screen; one dropdown carries the same filter. */}
+        {isMobile ? (
+          <select value={activeTab} onChange={e => setActiveTab(e.target.value)}
+            style={{ ...inp({ width: "100%", cursor: "pointer", fontWeight: 700 }) }}>
+            {TABS.map(tab => (
+              <option key={tab} value={tab}>
+                {tab === "ALL" ? "All accounts" : tab.charAt(0) + tab.slice(1).toLowerCase()}
+              </option>
+            ))}
+          </select>
+        ) : (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {TABS.map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
@@ -627,6 +638,7 @@ export default function ChartOfAccounts() {
             }}>{tab === "ALL" ? "All" : tab}</button>
           ))}
         </div>
+        )}
       </div>
 
       {/* ── Table ── */}
