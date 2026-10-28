@@ -90,7 +90,7 @@ export default function OpeningBalancesPage() {
           const data = await readJsonResponse(res);
           if (!res.ok) { failed.push(`Page ${p + 1}: ${data.error || "scan failed"}`); continue; }
           const scanned: Array<{ rawName: string; nameRoman?: string | null; narration?: string | null; debit: number; credit: number; accountId?: string | null }> = data.rows || [];
-          if (!scanned.length) { failed.push(`Page ${p + 1}: no balances found`); continue; }
+          if (!scanned.length) { failed.push(`Page ${p + 1}: ${data.notes || "no balances found"}`); continue; }
           if (data.notes) notes.push(files.length > 1 ? `Page ${p + 1}: ${data.notes}` : data.notes);
           for (const r of scanned) {
             const acc = r.accountId ? accounts.find(a => a.id === r.accountId) : undefined;
@@ -288,9 +288,12 @@ export default function OpeningBalancesPage() {
         </div>
       )}
       {tab === "manual" && (
-        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: isMobile ? "visible" : "hidden" }}>
+          {/* On a phone each row becomes a card (account on top, Dr / Cr side by
+              side) instead of a four-column table that cannot fit and, inside a
+              clipped container, could not be scrolled either. */}
+          <table style={{ width: "100%", borderCollapse: "collapse", ...(isMobile && { display: "block" }) }}>
+            <thead style={isMobile ? { display: "none" } : undefined}>
               <tr>
                 <th style={th}>Account</th>
                 <th style={{ ...th, textAlign: "right" }}>Debit (Dr)</th>
@@ -298,11 +301,11 @@ export default function OpeningBalancesPage() {
                 <th style={{ ...th, width: 40 }}></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody style={isMobile ? { display: "block" } : undefined}>
               {rows.map((row, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
+                <tr key={i} style={{ borderBottom: "1px solid var(--border)", ...(isMobile && { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: "12px 12px" }) }}>
                   {/* Account selector */}
-                  <td style={{ padding: "8px 12px", position: "relative" }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px", position: "relative", ...(isMobile && { gridColumn: "1 / 3" }) }}>
                     <input
                       style={input}
                       placeholder="Search account name or code…"
@@ -335,7 +338,8 @@ export default function OpeningBalancesPage() {
                     )}
                   </td>
                   {/* Debit */}
-                  <td style={{ padding: "8px 12px" }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px" }}>
+                    {isMobile && <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Debit (Dr)</div>}
                     <input type="number" min="0" step="0.01" placeholder="0.00"
                       style={{ ...input, textAlign: "right" }}
                       value={row.debit}
@@ -343,7 +347,8 @@ export default function OpeningBalancesPage() {
                     />
                   </td>
                   {/* Credit */}
-                  <td style={{ padding: "8px 12px" }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px" }}>
+                    {isMobile && <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Credit (Cr)</div>}
                     <input type="number" min="0" step="0.01" placeholder="0.00"
                       style={{ ...input, textAlign: "right" }}
                       value={row.credit}
@@ -351,29 +356,35 @@ export default function OpeningBalancesPage() {
                     />
                   </td>
                   {/* Remove */}
-                  <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px", textAlign: isMobile ? "right" : "center", ...(isMobile && { gridColumn: "1 / 3" }) }}>
                     {rows.length > 1 && (
-                      <button onClick={() => removeRow(i)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: 17, lineHeight: 1, fontFamily: FONT }}>×</button>
+                      <button onClick={() => removeRow(i)} style={{ background: "transparent", border: "none", color: "var(--tx-f87171, #f87171)", cursor: "pointer", fontSize: isMobile ? 12 : 17, fontWeight: isMobile ? 700 : undefined, lineHeight: 1, fontFamily: FONT }}>{isMobile ? "✕ Remove" : "×"}</button>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot>
-              <tr style={{ background: "rgba(var(--ink),0.02)" }}>
-                <td style={{ padding: "12px 12px", fontSize: 13, fontWeight: 700 }}>
+            <tfoot style={isMobile ? { display: "block" } : undefined}>
+              <tr style={{ background: "rgba(var(--ink),0.02)", ...(isMobile && { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, padding: "12px 12px" }) }}>
+                <td style={{ padding: isMobile ? 0 : "12px 12px", fontSize: 13, fontWeight: 700, ...(isMobile && { gridColumn: "1 / 3" }) }}>
                   <button onClick={addRow} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--tx-a5b4fc, #a5b4fc)", fontFamily: FONT }}>
                     + Add Row
                   </button>
                 </td>
-                <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "var(--tx-10b981, #10b981)" }}>{totalDebit.toFixed(2)}</td>
-                <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "var(--tx-f87171, #f87171)" }}>{totalCredit.toFixed(2)}</td>
-                <td />
+                <td style={{ padding: isMobile ? 0 : "12px 12px", textAlign: isMobile ? "left" : "right", fontWeight: 800, fontSize: 15, color: "var(--tx-10b981, #10b981)" }}>
+                  {isMobile && <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6 }}>Total Dr</div>}
+                  {totalDebit.toFixed(2)}
+                </td>
+                <td style={{ padding: isMobile ? 0 : "12px 12px", textAlign: isMobile ? "left" : "right", fontWeight: 800, fontSize: 15, color: "var(--tx-f87171, #f87171)" }}>
+                  {isMobile && <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6 }}>Total Cr</div>}
+                  {totalCredit.toFixed(2)}
+                </td>
+                {!isMobile && <td />}
               </tr>
               {/* Balance indicator */}
-              <tr>
-                <td colSpan={4} style={{ padding: "10px 12px", borderTop: "1px solid var(--border)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between" }}>
+              <tr style={isMobile ? { display: "block" } : undefined}>
+                <td colSpan={4} style={{ padding: "10px 12px", borderTop: "1px solid var(--border)", ...(isMobile && { display: "block" }) }}>
+                  <div style={{ display: "flex", alignItems: isMobile ? "stretch" : "center", flexDirection: isMobile ? "column" : "row", gap: 10, justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: isBalanced ? "#4ade80" : "#f87171" }} />
                       {isBalanced
@@ -382,7 +393,7 @@ export default function OpeningBalancesPage() {
                       }
                     </div>
                     <button onClick={submitManual} disabled={saving || rows.every(r => !r.accountId)}
-                      style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "9px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FONT, opacity: saving || rows.every(r => !r.accountId) ? 0.6 : 1, flexShrink: 0 }}>
+                      style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "9px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FONT, opacity: saving || rows.every(r => !r.accountId) ? 0.6 : 1, flexShrink: 0, ...(isMobile && { width: "100%", padding: "12px 24px" }) }}>
                       {saving ? "Saving…" : "Save Opening Balances"}
                     </button>
                   </div>

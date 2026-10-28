@@ -113,29 +113,37 @@ export async function POST(req: NextRequest) {
     });
     const accountList = accounts.map(a => `${a.id}|${a.code}|${a.name}`).join("\n");
 
-    const prompt = `You read a photographed page from a handwritten or printed ledger / khata register kept by a Pakistani business. Each line is a party or account with a balance. The text may be in Urdu script (Nastaliq), Roman Urdu, English, or a mix.
+    const prompt = `You read a photographed page from a handwritten or printed ledger / khata register kept by a Pakistani business. The text may be Urdu script (Nastaliq), Roman Urdu, English, or a mix. Read ONLY the page that is fully in frame (a photo may also show part of the facing page - ignore it).
+
+First decide what kind of page it is:
+
+A) "party_ledger" - the page is ONE party's account: a heading like "کھاتہ بنام <party>" ("account in the name of"), then many dated lines (date, detail, debit, credit, running balance). This is the usual khata page.
+B) "balance_list" - the page is a LIST of different parties, one line each with a single balance.
+
+Column meanings on a khata page (Urdu headings, right to left): تاریخ = date, تفصیل = detail, صفحہ = page no, نام or بنام = DEBIT, جمع = CREDIT, بقایا = running BALANCE, and a narrow column "جمع یا نام" says whether the balance is credit (جمع) or debit (نام). "وصول" in the detail means money received (a credit). "Nill" / "Nil" / "نل" means zero.
+In a customer's khata a debit (نام) means the party owes the business.
 
 Return ONLY JSON of this shape:
 {
-  "rows": [
-    {
-      "rawName": "the name exactly as written on the page, in its ORIGINAL script (keep Urdu as Urdu)",
-      "nameRoman": "the same name in Roman/English letters, or null if already Roman",
-      "narration": "any remark written beside the line, in its original script, or null",
-      "debit": number,
-      "credit": number,
-      "accountId": "id of the matching account from the list below, or null",
-      "confidence": number 0-100
-    }
-  ],
+  "pageType": "party_ledger" | "balance_list",
+
+  "partyName": "party_ledger only: the name in the heading, in its ORIGINAL script",
+  "partyNameRoman": "the same name in Roman letters, or null",
+  "accountId": "party_ledger only: id of the matching account in the list below, or null",
+  "broughtForward": { "amount": number, "side": "debit" | "credit" | null } or null,   // an opening line that has only a balance and no debit/credit amount
+  "entries": [ { "date": "as written", "detail": "as written", "debit": number, "credit": number, "balance": number } ],
+  "closing": { "amount": number, "side": "debit" | "credit" | null },   // the LAST balance written on the page; amount 0 when it says Nill
+
+  "rows": [ { "rawName": "...", "nameRoman": "... or null", "narration": "... or null", "debit": number, "credit": number, "accountId": "id or null", "confidence": number } ],   // balance_list only
+
   "notes": "anything the user should check, or null"
 }
 
 Rules:
-- One row per line of the page. Skip headings, page totals and blank lines.
-- Amounts: read Urdu/Eastern digits (۰۱۲۳۴۵۶۷۸۹) as normal numbers. Remove commas. Never guess an unreadable amount: use 0 and say so in notes.
-- Debit vs credit: a column headed Dr / Debit / لینا / وصول / بنام means debit (the party owes the business). Cr / Credit / دینا / جمع / بنام means credit (the business owes the party). If the page has a single balance column with no marker, put the amount in debit and mention it in notes.
-- accountId: choose only when the page name and an account clearly refer to the same party, even across scripts or spellings (e.g. "علی ٹریڈرز" and "Ali Traders"). Otherwise null. Never invent an id.
+- For party_ledger fill partyName, entries, closing (and broughtForward when present); leave rows empty. List every dated line in entries in page order. debit/credit are the amounts in the نام / جمع columns; a line has one of them, the other is 0. balance is the running balance written on that line.
+- For balance_list fill rows only: one per line, skipping headings and totals. Debit = the party owes the business, credit = the business owes the party; if there is no marker put it in debit and say so in notes.
+- Read Urdu/Eastern digits (۰۱۲۳۴۵۶۷۸۹) as normal numbers. Remove commas. Never guess an unreadable amount: use 0 and say so in notes.
+- accountId: choose only when the page name and an account clearly refer to the same party, even across scripts or spellings. Otherwise null. Never invent an id.
 
 Accounts (id|code|name):
 ${accountList || "(no accounts yet)"}`;
@@ -148,26 +156,68 @@ ${accountList || "(no accounts yet)"}`;
     if ((raw === "{}" || !raw) && OPENAI_API_KEY) raw = await openAiVision(base64, mimeType, prompt);
 
     raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
-    let parsed: { rows?: any[]; notes?: string | null };
+    let parsed: any;
     try { parsed = JSON.parse(raw); }
     catch { return NextResponse.json({ error: "Could not read the page. Try a clearer, well-lit photo." }, { status: 422 }); }
 
     const validIds = new Set(accounts.map(a => a.id));
-    const rows: ScannedRow[] = (Array.isArray(parsed.rows) ? parsed.rows : [])
-      .map((r: any) => ({
-        rawName: String(r?.rawName ?? "").trim(),
-        nameRoman: r?.nameRoman ? String(r.nameRoman).trim() : null,
-        narration: r?.narration ? String(r.narration).trim() : null,
-        debit: toNumber(r?.debit),
-        credit: toNumber(r?.credit),
-        // The model can return an id that is not in the list; drop it rather
-        // than let an unverified id reach the import.
-        accountId: r?.accountId && validIds.has(String(r.accountId)) ? String(r.accountId) : null,
-        confidence: typeof r?.confidence === "number" ? r.confidence : undefined,
-      }))
-      .filter((r: ScannedRow) => r.rawName && (r.debit || r.credit));
+    const notes: string[] = parsed.notes ? [String(parsed.notes)] : [];
+    const safeId = (v: unknown) => (v && validIds.has(String(v)) ? String(v) : null);
+    let rows: ScannedRow[] = [];
 
-    return NextResponse.json({ rows, notes: parsed.notes ?? null });
+    if (parsed.pageType === "party_ledger") {
+      // One party, many lines. What goes into opening balances is that party's
+      // closing balance — never one row per line, which is how every line used
+      // to land as a separate debit.
+      const entries: Array<{ debit: number; credit: number }> = (Array.isArray(parsed.entries) ? parsed.entries : [])
+        .map((e: any) => ({ debit: toNumber(e?.debit), credit: toNumber(e?.credit) }));
+      const bfAmt = toNumber(parsed.broughtForward?.amount);
+      const bfSigned = parsed.broughtForward?.side === "credit" ? -bfAmt : bfAmt;
+      const computed = bfSigned + entries.reduce((n, e) => n + e.debit - e.credit, 0);
+      const hasClosing = parsed.closing && parsed.closing.amount != null;
+      const written = hasClosing ? toNumber(parsed.closing.amount) : Math.abs(computed);
+
+      // The entries are arithmetic and the last balance is a single reading;
+      // when they disagree one of them was misread, so say so and let the user decide.
+      if (hasClosing && Math.abs(Math.abs(computed) - written) > 1) {
+        notes.push(`The entries add up to ${Math.abs(computed).toFixed(2)} ${computed >= 0 ? "Dr" : "Cr"} but the last balance on the page reads ${written.toFixed(2)} - please check both.`);
+      }
+      const side: "debit" | "credit" =
+        Math.abs(Math.abs(computed) - written) <= 1 && computed !== 0 ? (computed > 0 ? "debit" : "credit")
+        : parsed.closing?.side === "credit" ? "credit"
+        : parsed.closing?.side === "debit" ? "debit"
+        : computed < 0 ? "credit" : "debit";
+
+      const name = String(parsed.partyName ?? "").trim();
+      if (name && written > 0) {
+        rows = [{
+          rawName: name,
+          nameRoman: parsed.partyNameRoman ? String(parsed.partyNameRoman).trim() : null,
+          narration: `Closing balance after ${entries.length} entries`,
+          debit: side === "debit" ? written : 0,
+          credit: side === "credit" ? written : 0,
+          accountId: safeId(parsed.accountId),
+        }];
+      } else if (name) {
+        notes.push(`"${name}" ends at Nil - every entry on this page is settled, so there is no opening balance to import.`);
+      }
+    } else {
+      rows = (Array.isArray(parsed.rows) ? parsed.rows : [])
+        .map((r: any) => ({
+          rawName: String(r?.rawName ?? "").trim(),
+          nameRoman: r?.nameRoman ? String(r.nameRoman).trim() : null,
+          narration: r?.narration ? String(r.narration).trim() : null,
+          debit: toNumber(r?.debit),
+          credit: toNumber(r?.credit),
+          // The model can return an id that is not in the list; drop it rather
+          // than let an unverified id reach the import.
+          accountId: safeId(r?.accountId),
+          confidence: typeof r?.confidence === "number" ? r.confidence : undefined,
+        }))
+        .filter((r: ScannedRow) => r.rawName && (r.debit || r.credit));
+    }
+
+    return NextResponse.json({ rows, notes: notes.length ? notes.join(" | ") : null });
   } catch (e: any) {
     const timedOut = e?.name === "TimeoutError" || e?.name === "AbortError";
     return NextResponse.json({ error: timedOut ? "Reading the photo took too long. Try again with a clearer, closer shot." : (e.message || "Scan failed") }, { status: timedOut ? 504 : 500 });
