@@ -27,6 +27,9 @@ async function geminiVision(base64: string, mimeType: string, prompt: string): P
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      // Cut off before the platform's own 60s limit, which answers with a
+      // non-JSON error page; a timeout here falls through to OpenAI or a clean error.
+      signal: AbortSignal.timeout(40_000),
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 8000, responseMimeType: "application/json" },
@@ -47,6 +50,7 @@ async function openAiVision(base64: string, mimeType: string, prompt: string): P
   const res = await fetch(aiUrl("openai", "chat/completions", "https://api.openai.com/v1/chat/completions"), {
     method: "POST",
     headers,
+    signal: AbortSignal.timeout(40_000),
     body: JSON.stringify({
       model: "gpt-4o",
       messages: [{ role: "user", content: [
@@ -175,6 +179,7 @@ ${items.map(i => `${i.id}|${i.code || ""}|${i.name}`).join("\n") || "(none)"}`;
       notes: parsed.notes ? String(parsed.notes) : null,
     });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message || "Scan failed" }, { status: 500 });
+    const timedOut = e?.name === "TimeoutError" || e?.name === "AbortError";
+    return NextResponse.json({ error: timedOut ? "Reading the photo took too long. Try again with a clearer, closer shot." : (e.message || "Scan failed") }, { status: timedOut ? 504 : 500 });
   }
 }

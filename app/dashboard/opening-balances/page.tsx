@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 import { shrinkImage } from "@/lib/shrinkImage";
+import { readJsonResponse } from "@/lib/readJsonResponse";
 import CameraCapture from "@/components/CameraCapture";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -86,7 +87,7 @@ export default function OpeningBalancesPage() {
           const fd = new FormData();
           fd.append("image", await shrinkImage(files[p]), "register.jpg");
           const res = await fetch("/api/opening-balances/scan", { method: "POST", credentials: "include", headers: getHeaders(), body: fd });
-          const data = await res.json();
+          const data = await readJsonResponse(res);
           if (!res.ok) { failed.push(`Page ${p + 1}: ${data.error || "scan failed"}`); continue; }
           const scanned: Array<{ rawName: string; nameRoman?: string | null; narration?: string | null; debit: number; credit: number; accountId?: string | null }> = data.rows || [];
           if (!scanned.length) { failed.push(`Page ${p + 1}: no balances found`); continue; }

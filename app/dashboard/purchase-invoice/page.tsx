@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
 import { canScanPurchaseInvoice } from "@/lib/purchaseInvoiceScan";
 import { shrinkImage } from "@/lib/shrinkImage";
+import { readJsonResponse } from "@/lib/readJsonResponse";
 import CameraCapture from "@/components/CameraCapture";
 
 import { QRCodeSVG } from "qrcode.react";
@@ -723,7 +724,7 @@ const [searchTerm, setSearchTerm] = useState("");
           fd.append("suppliers", JSON.stringify(supplierList));
           fd.append("items", JSON.stringify(itemList));
           const res = await fetch("/api/purchase-invoice/scan", { method: "POST", headers: requestHeaders, body: fd });
-          const d = await res.json();
+          const d = await readJsonResponse(res);
           if (!res.ok) { notes.push(`Page ${p + 1}: ${d.error || "scan failed"}`); continue; }
           if (!sup && (d.supplierId || d.supplierName)) sup = { id: d.supplierId, name: d.supplierName };
           invNo = invNo || d.invoiceNo; invDate = invDate || d.date;
