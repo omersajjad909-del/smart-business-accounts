@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useResponsive } from "@/hooks/useResponsive";
 import { shrinkImage } from "@/lib/shrinkImage";
+import CameraCapture from "@/components/CameraCapture";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -31,6 +32,7 @@ export default function OpeningBalancesPage() {
   const [acSearch, setAcSearch]     = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
   const [scanning, setScanning]     = useState(false);
+  const [camera, setCamera]         = useState<null | "new" | "append">(null);
   const [scanProgress, setScanProgress] = useState("");
   const [scanNotes, setScanNotes]   = useState<string | null>(null);
   const [scanDone, setScanDone]     = useState<{ total: number; matched: number } | null>(null);
@@ -166,6 +168,9 @@ export default function OpeningBalancesPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: isMobile ? "15px 14px" : "28px 32px", fontFamily: FONT, color: "var(--text-primary)" }}>
 
+      <CameraCapture open={camera !== null} onClose={() => setCamera(null)} title="Photograph the register page"
+        onCapture={file => scanRegister([file], camera === "append")} />
+
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
         <div>
@@ -248,11 +253,9 @@ export default function OpeningBalancesPage() {
             <br />Nothing is saved until you check the rows and approve.
           </div>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-            <label style={{ display: "inline-block", background: "#6366f1", color: "#fff", borderRadius: 10, padding: "11px 24px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+            <button type="button" disabled={scanning} onClick={() => setCamera("new")} style={{ display: "inline-block", background: "#6366f1", color: "#fff", border: "none", borderRadius: 10, padding: "11px 24px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1, fontFamily: FONT }}>
               📷 Take photo
-              <input type="file" accept="image/*" capture="environment" disabled={scanning} style={{ display: "none" }}
-                onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanRegister(fl); }} />
-            </label>
+            </button>
             <label style={{ display: "inline-block", background: "transparent", color: "var(--text-primary)", border: "1px solid var(--border)", borderRadius: 10, padding: "11px 24px", fontSize: 14, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
               🖼 Upload from gallery
               <input type="file" accept="image/*" multiple disabled={scanning} style={{ display: "none" }}
@@ -271,11 +274,9 @@ export default function OpeningBalancesPage() {
           {scanDone.matched < scanDone.total && <> Rows with no account are <strong>not saved</strong> — pick an account for each, or remove the row.</>}
           {scanNotes && <div style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>AI note: {scanNotes}</div>}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8, alignItems: "center" }}>
-            <label style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
+            <button type="button" disabled={scanning} onClick={() => setCamera("append")} style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", color: "inherit", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1, fontFamily: FONT }}>
               📷 Add page
-              <input type="file" accept="image/*" capture="environment" disabled={scanning} style={{ display: "none" }}
-                onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanRegister(fl, true); }} />
-            </label>
+            </button>
             <label style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1 }}>
               🖼 Add from gallery
               <input type="file" accept="image/*" multiple disabled={scanning} style={{ display: "none" }}

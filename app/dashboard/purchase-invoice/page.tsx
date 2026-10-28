@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
 import { canScanPurchaseInvoice } from "@/lib/purchaseInvoiceScan";
 import { shrinkImage } from "@/lib/shrinkImage";
+import CameraCapture from "@/components/CameraCapture";
 
 import { QRCodeSVG } from "qrcode.react";
 import { useResponsive } from "@/hooks/useResponsive";
@@ -254,6 +255,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const [allInventoryItems, setAllInventoryItems] = useState<InventoryItem[]>([]);
   const [scanCode, setScanCode] = useState("");
   const [invScanning, setInvScanning] = useState(false);
+  const [invCameraOpen, setInvCameraOpen] = useState(false);
   const [invScanProgress, setInvScanProgress] = useState("");
   const [invScanReport, setInvScanReport] = useState<{ matched: number; total: number; supplier: string | null; notes: string[] } | null>(null);
   const [scanActive, setScanActive] = useState(false);
@@ -1553,6 +1555,8 @@ const [searchTerm, setSearchTerm] = useState("");
                 </div>
               </div>
 
+              <CameraCapture open={invCameraOpen} onClose={() => setInvCameraOpen(false)} title="Photograph the supplier invoice"
+                onCapture={file => scanSupplierInvoice([file])} />
               {/* ── SCAN SUPPLIER INVOICE (enabled per company) ── */}
               {canScanPurchaseInvoice(user?.companyId) && (
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 16px", marginBottom: 16 }}>
@@ -1561,11 +1565,9 @@ const [searchTerm, setSearchTerm] = useState("");
                       <div style={{ fontSize: 12.5, fontWeight: 800, color: TEXT }}>Scan supplier invoice</div>
                       <div style={{ fontSize: 11, color: MUTED }}>Photo of the bill the supplier sent — the supplier and items are filled in for you to check.</div>
                     </div>
-                    <label style={{ background: ACCENT, color: "#fff", borderRadius: 8, padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: invScanning ? "default" : "pointer", opacity: invScanning ? 0.6 : 1 }}>
+                    <button type="button" disabled={invScanning} onClick={() => setInvCameraOpen(true)} style={{ background: ACCENT, color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: invScanning ? "default" : "pointer", opacity: invScanning ? 0.6 : 1, fontFamily: "inherit" }}>
                       📷 Take photo
-                      <input type="file" accept="image/*" capture="environment" disabled={invScanning} style={{ display: "none" }}
-                        onChange={e => { const fl = Array.from(e.target.files || []); e.target.value = ""; if (fl.length) scanSupplierInvoice(fl); }} />
-                    </label>
+                    </button>
                     <label style={{ border: `1px solid ${BORDER}`, color: TEXT, borderRadius: 8, padding: "8px 16px", fontSize: 12.5, fontWeight: 700, cursor: invScanning ? "default" : "pointer", opacity: invScanning ? 0.6 : 1 }}>
                       🖼 Upload from gallery
                       <input type="file" accept="image/*" multiple disabled={invScanning} style={{ display: "none" }}
@@ -1586,22 +1588,24 @@ const [searchTerm, setSearchTerm] = useState("");
               )}
 
               {/* ── SCAN BAR ── */}
-              <div onClick={() => setScanActive(true)} style={{ background: scanActive ? "rgba(99,102,241,.05)" : PANEL, border: `1.5px ${scanActive ? "solid" : "dashed"} ${scanActive ? ACCENT : BORDER}`, borderRadius: 12, padding: "12px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "text", marginBottom: 16, transition: "all .15s" }}>
+              <div onClick={() => setScanActive(true)} style={{ background: scanActive ? "rgba(99,102,241,.05)" : PANEL, border: `1.5px ${scanActive ? "solid" : "dashed"} ${scanActive ? ACCENT : BORDER}`, borderRadius: 12, padding: isMobile ? "12px 12px" : "12px 18px", display: "flex", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 10 : 14, cursor: "text", marginBottom: 16, transition: "all .15s" }}>
                 <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: ACCENT, letterSpacing: ".08em", textTransform: "uppercase" as const, marginBottom: 3 }}>Scan Barcode / Search Item &nbsp;<span style={{ color: MUTED, fontWeight: 600 }}>— type SKU or scan barcode, press Enter to add</span></div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: ACCENT, letterSpacing: ".08em", textTransform: "uppercase" as const, marginBottom: isMobile ? 6 : 3 }}>Scan Barcode / Search Item{!isMobile && <>&nbsp;<span style={{ color: MUTED, fontWeight: 600 }}>— type SKU or scan barcode, press Enter to add</span></>}</div>
                   <input value={scanCode} onChange={e => setScanCode(e.target.value)} onKeyDown={handlePIScan} onFocus={() => setScanActive(true)} onBlur={() => setScanActive(false)}
                     placeholder="Scan or type item code…"
-                    style={{ width: "100%", padding: "6px 10px", borderRadius: 7, background: "transparent", border: `1px solid ${BORDER}`, color: TEXT, fontSize: 13, fontFamily: "monospace", outline: "none" }} />
+                    style={{ width: "100%", boxSizing: "border-box", padding: isMobile ? "10px 12px" : "6px 10px", borderRadius: 7, background: "transparent", border: `1px solid ${BORDER}`, color: TEXT, fontSize: isMobile ? 14 : 13, fontFamily: "monospace", outline: "none" }} />
+                  {isMobile && <div style={{ fontSize: 10.5, color: MUTED, marginTop: 5 }}>Type SKU or scan barcode, press Enter to add</div>}
                 </div>
-                <div style={{ fontSize: 10, color: MUTED, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                {/* F3 / F4 are keyboard shortcuts; a phone has no such keys. */}
+                {!isMobile && <div style={{ fontSize: 10, color: MUTED, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
                   <span style={{ background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10 }}>F3</span>
                   <span>Copy box ↓</span>
                   <span style={{ background: "rgba(var(--ink),.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10, marginLeft: 6 }}>F4</span>
                   <span>Copy row</span>
-                </div>
+                </div>}
               </div>
 
               {/* ── MAIN 2-COL LAYOUT ── */}

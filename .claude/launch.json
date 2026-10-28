@@ -12,6 +12,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "/Users/umersajjad/Projects/finovaos-premium-site"],
       "port": 3010
+    },
+    {
+      "name": "atomic-atlas",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/umersajjad/Projects/atomic-atlas", "--", "-p", "3020"],
+      "port": 3020
     }
   ]
 }
