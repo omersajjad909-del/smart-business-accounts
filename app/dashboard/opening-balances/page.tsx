@@ -8,7 +8,7 @@ import CameraCapture from "@/components/CameraCapture";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
-interface Account { id: string; code: string; name: string; type: string; }
+interface Account { id: string; code: string; name: string; type: string; partyType?: string | null; }
 interface BalanceRow { accountId: string; accountCode: string; accountName: string; debit: number | string; credit: number | string; scanName?: string; scanNarration?: string; }
 interface ImportResult { updated: number; skipped: number; errors?: string[]; difference?: number; }
 
@@ -32,6 +32,7 @@ export default function OpeningBalancesPage() {
   const [csv, setCsv]               = useState("code,debit,credit\nCASH001,10000,0\nAP001,0,2500");
   const [acSearch, setAcSearch]     = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
+  const [acKind, setAcKind]         = useState<"ALL" | "CUSTOMER" | "SUPPLIER" | "OTHER">("ALL");
   const [scanning, setScanning]     = useState(false);
   const [camera, setCamera]         = useState<null | "new" | "append">(null);
   const [scanProgress, setScanProgress] = useState("");
@@ -64,13 +65,23 @@ export default function OpeningBalancesPage() {
   const addRow = () => setRows(prev => [...prev, BLANK_ROW()]);
   const removeRow = (i: number) => setRows(prev => prev.filter((_, idx) => idx !== i));
 
+  // The list used to stop at the first 12 accounts by name, so on an empty search
+  // customers — and anyone whose name is not near the top of the alphabet — never
+  // appeared at all. Everything is listed now (the box scrolls), and a kind filter
+  // narrows it to customers or suppliers in one tap.
   const filteredAccounts = (i: number) => {
     const q = (acSearch[i] || "").toLowerCase();
-    if (!q) return accounts.slice(0, 12);
-    return accounts.filter(a => a.name.toLowerCase().includes(q) || a.code.toLowerCase().includes(q)).slice(0, 12);
+    return accounts
+      .filter(a => {
+        const pt = String(a.partyType || "").toUpperCase();
+        if (acKind === "CUSTOMER" && pt !== "CUSTOMER") return false;
+        if (acKind === "SUPPLIER" && pt !== "SUPPLIER") return false;
+        if (acKind === "OTHER" && (pt === "CUSTOMER" || pt === "SUPPLIER")) return false;
+        return !q || a.name.toLowerCase().includes(q) || a.code.toLowerCase().includes(q);
+      })
+      .slice(0, 300);
   };
 
-  // ── Scan a ledger register photo ─────────────────────────────────────────
   // Pages are read one request each — a single call carrying many photos would
   // blow the request size limit and lose every page if one failed. A page that
   // fails is reported by number and the rest still land in the review table.
@@ -332,8 +343,23 @@ export default function OpeningBalancesPage() {
                         📄 {row.scanName}{row.scanNarration ? ` · ${row.scanNarration}` : ""}{!row.accountId && " — pick account"}
                       </div>
                     )}
-                    {dropdownOpen === i && filteredAccounts(i).length > 0 && (
-                      <div style={{ position: "absolute", top: "100%", left: 12, right: 12, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 10, zIndex: 100, maxHeight: 200, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+                    {dropdownOpen === i && (
+                      <div style={{ position: "absolute", top: "100%", left: 12, right: 12, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 10, zIndex: 100, maxHeight: 280, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+                        <div style={{ position: "sticky", top: 0, zIndex: 1, background: "var(--panel-bg)", display: "flex", gap: 6, padding: "8px 10px", borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
+                          {(["ALL", "CUSTOMER", "SUPPLIER", "OTHER"] as const).map(k => (
+                            <button key={k} type="button" onMouseDown={e => { e.preventDefault(); setAcKind(k); }}
+                              style={{ padding: "4px 11px", borderRadius: 14, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: FONT, textTransform: "capitalize",
+                                border: `1px solid ${acKind === k ? "#6366f1" : "var(--border)"}`,
+                                background: acKind === k ? "rgba(99,102,241,0.15)" : "transparent",
+                                color: acKind === k ? "#6366f1" : "var(--text-muted)" }}>
+                              {k === "ALL" ? "All" : k.toLowerCase()}
+                            </button>
+                          ))}
+                          <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted)", alignSelf: "center" }}>{filteredAccounts(i).length} accounts</span>
+                        </div>
+                        {filteredAccounts(i).length === 0 && (
+                          <div style={{ padding: "14px", fontSize: 12, color: "var(--text-muted)", textAlign: "center" }}>No account matches. Try another name, or switch the filter above.</div>
+                        )}
                         {filteredAccounts(i).map(acc => (
                           <div key={acc.id} onMouseDown={() => selectAccount(i, acc)}
                             style={{ padding: "9px 14px", cursor: "pointer", fontSize: 13, borderBottom: "1px solid var(--border)", display: "flex", gap: 10, alignItems: "center" }}
@@ -342,7 +368,7 @@ export default function OpeningBalancesPage() {
                           >
                             <span style={{ fontFamily: "monospace", fontSize: 11, color: "var(--tx-a5b4fc, #a5b4fc)", minWidth: 70 }}>{acc.code}</span>
                             <span style={{ flex: 1 }}>{acc.name}</span>
-                            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{acc.type}</span>
+                            <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase" }}>{acc.partyType || acc.type}</span>
                           </div>
                         ))}
                       </div>
