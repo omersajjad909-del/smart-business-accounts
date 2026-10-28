@@ -169,9 +169,10 @@ ${accountList || "(no accounts yet)"}`;
       // One party, many lines. What goes into opening balances is that party's
       // closing balance — never one row per line, which is how every line used
       // to land as a separate debit.
-      const entries: Array<{ date: string; debit: number; credit: number; balance: number | null }> =
+      const entries: Array<{ date: string; detail: string; debit: number; credit: number; balance: number | null }> =
         (Array.isArray(parsed.entries) ? parsed.entries : []).map((e: any) => ({
           date: String(e?.date ?? "").trim(),
+          detail: String(e?.detail ?? "").trim(),
           debit: toNumber(e?.debit),
           credit: toNumber(e?.credit),
           // null means unreadable; 0 means the page says Nill. They are not the same.
@@ -218,18 +219,23 @@ ${accountList || "(no accounts yet)"}`;
         : parsed.closing?.side === "debit" ? "debit"
         : last && last.credit > last.debit ? "credit" : "debit";
 
+      // Every line of the page becomes its own row, with its own debit and credit,
+      // so the user checks the page against the screen line by line instead of
+      // typing it. The opening balance itself is one figure per account, so rows
+      // of the same account are combined when saved (see the review screen).
       const name = String(parsed.partyName ?? "").trim();
-      if (name && written > 0) {
-        rows = [{
-          rawName: name,
-          nameRoman: parsed.partyNameRoman ? String(parsed.partyNameRoman).trim() : null,
-          narration: `Closing balance after ${entries.length} entries${lastLabel}`,
-          debit: side === "debit" ? written : 0,
-          credit: side === "credit" ? written : 0,
-          accountId: safeId(parsed.accountId),
-        }];
-      } else if (name) {
-        notes.push(`"${name}" ends at Nil - every entry on this page is settled, so there is no opening balance to import.`);
+      if (name) {
+        const roman = parsed.partyNameRoman ? String(parsed.partyNameRoman).trim() : null;
+        const accountId = safeId(parsed.accountId);
+        const mk = (debit: number, credit: number, narration: string): ScannedRow => ({ rawName: name, nameRoman: roman, narration, debit, credit, accountId });
+        if (parsed.broughtForward && bfAmt > 0) {
+          rows.push(mk(bfSigned > 0 ? bfAmt : 0, bfSigned < 0 ? bfAmt : 0, "Balance brought forward"));
+        }
+        for (const e of entries) {
+          if (e.debit || e.credit) rows.push(mk(e.debit, e.credit, [e.date, e.detail].filter(Boolean).join(" · ")));
+        }
+        if (!rows.length) notes.push(`No debit or credit amounts could be read for "${name}".`);
+        else if (written === 0) notes.push(`"${name}" ends at Nil - the lines below add up to nothing, so nothing is left owing.`);
       }
     } else {
       rows = (Array.isArray(parsed.rows) ? parsed.rows : [])

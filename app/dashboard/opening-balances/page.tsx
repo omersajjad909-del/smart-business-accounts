@@ -134,6 +134,28 @@ export default function OpeningBalancesPage() {
   const totalCredit = rows.reduce((s, r) => s + (parseFloat(String(r.credit)) || 0), 0);
   const isBalanced  = Math.abs(totalDebit - totalCredit) < 0.01;
 
+  const combinedAccounts = (list: BalanceRow[]) => {
+    const byId = new Map<string, { code: string; name: string; count: number; debit: number; credit: number; net: number }>();
+    for (const r of list) {
+      if (!r.accountId) continue;
+      const g = byId.get(r.accountId) || { code: r.accountCode, name: r.accountName, count: 0, debit: 0, credit: 0, net: 0 };
+      g.count += 1;
+      g.debit += parseFloat(String(r.debit)) || 0;
+      g.credit += parseFloat(String(r.credit)) || 0;
+      g.net = Math.round((g.debit - g.credit) * 100) / 100;
+      byId.set(r.accountId, g);
+    }
+    return [...byId.values()];
+  };
+
+  // One party's whole page lands on the same name, so picking its account once
+  // should not mean picking it again on every line.
+  const applyAccountToUnmatched = (id: string) => {
+    const acc = accounts.find(a => a.id === id);
+    if (!acc) return;
+    setRows(prev => prev.map(r => (!r.accountId && r.scanName ? { ...r, accountId: acc.id, accountCode: acc.code, accountName: acc.name } : r)));
+  };
+
   // ── Submit manual ────────────────────────────────────────────────────────
   const submitManual = async () => {
     const valid = rows.filter(r => r.accountId && (parseFloat(String(r.debit)) || parseFloat(String(r.credit))));
@@ -141,8 +163,11 @@ export default function OpeningBalancesPage() {
 
     setSaving(true); setError(null); setResult(null);
     try {
+      // An account has one opening figure, not a list of lines, so rows for the
+      // same account are combined into their net. Sent one by one the import would
+      // let each row overwrite the one before it and keep only the last.
       const csvData = ["code,debit,credit",
-        ...valid.map(r => `${r.accountCode},${parseFloat(String(r.debit)) || 0},${parseFloat(String(r.credit)) || 0}`)
+        ...combinedAccounts(valid).map(c => `${c.code},${c.net > 0 ? c.net : 0},${c.net < 0 ? -c.net : 0}`)
       ].join("\n");
 
       const res = await fetch("/api/opening-balances/import", {
@@ -283,8 +308,18 @@ export default function OpeningBalancesPage() {
       {tab === "manual" && scanDone && (
         <div style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 12, padding: "12px 16px", marginBottom: 14, fontSize: 13, lineHeight: 1.7 }}>
           <strong>Review scanned rows.</strong> {scanDone.matched} of {scanDone.total} matched to an account.
-          {scanDone.matched < scanDone.total && <> Rows with no account are <strong>not saved</strong> — pick an account for each, or remove the row.</>}
+          {scanDone.matched < scanDone.total && <> Rows with no account are <strong>not saved</strong> — choose the account below, or remove the row.</>}
           {scanNotes && <div style={{ color: "var(--tx-fbbf24, #fbbf24)" }}>AI note: {scanNotes}</div>}
+          {rows.some(r => !r.accountId && r.scanName) && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Set one account for all unmatched rows</div>
+              <select value="" onChange={e => applyAccountToUnmatched(e.target.value)}
+                style={{ ...input, cursor: "pointer" }}>
+                <option value="">Choose account…</option>
+                {accounts.map(a => <option key={a.id} value={a.id}>{a.code} — {a.name}{a.partyType ? ` (${a.partyType.toLowerCase()})` : ""}</option>)}
+              </select>
+            </div>
+          )}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8, alignItems: "center" }}>
             <button type="button" disabled={scanning} onClick={() => setCamera("append")} style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)", color: "inherit", borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: scanning ? "default" : "pointer", opacity: scanning ? 0.6 : 1, fontFamily: FONT }}>
               📷 Add page
@@ -438,6 +473,16 @@ export default function OpeningBalancesPage() {
               </tr>
             </tfoot>
           </table>
+          {combinedAccounts(rows).filter(c => c.count > 1).length > 0 && (
+            <div style={{ padding: "12px 14px", borderTop: "1px solid var(--border)", fontSize: 12, lineHeight: 1.7, color: "var(--text-muted)" }}>
+              <strong style={{ color: "var(--text-primary)" }}>On save, rows of the same account are combined</strong> — an opening balance is one figure per account:
+              {combinedAccounts(rows).filter(c => c.count > 1).map(c => (
+                <div key={c.code} style={{ color: "var(--text-primary)" }}>
+                  {c.name}: {c.count} rows → <strong>{Math.abs(c.net).toFixed(2)} {c.net >= 0 ? "Dr" : "Cr"}</strong>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
