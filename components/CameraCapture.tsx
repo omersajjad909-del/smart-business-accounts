@@ -89,7 +89,9 @@ export default function CameraCapture({
 
   const close = () => { stop(); onClose(); };
 
-  const btn: React.CSSProperties = { border: "none", borderRadius: 10, padding: "11px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" };
+  // appearance:none — iOS Safari paints a <button> white unless told not to, which
+  // turned the white-on-translucent "Choose a file" button invisible.
+  const btn: React.CSSProperties = { WebkitAppearance: "none", appearance: "none", border: "none", borderRadius: 10, padding: "11px 22px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" };
 
   return (
     <div onClick={close} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.85)", zIndex: 3000, display: "flex", alignItems: "center", justifyContent: "center", padding: 12 }}>
@@ -105,7 +107,7 @@ export default function CameraCapture({
         )}
         <div style={{ padding: 14, display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
           {!error && <button onClick={snap} disabled={!ready} style={{ ...btn, background: "#6366f1", color: "#fff", opacity: ready ? 1 : 0.5 }}>📸 Capture</button>}
-          <button onClick={() => fileRef.current?.click()} style={{ ...btn, background: "rgba(255,255,255,.08)", color: "#fff" }}>🖼 Choose a file</button>
+          <button onClick={() => fileRef.current?.click()} style={{ ...btn, background: "#262a40", border: "1px solid rgba(255,255,255,.2)", color: "#fff" }}>🖼 Choose a file</button>
           <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
             onChange={e => { const f = e.target.files?.[0]; e.target.value = ""; if (f) { stop(); onCapture(f); onClose(); } }} />
         </div>

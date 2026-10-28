@@ -288,11 +288,22 @@ export default function OpeningBalancesPage() {
         </div>
       )}
       {tab === "manual" && (
-        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: isMobile ? "visible" : "hidden" }}>
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "visible" }}>
           {/* On a phone each row becomes a card (account on top, Dr / Cr side by
               side) instead of a four-column table that cannot fit and, inside a
               clipped container, could not be scrolled either. */}
-          <table style={{ width: "100%", borderCollapse: "collapse", ...(isMobile && { display: "block" }) }}>
+          {/* overflow stays visible: the account search list drops below its row, and a
+              clipped container cut that list off and left it unscrollable. A fixed
+              table layout keeps the Debit / Credit columns inside the card instead. */}
+          <table style={{ width: "100%", borderCollapse: "collapse", ...(isMobile ? { display: "block" } : { tableLayout: "fixed" }) }}>
+            {!isMobile && (
+              <colgroup>
+                <col />
+                <col style={{ width: 150 }} />
+                <col style={{ width: 150 }} />
+                <col style={{ width: 48 }} />
+              </colgroup>
+            )}
             <thead style={isMobile ? { display: "none" } : undefined}>
               <tr>
                 <th style={th}>Account</th>
