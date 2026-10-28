@@ -306,7 +306,7 @@ export default function OpeningBalancesPage() {
           {/* overflow stays visible: the account search list drops below its row, and a
               clipped container cut that list off and left it unscrollable. A fixed
               table layout keeps the Debit / Credit columns inside the card instead. */}
-          <table style={{ width: "100%", borderCollapse: "collapse", ...(isMobile ? { display: "block" } : { tableLayout: "fixed" }) }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", ...(isMobile ? { display: "block", maxWidth: "100%" } : { tableLayout: "fixed" }) }}>
             {!isMobile && (
               <colgroup>
                 <col />
@@ -325,9 +325,9 @@ export default function OpeningBalancesPage() {
             </thead>
             <tbody style={isMobile ? { display: "block" } : undefined}>
               {rows.map((row, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid var(--border)", ...(isMobile && { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: "12px 12px" }) }}>
+                <tr key={i} style={{ borderBottom: "1px solid var(--border)", ...(isMobile && { display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 8, padding: "12px 12px" }) }}>
                   {/* Account selector */}
-                  <td style={{ padding: isMobile ? 0 : "8px 12px", position: "relative", ...(isMobile && { gridColumn: "1 / 3" }) }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px", position: "relative", ...(isMobile && { gridColumn: "1 / 3", minWidth: 0 }) }}>
                     <input
                       style={input}
                       placeholder="Search account name or code…"
@@ -339,7 +339,7 @@ export default function OpeningBalancesPage() {
                       }}
                     />
                     {row.scanName && (
-                      <div dir="auto" style={{ fontSize: 12, marginTop: 5, color: row.accountId ? "var(--text-muted)" : "var(--tx-fbbf24, #fbbf24)" }}>
+                      <div dir="auto" style={{ fontSize: 12, marginTop: 5, overflowWrap: "anywhere", color: row.accountId ? "var(--text-muted)" : "var(--tx-fbbf24, #fbbf24)" }}>
                         📄 {row.scanName}{row.scanNarration ? ` · ${row.scanNarration}` : ""}{!row.accountId && " — pick account"}
                       </div>
                     )}
@@ -375,7 +375,7 @@ export default function OpeningBalancesPage() {
                     )}
                   </td>
                   {/* Debit */}
-                  <td style={{ padding: isMobile ? 0 : "8px 12px" }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px", minWidth: 0 }}>
                     {isMobile && <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Debit (Dr)</div>}
                     <input type="number" min="0" step="0.01" placeholder="0.00"
                       style={{ ...input, textAlign: "right" }}
@@ -384,7 +384,7 @@ export default function OpeningBalancesPage() {
                     />
                   </td>
                   {/* Credit */}
-                  <td style={{ padding: isMobile ? 0 : "8px 12px" }}>
+                  <td style={{ padding: isMobile ? 0 : "8px 12px", minWidth: 0 }}>
                     {isMobile && <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Credit (Cr)</div>}
                     <input type="number" min="0" step="0.01" placeholder="0.00"
                       style={{ ...input, textAlign: "right" }}
@@ -402,7 +402,7 @@ export default function OpeningBalancesPage() {
               ))}
             </tbody>
             <tfoot style={isMobile ? { display: "block" } : undefined}>
-              <tr style={{ background: "rgba(var(--ink),0.02)", ...(isMobile && { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, padding: "12px 12px" }) }}>
+              <tr style={{ background: "rgba(var(--ink),0.02)", ...(isMobile && { display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 6, padding: "12px 12px" }) }}>
                 <td style={{ padding: isMobile ? 0 : "12px 12px", fontSize: 13, fontWeight: 700, ...(isMobile && { gridColumn: "1 / 3" }) }}>
                   <button onClick={addRow} style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--tx-a5b4fc, #a5b4fc)", fontFamily: FONT }}>
                     + Add Row

@@ -131,7 +131,7 @@ Return ONLY JSON of this shape:
   "partyNameRoman": "the same name in Roman letters, or null",
   "accountId": "party_ledger only: id of the matching account in the list below, or null",
   "broughtForward": { "amount": number, "side": "debit" | "credit" | null } or null,   // an opening line that has only a balance and no debit/credit amount
-  "entries": [ { "date": "as written", "detail": "as written", "debit": number, "credit": number, "balance": number } ],
+  "entries": [ { "date": "as written", "detail": "as written", "debit": number, "credit": number, "balance": number or null } ],   // balance: the number written in the بقایا column on THAT line; 0 when it says Nill; null only if unreadable
   "closing": { "amount": number, "side": "debit" | "credit" | null },   // the LAST balance written on the page; amount 0 when it says Nill
 
   "rows": [ { "rawName": "...", "nameRoman": "... or null", "narration": "... or null", "debit": number, "credit": number, "accountId": "id or null", "confidence": number } ],   // balance_list only
@@ -140,7 +140,7 @@ Return ONLY JSON of this shape:
 }
 
 Rules:
-- For party_ledger fill partyName, entries, closing (and broughtForward when present); leave rows empty. List every dated line in entries in page order. debit/credit are the amounts in the نام / جمع columns; a line has one of them, the other is 0. balance is the running balance written on that line.
+- For party_ledger fill partyName, entries, closing (and broughtForward when present); leave rows empty. List EVERY written line from the top line to the very bottom line in page order - do not stop early and do not skip lines; the last balance on the page is on the bottom-most written line, not in the middle. Each line's balance should equal the previous balance plus its debit or minus its credit - use that to double-check how you read each number. debit/credit are the amounts in the نام / جمع columns; a line has one of them, the other is 0. balance is the running balance written on that line.
 - For balance_list fill rows only: one per line, skipping headings and totals. Debit = the party owes the business, credit = the business owes the party; if there is no marker put it in debit and say so in notes.
 - Read Urdu/Eastern digits (۰۱۲۳۴۵۶۷۸۹) as normal numbers. Remove commas. Never guess an unreadable amount: use 0 and say so in notes.
 - accountId: choose only when the page name and an account clearly refer to the same party, even across scripts or spellings. Otherwise null. Never invent an id.
@@ -169,31 +169,61 @@ ${accountList || "(no accounts yet)"}`;
       // One party, many lines. What goes into opening balances is that party's
       // closing balance — never one row per line, which is how every line used
       // to land as a separate debit.
-      const entries: Array<{ debit: number; credit: number }> = (Array.isArray(parsed.entries) ? parsed.entries : [])
-        .map((e: any) => ({ debit: toNumber(e?.debit), credit: toNumber(e?.credit) }));
+      const entries: Array<{ date: string; debit: number; credit: number; balance: number | null }> =
+        (Array.isArray(parsed.entries) ? parsed.entries : []).map((e: any) => ({
+          date: String(e?.date ?? "").trim(),
+          debit: toNumber(e?.debit),
+          credit: toNumber(e?.credit),
+          // null means unreadable; 0 means the page says Nill. They are not the same.
+          balance: e?.balance === null || e?.balance === undefined || e?.balance === "" ? null : toNumber(e.balance),
+        }));
       const bfAmt = toNumber(parsed.broughtForward?.amount);
       const bfSigned = parsed.broughtForward?.side === "credit" ? -bfAmt : bfAmt;
       const computed = bfSigned + entries.reduce((n, e) => n + e.debit - e.credit, 0);
-      const hasClosing = parsed.closing && parsed.closing.amount != null;
-      const written = hasClosing ? toNumber(parsed.closing.amount) : Math.abs(computed);
 
-      // The entries are arithmetic and the last balance is a single reading;
-      // when they disagree one of them was misread, so say so and let the user decide.
-      if (hasClosing && Math.abs(Math.abs(computed) - written) > 1) {
-        notes.push(`The entries add up to ${Math.abs(computed).toFixed(2)} ${computed >= 0 ? "Dr" : "Cr"} but the last balance on the page reads ${written.toFixed(2)} - please check both.`);
+      // Every line's written balance has to follow from the one before it. Where it
+      // does not, a number on that line (or the one above) was misread — handwriting
+      // reads wrong by a digit far more often than it adds up wrong, so this finds
+      // the line to look at instead of leaving the user with a bare total.
+      const broken: string[] = [];
+      let prev: number | null = parsed.broughtForward ? Math.abs(bfAmt) : null;
+      entries.forEach((e, i) => {
+        if (prev !== null && e.balance !== null) {
+          const expected = Math.abs(prev + e.debit - e.credit);
+          if (Math.abs(expected - e.balance) > 1) {
+            broken.push(`line ${i + 1}${e.date ? ` (${e.date})` : ""}: ${prev} ${e.debit ? `+ ${e.debit}` : `- ${e.credit}`} should be ${expected}, page reads ${e.balance}`);
+          }
+        }
+        if (e.balance !== null) prev = e.balance;
+      });
+      if (broken.length) {
+        notes.push(`These lines do not add up - check them against the page: ${broken.slice(0, 3).join("; ")}${broken.length > 3 ? `; and ${broken.length - 3} more` : ""}.`);
+      }
+
+      // The last line's own balance is the closing figure; fall back to the
+      // model's separate "closing", then to the running total.
+      const last = entries[entries.length - 1];
+      const written =
+        last && last.balance !== null ? last.balance
+        : parsed.closing && parsed.closing.amount != null ? toNumber(parsed.closing.amount)
+        : Math.abs(computed);
+      const lastLabel = last?.date ? `, last entry ${last.date}` : "";
+
+      if (!broken.length && Math.abs(Math.abs(computed) - written) > 1 && entries.length) {
+        notes.push(`The entries add up to ${Math.abs(computed).toFixed(2)} ${computed >= 0 ? "Dr" : "Cr"} but the last balance reads ${written.toFixed(2)} - please check both.`);
       }
       const side: "debit" | "credit" =
         Math.abs(Math.abs(computed) - written) <= 1 && computed !== 0 ? (computed > 0 ? "debit" : "credit")
         : parsed.closing?.side === "credit" ? "credit"
         : parsed.closing?.side === "debit" ? "debit"
-        : computed < 0 ? "credit" : "debit";
+        : last && last.credit > last.debit ? "credit" : "debit";
 
       const name = String(parsed.partyName ?? "").trim();
       if (name && written > 0) {
         rows = [{
           rawName: name,
           nameRoman: parsed.partyNameRoman ? String(parsed.partyNameRoman).trim() : null,
-          narration: `Closing balance after ${entries.length} entries`,
+          narration: `Closing balance after ${entries.length} entries${lastLabel}`,
           debit: side === "debit" ? written : 0,
           credit: side === "credit" ? written : 0,
           accountId: safeId(parsed.accountId),
