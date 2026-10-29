@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import { signJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TRIAL_PLAN } from "@/lib/trial";
-import { promotePendingSignup } from "@/lib/services/promotePendingSignup";
 import { claimReferral, REF_COOKIE } from "@/lib/affiliateTracking";
 import {
   getAvailableChannels,
@@ -266,59 +265,6 @@ export async function POST(req: NextRequest) {
         channel,
       },
     });
-
-    // TEMPORARY: SKIP_SIGNUP_VERIFICATION=true creates the account straight away,
-    // no OTP. Remove the env var to restore the normal verified flow.
-    if (process.env.SKIP_SIGNUP_VERIFICATION === "true") {
-      const promoted = await promotePendingSignup(pending.id);
-      if (!promoted) {
-        return NextResponse.json({ error: "Could not complete signup. Please try again." }, { status: 500 });
-      }
-      await prisma.activityLog
-        .create({
-          data: {
-            companyId: promoted.companyId,
-            userId: promoted.userId,
-            action: "ACCOUNT_VERIFIED",
-            details: JSON.stringify({ at: Date.now(), channel: "skipped" }),
-          },
-        })
-        .catch(() => {});
-
-      const token = signJwt({ userId: promoted.userId, role: "ADMIN", companyId: promoted.companyId });
-      await prisma.session
-        .create({
-          data: {
-            userId: promoted.userId,
-            token,
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            companyId: promoted.companyId,
-            ip: req.headers.get("x-forwarded-for"),
-            userAgent: req.headers.get("user-agent") || null,
-          },
-        })
-        .catch(() => {});
-
-      const skipRes = NextResponse.json({
-        ok: true,
-        needsVerification: false,
-        user: {
-          id: promoted.userId,
-          name,
-          email: emailNormalized,
-          role: "ADMIN",
-          companyId: promoted.companyId,
-        },
-        next,
-      });
-      skipRes.cookies.set("sb_auth", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
-      return skipRes;
-    }
 
     const sendResult = await sendVerificationCode({
       name,
