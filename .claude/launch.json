@@ -18,6 +18,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "/Users/umersajjad/Projects/atomic-atlas", "--", "-p", "3020"],
       "port": 3020
+    },
+    {
+      "name": "leadfinder-ui",
+      "runtimeExecutable": "/Users/umersajjad/Projects/finovaos-lead-finder/.venv/bin/streamlit",
+      "runtimeArgs": ["run", "/Users/umersajjad/Projects/finovaos-lead-finder/app.py", "--server.port", "8501", "--server.headless", "true"],
+      "port": 8501
     }
   ]
 }
