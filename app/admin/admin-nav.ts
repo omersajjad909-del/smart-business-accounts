@@ -6,6 +6,9 @@ export type AdminNavItem = {
   short: string;
   icon?: string;
   badge?: string;
+  /** Opens href in a new tab instead of client-side routing — for links that
+   * leave the Next.js app entirely (e.g. a separate local tool). */
+  external?: boolean;
 };
 
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
@@ -42,6 +45,10 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   // the AI, not for X. AI Prospecting moved here from Marketing for the same
   // reason; its id and route are unchanged, so permissions carry over.
   { id: "prospecting",         label: "AI Prospecting",     href: "/admin/prospecting",           group: "AI", short: "AP", icon: "target",    badge: "AI" },
+  // A separate local tool (Python/Streamlit, not part of this Next.js app),
+  // so it opens in its own tab rather than client-side routing. Run it first
+  // via the "leadfinder-ui" launch.json entry (localhost:8501).
+  { id: "lead-finder",         label: "Lead Finder (Maps)", href: "http://localhost:8501",        group: "AI", short: "LF", icon: "radar",     badge: "AI", external: true },
   { id: "market-scanner",      label: "Market Scanner",     href: "/admin/market-scanner",        group: "AI", short: "MS", icon: "radar",     badge: "AI" },
   { id: "migration-wizard",    label: "Migration Wizard",   href: "/admin/migration-wizard",      group: "AI", short: "MW", icon: "box",       badge: "AI" },
   { id: "support-copilot",     label: "Support Copilot",    href: "/admin/support-copilot",       group: "AI", short: "SC", icon: "message",   badge: "AI" },

@@ -386,6 +386,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                         key={item.id}
                         href={item.href}
                         prefetch={false}
+                        target={item.external ? "_blank" : undefined}
+                        rel={item.external ? "noopener noreferrer" : undefined}
                         className={`fin-admin-navLink${active ? " is-active" : ""}`}
                         onClick={() => { setMobileOpen(false); setQuickOpen(false); }}
                       >
