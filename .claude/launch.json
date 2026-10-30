@@ -24,6 +24,18 @@
       "runtimeExecutable": "/Users/umersajjad/Projects/finovaos-lead-finder/.venv/bin/streamlit",
       "runtimeArgs": ["run", "/Users/umersajjad/Projects/finovaos-lead-finder/app.py", "--server.port", "8501", "--server.headless", "true"],
       "port": 8501
+    },
+    {
+      "name": "daily-planner",
+      "runtimeExecutable": "/Users/umersajjad/Projects/daily-planner/venv/bin/streamlit",
+      "runtimeArgs": ["run", "/Users/umersajjad/Projects/daily-planner/app.py", "--server.port", "8502", "--server.headless", "true"],
+      "port": 8502
+    },
+    {
+      "name": "bizplan-ai",
+      "runtimeExecutable": "/Users/umersajjad/Projects/bizplan-ai/venv/bin/uvicorn",
+      "runtimeArgs": ["app.main:app", "--app-dir", "/Users/umersajjad/Projects/bizplan-ai", "--port", "8600", "--reload"],
+      "port": 8600
     }
   ]
 }

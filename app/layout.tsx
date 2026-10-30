@@ -235,10 +235,10 @@ function buildSoftwareApplicationJsonLd(aggregateRating: { ratingValue: number; 
   },
   offers: {
     "@type": "AggregateOffer",
-    lowPrice: "49",
-    highPrice: "249",
+    lowPrice: 49,
+    highPrice: 249,
     priceCurrency: "USD",
-    offerCount: "3",
+    offerCount: 3,
     description: "14-day free trial with full Professional features, no credit card required.",
   },
   ...(aggregateRating && aggregateRating.reviewCount > 0
@@ -282,90 +282,101 @@ function buildSoftwareApplicationJsonLd(aggregateRating: { ratingValue: number; 
   };
 }
 
-const founderJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "@id": `${BASE_URL}/#founder`,
-  name: "Umer Sajjad",
-  jobTitle: "Founder & CEO",
-  worksFor: { "@id": `${BASE_URL}/#organization` },
-  url: `${BASE_URL}/forge/about`,
-  // No Wikidata entry here — the ID this used to carry (Q140701676) doesn't
-  // resolve to a real Wikidata item. A fabricated, checkable claim is worse
-  // than no claim at all; add it back only once a real entity exists there.
-  sameAs: [
-    "https://www.linkedin.com/in/umer-sajjad-657936417",
-    `${BASE_URL}/forge/about`,
-    `${BASE_URL}/about`,
-  ],
-  description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter based in Faisalabad, Pakistan — and the creator of FinovaOS, an AI-powered cloud ERP and accounting platform serving 6 focused industries with 60+ features.",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Faisalabad",
-    addressCountry: "PK",
-  },
-};
-
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${BASE_URL}/#organization`,
-  name: "Finova Forge",
-  alternateName: ["FinovaOS", ...BRAND_ALTERNATE_NAMES, "Finova Forge Pakistan"],
-  url: "https://finovaforge.com",
-  logo: {
-    "@type": "ImageObject",
-    url: `${BASE_URL}${BRAND_ICON_PATH}`,
-    width: 512,
-    height: 512,
-  },
-  description: "Finova Forge is a PSEB Registered IT Exporter based in Faisalabad, Pakistan — founded in 2025 by Umer Sajjad. We build FinovaOS, a cloud ERP & accounting platform purpose-built for six focused industries: retail, trading, distribution, import/export, manufacturing, and travel — for businesses worldwide.",
-  foundingDate: "2025",
-  foundingLocation: {
-    "@type": "Place",
-    name: "Faisalabad, Pakistan",
+// baseUrl/isForgeHost let these switch their @id and self-links to
+// finovaforge.com when the request came in on that host (see RootLayout
+// below) — previously every block hard-coded the finovaos.app BASE_URL even
+// when the forge-hostname rewrite in proxy.ts served the HTML for
+// finovaforge.com, so that site's own schema pointed at the wrong domain.
+function buildFounderJsonLd(baseUrl: string, isForgeHost: boolean) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `${baseUrl}/#founder`,
+    name: "Umer Sajjad",
+    jobTitle: "Founder & CEO",
+    worksFor: { "@id": `${baseUrl}/#organization` },
+    url: isForgeHost ? `${baseUrl}/about` : `${baseUrl}/forge/about`,
+    // No Wikidata entry here — the ID this used to carry (Q140701676) doesn't
+    // resolve to a real Wikidata item. A fabricated, checkable claim is worse
+    // than no claim at all; add it back only once a real entity exists there.
+    sameAs: [
+      "https://www.linkedin.com/in/umer-sajjad-657936417",
+      "https://finovaforge.com/about",
+      `${BASE_URL}/about`,
+    ],
+    description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter based in Faisalabad, Pakistan — and the creator of FinovaOS, an AI-powered cloud ERP and accounting platform serving 6 focused industries with 60+ features.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Faisalabad",
       addressCountry: "PK",
     },
-  },
-  founder: {
-    "@id": `${BASE_URL}/#founder`,
-    "@type": "Person",
-    name: "Umer Sajjad",
-  },
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer service",
-    email: "hello@finovaos.app",
-    url: `${BASE_URL}/contact`,
-    availableLanguage: ["English", "Urdu"],
-  },
-  // No Wikidata entry here either — same reasoning as founderJsonLd above;
-  // Q140701786 does not resolve to a real item.
-  sameAs: [
-    "https://finovaforge.com",
-    "https://www.finovaos.app",
-    "https://x.com/finovaos",
-    "https://www.linkedin.com/in/umer-sajjad-657936417",
-  ],
-};
+  };
+}
 
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": `${BASE_URL}/#website`,
-  name: "FinovaOS",
-  alternateName: BRAND_ALTERNATE_NAMES,
-  url: BASE_URL,
-  description: "FinovaOS — also written Finova OS — is cloud accounting and ERP software for businesses of every size, from growing SMEs to multi-branch enterprises.",
-  publisher: { "@id": `${BASE_URL}/#organization` },
-  // No SearchAction here — it used to promise a /search?q= sitelinks
-  // searchbox, but no /search page exists (app/api/search/route.ts is an
-  // internal accounts API, not a public page), so the promised URL 404s.
-  // Add this back once a real on-site search page ships.
-};
+function buildOrganizationJsonLd(baseUrl: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${baseUrl}/#organization`,
+    name: "Finova Forge",
+    alternateName: ["FinovaOS", ...BRAND_ALTERNATE_NAMES, "Finova Forge Pakistan"],
+    url: "https://finovaforge.com",
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE_URL}${BRAND_ICON_PATH}`,
+      width: 512,
+      height: 512,
+    },
+    description: "Finova Forge is a PSEB Registered IT Exporter based in Faisalabad, Pakistan — founded in 2025 by Umer Sajjad. We build FinovaOS, a cloud ERP & accounting platform purpose-built for six focused industries: retail, trading, distribution, import/export, manufacturing, and travel — for businesses worldwide.",
+    foundingDate: "2025",
+    foundingLocation: {
+      "@type": "Place",
+      name: "Faisalabad, Pakistan",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Faisalabad",
+        addressCountry: "PK",
+      },
+    },
+    founder: {
+      "@id": `${baseUrl}/#founder`,
+      "@type": "Person",
+      name: "Umer Sajjad",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      email: "hello@finovaos.app",
+      url: `${BASE_URL}/contact`,
+      availableLanguage: ["English", "Urdu"],
+    },
+    // No Wikidata entry here either — same reasoning as founderJsonLd above;
+    // Q140701786 does not resolve to a real item.
+    sameAs: [
+      "https://finovaforge.com",
+      "https://www.finovaos.app",
+      "https://x.com/finovaos",
+      "https://www.linkedin.com/in/umer-sajjad-657936417",
+    ],
+  };
+}
+
+function buildWebsiteJsonLd(baseUrl: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${baseUrl}/#website`,
+    name: "FinovaOS",
+    alternateName: BRAND_ALTERNATE_NAMES,
+    url: BASE_URL,
+    description: "FinovaOS — also written Finova OS — is cloud accounting and ERP software for businesses of every size, from growing SMEs to multi-branch enterprises.",
+    publisher: { "@id": `${baseUrl}/#organization` },
+    // No SearchAction here — it used to promise a /search?q= sitelinks
+    // searchbox, but no /search page exists (app/api/search/route.ts is an
+    // internal accounts API, not a public page), so the promised URL 404s.
+    // Add this back once a real on-site search page ships.
+  };
+}
 
 /**
  * Review aggregate for the SoftwareApplication JSON-LD, cached.
@@ -407,7 +418,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const nonce = (await headers()).get("x-nonce") || undefined;
+  const hdrs = await headers();
+  const nonce = hdrs.get("x-nonce") || undefined;
+  // finovaforge.com is served by this same deployment via a host-based
+  // rewrite in proxy.ts (to /forge/*), so this layout renders for both
+  // domains. Schema must follow suit: finovaforge.com's own pages should
+  // declare themselves under their own domain, not finovaos.app's.
+  const requestHost = (hdrs.get("host") || "").split(":")[0];
+  const isForgeHost = requestHost === "finovaforge.com" || requestHost === "www.finovaforge.com";
+  const baseUrl = isForgeHost ? "https://finovaforge.com" : BASE_URL;
 
   const reviewAgg = await getCachedReviewAggregate();
   const aggregateRating =
@@ -415,6 +434,9 @@ export default async function RootLayout({
       ? { ratingValue: Math.round(reviewAgg._avg.rating * 10) / 10, reviewCount: reviewAgg._count }
       : null;
   const softwareApplicationJsonLd = buildSoftwareApplicationJsonLd(aggregateRating);
+  const organizationJsonLd = buildOrganizationJsonLd(baseUrl);
+  const founderJsonLd = buildFounderJsonLd(baseUrl, isForgeHost);
+  const websiteJsonLd = buildWebsiteJsonLd(baseUrl);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -454,10 +476,17 @@ export default async function RootLayout({
         <script nonce={nonce} suppressHydrationWarning async src="https://www.googletagmanager.com/gtag/js?id=G-PY9D7NW061" />
         <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',wait_for_update:500});gtag('js',new Date());gtag('config','G-PY9D7NW061',{anonymize_ip:true});gtag('config','AW-18478573284');` }} />
         {/* Clarity is injected by AnalyticsLoader only after analytics consent is given */}
-        <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }} />
+        {/* SoftwareApplication and WebSite describe the FinovaOS product itself, not
+            Finova Forge the company — they stay off finovaforge.com's pages so that
+            site's own schema isn't dominated by a different product's entity. */}
+        {!isForgeHost && (
+          <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }} />
+        )}
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(founderJsonLd) }} />
-        <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        {!isForgeHost && (
+          <script nonce={nonce} suppressHydrationWarning type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        )}
       </head>
       <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />

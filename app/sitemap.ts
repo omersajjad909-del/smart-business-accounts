@@ -5,7 +5,7 @@ import { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { SEO_ARTICLES } from "./(marketing)/blog/seo-articles";
 import { ALL_POSTS } from "./(marketing)/blog/posts";
-import { LIVE_TYPES } from "@/lib/businessModules";
+import { getPublicBusinessTypes } from "@/lib/publicBusinessTypes";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const FORGE_BASE = "https://finovaforge.com";
@@ -17,7 +17,7 @@ const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
 // finovaforge.com/sitemap.xml served 134 www.finovaos.app URLs and not one of
 // its own 13 pages — Google had no sitemap-level way to discover the Forge
 // site at all. /status is deliberately left out: robots.ts disallows it.
-function forgeSitemap(now: Date): MetadataRoute.Sitemap {
+function forgeSitemap(): MetadataRoute.Sitemap {
   const forgePages = [
     { path: "",            changeFrequency: "weekly" as const,  priority: 1.0 },
     { path: "/about",      changeFrequency: "monthly" as const, priority: 0.8 },
@@ -32,9 +32,12 @@ function forgeSitemap(now: Date): MetadataRoute.Sitemap {
     { path: "/privacy",    changeFrequency: "yearly" as const,  priority: 0.4 },
     { path: "/terms",      changeFrequency: "yearly" as const,  priority: 0.4 },
   ];
+  // No lastModified here — there's no tracked per-page edit date for these,
+  // and stamping every one with the moment the sitemap was requested told
+  // crawlers nothing real (see the comment below on the same pattern for the
+  // main sitemap).
   return forgePages.map(({ path, changeFrequency, priority }) => ({
     url: `${FORGE_BASE}${path}`,
-    lastModified: now,
     changeFrequency,
     priority,
   }));
@@ -66,39 +69,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const host = (await headers()).get("host") || "";
   if (FORGE_HOSTS.includes(host.toLowerCase())) {
-    return forgeSitemap(now);
+    return forgeSitemap();
   }
 
   const staticPages = [
     // Marketing - highest priority
-    { url: BASE,                        lastModified: now, changeFrequency: "weekly" as const,  priority: 1.0 },
-    { url: `${BASE}/features`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.9 },
-    { url: `${BASE}/pricing`,           lastModified: now, changeFrequency: "weekly" as const,  priority: 0.9 },
-    { url: `${BASE}/solutions`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: BASE,                        changeFrequency: "weekly" as const,  priority: 1.0 },
+    { url: `${BASE}/features`,          changeFrequency: "monthly" as const, priority: 0.9 },
+    { url: `${BASE}/pricing`,           changeFrequency: "weekly" as const,  priority: 0.9 },
+    { url: `${BASE}/solutions`,         changeFrequency: "monthly" as const, priority: 0.8 },
     // Company
-    { url: `${BASE}/about`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: `${BASE}/contact`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: `${BASE}/waitlist`,          lastModified: now, changeFrequency: "weekly" as const,  priority: 0.75 },
-    { url: `${BASE}/careers`,           lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
+    { url: `${BASE}/about`,             changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${BASE}/contact`,           changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${BASE}/waitlist`,          changeFrequency: "weekly" as const,  priority: 0.75 },
+    { url: `${BASE}/careers`,           changeFrequency: "weekly" as const,  priority: 0.7 },
     // Real pages, each with its own self-referencing canonical, that were
     // linked from the footer and/or another marketing page but never added
     // here — Google had to discover them by crawling those links instead of
     // being told about them directly.
-    { url: `${BASE}/culture`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
-    { url: `${BASE}/roles`,             lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
-    { url: `${BASE}/feedback`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 },
-    { url: `${BASE}/automation`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/culture`,           changeFrequency: "monthly" as const, priority: 0.6 },
+    // /roles was dropped — it now 301s to /careers (see next.config.ts), so
+    // listing both here would submit a redirect as if it were a real page.
+    { url: `${BASE}/feedback`,          changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${BASE}/automation`,        changeFrequency: "monthly" as const, priority: 0.75 },
     // Resources
-    { url: `${BASE}/blog`,              lastModified: now, changeFrequency: "daily" as const,   priority: 0.8 },
-    { url: `${BASE}/changelog`,         lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
-    { url: `${BASE}/updates`,           lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
-    { url: `${BASE}/demo`,              lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${BASE}/affiliate`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
-    { url: `${BASE}/trust`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: `${BASE}/help`,              lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
-    { url: `${BASE}/security`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
-    { url: `${BASE}/testimonials`,      lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
-    { url: `${BASE}/industries`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE}/blog`,              changeFrequency: "daily" as const,   priority: 0.8 },
+    { url: `${BASE}/changelog`,         changeFrequency: "weekly" as const,  priority: 0.6 },
+    { url: `${BASE}/updates`,           changeFrequency: "weekly" as const,  priority: 0.6 },
+    { url: `${BASE}/demo`,              changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE}/affiliate`,         changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${BASE}/trust`,             changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${BASE}/help`,              changeFrequency: "weekly" as const,  priority: 0.7 },
+    { url: `${BASE}/security`,          changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${BASE}/testimonials`,      changeFrequency: "weekly" as const,  priority: 0.7 },
+    { url: `${BASE}/industries`,        changeFrequency: "monthly" as const, priority: 0.8 },
     // Legal — real last-updated date (matches LAST_UPDATED shown on each page)
     { url: `${BASE}/legal/privacy`,     lastModified: LEGAL_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.4 },
     { url: `${BASE}/legal/cookies`,     lastModified: LEGAL_COOKIES_LAST_UPDATED, changeFrequency: "yearly" as const,  priority: 0.38 },
@@ -114,36 +118,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // of being told about it directly.
     { url: `${BASE}/legal/sub-processors`, lastModified: LEGAL_SUBPROCESSORS_LAST_UPDATED, changeFrequency: "yearly" as const, priority: 0.35 },
     // Tools & converters
-    { url: `${BASE}/roi-calculator`,    lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${BASE}/compare`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${BASE}/integrations`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/faq`,               lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${BASE}/roi-calculator`,    changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE}/compare`,           changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE}/integrations`,      changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/faq`,               changeFrequency: "monthly" as const, priority: 0.7 },
     // Head-to-head pages — slugs must match RIVALS in compare/_data.ts
-    { url: `${BASE}/compare/xero`,       lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/compare/zoho-books`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/compare/quickbooks`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/compare/wave`,       lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: `${BASE}/compare/xero`,       changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/compare/zoho-books`, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/compare/quickbooks`, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/compare/wave`,       changeFrequency: "monthly" as const, priority: 0.7 },
   ];
 
   // Additional pages
   const extraPages = [
-    { url: `${BASE}/get-started`,              lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/support`,                  lastModified: now, changeFrequency: "monthly" as const, priority: 0.65 },
-    { url: `${BASE}/developers/api`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.6  },
-    { url: `${BASE}/docs`,                     lastModified: now, changeFrequency: "weekly" as const,  priority: 0.65 },
+    { url: `${BASE}/get-started`,              changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/support`,                  changeFrequency: "monthly" as const, priority: 0.65 },
+    { url: `${BASE}/developers/api`,           changeFrequency: "monthly" as const, priority: 0.6  },
+    { url: `${BASE}/docs`,                     changeFrequency: "weekly" as const,  priority: 0.65 },
     // Feature detail pages — all slugs verified against MODULES in features/[slug]/page.tsx
-    { url: `${BASE}/features/accounting`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/invoicing`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/inventory`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/bank-reconciliation`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/hr-payroll`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/crm`,                 lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
-    { url: `${BASE}/features/reports`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
-    { url: `${BASE}/features/pos`,                 lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/features/purchase-grn`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/features/multi-currency`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/features/multi-branch`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/features/role-access`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.7  },
+    { url: `${BASE}/features/accounting`,          changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/invoicing`,           changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/inventory`,           changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/bank-reconciliation`, changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/hr-payroll`,          changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/crm`,                 changeFrequency: "monthly" as const, priority: 0.8  },
+    { url: `${BASE}/features/reports`,             changeFrequency: "monthly" as const, priority: 0.8  },
+    { url: `${BASE}/features/pos`,                 changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/purchase-grn`,        changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/multi-currency`,      changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/multi-branch`,        changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/role-access`,         changeFrequency: "monthly" as const, priority: 0.7  },
   ];
 
   // Blog articles — only add real published slugs here (must exist in app/(marketing)/blog/posts.ts)
@@ -191,7 +195,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
   const helpPages = helpSlugs.map(slug => ({
     url: `${BASE}/help/${slug}`,
-    lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.55,
   }));
@@ -201,12 +204,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // (see app/(marketing)/for/[industry]/layout.tsx) but they are thin, so
   // pushing ~90 of them at Google would invite the duplicate-content problem
   // this sitemap is meant to help solve.
-  const industryPages = LIVE_TYPES.map(id => ({
-    url: `${BASE}/for/${id}`,
-    lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
+  //
+  // Sourced from getPublicBusinessTypes() — the same DB-aware "effective
+  // status" the page itself uses to decide its own noindex (layout.tsx reads
+  // publicTypes[i].isLive, not the static LIVE_TYPES). This used to read
+  // LIVE_TYPES from lib/businessModules.ts directly, which only reflects the
+  // static config and ignores admin overrides stored in the DB — so a type
+  // flipped back to coming_soon by an override stayed listed here while the
+  // page itself started serving noindex, a signal mismatch the SEO audit
+  // caught as "noindexed pages still in the sitemap".
+  const publicBusinessTypes = await getPublicBusinessTypes();
+  const industryPages = publicBusinessTypes
+    .filter((t) => t.isLive)
+    .map(({ id }) => ({
+      url: `${BASE}/for/${id}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
 
   return [...staticPages, ...extraPages, ...seoArticlePages, ...blogPages, ...helpPages, ...industryPages];
 }

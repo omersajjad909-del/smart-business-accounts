@@ -60,6 +60,17 @@ const nextConfig: NextConfig = {
         destination: "https://www.finovaos.app/:path*",
         permanent: true,
       },
+      // www.finovaforge.com served its pages directly (200) instead of
+      // redirecting to the apex domain, relying on the canonical tag alone
+      // to tell crawlers which host was authoritative — an SEO audit flagged
+      // this as the one domain-level gap next to finovaos.app's www
+      // redirect above, which already does this correctly.
+      {
+        source: "/:path((?!api|_next|favicon|robots|sitemap|images|icons|fonts).*)*",
+        has: [{ type: "host", value: "www.finovaforge.com" }],
+        destination: "https://finovaforge.com/:path*",
+        permanent: true,
+      },
       {
         source: "/forge",
         destination: "/forge/home",
@@ -78,6 +89,13 @@ const nextConfig: NextConfig = {
       // Removed until real customers agree to be written up; /testimonials
       // lists only reviews customers actually submitted.
       { source: "/case-studies", destination: "/testimonials", permanent: true },
+      // /roles and /careers were two copies of the same "not hiring right
+      // now" placeholder, differing only in one badge label — an SEO audit
+      // flagged this as duplicate content. /careers is the more recognized
+      // URL, so /roles collapses onto it; this redirect runs before
+      // app/(marketing)/roles/page.tsx ever renders, so that file is now
+      // dead code, left in place rather than deleted mid-fix.
+      { source: "/roles", destination: "/careers", permanent: true },
     ];
   },
   async headers() {

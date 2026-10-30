@@ -169,6 +169,15 @@ export async function proxy(req: NextRequest) {
     // Skip rewrite for static files (any path with a file extension like .png, .svg, .ico, .txt, .json, etc.)
     // so /FinovaForge.png resolves to public/FinovaForge.png instead of /forge/FinovaForge.png.
     const isStaticFile = /\.[a-z0-9]+$/i.test(pathname);
+    // A direct hit on the internal /forge/* path (someone typed or linked
+    // finovaforge.com/forge/about) would serve the same page a second time
+    // next to its clean rewrite target above — SEO audit flagged this as a
+    // live duplicate-content pair, both HTTP 200. Collapse it onto the clean
+    // path instead of letting both stand.
+    if (!isStaticFile && pathname.startsWith("/forge") && pathname !== "/_next" && !pathname.startsWith("/api")) {
+      const clean = pathname === "/forge" ? "/" : pathname.slice("/forge".length) || "/";
+      return NextResponse.redirect(new URL(clean + search, req.url), { status: 301 });
+    }
     if (
       !isStaticFile &&
       !pathname.startsWith("/forge") &&
@@ -183,6 +192,24 @@ export async function proxy(req: NextRequest) {
     const res = NextResponse.next({ request: { headers: fwdHeaders } });
     res.headers.set("Content-Security-Policy", csp);
     return res;
+  }
+  // Any OTHER host (finovaos.app, a preview URL, etc.) hitting the internal
+  // /forge/* tree directly would serve Finova Forge's pages a second time
+  // under a completely different domain — the most severe form of the same
+  // duplicate-content issue. Send it to the real site.
+  {
+    const forgePathname = req.nextUrl.pathname;
+    if (
+      forgePathname.startsWith("/forge") &&
+      !/\.[a-z0-9]+$/i.test(forgePathname) &&
+      !forgePathname.startsWith("/_next") &&
+      !forgePathname.startsWith("/api")
+    ) {
+      const clean = forgePathname === "/forge" ? "/" : forgePathname.slice("/forge".length) || "/";
+      return NextResponse.redirect(new URL(`https://finovaforge.com${clean}${req.nextUrl.search}`, req.url), {
+        status: 301,
+      });
+    }
   }
   // ───────────────────────────────────────────────────────────────
 

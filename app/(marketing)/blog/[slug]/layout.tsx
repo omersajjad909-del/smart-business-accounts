@@ -49,11 +49,20 @@ export async function generateMetadata({
   // entries ("1" through "15") carry no `id` field at all, so building the
   // canonical from `post.id` emitted `/blog/undefined` for every one of them.
   const url = `${BASE}/blog/${slug}`;
+  // The numeric-slug posts ("1" through "15") predate the named-slug posts
+  // above and duplicate their topics (e.g. "1" and bank-reconciliation-guide
+  // both cover invoicing/reconciliation) — live and linkable for anyone who
+  // bookmarked one, but kept out of the index so they don't compete with the
+  // newer version of the same content. They were never in the sitemap either
+  // (see app/sitemap.ts's blogSlugs), so this just makes the signal explicit
+  // instead of leaving it to be inferred.
+  const isLegacyNumericSlug = /^\d+$/.test(slug);
 
   return {
     title: post.title,
     description: post.excerpt || `${post.title} — Read this guide on business finance and accounting by the FinovaOS team.`,
     keywords: post.keywords,
+    robots: isLegacyNumericSlug ? { index: false, follow: true } : undefined,
     authors: post.author ? [{ name: post.author }] : undefined,
     openGraph: {
       title: post.title,

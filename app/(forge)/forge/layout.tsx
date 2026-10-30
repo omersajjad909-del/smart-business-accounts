@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 const FORGE_URL = "https://finovaforge.com";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const FORGE_TITLE = "Finova Forge - Industry-Specific Business Software | Trading, Manufacturing, Restaurant, Retail & More";
 // Was 252 chars — over Google's ~160 cutoff on every one of the 14 pages that
 // share this constant verbatim, and identical across all of them on top of
@@ -32,13 +31,74 @@ function forgeCanonical(pathname: string): string {
   return `${FORGE_URL}${publicPath}`;
 }
 
+// Every /forge/* page used to share FORGE_TITLE/FORGE_DESCRIPTION verbatim —
+// an SEO audit flagged this as a Critical finding (13 pages, one identical
+// title and description) since H1s and body content differ per page but the
+// <title>/meta description never did. publicPath below is forgeCanonical()'s
+// own normalized key (home = ""), so this map and the canonical logic can
+// never drift out of sync with each other.
+const PAGE_META: Record<string, { title: string; description: string }> = {
+  "": { title: FORGE_TITLE, description: FORGE_DESCRIPTION },
+  "/about": {
+    title: "About Finova Forge — PSEB Registered IT Exporter, Faisalabad",
+    description: "Finova Forge is a PSEB Registered IT Exporter based in Faisalabad, Pakistan, founded in 2025 by Umer Sajjad. Meet the team building FinovaOS.",
+  },
+  "/products": {
+    title: "Products — Finova Forge",
+    description: "FinovaOS: the cloud ERP and accounting platform Finova Forge builds for trading, manufacturing, retail, distribution and more.",
+  },
+  "/industries": {
+    title: "Industries We Serve — Finova Forge",
+    description: "See how FinovaOS supports trading, wholesale, manufacturing, distribution, retail, restaurant and other industries.",
+  },
+  "/solutions": {
+    title: "Solutions — Finova Forge",
+    description: "Explore Finova Forge's industry-specific business software solutions, built on the FinovaOS platform.",
+  },
+  "/blog": {
+    title: "Blog — Finova Forge",
+    description: "Insights on business software, accounting and industry-specific technology from the Finova Forge team.",
+  },
+  "/careers": {
+    title: "Careers at Finova Forge",
+    description: "Join Finova Forge, the team building FinovaOS. See open roles and what it's like to work with us.",
+  },
+  "/contact": {
+    title: "Contact Finova Forge",
+    description: "Get in touch with Finova Forge for sales, support or partnership inquiries.",
+  },
+  "/support": {
+    title: "Support — Finova Forge",
+    description: "Get help with FinovaOS and Finova Forge products. Contact our support team.",
+  },
+  "/security": {
+    title: "Security — Finova Forge",
+    description: "How Finova Forge protects your data, and which security certifications we do and don't currently hold.",
+  },
+  "/privacy": {
+    title: "Privacy Policy — Finova Forge",
+    description: "Finova Forge's privacy policy: how we collect, use and protect your data.",
+  },
+  "/terms": {
+    title: "Terms of Service — Finova Forge",
+    description: "Finova Forge's terms of service for using FinovaOS and related products.",
+  },
+  "/status": {
+    title: "System Status — Finova Forge",
+    description: "Current uptime and status of FinovaOS and Finova Forge services.",
+  },
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const pathname = (await headers()).get("x-pathname") ?? "/";
+  const path = pathname.replace(/^\/forge(?=\/|$)/, "");
+  const publicPath = path === "" || path === "/" || path === "/home" ? "" : path;
+  const { title, description } = PAGE_META[publicPath] ?? { title: FORGE_TITLE, description: FORGE_DESCRIPTION };
 
   return {
   metadataBase: new URL(FORGE_URL),
-  title: FORGE_TITLE,
-  description: FORGE_DESCRIPTION,
+  title,
+  description,
   applicationName: "Finova Forge",
   authors: [{ name: "Umer Sajjad", url: "https://www.linkedin.com/in/umer-sajjad-657936417" }, { name: "Finova Forge", url: FORGE_URL }],
   creator: "Umer Sajjad",
@@ -83,8 +143,8 @@ export async function generateMetadata(): Promise<Metadata> {
     // pages disagreed with their own canonical because of it.
     url: forgeCanonical(pathname),
     siteName: "Finova Forge",
-    title: FORGE_TITLE,
-    description: FORGE_DESCRIPTION,
+    title,
+    description,
     images: [
       {
         url: FORGE_OG_IMAGE,
@@ -96,8 +156,8 @@ export async function generateMetadata(): Promise<Metadata> {
   },
   twitter: {
     card: "summary",
-    title: FORGE_TITLE,
-    description: FORGE_DESCRIPTION,
+    title,
+    description,
     images: [FORGE_OG_IMAGE],
   },
   alternates: {
@@ -106,81 +166,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const forgeOrganizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${BASE_URL}/#organization`,
-  name: "Finova Forge",
-  alternateName: "FinovaOS",
-  url: FORGE_URL,
-  logo: {
-    "@type": "ImageObject",
-    url: `${FORGE_URL}/FinovaForge.png`,
-    width: 512,
-    height: 512,
-  },
-  description: "Finova Forge is a PSEB Registered IT Exporter based in Faisalabad, Pakistan — founded in 2025 by Umer Sajjad. We build FinovaOS, an AI-powered cloud ERP & accounting platform for 6 focused industries with 60+ features.",
-  foundingDate: "2025",
-  foundingLocation: {
-    "@type": "Place",
-    name: "Faisalabad, Pakistan",
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Faisalabad",
-      addressCountry: "PK",
-    },
-  },
-  founder: {
-    "@type": "Person",
-    name: "Umer Sajjad",
-    jobTitle: "Founder & CEO",
-    url: `${FORGE_URL}/about`,
-    sameAs: ["https://www.linkedin.com/in/umer-sajjad-657936417"],
-  },
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer service",
-    email: "hello@finovaos.app",
-    availableLanguage: ["English", "Urdu"],
-  },
-  sameAs: [
-    `${BASE_URL}`,
-    "https://www.linkedin.com/in/umer-sajjad-657936417",
-    "https://www.wikidata.org/wiki/Q140701786",
-  ],
-};
-
-const forgePersonJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Umer Sajjad",
-  jobTitle: "Founder & CEO",
-  worksFor: {
-    "@type": "Organization",
-    name: "Finova Forge",
-    url: FORGE_URL,
-  },
-  url: `${FORGE_URL}/about`,
-  sameAs: [
-    "https://www.linkedin.com/in/umer-sajjad-657936417",
-    "https://www.wikidata.org/wiki/Q140701676",
-    `${FORGE_URL}/about`,
-    `${BASE_URL}/about`,
-  ],
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Faisalabad",
-    addressCountry: "PK",
-  },
-  description: "Umer Sajjad is the Founder and CEO of Finova Forge — a PSEB Registered IT Exporter from Lahore, Pakistan — and creator of FinovaOS, an AI cloud ERP platform serving 6 focused industries.",
-};
+// Organization and Person JSON-LD for finovaforge.com used to be declared
+// again here — a second, independent copy of what app/layout.tsx also
+// renders (that root layout now builds them pointed at finovaforge.com
+// whenever the request arrives on that host; see isForgeHost there). Two
+// Organization nodes on the same page is exactly the "duplicate/inconsistent
+// JSON-LD entity" finding from the SEO audit, and the copies had drifted:
+// this one gave Umer Sajjad's location as Lahore while the other said
+// Faisalabad. Removed so there is one Organization and one Person node,
+// sourced from one place.
 
 export default function ForgeLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(forgeOrganizationJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(forgePersonJsonLd) }} />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
