@@ -233,7 +233,7 @@ export default function PayrollPage() {
     <div class="row"><span class="label">Employee Name:</span><span>${p.employee.firstName} ${p.employee.lastName}</span></div>
     <div class="row"><span class="label">Basic Salary:</span><span class="amt">${fmt(p.baseSalary)}</span></div>
     <div class="row"><span class="label">Allowances:</span><span class="amt">${fmt(p.allowances)}</span></div>
-    <div class="row"><span class="label">Deductions:</span><span class="amt">-${fmt(p.deductions)}</span></div>
+    <div class="row"><span class="label">Deductions:</span><span class="amt">${p.deductions > 0 ? "-" : ""}${fmt(p.deductions)}</span></div>
     ${p.deductionReason ? `<div class="row"><span class="label">Deduction Reason:</span><span>${p.deductionReason}</span></div>` : ""}
     <div class="row" style="font-weight:bold"><span class="label">Net Pay:</span><span class="amt">${fmt(pay)}</span></div>
     ${p.additionalCash > 0 ? `<div class="row"><span class="label">Cash Paid:</span><span class="amt">-${fmt(p.additionalCash)}</span></div>` : ""}
@@ -488,7 +488,7 @@ export default function PayrollPage() {
                 <tr style={{ borderTop: "2px solid var(--border)", background: "rgba(var(--ink),0.03)" }}>
                   <td colSpan={2} style={{ padding: "12px 14px", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Totals</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right" }}>{fmt(totalBasic)}</td>
-                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-f87171, #f87171)" }}>-{fmt(totalDed)}</td>
+                  <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-f87171, #f87171)" }}>{totalDed > 0 ? "-" : ""}{fmt(totalDed)}</td>
                   <td></td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right" }}>{fmt(totalBasic - totalDed)}</td>
                   <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 700, textAlign: "right", color: "var(--tx-818cf8, #818cf8)" }}>{fmt(totalPaid)}</td>
@@ -673,7 +673,7 @@ export default function PayrollPage() {
                   <tr style={{ background: "var(--dk-0f172a, #0f172a)", color: "var(--ink-solid, #fff)" }}>
                     <td colSpan={2} style={{ padding: "12px 8px", textAlign: "right", fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase" }}>Totals</td>
                     <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(totalBasic)}</td>
-                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>-{fmt(totalDed)}</td>
+                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{totalDed > 0 ? "-" : ""}{fmt(totalDed)}</td>
                     <td style={{ padding: "12px 8px" }}></td>
                     <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(netPay)}</td>
                     <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(totalPaid)}</td>
