@@ -65,8 +65,20 @@ export async function GET(req: NextRequest) {
     if (Number.isFinite(std) && std > 0) rates.standardHoursPerDay = std;
     if (Number.isFinite(mult) && mult > 0) rates.otMultiplier = mult;
 
+    let weeklyOffDays = [0];
+    try {
+      const settingsRow = await prisma.activityLog.findFirst({
+        where: { companyId, action: "COMPANY_HOLIDAY_SETTINGS" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      });
+      const parsed = settingsRow?.details ? JSON.parse(settingsRow.details) : null;
+      if (Array.isArray(parsed?.weeklyOffDays)) weeklyOffDays = parsed.weeklyOffDays;
+    } catch {}
+
     const computed = computePayroll({
       employeeId,
+      weeklyOffDays,
       monthYear,
       baseSalary: employee.salary || 0,
       attendance: attendance.map(a => ({

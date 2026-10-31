@@ -87,6 +87,7 @@ export function computePayroll(params: {
   baseSalary: number;
   attendance: AttendanceRow[];
   rates?: Partial<PayrollRates>;
+  weeklyOffDays?: number[];          // 0 = Sunday; defaults to Sunday only
 }): PayrollComputed {
   const rates: PayrollRates = { ...DEFAULT_RATES, ...(params.rates || {}) };
   const totalDays = daysInCalendarMonth(params.monthYear);
@@ -140,11 +141,19 @@ export function computePayroll(params: {
   const netDeduction  = 0;
   const otAllowance   = otCredit;
 
-  // Pay only days credited by attendance. Unmarked days do not earn salary;
-  // paid leave and holidays remain credited. Absence deductions are retained
-  // as a separate line for the existing payroll breakdown.
-  const creditedDays = counts.present + counts.late + counts.leave + counts.holiday + counts.halfDay / 2;
-  const earnedBasicSalary = money(creditedDays * perDay);
+  // Salary is a monthly figure: start from the full base and take off only the
+  // days that were not worked. Weekly-off days (Sunday by default) with no
+  // attendance row are paid rest days, so they are not lost; any other day with
+  // no row at all earns nothing. Absences and half-days come off as before.
+  const [yy, mm] = params.monthYear.split("-").map(Number);
+  const weeklyOff = params.weeklyOffDays ?? [0];
+  const marked = new Set(params.attendance.map(r => r.date.getDate()));
+  let unpaidUnmarked = 0;
+  for (let d = 1; d <= totalDays; d++) {
+    if (!marked.has(d) && !weeklyOff.includes(new Date(yy, mm - 1, d).getDay())) unpaidUnmarked++;
+  }
+  const creditedDays = Math.max(0, workingDaysCredit(rates.workingDaysPerMonth, counts, unpaidUnmarked));
+  const earnedBasicSalary = Math.max(0, money(params.baseSalary - grossDeduction - unpaidUnmarked * perDay));
   const suggestedNetSalary = money(earnedBasicSalary + otAllowance - netDeduction);
 
   const reasonBits: string[] = [];
@@ -189,6 +198,14 @@ export function computePayroll(params: {
       reasonText,
     },
   };
+}
+
+function workingDaysCredit(
+  workingDays: number,
+  counts: { absent: number; halfDay: number },
+  unpaidUnmarked: number,
+) {
+  return workingDays - counts.absent - counts.halfDay / 2 - unpaidUnmarked;
 }
 
 function round2(n: number) { return Math.round(n * 100) / 100; }
