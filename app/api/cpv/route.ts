@@ -123,33 +123,14 @@ export async function POST(req: Request) {
         employeeCode: employee.employeeId,
         employeeName: `${employee.firstName} ${employee.lastName || ""}`.trim(),
       });
-      let postedAccountId = accountId;
       if (validEntries[0].accountId !== accountId) {
-        // The user may have picked the employee's legacy "NAME (SALARY)" account
-        // by hand; accept it when it is that employee's and make it their account.
-        const picked = await prisma.account.findFirst({
-          where: {
-            id: validEntries[0].accountId,
-            companyId,
-            deletedAt: null,
-            name: { equals: `${employee.firstName} ${employee.lastName || ""}`.trim() + " (SALARY)", mode: "insensitive" },
-          },
-          select: { id: true },
-        });
-        if (picked) {
-          await prisma.account.update({ where: { id: picked.id }, data: { partyType: "EMPLOYEES", type: "LIABILITY" } });
-          await prisma.employee.update({ where: { id: employeeId }, data: { accountId: picked.id } });
-          postedAccountId = picked.id;
-        }
-      }
-      if (validEntries[0].accountId !== postedAccountId) {
         return NextResponse.json({ error: "Advance payment must be posted to the selected employee's salary account" }, { status: 400 });
       }
       advanceDetails = {
         employeeId,
         reason: String(advanceSalary.reason || "").trim(),
         deductMonths: Math.max(1, Number(advanceSalary.deductMonths || 1)),
-        accountId: postedAccountId,
+        accountId,
       };
     }
 

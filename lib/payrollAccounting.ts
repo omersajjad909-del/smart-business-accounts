@@ -119,22 +119,6 @@ export async function ensureEmployeePayableAccount(params: {
     }
   }
 
-  // Older payroll versions / imported charts already hold a "NAME (SALARY)"
-  // account for this employee. Link to it rather than opening a duplicate.
-  const legacy = await prisma.account.findMany({
-    where: {
-      companyId: params.companyId,
-      deletedAt: null,
-      name: { equals: `${params.employeeName} (SALARY)`, mode: "insensitive" },
-    },
-    take: 2,
-  });
-  if (legacy.length === 1) {
-    await prisma.account.update({ where: { id: legacy[0].id }, data: { partyType: "EMPLOYEES", type: "LIABILITY" } });
-    await prisma.employee.update({ where: { id: params.employeeId }, data: { accountId: legacy[0].id } });
-    return legacy[0].id;
-  }
-
   const parent = await ensureSalariesPayableParent(params.companyId);
   const code   = `SALP-${params.employeeCode}`;
   const acc    = await findOrCreateAccount({
