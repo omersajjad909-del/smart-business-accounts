@@ -532,6 +532,7 @@ export function PrintDocA4({
                 {columns.map((c, ci) => (
                   <td
                     key={c.key}
+                    className={ci === 0 || c.width === undefined || (c.align ?? "left") === "left" ? "pdoc-wrap" : undefined}
                     style={{
                       border: RULE, padding: cellPad,
                       textAlign: (c.align || "left") as any,
@@ -806,6 +807,19 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
           color: var(--pdoc-ink, #111) !important;
           border: 1px solid var(--pdoc-rule, var(--dkb-111111, #111)) !important;
           background-color: transparent !important;
+        }
+        /* globals.css forces "white-space: nowrap !important" on every
+           .dashboard-root td for phones, and that media query fires on A4 too
+           (see above). An inline white-space cannot beat an !important, so on
+           paper the description stayed on one line and printed over Qty and
+           Unit while the screen preview, which is wider, wrapped fine. The
+           cells allowed to wrap carry this class so the rule can say so. */
+        html.dark .dashboard-root .print-doc-a4 .pdoc-grid td.pdoc-wrap,
+        html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid td.pdoc-wrap,
+        .dashboard-root .print-doc-a4 .pdoc-grid td.pdoc-wrap {
+          white-space: normal !important;
+          overflow-wrap: anywhere !important;
+          word-break: break-word !important;
         }
         html.dark .dashboard-root .print-doc-a4 .pdoc-grid tr.pdoc-zebra td,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid tr.pdoc-zebra td,
