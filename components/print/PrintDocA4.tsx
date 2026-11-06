@@ -538,7 +538,12 @@ export function PrintDocA4({
                       verticalAlign: "top",
                       // Only the description may wrap. A figure that wraps turns
                       // a one-line row into three and the grid stops scanning.
-                      whiteSpace: ci === 0 ? "normal" : "nowrap",
+                      // The description is not always the first column (the
+                      // challan leads with # and Item Code), so a column with
+                      // no fixed width is the free-text one and must wrap too,
+                      // otherwise a long description pushes off the page.
+                      whiteSpace: ci === 0 || c.width === undefined ? "normal" : "nowrap",
+                      overflowWrap: "anywhere",
                     }}
                   >
                     {c.render ? c.render(row[c.key], row, i) : (row[c.key] ?? "")}
