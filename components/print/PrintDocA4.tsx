@@ -945,8 +945,11 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
                the wrappers above are auto-height in print — so it is an
                absolute length, kept well under A4 less the browser's own
                margins and its header/footer lines (Safari reserves more than
-               the 10mm it shows), so it can never spill onto a second page. */
-            min-height: 262mm !important;
+               the 10mm it shows), so it can never spill onto a second page. 262mm
+               still spilled the foot (totals, notes, "Powered by") onto a
+               second sheet in Safari with "Print headers and footers" on,
+               which takes the most room, so this stays well under that. */
+            min-height: 232mm !important;
             padding: 0 !important;
           }
           /* A band runs to the paper's edge on screen; on paper the printer's
