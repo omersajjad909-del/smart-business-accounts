@@ -540,9 +540,11 @@ export function PrintDocA4({
                       // a one-line row into three and the grid stops scanning.
                       // The description is not always the first column (the
                       // challan leads with # and Item Code), so a column with
-                      // no fixed width is the free-text one and must wrap too,
-                      // otherwise a long description pushes off the page.
-                      whiteSpace: ci === 0 || c.width === undefined ? "normal" : "nowrap",
+                      // no fixed width, or left-aligned text such as an item code,
+                      // must wrap too (overflowWrap breaks an unbroken string),
+                      // otherwise a long value pushes off the page. Centred and
+                      // right-aligned columns are figures and stay on one line.
+                      whiteSpace: ci === 0 || c.width === undefined || (c.align ?? "left") === "left" ? "normal" : "nowrap",
                       overflowWrap: "anywhere",
                     }}
                   >
@@ -766,9 +768,17 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
           overflow: visible !important;
           min-width: 0 !important;
         }
+        /* table-layout: fixed, not auto — auto lets a long, unwrappable
+           description outgrow its column and drag the whole grid past the
+           page's right edge, taking Qty/Unit off the sheet with it. Fixed
+           layout holds every column to the width this file hands it (or
+           splits what's left evenly among the columns that don't ask for
+           one, which here is just the description), so the grid can never
+           exceed the 100% it's told, and a long line wraps inside its own
+           column instead. */
         html.dark .dashboard-root .print-doc-a4 .pdoc-grid,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-grid,
-        .print-doc-a4 .pdoc-grid { width: 100% !important; table-layout: auto !important; }
+        .print-doc-a4 .pdoc-grid { width: 100% !important; table-layout: fixed !important; }
         html.dark .dashboard-root .print-doc-a4 .pdoc-totals,
         html:not(.dark) .dashboard-root .print-doc-a4 .pdoc-totals,
         .print-doc-a4 .pdoc-totals { width: auto !important; }
