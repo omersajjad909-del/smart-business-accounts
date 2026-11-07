@@ -160,7 +160,7 @@ export function TravelInvoiceSheet(props: TravelInvoiceSheetProps) {
         @media screen { .tvx-wrap { background:#e9edf2; padding:24px; overflow:auto; } .tvx-sheet { box-shadow:0 4px 24px rgba(0,0,0,.12); } }
         @media print {
           .tvx-wrap { background:#fff !important; padding:0 !important; }
-          .tvx-sheet { box-shadow:none !important; width:auto !important; min-height:235mm !important; }
+          .tvx-sheet { box-shadow:none !important; width:auto !important; min-height:232mm !important; }
           .tvx-sheet, .tvx-sheet * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
           .tvx-sheet [data-keep] { page-break-inside:avoid; }
         }
