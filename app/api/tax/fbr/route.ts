@@ -27,6 +27,7 @@ import {
   generateFbrSummaryText,
   type FbrReportPeriod,
 } from "@/lib/fbrReport";
+import { fbrAccessDenied } from "@/lib/fbrAccess";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -122,6 +123,8 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "x-company-id header is required" }, { status: 400 });
     }
+    const noFbr = await fbrAccessDenied(companyId);
+    if (noFbr) return noFbr;
 
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
@@ -185,6 +188,8 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "x-company-id header is required" }, { status: 400 });
     }
+    const noFbr = await fbrAccessDenied(companyId);
+    if (noFbr) return noFbr;
 
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");

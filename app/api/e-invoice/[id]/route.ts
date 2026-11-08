@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fbrAccessDenied } from "@/lib/fbrAccess";
 import { prisma } from "@/lib/prisma";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -12,6 +13,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const userRole = req.headers.get("x-user-role");
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    const noFbr = await fbrAccessDenied(companyId);
+    if (noFbr) return noFbr;
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
     if (!allowed) return NextResponse.json({ error: "No Access" }, { status: 403 });
@@ -36,6 +39,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const userRole = req.headers.get("x-user-role");
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    const noFbr = await fbrAccessDenied(companyId);
+    if (noFbr) return noFbr;
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
     if (!allowed) return NextResponse.json({ error: "No Access" }, { status: 403 });

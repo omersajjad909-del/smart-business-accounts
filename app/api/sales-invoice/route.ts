@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { computeDocumentTotals } from "@/lib/taxCalc";
+import { applyLineTaxCodes, UnknownTaxCodeError } from "@/lib/taxCodes";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { baseRate } from "@/lib/fx";
@@ -205,19 +207,25 @@ export async function POST(req: NextRequest) {
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
-    const subtotal = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
-    const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
-    const itemsTax = items.reduce((s: number, i: any) => {
-      const lineBase = i.qty * i.rate * (1 - (i.discountPercent || 0) / 100);
-      return s + lineBase * (i.taxPercent || 0) / 100;
-    }, 0);
-    let globalTax = 0;
+    // Optional per-line tax codes: a line naming one takes its rate from the
+    // company's own tax configuration; a line naming none is left as sent.
+    let taxedItems: Awaited<ReturnType<typeof applyLineTaxCodes<any>>>;
+    try {
+      taxedItems = await applyLineTaxCodes(prisma, companyId, items);
+    } catch (e) {
+      if (e instanceof UnknownTaxCodeError) return NextResponse.json({ error: e.message }, { status: 400 });
+      throw e;
+    }
+
+    let globalTaxRate = 0;
     if (applyTax && taxConfigId) {
       const tax = await prisma.taxConfiguration.findFirst({ where: { id: taxConfigId, companyId } });
-      if (tax) globalTax = (subtotal - discountAmt) * tax.taxRate / 100;
+      if (tax) globalTaxRate = tax.taxRate;
     }
-    const taxAmount = itemsTax + globalTax;
-    const total = subtotal - discountAmt + taxAmount + Number(freight);
+    const calc = computeDocumentTotals({
+      items: taxedItems, discount, discountType, freight, globalTaxRate,
+    });
+    const { subtotal, discountAmt, taxAmount, total } = calc;
 
     // ── Stock availability check ──────────────────────────────────────────────
     // Skipped when the invoice is settling challans: those goods left the
@@ -270,7 +278,7 @@ export async function POST(req: NextRequest) {
         total,
         approvalStatus: "PENDING",
         items: {
-          create: items.map((i: any) => {
+          create: taxedItems.map((i: any, idx: number) => {
             const lineBase = i.qty * i.rate;
             const lineDisc = lineBase * (i.discountPercent || 0) / 100;
             const lineTax = (lineBase - lineDisc) * (i.taxPercent || 0) / 100;
@@ -280,6 +288,10 @@ export async function POST(req: NextRequest) {
               rate: i.rate,
               discountPercent: i.discountPercent || 0,
               taxPercent: i.taxPercent || 0,
+              taxCodeId: i.taxCodeId || null,
+              taxCategory: i.taxCategory,
+              taxableAmount: calc.lines[idx].taxable,
+              taxAmount: calc.lines[idx].tax,
               amount: lineBase - lineDisc + lineTax,
               hsCode: i.hsCode || null,
               poNo: i.poNo || null,
@@ -493,19 +505,25 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const subtotal = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
-    const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
-    const itemsTax = items.reduce((s: number, i: any) => {
-      const lineBase = i.qty * i.rate * (1 - (i.discountPercent || 0) / 100);
-      return s + lineBase * (i.taxPercent || 0) / 100;
-    }, 0);
-    let globalTax = 0;
+    // Optional per-line tax codes: a line naming one takes its rate from the
+    // company's own tax configuration; a line naming none is left as sent.
+    let taxedItems: Awaited<ReturnType<typeof applyLineTaxCodes<any>>>;
+    try {
+      taxedItems = await applyLineTaxCodes(prisma, companyId, items);
+    } catch (e) {
+      if (e instanceof UnknownTaxCodeError) return NextResponse.json({ error: e.message }, { status: 400 });
+      throw e;
+    }
+
+    let globalTaxRate = 0;
     if (applyTax && taxConfigId) {
       const tax = await prisma.taxConfiguration.findFirst({ where: { id: taxConfigId, companyId } });
-      if (tax) globalTax = (subtotal - discountAmt) * tax.taxRate / 100;
+      if (tax) globalTaxRate = tax.taxRate;
     }
-    const taxAmount = itemsTax + globalTax;
-    const total = subtotal - discountAmt + taxAmount + Number(freight);
+    const calc = computeDocumentTotals({
+      items: taxedItems, discount, discountType, freight, globalTaxRate,
+    });
+    const { total, taxAmount } = calc;
 
     const result = await prisma.$transaction(async (tx: TxClient) => {
       // Reverse old inventory txns (SALE stored negative qty; reversal restores stock)
@@ -547,7 +565,7 @@ export async function PUT(req: NextRequest) {
           total,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: items.map((i: any) => {
+            create: taxedItems.map((i: any, idx: number) => {
               const lineBase = i.qty * i.rate;
               const lineDisc = lineBase * (i.discountPercent || 0) / 100;
               const lineTax = (lineBase - lineDisc) * (i.taxPercent || 0) / 100;
@@ -557,6 +575,10 @@ export async function PUT(req: NextRequest) {
                 rate: i.rate,
                 discountPercent: i.discountPercent || 0,
                 taxPercent: i.taxPercent || 0,
+                taxCodeId: i.taxCodeId || null,
+                taxCategory: i.taxCategory,
+                taxableAmount: calc.lines[idx].taxable,
+                taxAmount: calc.lines[idx].tax,
                 amount: lineBase - lineDisc + lineTax,
                 hsCode: i.hsCode || null,
                 poNo: i.poNo || null,

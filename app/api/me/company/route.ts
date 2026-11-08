@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { currencyByCountry } from "@/lib/currency";
+import { companyHasFbr } from "@/lib/fbrAccess";
 import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 
 function isDatabaseUnavailable(error: unknown): boolean {
@@ -60,6 +61,8 @@ export async function GET(req: NextRequest) {
       introOfferClaimed: !!offerClaimed,
       extraSeats,
       effectiveUserLimit,
+      // Country-gated feature: the sidebar hides FBR e-invoicing without it.
+      fbrAvailable: await companyHasFbr(companyId),
     });
   } catch (e: unknown) {
     if (isDatabaseUnavailable(e)) {

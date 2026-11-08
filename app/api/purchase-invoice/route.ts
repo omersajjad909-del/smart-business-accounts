@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
-import { baseRate, toBase } from "@/lib/fx";
+import { baseRate } from "@/lib/fx";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -9,6 +9,9 @@ import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { sanitizeLineMeta } from "@/lib/rateFormula";
 import { withReadableParties } from "@/lib/partyDecrypt";
+import { computeDocumentTotals } from "@/lib/taxCalc";
+import { applyLineTaxCodes, UnknownTaxCodeError } from "@/lib/taxCodes";
+import { purchaseInvoiceEntries } from "@/lib/purchasePosting";
 
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
 export async function GET(req: NextRequest) {
@@ -135,6 +138,16 @@ export async function POST(req: NextRequest) {
 
     const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
 
+    // Optional per-line tax codes: a line naming one takes its rate from the
+    // company's own tax configuration; a line naming none is left as sent.
+    let taxedItems: Awaited<ReturnType<typeof applyLineTaxCodes<any>>>;
+    try {
+      taxedItems = await applyLineTaxCodes(prisma, companyId, validItems);
+    } catch (e) {
+      if (e instanceof UnknownTaxCodeError) return NextResponse.json({ error: e.message }, { status: 400 });
+      throw e;
+    }
+
     // An invoice can only bill stock that was actually received on its GRN.
     // The UI pre-fills these lines; this server check prevents a handcrafted
     // request from attaching an unrelated supplier/item to the GRN.
@@ -198,18 +211,15 @@ export async function POST(req: NextRequest) {
       }
       const invoiceNo = `PI-${nextNo}`;
 
-      const subtotal = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
-      const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
-      const itemsTax = validItems.reduce((s: number, i: any) => {
-        const lineBase = Number(i.qty) * Number(i.rate) * (1 - (Number(i.discountPercent) || 0) / 100);
-        return s + lineBase * (Number(i.taxPercent) || 0) / 100;
-      }, 0);
-      let globalTax = 0;
+      let globalTaxRate = 0;
       if (applyTax && taxConfigId) {
         const tax = await tx.taxConfiguration.findFirst({ where: { id: taxConfigId, companyId } });
-        if (tax) globalTax = (subtotal - discountAmt) * tax.taxRate / 100;
+        if (tax) globalTaxRate = tax.taxRate;
       }
-      const netTotal = subtotal - discountAmt + itemsTax + globalTax + Number(freight);
+      const calc = computeDocumentTotals({
+        items: taxedItems, discount, discountType, freight, globalTaxRate,
+      });
+      const { total: netTotal, taxAmount: invoiceTax } = calc;
 
       // C. Create the purchase invoice record.
       const invoice = await tx.purchaseInvoice.create({
@@ -233,7 +243,7 @@ export async function POST(req: NextRequest) {
           approvalStatus: "PENDING",
           taxConfigId: applyTax && taxConfigId ? taxConfigId : null,
           items: {
-            create: validItems.map((i: any) => {
+            create: taxedItems.map((i: any, idx: number) => {
               const lineBase = Number(i.qty) * Number(i.rate);
               const lineDisc = lineBase * (Number(i.discountPercent) || 0) / 100;
               const lineTax = (lineBase - lineDisc) * (Number(i.taxPercent) || 0) / 100;
@@ -243,6 +253,10 @@ export async function POST(req: NextRequest) {
               rate: Number(i.rate),
               discountPercent: Number(i.discountPercent || 0),
               taxPercent: Number(i.taxPercent || 0),
+              taxCodeId: i.taxCodeId || null,
+              taxCategory: i.taxCategory,
+              taxableAmount: calc.lines[idx].taxable,
+              taxAmount: calc.lines[idx].tax,
               amount: lineBase - lineDisc + lineTax,
               meta: sanitizeLineMeta(i.meta),
               };
@@ -316,7 +330,6 @@ export async function POST(req: NextRequest) {
       }
 
       // F. Create the accounting voucher (double entry) and debit inventory (asset).
-      const billBase = toBase(netTotal, baseRate(currencyId, exchangeRate));
       await tx.voucher.create({
         data: {
           voucherNo: invoiceNo,
@@ -326,12 +339,12 @@ export async function POST(req: NextRequest) {
           companyId,
           branchId,
           entries: {
-            create: [
-              // In the company's own currency, whatever the bill was raised in.
-              // One conversion for both legs, so they cannot round apart.
-              { accountId: inventoryAcc.id, amount: billBase, companyId }, // Debit Inventory (Asset)
-              { accountId: supplier.id, amount: -billBase, companyId },    // Credit Supplier
-            ],
+            // In the company's own currency, whatever the bill was raised in.
+            // Dr Inventory (net of tax) + Dr Input Tax / Cr Supplier (total).
+            create: await purchaseInvoiceEntries(tx, {
+              companyId, supplierId: supplier.id, inventoryAccountId: inventoryAcc.id,
+              total: netTotal, tax: invoiceTax, rate: baseRate(currencyId, exchangeRate),
+            }),
           },
         },
       });
@@ -403,19 +416,32 @@ export async function PUT(req: NextRequest) {
     }
 
     const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
-    const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
 
-    let taxAmount = 0;
+    // Optional per-line tax codes: a line naming one takes its rate from the
+    // company's own tax configuration; a line naming none is left as sent.
+    let taxedItems: Awaited<ReturnType<typeof applyLineTaxCodes<any>>>;
+    try {
+      taxedItems = await applyLineTaxCodes(prisma, companyId, validItems);
+    } catch (e) {
+      if (e instanceof UnknownTaxCodeError) return NextResponse.json({ error: e.message }, { status: 400 });
+      throw e;
+    }
+    let globalTaxRate = 0;
     if (applyTax && taxConfigId) {
       const tax = await prisma.taxConfiguration.findFirst({
         where: { id: taxConfigId, companyId }
       });
-      if (tax) {
-        taxAmount = (totalItemsAmount * tax.taxRate) / 100;
-      }
+      if (tax) globalTaxRate = tax.taxRate;
     }
 
-    const netTotal = totalItemsAmount + Number(freight) + taxAmount;
+    // Same arithmetic as create. This path used to ignore item-level tax and
+    // discounts, so editing a bill silently dropped its tax.
+    const discount = body.discount ?? existing.discount ?? 0;
+    const discountType = body.discountType ?? existing.discountType ?? "flat";
+    const calc = computeDocumentTotals({
+      items: taxedItems, discount, discountType, freight, globalTaxRate,
+    });
+    const { total: netTotal, taxAmount } = calc;
 
     const tx = prisma;
 
@@ -448,16 +474,30 @@ export async function PUT(req: NextRequest) {
         date: new Date(date),
         grnId: grnId || null,
         total: netTotal,
+        discount: Number(discount),
+        discountType,
+        freight: Number(freight),
         approvalStatus,
         taxConfigId: applyTax && taxConfigId ? taxConfigId : null,
         items: {
-          create: validItems.map((i: any) => ({
-            itemId: i.itemId,
-            qty: Number(i.qty),
-            rate: Number(i.rate),
-            amount: Number(i.qty) * Number(i.rate),
-            meta: sanitizeLineMeta(i.meta),
-          })),
+          create: taxedItems.map((i: any, idx: number) => {
+            const lineBase = Number(i.qty) * Number(i.rate);
+            const lineDisc = (lineBase * (Number(i.discountPercent) || 0)) / 100;
+            const lineTax = ((lineBase - lineDisc) * (Number(i.taxPercent) || 0)) / 100;
+            return {
+              itemId: i.itemId,
+              qty: Number(i.qty),
+              rate: Number(i.rate),
+              discountPercent: Number(i.discountPercent || 0),
+              taxPercent: Number(i.taxPercent || 0),
+              taxCodeId: i.taxCodeId || null,
+              taxCategory: i.taxCategory,
+              taxableAmount: calc.lines[idx].taxable,
+              taxAmount: calc.lines[idx].tax,
+              amount: lineBase - lineDisc + lineTax,
+              meta: sanitizeLineMeta(i.meta),
+            };
+          }),
         },
       },
       include: {
@@ -504,12 +544,12 @@ export async function PUT(req: NextRequest) {
       if (inventoryAcc) {
         // Same conversion as the create path — an edit that changed the rate
         // has to re-post the ledger at the new one.
-        const editedBase = toBase(netTotal, baseRate(currencyId, exchangeRate));
+        const editedEntries = await purchaseInvoiceEntries(tx, {
+          companyId, supplierId: existing.supplierId, inventoryAccountId: inventoryAcc.id,
+          total: netTotal, tax: taxAmount, rate: baseRate(currencyId, exchangeRate),
+        });
         await tx.voucherEntry.createMany({
-          data: [
-            { voucherId: voucher.id, companyId, accountId: inventoryAcc.id, amount: editedBase },
-            { voucherId: voucher.id, companyId, accountId: existing.supplierId, amount: -editedBase },
-          ],
+          data: editedEntries.map((e) => ({ ...e, voucherId: voucher.id })),
         });
       }
       await tx.voucher.update({

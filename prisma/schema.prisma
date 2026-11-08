@@ -269,6 +269,14 @@ model PurchaseInvoiceItem {
   amount          Float
   discountPercent Float  @default(0)
   taxPercent      Float  @default(0)
+  // The tax code picked for this line, snapshotted with its category and the
+  // amounts it produced. All null on a line that carries no tax code (tax is
+  // optional — the line's own taxPercent still applies exactly as before), and
+  // on every line issued before tax codes existed.
+  taxCodeId       String?
+  taxCategory     String?
+  taxableAmount   Float?
+  taxAmount       Float?
 
   invoice PurchaseInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew         @relation(fields: [itemId], references: [id])
@@ -397,6 +405,14 @@ model SalesInvoiceItem {
   amount          Float
   discountPercent Float   @default(0)
   taxPercent      Float   @default(0)
+  // The tax code picked for this line, snapshotted with its category and the
+  // amounts it produced. All null on a line that carries no tax code (tax is
+  // optional — the line's own taxPercent still applies exactly as before), and
+  // on every line issued before tax codes existed.
+  taxCodeId       String?
+  taxCategory     String?
+  taxableAmount   Float?
+  taxAmount       Float?
   // Snapshotted from the item at billing time — a later edit to the item's
   // own HS Code must not silently rewrite an already-issued invoice.
   hsCode          String?
@@ -1074,6 +1090,11 @@ model TaxConfiguration {
   taxType          String // GST | VAT | INCOME_TAX | SALES_TAX
   taxCode          String
   taxRate          Float
+  // How the tax return treats a line carrying this code. A 0% rate alone
+  // cannot tell a zero-rated export from an exempt supply, and a VAT return
+  // reports them in different boxes.
+  // STANDARD | ZERO_RATED | EXEMPT | OUT_OF_SCOPE | REVERSE_CHARGE
+  category         String            @default("STANDARD")
   description      String?
   isActive         Boolean           @default(true)
   taxAccounts      TaxAccount[]
