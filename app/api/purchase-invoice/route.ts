@@ -11,7 +11,7 @@ import { sanitizeLineMeta } from "@/lib/rateFormula";
 import { withReadableParties } from "@/lib/partyDecrypt";
 import { computeDocumentTotals } from "@/lib/taxCalc";
 import { applyLineTaxCodes, UnknownTaxCodeError } from "@/lib/taxCodes";
-import { purchaseInvoiceEntries } from "@/lib/purchasePosting";
+import { purchaseInvoiceEntries, separatesInputTax } from "@/lib/purchasePosting";
 
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
 export async function GET(req: NextRequest) {
@@ -342,6 +342,7 @@ export async function POST(req: NextRequest) {
             // In the company's own currency, whatever the bill was raised in.
             // Dr Inventory (net of tax) + Dr Input Tax / Cr Supplier (total).
             create: await purchaseInvoiceEntries(tx, {
+              separateTax: await separatesInputTax(companyId),
               companyId, supplierId: supplier.id, inventoryAccountId: inventoryAcc.id,
               total: netTotal, tax: invoiceTax, rate: baseRate(currencyId, exchangeRate),
             }),
@@ -545,6 +546,7 @@ export async function PUT(req: NextRequest) {
         // Same conversion as the create path — an edit that changed the rate
         // has to re-post the ledger at the new one.
         const editedEntries = await purchaseInvoiceEntries(tx, {
+          separateTax: await separatesInputTax(companyId),
           companyId, supplierId: existing.supplierId, inventoryAccountId: inventoryAcc.id,
           total: netTotal, tax: taxAmount, rate: baseRate(currencyId, exchangeRate),
         });

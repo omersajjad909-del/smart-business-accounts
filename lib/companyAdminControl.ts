@@ -105,6 +105,12 @@ export type BusinessFeatureFlags = {
   batchSerialTracking:  boolean;  // Batch & serial number tracking
   taxConfiguration:     boolean;  // Advanced tax rules / multiple tax rates
   smsNotifications:     boolean;  // SMS alerts for invoices / payments
+  /**
+   * Post the tax on a purchase invoice to its own Input Tax account instead of
+   * burying it in Inventory. For VAT/GST-registered companies that claim input
+   * tax back. Off by default, so existing books post exactly as they always did.
+   */
+  separateInputTax:     boolean;
 };
 
 export const DEFAULT_FEATURE_FLAGS: BusinessFeatureFlags = {
@@ -117,6 +123,7 @@ export const DEFAULT_FEATURE_FLAGS: BusinessFeatureFlags = {
   batchSerialTracking:  false,
   taxConfiguration:     false,
   smsNotifications:     false,
+  separateInputTax:     false,
 };
 
 export type ShiftSetting = {

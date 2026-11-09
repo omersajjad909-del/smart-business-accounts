@@ -211,7 +211,7 @@ function SalesInvoiceContent() {
   // ── Init ──
   useEffect(() => {
     setOrigin(window.location.origin);
-    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo((c: any) => ({ ...d, ...c })); });
+    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo((c: any) => ({ ...d, ...c })); }).catch(() => {});
     fetch("/api/company/admin-control").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.printPreferences) setPrintPrefs(p => ({ ...p, ...d.printPreferences }));
       if (d?.fbrSettings?.enabled) setFbrEnabled(true);
@@ -229,7 +229,7 @@ function SalesInvoiceContent() {
           gst: d.taxProfile?.gstNumber || c?.gst,
         }));
       }
-    }).finally(() => setLoading(false));
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
 
@@ -248,7 +248,7 @@ function SalesInvoiceContent() {
     fetch("/api/accounts?partyType=CUSTOMER", { headers: h }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : d.accounts || [];
       setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
-    });
+    }).catch(() => {});
     // withStock=1: the picker shows received / sold / balance and can hide
     // whatever the godown has none of, the way the old sale-billing screen did.
     fetch("/api/items-new?withStock=1", { headers: h }).then(r => r.json()).then(d => {
@@ -263,7 +263,7 @@ function SalesInvoiceContent() {
         hsCode: i.hsCode || null, secondaryUnit: i.secondaryUnit || null,
         secondaryUnitRatio: i.secondaryUnitRatio ?? null,
       })));
-    });
+    }).catch(() => {});
     fetch("/api/tax-configuration").then(r => r.json()).then(d => setTaxes(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/users", { headers: h }).then(r => r.ok ? r.json() : []).then(d => setTeamMembers((Array.isArray(d) ? d : []).map((u: any) => ({ id: u.id, name: u.name })))).catch(() => {});
     fetch("/api/sales-invoice", { headers: { "x-user-role": user.role || "", "x-user-id": user.id || "" } })

@@ -138,6 +138,31 @@ export default function DeliveryChallanPage() {
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
   const [savedChallan, setSavedChallan] = useState<any>(null);
+  // Row "Actions" dropdown: which challan's menu is open and where to draw it
+  // (fixed, so the table's scroll container can't clip it).
+  const [menu, setMenu] = useState<{ c: DeliveryChallan; top: number; right: number } | null>(null);
+  const [pendingPrint, setPendingPrint] = useState(false);
+
+  useEffect(() => {
+    if (!menu) return;
+    const close = () => setMenu(null);
+    window.addEventListener("click", close);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("click", close);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [menu]);
+
+  // Print straight from the list: load the challan into the preview, then print
+  // once it has rendered.
+  useEffect(() => {
+    if (!pendingPrint || !preview) return;
+    const t = setTimeout(() => { setPendingPrint(false); window.print(); }, 300);
+    return () => clearTimeout(t);
+  }, [pendingPrint, preview]);
   const [companyName, setCompanyName] = useState("FINOVA SME");
   const [companyInfo, setCompanyInfo] = useState<{ address?: string; phone?: string; email?: string; logoUrl?: string; ntn?: string; ntnLabel?: string; strn?: string }>({});
   const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
@@ -520,6 +545,13 @@ export default function DeliveryChallanPage() {
     setShowList(false);
   }
 
+  function printChallan(c: DeliveryChallan) {
+    startEdit(c);
+    setSavedChallan(c);
+    setPreview(true);
+    setPendingPrint(true);
+  }
+
   async function deleteChallan(id: string) {
     if (!await confirmToast("Are you sure you want to delete this delivery challan?")) return;
     try {
@@ -735,37 +767,17 @@ export default function DeliveryChallanPage() {
                         return <span className={`px-2 py-1 rounded text-xs ${tone}`}>{a}</span>;
                       })()}
                     </td>
-                    <td className="p-3 text-center space-x-2 whitespace-nowrap">
-                      {c.status !== "INVOICED" && (
-                        <button
-                          onClick={() => invoiceOne(c)}
-                          className="text-green-700 hover:text-green-900 font-medium text-sm"
-                          title="Bill this challan — the ledger is posted when the invoice is saved"
-                        >
-                          Sales Invoice
-                        </button>
-                      )}
-                      {(c.approvalStatus || "DRAFT") !== "APPROVED" && (
-                        <button onClick={() => decide(c, "APPROVED")} className="text-emerald-700 hover:text-emerald-900 font-medium text-sm">
-                          Approve
-                        </button>
-                      )}
-                      {(c.approvalStatus || "DRAFT") !== "REJECTED" && (
-                        <button onClick={() => decide(c, "REJECTED")} className="text-orange-600 hover:text-orange-800 font-medium text-sm">
-                          Reject
-                        </button>
-                      )}
+                    <td className="p-3 text-center whitespace-nowrap">
                       <button
-                        onClick={() => startEdit(c)}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (menu?.c.id === c.id) { setMenu(null); return; }
+                          const r = e.currentTarget.getBoundingClientRect();
+                          setMenu({ c, top: r.bottom + 4, right: window.innerWidth - r.right });
+                        }}
+                        className="border border-gray-300 rounded px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100"
                       >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteChallan(c.id)}
-                        className="text-red-600 hover:text-red-800 font-medium text-sm"
-                      >
-                        Delete
+                        Actions ▾
                       </button>
                     </td>
                   </tr>
@@ -775,6 +787,31 @@ export default function DeliveryChallanPage() {
           </table>
         </div>
       )}
+
+      {menu && (() => {
+        const c = menu.c;
+        const item = "block w-full text-left px-4 py-2 text-sm hover:bg-gray-100";
+        return (
+          <div
+            style={{ position: "fixed", top: menu.top, right: menu.right, zIndex: 50 }}
+            className="bg-white border rounded shadow-lg py-1 min-w-[160px] print:hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className={`${item} text-gray-800`} onClick={() => { setMenu(null); printChallan(c); }}>Print</button>
+            {c.status !== "INVOICED" && (
+              <button className={`${item} text-green-700`} title="Bill this challan — the ledger is posted when the invoice is saved" onClick={() => { setMenu(null); invoiceOne(c); }}>Sales Invoice</button>
+            )}
+            {(c.approvalStatus || "DRAFT") !== "APPROVED" && (
+              <button className={`${item} text-emerald-700`} onClick={() => { setMenu(null); decide(c, "APPROVED"); }}>Approve</button>
+            )}
+            {(c.approvalStatus || "DRAFT") !== "REJECTED" && (
+              <button className={`${item} text-orange-600`} onClick={() => { setMenu(null); decide(c, "REJECTED"); }}>Reject</button>
+            )}
+            <button className={`${item} text-blue-600`} onClick={() => { setMenu(null); startEdit(c); }}>Edit</button>
+            <button className={`${item} text-red-600`} onClick={() => { setMenu(null); deleteChallan(c.id); }}>Delete</button>
+          </div>
+        );
+      })()}
 
       {/* FORM */}
       {showForm && (

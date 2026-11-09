@@ -16,6 +16,7 @@ type Features = {
   discountEngine:        boolean;
   taxConfiguration:      boolean;
   smsNotifications:      boolean;
+  separateInputTax:      boolean;
 };
 
 const DEFAULT: Features = {
@@ -28,6 +29,7 @@ const DEFAULT: Features = {
   discountEngine:        false,
   taxConfiguration:      false,
   smsNotifications:      false,
+  separateInputTax:      false,
 };
 
 /* ─── Feature definitions ─── */
@@ -220,6 +222,30 @@ const FEATURE_CARDS = [
       note: "Required for FBR/GST-registered businesses.",
     },
     unlocks: ["Tax class setup (Standard, Zero-rated, Exempt)", "Auto tax on sales & purchase invoices", "Tax summary report for filing"],
+    color: "var(--tx-4ade80, #4ade80)",
+    bg: "rgba(74,222,128,.07)",
+    border: "rgba(74,222,128,.2)",
+  },
+  {
+    key: "separateInputTax" as keyof Features,
+    icon: "🧾",
+    title: "Input Tax (VAT / GST) on Purchases",
+    subtitle: "Claim back the tax you pay suppliers",
+    who: "VAT / GST Registered Businesses",
+    whoColor: "#4ade80",
+    description:
+      "Posts the tax on purchase invoices to its own Input Tax account, so it can be claimed back on your tax return, and keeps stock value free of tax.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["Purchase invoice posted at full amount", "→ Tax stays inside Inventory cost", "→ Books work as they always have ✅"],
+      note: "For businesses that do not claim input tax.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Purchase tax posted to Input Tax account", "→ Inventory holds the net cost only", "→ Input tax available for the tax return ✅"],
+      note: "Applies to new and edited purchase invoices only. Earlier ones are not changed.",
+    },
+    unlocks: ["Input Tax Receivable account", "Net-of-tax stock value", "Input vs output tax for returns"],
     color: "var(--tx-4ade80, #4ade80)",
     bg: "rgba(74,222,128,.07)",
     border: "rgba(74,222,128,.2)",

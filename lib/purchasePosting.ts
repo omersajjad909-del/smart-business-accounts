@@ -11,16 +11,34 @@
 //     excluded, so the GL and the sub-ledger disagreed by the tax on every
 //     taxed bill.
 //
-// Now:
+// For a company that switched on "Input Tax on Purchases" (Business Features):
 //
 //     Dr  Inventory           net of tax (freight stays in — landed cost)
 //     Dr  Input Tax           tax charged by the supplier
 //         Cr  Supplier            invoice total
 //
+// For everyone else the old posting is kept exactly: Dr Inventory / Cr Supplier
+// for the whole total.
+//
 // Mirror image of lib/salesPosting.ts.
 
 import { toBase } from "@/lib/fx";
 import type { Db } from "@/lib/inventoryAccounts";
+import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
+
+/**
+ * Whether this company posts purchase tax to its own Input Tax account. Off
+ * unless the company switched it on (Business Features), so books of companies
+ * that never asked for it post exactly as they always did.
+ */
+export async function separatesInputTax(companyId: string): Promise<boolean> {
+  try {
+    const settings = await getCompanyAdminControlSettings(companyId);
+    return settings.features?.separateInputTax === true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * The asset account input tax is debited to. Charts name it differently —
@@ -61,11 +79,15 @@ export async function resolveInputTaxAccountId(db: Db, companyId: string): Promi
  */
 export async function purchaseInvoiceEntries(
   db: Db,
-  opts: { companyId: string; supplierId: string; inventoryAccountId: string; total: number; tax: number; rate: number },
+  opts: {
+    companyId: string; supplierId: string; inventoryAccountId: string; total: number; tax: number; rate: number;
+    /** Result of separatesInputTax(). When false the whole total goes to Inventory, as before. */
+    separateTax: boolean;
+  },
 ): Promise<{ companyId: string; accountId: string; amount: number }[]> {
   const { companyId, supplierId, inventoryAccountId, rate } = opts;
   const totalBase = toBase(opts.total, rate);
-  const taxBase = opts.tax > 0 ? Math.min(toBase(opts.tax, rate), totalBase) : 0;
+  const taxBase = opts.separateTax && opts.tax > 0 ? Math.min(toBase(opts.tax, rate), totalBase) : 0;
 
   const entries = [
     { companyId, accountId: inventoryAccountId, amount: Number((totalBase - taxBase).toFixed(2)) },
