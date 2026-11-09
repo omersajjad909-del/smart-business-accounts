@@ -34,6 +34,7 @@ import {
   type PrintFieldKey,
   type PrintProfiles,
 } from "@/lib/printProfile";
+import { isWhiteLabelCompany } from "@/lib/whiteLabel";
 import type { PrintDesignId } from "@/components/print/printLayouts";
 
 export type CompanyPrintHeader = {
@@ -52,6 +53,8 @@ export type CompanyPrintHeader = {
   fields?: Partial<Record<PrintFieldKey, boolean>>;
   /** The note under the signatures, per document. */
   footerNote?: string;
+  /** White-label companies print without the "Powered by Finova OS" mark. */
+  hidePoweredBy?: boolean;
 };
 /**
  * `signatureLabels` is deliberately not returned. A challan is signed
@@ -108,6 +111,7 @@ export function useCompanyPrintHeader(doc?: DocKind): CompanyPrintHeader {
         design: resolved.design,
         fields: resolved.fields,
         footerNote: resolved.footerNote,
+        hidePoweredBy: isWhiteLabelCompany(company?.name),
       });
     })();
 

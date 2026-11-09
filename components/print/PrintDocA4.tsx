@@ -96,6 +96,8 @@ export interface PrintDocA4Props {
   notes?: string;
   terms?: string;
   footerNote?: string;
+  /** Leave off the "Powered by Finova OS" mark (white-label companies). */
+  hidePoweredBy?: boolean;
 
   // Signature lines (optional)
   signatureLabels?: string[];
@@ -175,6 +177,7 @@ export function PrintDocA4({
   notes,
   terms,
   footerNote,
+  hidePoweredBy,
   signatureLabels,
   template,
   design,
@@ -688,7 +691,7 @@ export function PrintDocA4({
           {/* Footer note, closed by the "Powered by Finova OS" mark. */}
           {(() => {
             const note = footerNote && on("footerNote") ? footerNote : "";
-            const mark = (
+            const mark = hidePoweredBy ? null : (
               <span className="pdoc-powered" style={{ fontSize: 8, letterSpacing: 0.3, opacity: 0.7 }}>
                 Powered by Finova OS
               </span>
@@ -733,7 +736,7 @@ export function PrintDocA4({
                 {note && (
                   <div className="pdoc-label" style={{ textAlign: "center", fontSize: 8.5, marginTop: 14, fontStyle: "italic" }}>{note}</div>
                 )}
-                <div style={{ textAlign: "center", marginTop: 6 }}>{mark}</div>
+                {mark && <div style={{ textAlign: "center", marginTop: 6 }}>{mark}</div>}
               </>
             );
           })()}
