@@ -11,6 +11,7 @@ ADD COLUMN     "guardianOccupation" TEXT,
 ADD COLUMN     "guardianRelation" TEXT,
 ADD COLUMN     "medicalNotes" TEXT,
 ADD COLUMN     "motherName" TEXT,
+ADD COLUMN     "photoUrl" TEXT,
 ADD COLUMN     "previousClass" TEXT,
 ADD COLUMN     "previousSchool" TEXT,
 ADD COLUMN     "religion" TEXT;

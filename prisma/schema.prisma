@@ -3389,6 +3389,8 @@ model SchoolStudent {
   medicalNotes       String?
   /// Documents received at admission: BFORM, PREV_RESULT, LEAVING_CERT, PHOTOS, GUARDIAN_CNIC, VACCINATION
   documents          String[] @default([])
+  /// Profile photo on Cloudinary (kind "students"). Never a base64 blob — it would bloat every list query.
+  photoUrl           String?
 
   invoices   SchoolFeeInvoice[]
   attendance SchoolAttendance[]

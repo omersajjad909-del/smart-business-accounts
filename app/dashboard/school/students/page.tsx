@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { api, Badge, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
+import { api, Avatar, Badge, uploadStudentPhoto, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
 
-type Student = { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; status: string; discount: number; class: { name: string; section: string } | null; classId: string | null };
+type Student = { photoUrl: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; status: string; discount: number; class: { name: string; section: string } | null; classId: string | null };
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 6 }}>
@@ -30,6 +30,8 @@ export default function StudentsPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(blank);
   const [error, setError] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [notice, setNotice] = useState("");
 
   async function save() {
     if (!form.name.trim()) return setError("Student name is required");
@@ -37,7 +39,13 @@ export default function StudentsPage() {
     if (!form.guardianName.trim() || !form.phone.trim()) return setError("Guardian name and phone are required");
     const r = await api("/api/school/students", { method: "POST", body: { ...form, discount: Number(form.discount || 0), admissionFee: Number(form.admissionFee || 0) } });
     if (!r.ok) return setError(r.error);
-    setOpen(false); setError(""); setForm(blank); void reload();
+    let note = "";
+    if (photo) {
+      const up = await uploadStudentPhoto((r.data as { id: string }).id, photo);
+      if (up.error) note = `Student admitted, but the photo was not saved: ${up.error}. You can add it from the student profile.`;
+    }
+    setNotice(note);
+    setOpen(false); setError(""); setForm(blank); setPhoto(null); void reload();
   }
   async function setStudentStatus(id: string, s: string) {
     const r = await api("/api/school/students", { method: "PATCH", body: { id, status: s } });
@@ -52,6 +60,7 @@ export default function StudentsPage() {
         <div><h1 style={ui.h1}>Students</h1><p style={ui.sub}>Admissions and student records. Only ACTIVE students are billed and marked.</p></div>
         <div style={{ display: "flex", gap: 10 }}><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setOpen(true)}>+ New Admission</button></div>
       </div>
+      {notice && <div style={{ ...ui.card, padding: 12, fontSize: 13, marginBottom: 14 }}>{notice}</div>}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
         <input style={{ ...ui.input, width: 240 }} placeholder="Search name, admission no, guardian" value={q} onChange={(e) => setQ(e.target.value)} />
         <ClassSelect classes={classes} value={classId} onChange={setClassId} allLabel="All classes" />
@@ -66,7 +75,7 @@ export default function StudentsPage() {
             {!loading && students.length === 0 && <tr><td colSpan={7} style={{ ...ui.td, textAlign: "center", padding: 32 }}>No students found.</td></tr>}
             {students.map((s) => (
               <tr key={s.id}>
-                <td style={{ ...ui.td, fontWeight: 700 }}>{s.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}><Link href={`/dashboard/school/students/${s.id}`} style={{ color: "inherit" }}>{s.name}</Link></td>
+                <td style={{ ...ui.td, fontWeight: 700 }}>{s.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}><Avatar url={s.photoUrl} name={s.name} /><Link href={`/dashboard/school/students/${s.id}`} style={{ color: "inherit" }}>{s.name}</Link></span></td>
                 <td style={ui.td}>{className(s.class)}</td><td style={ui.td}>{s.guardianName || "—"}</td><td style={ui.td}>{s.phone || "—"}</td>
                 <td style={ui.td}><Badge value={s.status} /></td>
                 <td style={{ ...ui.td, textAlign: "right" }}>
@@ -82,6 +91,7 @@ export default function StudentsPage() {
         <Modal title="New Admission" width={780} onClose={() => setOpen(false)}>
           <ErrorLine text={error} />
           <Section title="Student">
+            <Field label="Photo (JPG/PNG/WebP, max 2MB)"><div style={{ display: "flex", alignItems: "center", gap: 10 }}>{photo && <Avatar url={URL.createObjectURL(photo)} name={form.name || "?"} size={44} />}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f && f.size > 2 * 1024 * 1024) { setError("Photo must be under 2MB"); e.target.value = ""; return; } setPhoto(f); }} style={{ fontSize: 12 }} /></div></Field>
             <Field label="Full name *"><input style={ui.input} value={form.name} onChange={set("name")} /></Field>
             <Field label="Gender"><select style={ui.input} value={form.gender} onChange={set("gender")}><option value="">Select</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select></Field>
             <Field label="Date of birth"><input style={ui.input} type="date" value={form.dob} max={today()} onChange={set("dob")} /></Field>

@@ -100,3 +100,25 @@ export function ClassSelect({ classes, value, onChange, allLabel }: { classes: C
     </select>
   );
 }
+
+/** Round student photo, falling back to initials. */
+export function Avatar({ url, name, size = 36 }: { url?: string | null; name: string; size?: number }) {
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
+  const box: CSSProperties = { width: size, height: size, borderRadius: "50%", flexShrink: 0, background: "rgba(99,102,241,.2)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, overflow: "hidden" };
+  // eslint-disable-next-line @next/next/no-img-element
+  return url ? <img src={url} alt={name} style={{ ...box, objectFit: "cover" }} /> : <span style={box}>{initials || "?"}</span>;
+}
+
+/** Uploads a student photo; returns the new URL or an error. */
+export async function uploadStudentPhoto(studentId: string, file: File): Promise<{ url?: string; error?: string }> {
+  const body = new FormData();
+  body.set("studentId", studentId);
+  body.set("photo", file);
+  try {
+    const res = await fetch("/api/school/students/photo", { method: "POST", body });
+    const json = await res.json().catch(() => ({}));
+    return res.ok ? { url: json.photoUrl } : { error: json.error || "Upload failed" };
+  } catch {
+    return { error: "Network error" };
+  }
+}

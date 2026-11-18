@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import { use } from "react";
-import { Badge, className, money, Stat, ui, useApi } from "../../_ui";
+import { useRef, useState } from "react";
+import { api, Avatar, Badge, className, money, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
 
 type Profile = {
-  student: { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[] };
+  student: { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[]; photoUrl: string | null };
   fees: { billed: number; paid: number; balance: number };
   invoices: { id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; payments: { id: string; receiptNo: string; amount: number; method: string; paidAt: string }[] }[];
   attendance: { PRESENT: number; ABSENT: number; LATE: number; LEAVE: number; marked: number; percent: number | null };
@@ -13,7 +14,21 @@ type Profile = {
 
 export default function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data, loading, error } = useApi<Profile | null>(`/api/school/students/${id}`, null);
+  const { data, loading, error, reload } = useApi<Profile | null>(`/api/school/students/${id}`, null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoMsg, setPhotoMsg] = useState("");
+  async function onPick(file: File | undefined) {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return setPhotoMsg("Photo must be under 2MB");
+    setPhotoMsg("Uploading…");
+    const r = await uploadStudentPhoto(id, file);
+    setPhotoMsg(r.error ?? ""); if (!r.error) void reload();
+  }
+  async function removePhoto() {
+    if (!confirm("Remove this photo?")) return;
+    const r = await api(`/api/school/students/photo?studentId=${id}`, { method: "DELETE" });
+    setPhotoMsg(r.ok ? "" : r.error); if (r.ok) void reload();
+  }
   if (loading) return <div style={ui.page}>Loading…</div>;
   if (error || !data) return <div style={ui.page}>{error || "Student not found"} <Link href="/dashboard/school/students">← Back</Link></div>;
   const s = data.student;
@@ -31,10 +46,21 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
   return (
     <div style={ui.page}>
       <div style={ui.head}>
-        <div>
-          <Link href="/dashboard/school/students" style={{ ...ui.sub, textDecoration: "none" }}>← Students</Link>
-          <h1 style={{ ...ui.h1, marginTop: 6 }}>{s.name} <Badge value={s.status} /></h1>
-          <p style={ui.sub}>Admission # {s.admissionNo}</p>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <div style={{ textAlign: "center" }}>
+            <Avatar url={s.photoUrl} name={s.name} size={84} />
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { void onPick(e.target.files?.[0]); e.target.value = ""; }} />
+            <div style={{ marginTop: 6, display: "flex", gap: 6, justifyContent: "center" }} className="no-print">
+              <button style={{ ...ui.ghost, padding: "4px 8px", fontSize: 11 }} onClick={() => fileRef.current?.click()}>{s.photoUrl ? "Change" : "Add photo"}</button>
+              {s.photoUrl && <button style={{ ...ui.ghost, padding: "4px 8px", fontSize: 11 }} onClick={removePhoto}>Remove</button>}
+            </div>
+            {photoMsg && <div style={{ fontSize: 11, color: "#f87171", marginTop: 4, maxWidth: 150 }}>{photoMsg}</div>}
+          </div>
+          <div>
+            <Link href="/dashboard/school/students" style={{ ...ui.sub, textDecoration: "none" }}>← Students</Link>
+            <h1 style={{ ...ui.h1, marginTop: 6 }}>{s.name} <Badge value={s.status} /></h1>
+            <p style={ui.sub}>Admission # {s.admissionNo}</p>
+          </div>
         </div>
         <button style={ui.ghost} onClick={() => window.print()}>Print profile / report card</button>
       </div>
