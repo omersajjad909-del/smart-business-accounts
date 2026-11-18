@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api, Badge, ClassRow, ClassSelect, className, ErrorLine, Field, Modal, Stat, ui, useApi } from "../_ui";
+import { api, Badge, ClassRow, ClassSelect, className, ErrorLine, Field, Modal, Stat, ui, useApi, Guide } from "../_ui";
 
 type Exam = { id: string; name: string; subject: string; totalMarks: number; passMarks: number; class: { name: string; section: string }; resultsEntered: number };
 type Detail = {
@@ -39,6 +39,7 @@ export default function ResultsPage() {
         <div><h1 style={ui.h1}>Exams & Results</h1><p style={ui.sub}>Create an exam per class and subject, then enter marks</p></div>
         <button style={ui.btn} onClick={() => setOpen(true)}>+ New Exam</button>
       </div>
+      <Guide title="How exams and results work" steps={["Click New Exam and choose the class, exam name (e.g. Mid Term) and subject, with total and pass marks.", "Select the exam from the list and type each student's marks.", "Press Save marks. Pass rate updates, and grades show on each student's report card."]} note="Create one exam entry per subject. Students appear automatically from the class." />
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
         <select style={{ ...ui.input, width: "auto", minWidth: 280 }} value={examId} onChange={(e) => { setExamId(e.target.value); setMsg(""); }}>
           <option value="">Select exam</option>

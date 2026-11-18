@@ -712,6 +712,7 @@ model Company {
   schoolFeeHeads        SchoolFeeHead[]
   schoolClassFees       SchoolClassFee[]
   schoolStudentFees     SchoolStudentFee[]
+  schoolPromotions      SchoolPromotionLog[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -3400,6 +3401,7 @@ model SchoolStudent {
   attendance   SchoolAttendance[]
   results      SchoolResult[]
   optionalFees SchoolStudentFee[]
+  promotions   SchoolPromotionLog[]
 
   @@unique([companyId, admissionNo])
   @@index([companyId, status])
@@ -3616,4 +3618,23 @@ model SchoolStudentFee {
 
   @@unique([studentId, headId])
   @@index([companyId])
+}
+
+/// Every class change: promotion, double promotion (skipping a grade) and graduation.
+/// Class names are stored as text so the history survives a class being renamed or deleted.
+model SchoolPromotionLog {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  fromClass String
+  toClass   String // class name, or "Graduated"
+  /// PROMOTED | SKIPPED (jumped one or more classes) | GRADUATED
+  kind      String
+  reason    String?
+  createdAt DateTime      @default(now())
+
+  @@index([studentId])
+  @@index([companyId, createdAt])
 }

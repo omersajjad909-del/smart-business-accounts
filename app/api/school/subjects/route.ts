@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
 
+/** Common subjects of a Pakistani school, offered as a one-click starting point. */
+const DEFAULT_SUBJECTS = ["English", "Urdu", "Mathematics", "General Science", "Islamiat", "Social Studies", "Computer Science", "Pakistan Studies", "Physics", "Chemistry", "Biology", "Drawing", "Nazra Quran"];
+
 export async function GET(req: NextRequest) {
   const ctx = await schoolGuard(req, false);
   if (isResponse(ctx)) return ctx;
@@ -16,6 +19,10 @@ export async function POST(req: NextRequest) {
   const ctx = await schoolGuard(req, true);
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
+  if (str(b.action) === "seed") {
+    const res = await prisma.schoolSubject.createMany({ data: DEFAULT_SUBJECTS.map((name) => ({ companyId: ctx.companyId, name })), skipDuplicates: true });
+    return NextResponse.json({ created: res.count });
+  }
   const name = str(b.name);
   if (!name) return bad("Subject name is required");
   try {

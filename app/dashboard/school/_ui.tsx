@@ -159,3 +159,24 @@ export function PhotoPicker({ file, name, onChange, onError }: { file: File | nu
     </div>
   );
 }
+
+/** A short "how this page works" card, so a new user is never left guessing. */
+export function Guide({ title, steps, note }: { title: string; steps: string[]; note?: string }) {
+  return (
+    <div style={{ ...ui.card, marginBottom: 20, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.25)" }}>
+      <div style={{ fontWeight: 700, marginBottom: 8, display: "flex", gap: 8, alignItems: "center" }}><span>💡</span>{title}</div>
+      <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13, lineHeight: 1.7, color: "rgba(var(--ink),.8)" }}>{steps.map((st) => <li key={st}>{st}</li>)}</ol>
+      {note && <div style={{ fontSize: 12.5, marginTop: 10, color: "rgba(var(--ink),.55)" }}>{note}</div>}
+    </div>
+  );
+}
+
+/** Numbered step heading used on guided pages. */
+export function StepTitle({ n, title, hint, done }: { n: number; title: string; hint?: string; done?: boolean }) {
+  return (
+    <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
+      <span style={{ width: 28, height: 28, borderRadius: "50%", background: done ? "#16a34a" : "#6366f1", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{done ? "✓" : n}</span>
+      <div><div style={{ fontWeight: 700, fontSize: 15 }}>{title}</div>{hint && <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>{hint}</div>}</div>
+    </div>
+  );
+}

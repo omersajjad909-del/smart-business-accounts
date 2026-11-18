@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { api, ClassRow, ClassSelect, ErrorLine, Field, Modal, ui, useApi } from "../_ui";
+import { api, ClassRow, ClassSelect, ErrorLine, Field, Modal, ui, useApi, Guide } from "../_ui";
 
 type Entry = { id: string; day: number; periodNo: number; startTime: string; endTime: string; subject: { name: string }; teacher: { name: string } | null };
 type Allocation = { subject: { id: string; name: string }; teacher: { id: string; name: string } | null };
@@ -39,6 +39,7 @@ export default function TimetablePage() {
   return (
     <div style={ui.page}>
       <div style={ui.head}><div><h1 style={ui.h1}>Timetable</h1><p style={ui.sub}>Weekly periods per class. The teacher comes from the class&apos;s subject allocation, and a teacher cannot be double-booked.</p></div></div>
+      <Guide title="How to build a timetable" steps={["Under Subjects & Teachers, add the class's subjects and assign a teacher to each.", "Select the class here, then click a cell to place a subject in that period.", "A teacher cannot be put in two classes in the same period — you will be told if there is a clash."]} />
       <div style={{ marginBottom: 16 }}><ClassSelect classes={classes} value={classId} onChange={setClassId} /></div>
       {classId && alloc.length === 0 && <div style={{ ...ui.card, marginBottom: 16 }}>This class has no subjects yet. Add them under Subjects &amp; Teachers first.</div>}
       {classId && (

@@ -24,6 +24,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       class: { select: { name: true, section: true } },
       invoices: { orderBy: { dueDate: "desc" }, include: { payments: { orderBy: { paidAt: "asc" } } } },
       attendance: { orderBy: { date: "desc" }, take: 90 },
+      promotions: { orderBy: { createdAt: "desc" } },
       results: { include: { exam: { select: { name: true, subject: true, totalMarks: true, passMarks: true, date: true } } } },
     },
   });
@@ -55,11 +56,12 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     return { ...e, marks, total, percent, grade: gradeFor(percent), passed: e.subjects.every((x) => x.passed) };
   });
 
-  const { invoices: _i, attendance: _a, results: _r, ...profile } = student;
+  const { invoices: _i, attendance: _a, results: _r, promotions, ...profile } = student;
   void _i; void _a; void _r;
   return NextResponse.json({
     student: profile, fees, invoices,
     attendance: { ...counts, marked, percent: marked ? Math.round(((counts.PRESENT + counts.LATE) / marked) * 1000) / 10 : null },
     reportCards,
+    promotions,
   });
 }

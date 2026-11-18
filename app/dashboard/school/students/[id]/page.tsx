@@ -9,6 +9,7 @@ type Profile = {
   fees: { billed: number; paid: number; balance: number };
   invoices: { id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; payments: { id: string; receiptNo: string; amount: number; method: string; paidAt: string }[] }[];
   attendance: { PRESENT: number; ABSENT: number; LATE: number; LEAVE: number; marked: number; percent: number | null };
+  promotions: { id: string; fromClass: string; toClass: string; kind: string; reason: string | null; createdAt: string }[];
   reportCards: { exam: string; marks: number; total: number; percent: number; grade: string; passed: boolean; subjects: { subject: string; marks: number; total: number; percent: number; grade: string; passed: boolean }[] }[];
 };
 
@@ -87,6 +88,20 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
           {info.map(([k, v]) => <div key={k}><span style={ui.label}>{k}</span><div>{v}</div></div>)}
         </div>
       </div>
+
+      {data.promotions.length > 0 && (
+        <div style={{ ...ui.card, marginBottom: 20 }}>
+          <div style={{ fontWeight: 700, marginBottom: 10 }}>Class history</div>
+          {data.promotions.map((p) => (
+            <div key={p.id} style={{ display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap", padding: "8px 0", borderBottom: "1px solid rgba(var(--ink),.06)", fontSize: 13 }}>
+              <span style={{ ...ui.sub, minWidth: 90 }}>{p.createdAt.slice(0, 10)}</span>
+              <span style={{ fontWeight: 600 }}>{p.fromClass} → {p.toClass}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, borderRadius: 10, padding: "2px 8px", color: "#fff", background: p.kind === "SKIPPED" ? "#d97706" : p.kind === "GRADUATED" ? "#7c3aed" : "#16a34a" }}>{p.kind === "SKIPPED" ? "SKIPPED A CLASS" : p.kind}</span>
+              {p.reason && <span style={ui.sub}>“{p.reason}”</span>}
+            </div>
+          ))}
+        </div>
+      )}
 
       {optionalHeads.heads.some((h) => h.optional && h.active) && (
         <div style={{ ...ui.card, marginBottom: 20 }}>

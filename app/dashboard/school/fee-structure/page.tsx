@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { api, ClassRow, className, ErrorLine, Field, Modal, money, ui, useApi } from "../_ui";
+import { api, ClassRow, className, ErrorLine, Field, Modal, money, ui, useApi, Guide } from "../_ui";
 
 type Head = { id: string; name: string; frequency: string; optional: boolean; defaultAmount: number; active: boolean };
 type Data = { heads: Head[]; classFees: { classId: string; headId: string; amount: number }[] };
@@ -47,6 +47,7 @@ export default function FeeStructurePage() {
           <button style={ui.btn} onClick={() => setOpen(true)}>+ New fee type</button>
         </div>
       </div>
+      <Guide title="How the fee structure works" steps={["Add your fee types — start with “Add common fee types”.", "Enter what each class pays for each fee in the grid.", "For transport or hostel, enrol only the students who use it from their profile.", "Then generate invoices from the Fee Ledger."]} />
       {notice && <div style={{ ...ui.card, padding: 12, fontSize: 13, marginBottom: 14 }}>{notice}</div>}
 
       <div style={{ ...ui.card, padding: 0, overflowX: "auto", marginBottom: 24 }}>

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api, ClassRow, ClassSelect, ErrorLine, today, ui, useApi } from "../_ui";
+import { api, ClassRow, ClassSelect, ErrorLine, today, ui, useApi, Guide } from "../_ui";
 
 type Row = { id: string; name: string; admissionNo: string; status: string | null };
 const OPTIONS = [["PRESENT", "#16a34a"], ["ABSENT", "#dc2626"], ["LATE", "#ca8a04"], ["LEAVE", "#0284c7"]] as const;
@@ -27,6 +27,7 @@ export default function AttendancePage() {
   return (
     <div style={ui.page}>
       <div style={ui.head}><div><h1 style={ui.h1}>Attendance</h1><p style={ui.sub}>Pick a class and date — everyone starts as present</p></div></div>
+      <Guide title="How to mark attendance" steps={["Pick a class and the date.", "Everyone starts as Present — tap Absent, Late or Leave for the exceptions.", "Press Save. You can reopen the same day and correct it any time."]} note="Guardians of absent students can be messaged from Reports → Guardian Messages." />
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
         <ClassSelect classes={classes} value={classId} onChange={setClassId} />
         <input style={{ ...ui.input, width: 170 }} type="date" value={date} max={today()} onChange={(e) => setDate(e.target.value)} />
