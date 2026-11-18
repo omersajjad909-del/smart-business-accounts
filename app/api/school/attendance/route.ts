@@ -15,9 +15,9 @@ export async function GET(req: NextRequest) {
   const students = await prisma.schoolStudent.findMany({
     where: { companyId: ctx.companyId, classId, status: "ACTIVE" },
     orderBy: { admissionNo: "asc" },
-    select: { id: true, name: true, admissionNo: true, attendance: { where: { date }, select: { status: true } } },
+    select: { id: true, name: true, admissionNo: true, photoUrl: true, attendance: { where: { date }, select: { status: true, remark: true } } },
   });
-  return NextResponse.json(students.map(({ attendance, ...s }) => ({ ...s, status: attendance[0]?.status ?? null })));
+  return NextResponse.json(students.map(({ attendance, ...s }) => ({ ...s, status: attendance[0]?.status ?? null, remark: attendance[0]?.remark ?? "" })));
 }
 
 /** POST { date, classId, entries:[{studentId,status}] } — upserts one row per student per day. */
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   const b = await req.json().catch(() => ({}));
   const date = parseDay(b.date);
   const classId = str(b.classId);
-  const entries: { studentId: string; status: string }[] = Array.isArray(b.entries) ? b.entries : [];
+  const entries: { studentId: string; status: string; remark?: string }[] = Array.isArray(b.entries) ? b.entries : [];
   if (!date || !classId || entries.length === 0) return bad("date, classId and entries are required");
   if (entries.some((e) => !STATUSES.includes(str(e.status).toUpperCase()))) return bad("Invalid attendance status");
 
@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
     rows.map((e) =>
       prisma.schoolAttendance.upsert({
         where: { studentId_date: { studentId: e.studentId, date } },
-        create: { companyId: ctx.companyId, studentId: e.studentId, date, status: str(e.status).toUpperCase() },
-        update: { status: str(e.status).toUpperCase() },
+        create: { companyId: ctx.companyId, studentId: e.studentId, date, status: str(e.status).toUpperCase(), remark: str(e.remark).slice(0, 200) || null },
+        update: { status: str(e.status).toUpperCase(), remark: str(e.remark).slice(0, 200) || null },
       }),
     ),
   );

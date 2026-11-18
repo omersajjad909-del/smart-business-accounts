@@ -29,7 +29,7 @@ if (configured && !hasUrl) {
 /** Top-level folder, so dev and production uploads never share a namespace. */
 const ROOT = process.env.CLOUDINARY_FOLDER?.trim() || (process.env.NODE_ENV === "production" ? "finova" : "finova-dev");
 
-export type MediaKind = "avatars" | "logos" | "products" | "students";
+export type MediaKind = "avatars" | "logos" | "products" | "students" | "teachers";
 
 export function isMediaConfigured(): boolean {
   return configured;

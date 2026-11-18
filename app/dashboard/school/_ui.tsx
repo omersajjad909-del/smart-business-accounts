@@ -128,7 +128,7 @@ export async function uploadStudentPhoto(studentId: string, file: File): Promise
 }
 
 /** Photo chooser with preview and a Remove button, for forms where the file is uploaded after save. */
-export function PhotoPicker({ file, name, onChange, onError }: { file: File | null; name: string; onChange: (f: File | null) => void; onError: (m: string) => void }) {
+export function PhotoPicker({ file, name, onChange, onError, label = "Student photo" }: { file: File | null; name: string; onChange: (f: File | null) => void; onError: (m: string) => void; label?: string }) {
   const [preview, setPreview] = useState<string | null>(null);
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
@@ -141,7 +141,7 @@ export function PhotoPicker({ file, name, onChange, onError }: { file: File | nu
     <div style={{ display: "flex", alignItems: "center", gap: 16, padding: 14, border: "1px dashed rgba(var(--ink),.2)", borderRadius: 14, background: "rgba(var(--ink),.03)" }}>
       <Avatar url={preview} name={name || "Student"} size={76} />
       <div>
-        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>Student photo</div>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{label}</div>
         <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 10 }}>JPG, PNG or WebP · up to 2MB · optional</div>
         <div style={{ display: "flex", gap: 8 }}>
           <label style={{ ...ui.ghost, display: "inline-block", cursor: "pointer" }}>
@@ -165,7 +165,7 @@ export function Guide({ title, steps, note }: { title: string; steps: string[]; 
   return (
     <div style={{ ...ui.card, marginBottom: 20, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.25)" }}>
       <div style={{ fontWeight: 700, marginBottom: 8, display: "flex", gap: 8, alignItems: "center" }}><span>💡</span>{title}</div>
-      <ol style={{ margin: 0, paddingLeft: 20, fontSize: 13, lineHeight: 1.7, color: "rgba(var(--ink),.8)" }}>{steps.map((st) => <li key={st}>{st}</li>)}</ol>
+      <ol style={{ margin: 0, paddingLeft: 22, fontSize: 13, lineHeight: 1.7, color: "rgba(var(--ink),.8)", listStyleType: "decimal" }}>{steps.map((st) => <li key={st} style={{ display: "list-item", listStyleType: "decimal" }}>{st}</li>)}</ol>
       {note && <div style={{ fontSize: 12.5, marginTop: 10, color: "rgba(var(--ink),.55)" }}>{note}</div>}
     </div>
   );
@@ -177,6 +177,30 @@ export function StepTitle({ n, title, hint, done }: { n: number; title: string; 
     <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
       <span style={{ width: 28, height: 28, borderRadius: "50%", background: done ? "#16a34a" : "#6366f1", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{done ? "✓" : n}</span>
       <div><div style={{ fontWeight: 700, fontSize: 15 }}>{title}</div>{hint && <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)" }}>{hint}</div>}</div>
+    </div>
+  );
+}
+
+/** Uploads a teacher photo; returns the new URL or an error. */
+export async function uploadTeacherPhoto(teacherId: string, file: File): Promise<{ url?: string; error?: string }> {
+  const body = new FormData();
+  body.set("teacherId", teacherId);
+  body.set("photo", file);
+  try {
+    const res = await fetch("/api/school/teachers/photo", { method: "POST", body });
+    const json = await res.json().catch(() => ({}));
+    return res.ok ? { url: json.photoUrl } : { error: json.error || "Upload failed" };
+  } catch {
+    return { error: "Network error" };
+  }
+}
+
+/** Titled group of form fields in a responsive grid. */
+export function FormSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <div style={{ fontWeight: 700, fontSize: 13, margin: "10px 0 14px", display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 4, height: 16, borderRadius: 2, background: "#6366f1" }} />{title}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "0 14px" }}>{children}</div>
     </div>
   );
 }

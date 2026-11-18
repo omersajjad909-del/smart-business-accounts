@@ -3456,6 +3456,8 @@ model SchoolAttendance {
   student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
   date      DateTime      @db.Date
   status    String // PRESENT | ABSENT | LATE | LEAVE
+  /// Why the student was absent / late / on leave ("fever", "family function")
+  remark    String?
 
   @@unique([studentId, date])
   @@index([companyId, date])
@@ -3523,6 +3525,29 @@ model SchoolTeacher {
   /// ACTIVE | LEFT
   status        String   @default("ACTIVE")
   createdAt     DateTime @default(now())
+
+  // ── Full profile (all optional) ──
+  gender            String? // MALE | FEMALE | OTHER
+  dob               DateTime?
+  cnic              String?
+  fatherName        String?
+  bloodGroup        String?
+  address           String?
+  city              String?
+  designation       String? // Class Teacher, Head of Department, Vice Principal …
+  /// PERMANENT | CONTRACT | PART_TIME | VISITING
+  employmentType    String?
+  experienceYears   Float?
+  /// Subjects they are qualified to teach, free text ("Maths, Physics")
+  specialization    String?
+  previousInstitute String?
+  /// Reference figure; payroll itself runs from the Employees module
+  monthlySalary     Float?
+  emergencyContact  String?
+  emergencyPhone    String?
+  /// CNIC, DEGREES, EXPERIENCE_LETTER, PHOTOS, APPOINTMENT_LETTER
+  documents         String[]  @default([])
+  photoUrl          String?
 
   classSubjects SchoolClassSubject[]
   timetable     SchoolTimetableEntry[]

@@ -1,25 +1,18 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
-import { api, Badge, className, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
+import { api, Avatar, Badge, className, Guide, ui, useApi } from "../_ui";
+import { EMPLOYMENT, TeacherForm, type TeacherRecord } from "./_form";
 
-type Teacher = {
-  id: string; employeeNo: string; name: string; phone: string | null; email: string | null; qualification: string | null; status: string; joiningDate: string;
-  classSubjects: { class: { name: string; section: string }; subject: { name: string } }[];
-};
-const blank = { name: "", phone: "", email: "", qualification: "", joiningDate: today() };
+type Teacher = TeacherRecord & { employeeNo: string; status: string; classSubjects: { class: { name: string; section: string }; subject: { name: string } }[] };
 
 export default function TeachersPage() {
   const { data: teachers, loading, reload } = useApi<Teacher[]>("/api/school/teachers", []);
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState(blank);
-  const [error, setError] = useState("");
-  const set = (k: keyof typeof blank) => (e: { target: { value: string } }) => setForm({ ...form, [k]: e.target.value });
+  const [form, setForm] = useState<{ teacher?: Teacher } | null>(null);
+  const [notice, setNotice] = useState("");
+  const [q, setQ] = useState("");
+  const shown = teachers.filter((t) => !q || `${t.name} ${t.employeeNo} ${t.designation ?? ""}`.toLowerCase().includes(q.toLowerCase()));
 
-  async function save() {
-    const r = await api("/api/school/teachers", { method: "POST", body: form });
-    if (!r.ok) return setError(r.error);
-    setOpen(false); setError(""); setForm(blank); void reload();
-  }
   async function setStatus(id: string, status: string) {
     const r = await api("/api/school/teachers", { method: "PATCH", body: { id, status } });
     if (!r.ok) alert(r.error); else void reload();
@@ -28,21 +21,26 @@ export default function TeachersPage() {
   return (
     <div style={ui.page}>
       <div style={ui.head}>
-        <div><h1 style={ui.h1}>Teachers</h1><p style={ui.sub}>Teaching staff and the classes and subjects they handle</p></div>
-        <button style={ui.btn} onClick={() => setOpen(true)}>+ Add Teacher</button>
+        <div><h1 style={ui.h1}>Teachers</h1><p style={ui.sub}>Teaching staff — profile, job details, documents and the classes they take</p></div>
+        <button style={ui.btn} onClick={() => setForm({})}>+ Add Teacher</button>
       </div>
+      <Guide title="How teachers work" steps={["Add each teacher with their details and documents.", "Go to Subjects & Teachers to give each one their subjects and classes.", "The timetable then shows who teaches every period, and a teacher can never be in two classes at once."]} note="Salaries are paid from the Salaries / Employees section — the salary here is for your reference." />
+      {notice && <div style={{ ...ui.card, padding: 12, fontSize: 13, marginBottom: 14 }}>{notice}</div>}
+      <input style={{ ...ui.input, width: 280, marginBottom: 14 }} placeholder="Search name, emp # or designation" value={q} onChange={(e) => setQ(e.target.value)} />
       <div style={{ ...ui.card, padding: 0, overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["Emp #", "Name", "Qualification", "Phone", "Teaches", "Status", ""].map((h) => <th key={h} style={ui.th}>{h}</th>)}</tr></thead>
+          <thead><tr>{["Emp #", "Teacher", "Designation", "Type", "Phone", "Teaches", "Status", ""].map((h) => <th key={h} style={ui.th}>{h}</th>)}</tr></thead>
           <tbody>
-            {!loading && teachers.length === 0 && <tr><td colSpan={7} style={{ ...ui.td, textAlign: "center", padding: 32 }}>No teachers yet.</td></tr>}
-            {teachers.map((t) => (
+            {!loading && shown.length === 0 && <tr><td colSpan={8} style={{ ...ui.td, textAlign: "center", padding: 32 }}>{teachers.length ? "No teachers match." : "No teachers yet. Click “+ Add Teacher” to add your first one."}</td></tr>}
+            {shown.map((t) => (
               <tr key={t.id}>
-                <td style={{ ...ui.td, fontWeight: 700 }}>{t.employeeNo}</td><td style={{ ...ui.td, fontWeight: 600 }}>{t.name}</td>
-                <td style={ui.td}>{t.qualification || "—"}</td><td style={ui.td}>{t.phone || "—"}</td>
-                <td style={{ ...ui.td, maxWidth: 280 }}>{t.classSubjects.length ? t.classSubjects.map((c) => `${c.subject.name} (${className(c.class)})`).join(", ") : "Not assigned"}</td>
+                <td style={{ ...ui.td, fontWeight: 700 }}>{t.employeeNo}</td>
+                <td style={{ ...ui.td, fontWeight: 600 }}><span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}><Avatar url={t.photoUrl} name={t.name} /><Link href={`/dashboard/school/teachers/${t.id}`} style={{ color: "inherit" }}>{t.name}</Link></span></td>
+                <td style={ui.td}>{t.designation || "—"}</td><td style={ui.td}>{t.employmentType ? EMPLOYMENT[t.employmentType] : "—"}</td><td style={ui.td}>{t.phone || "—"}</td>
+                <td style={{ ...ui.td, maxWidth: 260, fontSize: 12.5 }}>{t.classSubjects.length ? t.classSubjects.map((c) => `${c.subject.name} (${className(c.class)})`).join(", ") : <span style={{ color: "#fbbf24" }}>Not assigned yet</span>}</td>
                 <td style={ui.td}><Badge value={t.status} /></td>
-                <td style={{ ...ui.td, textAlign: "right" }}>
+                <td style={{ ...ui.td, textAlign: "right", whiteSpace: "nowrap" }}>
+                  <button style={ui.ghost} onClick={() => setForm({ teacher: t })}>Edit</button>{" "}
                   {t.status === "ACTIVE" ? <button style={ui.ghost} onClick={() => confirm(`Mark ${t.name} as left?`) && setStatus(t.id, "LEFT")}>Mark left</button> : <button style={ui.ghost} onClick={() => setStatus(t.id, "ACTIVE")}>Reactivate</button>}
                 </td>
               </tr>
@@ -50,19 +48,7 @@ export default function TeachersPage() {
           </tbody>
         </table>
       </div>
-      {open && (
-        <Modal title="Add Teacher" onClose={() => setOpen(false)}>
-          <ErrorLine text={error} />
-          <Field label="Full name"><input style={ui.input} value={form.name} onChange={set("name")} /></Field>
-          <Field label="Qualification"><input style={ui.input} value={form.qualification} onChange={set("qualification")} placeholder="M.Sc Mathematics, B.Ed" /></Field>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Field label="Phone"><input style={ui.input} value={form.phone} onChange={set("phone")} /></Field>
-            <Field label="Email"><input style={ui.input} type="email" value={form.email} onChange={set("email")} /></Field>
-          </div>
-          <Field label="Joining date"><input style={ui.input} type="date" value={form.joiningDate} onChange={set("joiningDate")} /></Field>
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}><button style={ui.ghost} onClick={() => setOpen(false)}>Cancel</button><button style={ui.btn} onClick={save}>Save</button></div>
-        </Modal>
-      )}
+      {form && <TeacherForm teacher={form.teacher} onClose={() => setForm(null)} onSaved={(note) => { setForm(null); setNotice(note ?? ""); void reload(); }} />}
     </div>
   );
 }
