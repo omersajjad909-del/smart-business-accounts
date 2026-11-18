@@ -4,7 +4,23 @@ import { useState } from "react";
 import { api, Badge, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
 
 type Student = { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; status: string; discount: number; class: { name: string; section: string } | null; classId: string | null };
-const blank = { name: "", guardianName: "", phone: "", classId: "", gender: "", dob: "", admissionDate: today(), discount: "", status: "ACTIVE" };
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <div style={{ fontWeight: 700, fontSize: 13, margin: "6px 0 12px", paddingBottom: 6, borderBottom: "1px solid rgba(var(--ink),.1)" }}>{title}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "0 14px" }}>{children}</div>
+    </div>
+  );
+}
+
+const blank = {
+  name: "", gender: "", dob: "", bFormNo: "", religion: "", bloodGroup: "", classId: "", admissionDate: today(), status: "ACTIVE",
+  guardianName: "", guardianRelation: "FATHER", guardianCnic: "", guardianOccupation: "", motherName: "", phone: "", alternatePhone: "",
+  emergencyContact: "", emergencyPhone: "", address: "", city: "",
+  previousSchool: "", previousClass: "", medicalNotes: "",
+  admissionFee: "", discount: "", documents: [] as string[],
+};
+const DOCS: [string, string][] = [["BFORM", "B-Form copy"], ["GUARDIAN_CNIC", "Guardian CNIC copy"], ["PHOTOS", "Passport photos"], ["PREV_RESULT", "Previous result card"], ["LEAVING_CERT", "School leaving certificate"], ["VACCINATION", "Vaccination card"]];
 
 export default function StudentsPage() {
   const [q, setQ] = useState(""); const [classId, setClassId] = useState(""); const [status, setStatus] = useState("");
@@ -16,7 +32,10 @@ export default function StudentsPage() {
   const [error, setError] = useState("");
 
   async function save() {
-    const r = await api("/api/school/students", { method: "POST", body: { ...form, discount: Number(form.discount || 0) } });
+    if (!form.name.trim()) return setError("Student name is required");
+    if (!form.classId && form.status === "ACTIVE") return setError("Choose a class for an active student");
+    if (!form.guardianName.trim() || !form.phone.trim()) return setError("Guardian name and phone are required");
+    const r = await api("/api/school/students", { method: "POST", body: { ...form, discount: Number(form.discount || 0), admissionFee: Number(form.admissionFee || 0) } });
     if (!r.ok) return setError(r.error);
     setOpen(false); setError(""); setForm(blank); void reload();
   }
@@ -25,6 +44,7 @@ export default function StudentsPage() {
     if (!r.ok) alert(r.error); else void reload();
   }
   const set = (k: keyof typeof blank) => (e: { target: { value: string } }) => setForm({ ...form, [k]: e.target.value });
+  const toggleDoc = (d: string) => setForm({ ...form, documents: form.documents.includes(d) ? form.documents.filter((x) => x !== d) : [...form.documents, d] });
 
   return (
     <div style={ui.page}>
@@ -59,19 +79,50 @@ export default function StudentsPage() {
         </table>
       </div>
       {open && (
-        <Modal title="New Admission" onClose={() => setOpen(false)}>
+        <Modal title="New Admission" width={780} onClose={() => setOpen(false)}>
           <ErrorLine text={error} />
-          <Field label="Student name"><input style={ui.input} value={form.name} onChange={set("name")} /></Field>
-          <Field label="Class"><ClassSelect classes={classes} value={form.classId} onChange={(v) => setForm({ ...form, classId: v })} /></Field>
-          <Field label="Guardian"><input style={ui.input} value={form.guardianName} onChange={set("guardianName")} /></Field>
-          <Field label="Phone"><input style={ui.input} value={form.phone} onChange={set("phone")} placeholder="03XX-XXXXXXX" /></Field>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Field label="Date of birth"><input style={ui.input} type="date" value={form.dob} onChange={set("dob")} /></Field>
+          <Section title="Student">
+            <Field label="Full name *"><input style={ui.input} value={form.name} onChange={set("name")} /></Field>
+            <Field label="Gender"><select style={ui.input} value={form.gender} onChange={set("gender")}><option value="">Select</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select></Field>
+            <Field label="Date of birth"><input style={ui.input} type="date" value={form.dob} max={today()} onChange={set("dob")} /></Field>
+            <Field label="B-Form / CRC no. (13 digits)"><input style={ui.input} inputMode="numeric" value={form.bFormNo} onChange={set("bFormNo")} placeholder="3520212345671" /></Field>
+            <Field label="Religion"><input style={ui.input} value={form.religion} onChange={set("religion")} /></Field>
+            <Field label="Blood group"><select style={ui.input} value={form.bloodGroup} onChange={set("bloodGroup")}><option value="">Unknown</option>{["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => <option key={g}>{g}</option>)}</select></Field>
+          </Section>
+          <Section title="Admission">
+            <Field label="Class *"><ClassSelect classes={classes} value={form.classId} onChange={(v) => setForm({ ...form, classId: v })} /></Field>
             <Field label="Admission date"><input style={ui.input} type="date" value={form.admissionDate} onChange={set("admissionDate")} /></Field>
-            <Field label="Monthly discount"><input style={ui.input} type="number" min={0} value={form.discount} onChange={set("discount")} /></Field>
-            <Field label="Status"><select style={ui.input} value={form.status} onChange={set("status")}><option>ACTIVE</option><option>APPLICANT</option></select></Field>
+            <Field label="Status"><select style={ui.input} value={form.status} onChange={set("status")}><option value="ACTIVE">Active (enrolled)</option><option value="APPLICANT">Applicant (not confirmed)</option></select></Field>
+            <Field label="Admission fee (one-time)"><input style={ui.input} type="number" min={0} value={form.admissionFee} onChange={set("admissionFee")} placeholder="Creates an invoice" /></Field>
+            <Field label="Monthly discount / scholarship"><input style={ui.input} type="number" min={0} value={form.discount} onChange={set("discount")} /></Field>
+          </Section>
+          <Section title="Parent / Guardian">
+            <Field label="Guardian name *"><input style={ui.input} value={form.guardianName} onChange={set("guardianName")} /></Field>
+            <Field label="Relation"><select style={ui.input} value={form.guardianRelation} onChange={set("guardianRelation")}><option value="FATHER">Father</option><option value="MOTHER">Mother</option><option value="OTHER">Other</option></select></Field>
+            <Field label="Guardian CNIC (13 digits)"><input style={ui.input} inputMode="numeric" value={form.guardianCnic} onChange={set("guardianCnic")} /></Field>
+            <Field label="Occupation"><input style={ui.input} value={form.guardianOccupation} onChange={set("guardianOccupation")} /></Field>
+            <Field label="Mother's name"><input style={ui.input} value={form.motherName} onChange={set("motherName")} /></Field>
+            <Field label="Phone * (SMS alerts go here)"><input style={ui.input} inputMode="tel" value={form.phone} onChange={set("phone")} placeholder="03XX-XXXXXXX" /></Field>
+            <Field label="Alternate phone"><input style={ui.input} inputMode="tel" value={form.alternatePhone} onChange={set("alternatePhone")} /></Field>
+          </Section>
+          <Section title="Address & emergency contact">
+            <Field label="Home address"><input style={ui.input} value={form.address} onChange={set("address")} /></Field>
+            <Field label="City"><input style={ui.input} value={form.city} onChange={set("city")} /></Field>
+            <Field label="Emergency contact name"><input style={ui.input} value={form.emergencyContact} onChange={set("emergencyContact")} /></Field>
+            <Field label="Emergency phone"><input style={ui.input} inputMode="tel" value={form.emergencyPhone} onChange={set("emergencyPhone")} /></Field>
+          </Section>
+          <Section title="Previous school & health">
+            <Field label="Previous school"><input style={ui.input} value={form.previousSchool} onChange={set("previousSchool")} /></Field>
+            <Field label="Last class passed"><input style={ui.input} value={form.previousClass} onChange={set("previousClass")} /></Field>
+            <Field label="Medical notes / allergies"><input style={ui.input} value={form.medicalNotes} onChange={set("medicalNotes")} /></Field>
+          </Section>
+          <div style={{ marginBottom: 18 }}>
+            <span style={ui.label}>Documents received</span>
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+              {DOCS.map(([k, l]) => <label key={k} style={{ fontSize: 13, display: "flex", gap: 6, alignItems: "center" }}><input type="checkbox" checked={form.documents.includes(k)} onChange={() => toggleDoc(k)} />{l}</label>)}
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}><button style={ui.ghost} onClick={() => setOpen(false)}>Cancel</button><button style={ui.btn} onClick={save}>Admit</button></div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}><button style={ui.ghost} onClick={() => setOpen(false)}>Cancel</button><button style={ui.btn} onClick={save}>Admit student</button></div>
         </Modal>
       )}
     </div>

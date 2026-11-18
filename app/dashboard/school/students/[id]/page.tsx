@@ -4,7 +4,7 @@ import { use } from "react";
 import { Badge, className, money, Stat, ui, useApi } from "../../_ui";
 
 type Profile = {
-  student: { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null };
+  student: { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[] };
   fees: { billed: number; paid: number; balance: number };
   invoices: { id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; payments: { id: string; receiptNo: string; amount: number; method: string; paidAt: string }[] }[];
   attendance: { PRESENT: number; ABSENT: number; LATE: number; LEAVE: number; marked: number; percent: number | null };
@@ -17,9 +17,15 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
   if (loading) return <div style={ui.page}>Loading…</div>;
   if (error || !data) return <div style={ui.page}>{error || "Student not found"} <Link href="/dashboard/school/students">← Back</Link></div>;
   const s = data.student;
+  const v = (x: string | null | undefined) => x || "—";
+  const DOC_LABELS: Record<string, string> = { BFORM: "B-Form", GUARDIAN_CNIC: "Guardian CNIC", PHOTOS: "Photos", PREV_RESULT: "Previous result card", LEAVING_CERT: "Leaving certificate", VACCINATION: "Vaccination card" };
   const info: [string, string][] = [
-    ["Class", className(s.class)], ["Guardian", s.guardianName || "—"], ["Phone", s.phone || "—"], ["Gender", s.gender || "—"],
-    ["Date of birth", s.dob ? s.dob.slice(0, 10) : "—"], ["Admitted", s.admissionDate.slice(0, 10)], ["Address", s.address || "—"], ["Monthly discount", s.discount ? money(s.discount) : "—"],
+    ["Class", className(s.class)], ["Gender", v(s.gender)], ["Date of birth", s.dob ? s.dob.slice(0, 10) : "—"], ["B-Form no.", v(s.bFormNo)],
+    ["Religion", v(s.religion)], ["Blood group", v(s.bloodGroup)], ["Admitted", s.admissionDate.slice(0, 10)], ["Monthly discount", s.discount ? money(s.discount) : "—"],
+    [`Guardian (${(s.guardianRelation || "").toLowerCase() || "—"})`, v(s.guardianName)], ["Guardian CNIC", v(s.guardianCnic)], ["Occupation", v(s.guardianOccupation)], ["Mother", v(s.motherName)],
+    ["Phone", v(s.phone)], ["Alternate phone", v(s.alternatePhone)], ["Emergency contact", s.emergencyContact ? `${s.emergencyContact} · ${v(s.emergencyPhone)}` : "—"],
+    ["Address", [s.address, s.city].filter(Boolean).join(", ") || "—"], ["Previous school", s.previousSchool ? `${s.previousSchool}${s.previousClass ? ` (${s.previousClass})` : ""}` : "—"], ["Medical notes", v(s.medicalNotes)],
+    ["Documents", s.documents.length ? s.documents.map((d) => DOC_LABELS[d] ?? d).join(", ") : "None received"],
   ];
 
   return (

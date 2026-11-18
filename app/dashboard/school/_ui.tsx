@@ -70,10 +70,10 @@ export function Badge({ value }: { value: string }) {
   return <span style={{ background: BADGE[value] ?? "#64748b", color: "#fff", borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>{value.replace("_", " ")}</span>;
 }
 
-export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+export function Modal({ title, onClose, children, width = 520 }: { title: string; onClose: () => void; children: ReactNode; width?: number }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }} onClick={onClose}>
-      <div style={{ background: "var(--dk-1a1d2e, #1a1d2e)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 16, padding: 24, width: "min(520px,100%)", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+      <div style={{ background: "var(--dk-1a1d2e, #1a1d2e)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 16, padding: 24, width: `min(${width}px,100%)`, maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
         <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 18 }}>{title}</div>
         {children}
       </div>
