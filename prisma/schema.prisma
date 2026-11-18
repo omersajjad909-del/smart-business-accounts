@@ -3372,6 +3372,24 @@ model SchoolStudent {
   discount      Float        @default(0)
   createdAt     DateTime     @default(now())
 
+  // ── Admission form details (all optional) ──
+  bFormNo            String? // B-Form / CRC number
+  religion           String?
+  bloodGroup         String?
+  city               String?
+  previousSchool     String?
+  previousClass      String?
+  guardianRelation   String? // FATHER | MOTHER | OTHER
+  guardianCnic       String?
+  guardianOccupation String?
+  motherName         String?
+  alternatePhone     String?
+  emergencyContact   String?
+  emergencyPhone     String?
+  medicalNotes       String?
+  /// Documents received at admission: BFORM, PREV_RESULT, LEAVING_CERT, PHOTOS, GUARDIAN_CNIC, VACCINATION
+  documents          String[] @default([])
+
   invoices   SchoolFeeInvoice[]
   attendance SchoolAttendance[]
   results    SchoolResult[]
