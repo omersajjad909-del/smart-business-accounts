@@ -1648,8 +1648,20 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
+          {/* ── SCHOOL ── */}
+          {hasModule(businessType, "student_mgmt") && isBusinessEnabled(businessType) && (
+            <NavGroup title="School" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "school"} onToggle={() => toggle("school")}>
+              {hasDashboardFeature("SCHOOL_OVERVIEW") && <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>}
+              {hasDashboardFeature("SCHOOL_CLASSES") && <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fees</NavLink>}
+              {hasDashboardFeature("SCHOOL_STUDENTS") && <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>}
+              {hasDashboardFeature("SCHOOL_ATTENDANCE") && <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>}
+              {hasDashboardFeature("SCHOOL_FEES") && <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Ledger</NavLink>}
+              {hasDashboardFeature("SCHOOL_EXAMS") && <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>}
+            </NavGroup>
+          )}
+
           {/* ── SALES & PURCHASE ── (hidden for retail which has its own groups) */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && !hasModule(businessType, "pos") && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && !hasModule(businessType, "pos") && businessType !== "school" && (
             <NavGroup
               title="Sales & Purchase"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>}
@@ -1682,7 +1694,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── INVENTORY ── (hidden for retail which has its own inventory group) */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && !hasModule(businessType, "pos") && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && !hasModule(businessType, "pos") && businessType !== "school" && (
             <NavGroup
               title="Inventory"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
@@ -2013,17 +2025,6 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* ── SCHOOL ── */}
-          {hasModule(businessType, "student_mgmt") && isBusinessEnabled(businessType) && (
-            <NavGroup title="School" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "school"} onToggle={() => toggle("school")}>
-              {hasDashboardFeature("SCHOOL_OVERVIEW") && <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>}
-              {hasDashboardFeature("SCHOOL_CLASSES") && <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fees</NavLink>}
-              {hasDashboardFeature("SCHOOL_STUDENTS") && <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>}
-              {hasDashboardFeature("SCHOOL_ATTENDANCE") && <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>}
-              {hasDashboardFeature("SCHOOL_FEES") && <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Ledger</NavLink>}
-              {hasDashboardFeature("SCHOOL_EXAMS") && <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>}
-            </NavGroup>
-          )}
 
           {/* Hospital / Clinic */}
           {hasModule(businessType, "patient_records") && isBusinessEnabled(businessType) && (
@@ -2775,8 +2776,8 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* ── RECEIVABLES & PAYABLES ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+          {/* ── RECEIVABLES & PAYABLES ── (schools bill through the fee ledger) */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && businessType !== "school" && (
             <NavGroup
               title="Receivables & Payables"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>}
@@ -3201,7 +3202,7 @@ export default function DashboardLayout({
 
             {/* + New button — desktop only */}
             {!isMobileViewport && (
-              <Link prefetch={false} href="/dashboard/sales-invoice"
+              <Link prefetch={false} href={businessType === "school" ? "/dashboard/school/students" : "/dashboard/sales-invoice"}
                 style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:10,background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:13,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(var(--accent-rgb),.4)"}}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

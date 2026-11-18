@@ -30,10 +30,30 @@ export async function GET(req: NextRequest) {
       owed.set(inv.studentId, cur);
     }
   }
+  // Last 6 months: billed (by due month) vs collected (by payment month).
+  const months: string[] = [];
+  for (let i = 5; i >= 0; i--) months.push(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - i, 1)).toISOString().slice(0, 7));
+  const trend = new Map(months.map((m) => [m, { month: m, invested: 0, earned: 0 }]));
+  for (const inv of invoices) {
+    const row = trend.get(inv.dueDate.toISOString().slice(0, 7));
+    if (row) row.invested += invoiceTotals({ ...inv, payments: [] }).payable;
+  }
+  const recent = await prisma.schoolPayment.findMany({ where: { companyId, paidAt: { gte: new Date(`${months[0]}-01T00:00:00.000Z`) } }, select: { amount: true, paidAt: true } });
+  for (const pay of recent) {
+    const row = trend.get(pay.paidAt.toISOString().slice(0, 7));
+    if (row) row.earned += pay.amount;
+  }
   const att = Object.fromEntries(todayMarks.map((m) => [m.status, m._count]));
   const marked = todayMarks.reduce((s, m) => s + m._count, 0);
 
+  const present = (att.PRESENT ?? 0) + (att.LATE ?? 0);
   return NextResponse.json({
+    // Flat numeric block read by the main dashboard (lib/dashboardLayouts.ts).
+    summary: {
+      activeStudents: active, classes, collectedThisMonth: monthPayments._sum.amount ?? 0,
+      outstanding, overdue, defaulterCount: owed.size, presentToday: present, absentToday: att.ABSENT ?? 0,
+    },
+    monthlyTrend: [...trend.values()],
     activeStudents: active, classes,
     collectedThisMonth: monthPayments._sum.amount ?? 0, outstanding, overdue,
     defaulters: [...owed.values()].sort((a, b) => b.balance - a.balance).slice(0, 8),

@@ -157,6 +157,16 @@ const INSTITUTION: CorePack = {
   payroll: true, multiBranch: true, crm: true, costing: true,
 };
 
+/**
+ * A school bills fees from its own student ledger (app/dashboard/school), so it
+ * has no sales invoices, no stock and no goods pipeline. Day-to-day costs go
+ * through expense vouchers; staff are on a payroll.
+ */
+const SCHOOL: CorePack = {
+  purchaseDepth: "none", salesDepth: "none", stockDepth: "none",
+  payroll: true, multiBranch: false, crm: false, costing: false,
+};
+
 // ─────────────────────────────────────────────────────────────
 //  Per-business packs
 //
@@ -229,7 +239,7 @@ export const CORE_PACKS: Record<string, CorePack> = {
   hotel: INSTITUTION,
   hospital: INSTITUTION,
   hospital_chain: INSTITUTION,
-  school: INSTITUTION,
+  school: SCHOOL,
   university: INSTITUTION,
 
   // A clinic is a consulting room, not a ward: supplies arrive on a bill.

@@ -277,6 +277,31 @@ export const DASHBOARD_LAYOUTS: Partial<Record<BusinessType, DashboardLayout>> =
     ],
     chart: { title: "Collections vs Operating Cost", revenueLabel: "Collections", expensesLabel: "Cost" },
   },
+  // ── SCHOOL ─────────────────────────────────────────────────
+  school: {
+    opsTitle: "School today",
+    verticalEndpoint: "/api/school/overview",
+    kpis: [
+      { key: "students",    label: "Active Students",       icon: "🎓", color: "#6366f1", source: "vertical", metric: "activeStudents",     format: "number",   caption: "Currently enrolled",     href: "/dashboard/school/students" },
+      { key: "collected",   label: "Fee Collected (Month)", icon: "💰", color: "#10b981", source: "vertical", metric: "collectedThisMonth", format: "currency", caption: "Received this month",    href: "/dashboard/school/fees" },
+      { key: "outstanding", label: "Fee Outstanding",       icon: "⏳", color: "#fbbf24", source: "vertical", metric: "outstanding",        format: "currency", caption: "Unpaid across all months", href: "/dashboard/school/fees" },
+      { key: "overdue",     label: "Fee Overdue",           icon: "⚠️", color: "#f87171", source: "vertical", metric: "overdue",            format: "currency", caption: "Past due date",           href: "/dashboard/school/fees" },
+    ],
+    opsStrip: [
+      { label: "Classes",            icon: "🏫", color: "#38bdf8", source: "vertical", metric: "classes",        format: "number", href: "/dashboard/school/classes" },
+      { label: "Present Today",      icon: "✅", color: "#34d399", source: "vertical", metric: "presentToday",   format: "number", href: "/dashboard/school/attendance" },
+      { label: "Absent Today",       icon: "🚫", color: "#f87171", source: "vertical", metric: "absentToday",    format: "number", href: "/dashboard/school/attendance" },
+      { label: "Defaulter Students", icon: "📋", color: "#fbbf24", source: "vertical", metric: "defaulterCount", format: "number", href: "/dashboard/school/fees" },
+    ],
+    actions: [
+      { label: "Collect Fee",   href: "/dashboard/school/fees",       icon: "💰", bg: GR.green  },
+      { label: "New Admission", href: "/dashboard/school/students",   icon: "📝", bg: GR.indigo },
+      { label: "Attendance",    href: "/dashboard/school/attendance", icon: "✅", bg: GR.sky    },
+      { label: "Enter Marks",   href: "/dashboard/school/results",    icon: "📊", bg: GR.amber  },
+    ],
+    chart: { title: "Fee Billed vs Collected", revenueLabel: "Collected", expensesLabel: "Billed" },
+    chartSource: "vertical",
+  },
   // ── INVESTOR / PROFIT SHARING ──────────────────────────────
   investor: {
     opsTitle: "Portfolio today",
