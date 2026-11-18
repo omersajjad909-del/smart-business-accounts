@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { api, Avatar, Badge, uploadStudentPhoto, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
+import { api, Avatar, Badge, PhotoPicker, uploadStudentPhoto, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
 
 type Student = { photoUrl: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; status: string; discount: number; class: { name: string; section: string } | null; classId: string | null };
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 6 }}>
-      <div style={{ fontWeight: 700, fontSize: 13, margin: "6px 0 12px", paddingBottom: 6, borderBottom: "1px solid rgba(var(--ink),.1)" }}>{title}</div>
+      <div style={{ fontWeight: 700, fontSize: 13, margin: "10px 0 14px", display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 4, height: 16, borderRadius: 2, background: "#6366f1" }} />{title}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "0 14px" }}>{children}</div>
     </div>
   );
@@ -88,10 +88,10 @@ export default function StudentsPage() {
         </table>
       </div>
       {open && (
-        <Modal title="New Admission" width={780} onClose={() => setOpen(false)}>
+        <Modal title="New Admission" subtitle="Fields marked * are required. Everything else can be added later from the student profile." width={820} onClose={() => setOpen(false)} footer={<><button style={ui.ghost} onClick={() => setOpen(false)}>Cancel</button><button style={ui.btn} onClick={save}>Admit student</button></>}>
           <ErrorLine text={error} />
           <Section title="Student">
-            <Field label="Photo (JPG/PNG/WebP, max 2MB)"><div style={{ display: "flex", alignItems: "center", gap: 10 }}>{photo && <Avatar url={URL.createObjectURL(photo)} name={form.name || "?"} size={44} />}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => { const f = e.target.files?.[0] ?? null; if (f && f.size > 2 * 1024 * 1024) { setError("Photo must be under 2MB"); e.target.value = ""; return; } setPhoto(f); }} style={{ fontSize: 12 }} /></div></Field>
+            <div style={{ gridColumn: "1 / -1", marginBottom: 14 }}><PhotoPicker file={photo} name={form.name} onChange={setPhoto} onError={setError} /></div>
             <Field label="Full name *"><input style={ui.input} value={form.name} onChange={set("name")} /></Field>
             <Field label="Gender"><select style={ui.input} value={form.gender} onChange={set("gender")}><option value="">Select</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select></Field>
             <Field label="Date of birth"><input style={ui.input} type="date" value={form.dob} max={today()} onChange={set("dob")} /></Field>
@@ -132,7 +132,6 @@ export default function StudentsPage() {
               {DOCS.map(([k, l]) => <label key={k} style={{ fontSize: 13, display: "flex", gap: 6, alignItems: "center" }}><input type="checkbox" checked={form.documents.includes(k)} onChange={() => toggleDoc(k)} />{l}</label>)}
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}><button style={ui.ghost} onClick={() => setOpen(false)}>Cancel</button><button style={ui.btn} onClick={save}>Admit student</button></div>
         </Modal>
       )}
     </div>

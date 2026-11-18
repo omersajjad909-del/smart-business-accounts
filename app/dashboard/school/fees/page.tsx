@@ -7,6 +7,7 @@ type Invoice = {
   id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; lateFee: number;
   payments: Payment[]; student: { name: string; admissionNo: string; class: { name: string; section: string } | null };
 };
+type Head = { id: string; name: string; frequency: string; optional: boolean; active: boolean };
 type Resp = { invoices: Invoice[]; summary: { billed: number; collected: number; outstanding: number } };
 
 export default function FeesPage() {
@@ -17,6 +18,9 @@ export default function FeesPage() {
   const { data, loading, reload } = useApi<Resp>(`/api/school/fees?${qs}`, { invoices: [], summary: { billed: 0, collected: 0, outstanding: 0 } });
   const { data: classes } = useApi<ClassRow[]>("/api/school/classes", []);
 
+  const { data: headData } = useApi<{ heads: Head[] }>("/api/school/fee-heads", { heads: [] });
+  const activeHeads = headData.heads.filter((h) => h.active);
+  const [picked, setPicked] = useState<string[] | null>(null);
   const [gen, setGen] = useState(false);
   const [genForm, setGenForm] = useState({ classId: "", dueDate: today() });
   const [payFor, setPayFor] = useState<Invoice | null>(null);
@@ -25,10 +29,10 @@ export default function FeesPage() {
   const [notice, setNotice] = useState("");
 
   async function generate() {
-    const r = await api<{ created: number; skipped: number; noFee: number }>("/api/school/fees", { method: "POST", body: { action: "generate", period, ...genForm } });
+    const r = await api<{ created: number; skipped: number; noFee: number }>("/api/school/fees", { method: "POST", body: { action: "generate", period, ...genForm, headIds: picked ?? activeHeads.filter((h) => h.frequency === "MONTHLY").map((h) => h.id) } });
     if (!r.ok) return setError(r.error);
     setGen(false); setError("");
-    setNotice(`${r.data.created} invoices created, ${r.data.skipped} already existed${r.data.noFee ? `, ${r.data.noFee} students skipped (class has no fee set)` : ""}.`);
+    setNotice(`${r.data.created} invoices created, ${r.data.skipped} already existed${r.data.noFee ? `, ${r.data.noFee} fee line(s) skipped because the class has no amount set` : ""}.`);
     void reload();
   }
   async function lateFee() {
@@ -87,7 +91,20 @@ export default function FeesPage() {
           <ErrorLine text={error} />
           <Field label="Class"><ClassSelect classes={classes} value={genForm.classId} onChange={(v) => setGenForm({ ...genForm, classId: v })} allLabel="All classes" /></Field>
           <Field label="Due date"><input style={ui.input} type="date" value={genForm.dueDate} onChange={(e) => setGenForm({ ...genForm, dueDate: e.target.value })} /></Field>
-          <p style={ui.sub}>Uses each class&apos;s monthly fee minus the student&apos;s discount. Existing invoices are never duplicated.</p>
+          {activeHeads.length > 0 ? (
+            <Field label="Fees to bill">
+              {activeHeads.map((h) => {
+                const sel = picked ?? activeHeads.filter((x) => x.frequency === "MONTHLY").map((x) => x.id);
+                return (
+                  <label key={h.id} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, padding: "4px 0" }}>
+                    <input type="checkbox" checked={sel.includes(h.id)} onChange={() => setPicked(sel.includes(h.id) ? sel.filter((x) => x !== h.id) : [...sel, h.id])} />
+                    {h.name} <span style={ui.sub}>· {h.frequency.replace("_", " ").toLowerCase()}{h.optional ? " · enrolled students only" : ""}</span>
+                  </label>
+                );
+              })}
+            </Field>
+          ) : <p style={ui.sub}>No fee types set up yet — this bills each class&apos;s single monthly fee. Add more under Fee Structure.</p>}
+          <p style={ui.sub}>One-time and annual fees are never billed twice to the same student. Existing invoices are never duplicated.</p>
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button style={ui.ghost} onClick={() => setGen(false)}>Cancel</button><button style={ui.btn} onClick={generate}>Generate</button></div>
         </Modal>
       )}

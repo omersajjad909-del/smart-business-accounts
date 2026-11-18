@@ -1853,6 +1853,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["school"],
   },
   {
+    id: "SCHOOL_FEE_STRUCTURE",
+    label: "Fee Structure",
+    route: "/dashboard/school/fee-structure",
+    business: "school",
+    businessLabel: "School",
+    section: "Fees",
+    businessTypes: ["school"],
+  },
+  {
     id: "SCHOOL_EXAMS",
     label: "Exams & Results",
     route: "/dashboard/school/results",

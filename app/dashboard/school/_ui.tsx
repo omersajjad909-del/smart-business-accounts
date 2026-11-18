@@ -8,8 +8,8 @@ export const ui = {
   sub: { fontSize: 13, color: "rgba(var(--ink),.5)", marginTop: 4 } as CSSProperties,
   card: { background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.08)", borderRadius: 14, padding: 20 } as CSSProperties,
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 } as CSSProperties,
-  label: { fontSize: 11, color: "rgba(var(--ink),.5)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 6, display: "block" } as CSSProperties,
-  input: { background: "rgba(var(--ink),.05)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 8, padding: "9px 11px", color: "var(--ink-solid, #fff)", fontSize: 14, outline: "none", boxSizing: "border-box", width: "100%" } as CSSProperties,
+  label: { fontSize: 11, fontWeight: 600, color: "rgba(var(--ink),.55)", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6, display: "block" } as CSSProperties,
+  input: { background: "rgba(var(--ink),.04)", border: "1px solid rgba(var(--ink),.14)", borderRadius: 10, padding: "10px 12px", color: "var(--ink-solid, #fff)", fontSize: 14, outline: "none", boxSizing: "border-box", width: "100%", height: 42 } as CSSProperties,
   btn: { background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 18px", fontSize: 14, fontWeight: 600, cursor: "pointer" } as CSSProperties,
   ghost: { background: "rgba(var(--ink),.07)", color: "var(--ink-solid, #fff)", border: "none", borderRadius: 8, padding: "9px 14px", fontSize: 13, cursor: "pointer" } as CSSProperties,
   th: { padding: "12px 14px", textAlign: "left", fontSize: 11, color: "rgba(var(--ink),.45)", textTransform: "uppercase", letterSpacing: ".5px", borderBottom: "1px solid rgba(var(--ink),.08)", whiteSpace: "nowrap" } as CSSProperties,
@@ -70,12 +70,16 @@ export function Badge({ value }: { value: string }) {
   return <span style={{ background: BADGE[value] ?? "#64748b", color: "#fff", borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>{value.replace("_", " ")}</span>;
 }
 
-export function Modal({ title, onClose, children, width = 520 }: { title: string; onClose: () => void; children: ReactNode; width?: number }) {
+export function Modal({ title, subtitle, onClose, children, footer, width = 520 }: { title: string; subtitle?: string; onClose: () => void; children: ReactNode; footer?: ReactNode; width?: number }) {
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }} onClick={onClose}>
-      <div style={{ background: "var(--dk-1a1d2e, #1a1d2e)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 16, padding: 24, width: `min(${width}px,100%)`, maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 18 }}>{title}</div>
-        {children}
+    <div style={{ position: "fixed", inset: 0, background: "rgba(8,10,20,.6)", backdropFilter: "blur(3px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }} onClick={onClose}>
+      <div style={{ background: "var(--dk-1a1d2e, #1a1d2e)", border: "1px solid rgba(var(--ink),.12)", borderRadius: 18, width: `min(${width}px,100%)`, maxHeight: "92vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 60px rgba(0,0,0,.45)" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "20px 24px 16px", borderBottom: "1px solid rgba(var(--ink),.08)" }}>
+          <div><div style={{ fontSize: 18, fontWeight: 700 }}>{title}</div>{subtitle && <div style={{ fontSize: 12.5, color: "rgba(var(--ink),.5)", marginTop: 3 }}>{subtitle}</div>}</div>
+          <button onClick={onClose} aria-label="Close" style={{ background: "rgba(var(--ink),.07)", border: "none", color: "inherit", width: 30, height: 30, borderRadius: 8, cursor: "pointer", fontSize: 16, lineHeight: 1 }}>×</button>
+        </div>
+        <div style={{ padding: "18px 24px", overflowY: "auto", flex: 1 }}>{children}</div>
+        {footer && <div style={{ padding: "14px 24px", borderTop: "1px solid rgba(var(--ink),.08)", display: "flex", justifyContent: "flex-end", gap: 10 }}>{footer}</div>}
       </div>
     </div>
   );
@@ -121,4 +125,37 @@ export async function uploadStudentPhoto(studentId: string, file: File): Promise
   } catch {
     return { error: "Network error" };
   }
+}
+
+/** Photo chooser with preview and a Remove button, for forms where the file is uploaded after save. */
+export function PhotoPicker({ file, name, onChange, onError }: { file: File | null; name: string; onChange: (f: File | null) => void; onError: (m: string) => void }) {
+  const [preview, setPreview] = useState<string | null>(null);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    if (!file) { setPreview(null); return; }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: 14, border: "1px dashed rgba(var(--ink),.2)", borderRadius: 14, background: "rgba(var(--ink),.03)" }}>
+      <Avatar url={preview} name={name || "Student"} size={76} />
+      <div>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>Student photo</div>
+        <div style={{ fontSize: 12, color: "rgba(var(--ink),.5)", marginBottom: 10 }}>JPG, PNG or WebP · up to 2MB · optional</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <label style={{ ...ui.ghost, display: "inline-block", cursor: "pointer" }}>
+            {file ? "Change photo" : "Choose photo"}
+            <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => {
+              const f = e.target.files?.[0] ?? null;
+              e.target.value = "";
+              if (f && f.size > 2 * 1024 * 1024) return onError("Photo must be under 2MB");
+              onChange(f);
+            }} />
+          </label>
+          {file && <button type="button" style={{ ...ui.ghost, color: "#f87171" }} onClick={() => onChange(null)}>Remove</button>}
+        </div>
+      </div>
+    </div>
+  );
 }

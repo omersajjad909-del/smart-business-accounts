@@ -15,6 +15,15 @@ type Profile = {
 export default function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data, loading, error, reload } = useApi<Profile | null>(`/api/school/students/${id}`, null);
+  const { data: optionalHeads } = useApi<{ heads: { id: string; name: string; optional: boolean; active: boolean; defaultAmount: number }[] }>("/api/school/fee-heads", { heads: [] });
+  const { data: enrolled, reload: reloadEnrolled } = useApi<{ id: string; headId: string; amount: number; head: { name: string } }[]>(`/api/school/student-fees?studentId=${id}`, []);
+  const [enrol, setEnrol] = useState({ headId: "", amount: "" });
+  const [feeMsg, setFeeMsg] = useState("");
+  async function addOptional() {
+    const r = await api("/api/school/student-fees", { method: "POST", body: { studentId: id, headId: enrol.headId, amount: Number(enrol.amount) } });
+    setFeeMsg(r.ok ? "" : r.error); if (r.ok) { setEnrol({ headId: "", amount: "" }); void reloadEnrolled(); }
+  }
+  async function dropOptional(rowId: string) { await api(`/api/school/student-fees?id=${rowId}`, { method: "DELETE" }); void reloadEnrolled(); }
   const fileRef = useRef<HTMLInputElement>(null);
   const [photoMsg, setPhotoMsg] = useState("");
   async function onPick(file: File | undefined) {
@@ -78,6 +87,26 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
           {info.map(([k, v]) => <div key={k}><span style={ui.label}>{k}</span><div>{v}</div></div>)}
         </div>
       </div>
+
+      {optionalHeads.heads.some((h) => h.optional && h.active) && (
+        <div style={{ ...ui.card, marginBottom: 20 }}>
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>Optional fees (transport, hostel …)</div>
+          <p style={{ ...ui.sub, marginTop: 0 }}>Billed monthly only to students enrolled here, at the amount you set for this student.</p>
+          {enrolled.map((e) => (
+            <div key={e.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(var(--ink),.06)" }}>
+              <span>{e.head.name} · {money(e.amount)}</span><button style={ui.ghost} onClick={() => dropOptional(e.id)}>Remove</button>
+            </div>
+          ))}
+          <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+            <select style={{ ...ui.input, width: 200 }} value={enrol.headId} onChange={(e) => setEnrol({ headId: e.target.value, amount: String(optionalHeads.heads.find((h) => h.id === e.target.value)?.defaultAmount || "") })}>
+              <option value="">Enrol in…</option>{optionalHeads.heads.filter((h) => h.optional && h.active && !enrolled.some((x) => x.headId === h.id)).map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+            </select>
+            <input style={{ ...ui.input, width: 130 }} type="number" min={1} placeholder="Amount" value={enrol.amount} onChange={(e) => setEnrol({ ...enrol, amount: e.target.value })} />
+            <button style={ui.btn} disabled={!enrol.headId || !enrol.amount} onClick={addOptional}>Enrol</button>
+          </div>
+          {feeMsg && <div style={{ color: "#f87171", fontSize: 12, marginTop: 6 }}>{feeMsg}</div>}
+        </div>
+      )}
 
       <div style={{ ...ui.card, marginBottom: 20, padding: 0, overflowX: "auto" }}>
         <div style={{ fontWeight: 700, padding: "16px 20px 4px" }}>Fee history</div>

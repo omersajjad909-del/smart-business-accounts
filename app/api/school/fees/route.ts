@@ -51,25 +51,60 @@ export async function POST(req: NextRequest) {
   const b = await req.json().catch(() => ({}));
   const action = str(b.action);
 
-  // ── Bulk monthly invoice generation ────────────────────────────────────
+  // ── Bulk invoice generation ────────────────────────────────────────────
+  // Bills every selected fee head to every active student it applies to:
+  //   class heads    → the class's amount for that head
+  //   optional heads → only students enrolled in it, at their own amount
+  // ONE_TIME heads are never billed twice to a student, ANNUAL heads once a calendar year.
   if (action === "generate") {
     const period = str(b.period);
     const dueDate = parseDay(b.dueDate);
     if (!PERIOD_RE.test(period)) return bad("Period must look like 2026-11");
     if (!dueDate) return bad("Due date is required");
     const classId = str(b.classId);
+    const headIds: string[] = Array.isArray(b.headIds) ? b.headIds.map(String) : [];
+
+    const allHeads = await prisma.schoolFeeHead.findMany({ where: { companyId: ctx.companyId, active: true } });
+    // Nothing configured yet → the original single-fee behaviour (class.monthlyFee).
+    const heads = allHeads.length === 0
+      ? [{ id: "_legacy", name: "Tuition Fee", frequency: "MONTHLY", optional: false }]
+      : allHeads.filter((h) => (headIds.length ? headIds.includes(h.id) : h.frequency === "MONTHLY"));
+    if (heads.length === 0) return bad("Select at least one fee to bill");
+
     const students = await prisma.schoolStudent.findMany({
       where: { companyId: ctx.companyId, status: "ACTIVE", classId: classId || { not: null } },
-      select: { id: true, discount: true, class: { select: { monthlyFee: true } } },
+      select: { id: true, classId: true, discount: true, class: { select: { monthlyFee: true } } },
     });
-    const data = students
-      .filter((s) => (s.class?.monthlyFee ?? 0) > 0)
-      .map((s) => ({
-        companyId: ctx.companyId, studentId: s.id, period, title: "Tuition Fee", dueDate,
-        amount: s.class!.monthlyFee, discount: Math.min(s.discount, s.class!.monthlyFee),
-      }));
+    const ids = students.map((s) => s.id);
+    const realIds = heads.filter((h) => h.id !== "_legacy").map((h) => h.id);
+    const [classFees, studentFees, prior] = await Promise.all([
+      prisma.schoolClassFee.findMany({ where: { companyId: ctx.companyId, headId: { in: realIds } } }),
+      prisma.schoolStudentFee.findMany({ where: { companyId: ctx.companyId, studentId: { in: ids }, headId: { in: realIds } } }),
+      prisma.schoolFeeInvoice.findMany({ where: { companyId: ctx.companyId, studentId: { in: ids }, title: { in: heads.map((h) => h.name) } }, select: { studentId: true, title: true, period: true } }),
+    ]);
+    const classFee = new Map(classFees.map((c) => [`${c.classId}|${c.headId}`, c.amount]));
+    const studentFee = new Map(studentFees.map((c) => [`${c.studentId}|${c.headId}`, c.amount]));
+    const billedEver = new Set(prior.map((p) => `${p.studentId}|${p.title}`));
+    const billedYear = new Set(prior.map((p) => `${p.studentId}|${p.title}|${p.period.slice(0, 4)}`));
+
+    const data: { companyId: string; studentId: string; period: string; title: string; dueDate: Date; amount: number; discount: number }[] = [];
+    let noFee = 0, alreadyBilled = 0;
+    for (const st of students) {
+      for (const h of heads) {
+        let amount = 0;
+        if (h.optional) amount = studentFee.get(`${st.id}|${h.id}`) ?? 0;
+        else {
+          amount = classFee.get(`${st.classId}|${h.id}`) ?? 0;
+          if (!amount && h.name === "Tuition Fee") amount = st.class?.monthlyFee ?? 0; // fall back to the class's single monthly fee
+        }
+        if (amount <= 0) { if (!h.optional) noFee++; continue; }
+        if (h.frequency === "ONE_TIME" && billedEver.has(`${st.id}|${h.name}`)) { alreadyBilled++; continue; }
+        if (h.frequency === "ANNUAL" && billedYear.has(`${st.id}|${h.name}|${period.slice(0, 4)}`)) { alreadyBilled++; continue; }
+        data.push({ companyId: ctx.companyId, studentId: st.id, period, title: h.name, dueDate, amount, discount: h.name === "Tuition Fee" ? Math.min(st.discount, amount) : 0 });
+      }
+    }
     const res = await prisma.schoolFeeInvoice.createMany({ data, skipDuplicates: true });
-    return NextResponse.json({ created: res.count, skipped: data.length - res.count, noFee: students.length - data.length });
+    return NextResponse.json({ created: res.count, skipped: data.length - res.count + alreadyBilled, noFee });
   }
 
   // ── One-off invoice (admission fee, exam fee, books …) ────────────────
