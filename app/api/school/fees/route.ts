@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { postSchoolFeeReceipt, syncSchoolFeeReceipts } from "@/lib/schoolAccounting";
 import { bad, invoiceStatus, invoiceTotals, isResponse, num, parseDay, schoolGuard, str } from "@/lib/schoolApi";
 
 const METHODS = ["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"];
@@ -103,6 +104,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ updated: res.count });
   }
 
+  // ── Post any receipts missing from the general ledger ────────────────
+  if (action === "sync_books") {
+    return NextResponse.json(await syncSchoolFeeReceipts(ctx.companyId));
+  }
+
   // ── Collect a payment ──────────────────────────────────────────────────
   if (action === "pay") {
     const invoiceId = str(b.invoiceId);
@@ -124,7 +130,17 @@ export async function POST(req: NextRequest) {
           const receiptNo = `RCP-${new Date().getFullYear()}-${String(seq + 1 + attempt).padStart(5, "0")}`;
           return tx.schoolPayment.create({ data: { companyId: ctx.companyId, invoiceId, amount, method, receiptNo, note: str(b.note) || null } });
         });
-        return NextResponse.json(payment, { status: 201 });
+        // Book it in the general ledger. The receipt stands even if posting fails;
+        // "Sync to books" on the fee page picks up anything missed.
+        const student = await prisma.schoolFeeInvoice.findUnique({ where: { id: invoiceId }, select: { student: { select: { name: true } } } });
+        let booked = true;
+        try {
+          await postSchoolFeeReceipt({ companyId: ctx.companyId, paymentId: payment.id, receiptNo: payment.receiptNo, studentName: student?.student.name ?? "", amount: payment.amount, method: payment.method, paidAt: payment.paidAt });
+        } catch (err) {
+          booked = false;
+          console.error("[school] ledger posting failed", err);
+        }
+        return NextResponse.json({ ...payment, booked }, { status: 201 });
       } catch (e) {
         if (e instanceof HttpError) return bad(e.message, e.status);
         if ((e as { code?: string }).code !== "P2002") throw e;

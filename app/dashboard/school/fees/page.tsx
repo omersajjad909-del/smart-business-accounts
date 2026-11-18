@@ -37,18 +37,22 @@ export default function FeesPage() {
     const r = await api<{ updated: number }>("/api/school/fees", { method: "POST", body: { action: "late_fee", period, amount: Number(v) } });
     setNotice(r.ok ? `Late fee applied to ${r.data.updated} invoices.` : r.error); void reload();
   }
+  async function syncBooks() {
+    const r = await api<{ posted: number; total: number }>("/api/school/fees", { method: "POST", body: { action: "sync_books" } });
+    setNotice(r.ok ? `${r.data.posted} receipt(s) posted to the ledger (${r.data.total} total).` : r.error);
+  }
   async function collect() {
     if (!payFor) return;
-    const r = await api<{ receiptNo: string }>("/api/school/fees", { method: "POST", body: { action: "pay", invoiceId: payFor.id, ...pay, amount: Number(pay.amount) } });
+    const r = await api<{ receiptNo: string; booked?: boolean }>("/api/school/fees", { method: "POST", body: { action: "pay", invoiceId: payFor.id, ...pay, amount: Number(pay.amount) } });
     if (!r.ok) return setError(r.error);
-    setNotice(`Receipt ${r.data.receiptNo} issued.`); setPayFor(null); setError(""); void reload();
+    setNotice(`Receipt ${r.data.receiptNo} issued${r.data.booked === false ? " — but posting to the ledger failed, use Sync to books." : " and posted to the ledger."}`); setPayFor(null); setError(""); void reload();
   }
 
   return (
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Fee Ledger</h1><p style={ui.sub}>Invoices, receipts and balances per student</p></div>
-        <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => setGen(true)}>Generate {period} invoices</button></div>
+        <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => setGen(true)}>Generate {period} invoices</button></div>
       </div>
       {notice && <div style={{ ...ui.card, marginBottom: 16, padding: 12, fontSize: 13 }}>{notice}</div>}
       <div style={ui.grid}>
