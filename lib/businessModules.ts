@@ -568,14 +568,13 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
   },
   */
 
-  /* PHASE-2+ (hidden for Phase 1 launch)
   // ── SCHOOL / EDUCATION ────────────────────────────────────
   {
     id: "school", label: "School / Academy", icon: "🏫", emoji: "🏫",
-    description: "Educational institutions — schools, colleges, academies, coaching centers",
-    tagline: "Enroll → Teach → Exam → Result",
+    description: "Schools, academies and coaching centers — admissions, class-wise fee ledger, attendance and exam results",
+    tagline: "Admit → Bill → Attend → Result",
     color: "#6366f1", gradient: "linear-gradient(135deg,#4f46e5,#6366f1)", category: "Education",
-    modules: [...CORE, "sales_invoice","expense_vouchers","hr_payroll","student_mgmt","fee_collection","class_schedule","exam_results","crm"],
+    modules: [...CORE, "sales_invoice","expense_vouchers","hr_payroll","student_mgmt","fee_collection","exam_results"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Fee Receivables", type: "Asset" },
@@ -597,12 +596,11 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     ],
     quickActions: [
       { label: "Collect Fee", href: "/dashboard/school/fees", icon: "💰", color: "#6366f1" },
-      { label: "Attendance", href: "/dashboard/attendance", icon: "📋", color: "#38bdf8" },
+      { label: "Attendance", href: "/dashboard/school/attendance", icon: "📋", color: "#38bdf8" },
       { label: "New Student", href: "/dashboard/school/students", icon: "👤", color: "#34d399" },
       { label: "Exam Results", href: "/dashboard/school/results", icon: "📊", color: "#fbbf24" },
     ],
   },
-  */
 
   /* PHASE-2+ (hidden for Phase 1 launch)
   // ── CONSTRUCTION ──────────────────────────────────────────
@@ -1864,7 +1862,7 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
 
   // ── Phase 4 — COMING SOON (Specialised / Institutional) ─────
   hospital:             { phase:4, status:"coming_soon", category:"Healthcare",        label:"Hospital / Clinic",       emoji:"🏥", description:"Patients, appointments, lab, OPD/IPD billing" },
-  school:               { phase:4, status:"coming_soon", category:"Education",         label:"School / College",        emoji:"🏫", description:"Students, fees, schedules, exams, results" },
+  school:               { phase:1, status:"live",        category:"Education",         label:"School / Academy",        emoji:"🏫", description:"Admissions, class-wise fee ledger, attendance, exam results" },
   hotel:                { phase:4, status:"coming_soon", category:"Hospitality",       label:"Hotel / Guesthouse",      emoji:"🏨", description:"Room booking, housekeeping, front desk, folios" },
   salon:                { phase:4, status:"coming_soon", category:"Beauty & Wellness", label:"Salon & Spa",             emoji:"✂️", description:"Appointments, stylists, service menu, commissions" },
   gym:                  { phase:4, status:"coming_soon", category:"Beauty & Wellness", label:"Gym & Fitness",           emoji:"🏋️", description:"Memberships, trainers, class schedules" },

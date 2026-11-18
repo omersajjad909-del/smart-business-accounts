@@ -82,12 +82,12 @@ const FLOW_MAP: Record<string, { step: string; icon: string; desc: string; link:
     { step: "Reports", icon: "📊", desc: "Doctor-wise revenue, patient volume, test turnaround, and insurance tracking.", link: "/dashboard/ai" },
   ],
   school: [
-    { step: "Admissions", icon: "📝", desc: "Register new students, assign class, collect admission fee and documents.", link: "/dashboard/school/students" },
-    { step: "Class Schedule", icon: "🗓️", desc: "Create timetable, assign teachers to classes and subjects.", link: "/dashboard/school/schedule" },
-    { step: "Attendance", icon: "✅", desc: "Daily student and teacher attendance tracking by class.", link: "/dashboard/school/attendance" },
-    { step: "Examinations", icon: "📖", desc: "Schedule exams, record marks, generate result cards and report cards.", link: "/dashboard/school/exams" },
-    { step: "Fee Collection", icon: "💵", desc: "Issue fee challan, record payments, track defaulters by class.", link: "/dashboard/school/fees" },
-    { step: "Reports & Analytics", icon: "📊", desc: "Class performance, fee collection status, student strength reports.", link: "/dashboard/ai" },
+    { step: "Set up Classes & Fees", icon: "🏫", desc: "Create classes and sections and set each class's monthly tuition fee.", link: "/dashboard/school/classes" },
+    { step: "Admit Students", icon: "📝", desc: "Register students, assign class, set guardian details and any fee discount.", link: "/dashboard/school/students" },
+    { step: "Generate Fee Invoices", icon: "🧾", desc: "Generate the month's invoices for every active student in one click.", link: "/dashboard/school/fees" },
+    { step: "Collect Fees", icon: "💵", desc: "Receive full or partial payments, issue receipt numbers, track defaulters.", link: "/dashboard/school/fees" },
+    { step: "Mark Attendance", icon: "✅", desc: "Mark daily attendance class by class.", link: "/dashboard/school/attendance" },
+    { step: "Exams & Results", icon: "📖", desc: "Create exams per class and subject, enter marks, see pass rate.", link: "/dashboard/school/results" },
   ],
   pharmacy: [
     { step: "Purchase Stock", icon: "🏭", desc: "Record medicines from suppliers with batch number and expiry date.", link: "/dashboard/pharmacy/purchases" },

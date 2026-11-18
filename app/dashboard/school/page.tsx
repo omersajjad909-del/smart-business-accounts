@@ -1,100 +1,39 @@
 "use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { fetchJson, schoolBg, schoolBorder, schoolFont, schoolMuted, type SchoolControlCenter } from "./_shared";
-import { useResponsive } from "@/hooks/useResponsive";
+import { money, Stat, ui, useApi } from "./_ui";
 
-const emptyState: SchoolControlCenter = {
-  summary: { students: 0, activeStudents: 0, defaulters: 0, collectedFees: 0, pendingFees: 0, schedules: 0, exams: 0, passRate: 0, pendingAdmissions: 0, teachers: 0, attendancePresent: 0, attendanceTotal: 0 },
-  students: [],
-  fees: [],
-  schedules: [],
-  exams: [],
-  admissions: [],
-  attendance: [],
-  teachers: [],
+type Overview = {
+  activeStudents: number; classes: number; collectedThisMonth: number; outstanding: number; overdue: number;
+  defaulters: { name: string; admissionNo: string; balance: number }[];
+  attendanceToday: { marked: number; present: number; absent: number };
 };
+const empty: Overview = { activeStudents: 0, classes: 0, collectedThisMonth: 0, outstanding: 0, overdue: 0, defaulters: [], attendanceToday: { marked: 0, present: 0, absent: 0 } };
 
-export default function SchoolOverviewPage() {
-  const { isMobile } = useResponsive();
-  const [data, setData] = useState(emptyState);
-
-  useEffect(() => {
-    fetchJson("/api/school/control-center", emptyState).then(setData);
-  }, []);
-
-  const { summary, students } = data;
-
+export default function SchoolOverview() {
+  const { data, loading, error } = useApi<Overview>("/api/school/overview", empty);
+  const a = data.attendanceToday;
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: schoolFont }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>School Command Center</h1>
-          <p style={{ margin: 0, fontSize: 13, color: schoolMuted }}>Admissions, fees, schedules, and exam health in one view.</p>
-        </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {[
-            { label: "Students", href: "/dashboard/school/students" },
-            { label: "Fees", href: "/dashboard/school/fees" },
-            { label: "Schedule", href: "/dashboard/school/schedule" },
-            { label: "Exams", href: "/dashboard/school/exams" },
-            { label: "Analytics", href: "/dashboard/school/analytics" },
-          ].map((item) => (
-            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: isMobile ? "8px 8px" : "10px 14px", borderRadius: 10, border: `1px solid ${schoolBorder}`, background: schoolBg, color: "#a5b4fc", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
-              {item.label}
-            </Link>
-          ))}
-        </div>
+    <div style={ui.page}>
+      <div style={ui.head}>
+        <div><h1 style={ui.h1}>School Overview</h1><p style={ui.sub}>Students, fee collection and today&apos;s attendance</p></div>
+        <Link href="/dashboard/school/fees" style={{ ...ui.btn, textDecoration: "none" }}>Collect Fee</Link>
       </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
-        {[
-          { label: "Students", value: summary.students, color: "var(--tx-818cf8, #818cf8)" },
-          { label: "Active Students", value: summary.activeStudents, color: "var(--tx-34d399, #34d399)" },
-          { label: "Collected Fees", value: `Rs. ${summary.collectedFees.toLocaleString()}`, color: "var(--tx-60a5fa, #60a5fa)" },
-          { label: "Pending Fees", value: `Rs. ${summary.pendingFees.toLocaleString()}`, color: "var(--tx-f87171, #f87171)" },
-          { label: "Pass Rate", value: `${summary.passRate}%`, color: "var(--tx-f59e0b, #f59e0b)" },
-        ].map((card) => (
-          <div key={card.label} style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 14, padding: isMobile ? "11px 10px" : "18px 20px" }}>
-            <div style={{ fontSize: 12, color: schoolMuted, marginBottom: 8 }}>{card.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
-          </div>
-        ))}
+      {error && <div style={{ color: "#f87171", marginBottom: 12 }}>{error}</div>}
+      <div style={ui.grid}>
+        <Stat label="Active Students" value={loading ? "…" : data.activeStudents} hint={`${data.classes} classes`} />
+        <Stat label="Collected This Month" value={money(data.collectedThisMonth)} />
+        <Stat label="Outstanding" value={money(data.outstanding)} hint={`${money(data.overdue)} overdue`} />
+        <Stat label="Attendance Today" value={a.marked ? `${Math.round((a.present / a.marked) * 100)}%` : "Not marked"} hint={a.marked ? `${a.present} present · ${a.absent} absent` : undefined} />
       </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 18 }}>
-        <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Academic Snapshot</div>
-          <div style={{ padding: 18, display: "grid", gap: 10 }}>
-            {[
-              { label: "Scheduled periods", value: summary.schedules, color: "var(--tx-a5b4fc, #a5b4fc)" },
-              { label: "Fee defaulters", value: summary.defaulters, color: "var(--tx-f87171, #f87171)" },
-              { label: "Pending admissions", value: summary.pendingAdmissions, color: "var(--tx-f59e0b, #f59e0b)" },
-              { label: "Teachers", value: summary.teachers, color: "var(--tx-34d399, #34d399)" },
-              { label: "Attendance today", value: `${summary.attendancePresent}/${summary.attendanceTotal}`, color: "var(--tx-60a5fa, #60a5fa)" },
-            ].map((row) => (
-              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: isMobile ? "8px 8px" : "10px 12px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
-                <span style={{ fontSize: 13, color: schoolMuted }}>{row.label}</span>
-                <span style={{ fontSize: 16, fontWeight: 800, color: row.color }}>{row.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 16, overflow: "hidden" }}>
-          <div style={{ padding: isMobile ? "10px 9px" : "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Watchlist</div>
-          <div style={{ padding: 18, display: "grid", gap: 10 }}>
-            {students.filter((row) => row.feeStatus === "overdue").slice(0, 5).map((student) => (
-              <div key={student.id} style={{ padding: isMobile ? "8px 8px" : "12px 14px", borderRadius: 10, background: "rgba(var(--ink),.03)", border: "1px solid rgba(var(--ink),.05)" }}>
-                <div style={{ fontSize: 14, fontWeight: 700 }}>{student.name}</div>
-                <div style={{ fontSize: 12, color: schoolMuted, marginTop: 4 }}>Roll {student.rollNo} | Class {student.className}{student.section ? `-${student.section}` : ""}</div>
-                <div style={{ fontSize: 12, color: "var(--tx-fca5a5, #fca5a5)", marginTop: 6 }}>Fee status: {student.feeStatus}</div>
-              </div>
-            ))}
-            {students.filter((row) => row.feeStatus === "overdue").length === 0 && <div style={{ color: "rgba(var(--ink),var(--ta-28, .28))" }}>No overdue student accounts right now.</div>}
-          </div>
-        </div>
+      <div style={ui.card}>
+        <div style={{ fontWeight: 700, marginBottom: 12 }}>Top defaulters (overdue)</div>
+        {data.defaulters.length === 0 ? <div style={ui.sub}>No overdue fees.</div> : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>{data.defaulters.map((d) => (
+              <tr key={d.admissionNo}><td style={ui.td}>{d.admissionNo}</td><td style={ui.td}>{d.name}</td><td style={{ ...ui.td, textAlign: "right", fontWeight: 600 }}>{money(d.balance)}</td></tr>
+            ))}</tbody>
+          </table>
+        )}
       </div>
     </div>
   );

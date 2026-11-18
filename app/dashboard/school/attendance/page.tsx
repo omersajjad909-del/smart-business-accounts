@@ -1,117 +1,60 @@
 "use client";
+import { useEffect, useState } from "react";
+import { api, ClassRow, ClassSelect, ErrorLine, today, ui, useApi } from "../_ui";
 
-import { useMemo, useState } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { mapAttendanceRecords, mapStudentRecords, schoolBg, schoolBorder, schoolFont, schoolMuted, todayIso } from "../_shared";
-import { useResponsive } from "@/hooks/useResponsive";
+type Row = { id: string; name: string; admissionNo: string; status: string | null };
+const OPTIONS = [["PRESENT", "#16a34a"], ["ABSENT", "#dc2626"], ["LATE", "#ca8a04"], ["LEAVE", "#0284c7"]] as const;
 
-export default function SchoolAttendancePage() {
-  const { isMobile } = useResponsive();
-  const attendanceStore = useBusinessRecords("school_attendance");
-  const studentStore = useBusinessRecords("student");
-  const { records, loading, create } = attendanceStore;
-  const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState("");
-  const [form, setForm] = useState({ student: "", className: "", date: todayIso(), status: "present", remarks: "" });
+export default function AttendancePage() {
+  const { data: classes } = useApi<ClassRow[]>("/api/school/classes", []);
+  const [classId, setClassId] = useState("");
+  const [date, setDate] = useState(today());
+  const { data: loaded, loading } = useApi<Row[]>(classId ? `/api/school/attendance?classId=${classId}&date=${date}` : null, []);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [msg, setMsg] = useState(""); const [error, setError] = useState("");
 
-  const attendance = useMemo(() => mapAttendanceRecords(records), [records]);
-  const students = useMemo(() => mapStudentRecords(studentStore.records), [studentStore.records]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setRows(loaded.map((r) => ({ ...r, status: r.status ?? "PRESENT" }))); setMsg(""); }, [loaded]);
 
+  const mark = (id: string, status: string) => setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status } : r)));
   async function save() {
-    if (!form.student || !form.className || !form.date) {
-      setError("Student, class, and date are required.");
-      return;
-    }
-    if (!students.some((row) => row.name === form.student && row.className === form.className)) {
-      setError("Selected student does not exist in the selected class.");
-      return;
-    }
-    if (attendance.some((row) => row.student === form.student && row.className === form.className && row.date === form.date)) {
-      setError("Attendance already exists for this student on this date.");
-      return;
-    }
-    await create({
-      title: form.student,
-      status: form.status,
-      date: form.date,
-      data: { class: form.className, remarks: form.remarks.trim() },
-    });
-    setShowModal(false);
-    setError("");
-    setForm({ student: "", className: "", date: todayIso(), status: "present", remarks: "" });
+    const r = await api<{ saved: number }>("/api/school/attendance", { method: "POST", body: { date, classId, entries: rows.map((x) => ({ studentId: x.id, status: x.status })) } });
+    if (!r.ok) return setError(r.error);
+    setError(""); setMsg(`Attendance saved for ${r.data.saved} students.`);
   }
+  const absent = rows.filter((r) => r.status === "ABSENT").length;
 
   return (
-    <div style={{ minHeight: "100vh", padding: isMobile ? "17px 16px" : "28px 32px", color: "var(--ink-solid, #fff)", fontFamily: schoolFont }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
-        <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>Attendance Register</h1>
-          <p style={{ margin: 0, fontSize: 13, color: schoolMuted }}>Daily student attendance by class with duplicate-day protection.</p>
+    <div style={ui.page}>
+      <div style={ui.head}><div><h1 style={ui.h1}>Attendance</h1><p style={ui.sub}>Pick a class and date — everyone starts as present</p></div></div>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
+        <ClassSelect classes={classes} value={classId} onChange={setClassId} />
+        <input style={{ ...ui.input, width: 170 }} type="date" value={date} max={today()} onChange={(e) => setDate(e.target.value)} />
+      </div>
+      <ErrorLine text={error} />
+      {!classId ? <div style={ui.sub}>Select a class to begin.</div> : (
+        <div style={{ ...ui.card, padding: 0, overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {!loading && rows.length === 0 && <tr><td style={{ ...ui.td, textAlign: "center", padding: 32 }}>No active students in this class.</td></tr>}
+              {rows.map((r) => (
+                <tr key={r.id}>
+                  <td style={ui.td}>{r.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}>{r.name}</td>
+                  <td style={{ ...ui.td, textAlign: "right" }}>
+                    {OPTIONS.map(([s, c]) => (
+                      <button key={s} onClick={() => mark(r.id, s)} style={{ ...ui.ghost, marginLeft: 6, padding: "6px 10px", fontSize: 12, background: r.status === s ? c : undefined, color: r.status === s ? "#fff" : undefined }}>{s[0] + s.slice(1).toLowerCase()}</button>
+                    ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <button onClick={() => setShowModal(true)} style={{ padding: isMobile ? "8px 9px" : "10px 18px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Mark Attendance</button>
-      </div>
-
-      <div style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 14, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>{["Student", "Class", "Date", "Status", "Remarks"].map((head) => (
-              <th key={head} style={{ textAlign: "left", padding: isMobile ? "8px 8px" : "12px 16px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 12, color: schoolMuted }}>{head}</th>
-            ))}</tr>
-          </thead>
-          <tbody>
-            {attendance.map((row) => (
-              <tr key={row.id}>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)", fontWeight: 700 }}>{row.student}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>Class {row.className}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.date}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.status}</td>
-                <td style={{ padding: isMobile ? "8px 8px" : "14px 16px", borderBottom: "1px solid rgba(var(--ink),.04)" }}>{row.remarks || "—"}</td>
-              </tr>
-            ))}
-            {!loading && attendance.length === 0 && <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(var(--ink),var(--ta-25, .25))" }}>No attendance records yet.</td></tr>}
-          </tbody>
-        </table>
-      </div>
-
-      {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 560, background: "var(--dk-161b27, #161b27)", border: `1px solid ${schoolBorder}`, borderRadius: 16, padding: 28 }}>
-            <h2 style={{ margin: "0 0 18px", fontSize: 18, fontWeight: 800 }}>Mark Attendance</h2>
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-              <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Student</label>
-                <select value={form.student} onChange={(e) => setForm((prev) => ({ ...prev, student: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }}>
-                  <option value="">Select student</option>
-                  {students.map((row) => <option key={row.id} value={row.name}>{row.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Class</label>
-                <input value={form.className} onChange={(e) => setForm((prev) => ({ ...prev, className: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Date</label>
-                <input type="date" value={form.date} onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Status</label>
-                <select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }}>
-                  <option value="present">Present</option>
-                  <option value="absent">Absent</option>
-                  <option value="leave">Leave</option>
-                </select>
-              </div>
-              <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 12, color: schoolMuted }}>Remarks</label>
-                <input value={form.remarks} onChange={(e) => setForm((prev) => ({ ...prev, remarks: e.target.value }))} style={{ width: "100%", padding: isMobile ? "8px 8px" : "10px 12px", background: "var(--dk-111827, #111827)", border: `1px solid ${schoolBorder}`, borderRadius: 8, color: "var(--ink-solid, #fff)" }} />
-              </div>
-            </div>
-            {error && <div style={{ marginTop: 12, color: "var(--tx-fda4af, #fda4af)", fontSize: 12 }}>{error}</div>}
-            <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
-              <button onClick={save} style={{ flex: 1, padding: "11px 0", borderRadius: 8, border: "none", background: "#6366f1", color: "#fff", fontWeight: 700, cursor: "pointer" }}>Save</button>
-              <button onClick={() => { setShowModal(false); setError(""); }} style={{ padding: isMobile ? "8px 9px" : "11px 18px", borderRadius: 8, border: `1px solid ${schoolBorder}`, background: "transparent", color: "var(--tx-cbd5e1, #cbd5e1)", cursor: "pointer" }}>Cancel</button>
-            </div>
-          </div>
+      )}
+      {rows.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 16 }}>
+          <button style={ui.btn} onClick={save}>Save attendance</button>
+          <span style={ui.sub}>{rows.length} students · {absent} absent</span>{msg && <span style={{ color: "#4ade80", fontSize: 13 }}>{msg}</span>}
         </div>
       )}
     </div>

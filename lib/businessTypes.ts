@@ -63,7 +63,7 @@ export const ALL_BUSINESS_TYPES: BusinessType[] = [
 
   // ── PHASE 4 ───────────────────────────────────────────────────
   { id: "hospital",         label: "Hospital / Clinic",        icon: "🏥", phase: 4, liveByDefault: false, category: "Healthcare",    description: "Patient billing, pharmacy stock, and doctor scheduling" },
-  { id: "school",           label: "School / Institute",       icon: "🏫", phase: 4, liveByDefault: false, category: "Education",     description: "Fee collection, payroll, and student ledger management" },
+  { id: "school",           label: "School / Institute",       icon: "🏫", phase: 1, liveByDefault: true, category: "Education",     description: "Admissions, class-wise fee ledger, attendance, and exam results" },
   { id: "ngo",              label: "NGO / Non-Profit",         icon: "🤝", phase: 4, liveByDefault: false, category: "Social",        description: "Donor tracking, grant management, and fund accounting" },
   { id: "franchise",        label: "Franchise",                icon: "🏬", phase: 4, liveByDefault: false, category: "Corporate",     description: "Royalty billing, outlet performance, and brand compliance" },
   { id: "university",       label: "University / College",     icon: "🎓", phase: 4, liveByDefault: false, category: "Education",     description: "Department budgets, fee management, and research grants" },

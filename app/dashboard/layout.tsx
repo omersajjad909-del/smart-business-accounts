@@ -2017,14 +2017,11 @@ export default function DashboardLayout({
           {hasModule(businessType, "student_mgmt") && isBusinessEnabled(businessType) && (
             <NavGroup title="School" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "school"} onToggle={() => toggle("school")}>
               {hasDashboardFeature("SCHOOL_OVERVIEW") && <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>}
-              {hasDashboardFeature("SCHOOL_ADMISSIONS") && <NavLink href="/dashboard/school/admissions" pathname={pathname}>Admissions</NavLink>}
-              {hasDashboardFeature("SCHOOL_STUDENTS") && <NavLink href="/dashboard/school/students" pathname={pathname}>Students</NavLink>}
+              {hasDashboardFeature("SCHOOL_CLASSES") && <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fees</NavLink>}
+              {hasDashboardFeature("SCHOOL_STUDENTS") && <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>}
               {hasDashboardFeature("SCHOOL_ATTENDANCE") && <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>}
-              {hasDashboardFeature("SCHOOL_TEACHERS") && <NavLink href="/dashboard/school/teachers" pathname={pathname}>Teachers & Rooms</NavLink>}
-              {hasDashboardFeature("SCHOOL_FEES") && <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Collection</NavLink>}
-              {hasDashboardFeature("SCHOOL_SCHEDULE") && <NavLink href="/dashboard/school/schedule" pathname={pathname}>Class Schedule</NavLink>}
-              {hasDashboardFeature("SCHOOL_EXAMS") && <NavLink href="/dashboard/school/exams" pathname={pathname}>Exam Results</NavLink>}
-              {hasDashboardFeature("SCHOOL_ANALYTICS") && <NavLink href="/dashboard/school/analytics" pathname={pathname}>Analytics</NavLink>}
+              {hasDashboardFeature("SCHOOL_FEES") && <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Ledger</NavLink>}
+              {hasDashboardFeature("SCHOOL_EXAMS") && <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>}
             </NavGroup>
           )}
 

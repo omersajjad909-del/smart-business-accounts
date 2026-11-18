@@ -19,10 +19,12 @@ model Account {
   type          String
   parentId      String?
   partyType     String?
-  /* Which sort of party, in the trade's own words — "Hotel", "Airline /
-     Consolidator". partyType says which side of the ledger they sit on, which
-     is all the accounting needs; it cannot tell a hotel from an airline, so a
-     booking screen asking for a hotel had to offer every payable on file. */
+  /**
+   * Which sort of party, in the trade's own words — "Hotel", "Airline /
+   * Consolidator". partyType says which side of the ledger they sit on, which
+   * is all the accounting needs; it cannot tell a hotel from an airline, so a
+   * booking screen asking for a hotel had to offer every payable on file.
+   */
   partyKind     String?
   inventoryTxns InventoryTxn[]
 
@@ -261,14 +263,14 @@ model PurchaseInvoice {
 }
 
 model PurchaseInvoiceItem {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   invoiceId       String
   itemId          String
   qty             Float
   rate            Float
   amount          Float
-  discountPercent Float  @default(0)
-  taxPercent      Float  @default(0)
+  discountPercent Float   @default(0)
+  taxPercent      Float   @default(0)
   // The tax code picked for this line, snapshotted with its category and the
   // amounts it produced. All null on a line that carries no tax code (tax is
   // optional — the line's own taxPercent still applies exactly as before), and
@@ -696,6 +698,13 @@ model Company {
   fixedAssets           FixedAsset[]
   sessions              Session[]
   businessRecords       BusinessRecord[]
+  schoolClasses         SchoolClass[]
+  schoolStudents        SchoolStudent[]
+  schoolFeeInvoices     SchoolFeeInvoice[]
+  schoolPayments        SchoolPayment[]
+  schoolAttendance      SchoolAttendance[]
+  schoolExams           SchoolExam[]
+  schoolResults         SchoolResult[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -3282,8 +3291,8 @@ model MarketSignal {
 // so /admin/google-ads has something real to show instead of nothing.
 
 model GoogleAdsSnapshot {
-  id           String   @id @default(cuid())
-  campaignName String
+  id            String   @id @default(cuid())
+  campaignName  String
   dateRangeFrom DateTime
   dateRangeTo   DateTime
 
@@ -3314,4 +3323,140 @@ model GoogleAdsAuth {
   createdAt    DateTime @default(now())
 
   @@index([createdAt])
+}
+
+// ── School (Education) ───────────────────────────────────────────────────────
+//
+// Real tables, not BusinessRecord JSON: a fee ledger has to be summed, a roll
+// number has to be unique, attendance has to be one row per student per day.
+// College/University gets its own tables later (departments, semesters).
+
+model SchoolClass {
+  id         String   @id @default(uuid())
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name       String // "Class 9", "Nursery"
+  section    String   @default("") // "A", "B" or empty
+  monthlyFee Float    @default(0) // default tuition fee used by bulk invoice generation
+  createdAt  DateTime @default(now())
+
+  students SchoolStudent[]
+  exams    SchoolExam[]
+
+  @@unique([companyId, name, section])
+}
+
+model SchoolStudent {
+  id            String       @id @default(uuid())
+  companyId     String
+  company       Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId       String?
+  class         SchoolClass? @relation(fields: [classId], references: [id], onDelete: SetNull)
+  admissionNo   String
+  name          String
+  guardianName  String?
+  phone         String?
+  dob           DateTime?
+  gender        String? // MALE | FEMALE | OTHER
+  address       String?
+  admissionDate DateTime     @default(now())
+  /// APPLICANT | ACTIVE | LEFT | GRADUATED — only ACTIVE counts toward the plan student limit
+  status        String       @default("ACTIVE")
+  /// Fixed monthly discount on the class fee (scholarship / sibling concession)
+  discount      Float        @default(0)
+  createdAt     DateTime     @default(now())
+
+  invoices   SchoolFeeInvoice[]
+  attendance SchoolAttendance[]
+  results    SchoolResult[]
+
+  @@unique([companyId, admissionNo])
+  @@index([companyId, status])
+  @@index([classId])
+}
+
+model SchoolFeeInvoice {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  /// "2026-11" for monthly fees, or a free label for one-offs (admission, exam fee)
+  period    String
+  title     String        @default("Tuition Fee")
+  amount    Float
+  discount  Float         @default(0)
+  lateFee   Float         @default(0)
+  dueDate   DateTime
+  createdAt DateTime      @default(now())
+
+  payments SchoolPayment[]
+
+  /// One tuition invoice per student per period; one-offs use a distinct title.
+  @@unique([studentId, period, title])
+  @@index([companyId, period])
+  @@index([companyId, dueDate])
+}
+
+model SchoolPayment {
+  id        String           @id @default(uuid())
+  companyId String
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invoiceId String
+  invoice   SchoolFeeInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  receiptNo String
+  amount    Float
+  method    String           @default("CASH") // CASH | BANK | JAZZCASH | EASYPAISA | OTHER
+  note      String?
+  paidAt    DateTime         @default(now())
+
+  @@unique([companyId, receiptNo])
+  @@index([invoiceId])
+  @@index([companyId, paidAt])
+}
+
+model SchoolAttendance {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date      DateTime      @db.Date
+  status    String // PRESENT | ABSENT | LATE | LEAVE
+
+  @@unique([studentId, date])
+  @@index([companyId, date])
+}
+
+model SchoolExam {
+  id         String      @id @default(uuid())
+  companyId  String
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId    String
+  class      SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name       String // "Mid Term 2026"
+  subject    String
+  totalMarks Float       @default(100)
+  passMarks  Float       @default(33)
+  date       DateTime?
+  createdAt  DateTime    @default(now())
+
+  results SchoolResult[]
+
+  @@unique([classId, name, subject])
+  @@index([companyId])
+}
+
+model SchoolResult {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  examId    String
+  exam      SchoolExam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  marks     Float
+
+  @@unique([examId, studentId])
+  @@index([companyId])
 }
