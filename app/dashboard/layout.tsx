@@ -1616,6 +1616,8 @@ export default function DashboardLayout({
             </NavGroup>
             <NavGroup title="Academics" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "schAcademics"} onToggle={() => toggle("schAcademics")}>
               <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fee Plan</NavLink>
+              <NavLink href="/dashboard/school/subjects" pathname={pathname}>Subjects &amp; Teachers</NavLink>
+              <NavLink href="/dashboard/school/timetable" pathname={pathname}>Timetable</NavLink>
               <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>
               <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>
             </NavGroup>
@@ -1627,7 +1629,8 @@ export default function DashboardLayout({
             </NavGroup>
             <NavGroup title="Accounts &amp; Staff" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>} open={openSection === "schAccounts"} onToggle={() => toggle("schAccounts")}>
               <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>School Expenses</NavLink>
-              <NavLink href="/dashboard/employees" pathname={pathname}>Teachers &amp; Staff</NavLink>
+              <NavLink href="/dashboard/school/teachers" pathname={pathname}>Teachers</NavLink>
+              <NavLink href="/dashboard/employees" pathname={pathname}>Other Staff</NavLink>
               <NavLink href="/dashboard/payroll" pathname={pathname}>Salaries</NavLink>
               <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Ledger</NavLink>
               <NavLink href="/dashboard/reports/profit-loss" pathname={pathname}>Income &amp; Expense</NavLink>

@@ -705,6 +705,10 @@ model Company {
   schoolAttendance      SchoolAttendance[]
   schoolExams           SchoolExam[]
   schoolResults         SchoolResult[]
+  schoolSubjects        SchoolSubject[]
+  schoolTeachers        SchoolTeacher[]
+  schoolClassSubjects   SchoolClassSubject[]
+  schoolTimetable       SchoolTimetableEntry[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -3340,8 +3344,10 @@ model SchoolClass {
   monthlyFee Float    @default(0) // default tuition fee used by bulk invoice generation
   createdAt  DateTime @default(now())
 
-  students SchoolStudent[]
-  exams    SchoolExam[]
+  students  SchoolStudent[]
+  exams     SchoolExam[]
+  subjects  SchoolClassSubject[]
+  timetable SchoolTimetableEntry[]
 
   @@unique([companyId, name, section])
 }
@@ -3459,4 +3465,77 @@ model SchoolResult {
 
   @@unique([examId, studentId])
   @@index([companyId])
+}
+
+// ── School: subjects, teachers, allocation, timetable ───────────────────────
+
+model SchoolSubject {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  code      String?
+  createdAt DateTime @default(now())
+
+  classSubjects SchoolClassSubject[]
+  timetable     SchoolTimetableEntry[]
+
+  @@unique([companyId, name])
+}
+
+model SchoolTeacher {
+  id            String   @id @default(uuid())
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employeeNo    String
+  name          String
+  phone         String?
+  email         String?
+  qualification String?
+  joiningDate   DateTime @default(now())
+  /// ACTIVE | LEFT
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now())
+
+  classSubjects SchoolClassSubject[]
+  timetable     SchoolTimetableEntry[]
+
+  @@unique([companyId, employeeNo])
+  @@index([companyId, status])
+}
+
+/// Which subjects a class studies, and who teaches each.
+model SchoolClassSubject {
+  id        String         @id @default(uuid())
+  companyId String
+  company   Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId   String
+  class     SchoolClass    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   SchoolSubject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId String?
+  teacher   SchoolTeacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+
+  @@unique([classId, subjectId])
+  @@index([companyId])
+}
+
+/// One period of a class's weekly timetable. day: 1 = Monday … 6 = Saturday.
+model SchoolTimetableEntry {
+  id        String         @id @default(uuid())
+  companyId String
+  company   Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId   String
+  class     SchoolClass    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  day       Int
+  periodNo  Int
+  startTime String // "08:00"
+  endTime   String // "08:40"
+  subjectId String
+  subject   SchoolSubject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId String?
+  teacher   SchoolTeacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+
+  @@unique([classId, day, periodNo])
+  @@index([companyId, teacherId, day, periodNo])
 }
