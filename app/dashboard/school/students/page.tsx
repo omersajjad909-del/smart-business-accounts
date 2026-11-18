@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { api, Badge, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
 
@@ -29,7 +30,7 @@ export default function StudentsPage() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Students</h1><p style={ui.sub}>Admissions and student records. Only ACTIVE students are billed and marked.</p></div>
-        <button style={ui.btn} onClick={() => setOpen(true)}>+ New Admission</button>
+        <div style={{ display: "flex", gap: 10 }}><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setOpen(true)}>+ New Admission</button></div>
       </div>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
         <input style={{ ...ui.input, width: 240 }} placeholder="Search name, admission no, guardian" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -45,7 +46,7 @@ export default function StudentsPage() {
             {!loading && students.length === 0 && <tr><td colSpan={7} style={{ ...ui.td, textAlign: "center", padding: 32 }}>No students found.</td></tr>}
             {students.map((s) => (
               <tr key={s.id}>
-                <td style={{ ...ui.td, fontWeight: 700 }}>{s.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}>{s.name}</td>
+                <td style={{ ...ui.td, fontWeight: 700 }}>{s.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}><Link href={`/dashboard/school/students/${s.id}`} style={{ color: "inherit" }}>{s.name}</Link></td>
                 <td style={ui.td}>{className(s.class)}</td><td style={ui.td}>{s.guardianName || "—"}</td><td style={ui.td}>{s.phone || "—"}</td>
                 <td style={ui.td}><Badge value={s.status} /></td>
                 <td style={{ ...ui.td, textAlign: "right" }}>

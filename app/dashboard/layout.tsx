@@ -1607,6 +1607,35 @@ export default function DashboardLayout({
             >Dashboard</NavDirectLink>
           )}
 
+          {/* ── SCHOOL WORKSPACE ── a school gets its own navigation, not the trading menus */}
+          {businessType === "school" && (
+            <>
+            <NavGroup title="Students" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>} open={openSection === "schStudents"} onToggle={() => toggle("schStudents")}>
+              <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>
+              <NavLink href="/dashboard/school/students/promote" pathname={pathname}>Promote / Graduate</NavLink>
+            </NavGroup>
+            <NavGroup title="Academics" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "schAcademics"} onToggle={() => toggle("schAcademics")}>
+              <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fee Plan</NavLink>
+              <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>
+              <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>
+            </NavGroup>
+            <NavGroup title="Fees" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>} open={openSection === "schFees"} onToggle={() => toggle("schFees")}>
+              <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Ledger &amp; Collection</NavLink>
+            </NavGroup>
+            <NavGroup title="Reports" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>} open={openSection === "schReports"} onToggle={() => toggle("schReports")}>
+              <NavLink href="/dashboard/school/reports" pathname={pathname}>Class-wise Reports</NavLink>
+            </NavGroup>
+            <NavGroup title="Accounts &amp; Staff" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>} open={openSection === "schAccounts"} onToggle={() => toggle("schAccounts")}>
+              <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>School Expenses</NavLink>
+              <NavLink href="/dashboard/employees" pathname={pathname}>Teachers &amp; Staff</NavLink>
+              <NavLink href="/dashboard/payroll" pathname={pathname}>Salaries</NavLink>
+              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Ledger</NavLink>
+              <NavLink href="/dashboard/reports/profit-loss" pathname={pathname}>Income &amp; Expense</NavLink>
+            </NavGroup>
+            </>
+          )}
+
+          {businessType !== "school" && (<>
           {/* Dashboard utilities */}
           {canShowDashboardUtilities && (
             <div style={{marginBottom:6}}>
@@ -1648,20 +1677,9 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* ── SCHOOL ── */}
-          {hasModule(businessType, "student_mgmt") && isBusinessEnabled(businessType) && (
-            <NavGroup title="School" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "school"} onToggle={() => toggle("school")}>
-              {hasDashboardFeature("SCHOOL_OVERVIEW") && <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>}
-              {hasDashboardFeature("SCHOOL_CLASSES") && <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fees</NavLink>}
-              {hasDashboardFeature("SCHOOL_STUDENTS") && <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>}
-              {hasDashboardFeature("SCHOOL_ATTENDANCE") && <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>}
-              {hasDashboardFeature("SCHOOL_FEES") && <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Ledger</NavLink>}
-              {hasDashboardFeature("SCHOOL_EXAMS") && <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>}
-            </NavGroup>
-          )}
 
           {/* ── SALES & PURCHASE ── (hidden for retail which has its own groups) */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && !hasModule(businessType, "pos") && businessType !== "school" && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && !hasModule(businessType, "pos") && (
             <NavGroup
               title="Sales & Purchase"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>}
@@ -1694,7 +1712,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── INVENTORY ── (hidden for retail which has its own inventory group) */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && !hasModule(businessType, "pos") && businessType !== "school" && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && !hasModule(businessType, "pos") && (
             <NavGroup
               title="Inventory"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
@@ -2777,7 +2795,7 @@ export default function DashboardLayout({
           )}
 
           {/* ── RECEIVABLES & PAYABLES ── (schools bill through the fee ledger) */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && businessType !== "school" && (
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
             <NavGroup
               title="Receivables & Payables"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>}
@@ -2895,6 +2913,7 @@ export default function DashboardLayout({
             <NavLink href="/dashboard/import/oracle-guide" pathname={pathname}>📖 Migration Guide</NavLink>
           </NavGroup>
 
+          </>)}
           {/* ── SETTINGS ── */}
           {showSettingsSection && (
             <NavGroup

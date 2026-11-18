@@ -255,9 +255,11 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
       "/dashboard/school",
       "/dashboard/school/classes",
       "/dashboard/school/students",
+      "/dashboard/school/students/promote",
       "/dashboard/school/attendance",
       "/dashboard/school/fees",
       "/dashboard/school/results",
+      "/dashboard/school/reports",
     ],
   },
   {
