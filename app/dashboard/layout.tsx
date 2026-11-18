@@ -1626,6 +1626,7 @@ export default function DashboardLayout({
             </NavGroup>
             <NavGroup title="Reports" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>} open={openSection === "schReports"} onToggle={() => toggle("schReports")}>
               <NavLink href="/dashboard/school/reports" pathname={pathname}>Class-wise Reports</NavLink>
+              <NavLink href="/dashboard/school/messages" pathname={pathname}>Guardian Messages</NavLink>
             </NavGroup>
             <NavGroup title="Accounts &amp; Staff" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>} open={openSection === "schAccounts"} onToggle={() => toggle("schAccounts")}>
               <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>School Expenses</NavLink>
