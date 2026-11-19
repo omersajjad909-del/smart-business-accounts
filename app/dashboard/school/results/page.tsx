@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api, Badge, ClassRow, ClassSelect, className, ErrorLine, Field, Modal, Stat, ui, useApi, Guide } from "../_ui";
 
-type Exam = { id: string; name: string; subject: string; totalMarks: number; passMarks: number; class: { name: string; section: string }; resultsEntered: number };
+type Exam = { id: string; name: string; subject: string; date: string | null; totalMarks: number; passMarks: number; class: { name: string; section: string }; resultsEntered: number };
 type Detail = {
   exam: Exam; rows: { id: string; name: string; admissionNo: string; marks: number | null; passed: boolean | null; percent: number | null }[];
   summary: { entered: number; total: number; passed: number; passRate: number };
@@ -38,6 +38,13 @@ export default function ResultsPage() {
     setForm({ classId: "", name: "", subjects: [], date: "", totalMarks: "100", passMarks: "33" });
     void reloadExams();
   }
+  async function removeExam() {
+    const x = exams.find((e) => e.id === examId);
+    if (!x || !confirm(`Delete "${x.name} — ${x.subject}" and all ${x.resultsEntered} mark(s) entered for it? This cannot be undone.`)) return;
+    const r = await api(`/api/school/results?id=${examId}`, { method: "DELETE" });
+    if (!r.ok) return setError(r.error);
+    setExamId(""); setError(""); setMsg("Exam deleted."); void reloadExams();
+  }
   async function saveMarks() {
     const entries = Object.entries(marks).filter(([, v]) => v !== "").map(([studentId, v]) => ({ studentId, marks: Number(v) }));
     const r = await api<{ saved: number }>("/api/school/results", { method: "POST", body: { action: "marks", examId, entries } });
@@ -55,9 +62,11 @@ export default function ResultsPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
         <select style={{ ...ui.input, width: "auto", minWidth: 280 }} value={examId} onChange={(e) => { setExamId(e.target.value); setMsg(""); }}>
           <option value="">Select exam</option>
-          {exams.map((x) => <option key={x.id} value={x.id}>{x.name} — {x.subject} ({className(x.class)}) · {x.resultsEntered} entered</option>)}
+          {exams.map((x) => <option key={x.id} value={x.id}>{x.name} — {x.subject} ({className(x.class)}){x.date ? ` · ${x.date.slice(0, 10)}` : ""} · {x.resultsEntered} entered</option>)}
         </select>
+        {examId && <button style={ui.ghost} onClick={removeExam}>Delete exam</button>}
       </div>
+      {!detail && msg && <div style={{ ...ui.card, padding: 12, fontSize: 13, marginBottom: 14 }}>{msg}</div>}
       <ErrorLine text={error} />
       {detail && (
         <>

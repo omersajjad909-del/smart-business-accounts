@@ -48,9 +48,18 @@ export async function POST(req: NextRequest) {
     if (!name) return bad("Fee name is required");
     if (!FREQUENCIES.includes(frequency)) return bad("Invalid frequency");
     try {
+      const optional = b.optional === true;
       const row = await prisma.schoolFeeHead.create({
-        data: { companyId: ctx.companyId, name, frequency, optional: b.optional === true, defaultAmount: Math.max(0, num(b.defaultAmount)) },
+        data: { companyId: ctx.companyId, name, frequency, optional, defaultAmount: Math.max(0, num(b.defaultAmount)) },
       });
+      // Optionally give every existing class the same amount straight away (class-wide fees only).
+      const allClassAmount = num(b.allClassAmount);
+      if (!optional && allClassAmount > 0) {
+        const classes = await prisma.schoolClass.findMany({ where: { companyId: ctx.companyId }, select: { id: true } });
+        await prisma.schoolClassFee.createMany({
+          data: classes.map((c) => ({ companyId: ctx.companyId, classId: c.id, headId: row.id, amount: allClassAmount })), skipDuplicates: true,
+        });
+      }
       return NextResponse.json(row, { status: 201 });
     } catch (e) {
       if ((e as { code?: string }).code === "P2002") return bad("A fee with this name already exists", 409);
@@ -92,7 +101,24 @@ export async function PATCH(req: NextRequest) {
   const data: Record<string, unknown> = {};
   if (b.active !== undefined) data.active = b.active === true;
   if (b.defaultAmount !== undefined) data.defaultAmount = Math.max(0, num(b.defaultAmount));
-  const res = await prisma.schoolFeeHead.updateMany({ where: { id, companyId: ctx.companyId }, data });
+  if (b.name !== undefined) {
+    const name = str(b.name);
+    if (!name) return bad("Fee name is required");
+    data.name = name;
+  }
+  if (b.frequency !== undefined) {
+    const frequency = str(b.frequency).toUpperCase();
+    if (!FREQUENCIES.includes(frequency)) return bad("Invalid frequency");
+    data.frequency = frequency;
+  }
+  let res;
+  try {
+    res = await prisma.schoolFeeHead.updateMany({ where: { id, companyId: ctx.companyId }, data });
+  } catch (e) {
+    if ((e as { code?: string }).code === "P2002") return bad("A fee with this name already exists", 409);
+    throw e;
+  }
+
   if (!res.count) return bad("Fee not found", 404);
   return NextResponse.json({ ok: true });
 }

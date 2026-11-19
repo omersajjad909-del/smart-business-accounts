@@ -80,3 +80,13 @@ export async function POST(req: NextRequest) {
   }
   return bad("Unknown action");
 }
+
+/** DELETE ?id= — removes an exam and every mark entered for it. */
+export async function DELETE(req: NextRequest) {
+  const ctx = await schoolGuard(req, true);
+  if (isResponse(ctx)) return ctx;
+  const id = new URL(req.url).searchParams.get("id") || "";
+  const res = await prisma.schoolExam.deleteMany({ where: { id, companyId: ctx.companyId } });
+  if (!res.count) return bad("Exam not found", 404);
+  return NextResponse.json({ ok: true });
+}

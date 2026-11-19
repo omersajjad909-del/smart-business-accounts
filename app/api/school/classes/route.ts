@@ -38,10 +38,18 @@ export async function PATCH(req: NextRequest) {
   const b = await req.json().catch(() => ({}));
   const id = str(b.id);
   if (!id) return bad("id is required");
-  const monthlyFee = num(b.monthlyFee, -1);
-  if (monthlyFee < 0) return bad("Valid monthly fee required");
-  const res = await prisma.schoolClass.updateMany({ where: { id, companyId: ctx.companyId }, data: { monthlyFee } });
-  if (!res.count) return bad("Class not found", 404);
+  const data: { name?: string; section?: string; monthlyFee?: number } = {};
+  if (b.name !== undefined) { const name = str(b.name); if (!name) return bad("Class name is required"); data.name = name; }
+  if (b.section !== undefined) data.section = str(b.section);
+  if (b.monthlyFee !== undefined) { const fee = num(b.monthlyFee, -1); if (fee < 0) return bad("Valid monthly fee required"); data.monthlyFee = fee; }
+  if (Object.keys(data).length === 0) return bad("Nothing to update");
+  try {
+    const res = await prisma.schoolClass.updateMany({ where: { id, companyId: ctx.companyId }, data });
+    if (!res.count) return bad("Class not found", 404);
+  } catch (e) {
+    if ((e as { code?: string }).code === "P2002") return bad("This class and section already exists", 409);
+    throw e;
+  }
   return NextResponse.json({ ok: true });
 }
 
