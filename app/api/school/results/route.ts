@@ -41,18 +41,21 @@ export async function POST(req: NextRequest) {
   const b = await req.json().catch(() => ({}));
 
   if (str(b.action) === "exam") {
-    const classId = str(b.classId), name = str(b.name), subject = str(b.subject);
+    const classId = str(b.classId), name = str(b.name);
+    // One subject (`subject`) or several at once (`subjects`) — one exam row per subject.
+    const rawSubjects: unknown[] = Array.isArray(b.subjects) ? b.subjects : [b.subject];
+    const subjects: string[] = [...new Set(rawSubjects.map((s) => String(str(s))).filter(Boolean))];
     const totalMarks = num(b.totalMarks, 100), passMarks = num(b.passMarks, 33);
-    if (!classId || !name || !subject) return bad("Class, exam name and subject are required");
+    if (!classId || !name || subjects.length === 0) return bad("Class, exam name and at least one subject are required");
     if (totalMarks <= 0 || passMarks < 0 || passMarks > totalMarks) return bad("Check total and pass marks");
     if (!(await prisma.schoolClass.findFirst({ where: { id: classId, companyId: ctx.companyId }, select: { id: true } }))) return bad("Class not found", 404);
-    try {
-      const row = await prisma.schoolExam.create({ data: { companyId: ctx.companyId, classId, name, subject, totalMarks, passMarks, date: parseDay(b.date) } });
-      return NextResponse.json(row, { status: 201 });
-    } catch (e) {
-      if ((e as { code?: string }).code === "P2002") return bad("This exam and subject already exists for the class", 409);
-      throw e;
-    }
+    const date = parseDay(b.date);
+    const res = await prisma.schoolExam.createMany({
+      data: subjects.map((subject) => ({ companyId: ctx.companyId, classId, name, subject, totalMarks, passMarks, date })),
+      skipDuplicates: true,
+    });
+    if (res.count === 0) return bad("This exam already exists for the selected subject(s) in this class", 409);
+    return NextResponse.json({ created: res.count, skipped: subjects.length - res.count }, { status: 201 });
   }
 
   if (str(b.action) === "marks") {
