@@ -719,7 +719,9 @@ model Company {
   educationCourses      EducationCourse[]
   educationApplications EducationApplication[]
   educationEnrollments  EducationEnrollment[]
+  educationCourseRegistrations EducationCourseRegistration[]
   guardianAccesses      SchoolGuardianAccess[]
+  schoolAnnouncements   SchoolAnnouncement[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -892,6 +894,7 @@ model User {
 
   gdprRequests GdprRequest[]
   guardianAccesses SchoolGuardianAccess[]
+  schoolTeacherProfile SchoolTeacher?
 }
 
 model Session {
@@ -3361,6 +3364,7 @@ model SchoolClass {
   subjects  SchoolClassSubject[]
   timetable SchoolTimetableEntry[]
   fees      SchoolClassFee[]
+  announcements SchoolAnnouncement[]
 
   @@unique([companyId, name, section])
 }
@@ -3559,6 +3563,9 @@ model SchoolTeacher {
   /// CNIC, DEGREES, EXPERIENCE_LETTER, PHOTOS, APPOINTMENT_LETTER
   documents         String[]  @default([])
   photoUrl          String?
+  /// Optional login account for the teacher portal.
+  userId            String?  @unique
+  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   classSubjects SchoolClassSubject[]
   timetable     SchoolTimetableEntry[]
@@ -3738,6 +3745,7 @@ model EducationCourse {
   creditHours Float  @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
+  registrations EducationCourseRegistration[]
 
   @@unique([companyId, name])
   @@index([companyId, programId])
@@ -3776,9 +3784,29 @@ model EducationEnrollment {
   rollNo    String?
   status    String   @default("ACTIVE")
   createdAt DateTime @default(now())
+  courseRegistrations EducationCourseRegistration[]
 
   @@unique([studentId, sessionId])
   @@index([companyId, programId, sessionId])
+}
+
+/// A course selected by a student in a particular academic enrollment.
+model EducationCourseRegistration {
+  id           String              @id @default(uuid())
+  companyId    String
+  company      Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  enrollmentId String
+  enrollment   EducationEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       EducationCourse     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status       String              @default("REGISTERED") // REGISTERED | DROPPED | COMPLETED
+  marks        Float?
+  grade        String?
+  gradePoints  Float?
+  createdAt    DateTime            @default(now())
+
+  @@unique([enrollmentId, courseId])
+  @@index([companyId, enrollmentId])
 }
 
 /// Explicit guardian-to-student grants for the parent portal.
@@ -3796,4 +3824,20 @@ model SchoolGuardianAccess {
 
   @@unique([studentId, userId])
   @@index([companyId, userId, active])
+}
+
+/// Published notice for all guardians or a single class.
+model SchoolAnnouncement {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId   String?
+  class     SchoolClass? @relation(fields: [classId], references: [id], onDelete: SetNull)
+  title     String
+  body      String
+  audience  String   @default("ALL") // ALL | CLASS
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([companyId, published, createdAt])
 }

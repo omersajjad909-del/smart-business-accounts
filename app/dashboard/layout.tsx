@@ -1614,6 +1614,8 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>
               <NavLink href="/dashboard/school/applications" pathname={pathname}>Applications</NavLink>
               <NavLink href="/dashboard/school/enrollments" pathname={pathname}>Enrollments</NavLink>
+              <NavLink href="/dashboard/school/course-registration" pathname={pathname}>Course Registration</NavLink>
+              <NavLink href="/dashboard/school/transcripts" pathname={pathname}>Transcripts</NavLink>
               <NavLink href="/dashboard/school/guardian-access" pathname={pathname}>Guardian Access</NavLink>
               <NavLink href="/dashboard/school/students/promote" pathname={pathname}>Promote / Graduate</NavLink>
             </NavGroup>
