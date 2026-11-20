@@ -1,9 +1,47 @@
-ALTER TABLE "LibraryLoan"
-  ADD COLUMN "renewalCount" INTEGER NOT NULL DEFAULT 0,
-  ADD COLUMN "fineAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
-  ADD COLUMN "finePaid" BOOLEAN NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS "AcademicSession" (
+  "id" TEXT NOT NULL,
+  "companyId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "startsOn" DATE NOT NULL,
+  "endsOn" DATE NOT NULL,
+  "active" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "AcademicSession_pkey" PRIMARY KEY ("id")
+);
 
-CREATE TABLE "SchoolAssignmentSubmission" (
+CREATE TABLE IF NOT EXISTS "EducationDepartment" (
+  "id" TEXT NOT NULL,
+  "companyId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "code" TEXT,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EducationDepartment_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "EducationProgram" (
+  "id" TEXT NOT NULL,
+  "companyId" TEXT NOT NULL,
+  "departmentId" TEXT,
+  "name" TEXT NOT NULL,
+  "code" TEXT,
+  "duration" TEXT,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EducationProgram_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "EducationCourse" (
+  "id" TEXT NOT NULL,
+  "companyId" TEXT NOT NOT NULL,
+  "programId" TEXT,
+  "name" TEXT NOT NULL,
+  "code" TEXT,
+  "creditHours" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EducationCourse_pkey" PRIMARY KEY ("id")
+);
   "id" TEXT NOT NULL,
   "companyId" TEXT NOT NULL,
   "assignmentId" TEXT NOT NULL,
