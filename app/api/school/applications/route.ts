@@ -26,3 +26,12 @@ export async function PATCH(req: NextRequest) {
   const result = await prisma.educationApplication.updateMany({ where: { id, companyId: ctx.companyId }, data: { status, note: b.note === undefined ? undefined : str(b.note) || null } });
   if (!result.count) return bad("Application not found", 404); return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(req: NextRequest) {
+  const ctx = await schoolGuard(req, true); if (isResponse(ctx)) return ctx;
+  const id = str(new URL(req.url).searchParams.get("id"));
+  if (!id) return bad("Application id is required");
+  const result = await prisma.educationApplication.deleteMany({ where: { id, companyId: ctx.companyId, studentId: null } });
+  if (!result.count) return bad("Application not found or already enrolled", 409);
+  return NextResponse.json({ ok: true });
+}

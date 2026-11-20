@@ -725,6 +725,7 @@ model Company {
   libraryBooks          LibraryBook[]
   libraryLoans          LibraryLoan[]
   schoolAssignments     SchoolAssignment[]
+  schoolAssignmentSubmissions SchoolAssignmentSubmission[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -3422,6 +3423,7 @@ model SchoolStudent {
   enrollments  EducationEnrollment[]
   guardianAccesses SchoolGuardianAccess[]
   libraryLoans LibraryLoan[]
+  assignmentSubmissions SchoolAssignmentSubmission[]
 
   @@unique([companyId, admissionNo])
   @@index([companyId, status])
@@ -3877,6 +3879,9 @@ model LibraryLoan {
   issuedAt  DateTime      @default(now())
   dueDate   DateTime      @db.Date
   returnedAt DateTime?
+  renewalCount Int      @default(0)
+  fineAmount   Float    @default(0)
+  finePaid     Boolean  @default(false)
   createdAt DateTime      @default(now())
 
   @@index([companyId, returnedAt, dueDate])
@@ -3897,6 +3902,28 @@ model SchoolAssignment {
   detail    String?
   dueDate   DateTime?     @db.Date
   createdAt DateTime      @default(now())
+  submissions SchoolAssignmentSubmission[]
 
   @@index([companyId, classId, dueDate])
+}
+
+model SchoolAssignmentSubmission {
+  id           String          @id @default(uuid())
+  companyId    String
+  company      Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignmentId String
+  assignment   SchoolAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      SchoolStudent   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  detail       String?
+  attachmentUrl String?
+  status       String          @default("SUBMITTED") // SUBMITTED | RETURNED | GRADED
+  marks        Float?
+  feedback     String?
+  submittedAt  DateTime        @default(now())
+  gradedAt     DateTime?
+
+  @@unique([assignmentId, studentId])
+  @@index([companyId, assignmentId])
+  @@index([studentId])
 }

@@ -1,19 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveCompanyId } from "@/lib/tenant";
+import { prisma } from "@/lib/prisma";
+import { requireActiveSession } from "@/lib/sessionGuard";
 
 const READ_ROLES = ["ADMIN", "ACCOUNTANT", "VIEWER"];
 const WRITE_ROLES = ["ADMIN", "ACCOUNTANT"];
 
 export type SchoolCtx = { companyId: string };
 
-/** Resolves the tenant and enforces role. Returns a NextResponse on failure. */
+/** Resolves the tenant from the verified active session and enforces role. */
 export async function schoolGuard(req: NextRequest, write: boolean): Promise<SchoolCtx | NextResponse> {
-  const role = String(req.headers.get("x-user-role") || "").trim().toUpperCase();
-  if (!(write ? WRITE_ROLES : READ_ROLES).includes(role)) {
+  const session = await requireActiveSession(req);
+  if (!session) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  if (!(write ? WRITE_ROLES : READ_ROLES).includes(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const companyId = await resolveCompanyId(req);
+
+  const companyId = session.companyId || await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { defaultCompanyId: true },
+  }).then((user) => user?.defaultCompanyId || null);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+
+  const membership = await prisma.userCompany.findUnique({
+    where: { userId_companyId: { userId: session.userId, companyId } },
+    select: { id: true },
+  });
+  const user = membership ? null : await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { defaultCompanyId: true },
+  });
+  if (!membership && user?.defaultCompanyId !== companyId && !session.impersonatedBy) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   return { companyId };
 }
 

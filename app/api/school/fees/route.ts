@@ -190,3 +190,29 @@ export async function POST(req: NextRequest) {
 class HttpError extends Error {
   constructor(message: string, public status: number) { super(message); }
 }
+
+export async function DELETE(req: NextRequest) {
+  const ctx = await schoolGuard(req, true);
+  if (isResponse(ctx)) return ctx;
+  const paymentId = str(new URL(req.url).searchParams.get("paymentId"));
+  if (!paymentId) return bad("Payment id is required");
+
+  const payment = await prisma.schoolPayment.findFirst({
+    where: { id: paymentId, companyId: ctx.companyId },
+  });
+  if (!payment) return bad("Payment not found", 404);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.voucher.updateMany({
+      where: {
+        companyId: ctx.companyId,
+        narration: { contains: `[SCHPAY:${paymentId}]` },
+        deletedAt: null,
+      },
+      data: { deletedAt: new Date(), deletedBy: "school-fee-reversal" },
+    });
+    await tx.schoolPayment.delete({ where: { id: payment.id } });
+  });
+
+  return NextResponse.json({ ok: true, reversed: payment.amount, receiptNo: payment.receiptNo });
+}

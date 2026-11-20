@@ -52,6 +52,12 @@ export default function FeesPage() {
     if (!r.ok) return setError(r.error);
     setNotice(`Receipt ${r.data.receiptNo} issued${r.data.booked === false ? " — but posting to the ledger failed, use Sync to books." : " and posted to the ledger."}`); setPayFor(null); setError(""); void reload();
   }
+  async function reversePayment(payment: Payment) {
+    if (!confirm(`Reverse receipt ${payment.receiptNo} for ${money(payment.amount)}?`)) return;
+    const r = await api<{ ok: boolean }>(`/api/school/fees?paymentId=${payment.id}`, { method: "DELETE" });
+    setNotice(r.ok ? `Receipt ${payment.receiptNo} reversed and excluded from the ledger.` : r.error);
+    if (r.ok) void reload();
+  }
 
   return (
     <div style={ui.page}>
@@ -115,7 +121,13 @@ export default function FeesPage() {
           <p style={ui.sub}>{payFor.title} · {payFor.period} · balance {money(payFor.balance)}</p>
           <Field label="Amount"><input style={ui.input} type="number" min={1} max={payFor.balance} value={pay.amount} onChange={(e) => setPay({ ...pay, amount: e.target.value })} /></Field>
           <Field label="Method"><select style={ui.input} value={pay.method} onChange={(e) => setPay({ ...pay, method: e.target.value })}>{["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"].map((m) => <option key={m}>{m}</option>)}</select></Field>
-          {payFor.payments.length > 0 && <p style={ui.sub}>Earlier: {payFor.payments.map((p) => `${p.receiptNo} (${money(p.amount)})`).join(", ")}</p>}
+          {payFor.payments.length > 0 && <p style={ui.sub}>Earlier payments:</p>}
+          {payFor.payments.length > 0 && payFor.payments.map((p) => (
+            <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, marginTop: 6 }}>
+              <span>{p.receiptNo} — {money(p.amount)} — {p.method}</span>
+              <button style={{ ...ui.ghost, color: "#f87171", padding: "5px 8px" }} onClick={() => reversePayment(p)}>Reverse</button>
+            </div>
+          ))}
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button style={ui.ghost} onClick={() => setPayFor(null)}>Cancel</button><button style={ui.btn} onClick={collect}>Receive payment</button></div>
         </Modal>
       )}
