@@ -1610,7 +1610,7 @@ export default function DashboardLayout({
           {/* ── SCHOOL WORKSPACE ── a school gets its own navigation, not the trading menus */}
           {businessType === "school" && (
             <>
-            <NavLink href="/dashboard/school" pathname={pathname} exact>School Overview</NavLink>
+            <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>
             <NavGroup title="Students" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>} open={openSection === "schStudents"} onToggle={() => toggle("schStudents")}>
               <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>
               <NavLink href="/dashboard/school/applications" pathname={pathname}>Applications</NavLink>
