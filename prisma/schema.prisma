@@ -719,6 +719,7 @@ model Company {
   educationCourses      EducationCourse[]
   educationApplications EducationApplication[]
   educationEnrollments  EducationEnrollment[]
+  guardianAccesses      SchoolGuardianAccess[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -890,6 +891,7 @@ model User {
   preferredLanguage String? @default("en")
 
   gdprRequests GdprRequest[]
+  guardianAccesses SchoolGuardianAccess[]
 }
 
 model Session {
@@ -3410,6 +3412,7 @@ model SchoolStudent {
   promotions   SchoolPromotionLog[]
   applications EducationApplication[]
   enrollments  EducationEnrollment[]
+  guardianAccesses SchoolGuardianAccess[]
 
   @@unique([companyId, admissionNo])
   @@index([companyId, status])
@@ -3776,4 +3779,21 @@ model EducationEnrollment {
 
   @@unique([studentId, sessionId])
   @@index([companyId, programId, sessionId])
+}
+
+/// Explicit guardian-to-student grants for the parent portal.
+model SchoolGuardianAccess {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relation  String?
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+
+  @@unique([studentId, userId])
+  @@index([companyId, userId, active])
 }
