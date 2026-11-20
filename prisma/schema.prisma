@@ -722,6 +722,9 @@ model Company {
   educationCourseRegistrations EducationCourseRegistration[]
   guardianAccesses      SchoolGuardianAccess[]
   schoolAnnouncements   SchoolAnnouncement[]
+  libraryBooks          LibraryBook[]
+  libraryLoans          LibraryLoan[]
+  schoolAssignments     SchoolAssignment[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -3365,6 +3368,7 @@ model SchoolClass {
   timetable SchoolTimetableEntry[]
   fees      SchoolClassFee[]
   announcements SchoolAnnouncement[]
+  assignments SchoolAssignment[]
 
   @@unique([companyId, name, section])
 }
@@ -3417,6 +3421,7 @@ model SchoolStudent {
   applications EducationApplication[]
   enrollments  EducationEnrollment[]
   guardianAccesses SchoolGuardianAccess[]
+  libraryLoans LibraryLoan[]
 
   @@unique([companyId, admissionNo])
   @@index([companyId, status])
@@ -3523,6 +3528,7 @@ model SchoolSubject {
 
   classSubjects SchoolClassSubject[]
   timetable     SchoolTimetableEntry[]
+  assignments   SchoolAssignment[]
 
   @@unique([companyId, name])
 }
@@ -3569,6 +3575,7 @@ model SchoolTeacher {
 
   classSubjects SchoolClassSubject[]
   timetable     SchoolTimetableEntry[]
+  assignments   SchoolAssignment[]
 
   @@unique([companyId, employeeNo])
   @@index([companyId, status])
@@ -3840,4 +3847,56 @@ model SchoolAnnouncement {
   createdAt DateTime @default(now())
 
   @@index([companyId, published, createdAt])
+}
+
+model LibraryBook {
+  id              String   @id @default(uuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  accessionNo     String
+  title           String
+  author          String?
+  category        String?
+  totalCopies     Int      @default(1)
+  availableCopies Int      @default(1)
+  createdAt       DateTime @default(now())
+  loans           LibraryLoan[]
+
+  @@unique([companyId, accessionNo])
+  @@index([companyId, title])
+}
+
+model LibraryLoan {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bookId    String
+  book      LibraryBook  @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  issuedAt  DateTime      @default(now())
+  dueDate   DateTime      @db.Date
+  returnedAt DateTime?
+  createdAt DateTime      @default(now())
+
+  @@index([companyId, returnedAt, dueDate])
+  @@index([studentId, returnedAt])
+}
+
+model SchoolAssignment {
+  id        String        @id @default(uuid())
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId   String
+  class     SchoolClass   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   SchoolSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId String
+  teacher   SchoolTeacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title     String
+  detail    String?
+  dueDate   DateTime?     @db.Date
+  createdAt DateTime      @default(now())
+
+  @@index([companyId, classId, dueDate])
 }
