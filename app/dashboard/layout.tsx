@@ -1612,14 +1612,18 @@ export default function DashboardLayout({
             <>
             <NavGroup title="Students" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>} open={openSection === "schStudents"} onToggle={() => toggle("schStudents")}>
               <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>
+              <NavLink href="/dashboard/school/applications" pathname={pathname}>Applications</NavLink>
+              <NavLink href="/dashboard/school/enrollments" pathname={pathname}>Enrollments</NavLink>
               <NavLink href="/dashboard/school/students/promote" pathname={pathname}>Promote / Graduate</NavLink>
             </NavGroup>
             <NavGroup title="Academics" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "schAcademics"} onToggle={() => toggle("schAcademics")}>
               <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fee Plan</NavLink>
+              <NavLink href="/dashboard/school/academics" pathname={pathname}>Academic Setup</NavLink>
               <NavLink href="/dashboard/school/subjects" pathname={pathname}>Subjects &amp; Teachers</NavLink>
               <NavLink href="/dashboard/school/timetable" pathname={pathname}>Timetable</NavLink>
               <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>
               <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>
+              <NavLink href="/dashboard/school/report-cards" pathname={pathname}>Report Cards</NavLink>
             </NavGroup>
             <NavGroup title="Fees" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>} open={openSection === "schFees"} onToggle={() => toggle("schFees")}>
               <NavLink href="/dashboard/school/fee-structure" pathname={pathname}>Fee Structure</NavLink>

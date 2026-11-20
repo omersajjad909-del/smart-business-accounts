@@ -713,6 +713,12 @@ model Company {
   schoolClassFees       SchoolClassFee[]
   schoolStudentFees     SchoolStudentFee[]
   schoolPromotions      SchoolPromotionLog[]
+  academicSessions      AcademicSession[]
+  educationDepartments  EducationDepartment[]
+  educationPrograms     EducationProgram[]
+  educationCourses      EducationCourse[]
+  educationApplications EducationApplication[]
+  educationEnrollments  EducationEnrollment[]
   travelers             Traveler[]
   bookings              Booking[]
   teamInvites           TeamInvite[]
@@ -3402,6 +3408,8 @@ model SchoolStudent {
   results      SchoolResult[]
   optionalFees SchoolStudentFee[]
   promotions   SchoolPromotionLog[]
+  applications EducationApplication[]
+  enrollments  EducationEnrollment[]
 
   @@unique([companyId, admissionNo])
   @@index([companyId, status])
@@ -3662,4 +3670,110 @@ model SchoolPromotionLog {
 
   @@index([studentId])
   @@index([companyId, createdAt])
+}
+
+// ── Shared education foundation (school, college and university) ──────────
+
+model AcademicSession {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String   // e.g. 2026–27, Fall 2026
+  startsOn  DateTime @db.Date
+  endsOn    DateTime @db.Date
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  enrollments EducationEnrollment[]
+
+  @@unique([companyId, name])
+  @@index([companyId, active])
+}
+
+model EducationDepartment {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String
+  code      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  programs EducationProgram[]
+
+  @@unique([companyId, name])
+}
+
+model EducationProgram {
+  id           String              @id @default(uuid())
+  companyId    String
+  company      Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  departmentId String?
+  department   EducationDepartment? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  name         String
+  code         String?
+  duration     String?
+  active       Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+
+  courses     EducationCourse[]
+  applications EducationApplication[]
+  enrollments EducationEnrollment[]
+
+  @@unique([companyId, name])
+  @@index([companyId, departmentId])
+}
+
+model EducationCourse {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  programId String?
+  program   EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  name      String
+  code      String?
+  creditHours Float  @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([companyId, name])
+  @@index([companyId, programId])
+}
+
+model EducationApplication {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId String?
+  student   SchoolStudent? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  programId String?
+  program   EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  applicationNo String
+  applicantName String
+  phone     String?
+  status    String   @default("SUBMITTED") // SUBMITTED | REVIEW | ACCEPTED | REJECTED | WAITLISTED
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@unique([companyId, applicationNo])
+  @@index([companyId, status])
+}
+
+model EducationEnrollment {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId String
+  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sessionId String
+  session   AcademicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  programId String?
+  program   EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  semester  String?
+  rollNo    String?
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, sessionId])
+  @@index([companyId, programId, sessionId])
 }

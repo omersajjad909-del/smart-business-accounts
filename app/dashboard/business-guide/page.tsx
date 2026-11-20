@@ -295,9 +295,9 @@ const MODULES_MAP: Record<string, { icon: string; label: string; desc: string; l
   ],
   school: [
     { icon: "📝", label: "Student Admissions", desc: "Enrollment, class assignment, documents", link: "/dashboard/school/students" },
-    { icon: "🗓️", label: "Class Schedule", desc: "Timetable and teacher assignments", link: "/dashboard/school/schedule" },
-    { icon: "✅", label: "Attendance", desc: "Daily student and teacher attendance", link: "/dashboard/school/attendance" },
-    { icon: "📖", label: "Examinations", desc: "Exam setup, marks entry, report cards", link: "/dashboard/school/exams" },
+    { icon: "🗓️", label: "Class Schedule", desc: "Timetable and teacher assignments", link: "/dashboard/school/timetable" },
+    { icon: "✅", label: "Attendance", desc: "Daily student attendance and guardian alerts", link: "/dashboard/school/attendance" },
+    { icon: "📖", label: "Examinations", desc: "Exam setup, marks entry and results", link: "/dashboard/school/results" },
     { icon: "💵", label: "Fee Collection", desc: "Fee challan, payment, defaulter tracking", link: "/dashboard/school/fees" },
     { icon: "👥", label: "Teacher Management", desc: "Staff records, qualifications, payroll", link: "/dashboard/employees" },
     { icon: "🧾", label: "Fee Invoices", desc: "Automated fee invoicing per student", link: "/dashboard/sales-invoice" },

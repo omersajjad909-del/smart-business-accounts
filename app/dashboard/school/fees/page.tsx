@@ -24,6 +24,7 @@ export default function FeesPage() {
   const [gen, setGen] = useState(false);
   const [genForm, setGenForm] = useState({ classId: "", dueDate: today() });
   const [payFor, setPayFor] = useState<Invoice | null>(null);
+  const [challan, setChallan] = useState<Invoice | null>(null);
   const [pay, setPay] = useState({ amount: "", method: "CASH" });
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -80,7 +81,7 @@ export default function FeesPage() {
                 <td style={ui.td}>{i.title}</td><td style={ui.td}>{i.dueDate.slice(0, 10)}</td>
                 <td style={ui.td}>{money(i.payable)}</td><td style={ui.td}>{money(i.paid)}</td><td style={{ ...ui.td, fontWeight: 700 }}>{money(i.balance)}</td>
                 <td style={ui.td}><Badge value={i.status} /></td>
-                <td style={ui.td}>{i.balance > 0 && <button style={ui.ghost} onClick={() => { setPayFor(i); setPay({ amount: String(i.balance), method: "CASH" }); setError(""); }}>Collect</button>}</td>
+                <td style={ui.td}><div style={{ display: "flex", gap: 6 }}><button style={ui.ghost} onClick={() => setChallan(i)}>Challan</button>{i.balance > 0 && <button style={ui.ghost} onClick={() => { setPayFor(i); setPay({ amount: String(i.balance), method: "CASH" }); setError(""); }}>Collect</button>}</div></td>
               </tr>
             ))}
           </tbody>
@@ -116,6 +117,17 @@ export default function FeesPage() {
           <Field label="Method"><select style={ui.input} value={pay.method} onChange={(e) => setPay({ ...pay, method: e.target.value })}>{["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"].map((m) => <option key={m}>{m}</option>)}</select></Field>
           {payFor.payments.length > 0 && <p style={ui.sub}>Earlier: {payFor.payments.map((p) => `${p.receiptNo} (${money(p.amount)})`).join(", ")}</p>}
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}><button style={ui.ghost} onClick={() => setPayFor(null)}>Cancel</button><button style={ui.btn} onClick={collect}>Receive payment</button></div>
+        </Modal>
+      )}
+      {challan && (
+        <Modal title="Fee Challan" onClose={() => setChallan(null)} width={640}>
+          <div id="school-fee-challan" style={{ background: "#fff", color: "#172033", borderRadius: 10, padding: 28, fontFamily: "Arial,sans-serif" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "2px solid #4f46e5", paddingBottom: 14, marginBottom: 18 }}><div><div style={{ fontSize: 20, fontWeight: 800 }}>School Fee Challan</div><div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>Keep this copy as payment reference</div></div><div style={{ textAlign: "right", fontSize: 12 }}><b>Period:</b> {challan.period}<br/><b>Due date:</b> {challan.dueDate.slice(0, 10)}</div></div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, fontSize: 13, marginBottom: 20 }}><div><b>Student</b><br/>{challan.student.name}<br/><span style={{ color: "#64748b" }}>Admission # {challan.student.admissionNo}</span></div><div><b>Class</b><br/>{className(challan.student.class)}<br/><span style={{ color: "#64748b" }}>Reference: {challan.id.slice(0, 8).toUpperCase()}</span></div></div>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}><tbody><tr><td style={{ padding: "10px 0", borderTop: "1px solid #dbe2ef" }}>{challan.title}</td><td style={{ textAlign: "right", borderTop: "1px solid #dbe2ef" }}>{money(challan.payable)}</td></tr>{challan.paid > 0 && <tr><td style={{ padding: "10px 0" }}>Already paid</td><td style={{ textAlign: "right" }}>{money(challan.paid)}</td></tr>}<tr><td style={{ padding: "12px 0", fontWeight: 800, borderTop: "2px solid #4f46e5" }}>Amount payable</td><td style={{ textAlign: "right", fontWeight: 800, borderTop: "2px solid #4f46e5" }}>{money(challan.balance)}</td></tr></tbody></table>
+            <div style={{ fontSize: 11, color: "#64748b", marginTop: 20, lineHeight: 1.6 }}>Pay at the school office or through the payment methods accepted by the school. Quote the admission number and challan reference when paying.</div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}><button style={ui.ghost} onClick={() => setChallan(null)}>Close</button><button style={ui.btn} onClick={() => window.print()}>Print challan</button></div>
         </Modal>
       )}
     </div>
