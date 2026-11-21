@@ -17,7 +17,7 @@ export default function SchoolOverview() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>School Overview</h1><p style={ui.sub}>Students, fee collection and today&apos;s attendance</p></div>
-        <Link href="/dashboard/school/fees" style={{ ...ui.btn, textDecoration: "none" }}>Collect Fee</Link>
+        <Link href="/dashboard/school/collect" style={{ ...ui.btn, textDecoration: "none" }}>💰 Collect Fee</Link>
       </div>
       {error && <div style={{ color: "#f87171", marginBottom: 12 }}>{error}</div>}
       {setup && !setup.complete && !setup.dismissed && (

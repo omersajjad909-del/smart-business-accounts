@@ -294,7 +294,7 @@ export const DASHBOARD_LAYOUTS: Partial<Record<BusinessType, DashboardLayout>> =
       { label: "Defaulter Students", icon: "📋", color: "#fbbf24", source: "vertical", metric: "defaulterCount", format: "number", href: "/dashboard/school/fees" },
     ],
     actions: [
-      { label: "Collect Fee",   href: "/dashboard/school/fees",       icon: "💰", bg: GR.green  },
+      { label: "Collect Fee",   href: "/dashboard/school/collect",       icon: "💰", bg: GR.green  },
       { label: "New Admission", href: "/dashboard/school/students",   icon: "📝", bg: GR.indigo },
       { label: "Attendance",    href: "/dashboard/school/attendance", icon: "✅", bg: GR.sky    },
       { label: "Enter Marks",   href: "/dashboard/school/results",    icon: "📊", bg: GR.amber  },

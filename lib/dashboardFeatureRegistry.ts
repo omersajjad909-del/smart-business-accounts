@@ -1868,6 +1868,16 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["school"],
   },
   {
+    id: "SCHOOL_COLLECT",
+    permKey: "SCHOOL_FEES_COLLECT",
+    label: "Collect Fee",
+    route: "/dashboard/school/collect",
+    business: "school",
+    businessLabel: "School",
+    section: "Fees",
+    businessTypes: ["school"],
+  },
+  {
     id: "SCHOOL_FEES",
     permKey: "SCHOOL_FEES_VIEW",
     label: "Fee Ledger",

@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
       companyId: ctx.companyId,
       ...(STATUSES.includes(status) ? { status } : {}),
       ...(classId ? { classId } : {}),
-      ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { admissionNo: { contains: q, mode: "insensitive" } }, { guardianName: { contains: q, mode: "insensitive" } }] } : {}),
+      ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { admissionNo: { contains: q, mode: "insensitive" } }, { guardianName: { contains: q, mode: "insensitive" } }, { phone: { contains: q.replace(/\D/g, "") || "~~", mode: "insensitive" } }] } : {}),
     },
     orderBy: { admissionNo: "asc" },
     take: 2000,
