@@ -29,6 +29,27 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   transpilePackages: ["bcryptjs"],
   serverExternalPackages: ["@prisma/client"],
+  // Netlify rejects any function over 250 MB. Next was copying build-time tools
+  // (the two ~130 MB SWC compiler binaries, Prisma CLI/migration engines,
+  // TypeScript, esbuild, webpack, ...) into the server bundle even though the
+  // running app never loads them. @prisma/client and its query engine stay.
+  outputFileTracingExcludes: {
+    "/*": [
+      "node_modules/@next/swc-*/**",
+      "node_modules/@swc/**",
+      "node_modules/prisma/**",
+      "node_modules/@prisma/engines/**",
+      "node_modules/typescript/**",
+      "node_modules/esbuild/**",
+      "node_modules/@esbuild/**",
+      "node_modules/webpack/**",
+      "node_modules/lightningcss*/**",
+      "node_modules/babel-plugin-react-compiler/**",
+      ".next - Copy/**",
+      "backups/**",
+      "tmp-flutter-ui/**",
+    ],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

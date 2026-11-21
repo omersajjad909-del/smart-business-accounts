@@ -787,6 +787,9 @@ export async function sendShiftBlockedAlertEmail(opts: {
 }
 
 // ─── Send email ───────────────────────────────────────────────────────────────
+/** Result code for "this company has no SMTP login configured". */
+export const EMAIL_NOT_CONFIGURED = "EMAIL_NOT_CONFIGURED";
+
 export async function sendEmail(options: {
   to: string | string[];
   subject: string;
