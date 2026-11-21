@@ -8,6 +8,21 @@ const DOC_KEYS = ["BFORM", "PREV_RESULT", "LEAVING_CERT", "PHOTOS", "GUARDIAN_CN
 const BLOOD = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const digits = (v: string) => v.replace(/\D/g, "");
+
+/** Next free roll number in a class: one more than the highest numeric roll among its active students. */
+async function nextRollNo(companyId: string, classId: string) {
+  const rows = await prisma.schoolStudent.findMany({ where: { companyId, classId, status: "ACTIVE", rollNo: { not: null } }, select: { rollNo: true } });
+  return String(rows.reduce((m, r) => Math.max(m, parseInt(r.rollNo ?? "", 10) || 0), 0) + 1);
+}
+
+/** The name of the class if this roll number is already used there by another active student. */
+async function rollTaken(companyId: string, classId: string, rollNo: string, exceptId?: string) {
+  const hit = await prisma.schoolStudent.findFirst({
+    where: { companyId, classId, status: "ACTIVE", rollNo: { equals: rollNo, mode: "insensitive" }, ...(exceptId ? { id: { not: exceptId } } : {}) },
+    select: { name: true },
+  });
+  return hit?.name ?? null;
+}
 const optional = (v: unknown) => str(v) || null;
 
 /** Validates and normalises the optional admission-form fields. Returns an error string on bad input. */
@@ -92,6 +107,13 @@ export async function POST(req: NextRequest) {
   const admissionFee = Math.max(0, num(b.admissionFee));
   if (status === "ACTIVE") { const limitError = await checkStudentLimit(ctx.companyId); if (limitError) return bad(limitError, 402); }
 
+  // Roll number: use the supplied one (must be free in the class), else the next free number.
+  let rollNo = str(b.rollNo).slice(0, 12) || null;
+  if (classId && status === "ACTIVE") {
+    if (rollNo) { const who = await rollTaken(ctx.companyId, classId, rollNo); if (who) return bad(`Roll no. ${rollNo} is already taken in this class by ${who}`, 409); }
+    else rollNo = await nextRollNo(ctx.companyId, classId);
+  }
+
   // Admission number: use the supplied one, else next in sequence.
   let admissionNo = str(b.admissionNo);
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -102,7 +124,7 @@ export async function POST(req: NextRequest) {
     try {
       const row = await prisma.schoolStudent.create({
         data: {
-          companyId: ctx.companyId, classId, admissionNo, name, status,
+          companyId: ctx.companyId, classId, admissionNo, rollNo, name, status,
           guardianName: str(b.guardianName) || null, phone: str(b.phone) || null,
           gender: str(b.gender).toUpperCase() || null, address: str(b.address) || null,
           dob, admissionDate: parseDay(b.admissionDate) ?? new Date(),
@@ -137,6 +159,13 @@ export async function PATCH(req: NextRequest) {
     const classId = str(b.classId) || null;
     if (classId && !(await prisma.schoolClass.findFirst({ where: { id: classId, companyId: ctx.companyId }, select: { id: true } }))) return bad("Class not found", 404);
     data.classId = classId;
+  }
+  if (b.rollNo !== undefined) {
+    const roll = str(b.rollNo).slice(0, 12) || null;
+    const cur = await prisma.schoolStudent.findFirst({ where: { id, companyId: ctx.companyId }, select: { classId: true } });
+    const cls = data.classId !== undefined ? (data.classId as string | null) : cur?.classId ?? null;
+    if (roll && cls) { const who = await rollTaken(ctx.companyId, cls, roll, id); if (who) return bad(`Roll no. ${roll} is already taken in this class by ${who}`, 409); }
+    data.rollNo = roll;
   }
   if (b.status !== undefined) {
     const s = str(b.status).toUpperCase();

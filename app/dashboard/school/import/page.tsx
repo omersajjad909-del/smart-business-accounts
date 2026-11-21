@@ -3,10 +3,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { api, ErrorLine, Guide, PlanUsage, Stat, StepTitle, ui } from "../_ui";
 
-const COLUMNS = ["admission_no", "name", "gender", "dob", "b_form", "religion", "class", "section", "guardian_name", "guardian_relation", "guardian_cnic", "guardian_phone", "mother_name", "address", "city", "previous_school", "admission_date", "discount", "status"];
-const SAMPLE = ["", "Ali Raza", "Male", "2012-05-21", "3520112345671", "Islam", "Class 6", "A", "Raza Ahmed", "Father", "3520212345679", "03001234567", "Amina Bibi", "House 12, Model Town", "Lahore", "City Grammar School", "2026-04-01", "0", "Active"];
+const COLUMNS = ["admission_no", "roll_no", "name", "gender", "dob", "b_form", "religion", "class", "section", "guardian_name", "guardian_relation", "guardian_cnic", "guardian_phone", "mother_name", "address", "city", "previous_school", "admission_date", "discount", "status"];
+const SAMPLE = ["", "", "Ali Raza", "Male", "2012-05-21", "3520112345671", "Islam", "Class 6", "A", "Raza Ahmed", "Father", "3520212345679", "03001234567", "Amina Bibi", "House 12, Model Town", "Lahore", "City Grammar School", "2026-04-01", "0", "Active"];
 const ALIASES: Record<string, string> = {
-  student_name: "name", full_name: "name", student: "name", adm_no: "admission_no", admission_number: "admission_no", roll_no: "admission_no", gr_no: "admission_no",
+  student_name: "name", full_name: "name", student: "name", adm_no: "admission_no", admission_number: "admission_no", gr_no: "admission_no", roll_number: "roll_no", rollno: "roll_no", class_roll_no: "roll_no",
   date_of_birth: "dob", birth_date: "dob", bform: "b_form", b_form_no: "b_form", crc: "b_form", grade: "class", class_name: "class",
   father_name: "guardian_name", guardian: "guardian_name", parent_name: "guardian_name", father: "guardian_name", relation: "guardian_relation",
   cnic: "guardian_cnic", father_cnic: "guardian_cnic", phone: "guardian_phone", mobile: "guardian_phone", contact: "guardian_phone", guardian_mobile: "guardian_phone", father_phone: "guardian_phone",

@@ -42,6 +42,9 @@ export async function POST(req: NextRequest) {
   ]);
   const classByKey = new Map(classes.map((c) => [`${c.name.toLowerCase()}|${c.section.toLowerCase()}`, c.id]));
   const taken = new Set(existing.map((e) => e.admissionNo));
+  const activeRolls = await prisma.schoolStudent.findMany({ where: { companyId: ctx.companyId, status: "ACTIVE", rollNo: { not: null } }, select: { classId: true, rollNo: true } });
+  const rollTakenDb = new Set(activeRolls.map((r) => `${r.classId}|${(r.rollNo ?? "").toLowerCase()}`));
+  const rollSeen = new Set<string>();
   let nextNo = existing.reduce((m, e) => Math.max(m, parseInt(e.admissionNo.replace(/\D/g, ""), 10) || 0), 0);
   const seenInFile = new Set<string>();
 
@@ -72,6 +75,13 @@ export async function POST(req: NextRequest) {
     const relation = (g("guardian_relation") || "FATHER").toUpperCase(); if (!["FATHER", "MOTHER", "OTHER"].includes(relation)) errors.push("Guardian relation must be Father, Mother or Other");
     const discount = g("discount") ? Number(g("discount")) : 0; if (!Number.isFinite(discount) || discount < 0) errors.push("Discount must be a number");
 
+    const rollNo = g("roll_no");
+    if (rollNo && classKey && classByKey.has(classKey)) {
+      const key = `${classByKey.get(classKey)}|${rollNo.toLowerCase()}`;
+      if (rollTakenDb.has(key)) errors.push(`Roll no. ${rollNo} is already used in that class`);
+    }
+    if (rollNo && classKey) { const k2 = `${classKey}|${rollNo.toLowerCase()}`; if (rollSeen.has(k2)) errors.push(`Roll no. ${rollNo} appears twice for that class in this file`); rollSeen.add(k2); }
+
     let admissionNo = g("admission_no");
     if (admissionNo) {
       if (taken.has(admissionNo)) errors.push(`Admission no. ${admissionNo} already exists`);
@@ -85,7 +95,7 @@ export async function POST(req: NextRequest) {
     return {
       line: i + 2, errors, warnings, classKey, active: status === "ACTIVE", name,
       data: errors.length ? undefined : {
-        companyId: ctx.companyId, admissionNo, name, gender: gender || null, dob, bFormNo: bForm || null, religion: g("religion") || null,
+        companyId: ctx.companyId, admissionNo, rollNo: rollNo || null, name, gender: gender || null, dob, bFormNo: bForm || null, religion: g("religion") || null,
         guardianName, guardianRelation: relation, guardianCnic: cnic || null, phone, motherName: g("mother_name") || null,
         address: g("address") || null, city: g("city") || null, previousSchool: g("previous_school") || null,
         admissionDate: admissionDate ?? new Date(), discount, status, documents: [] as string[],

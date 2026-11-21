@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { api, Avatar, Badge, PhotoPicker, PlanUsage, uploadStudentPhoto, className, ClassRow, ClassSelect, ErrorLine, Field, Modal, today, ui, useApi } from "../_ui";
 
-type Student = { photoUrl: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; status: string; discount: number; class: { name: string; section: string } | null; classId: string | null };
+type Student = { rollNo: string | null; photoUrl: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; status: string; discount: number; class: { name: string; section: string } | null; classId: string | null };
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 6 }}>
@@ -14,7 +14,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 const blank = {
-  name: "", gender: "", dob: "", bFormNo: "", religion: "", bloodGroup: "", classId: "", admissionDate: today(), status: "ACTIVE",
+  admissionNo: "", rollNo: "", name: "", gender: "", dob: "", bFormNo: "", religion: "", bloodGroup: "", classId: "", admissionDate: today(), status: "ACTIVE",
   guardianName: "", guardianRelation: "FATHER", guardianCnic: "", guardianOccupation: "", motherName: "", phone: "", alternatePhone: "",
   emergencyContact: "", emergencyPhone: "", address: "", city: "",
   previousSchool: "", previousClass: "", medicalNotes: "",
@@ -76,18 +76,19 @@ export default function StudentsPage() {
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
         <input style={{ ...ui.input, width: 240 }} placeholder="Search name, admission no, guardian" value={q} onChange={(e) => setQ(e.target.value)} />
         <ClassSelect classes={classes} value={classId} onChange={setClassId} allLabel="All classes" />
+        {classId && <button style={ui.ghost} onClick={async () => { if (!confirm("Give every active student of this class a new roll number, A–Z by name? Existing roll numbers in the class are replaced.")) return; const r = await api<{ assigned: number }>("/api/school/students/rollnos", { method: "POST", body: { classId, order: "name" } }); setNotice(r.ok ? `Roll numbers 1–${r.data.assigned} assigned alphabetically.` : r.error); void reload(); }}>🔢 Assign roll numbers (A–Z)</button>}
         <select style={{ ...ui.input, width: "auto" }} value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">All statuses</option>{["ACTIVE", "APPLICANT", "LEFT", "GRADUATED"].map((s) => <option key={s}>{s}</option>)}
         </select>
       </div>
       <div style={{ ...ui.card, padding: 0, overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["Adm #", "Name", "Class", "Guardian", "Phone", "Status", ""].map((h) => <th key={h} style={ui.th}>{h}</th>)}</tr></thead>
+          <thead><tr>{["Adm #", "Roll #", "Name", "Class", "Guardian", "Phone", "Status", ""].map((h) => <th key={h} style={ui.th}>{h}</th>)}</tr></thead>
           <tbody>
-            {!loading && students.length === 0 && <tr><td colSpan={7} style={{ ...ui.td, textAlign: "center", padding: 32 }}>No students found.</td></tr>}
+            {!loading && students.length === 0 && <tr><td colSpan={8} style={{ ...ui.td, textAlign: "center", padding: 32 }}>No students found.</td></tr>}
             {students.map((s) => (
               <tr key={s.id}>
-                <td style={{ ...ui.td, fontWeight: 700 }}>{s.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}><Avatar url={s.photoUrl} name={s.name} /><Link href={`/dashboard/school/students/${s.id}`} style={{ color: "inherit" }}>{s.name}</Link></span></td>
+                <td style={{ ...ui.td, fontWeight: 700 }}>{s.admissionNo}</td><td style={ui.td}>{s.rollNo || "—"}</td><td style={{ ...ui.td, fontWeight: 600 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}><Avatar url={s.photoUrl} name={s.name} /><Link href={`/dashboard/school/students/${s.id}`} style={{ color: "inherit" }}>{s.name}</Link></span></td>
                 <td style={ui.td}>{className(s.class)}</td><td style={ui.td}>{s.guardianName || "—"}</td><td style={ui.td}>{s.phone || "—"}</td>
                 <td style={ui.td}><Badge value={s.status} /></td>
                 <td style={{ ...ui.td, textAlign: "right" }}>
@@ -112,7 +113,9 @@ export default function StudentsPage() {
             <Field label="Blood group"><select style={ui.input} value={form.bloodGroup} onChange={set("bloodGroup")}><option value="">Unknown</option>{["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => <option key={g}>{g}</option>)}</select></Field>
           </Section>
           <Section title="Admission">
+            <Field label="Admission no. (GR no.)"><input style={ui.input} value={form.admissionNo} onChange={set("admissionNo")} placeholder="Leave empty — assigned automatically" /></Field>
             <Field label="Class *"><ClassSelect classes={classes} value={form.classId} onChange={(v) => setForm({ ...form, classId: v })} /></Field>
+            <Field label="Roll no. (in this class)"><input style={ui.input} value={form.rollNo} onChange={set("rollNo")} placeholder="Leave empty — next free number" /></Field>
             <Field label="Admission date"><input style={ui.input} type="date" value={form.admissionDate} onChange={set("admissionDate")} /></Field>
             <Field label="Status"><select style={ui.input} value={form.status} onChange={set("status")}><option value="ACTIVE">Active (enrolled)</option><option value="APPLICANT">Applicant (not confirmed)</option></select></Field>
             <Field label="Admission fee (one-time)"><input style={ui.input} type="number" min={0} value={form.admissionFee} onChange={set("admissionFee")} placeholder="Creates an invoice" /></Field>

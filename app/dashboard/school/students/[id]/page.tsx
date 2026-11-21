@@ -6,7 +6,7 @@ import { AddChargeModal } from "../../fees/_AddCharge";
 import { api, Avatar, Badge, className, money, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
 
 type Profile = {
-  student: { id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[]; photoUrl: string | null };
+  student: { rollNo: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[]; photoUrl: string | null };
   fees: { billed: number; paid: number; balance: number };
   invoices: { id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; payments: { id: string; receiptNo: string; amount: number; method: string; paidAt: string }[] }[];
   attendance: { PRESENT: number; ABSENT: number; LATE: number; LEAVE: number; marked: number; percent: number | null };
@@ -48,7 +48,7 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
   const v = (x: string | null | undefined) => x || "—";
   const DOC_LABELS: Record<string, string> = { BFORM: "B-Form", GUARDIAN_CNIC: "Guardian CNIC", PHOTOS: "Photos", PREV_RESULT: "Previous result card", LEAVING_CERT: "Leaving certificate", VACCINATION: "Vaccination card" };
   const info: [string, string][] = [
-    ["Class", className(s.class)], ["Gender", v(s.gender)], ["Date of birth", s.dob ? s.dob.slice(0, 10) : "—"], ["B-Form no.", v(s.bFormNo)],
+    ["Class", className(s.class)], ["Roll no.", v(s.rollNo)], ["Gender", v(s.gender)], ["Date of birth", s.dob ? s.dob.slice(0, 10) : "—"], ["B-Form no.", v(s.bFormNo)],
     ["Religion", v(s.religion)], ["Blood group", v(s.bloodGroup)], ["Admitted", s.admissionDate.slice(0, 10)], ["Monthly discount", s.discount ? money(s.discount) : "—"],
     [`Guardian (${(s.guardianRelation || "").toLowerCase() || "—"})`, v(s.guardianName)], ["Guardian CNIC", v(s.guardianCnic)], ["Occupation", v(s.guardianOccupation)], ["Mother", v(s.motherName)],
     ["Phone", v(s.phone)], ["Alternate phone", v(s.alternatePhone)], ["Emergency contact", s.emergencyContact ? `${s.emergencyContact} · ${v(s.emergencyPhone)}` : "—"],

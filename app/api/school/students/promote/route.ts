@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     ...[...byTarget.entries()].map(([to, ids]) =>
       to === "GRADUATE"
         ? prisma.schoolStudent.updateMany({ where: { companyId: ctx.companyId, id: { in: ids } }, data: { status: "GRADUATED" } })
-        : prisma.schoolStudent.updateMany({ where: { companyId: ctx.companyId, id: { in: ids } }, data: { classId: to } }),
+        : prisma.schoolStudent.updateMany({ where: { companyId: ctx.companyId, id: { in: ids } }, data: { classId: to, rollNo: null } }),
     ),
     prisma.schoolPromotionLog.createMany({ data: logs }),
   ]);

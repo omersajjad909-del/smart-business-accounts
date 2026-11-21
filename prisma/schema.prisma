@@ -3382,6 +3382,8 @@ model SchoolStudent {
   classId       String?
   class         SchoolClass? @relation(fields: [classId], references: [id], onDelete: SetNull)
   admissionNo   String
+  /// Class roll number — unique among the active students of a class, reassigned when they are promoted
+  rollNo        String?
   name          String
   guardianName  String?
   phone         String?
