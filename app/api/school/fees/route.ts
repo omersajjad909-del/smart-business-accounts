@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { applyLateFees, daysLate, effectiveLateFee, getLateRule } from "@/lib/schoolLateFee";
 import { accrueIfEnabled, convertToAccrual, postSchoolFeeReceipt, syncSchoolFeeReceipts } from "@/lib/schoolAccounting";
 import { bad, invoiceStatus, invoiceTotals, isResponse, num, parseDay, schoolGuard, str } from "@/lib/schoolApi";
 
@@ -31,10 +32,24 @@ export async function GET(req: NextRequest) {
   });
 
   const now = new Date();
+  const rule = await getLateRule(ctx.companyId);
   const invoices = rows
     .map((inv) => {
-      const t = invoiceTotals(inv);
-      return { ...inv, ...t, status: invoiceStatus(t.balance, t.paid, inv.dueDate, now) };
+      let t = invoiceTotals(inv);
+      let lateFee = inv.lateFee;
+      // An unpaid invoice shows the fine as it stands today, so the balance on screen is what the student will be asked to pay.
+      if (t.balance > 0.005) {
+        lateFee = effectiveLateFee(rule, inv, now);
+        t = invoiceTotals({ ...inv, lateFee });
+      }
+      const last = inv.payments[inv.payments.length - 1];
+      return {
+        ...inv, ...t, lateFee,
+        lateFeePending: lateFee > inv.lateFee + 0.005,                    // earned but not yet written to the invoice
+        daysOverdue: t.balance > 0.005 ? daysLate(rule, inv.dueDate, now) : 0,
+        paidDaysLate: t.balance <= 0.005 && last ? daysLate(rule, inv.dueDate, last.paidAt) : 0,
+        status: invoiceStatus(t.balance, t.paid, inv.dueDate, now),
+      };
     })
     .filter((inv) => !wanted || inv.status === wanted || (wanted === "OUTSTANDING" && inv.balance > 0));
 
@@ -131,16 +146,23 @@ export async function POST(req: NextRequest) {
   // ── Late fee: flat amount on overdue unpaid invoices of a period ──────
   if (action === "late_fee") {
     const period = str(b.period);
-    const amount = num(b.amount);
-    if (!PERIOD_RE.test(period) || amount <= 0) return bad("Period and a positive late fee are required");
-    const overdue = await prisma.schoolFeeInvoice.findMany({
-      where: { companyId: ctx.companyId, period, dueDate: { lt: new Date(Date.now() - 86_400_000) }, lateFee: 0 },
-      include: { payments: { select: { amount: true } } },
-    });
-    const ids = overdue.filter((i) => invoiceTotals(i).balance > 0.005).map((i) => i.id);
-    const res = await prisma.schoolFeeInvoice.updateMany({ where: { id: { in: ids }, companyId: ctx.companyId }, data: { lateFee: amount } });
+    if (period && !PERIOD_RE.test(period)) return bad("Period must look like 2026-11");
+    const rule = await getLateRule(ctx.companyId);
+    if (rule.type === "NONE") return bad("Set a late fee rule first (Fee Structure → Due date & late fee)", 409);
+    const ids = await applyLateFees(ctx.companyId, period ? { period } : {});
     await accrueIfEnabled(ctx.companyId, { invoiceIds: ids });
-    return NextResponse.json({ updated: res.count });
+    return NextResponse.json({ updated: ids.length });
+  }
+
+  // ── Forgive (or restore) the late fine on one invoice ─────────────────
+  if (action === "waive_late_fee") {
+    const invoiceId = str(b.invoiceId);
+    const inv = await prisma.schoolFeeInvoice.findFirst({ where: { id: invoiceId, companyId: ctx.companyId }, select: { id: true } });
+    if (!inv) return bad("Invoice not found", 404);
+    const waive = b.waive !== false;
+    await prisma.schoolFeeInvoice.update({ where: { id: invoiceId }, data: waive ? { lateFeeWaived: true, lateFee: 0 } : { lateFeeWaived: false } });
+    await accrueIfEnabled(ctx.companyId, { invoiceIds: [invoiceId] });
+    return NextResponse.json({ ok: true });
   }
 
   // ── Switch the school to accrual accounting (explicitly confirmed on the Fee Structure page)
@@ -159,6 +181,10 @@ export async function POST(req: NextRequest) {
     const amount = num(b.amount);
     const method = METHODS.includes(str(b.method).toUpperCase()) ? str(b.method).toUpperCase() : "CASH";
     if (!invoiceId || amount <= 0) return bad("Invoice and a positive amount are required");
+
+    // Paying after the due date: the fine is added now, so the receipt matches what was quoted on screen.
+    const fined = await applyLateFees(ctx.companyId, { invoiceIds: [invoiceId] });
+    if (fined.length) await accrueIfEnabled(ctx.companyId, { invoiceIds: fined });
 
     for (let attempt = 0; attempt < 4; attempt++) {
       try {

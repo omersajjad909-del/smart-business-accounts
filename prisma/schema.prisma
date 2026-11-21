@@ -3445,6 +3445,8 @@ model SchoolFeeInvoice {
   lateFee       Float         @default(0)
   /// How much of this invoice has been booked as income + receivable (accrual basis). payable − accruedAmount is still to post.
   accruedAmount Float         @default(0)
+  /// The principal / accountant forgave the late fine for this invoice
+  lateFeeWaived Boolean       @default(false)
   dueDate       DateTime
   createdAt     DateTime      @default(now())
 
@@ -3945,6 +3947,15 @@ model SchoolSettings {
   registrationNo   String?
   /// CASH: fee is income when received. ACCRUAL: income when billed, unpaid fee sits in Fee Receivable.
   feeAccounting    String    @default("CASH")
+  /// Day of the month fees fall due (1–28). Pre-fills the due date when invoices are generated.
+  feeDueDay        Int       @default(10)
+  /// NONE | FLAT (one fixed fine once overdue) | PER_DAY (fine for every day overdue)
+  lateFeeType      String    @default("NONE")
+  lateFeeAmount    Float     @default(0)
+  /// Days after the due date before any fine applies
+  lateFeeGraceDays Int       @default(0)
+  /// Most a PER_DAY fine can add up to; 0 = no cap
+  lateFeeCap       Float     @default(0)
   /// Set when the owner hides the setup checklist or finishes the wizard
   setupDismissedAt DateTime?
   updatedAt        DateTime  @updatedAt
