@@ -58,7 +58,7 @@ export default function StudentsPage() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Students</h1><p style={ui.sub}>Admissions and student records. Only ACTIVE students are billed and marked.</p></div>
-        <div style={{ display: "flex", gap: 10 }}><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setOpen(true)}>+ New Admission</button></div>
+        <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={() => (classId ? (window.location.href = `/dashboard/school/print?kind=idcards&classId=${classId}`) : alert("Choose a class in the filter first, then print its ID cards."))}>🪪 ID cards</button><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setOpen(true)}>+ New Admission</button></div>
       </div>
       <PlanUsage compact />
       {notice && <div style={{ ...ui.card, padding: 12, fontSize: 13, marginBottom: 14 }}>{notice}</div>}

@@ -1817,6 +1817,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["school"],
   },
   {
+    id: "SCHOOL_SETUP",
+    label: "Setup Wizard",
+    route: "/dashboard/school/setup",
+    business: "school",
+    businessLabel: "School",
+    section: "Control Center",
+    businessTypes: ["school"],
+  },
+  {
     id: "SCHOOL_CLASSES",
     label: "Classes & Fees",
     route: "/dashboard/school/classes",

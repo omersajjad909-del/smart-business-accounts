@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { api, Badge, ClassRow, ClassSelect, className, ErrorLine, Field, Modal, money, Stat, thisPeriod, today, ui, useApi } from "../_ui";
 
@@ -63,7 +64,7 @@ export default function FeesPage() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Fee Ledger</h1><p style={ui.sub}>Invoices, receipts and balances per student</p></div>
-        <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => setGen(true)}>Generate {period} invoices</button></div>
+        <div style={{ display: "flex", gap: 10 }}><Link href={`/dashboard/school/print?kind=challan&period=${period}${classId ? `&classId=${classId}` : ""}`} style={{ ...ui.ghost, textDecoration: "none", display: "inline-block" }}>🖨 Print challans</Link><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => setGen(true)}>Generate {period} invoices</button></div>
       </div>
       {notice && <div style={{ ...ui.card, marginBottom: 16, padding: 12, fontSize: 13 }}>{notice}</div>}
       <div style={ui.grid}>
@@ -87,7 +88,7 @@ export default function FeesPage() {
                 <td style={ui.td}>{i.title}</td><td style={ui.td}>{i.dueDate.slice(0, 10)}</td>
                 <td style={ui.td}>{money(i.payable)}</td><td style={ui.td}>{money(i.paid)}</td><td style={{ ...ui.td, fontWeight: 700 }}>{money(i.balance)}</td>
                 <td style={ui.td}><Badge value={i.status} /></td>
-                <td style={ui.td}><div style={{ display: "flex", gap: 6 }}><button style={ui.ghost} onClick={() => setChallan(i)}>Challan</button>{i.balance > 0 && <button style={ui.ghost} onClick={() => { setPayFor(i); setPay({ amount: String(i.balance), method: "CASH" }); setError(""); }}>Collect</button>}</div></td>
+                <td style={ui.td}><div style={{ display: "flex", gap: 6 }}><button style={ui.ghost} onClick={() => setChallan(i)}>Challan</button>{i.payments.length > 0 && <Link href={`/dashboard/school/print?kind=receipt&id=${i.payments[i.payments.length - 1].id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Receipt</Link>}{i.balance > 0 && <button style={ui.ghost} onClick={() => { setPayFor(i); setPay({ amount: String(i.balance), method: "CASH" }); setError(""); }}>Collect</button>}</div></td>
               </tr>
             ))}
           </tbody>

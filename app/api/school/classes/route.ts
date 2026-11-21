@@ -17,6 +17,20 @@ export async function POST(req: NextRequest) {
   const ctx = await schoolGuard(req, true);
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
+
+  // Create many classes at once: every name × every section (used by the setup wizard).
+  if (str(b.action) === "bulk") {
+    const names: string[] = Array.isArray(b.names) ? b.names.map((n: unknown) => str(n)).filter(Boolean) : [];
+    const sections: string[] = Array.isArray(b.sections) && b.sections.length ? b.sections.map((x: unknown) => str(x)) : [""];
+    if (names.length === 0) return bad("Add at least one class name");
+    if (names.length * sections.length > 100) return bad("That would create too many classes at once (max 100)");
+    const res = await prisma.schoolClass.createMany({
+      data: names.flatMap((name) => sections.map((section) => ({ companyId: ctx.companyId, name, section, monthlyFee: 0 }))),
+      skipDuplicates: true,
+    });
+    return NextResponse.json({ created: res.count });
+  }
+
   const name = str(b.name);
   if (!name) return bad("Class name is required");
   const monthlyFee = num(b.monthlyFee);

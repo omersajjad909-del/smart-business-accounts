@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { money, PlanUsage, Stat, ui, useApi } from "./_ui";
+import { api, money, PlanUsage, Stat, ui, useApi } from "./_ui";
 
 type Overview = {
   activeStudents: number; classes: number; collectedThisMonth: number; outstanding: number; overdue: number;
@@ -11,6 +11,7 @@ const empty: Overview = { activeStudents: 0, classes: 0, collectedThisMonth: 0, 
 
 export default function SchoolOverview() {
   const { data, loading, error } = useApi<Overview>("/api/school/overview", empty);
+  const { data: setup, reload: reloadSetup } = useApi<{ doneCount: number; total: number; complete: boolean; dismissed: boolean } | null>("/api/school/setup", null);
   const a = data.attendanceToday;
   return (
     <div style={ui.page}>
@@ -19,6 +20,18 @@ export default function SchoolOverview() {
         <Link href="/dashboard/school/fees" style={{ ...ui.btn, textDecoration: "none" }}>Collect Fee</Link>
       </div>
       {error && <div style={{ color: "#f87171", marginBottom: 12 }}>{error}</div>}
+      {setup && !setup.complete && !setup.dismissed && (
+        <div style={{ ...ui.card, marginBottom: 18, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.3)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+            <div><div style={{ fontWeight: 700 }}>🚀 Finish setting up your school — {setup.doneCount} of {setup.total} done</div><div style={{ ...ui.sub, marginTop: 2 }}>Profile, session, classes, fees, subjects, teachers and students.</div></div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Link href="/dashboard/school/setup" style={{ ...ui.btn, textDecoration: "none" }}>Continue setup</Link>
+              <button style={ui.ghost} onClick={async () => { await api("/api/school/settings", { method: "PUT", body: { dismissSetup: true } }); void reloadSetup(); }}>Hide</button>
+            </div>
+          </div>
+          <div style={{ height: 6, borderRadius: 6, background: "rgba(var(--ink),.1)", marginTop: 12, overflow: "hidden" }}><div style={{ width: `${(setup.doneCount / setup.total) * 100}%`, height: "100%", background: "#6366f1" }} /></div>
+        </div>
+      )}
       <PlanUsage />
       <div style={ui.grid}>
         <Stat label="Active Students" value={loading ? "…" : data.activeStudents} hint={`${data.classes} classes`} />

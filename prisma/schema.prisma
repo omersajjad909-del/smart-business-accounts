@@ -653,85 +653,86 @@ model Company {
   // Financial Core
   ledgerEntries LedgerEntry[] @relation("CompanyLedgerEntries")
 
-  accounts              Account[]
-  items                 ItemNew[]
-  purchaseOrders        PurchaseOrder[]
-  purchaseInvoices      PurchaseInvoice[]
-  inventoryTxns         InventoryTxn[]
-  salesInvoices         SalesInvoice[]
-  vouchers              Voucher[]
-  voucherEntries        VoucherEntry[]
-  stockRates            StockRate[]
-  saleReturns           SaleReturn[]
-  outwards              Outward[]
-  employees             Employee[]
-  attendances           Attendance[]
-  biometricDevices      BiometricDevice[]
-  attendancePunches     AttendancePunch[]
-  payrolls              Payroll[]
-  advanceSalaries       AdvanceSalary[]
-  contacts              Contact[]
-  quotations            Quotation[]
-  deliveryChallans      DeliveryChallan[]
-  advancePayments       AdvancePayment[]
-  bankAccounts          BankAccount[]
-  bankStatements        BankStatement[]
-  paymentReceipts       PaymentReceipt[]
-  expenseVouchers       ExpenseVoucher[]
-  taxConfigurations     TaxConfiguration[]
-  budgets               Budget[]
-  recurringTransactions RecurringTransaction[]
-  financialYears        FinancialYear[]
-  currencies            Currency[]
-  activityLogs          ActivityLog[]
-  rolePermissions       RolePermission[]
-  userPermissions       UserPermission[]
-  backupSchedules       BackupSchedule[]
-  systemBackups         SystemBackup[]
-  branches              Branch[]
-  goodsReceiptNotes     GoodsReceiptNote[]
-  costCenters           CostCenter[]
-  departmentBudgets     DepartmentBudget[]
-  creditNotes           CreditNote[]
-  debitNotes            DebitNote[]
-  loans                 Loan[]
-  fixedAssets           FixedAsset[]
-  sessions              Session[]
-  businessRecords       BusinessRecord[]
-  schoolClasses         SchoolClass[]
-  schoolStudents        SchoolStudent[]
-  schoolFeeInvoices     SchoolFeeInvoice[]
-  schoolPayments        SchoolPayment[]
-  schoolAttendance      SchoolAttendance[]
-  schoolExams           SchoolExam[]
-  schoolResults         SchoolResult[]
-  schoolSubjects        SchoolSubject[]
-  schoolTeachers        SchoolTeacher[]
-  schoolClassSubjects   SchoolClassSubject[]
-  schoolTimetable       SchoolTimetableEntry[]
-  schoolFeeHeads        SchoolFeeHead[]
-  schoolClassFees       SchoolClassFee[]
-  schoolStudentFees     SchoolStudentFee[]
-  schoolPromotions      SchoolPromotionLog[]
-  academicSessions      AcademicSession[]
-  educationDepartments  EducationDepartment[]
-  educationPrograms     EducationProgram[]
-  educationCourses      EducationCourse[]
-  educationApplications EducationApplication[]
-  educationEnrollments  EducationEnrollment[]
+  accounts                     Account[]
+  items                        ItemNew[]
+  purchaseOrders               PurchaseOrder[]
+  purchaseInvoices             PurchaseInvoice[]
+  inventoryTxns                InventoryTxn[]
+  salesInvoices                SalesInvoice[]
+  vouchers                     Voucher[]
+  voucherEntries               VoucherEntry[]
+  stockRates                   StockRate[]
+  saleReturns                  SaleReturn[]
+  outwards                     Outward[]
+  employees                    Employee[]
+  attendances                  Attendance[]
+  biometricDevices             BiometricDevice[]
+  attendancePunches            AttendancePunch[]
+  payrolls                     Payroll[]
+  advanceSalaries              AdvanceSalary[]
+  contacts                     Contact[]
+  quotations                   Quotation[]
+  deliveryChallans             DeliveryChallan[]
+  advancePayments              AdvancePayment[]
+  bankAccounts                 BankAccount[]
+  bankStatements               BankStatement[]
+  paymentReceipts              PaymentReceipt[]
+  expenseVouchers              ExpenseVoucher[]
+  taxConfigurations            TaxConfiguration[]
+  budgets                      Budget[]
+  recurringTransactions        RecurringTransaction[]
+  financialYears               FinancialYear[]
+  currencies                   Currency[]
+  activityLogs                 ActivityLog[]
+  rolePermissions              RolePermission[]
+  userPermissions              UserPermission[]
+  backupSchedules              BackupSchedule[]
+  systemBackups                SystemBackup[]
+  branches                     Branch[]
+  goodsReceiptNotes            GoodsReceiptNote[]
+  costCenters                  CostCenter[]
+  departmentBudgets            DepartmentBudget[]
+  creditNotes                  CreditNote[]
+  debitNotes                   DebitNote[]
+  loans                        Loan[]
+  fixedAssets                  FixedAsset[]
+  sessions                     Session[]
+  businessRecords              BusinessRecord[]
+  schoolClasses                SchoolClass[]
+  schoolStudents               SchoolStudent[]
+  schoolFeeInvoices            SchoolFeeInvoice[]
+  schoolPayments               SchoolPayment[]
+  schoolAttendance             SchoolAttendance[]
+  schoolExams                  SchoolExam[]
+  schoolResults                SchoolResult[]
+  schoolSubjects               SchoolSubject[]
+  schoolTeachers               SchoolTeacher[]
+  schoolClassSubjects          SchoolClassSubject[]
+  schoolTimetable              SchoolTimetableEntry[]
+  schoolFeeHeads               SchoolFeeHead[]
+  schoolClassFees              SchoolClassFee[]
+  schoolStudentFees            SchoolStudentFee[]
+  schoolPromotions             SchoolPromotionLog[]
+  schoolSettings               SchoolSettings?
+  academicSessions             AcademicSession[]
+  educationDepartments         EducationDepartment[]
+  educationPrograms            EducationProgram[]
+  educationCourses             EducationCourse[]
+  educationApplications        EducationApplication[]
+  educationEnrollments         EducationEnrollment[]
   educationCourseRegistrations EducationCourseRegistration[]
-  guardianAccesses      SchoolGuardianAccess[]
-  schoolAnnouncements   SchoolAnnouncement[]
-  libraryBooks          LibraryBook[]
-  libraryLoans          LibraryLoan[]
-  schoolAssignments     SchoolAssignment[]
-  schoolAssignmentSubmissions SchoolAssignmentSubmission[]
-  travelers             Traveler[]
-  bookings              Booking[]
-  teamInvites           TeamInvite[]
-  bulkPaymentBatches    BulkPaymentBatch[]
-  paymentFollowUpLogs   PaymentFollowUpLog[]
-  fbrCredential         CompanyFbrCredential?
+  guardianAccesses             SchoolGuardianAccess[]
+  schoolAnnouncements          SchoolAnnouncement[]
+  libraryBooks                 LibraryBook[]
+  libraryLoans                 LibraryLoan[]
+  schoolAssignments            SchoolAssignment[]
+  schoolAssignmentSubmissions  SchoolAssignmentSubmission[]
+  travelers                    Traveler[]
+  bookings                     Booking[]
+  teamInvites                  TeamInvite[]
+  bulkPaymentBatches           BulkPaymentBatch[]
+  paymentFollowUpLogs          PaymentFollowUpLog[]
+  fbrCredential                CompanyFbrCredential?
 
   @@index([trialPhone])
   @@index([subscriptionStatus, trialEndsAt])
@@ -896,8 +897,8 @@ model User {
   // Preferred language
   preferredLanguage String? @default("en")
 
-  gdprRequests GdprRequest[]
-  guardianAccesses SchoolGuardianAccess[]
+  gdprRequests         GdprRequest[]
+  guardianAccesses     SchoolGuardianAccess[]
   schoolTeacherProfile SchoolTeacher?
 }
 
@@ -3363,13 +3364,13 @@ model SchoolClass {
   monthlyFee Float    @default(0) // default tuition fee used by bulk invoice generation
   createdAt  DateTime @default(now())
 
-  students  SchoolStudent[]
-  exams     SchoolExam[]
-  subjects  SchoolClassSubject[]
-  timetable SchoolTimetableEntry[]
-  fees      SchoolClassFee[]
+  students      SchoolStudent[]
+  exams         SchoolExam[]
+  subjects      SchoolClassSubject[]
+  timetable     SchoolTimetableEntry[]
+  fees          SchoolClassFee[]
   announcements SchoolAnnouncement[]
-  assignments SchoolAssignment[]
+  assignments   SchoolAssignment[]
 
   @@unique([companyId, name, section])
 }
@@ -3414,15 +3415,15 @@ model SchoolStudent {
   /// Profile photo on Cloudinary (kind "students"). Never a base64 blob — it would bloat every list query.
   photoUrl           String?
 
-  invoices     SchoolFeeInvoice[]
-  attendance   SchoolAttendance[]
-  results      SchoolResult[]
-  optionalFees SchoolStudentFee[]
-  promotions   SchoolPromotionLog[]
-  applications EducationApplication[]
-  enrollments  EducationEnrollment[]
-  guardianAccesses SchoolGuardianAccess[]
-  libraryLoans LibraryLoan[]
+  invoices              SchoolFeeInvoice[]
+  attendance            SchoolAttendance[]
+  results               SchoolResult[]
+  optionalFees          SchoolStudentFee[]
+  promotions            SchoolPromotionLog[]
+  applications          EducationApplication[]
+  enrollments           EducationEnrollment[]
+  guardianAccesses      SchoolGuardianAccess[]
+  libraryLoans          LibraryLoan[]
   assignmentSubmissions SchoolAssignmentSubmission[]
 
   @@unique([companyId, admissionNo])
@@ -3572,8 +3573,8 @@ model SchoolTeacher {
   documents         String[]  @default([])
   photoUrl          String?
   /// Optional login account for the teacher portal.
-  userId            String?  @unique
-  user              User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId            String?   @unique
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   classSubjects SchoolClassSubject[]
   timetable     SchoolTimetableEntry[]
@@ -3697,7 +3698,7 @@ model AcademicSession {
   id        String   @id @default(uuid())
   companyId String
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  name      String   // e.g. 2026–27, Fall 2026
+  name      String // e.g. 2026–27, Fall 2026
   startsOn  DateTime @db.Date
   endsOn    DateTime @db.Date
   active    Boolean  @default(false)
@@ -3724,36 +3725,36 @@ model EducationDepartment {
 }
 
 model EducationProgram {
-  id           String              @id @default(uuid())
+  id           String               @id @default(uuid())
   companyId    String
-  company      Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
   departmentId String?
   department   EducationDepartment? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   name         String
   code         String?
   duration     String?
-  active       Boolean             @default(true)
-  createdAt    DateTime            @default(now())
+  active       Boolean              @default(true)
+  createdAt    DateTime             @default(now())
 
-  courses     EducationCourse[]
+  courses      EducationCourse[]
   applications EducationApplication[]
-  enrollments EducationEnrollment[]
+  enrollments  EducationEnrollment[]
 
   @@unique([companyId, name])
   @@index([companyId, departmentId])
 }
 
 model EducationCourse {
-  id        String   @id @default(uuid())
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  programId String?
-  program   EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
-  name      String
-  code      String?
-  creditHours Float  @default(0)
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id            String                        @id @default(uuid())
+  companyId     String
+  company       Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  programId     String?
+  program       EducationProgram?             @relation(fields: [programId], references: [id], onDelete: SetNull)
+  name          String
+  code          String?
+  creditHours   Float                         @default(0)
+  active        Boolean                       @default(true)
+  createdAt     DateTime                      @default(now())
   registrations EducationCourseRegistration[]
 
   @@unique([companyId, name])
@@ -3761,38 +3762,38 @@ model EducationCourse {
 }
 
 model EducationApplication {
-  id        String   @id @default(uuid())
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  studentId String?
-  student   SchoolStudent? @relation(fields: [studentId], references: [id], onDelete: SetNull)
-  programId String?
-  program   EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  id            String            @id @default(uuid())
+  companyId     String
+  company       Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId     String?
+  student       SchoolStudent?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  programId     String?
+  program       EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
   applicationNo String
   applicantName String
-  phone     String?
-  status    String   @default("SUBMITTED") // SUBMITTED | REVIEW | ACCEPTED | REJECTED | WAITLISTED
-  note      String?
-  createdAt DateTime @default(now())
+  phone         String?
+  status        String            @default("SUBMITTED") // SUBMITTED | REVIEW | ACCEPTED | REJECTED | WAITLISTED
+  note          String?
+  createdAt     DateTime          @default(now())
 
   @@unique([companyId, applicationNo])
   @@index([companyId, status])
 }
 
 model EducationEnrollment {
-  id        String   @id @default(uuid())
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  studentId String
-  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  sessionId String
-  session   AcademicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  programId String?
-  program   EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
-  semester  String?
-  rollNo    String?
-  status    String   @default("ACTIVE")
-  createdAt DateTime @default(now())
+  id                  String                        @id @default(uuid())
+  companyId           String
+  company             Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId           String
+  student             SchoolStudent                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sessionId           String
+  session             AcademicSession               @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  programId           String?
+  program             EducationProgram?             @relation(fields: [programId], references: [id], onDelete: SetNull)
+  semester            String?
+  rollNo              String?
+  status              String                        @default("ACTIVE")
+  createdAt           DateTime                      @default(now())
   courseRegistrations EducationCourseRegistration[]
 
   @@unique([studentId, sessionId])
@@ -3837,31 +3838,31 @@ model SchoolGuardianAccess {
 
 /// Published notice for all guardians or a single class.
 model SchoolAnnouncement {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   classId   String?
   class     SchoolClass? @relation(fields: [classId], references: [id], onDelete: SetNull)
   title     String
   body      String
-  audience  String   @default("ALL") // ALL | CLASS
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
+  audience  String       @default("ALL") // ALL | CLASS
+  published Boolean      @default(true)
+  createdAt DateTime     @default(now())
 
   @@index([companyId, published, createdAt])
 }
 
 model LibraryBook {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   companyId       String
-  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   accessionNo     String
   title           String
   author          String?
   category        String?
-  totalCopies     Int      @default(1)
-  availableCopies Int      @default(1)
-  createdAt       DateTime @default(now())
+  totalCopies     Int           @default(1)
+  availableCopies Int           @default(1)
+  createdAt       DateTime      @default(now())
   loans           LibraryLoan[]
 
   @@unique([companyId, accessionNo])
@@ -3869,61 +3870,78 @@ model LibraryBook {
 }
 
 model LibraryLoan {
-  id        String        @id @default(uuid())
-  companyId String
-  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  bookId    String
-  book      LibraryBook  @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  studentId String
-  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  issuedAt  DateTime      @default(now())
-  dueDate   DateTime      @db.Date
-  returnedAt DateTime?
-  renewalCount Int      @default(0)
-  fineAmount   Float    @default(0)
-  finePaid     Boolean  @default(false)
-  createdAt DateTime      @default(now())
+  id           String        @id @default(uuid())
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bookId       String
+  book         LibraryBook   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  issuedAt     DateTime      @default(now())
+  dueDate      DateTime      @db.Date
+  returnedAt   DateTime?
+  renewalCount Int           @default(0)
+  fineAmount   Float         @default(0)
+  finePaid     Boolean       @default(false)
+  createdAt    DateTime      @default(now())
 
   @@index([companyId, returnedAt, dueDate])
   @@index([studentId, returnedAt])
 }
 
 model SchoolAssignment {
-  id        String        @id @default(uuid())
-  companyId String
-  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  classId   String
-  class     SchoolClass   @relation(fields: [classId], references: [id], onDelete: Cascade)
-  subjectId String
-  subject   SchoolSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  teacherId String
-  teacher   SchoolTeacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  title     String
-  detail    String?
-  dueDate   DateTime?     @db.Date
-  createdAt DateTime      @default(now())
+  id          String                       @id @default(uuid())
+  companyId   String
+  company     Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  classId     String
+  class       SchoolClass                  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     SchoolSubject                @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     SchoolTeacher                @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title       String
+  detail      String?
+  dueDate     DateTime?                    @db.Date
+  createdAt   DateTime                     @default(now())
   submissions SchoolAssignmentSubmission[]
 
   @@index([companyId, classId, dueDate])
 }
 
 model SchoolAssignmentSubmission {
-  id           String          @id @default(uuid())
-  companyId    String
-  company      Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  assignmentId String
-  assignment   SchoolAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  studentId    String
-  student      SchoolStudent   @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  detail       String?
+  id            String           @id @default(uuid())
+  companyId     String
+  company       Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignmentId  String
+  assignment    SchoolAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       SchoolStudent    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  detail        String?
   attachmentUrl String?
-  status       String          @default("SUBMITTED") // SUBMITTED | RETURNED | GRADED
-  marks        Float?
-  feedback     String?
-  submittedAt  DateTime        @default(now())
-  gradedAt     DateTime?
+  status        String           @default("SUBMITTED") // SUBMITTED | RETURNED | GRADED
+  marks         Float?
+  feedback      String?
+  submittedAt   DateTime         @default(now())
+  gradedAt      DateTime?
 
   @@unique([assignmentId, studentId])
   @@index([companyId, assignmentId])
   @@index([studentId])
+}
+
+/// One row per school: letterhead details and setup progress.
+model SchoolSettings {
+  id               String    @id @default(uuid())
+  companyId        String    @unique
+  company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  address          String?
+  city             String?
+  phone            String?
+  email            String?
+  website          String?
+  principalName    String?
+  registrationNo   String?
+  /// Set when the owner hides the setup checklist or finishes the wizard
+  setupDismissedAt DateTime?
+  updatedAt        DateTime  @updatedAt
 }

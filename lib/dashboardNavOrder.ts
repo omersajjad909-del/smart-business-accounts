@@ -253,6 +253,7 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     title: "School",
     routes: [
       "/dashboard/school",
+      "/dashboard/school/setup",
       "/dashboard/school/classes",
       "/dashboard/school/subjects",
       "/dashboard/school/teachers",
