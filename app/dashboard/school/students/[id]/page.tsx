@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { use } from "react";
 import { useRef, useState } from "react";
+import { AddChargeModal } from "../../fees/_AddCharge";
 import { api, Avatar, Badge, className, money, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
 
 type Profile = {
@@ -25,6 +26,8 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
     setFeeMsg(r.ok ? "" : r.error); if (r.ok) { setEnrol({ headId: "", amount: "" }); void reloadEnrolled(); }
   }
   async function dropOptional(rowId: string) { await api(`/api/school/student-fees?id=${rowId}`, { method: "DELETE" }); void reloadEnrolled(); }
+  const [addCharge, setAddCharge] = useState(false);
+  const [chargeMsg, setChargeMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const [photoMsg, setPhotoMsg] = useState("");
   async function onPick(file: File | undefined) {
@@ -129,7 +132,14 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
       )}
 
       <div style={{ ...ui.card, marginBottom: 20, padding: 0, overflowX: "auto" }}>
-        <div style={{ fontWeight: 700, padding: "16px 20px 4px" }}>Fee history</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px 4px", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ fontWeight: 700 }}>Fee history</div>
+          <div style={{ display: "flex", gap: 8 }} className="no-print">
+            <button style={ui.btn} onClick={() => setAddCharge(true)}>+ Add charge</button>
+            <Link href="/dashboard/school/fees" style={{ ...ui.ghost, textDecoration: "none" }}>Collect in Fee Ledger →</Link>
+          </div>
+        </div>
+        {chargeMsg && <div style={{ padding: "4px 20px 8px", fontSize: 13, color: "#4ade80" }}>{chargeMsg}</div>}
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead><tr>{["Period", "Fee", "Due", "Payable", "Paid", "Balance", "Status", "Receipts"].map((h) => <th key={h} style={ui.th}>{h}</th>)}</tr></thead>
           <tbody>
@@ -161,6 +171,7 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
           </table>
         </div>
       ))}
+      {addCharge && <AddChargeModal student={{ id, name: s.name }} onClose={() => setAddCharge(false)} onSaved={(m) => { setAddCharge(false); setChargeMsg(m); void reload(); }} />}
     </div>
   );
 }

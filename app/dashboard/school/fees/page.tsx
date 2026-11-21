@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { AddChargeModal } from "./_AddCharge";
 import { api, Badge, ClassRow, ClassSelect, className, ErrorLine, Field, Modal, money, Stat, thisPeriod, today, ui, useApi } from "../_ui";
 
 type Payment = { id: string; receiptNo: string; amount: number; method: string; paidAt: string };
@@ -23,6 +24,7 @@ export default function FeesPage() {
   const activeHeads = headData.heads.filter((h) => h.active);
   const [picked, setPicked] = useState<string[] | null>(null);
   const { data: school } = useApi<{ feeDueDay: number; lateFeeType: string } | null>("/api/school/settings", null);
+  const [charge, setCharge] = useState(false);
   const [gen, setGen] = useState(false);
   const [genForm, setGenForm] = useState({ classId: "", dueDate: today() });
   const [payFor, setPayFor] = useState<Invoice | null>(null);
@@ -70,7 +72,7 @@ export default function FeesPage() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Fee Ledger</h1><p style={ui.sub}>Invoices, receipts and balances per student</p></div>
-        <div style={{ display: "flex", gap: 10 }}><Link href={`/dashboard/school/print?kind=challan&period=${period}${classId ? `&classId=${classId}` : ""}`} style={{ ...ui.ghost, textDecoration: "none", display: "inline-block" }}>🖨 Print challans</Link><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => { setGenForm((f) => ({ ...f, dueDate: `${period}-${String(school?.feeDueDay ?? 10).padStart(2, "0")}` })); setGen(true); }}>Generate {period} invoices</button></div>
+        <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={() => setCharge(true)}>+ Add charge</button><Link href={`/dashboard/school/print?kind=challan&period=${period}${classId ? `&classId=${classId}` : ""}`} style={{ ...ui.ghost, textDecoration: "none", display: "inline-block" }}>🖨 Print challans</Link><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => { setGenForm((f) => ({ ...f, dueDate: `${period}-${String(school?.feeDueDay ?? 10).padStart(2, "0")}` })); setGen(true); }}>Generate {period} invoices</button></div>
       </div>
       {notice && <div style={{ ...ui.card, marginBottom: 16, padding: 12, fontSize: 13 }}>{notice}</div>}
       <div style={ui.grid}>
@@ -104,6 +106,7 @@ export default function FeesPage() {
           </tbody>
         </table>
       </div>
+      {charge && <AddChargeModal onClose={() => setCharge(false)} onSaved={(m) => { setCharge(false); setNotice(m); void reload(); }} />}
       {gen && (
         <Modal title={`Generate ${period} invoices`} onClose={() => setGen(false)}>
           <ErrorLine text={error} />
