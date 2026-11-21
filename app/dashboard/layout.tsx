@@ -1622,6 +1622,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/school/library" pathname={pathname}>Library</NavLink>
               <NavLink href="/dashboard/school/parent" pathname={pathname}>Parent Portal</NavLink>
               <NavLink href="/dashboard/school/students/promote" pathname={pathname}>Promote / Graduate</NavLink>
+              <NavLink href="/dashboard/school/import" pathname={pathname}>Import Students</NavLink>
             </NavGroup>
             <NavGroup title="Academics" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "schAcademics"} onToggle={() => toggle("schAcademics")}>
               <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fee Plan</NavLink>

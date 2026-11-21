@@ -1835,6 +1835,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["school"],
   },
   {
+    id: "SCHOOL_IMPORT",
+    label: "Import Students",
+    route: "/dashboard/school/import",
+    business: "school",
+    businessLabel: "School",
+    section: "Academic Desk",
+    businessTypes: ["school"],
+  },
+  {
     id: "SCHOOL_ATTENDANCE",
     label: "Attendance",
     route: "/dashboard/school/attendance",

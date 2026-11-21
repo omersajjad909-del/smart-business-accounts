@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkStudentLimit } from "@/lib/schoolLimits";
 import { bad, isResponse, num, parseDay, schoolGuard, str } from "@/lib/schoolApi";
 
 const STATUSES = ["APPLICANT", "ACTIVE", "LEFT", "GRADUATED"];
@@ -89,6 +90,7 @@ export async function POST(req: NextRequest) {
   const extras = admissionExtras(b, false);
   if ("error" in extras) return bad(extras.error);
   const admissionFee = Math.max(0, num(b.admissionFee));
+  if (status === "ACTIVE") { const limitError = await checkStudentLimit(ctx.companyId); if (limitError) return bad(limitError, 402); }
 
   // Admission number: use the supplied one, else next in sequence.
   let admissionNo = str(b.admissionNo);
@@ -147,6 +149,11 @@ export async function PATCH(req: NextRequest) {
   const extras = admissionExtras(b, true);
   if ("error" in extras) return bad(extras.error);
   Object.assign(data, extras.data);
+  if (data.status === "ACTIVE") {
+    // Re-activating (or confirming an applicant) takes a seat; saving an already-active student does not.
+    const current = await prisma.schoolStudent.findFirst({ where: { id, companyId: ctx.companyId }, select: { status: true } });
+    if (current && current.status !== "ACTIVE") { const limitError = await checkStudentLimit(ctx.companyId); if (limitError) return bad(limitError, 402); }
+  }
   const res = await prisma.schoolStudent.updateMany({ where: { id, companyId: ctx.companyId }, data });
   if (!res.count) return bad("Student not found", 404);
   return NextResponse.json({ ok: true });

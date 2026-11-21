@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkStudentLimit } from "@/lib/schoolLimits";
 import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!application || !session || !schoolClass) return bad("Application, session or class was not found", 404);
   if (application.status !== "ACCEPTED") return bad("Accept the application before enrolling the student", 409);
   if (application.studentId) return bad("This application has already been enrolled", 409);
+  const limitError = await checkStudentLimit(ctx.companyId); if (limitError) return bad(limitError, 402);
   const result = await prisma.$transaction(async (tx) => {
     const count = await tx.schoolStudent.count({ where: { companyId: ctx.companyId } });
     const admissionNo = String(count + 1).padStart(4, "0");

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { money, Stat, ui, useApi } from "./_ui";
+import { money, PlanUsage, Stat, ui, useApi } from "./_ui";
 
 type Overview = {
   activeStudents: number; classes: number; collectedThisMonth: number; outstanding: number; overdue: number;
@@ -19,6 +19,7 @@ export default function SchoolOverview() {
         <Link href="/dashboard/school/fees" style={{ ...ui.btn, textDecoration: "none" }}>Collect Fee</Link>
       </div>
       {error && <div style={{ color: "#f87171", marginBottom: 12 }}>{error}</div>}
+      <PlanUsage />
       <div style={ui.grid}>
         <Stat label="Active Students" value={loading ? "…" : data.activeStudents} hint={`${data.classes} classes`} />
         <Stat label="Collected This Month" value={money(data.collectedThisMonth)} />

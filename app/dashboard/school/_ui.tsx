@@ -130,12 +130,15 @@ export async function uploadStudentPhoto(studentId: string, file: File): Promise
 /** Photo chooser with preview and a Remove button, for forms where the file is uploaded after save. */
 export function PhotoPicker({ file, name, onChange, onError, label = "Student photo" }: { file: File | null; name: string; onChange: (f: File | null) => void; onError: (m: string) => void; label?: string }) {
   const [preview, setPreview] = useState<string | null>(null);
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    if (!file) { setPreview(null); return; }
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
+    if (!file) {
+      queueMicrotask(() => setPreview(null));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setPreview(typeof reader.result === "string" ? reader.result : null);
+    reader.readAsDataURL(file);
+    return () => reader.abort();
   }, [file]);
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 16, padding: 14, border: "1px dashed rgba(var(--ink),.2)", borderRadius: 14, background: "rgba(var(--ink),.03)" }}>
@@ -201,6 +204,32 @@ export function FormSection({ title, children }: { title: string; children: Reac
     <div style={{ marginBottom: 6 }}>
       <div style={{ fontWeight: 700, fontSize: 13, margin: "10px 0 14px", display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 4, height: 16, borderRadius: 2, background: "#6366f1" }} />{title}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "0 14px" }}>{children}</div>
+    </div>
+  );
+}
+
+export type PlanUsageData = { planLabel: string; limit: number | null; active: number; remaining: number | null; percent: number | null };
+
+/** How many of the plan's student seats are in use; turns amber near the limit and red when full. */
+export function PlanUsage({ compact = false }: { compact?: boolean }) {
+  const { data: u } = useApi<PlanUsageData | null>("/api/school/limits", null);
+  if (!u) return null;
+  const full = u.limit !== null && u.active >= u.limit;
+  const near = !full && u.percent !== null && u.percent >= 90;
+  if (compact && !full && !near) return null;
+  const tone = full ? "#dc2626" : near ? "#d97706" : "#6366f1";
+  return (
+    <div style={{ ...ui.card, marginBottom: 18, borderColor: full || near ? `${tone}66` : undefined, background: full || near ? `${tone}14` : undefined }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: u.limit !== null ? 8 : 0 }}>
+        <div style={{ fontWeight: 700 }}>
+          {u.planLabel} plan · {u.active} active student{u.active === 1 ? "" : "s"}{u.limit !== null ? ` of ${u.limit}` : " (no fixed limit)"}
+        </div>
+        {(full || near) && <a href="/dashboard/billing" style={{ color: tone, fontWeight: 700, fontSize: 13 }}>Upgrade plan →</a>}
+      </div>
+      {u.limit !== null && <div style={{ height: 8, borderRadius: 6, background: "rgba(var(--ink),.1)", overflow: "hidden" }}><div style={{ width: `${Math.min(100, u.percent ?? 0)}%`, height: "100%", background: tone }} /></div>}
+      {full && <div style={{ fontSize: 12.5, marginTop: 8 }}>You have reached your student limit — new admissions are blocked until you upgrade or mark students who have left.</div>}
+      {near && <div style={{ fontSize: 12.5, marginTop: 8 }}>Only {u.remaining} seat{u.remaining === 1 ? "" : "s"} left on your plan.</div>}
+      {!compact && !full && !near && u.limit !== null && <div style={{ fontSize: 12.5, marginTop: 8, opacity: 0.6 }}>Students who have left, graduated or are still applicants do not use a seat.</div>}
     </div>
   );
 }
