@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { api, Avatar, className, ErrorLine, Field, money, Stat, StepTitle, ui, useApi } from "../_ui";
 
 type Match = { id: string; name: string; admissionNo: string; guardianName: string | null; phone: string | null; photoUrl: string | null; class: { name: string; section: string } | null };
@@ -8,8 +9,17 @@ type Invoice = { id: string; period: string; title: string; dueDate: string; pay
 type Result = { receiptNo: string; paymentId: string; amount: number; title: string; period: string };
 
 export default function CollectFeePage() {
+  return <Suspense fallback={<div style={ui.page}>Loading…</div>}><CollectFee /></Suspense>;
+}
+
+function CollectFee() {
+  const presetId = useSearchParams().get("student");
   const [q, setQ] = useState("");
   const [student, setStudent] = useState<Match | null>(null);
+  // Arriving from a new admission (or a student profile): the student is already chosen.
+  const { data: preset } = useApi<{ student: Match } | null>(presetId ? `/api/school/students/${presetId}` : null, null);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { if (preset?.student) setStudent((cur) => cur ?? preset.student); }, [preset]);
   const { data: matches } = useApi<Match[]>(!student && q.trim().length >= 2 ? `/api/school/students?status=ACTIVE&q=${encodeURIComponent(q.trim())}` : null, []);
   const { data: fees, loading, reload } = useApi<{ invoices: Invoice[] }>(student ? `/api/school/fees?studentId=${student.id}` : null, { invoices: [] });
 

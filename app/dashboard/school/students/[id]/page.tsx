@@ -136,7 +136,7 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
           <div style={{ fontWeight: 700 }}>Fee history</div>
           <div style={{ display: "flex", gap: 8 }} className="no-print">
             <button style={ui.btn} onClick={() => setAddCharge(true)}>+ Add charge</button>
-            <Link href="/dashboard/school/fees" style={{ ...ui.ghost, textDecoration: "none" }}>Collect in Fee Ledger →</Link>
+            <Link href={`/dashboard/school/collect?student=${id}`} style={{ ...ui.btn, textDecoration: "none" }}>💰 Collect fee</Link>
           </div>
         </div>
         {chargeMsg && <div style={{ padding: "4px 20px 8px", fontSize: 13, color: "#4ade80" }}>{chargeMsg}</div>}

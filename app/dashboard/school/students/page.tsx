@@ -32,6 +32,7 @@ export default function StudentsPage() {
   const [error, setError] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [notice, setNotice] = useState("");
+  const [justAdmitted, setJustAdmitted] = useState<{ id: string; name: string; fee: number } | null>(null);
 
   async function save() {
     if (!form.name.trim()) return setError("Student name is required");
@@ -45,6 +46,7 @@ export default function StudentsPage() {
       if (up.error) note = `Student admitted, but the photo was not saved: ${up.error}. You can add it from the student profile.`;
     }
     setNotice(note);
+    setJustAdmitted(Number(form.admissionFee) > 0 ? { id: (r.data as { id: string }).id, name: form.name, fee: Number(form.admissionFee) } : null);
     setOpen(false); setError(""); setForm(blank); setPhoto(null); void reload();
   }
   async function setStudentStatus(id: string, s: string) {
@@ -60,6 +62,15 @@ export default function StudentsPage() {
         <div><h1 style={ui.h1}>Students</h1><p style={ui.sub}>Admissions and student records. Only ACTIVE students are billed and marked.</p></div>
         <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={() => (classId ? (window.location.href = `/dashboard/school/print?kind=idcards&classId=${classId}`) : alert("Choose a class in the filter first, then print its ID cards."))}>🪪 ID cards</button><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setOpen(true)}>+ New Admission</button></div>
       </div>
+      {justAdmitted && (
+        <div style={{ ...ui.card, marginBottom: 14, borderColor: "rgba(34,197,94,.4)", background: "rgba(34,197,94,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div><b>✓ {justAdmitted.name} admitted.</b> <span style={ui.sub}>Admission fee of Rs {justAdmitted.fee.toLocaleString("en-PK")} is waiting to be collected.</span></div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Link href={`/dashboard/school/collect?student=${justAdmitted.id}`} style={{ ...ui.btn, textDecoration: "none" }}>💰 Collect fee now</Link>
+            <button style={ui.ghost} onClick={() => setJustAdmitted(null)}>Later</button>
+          </div>
+        </div>
+      )}
       <PlanUsage compact />
       {notice && <div style={{ ...ui.card, padding: 12, fontSize: 13, marginBottom: 14 }}>{notice}</div>}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>

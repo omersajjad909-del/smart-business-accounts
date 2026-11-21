@@ -3246,15 +3246,15 @@ export default function DashboardLayout({
             <ModeToggle />
 
             {/* + New button — desktop only */}
-            {!isMobileViewport && (
-              <Link prefetch={false} href={businessType === "school" ? "/dashboard/school/students" : "/dashboard/sales-invoice"}
+            {!isMobileViewport && (businessType === "school" ? <SchoolNewMenu /> : (
+              <Link prefetch={false} href="/dashboard/sales-invoice"
                 style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:10,background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:13,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(var(--accent-rgb),.4)"}}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 New
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </Link>
-            )}
+            ))}
 
             {/* Notification Bell */}
             <div style={{position:"relative"}} data-panel-anchor="notif">
@@ -4228,5 +4228,39 @@ function NavLink({ href, children, pathname }: {
       )}
       <span>{displayChildren}</span>
     </Link>
+  );
+}
+
+
+/** Header "+ New" for a school: the jobs a front desk starts most often, in one menu. */
+function SchoolNewMenu() {
+  const [open, setOpen] = useState(false);
+  const items: [string, string, string][] = [
+    ["💰", "Collect Fee", "/dashboard/school/collect"],
+    ["📝", "New Admission", "/dashboard/school/students"],
+    ["🧾", "Add a charge", "/dashboard/school/fees"],
+    ["✅", "Mark Attendance", "/dashboard/school/attendance"],
+    ["📊", "Enter Marks", "/dashboard/school/results"],
+    ["📢", "New Announcement", "/dashboard/school/announcements"],
+  ];
+  return (
+    <div style={{ position: "relative" }} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false); }}>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-haspopup="menu" aria-expanded={open}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 10, border: "none", cursor: "pointer", background: "linear-gradient(135deg,var(--accent),var(--accent-strong))", color: "white", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 2px 10px rgba(var(--accent-rgb),.4)" }}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      {open && (
+        <div role="menu" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, minWidth: 220, background: "var(--card-bg, #fff)", color: "var(--text-primary, #111)", border: "1px solid rgba(0,0,0,.12)", borderRadius: 12, boxShadow: "0 12px 32px rgba(0,0,0,.2)", padding: 6, zIndex: 200 }}>
+          {items.map(([icon, label, href]) => (
+            <Link key={href + label} prefetch={false} href={href} role="menuitem" onClick={() => setOpen(false)}
+              style={{ display: "flex", gap: 10, alignItems: "center", padding: "9px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 600, color: "inherit", textDecoration: "none" }}>
+              <span>{icon}</span>{label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
