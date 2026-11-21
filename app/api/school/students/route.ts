@@ -160,6 +160,20 @@ export async function PATCH(req: NextRequest) {
     if (classId && !(await prisma.schoolClass.findFirst({ where: { id: classId, companyId: ctx.companyId }, select: { id: true } }))) return bad("Class not found", 404);
     data.classId = classId;
   }
+  if (b.admissionNo !== undefined) {
+    const no = str(b.admissionNo).slice(0, 20);
+    if (!no) return bad("Admission number cannot be empty");
+    const clash = await prisma.schoolStudent.findFirst({ where: { companyId: ctx.companyId, admissionNo: no, id: { not: id } }, select: { name: true } });
+    if (clash) return bad(`Admission no. ${no} already belongs to ${clash.name}`, 409);
+    data.admissionNo = no;
+  }
+  if (b.admissionDate !== undefined) { const d = parseDay(b.admissionDate); if (!d) return bad("Enter a valid admission date"); data.admissionDate = d; }
+  if (b.phone !== undefined) {
+    const ph = digits(str(b.phone));
+    if (!ph) return bad("Guardian phone is required");
+    if (ph.length < 10 || ph.length > 13) return bad("Enter a valid guardian phone number");
+    data.phone = str(b.phone);
+  }
   if (b.rollNo !== undefined) {
     const roll = str(b.rollNo).slice(0, 12) || null;
     const cur = await prisma.schoolStudent.findFirst({ where: { id, companyId: ctx.companyId }, select: { classId: true } });
@@ -172,7 +186,7 @@ export async function PATCH(req: NextRequest) {
     if (!STATUSES.includes(s)) return bad("Invalid status");
     data.status = s;
   }
-  for (const k of ["guardianName", "phone", "address", "gender"] as const) if (b[k] !== undefined) data[k] = str(b[k]) || null;
+  for (const k of ["guardianName", "address", "gender"] as const) if (b[k] !== undefined) data[k] = str(b[k]) || null;
   if (b.discount !== undefined) data.discount = Math.max(0, num(b.discount));
   if (b.dob !== undefined) data.dob = parseDay(b.dob);
   const extras = admissionExtras(b, true);

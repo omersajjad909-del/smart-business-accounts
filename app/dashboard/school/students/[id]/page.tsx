@@ -3,7 +3,8 @@ import Link from "next/link";
 import { use } from "react";
 import { useRef, useState } from "react";
 import { AddChargeModal } from "../../fees/_AddCharge";
-import { api, Avatar, Badge, className, money, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
+import { StudentForm, type StudentRecord } from "../_form";
+import { api, Avatar, Badge, className, type ClassRow, money, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
 
 type Profile = {
   student: { rollNo: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[]; photoUrl: string | null };
@@ -26,6 +27,8 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
     setFeeMsg(r.ok ? "" : r.error); if (r.ok) { setEnrol({ headId: "", amount: "" }); void reloadEnrolled(); }
   }
   async function dropOptional(rowId: string) { await api(`/api/school/student-fees?id=${rowId}`, { method: "DELETE" }); void reloadEnrolled(); }
+  const [editing, setEditing] = useState(false);
+  const { data: classList } = useApi<ClassRow[]>("/api/school/classes", []);
   const [addCharge, setAddCharge] = useState(false);
   const [chargeMsg, setChargeMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -76,6 +79,7 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} className="no-print">
+          <button style={ui.btn} onClick={() => setEditing(true)}>✏️ Edit student</button>
           <Link href={`/dashboard/school/print?kind=idcards&studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>🪪 ID card</Link>
           <Link href={`/dashboard/school/print?kind=certificate&type=leaving&studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Leaving certificate</Link>
           <Link href={`/dashboard/school/print?kind=certificate&type=character&studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Character certificate</Link>
@@ -172,6 +176,7 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
         </div>
       ))}
       {addCharge && <AddChargeModal student={{ id, name: s.name }} onClose={() => setAddCharge(false)} onSaved={(m) => { setAddCharge(false); setChargeMsg(m); void reload(); }} />}
+      {editing && <StudentForm student={data.student as unknown as StudentRecord} classes={classList} onClose={() => setEditing(false)} onSaved={() => { setEditing(false); void reload(); }} />}
     </div>
   );
 }
