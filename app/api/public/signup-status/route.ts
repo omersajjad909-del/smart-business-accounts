@@ -11,7 +11,7 @@
 
 import { NextResponse } from "next/server";
 
-import { getSignupsOpen } from "@/lib/signupGate";
+import { getSignupsOpen } from "@/lib/signupGateDb";
 
 // Stated rather than assumed. This handler reads nothing off the request, so
 // it is exactly the shape a future build could decide to render once and reuse

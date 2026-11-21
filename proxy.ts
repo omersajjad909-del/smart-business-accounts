@@ -3,7 +3,7 @@ import { getAdminTokenFromRequest, getTokenFromRequest, verifyJwt } from "@/lib/
 import { REF_COOKIE, REF_COOKIE_MAX_AGE, normalizeTrackingCode } from "@/lib/affiliateCookie";
 import {
   WAITLIST_PATH,
-  getSignupsOpen,
+  getSignupsOpenViaApi,
   isSignupApiRoute,
   isSignupPageRoute,
 } from "@/lib/signupGate";
@@ -345,7 +345,7 @@ export async function proxy(req: NextRequest) {
   //
   // Only the two route lists below are consulted, so the database read costs
   // nothing on ordinary traffic — and it is cached for a few seconds anyway.
-  if ((isSignupApiRoute(pathname) || isSignupPageRoute(pathname)) && !(await getSignupsOpen())) {
+  if ((isSignupApiRoute(pathname) || isSignupPageRoute(pathname)) && !(await getSignupsOpenViaApi(req.nextUrl.origin))) {
     if (isSignupApiRoute(pathname)) {
       return NextResponse.json(
         { error: "Signups are not open yet", waitlist: WAITLIST_PATH },

@@ -31,35 +31,26 @@ export const SIGNUPS_OPEN = process.env.NEXT_PUBLIC_SIGNUPS_OPEN !== "false";
  */
 export const SITE_LAUNCHED_KEY = "siteLaunched";
 
-// Read on every proxied request, so it is cached briefly rather than hitting the
-// database each time. A few seconds of staleness on launch day is invisible.
+// Prisma lives in lib/signupGateDb.ts. This file is imported by proxy.ts, and
+// anything it imports (even dynamically) is bundled into the middleware, where
+// Prisma's native engine is rejected by Netlify. The middleware therefore asks
+// the signup-status API instead of touching the database itself.
 const CACHE_TTL_MS = 15_000;
 let cached: { open: boolean; at: number } | null = null;
 
-export async function getSignupsOpen(): Promise<boolean> {
+export async function getSignupsOpenViaApi(origin: string): Promise<boolean> {
   if (SIGNUPS_OPEN) return true;
 
   const now = Date.now();
   if (cached && now - cached.at < CACHE_TTL_MS) return cached.open;
 
-  let open = false;
+  let open: boolean;
   try {
-    const { prisma } = await import("@/lib/prisma");
-    const row = await prisma.activityLog.findFirst({
-      where: {
-        action: "ADMIN_SETTING",
-        details: { startsWith: `{"key":"${SITE_LAUNCHED_KEY}"` },
-      },
-      orderBy: { createdAt: "desc" },
-      select: { details: true },
-    });
-    open = JSON.parse(row?.details || "{}")?.value === true;
+    const res = await fetch(`${origin}/api/public/signup-status`, { cache: "no-store" });
+    open = (await res.json())?.open === true;
   } catch {
-    // Keep whatever we last knew rather than slamming the doors mid-traffic on
-    // a transient database error; closed on a cold start.
     open = cached?.open ?? false;
   }
-
   cached = { open, at: now };
   return open;
 }
