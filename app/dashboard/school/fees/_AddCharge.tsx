@@ -9,28 +9,39 @@ type Match = { id: string; name: string; admissionNo: string };
  * Bills one student for something outside the regular monthly fees. Pass `student` when opened from a
  * profile; without it the user searches for the student first.
  */
-export function AddChargeModal({ student, onClose, onSaved }: { student?: { id: string; name: string }; onClose: () => void; onSaved: (msg: string) => void }) {
+export function AddChargeModal({ student, onClose, onSaved }: { student?: { id: string; name: string }; onClose: () => void; onSaved: (msg: string, paymentId?: string) => void }) {
   const [picked, setPicked] = useState<{ id: string; name: string } | null>(student ?? null);
   const [q, setQ] = useState("");
   const { data: matches } = useApi<Match[]>(!student && q.trim().length >= 2 ? `/api/school/students?status=ACTIVE&q=${encodeURIComponent(q.trim())}` : null, []);
   const [form, setForm] = useState({ title: "", amount: "", dueDate: today() });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [collectNow, setCollectNow] = useState(false);
+  const [method, setMethod] = useState("CASH");
 
   async function save() {
     if (!picked) return setError("Choose the student");
     if (!form.title.trim()) return setError("What is the charge for?");
     if (!(Number(form.amount) > 0)) return setError("Enter the amount");
     setBusy(true);
-    const r = await api("/api/school/fees", { method: "POST", body: { action: "one_off", studentId: picked.id, title: form.title.trim(), amount: Number(form.amount), dueDate: form.dueDate, period: form.dueDate.slice(0, 7) } });
+    const r = await api<{ id: string }>("/api/school/fees", { method: "POST", body: { action: "one_off", studentId: picked.id, title: form.title.trim(), amount: Number(form.amount), dueDate: form.dueDate, period: form.dueDate.slice(0, 7) } });
+    if (!r.ok) { setBusy(false); return setError(r.error); }
+    const what = `${form.title.trim()} of Rs ${Number(form.amount).toLocaleString("en-PK")}`;
+
+    // Counter shortcut: bill it and take the money in one go.
+    if (collectNow) {
+      const pay = await api<{ id: string; receiptNo: string }>("/api/school/fees", { method: "POST", body: { action: "pay", invoiceId: r.data.id, amount: Number(form.amount), method } });
+      setBusy(false);
+      if (!pay.ok) return setError(`${what} was added, but taking the payment failed: ${pay.error}. Collect it from the Collect Fee page.`);
+      return onSaved(`${what} added and received from ${picked.name}. Receipt ${pay.data.receiptNo}.`, pay.data.id);
+    }
     setBusy(false);
-    if (!r.ok) return setError(r.error);
-    onSaved(`${form.title.trim()} of Rs ${Number(form.amount).toLocaleString("en-PK")} added for ${picked.name}. It is now in the Fee Ledger — collect it from there.`);
+    onSaved(`${what} added for ${picked.name}. It is waiting to be collected.`);
   }
 
   return (
     <Modal title="Add a charge" subtitle="For anything outside the regular monthly fee — a trip, a fine, a replacement card" onClose={onClose}
-      footer={<><button style={ui.ghost} onClick={onClose}>Cancel</button><button style={ui.btn} disabled={busy} onClick={save}>Add charge</button></>}>
+      footer={<><button style={ui.ghost} onClick={onClose}>Cancel</button><button style={ui.btn} disabled={busy} onClick={save}>{collectNow ? "Add & receive" : "Add charge"}</button></>}>
       <ErrorLine text={error} />
       {!student && (
         <Field label="Student">
@@ -60,6 +71,10 @@ export function AddChargeModal({ student, onClose, onSaved }: { student?: { id: 
         <Field label="Amount (Rs)"><input style={ui.input} type="number" min={1} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></Field>
         <Field label="Due date"><input style={ui.input} type="date" value={form.dueDate} onChange={(e) => setForm({ ...form, dueDate: e.target.value })} /></Field>
       </div>
+      <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13.5, fontWeight: 600, marginBottom: collectNow ? 10 : 0 }}>
+        <input type="checkbox" checked={collectNow} onChange={(e) => setCollectNow(e.target.checked)} />Student is paying this now — receive the money too
+      </label>
+      {collectNow && <Field label="Payment method"><select style={ui.input} value={method} onChange={(e) => setMethod(e.target.value)}>{["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"].map((m) => <option key={m}>{m}</option>)}</select></Field>}
     </Modal>
   );
 }

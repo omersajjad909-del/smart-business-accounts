@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { AddChargeModal } from "../fees/_AddCharge";
 import { api, Avatar, className, ErrorLine, Field, money, Stat, StepTitle, ui, useApi } from "../_ui";
 
 type Match = { id: string; name: string; admissionNo: string; guardianName: string | null; phone: string | null; photoUrl: string | null; class: { name: string; section: string } | null };
@@ -23,6 +24,26 @@ function CollectFee() {
   const { data: matches } = useApi<Match[]>(!student && q.trim().length >= 2 ? `/api/school/students?status=ACTIVE&q=${encodeURIComponent(q.trim())}` : null, []);
   const { data: fees, loading, reload } = useApi<{ invoices: Invoice[] }>(student ? `/api/school/fees?studentId=${student.id}` : null, { invoices: [] });
 
+  const [charge, setCharge] = useState(false);
+  const [flash, setFlash] = useState<{ msg: string; paymentId?: string } | null>(null);
+  // Before anyone is chosen: everyone who owes something, so the page is never an empty box.
+  const { data: owing } = useApi<{ invoices: (Invoice & { studentId: string; student: { name: string; admissionNo: string; class: { name: string; section: string } | null } })[] }>(student ? null : "/api/school/fees?status=OUTSTANDING", { invoices: [] });
+  const debtors = [...owing.invoices.reduce((m, i) => { const c = m.get(i.studentId) ?? { id: i.studentId, name: i.student.name, admissionNo: i.student.admissionNo, class: i.student.class, total: 0, overdue: false }; c.total += i.balance; if ((i.daysOverdue ?? 0) > 0) c.overdue = true; m.set(i.studentId, c); return m; }, new Map<string, { id: string; name: string; admissionNo: string; class: { name: string; section: string } | null; total: number; overdue: boolean }>()).values()].sort((a, b) => b.total - a.total);
+
+  async function billThisMonth() {
+    if (!student) return;
+    const now = new Date(); const period = now.toISOString().slice(0, 7);
+    const settings = await api<{ feeDueDay: number }>("/api/school/settings");
+    const day = String(settings.ok ? settings.data.feeDueDay : 10).padStart(2, "0");
+    const heads = await api<{ heads: { id: string; frequency: string; active: boolean }[] }>("/api/school/fee-heads");
+    const headIds = heads.ok ? heads.data.heads.filter((h) => h.active && h.frequency === "MONTHLY").map((h) => h.id) : [];
+    const r = await api<{ created: number; skipped: number; noFee: number }>("/api/school/fees", { method: "POST", body: { action: "generate", period, dueDate: `${period}-${day}`, studentId: student.id, headIds } });
+    if (!r.ok) return setError(r.error);
+    setError("");
+    setFlash({ msg: r.data.created > 0 ? `${r.data.created} fee line(s) billed for ${period}.` : r.data.noFee > 0 ? "Nothing was billed: this student's class has no fee amount set yet. Set it under Fee Structure." : `${period} fees were already billed for this student.` });
+    void reload();
+  }
+
   const due = fees.invoices.filter((i) => i.balance > 0.005).sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   const [off, setOff] = useState<Set<string>>(new Set());                  // invoices un-ticked by the cashier
   const chosen = due.filter((i) => !off.has(i.id));
@@ -33,7 +54,7 @@ function CollectFee() {
   const [done, setDone] = useState<Result[] | null>(null);
 
   const pay = amount === "" ? totalChosen : Number(amount);
-  function pickStudent(m: Match) { setStudent(m); setQ(""); setOff(new Set()); setAmount(""); setError(""); setDone(null); }
+  function pickStudent(m: Match) { setFlash(null); setStudent(m); setQ(""); setOff(new Set()); setAmount(""); setError(""); setDone(null); }
   const toggle = (id: string) => setOff((p) => { const n = new Set(p); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   async function receive() {
@@ -89,6 +110,32 @@ function CollectFee() {
         )}
       </div>
 
+      {!student && (
+        <div style={{ ...ui.card, marginBottom: 20 }}>
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>Students with unpaid fees</div>
+          <p style={{ ...ui.sub, marginTop: 0 }}>Click a name to collect. Not listed? The student may have no invoice yet — search above, then use <b>+ Add charge</b> or <b>Bill this month&apos;s fees</b>.</p>
+          {debtors.length === 0 ? <div style={ui.sub}>No unpaid fees right now. To bill a student, search for them above, or generate the month&apos;s invoices from the <Link href="/dashboard/school/fees" style={{ color: "#818cf8" }}>Fee Ledger</Link>.</div> : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 10 }}>
+              {debtors.slice(0, 18).map((d) => (
+                <button key={d.id} onClick={() => pickStudent({ id: d.id, name: d.name, admissionNo: d.admissionNo, guardianName: null, phone: null, photoUrl: null, class: d.class })} style={{ textAlign: "left", padding: 12, borderRadius: 12, cursor: "pointer", color: "inherit", border: "1px solid rgba(var(--ink),.14)", background: "rgba(var(--ink),.03)" }}>
+                  <div style={{ fontWeight: 700 }}>{d.name}</div>
+                  <div style={{ fontSize: 12, opacity: 0.6 }}>Adm {d.admissionNo} · {className(d.class)}</div>
+                  <div style={{ marginTop: 4, fontWeight: 700, color: d.overdue ? "#f87171" : undefined }}>{money(d.total)}{d.overdue ? " · overdue" : ""}</div>
+                </button>
+              ))}
+            </div>
+          )}
+          <p style={{ ...ui.sub, marginBottom: 0 }}>New student? <Link href="/dashboard/school/students" style={{ color: "#818cf8" }}>Admit a student →</Link></p>
+        </div>
+      )}
+
+      {flash && (
+        <div style={{ ...ui.card, marginBottom: 20, borderColor: "rgba(34,197,94,.4)", background: "rgba(34,197,94,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span>✓ {flash.msg}</span>
+          {flash.paymentId && <Link href={`/dashboard/school/print?kind=receipt&id=${flash.paymentId}`} target="_blank" style={{ ...ui.ghost, textDecoration: "none" }}>🖨 Print receipt</Link>}
+        </div>
+      )}
+
       {done && (
         <div style={{ ...ui.card, marginBottom: 20, borderColor: "rgba(34,197,94,.4)", background: "rgba(34,197,94,.08)" }}>
           <strong>✓ {money(done.reduce((s, r) => s + r.amount, 0))} received from {student?.name}.</strong>
@@ -106,6 +153,11 @@ function CollectFee() {
 
       {student && (
         <>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
+            <button style={ui.btn} onClick={() => setCharge(true)}>+ Add charge</button>
+            <button style={ui.ghost} onClick={billThisMonth}>🧾 Bill this month&apos;s fees</button>
+            <Link href={`/dashboard/school/students/${student.id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Student profile</Link>
+          </div>
           <div style={ui.grid}>
             <Stat label="Total due" value={money(due.reduce((s, i) => s + i.balance, 0))} hint={`${due.length} unpaid invoice${due.length === 1 ? "" : "s"}`} />
             <Stat label="Selected to pay" value={money(totalChosen)} hint={`${chosen.length} invoice${chosen.length === 1 ? "" : "s"}`} />
@@ -116,7 +168,7 @@ function CollectFee() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead><tr>{["", "Fee", "Month", "Due date", "Fee", "Late fee", "Balance"].map((h) => <th key={h} style={ui.th}>{h}</th>)}</tr></thead>
               <tbody>
-                {!loading && due.length === 0 && <tr><td colSpan={7} style={{ ...ui.td, textAlign: "center", padding: 28 }}>🎉 Nothing is due for {student.name}. All fees are paid.</td></tr>}
+                {!loading && due.length === 0 && <tr><td colSpan={7} style={{ ...ui.td, textAlign: "center", padding: 28 }}>🎉 Nothing is due for {student.name}. To bill something, use <b>+ Add charge</b> (a one-off like a trip or fine) or <b>Bill this month&apos;s fees</b> above.</td></tr>}
                 {due.map((i) => (
                   <tr key={i.id} style={{ opacity: off.has(i.id) ? 0.45 : 1 }}>
                     <td style={ui.td}><input type="checkbox" checked={!off.has(i.id)} onChange={() => toggle(i.id)} /></td>
@@ -145,6 +197,7 @@ function CollectFee() {
           )}
         </>
       )}
+      {charge && student && <AddChargeModal student={{ id: student.id, name: student.name }} onClose={() => setCharge(false)} onSaved={(m, pid) => { setCharge(false); setFlash({ msg: m, paymentId: pid }); void reload(); }} />}
     </div>
   );
 }

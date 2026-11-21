@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
     if (!PERIOD_RE.test(period)) return bad("Period must look like 2026-11");
     if (!dueDate) return bad("Due date is required");
     const classId = str(b.classId);
+    const onlyStudent = str(b.studentId);
     const headIds: string[] = Array.isArray(b.headIds) ? b.headIds.map(String) : [];
 
     const allHeads = await prisma.schoolFeeHead.findMany({ where: { companyId: ctx.companyId, active: true } });
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
     if (heads.length === 0) return bad("Select at least one fee to bill");
 
     const students = await prisma.schoolStudent.findMany({
-      where: { companyId: ctx.companyId, status: "ACTIVE", classId: classId || { not: null } },
+      where: { companyId: ctx.companyId, status: "ACTIVE", classId: classId || { not: null }, ...(onlyStudent ? { id: onlyStudent } : {}) },
       select: { id: true, classId: true, discount: true, class: { select: { monthlyFee: true } } },
     });
     const ids = students.map((s) => s.id);
