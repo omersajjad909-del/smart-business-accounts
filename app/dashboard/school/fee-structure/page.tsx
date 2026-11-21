@@ -117,6 +117,8 @@ export default function FeeStructurePage() {
       )}
       <p style={{ ...ui.sub, marginTop: 14 }}>Tuition Fee with no amount here falls back to the single monthly fee set on the class ({classes.slice(0, 1).map((c) => money(c.monthlyFee)).join("")}). Monthly discounts apply to Tuition Fee only.</p>
 
+      <AccountingMethod />
+
       {open && (
         <Modal title={editId ? "Edit fee type" : "New fee type"} subtitle="For example Science Lab Fee, Bus Fee, Registration Fee" onClose={() => setOpen(false)} footer={<><button style={ui.ghost} onClick={() => setOpen(false)}>Cancel</button><button style={ui.btn} onClick={create}>{editId ? "Save changes" : "Create"}</button></>}>
           <ErrorLine text={error} />
@@ -145,6 +147,43 @@ export default function FeeStructurePage() {
             : !editId && <Field label="Same amount for all classes (optional)"><input style={ui.input} type="number" min={0} value={form.allClassAmount} placeholder="Leave empty to set each class separately" onChange={(e) => setForm({ ...form, allClassAmount: e.target.value })} /></Field>}
         </Modal>
       )}
+    </div>
+  );
+}
+
+/** How fee income reaches the books — and the one-way switch from cash to accrual. */
+function AccountingMethod() {
+  const { data, reload } = useApi<{ feeAccounting: "CASH" | "ACCRUAL" } | null>("/api/school/settings", null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  if (!data) return null;
+  const accrual = data.feeAccounting === "ACCRUAL";
+
+  async function convert() {
+    if (!confirm("Switch to accrual accounting?\n\n• Every invoice already issued will be booked as income, with the unpaid part in Fee Receivable.\n• Receipts already posted will credit Fee Receivable instead of Fee Income, so income is not counted twice.\n• This cannot be undone from here.\n\nYour accountant should agree before you continue.")) return;
+    setBusy(true);
+    const r = await api<{ receiptsMoved: number; vouchers: number; invoices: number }>("/api/school/fees", { method: "POST", body: { action: "convert_to_accrual" } });
+    setBusy(false);
+    setMsg(r.ok ? `Done: ${r.data.invoices} invoice(s) booked in ${r.data.vouchers} voucher(s); ${r.data.receiptsMoved} receipt(s) re-pointed to Fee Receivable.` : r.error);
+    void reload();
+  }
+
+  return (
+    <div style={{ ...ui.card, marginTop: 24 }}>
+      <div style={{ fontWeight: 700, marginBottom: 4 }}>3. How fees are recorded in your books</div>
+      <div style={{ marginBottom: 10 }}>
+        <span style={{ fontSize: 12, fontWeight: 700, borderRadius: 20, padding: "3px 12px", color: "#fff", background: accrual ? "#16a34a" : "#6366f1" }}>{accrual ? "ACCRUAL" : "CASH BASIS"}</span>
+      </div>
+      {accrual ? (
+        <p style={{ ...ui.sub, margin: 0 }}>Fee is income when it is <b>billed</b>. Unpaid fees show as <b>Fee Receivable</b> on your Balance Sheet, and collecting a fee reduces the receivable. Each billing run posts one voucher (SFB-…), each receipt one voucher (SFR-…).</p>
+      ) : (
+        <>
+          <p style={{ ...ui.sub, margin: 0 }}>Fee is income on the day it is <b>received</b>. This is simple and fine for most schools. Unpaid fees are tracked in the Fee Ledger but do <b>not</b> appear on the Balance Sheet.</p>
+          <p style={{ ...ui.sub }}>Switch to <b>accrual</b> if your accountant or auditor wants income recognised when fees are billed, with a Fee Receivable balance. Existing invoices and receipts are converted for you.</p>
+          <button style={ui.ghost} disabled={busy} onClick={convert}>{busy ? "Converting…" : "Switch to accrual accounting"}</button>
+        </>
+      )}
+      {msg && <div style={{ fontSize: 13, marginTop: 10 }}>{msg}</div>}
     </div>
   );
 }

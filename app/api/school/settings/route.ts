@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     prisma.schoolSettings.findUnique({ where: { companyId: ctx.companyId } }),
     prisma.company.findUnique({ where: { id: ctx.companyId }, select: { name: true, logoUrl: true } }),
   ]);
-  return NextResponse.json({ name: company?.name ?? "", logoUrl: company?.logoUrl ?? null, ...Object.fromEntries(FIELDS.map((f) => [f, row?.[f] ?? ""])), setupDismissedAt: row?.setupDismissedAt ?? null });
+  return NextResponse.json({ name: company?.name ?? "", logoUrl: company?.logoUrl ?? null, ...Object.fromEntries(FIELDS.map((f) => [f, row?.[f] ?? ""])), setupDismissedAt: row?.setupDismissedAt ?? null, feeAccounting: row?.feeAccounting ?? "CASH" });
 }
 
 /** PUT { address?, city?, phone?, email?, website?, principalName?, registrationNo?, dismissSetup? } */

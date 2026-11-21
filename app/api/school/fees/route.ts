@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { postSchoolFeeReceipt, syncSchoolFeeReceipts } from "@/lib/schoolAccounting";
+import { accrueIfEnabled, convertToAccrual, postSchoolFeeReceipt, syncSchoolFeeReceipts } from "@/lib/schoolAccounting";
 import { bad, invoiceStatus, invoiceTotals, isResponse, num, parseDay, schoolGuard, str } from "@/lib/schoolApi";
 
 const METHODS = ["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"];
@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
       }
     }
     const res = await prisma.schoolFeeInvoice.createMany({ data, skipDuplicates: true });
+    await accrueIfEnabled(ctx.companyId, { period });
     return NextResponse.json({ created: res.count, skipped: data.length - res.count + alreadyBilled, noFee });
   }
 
@@ -119,6 +120,7 @@ export async function POST(req: NextRequest) {
     if (!student) return bad("Student not found", 404);
     try {
       const row = await prisma.schoolFeeInvoice.create({ data: { companyId: ctx.companyId, studentId, title, period: str(b.period) || title, amount, dueDate } });
+      await accrueIfEnabled(ctx.companyId, { invoiceIds: [row.id] });
       return NextResponse.json(row, { status: 201 });
     } catch (e) {
       if ((e as { code?: string }).code === "P2002") return bad("This invoice already exists for the student", 409);
@@ -137,7 +139,13 @@ export async function POST(req: NextRequest) {
     });
     const ids = overdue.filter((i) => invoiceTotals(i).balance > 0.005).map((i) => i.id);
     const res = await prisma.schoolFeeInvoice.updateMany({ where: { id: { in: ids }, companyId: ctx.companyId }, data: { lateFee: amount } });
+    await accrueIfEnabled(ctx.companyId, { invoiceIds: ids });
     return NextResponse.json({ updated: res.count });
+  }
+
+  // ── Switch the school to accrual accounting (explicitly confirmed on the Fee Structure page)
+  if (action === "convert_to_accrual") {
+    return NextResponse.json(await convertToAccrual(ctx.companyId));
   }
 
   // ── Post any receipts missing from the general ledger ────────────────
@@ -171,6 +179,7 @@ export async function POST(req: NextRequest) {
         const student = await prisma.schoolFeeInvoice.findUnique({ where: { id: invoiceId }, select: { student: { select: { name: true } } } });
         let booked = true;
         try {
+          await accrueIfEnabled(ctx.companyId, { invoiceIds: [invoiceId] }); // an invoice is always billed in the books before it is paid
           await postSchoolFeeReceipt({ companyId: ctx.companyId, paymentId: payment.id, receiptNo: payment.receiptNo, studentName: student?.student.name ?? "", amount: payment.amount, method: payment.method, paidAt: payment.paidAt });
         } catch (err) {
           booked = false;

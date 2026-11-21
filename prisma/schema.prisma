@@ -3432,19 +3432,21 @@ model SchoolStudent {
 }
 
 model SchoolFeeInvoice {
-  id        String        @id @default(uuid())
-  companyId String
-  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  studentId String
-  student   SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  id            String        @id @default(uuid())
+  companyId     String
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
   /// "2026-11" for monthly fees, or a free label for one-offs (admission, exam fee)
-  period    String
-  title     String        @default("Tuition Fee")
-  amount    Float
-  discount  Float         @default(0)
-  lateFee   Float         @default(0)
-  dueDate   DateTime
-  createdAt DateTime      @default(now())
+  period        String
+  title         String        @default("Tuition Fee")
+  amount        Float
+  discount      Float         @default(0)
+  lateFee       Float         @default(0)
+  /// How much of this invoice has been booked as income + receivable (accrual basis). payable − accruedAmount is still to post.
+  accruedAmount Float         @default(0)
+  dueDate       DateTime
+  createdAt     DateTime      @default(now())
 
   payments SchoolPayment[]
 
@@ -3941,6 +3943,8 @@ model SchoolSettings {
   website          String?
   principalName    String?
   registrationNo   String?
+  /// CASH: fee is income when received. ACCRUAL: income when billed, unpaid fee sits in Fee Receivable.
+  feeAccounting    String    @default("CASH")
   /// Set when the owner hides the setup checklist or finishes the wizard
   setupDismissedAt DateTime?
   updatedAt        DateTime  @updatedAt
