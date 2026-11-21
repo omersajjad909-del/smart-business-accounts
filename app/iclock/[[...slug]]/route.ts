@@ -35,7 +35,17 @@ const DENY = () =>
     headers: { "Content-Type": "text/plain" },
   });
 
-type Device = { id: string; companyId: string; tzOffsetMin: number; name: string };
+type Device = { id: string; companyId: string; tzOffsetMin: number; name: string; lastSeenAt: Date | null };
+
+// A machine polls getrequest every few seconds, all day. Writing lastSeenAt on
+// every poll was a DB write + function CPU 24/7 per device, so only refresh it
+// when the stored value is older than this.
+const SEEN_REFRESH_MS = 5 * 60_000;
+
+async function touchSeen(device: Device) {
+  if (device.lastSeenAt && Date.now() - device.lastSeenAt.getTime() < SEEN_REFRESH_MS) return;
+  await prisma.biometricDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
+}
 
 /**
  * @param key present only when the firmware could be given a URL prefix. When
@@ -45,13 +55,13 @@ async function findDevice(sn: string | null, key: string | null): Promise<Device
   if (key) {
     return prisma.biometricDevice.findFirst({
       where: { apiKeyHash: hashDeviceKey(key), isActive: true },
-      select: { id: true, companyId: true, tzOffsetMin: true, name: true },
+      select: { id: true, companyId: true, tzOffsetMin: true, name: true, lastSeenAt: true },
     });
   }
   if (!sn) return null;
   return prisma.biometricDevice.findFirst({
     where: { serialNumber: sn.trim(), isActive: true, mode: "PUSH" },
-    select: { id: true, companyId: true, tzOffsetMin: true, name: true },
+    select: { id: true, companyId: true, tzOffsetMin: true, name: true, lastSeenAt: true },
   });
 }
 
@@ -76,10 +86,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ slug?: 
   const device = await findDevice(sn, key);
   if (!device) return DENY();
 
-  await prisma.biometricDevice.update({
-    where: { id: device.id },
-    data: { lastSeenAt: new Date() },
-  });
+  await touchSeen(device);
 
   if (endpoint === "getrequest") return OK();
 
@@ -89,8 +96,8 @@ export async function GET(req: NextRequest, context: { params: Promise<{ slug?: 
     `GET OPTION FROM: ${sn ?? device.name}`,
     "Stamp=9999",
     "OpStamp=9999",
-    "ErrorDelay=30",
-    "Delay=10",
+    "ErrorDelay=120",
+    "Delay=60",
     "TransTimes=00:00;14:00",
     "TransInterval=1",
     "TransFlag=1111000000",
