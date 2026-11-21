@@ -117,6 +117,7 @@ export default function FeeStructurePage() {
       )}
       <p style={{ ...ui.sub, marginTop: 14 }}>Tuition Fee with no amount here falls back to the single monthly fee set on the class ({classes.slice(0, 1).map((c) => money(c.monthlyFee)).join("")}). Monthly discounts apply to Tuition Fee only.</p>
 
+      <DueAndLateFee />
       <AccountingMethod />
 
       {open && (
@@ -170,7 +171,7 @@ function AccountingMethod() {
 
   return (
     <div style={{ ...ui.card, marginTop: 24 }}>
-      <div style={{ fontWeight: 700, marginBottom: 4 }}>3. How fees are recorded in your books</div>
+      <div style={{ fontWeight: 700, marginBottom: 4 }}>4. How fees are recorded in your books</div>
       <div style={{ marginBottom: 10 }}>
         <span style={{ fontSize: 12, fontWeight: 700, borderRadius: 20, padding: "3px 12px", color: "#fff", background: accrual ? "#16a34a" : "#6366f1" }}>{accrual ? "ACCRUAL" : "CASH BASIS"}</span>
       </div>
@@ -184,6 +185,54 @@ function AccountingMethod() {
         </>
       )}
       {msg && <div style={{ fontSize: 13, marginTop: 10 }}>{msg}</div>}
+    </div>
+  );
+}
+
+/** The school's due date and what happens to a student who pays after it. */
+function DueAndLateFee() {
+  const { data, reload } = useApi<{ feeDueDay: number; lateFeeType: string; lateFeeAmount: number; lateFeeGraceDays: number; lateFeeCap: number } | null>("/api/school/settings", null);
+  const [edit, setEdit] = useState<{ dueDay: string; type: string; amount: string; grace: string; cap: string } | null>(null);
+  const [msg, setMsg] = useState("");
+  if (!data) return null;
+  const f = edit ?? { dueDay: String(data.feeDueDay), type: data.lateFeeType, amount: String(data.lateFeeAmount || ""), grace: String(data.lateFeeGraceDays), cap: String(data.lateFeeCap || "") };
+  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setEdit({ ...f, [k]: e.target.value });
+
+  async function save() {
+    const r = await api("/api/school/settings", { method: "PUT", body: { feeDueDay: Number(f.dueDay), lateFeeType: f.type, lateFeeAmount: Number(f.amount || 0), lateFeeGraceDays: Number(f.grace || 0), lateFeeCap: Number(f.cap || 0) } });
+    setMsg(r.ok ? "Saved." : r.error); if (r.ok) { setEdit(null); void reload(); }
+  }
+  const day = Number(f.dueDay) || 10, amt = Number(f.amount || 0), grace = Number(f.grace || 0), cap = Number(f.cap || 0);
+  const ord = (n: number) => `${n}${n % 10 === 1 && n !== 11 ? "st" : n % 10 === 2 && n !== 12 ? "nd" : n % 10 === 3 && n !== 13 ? "rd" : "th"}`;
+  const lastFree = day + grace;
+  const fineAfter = (late: number) => (f.type === "FLAT" ? amt : f.type === "PER_DAY" ? (cap > 0 ? Math.min(cap, amt * late) : amt * late) : 0);
+
+  return (
+    <div style={{ ...ui.card, marginTop: 24 }}>
+      <div style={{ fontWeight: 700, marginBottom: 4 }}>3. Due date &amp; late fee</div>
+      <p style={{ ...ui.sub, marginTop: 0 }}>Students pay between the 1st and the due day. Whoever pays after it gets the late fee automatically — no need to add it by hand.</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: "0 14px" }}>
+        <Field label="Fee due on the … of every month"><input style={ui.input} type="number" min={1} max={28} value={f.dueDay} onChange={set("dueDay")} /></Field>
+        <Field label="Late fee">
+          <select style={ui.input} value={f.type} onChange={set("type")}>
+            <option value="NONE">No late fee</option><option value="FLAT">One fixed fine after the due date</option><option value="PER_DAY">Fine for every day late</option>
+          </select>
+        </Field>
+        {f.type !== "NONE" && <Field label={f.type === "FLAT" ? "Fine (Rs)" : "Fine per day (Rs)"}><input style={ui.input} type="number" min={0} value={f.amount} onChange={set("amount")} /></Field>}
+        {f.type !== "NONE" && <Field label="Grace days after due date"><input style={ui.input} type="number" min={0} max={60} value={f.grace} onChange={set("grace")} /></Field>}
+        {f.type === "PER_DAY" && <Field label="Maximum fine (Rs, optional)"><input style={ui.input} type="number" min={0} value={f.cap} onChange={set("cap")} placeholder="No limit" /></Field>}
+      </div>
+      <div style={{ padding: 12, borderRadius: 10, background: "rgba(99,102,241,.08)", fontSize: 13, marginBottom: 12 }}>
+        {f.type === "NONE" ? <>Fee is due on the <b>{ord(day)}</b>. Students who pay later are not fined.</> : (
+          <>
+            Fee is due on the <b>{ord(day)}</b>{grace > 0 ? <> (fine starts after the <b>{ord(lastFree)}</b>)</> : null}.<br />
+            Pays on the 3rd, 4th or 5th → <b>no fine</b>. Pays on the {ord(lastFree)} → <b>no fine</b>.<br />
+            Pays on the {ord(lastFree + 1)} → <b>Rs {fineAfter(1).toLocaleString("en-PK")}</b>{f.type === "PER_DAY" ? <>; on the {ord(lastFree + 5)} → <b>Rs {fineAfter(5).toLocaleString("en-PK")}</b></> : null}.
+          </>
+        )}
+      </div>
+      <button style={ui.btn} onClick={save}>Save rule</button>
+      {msg && <span style={{ marginLeft: 12, fontSize: 13 }}>{msg}</span>}
     </div>
   );
 }

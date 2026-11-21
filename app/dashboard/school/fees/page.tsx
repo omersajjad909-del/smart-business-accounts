@@ -5,7 +5,7 @@ import { api, Badge, ClassRow, ClassSelect, className, ErrorLine, Field, Modal, 
 
 type Payment = { id: string; receiptNo: string; amount: number; method: string; paidAt: string };
 type Invoice = {
-  id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; lateFee: number;
+  id: string; period: string; title: string; payable: number; paid: number; balance: number; status: string; dueDate: string; lateFee: number; daysOverdue?: number; paidDaysLate?: number; lateFeeWaived?: boolean;
   payments: Payment[]; student: { name: string; admissionNo: string; class: { name: string; section: string } | null };
 };
 type Head = { id: string; name: string; frequency: string; optional: boolean; active: boolean };
@@ -22,6 +22,7 @@ export default function FeesPage() {
   const { data: headData } = useApi<{ heads: Head[] }>("/api/school/fee-heads", { heads: [] });
   const activeHeads = headData.heads.filter((h) => h.active);
   const [picked, setPicked] = useState<string[] | null>(null);
+  const { data: school } = useApi<{ feeDueDay: number; lateFeeType: string } | null>("/api/school/settings", null);
   const [gen, setGen] = useState(false);
   const [genForm, setGenForm] = useState({ classId: "", dueDate: today() });
   const [payFor, setPayFor] = useState<Invoice | null>(null);
@@ -38,10 +39,15 @@ export default function FeesPage() {
     void reload();
   }
   async function lateFee() {
-    const v = prompt(`Late fee to add on all overdue unpaid ${period} invoices (Rs):`);
-    if (!v) return;
-    const r = await api<{ updated: number }>("/api/school/fees", { method: "POST", body: { action: "late_fee", period, amount: Number(v) } });
-    setNotice(r.ok ? `Late fee applied to ${r.data.updated} invoices.` : r.error); void reload();
+    if (!confirm(`Add the late fee, as per your rule, to every overdue unpaid invoice${period ? ` of ${period}` : ""}?`)) return;
+    const r = await api<{ updated: number }>("/api/school/fees", { method: "POST", body: { action: "late_fee", period } });
+    setNotice(r.ok ? `Late fee added to ${r.data.updated} invoice(s).` : r.error); void reload();
+  }
+  async function waive(inv: Invoice) {
+    if (!confirm(`Waive the late fee of ${money(inv.lateFee)} for ${inv.student.name}?`)) return;
+    const r = await api("/api/school/fees", { method: "POST", body: { action: "waive_late_fee", invoiceId: inv.id } });
+    if (!r.ok) return setError(r.error);
+    setPayFor(null); setNotice("Late fee waived."); void reload();
   }
   async function syncBooks() {
     const r = await api<{ posted: number; total: number }>("/api/school/fees", { method: "POST", body: { action: "sync_books" } });
@@ -64,7 +70,7 @@ export default function FeesPage() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Fee Ledger</h1><p style={ui.sub}>Invoices, receipts and balances per student</p></div>
-        <div style={{ display: "flex", gap: 10 }}><Link href={`/dashboard/school/print?kind=challan&period=${period}${classId ? `&classId=${classId}` : ""}`} style={{ ...ui.ghost, textDecoration: "none", display: "inline-block" }}>🖨 Print challans</Link><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => setGen(true)}>Generate {period} invoices</button></div>
+        <div style={{ display: "flex", gap: 10 }}><Link href={`/dashboard/school/print?kind=challan&period=${period}${classId ? `&classId=${classId}` : ""}`} style={{ ...ui.ghost, textDecoration: "none", display: "inline-block" }}>🖨 Print challans</Link><button style={ui.ghost} onClick={syncBooks}>Sync to books</button><button style={ui.ghost} onClick={lateFee}>Apply late fee</button><button style={ui.btn} onClick={() => { setGenForm((f) => ({ ...f, dueDate: `${period}-${String(school?.feeDueDay ?? 10).padStart(2, "0")}` })); setGen(true); }}>Generate {period} invoices</button></div>
       </div>
       {notice && <div style={{ ...ui.card, marginBottom: 16, padding: 12, fontSize: 13 }}>{notice}</div>}
       <div style={ui.grid}>
@@ -87,7 +93,11 @@ export default function FeesPage() {
                 <td style={ui.td}>{i.student.admissionNo}</td><td style={{ ...ui.td, fontWeight: 600 }}>{i.student.name}</td><td style={ui.td}>{className(i.student.class)}</td>
                 <td style={ui.td}>{i.title}</td><td style={ui.td}>{i.dueDate.slice(0, 10)}</td>
                 <td style={ui.td}>{money(i.payable)}</td><td style={ui.td}>{money(i.paid)}</td><td style={{ ...ui.td, fontWeight: 700 }}>{money(i.balance)}</td>
-                <td style={ui.td}><Badge value={i.status} /></td>
+                <td style={ui.td}>
+                  <Badge value={i.status} />
+                  {(i.daysOverdue ?? 0) > 0 && <div style={{ fontSize: 11, color: "#f87171", marginTop: 3 }}>{i.daysOverdue} day{i.daysOverdue === 1 ? "" : "s"} late{i.lateFee > 0 ? ` · +${money(i.lateFee)} fine` : ""}</div>}
+                  {i.balance <= 0.005 && i.payments.length > 0 && <div style={{ fontSize: 11, opacity: 0.65, marginTop: 3 }}>Paid {i.payments[i.payments.length - 1].paidAt.slice(0, 10)}{(i.paidDaysLate ?? 0) > 0 ? ` · ${i.paidDaysLate} day(s) late` : " · on time"}</div>}
+                </td>
                 <td style={ui.td}><div style={{ display: "flex", gap: 6 }}><button style={ui.ghost} onClick={() => setChallan(i)}>Challan</button>{i.payments.length > 0 && <Link href={`/dashboard/school/print?kind=receipt&id=${i.payments[i.payments.length - 1].id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Receipt</Link>}{i.balance > 0 && <button style={ui.ghost} onClick={() => { setPayFor(i); setPay({ amount: String(i.balance), method: "CASH" }); setError(""); }}>Collect</button>}</div></td>
               </tr>
             ))}
@@ -119,7 +129,18 @@ export default function FeesPage() {
       {payFor && (
         <Modal title={`Collect fee — ${payFor.student.name}`} onClose={() => setPayFor(null)}>
           <ErrorLine text={error} />
-          <p style={ui.sub}>{payFor.title} · {payFor.period} · balance {money(payFor.balance)}</p>
+          <p style={ui.sub}>{payFor.title} · {payFor.period} · due {payFor.dueDate.slice(0, 10)}</p>
+          <div style={{ ...ui.card, padding: 12, marginBottom: 14, fontSize: 13 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Fee</span><span>{money(payFor.payable - payFor.lateFee)}</span></div>
+            {payFor.lateFee > 0 && (
+              <div style={{ display: "flex", justifyContent: "space-between", color: "#f87171", marginTop: 4 }}>
+                <span>Late fee{(payFor.daysOverdue ?? 0) > 0 ? ` (${payFor.daysOverdue} day${payFor.daysOverdue === 1 ? "" : "s"} after due date)` : ""} <button style={{ ...ui.ghost, padding: "2px 8px", fontSize: 11, marginLeft: 6 }} onClick={() => waive(payFor)}>Waive</button></span>
+                <span>+ {money(payFor.lateFee)}</span>
+              </div>
+            )}
+            {payFor.paid > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}><span>Already paid</span><span>− {money(payFor.paid)}</span></div>}
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, marginTop: 6, paddingTop: 6, borderTop: "1px solid rgba(var(--ink),.12)" }}><span>To pay now</span><span>{money(payFor.balance)}</span></div>
+          </div>
           <Field label="Amount"><input style={ui.input} type="number" min={1} max={payFor.balance} value={pay.amount} onChange={(e) => setPay({ ...pay, amount: e.target.value })} /></Field>
           <Field label="Method"><select style={ui.input} value={pay.method} onChange={(e) => setPay({ ...pay, method: e.target.value })}>{["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"].map((m) => <option key={m}>{m}</option>)}</select></Field>
           {payFor.payments.length > 0 && <p style={ui.sub}>Earlier payments:</p>}
