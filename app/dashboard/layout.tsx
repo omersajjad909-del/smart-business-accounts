@@ -1611,43 +1611,49 @@ export default function DashboardLayout({
           {businessType === "school" && (
             <>
             <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>
-            <NavGroup title="Students" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>} open={openSection === "schStudents"} onToggle={() => toggle("schStudents")}>
-              <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>
+            <NavLink href="/dashboard/school/setup" pathname={pathname}>🚀 Setup Wizard</NavLink>
+            <NavGroup title="Admissions &amp; Students" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>} open={openSection === "schAdmissions"} onToggle={() => toggle("schAdmissions")}>
               <NavLink href="/dashboard/school/applications" pathname={pathname}>Applications</NavLink>
+              <NavLink href="/dashboard/school/students" pathname={pathname}>Students &amp; Admissions</NavLink>
               <NavLink href="/dashboard/school/enrollments" pathname={pathname}>Enrollments</NavLink>
-              <NavLink href="/dashboard/school/course-registration" pathname={pathname}>Course Registration</NavLink>
-              <NavLink href="/dashboard/school/transcripts" pathname={pathname}>Transcripts</NavLink>
-              <NavLink href="/dashboard/school/guardian-access" pathname={pathname}>Guardian Access</NavLink>
-              <NavLink href="/dashboard/school/announcements" pathname={pathname}>Announcements</NavLink>
-              <NavLink href="/dashboard/school/library" pathname={pathname}>Library</NavLink>
-              <NavLink href="/dashboard/school/parent" pathname={pathname}>Parent Portal</NavLink>
-              <NavLink href="/dashboard/school/students/promote" pathname={pathname}>Promote / Graduate</NavLink>
               <NavLink href="/dashboard/school/import" pathname={pathname}>Import Students</NavLink>
+              <NavLink href="/dashboard/school/students/promote" pathname={pathname}>Promote / Graduate</NavLink>
             </NavGroup>
             <NavGroup title="Academics" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "schAcademics"} onToggle={() => toggle("schAcademics")}>
-              <NavLink href="/dashboard/school/setup" pathname={pathname}>🚀 Setup Wizard</NavLink>
               <NavLink href="/dashboard/school/classes" pathname={pathname}>Classes &amp; Fee Plan</NavLink>
               <NavLink href="/dashboard/school/academics" pathname={pathname}>Academic Setup</NavLink>
               <NavLink href="/dashboard/school/subjects" pathname={pathname}>Subjects &amp; Teachers</NavLink>
               <NavLink href="/dashboard/school/timetable" pathname={pathname}>Timetable</NavLink>
+              <NavLink href="/dashboard/school/course-registration" pathname={pathname}>Course Registration</NavLink>
+            </NavGroup>
+            <NavGroup title="Attendance &amp; Exams" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>} open={openSection === "schExams"} onToggle={() => toggle("schExams")}>
               <NavLink href="/dashboard/school/attendance" pathname={pathname}>Attendance</NavLink>
               <NavLink href="/dashboard/school/results" pathname={pathname}>Exams &amp; Results</NavLink>
               <NavLink href="/dashboard/school/report-cards" pathname={pathname}>Report Cards</NavLink>
-              <NavLink href="/dashboard/school/teacher" pathname={pathname}>Teacher Portal</NavLink>
+              <NavLink href="/dashboard/school/transcripts" pathname={pathname}>Transcripts</NavLink>
             </NavGroup>
             <NavGroup title="Fees" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>} open={openSection === "schFees"} onToggle={() => toggle("schFees")}>
               <NavLink href="/dashboard/school/fee-structure" pathname={pathname}>Fee Structure</NavLink>
               <NavLink href="/dashboard/school/fees" pathname={pathname}>Fee Ledger &amp; Collection</NavLink>
             </NavGroup>
-            <NavGroup title="Reports" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>} open={openSection === "schReports"} onToggle={() => toggle("schReports")}>
-              <NavLink href="/dashboard/school/reports" pathname={pathname}>Class-wise Reports</NavLink>
-              <NavLink href="/dashboard/school/messages" pathname={pathname}>Guardian Messages</NavLink>
-            </NavGroup>
-            <NavGroup title="Accounts &amp; Staff" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>} open={openSection === "schAccounts"} onToggle={() => toggle("schAccounts")}>
-              <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>School Expenses</NavLink>
+            <NavGroup title="Teachers &amp; Staff" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>} open={openSection === "schStaff"} onToggle={() => toggle("schStaff")}>
               <NavLink href="/dashboard/school/teachers" pathname={pathname}>Teachers</NavLink>
+              <NavLink href="/dashboard/school/teacher" pathname={pathname}>Teacher Portal</NavLink>
               <NavLink href="/dashboard/employees" pathname={pathname}>Other Staff</NavLink>
               <NavLink href="/dashboard/payroll" pathname={pathname}>Salaries</NavLink>
+            </NavGroup>
+            <NavGroup title="Parents &amp; Communication" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>} open={openSection === "schComms"} onToggle={() => toggle("schComms")}>
+              <NavLink href="/dashboard/school/announcements" pathname={pathname}>Announcements</NavLink>
+              <NavLink href="/dashboard/school/messages" pathname={pathname}>Guardian Messages</NavLink>
+              <NavLink href="/dashboard/school/guardian-access" pathname={pathname}>Guardian Access</NavLink>
+              <NavLink href="/dashboard/school/parent" pathname={pathname}>Parent Portal</NavLink>
+            </NavGroup>
+            <NavLink href="/dashboard/school/library" pathname={pathname}>Library</NavLink>
+            <NavGroup title="Reports" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>} open={openSection === "schReports"} onToggle={() => toggle("schReports")}>
+              <NavLink href="/dashboard/school/reports" pathname={pathname}>Class-wise Reports</NavLink>
+            </NavGroup>
+            <NavGroup title="Accounts" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>} open={openSection === "schAccounts"} onToggle={() => toggle("schAccounts")}>
+              <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>School Expenses</NavLink>
               <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Ledger</NavLink>
               <NavLink href="/dashboard/reports/profit-loss" pathname={pathname}>Income &amp; Expense</NavLink>
             </NavGroup>
