@@ -10,10 +10,11 @@ import { bad, invoiceTotals, isResponse, schoolGuard, str } from "@/lib/schoolAp
  *   ?kind=certificate&studentId=<id>
  */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
-  if (isResponse(ctx)) return ctx;
   const sp = new URL(req.url).searchParams;
   const kind = str(sp.get("kind"));
+  // Receipts and challans show money; ID cards and certificates only need the school module.
+  const ctx = await schoolGuard(req, false, kind === "receipt" || kind === "challan" ? "SCHOOL_FEES_VIEW" : "SCHOOL_VIEW");
+  if (isResponse(ctx)) return ctx;
   const company = await prisma.company.findUnique({ where: { id: ctx.companyId }, select: { name: true, logoUrl: true } });
   const school = { name: company?.name ?? "School", logoUrl: company?.logoUrl ?? null };
   const cls = (c?: { name: string; section: string } | null) => (c ? (c.section ? `${c.name} - ${c.section}` : c.name) : "");

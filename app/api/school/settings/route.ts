@@ -5,7 +5,7 @@ import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
 const FIELDS = ["address", "city", "phone", "email", "website", "principalName", "registrationNo"] as const;
 
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const [row, company] = await Promise.all([
     prisma.schoolSettings.findUnique({ where: { companyId: ctx.companyId } }),
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
 /** PUT { address?, city?, phone?, email?, website?, principalName?, registrationNo?, dismissSetup? } */
 export async function PUT(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_SETUP_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const data: Record<string, unknown> = {};

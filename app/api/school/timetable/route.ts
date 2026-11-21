@@ -6,7 +6,7 @@ const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /** GET ?classId= or ?teacherId= → that class's / teacher's weekly periods. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const sp = new URL(req.url).searchParams;
   const classId = str(sp.get("classId")), teacherId = str(sp.get("teacherId"));
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
 /** POST — sets one period. A teacher cannot be in two classes in the same period. */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const classId = str(b.classId), subjectId = str(b.subjectId), teacherId = str(b.teacherId) || null;
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const id = new URL(req.url).searchParams.get("id") || "";
   const res = await prisma.schoolTimetableEntry.deleteMany({ where: { id, companyId: ctx.companyId } });

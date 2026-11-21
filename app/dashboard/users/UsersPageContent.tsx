@@ -257,6 +257,9 @@ export default function UsersPage() {
             <option value="MANAGER">Manager</option>
             <option value="ACCOUNTANT">Accountant</option>
             <option value="HR_MANAGER">HR Manager</option>
+            <option value="PRINCIPAL">Principal</option>
+            <option value="SCHOOL_ACCOUNTANT">School Accountant</option>
+            <option value="OFFICE_CLERK">Office Clerk</option>
             <option value="SALES">Sales Executive</option>
             <option value="INVENTORY_MANAGER">Inventory Manager</option>
             <option value="CASHIER">Cashier</option>
@@ -306,6 +309,9 @@ export default function UsersPage() {
             <option value="MANAGER">Manager</option>
             <option value="ACCOUNTANT">Accountant</option>
             <option value="HR_MANAGER">HR Manager</option>
+            <option value="PRINCIPAL">Principal</option>
+            <option value="SCHOOL_ACCOUNTANT">School Accountant</option>
+            <option value="OFFICE_CLERK">Office Clerk</option>
             <option value="SALES">Sales Executive</option>
             <option value="INVENTORY_MANAGER">Inventory Manager</option>
             <option value="CASHIER">Cashier</option>

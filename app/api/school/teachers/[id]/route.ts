@@ -4,7 +4,7 @@ import { bad, isResponse, schoolGuard } from "@/lib/schoolApi";
 
 /** Teacher profile with the classes/subjects they take and their weekly teaching load. */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await schoolGuard(req, false);
+  const guard = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(guard)) return guard;
   const { id } = await ctx.params;
   const teacher = await prisma.schoolTeacher.findFirst({

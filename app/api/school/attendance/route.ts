@@ -6,7 +6,7 @@ const STATUSES = ["PRESENT", "ABSENT", "LATE", "LEAVE"];
 
 /** GET ?classId=&date= → active students of the class with that day's mark (if any). */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const sp = new URL(req.url).searchParams;
   const classId = str(sp.get("classId"));
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
 /** POST { date, classId, entries:[{studentId,status}] } — upserts one row per student per day. */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ATTENDANCE_MARK");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const date = parseDay(b.date);

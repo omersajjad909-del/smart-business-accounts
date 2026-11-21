@@ -4,7 +4,7 @@ import { bad, invoiceTotals, isResponse, schoolGuard, str } from "@/lib/schoolAp
 
 /** GET ?classId= → active students of the class with their unpaid fee balance, so the review step can warn about it. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const classId = str(new URL(req.url).searchParams.get("classId"));
   if (!classId) return bad("classId is required");
@@ -29,7 +29,7 @@ const gradeNo = (name: string) => { const m = /(\d+)/.exec(name); return m ? Num
  * The old shape { fromClassId, toClassId, studentIds? } still works: everyone goes to one place.
  */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_STUDENTS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const fromClassId = str(b.fromClassId);

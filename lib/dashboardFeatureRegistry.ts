@@ -1809,6 +1809,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_OVERVIEW",
+    permKey: "SCHOOL_VIEW",
     label: "School Overview",
     route: "/dashboard/school",
     business: "school",
@@ -1818,6 +1819,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_SETUP",
+    permKey: "SCHOOL_SETUP_MANAGE",
     label: "Setup Wizard",
     route: "/dashboard/school/setup",
     business: "school",
@@ -1827,6 +1829,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_CLASSES",
+    permKey: "SCHOOL_VIEW",
     label: "Classes & Fees",
     route: "/dashboard/school/classes",
     business: "school",
@@ -1836,6 +1839,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_STUDENTS",
+    permKey: "SCHOOL_VIEW",
     label: "Students & Admissions",
     route: "/dashboard/school/students",
     business: "school",
@@ -1845,6 +1849,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_IMPORT",
+    permKey: "SCHOOL_STUDENTS_MANAGE",
     label: "Import Students",
     route: "/dashboard/school/import",
     business: "school",
@@ -1854,6 +1859,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_ATTENDANCE",
+    permKey: "SCHOOL_VIEW",
     label: "Attendance",
     route: "/dashboard/school/attendance",
     business: "school",
@@ -1863,6 +1869,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_FEES",
+    permKey: "SCHOOL_FEES_VIEW",
     label: "Fee Ledger",
     route: "/dashboard/school/fees",
     business: "school",
@@ -1872,6 +1879,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_FEE_STRUCTURE",
+    permKey: "SCHOOL_FEES_VIEW",
     label: "Fee Structure",
     route: "/dashboard/school/fee-structure",
     business: "school",
@@ -1881,6 +1889,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_EXAMS",
+    permKey: "SCHOOL_VIEW",
     label: "Exams & Results",
     route: "/dashboard/school/results",
     business: "school",
@@ -1890,6 +1899,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_PROMOTION",
+    permKey: "SCHOOL_STUDENTS_MANAGE",
     label: "Promote Students",
     route: "/dashboard/school/students/promote",
     business: "school",
@@ -1899,6 +1909,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_REPORTS",
+    permKey: "SCHOOL_VIEW",
     label: "School Reports",
     route: "/dashboard/school/reports",
     business: "school",
@@ -1908,6 +1919,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_MESSAGES",
+    permKey: "SCHOOL_MESSAGES_SEND",
     label: "Guardian Messages",
     route: "/dashboard/school/messages",
     business: "school",
@@ -1917,6 +1929,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_TEACHERS",
+    permKey: "SCHOOL_VIEW",
     label: "Teachers",
     route: "/dashboard/school/teachers",
     business: "school",
@@ -1926,6 +1939,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_SUBJECTS",
+    permKey: "SCHOOL_VIEW",
     label: "Subjects & Teacher Allocation",
     route: "/dashboard/school/subjects",
     business: "school",
@@ -1935,6 +1949,7 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
   },
   {
     id: "SCHOOL_TIMETABLE",
+    permKey: "SCHOOL_VIEW",
     label: "Timetable",
     route: "/dashboard/school/timetable",
     business: "school",

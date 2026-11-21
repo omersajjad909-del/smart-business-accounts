@@ -93,6 +93,22 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
     ],
   },
   {
+    key: "school",
+    label: "School",
+    permissions: [
+      PERMISSIONS.SCHOOL_VIEW,
+      PERMISSIONS.SCHOOL_STUDENTS_MANAGE,
+      PERMISSIONS.SCHOOL_FEES_VIEW,
+      PERMISSIONS.SCHOOL_FEES_COLLECT,
+      PERMISSIONS.SCHOOL_FEES_MANAGE,
+      PERMISSIONS.SCHOOL_ATTENDANCE_MARK,
+      PERMISSIONS.SCHOOL_EXAMS_MANAGE,
+      PERMISSIONS.SCHOOL_ACADEMICS_MANAGE,
+      PERMISSIONS.SCHOOL_MESSAGES_SEND,
+      PERMISSIONS.SCHOOL_SETUP_MANAGE,
+    ],
+  },
+  {
     key: "trading",
     label: "Trading Control",
     permissions: [
@@ -502,11 +518,29 @@ export function normalizePlanCode(plan: string | null | undefined): string {
   return p || "STARTER";
 }
 
+/**
+ * School permissions are not sold per plan — a school's plan is limited by how many
+ * students it may enrol (lib/schoolLimits.ts), and the pages only exist for school
+ * companies. They are added to every plan here because saved plan configs predate
+ * these keys, and a plan list that lacks one would lock even the ADMIN out of the page.
+ */
+export const SCHOOL_PERMISSION_KEYS: string[] = Object.values(PERMISSIONS).filter((p) => p.startsWith("SCHOOL_"));
+
 export function resolvePlanPermissions(params: {
   plan: string | null | undefined;
   configuredPlanPermissions?: Record<string, string[]> | null;
   activeModules?: string | null;
   // Pass true when the company pays in PKR (Safepay) — uses PKR-specific permission config
+  isPkrUser?: boolean;
+  pkrPlanPermissions?: Record<string, string[]> | null;
+}): string[] {
+  return [...new Set([...resolvePlanPermissionsBase(params), ...SCHOOL_PERMISSION_KEYS])];
+}
+
+function resolvePlanPermissionsBase(params: {
+  plan: string | null | undefined;
+  configuredPlanPermissions?: Record<string, string[]> | null;
+  activeModules?: string | null;
   isPkrUser?: boolean;
   pkrPlanPermissions?: Record<string, string[]> | null;
 }): string[] {

@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireActiveSession } from "@/lib/sessionGuard";
+import { schoolHasPermission } from "@/lib/schoolPermissions";
 
 const READ_ROLES = ["ADMIN", "ACCOUNTANT", "VIEWER"];
 const WRITE_ROLES = ["ADMIN", "ACCOUNTANT"];
 
 export type SchoolCtx = { companyId: string };
 
-/** Resolves the tenant from the verified active session and enforces role. */
-export async function schoolGuard(req: NextRequest, write: boolean): Promise<SchoolCtx | NextResponse> {
+/**
+ * Resolves the tenant from the verified active session and checks access.
+ *
+ * Pass the `permission` the route needs (PERMISSIONS.SCHOOL_*) and the user's role is checked
+ * against it, so a clerk, accountant or principal each get only their part. Without one the
+ * older coarse rule applies — ADMIN/ACCOUNTANT write, plus VIEWER to read — which the older
+ * school routes still rely on.
+ */
+export async function schoolGuard(req: NextRequest, write: boolean, permission?: string): Promise<SchoolCtx | NextResponse> {
   const session = await requireActiveSession(req);
   if (!session) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
-  if (!(write ? WRITE_ROLES : READ_ROLES).includes(session.role)) {
+  if (!permission && !(write ? WRITE_ROLES : READ_ROLES).includes(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -31,6 +39,10 @@ export async function schoolGuard(req: NextRequest, write: boolean): Promise<Sch
   });
   if (!membership && user?.defaultCompanyId !== companyId && !session.impersonatedBy) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (permission && !(await schoolHasPermission(session.userId, session.role, permission, companyId))) {
+    return NextResponse.json({ error: "You do not have permission to do this" }, { status: 403 });
   }
   return { companyId };
 }

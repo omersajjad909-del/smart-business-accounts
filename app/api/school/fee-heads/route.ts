@@ -20,7 +20,7 @@ const DEFAULT_HEADS: { name: string; frequency: string; optional?: boolean }[] =
 
 /** GET → fee heads plus the class × head amount grid. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_FEES_VIEW");
   if (isResponse(ctx)) return ctx;
   const [heads, classFees] = await Promise.all([
     prisma.schoolFeeHead.findMany({ where: { companyId: ctx.companyId }, orderBy: [{ createdAt: "asc" }] }),
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_FEES_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const action = str(b.action);
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_FEES_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const id = str(b.id);
@@ -124,7 +124,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_FEES_MANAGE");
   if (isResponse(ctx)) return ctx;
   const id = new URL(req.url).searchParams.get("id") || "";
   const res = await prisma.schoolFeeHead.deleteMany({ where: { id, companyId: ctx.companyId } });

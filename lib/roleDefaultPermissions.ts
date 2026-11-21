@@ -27,6 +27,7 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<string, string[]> = {
       "MANAGE_OPENING_BALANCES", "MANAGE_COST_CENTERS", "VIEW_AUDIT_LOG",
       "BANK_RECONCILIATION", "PAYMENT_RECEIPTS", "EXPENSE_VOUCHERS", "TAX_CONFIGURATION",
       "BULK_PAYMENTS", "BUDGET_PLANNING", "RECURRING_TRANSACTIONS", "MULTI_CURRENCY",
+      "SCHOOL_VIEW", "SCHOOL_FEES_VIEW", "SCHOOL_FEES_COLLECT", "SCHOOL_FEES_MANAGE",
     ),
     ...ALL.filter((p) => /^VIEW_.*REPORT/.test(p) || p.startsWith("AI_")),
   ],
@@ -63,7 +64,30 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<string, string[]> = {
 
   SECURITY: only("VIEW_DASHBOARD", "VIEW_LOGS", "VIEW_AUDIT_LOG", "VIEW_INWARD", "VIEW_OUTWARD", "VIEW_LOCATION"),
 
-  VIEWER: only("VIEW_DASHBOARD", "VIEW_CATALOG", "VIEW_REPORTS"),
+  VIEWER: only("VIEW_DASHBOARD", "VIEW_CATALOG", "VIEW_REPORTS", "SCHOOL_VIEW", "SCHOOL_FEES_VIEW"),
+
+  // ── School staff ──
+  // Principal runs the school but not the company: no users, roles, backups or billing.
+  PRINCIPAL: only(
+    "VIEW_DASHBOARD", "VIEW_REPORTS", "VIEW_HR_PAYROLL",
+    "SCHOOL_VIEW", "SCHOOL_STUDENTS_MANAGE", "SCHOOL_FEES_VIEW", "SCHOOL_ATTENDANCE_MARK", "SCHOOL_EXAMS_MANAGE",
+    "SCHOOL_ACADEMICS_MANAGE", "SCHOOL_MESSAGES_SEND", "SCHOOL_SETUP_MANAGE",
+  ),
+
+  // Fees and the books; cannot touch academics or admissions.
+  SCHOOL_ACCOUNTANT: [
+    ...only(
+      "VIEW_DASHBOARD", "VIEW_ACCOUNTS", "VIEW_ACCOUNTING", "CREATE_CPV", "CREATE_CRV", "CREATE_JV",
+      "PAYMENT_RECEIPTS", "EXPENSE_VOUCHERS", "VIEW_AUDIT_LOG",
+      "SCHOOL_VIEW", "SCHOOL_FEES_VIEW", "SCHOOL_FEES_COLLECT", "SCHOOL_FEES_MANAGE", "SCHOOL_MESSAGES_SEND",
+    ),
+    ...ALL.filter((p) => /^VIEW_.*REPORT/.test(p)),
+  ],
+
+  // Front office: admissions, attendance, taking fees at the counter. No fee structure, no marks.
+  OFFICE_CLERK: only(
+    "VIEW_DASHBOARD", "SCHOOL_VIEW", "SCHOOL_STUDENTS_MANAGE", "SCHOOL_ATTENDANCE_MARK", "SCHOOL_FEES_VIEW", "SCHOOL_FEES_COLLECT",
+  ),
 };
 
 export function defaultsForRole(role: string, planPermissions: string[] | null): string[] {

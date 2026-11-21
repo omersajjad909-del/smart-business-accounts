@@ -26,7 +26,7 @@ function profileFields(b: Record<string, unknown>, partial: boolean): { error: s
 }
 
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const status = str(new URL(req.url).searchParams.get("status")).toUpperCase();
   const rows = await prisma.schoolTeacher.findMany({
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const name = str(b.name);
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const id = str(b.id);

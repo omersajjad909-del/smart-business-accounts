@@ -4,7 +4,7 @@ import { invoiceTotals, isResponse, schoolGuard } from "@/lib/schoolApi";
 
 /** Class-wise strength, 30-day attendance and fee position. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const { companyId } = ctx;
   const since = new Date(); since.setUTCDate(since.getUTCDate() - 30); since.setUTCHours(0, 0, 0, 0);

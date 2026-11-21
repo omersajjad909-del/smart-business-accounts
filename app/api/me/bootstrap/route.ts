@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureSchoolRolePermissions } from "@/lib/schoolPermissions";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { resolvePlanPermissions, PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
@@ -180,6 +181,11 @@ export async function GET(req: NextRequest) {
     // fine while every member also had the plan's permissions copied onto their
     // own row, but a role set in Team & Permissions never reached the client, so
     // a Manager's sidebar showed almost nothing.
+    // A school's roles get their school presets the first time they are looked at, so the
+    // sidebar and the school APIs agree from the very first request.
+    if (String(company.businessType || "") === "school") {
+      await ensureSchoolRolePermissions(companyId, String(user.role || "VIEWER")).catch(() => {});
+    }
     const roleRows = await prisma.rolePermission.findMany({
       where: { companyId, role: String(user.role || "VIEWER").toUpperCase() },
       select: { permission: true },

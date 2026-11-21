@@ -13,7 +13,7 @@ const TYPES = ["image/jpeg", "image/png", "image/webp"];
  * student list query, so if storage is not available the upload is refused instead.
  */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   if (!isMediaConfigured()) return bad("Image storage is not configured on this server", 503);
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const teacherId = str(new URL(req.url).searchParams.get("teacherId"));
   const student = await prisma.schoolTeacher.findFirst({ where: { id: teacherId, companyId: ctx.companyId }, select: { photoUrl: true } });

@@ -4,7 +4,7 @@ import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
 
 /** GET ?classId= → subjects of that class with the assigned teacher. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const classId = str(new URL(req.url).searchParams.get("classId"));
   if (!classId) return bad("classId is required");
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
 /** POST { classId, subjectId, teacherId|null } — adds the subject to the class or changes its teacher. */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const action = str(b.action);
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const id = new URL(req.url).searchParams.get("id") || "";
   const res = await prisma.schoolClassSubject.deleteMany({ where: { id, companyId: ctx.companyId } });

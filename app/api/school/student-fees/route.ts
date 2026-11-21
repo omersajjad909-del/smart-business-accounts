@@ -4,7 +4,7 @@ import { bad, isResponse, num, schoolGuard, str } from "@/lib/schoolApi";
 
 /** GET ?studentId= → the optional fees (transport, hostel …) this student is enrolled in. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_FEES_VIEW");
   if (isResponse(ctx)) return ctx;
   const studentId = str(new URL(req.url).searchParams.get("studentId"));
   if (!studentId) return bad("studentId is required");
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
 /** POST { studentId, headId, amount } — enrol (or change the amount). */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_FEES_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const studentId = str(b.studentId), headId = str(b.headId), amount = num(b.amount, -1);
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_FEES_MANAGE");
   if (isResponse(ctx)) return ctx;
   const id = new URL(req.url).searchParams.get("id") || "";
   const res = await prisma.schoolStudentFee.deleteMany({ where: { id, companyId: ctx.companyId } });

@@ -4,7 +4,7 @@ import { isResponse, schoolGuard } from "@/lib/schoolApi";
 
 /** Progress of the school's setup, worked out from what actually exists — nothing to keep in sync. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const { companyId } = ctx;
   const [settings, session, classes, heads, classFees, subjects, allocations, teachers, students, timetable] = await Promise.all([

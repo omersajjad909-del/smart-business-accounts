@@ -4,7 +4,7 @@ import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
 
 /** GET ?classId=&month=YYYY-MM → a register: every student's mark for every day, with totals. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const sp = new URL(req.url).searchParams;
   const classId = str(sp.get("classId")), month = str(sp.get("month"));

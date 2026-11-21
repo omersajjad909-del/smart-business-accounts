@@ -14,7 +14,7 @@ export function gradeFor(percent: number) {
 
 /** Full student profile: record, fee ledger, attendance summary and report card. */
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await schoolGuard(req, false);
+  const guard = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(guard)) return guard;
   const { id } = await ctx.params;
 

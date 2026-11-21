@@ -137,4 +137,16 @@ export const PERMISSIONS = {
   TRADING_CONVERSION_CENTER: "TRADING_CONVERSION_CENTER",
   TRADING_ANALYTICS: "TRADING_ANALYTICS",
 
+  // School
+  SCHOOL_VIEW: "SCHOOL_VIEW",                         // open the school module, read students/classes/attendance/results
+  SCHOOL_STUDENTS_MANAGE: "SCHOOL_STUDENTS_MANAGE",   // admissions, edit students, promote, import
+  SCHOOL_FEES_VIEW: "SCHOOL_FEES_VIEW",               // see fee ledger, receipts, defaulters
+  SCHOOL_FEES_COLLECT: "SCHOOL_FEES_COLLECT",         // take a fee payment
+  SCHOOL_FEES_MANAGE: "SCHOOL_FEES_MANAGE",           // fee structure, generate invoices, late fees, discounts
+  SCHOOL_ATTENDANCE_MARK: "SCHOOL_ATTENDANCE_MARK",   // mark student attendance
+  SCHOOL_EXAMS_MANAGE: "SCHOOL_EXAMS_MANAGE",         // create exams, enter marks
+  SCHOOL_ACADEMICS_MANAGE: "SCHOOL_ACADEMICS_MANAGE", // classes, subjects, teachers, timetable
+  SCHOOL_MESSAGES_SEND: "SCHOOL_MESSAGES_SEND",       // SMS / WhatsApp to guardians
+  SCHOOL_SETUP_MANAGE: "SCHOOL_SETUP_MANAGE",         // school profile, setup wizard
+
 } as const;

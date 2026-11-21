@@ -7,7 +7,7 @@ const METHODS = ["CASH", "BANK", "JAZZCASH", "EASYPAISA", "OTHER"];
 const PERIOD_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_FEES_VIEW");
   if (isResponse(ctx)) return ctx;
   const sp = new URL(req.url).searchParams;
   const period = str(sp.get("period"));
@@ -46,10 +46,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
-  if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const action = str(b.action);
+  // Taking a payment is a counter job; everything else changes what the school bills.
+  const ctx = await schoolGuard(req, true, action === "pay" ? "SCHOOL_FEES_COLLECT" : "SCHOOL_FEES_MANAGE");
+  if (isResponse(ctx)) return ctx;
 
   // ── Bulk invoice generation ────────────────────────────────────────────
   // Bills every selected fee head to every active student it applies to:
@@ -192,7 +193,7 @@ class HttpError extends Error {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_FEES_MANAGE");
   if (isResponse(ctx)) return ctx;
   const paymentId = str(new URL(req.url).searchParams.get("paymentId"));
   if (!paymentId) return bad("Payment id is required");

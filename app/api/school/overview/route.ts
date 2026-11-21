@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { invoiceTotals, isResponse, schoolGuard } from "@/lib/schoolApi";
 
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const { companyId } = ctx;
   const today = new Date(); today.setUTCHours(0, 0, 0, 0);

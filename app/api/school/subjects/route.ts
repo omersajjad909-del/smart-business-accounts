@@ -6,7 +6,7 @@ import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
 const DEFAULT_SUBJECTS = ["English", "Urdu", "Mathematics", "General Science", "Islamiat", "Social Studies", "Computer Science", "Pakistan Studies", "Physics", "Chemistry", "Biology", "Drawing", "Nazra Quran"];
 
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const rows = await prisma.schoolSubject.findMany({
     where: { companyId: ctx.companyId }, orderBy: { name: "asc" },
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   if (str(b.action) === "seed") {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_ACADEMICS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const id = new URL(req.url).searchParams.get("id") || "";
   const res = await prisma.schoolSubject.deleteMany({ where: { id, companyId: ctx.companyId } });

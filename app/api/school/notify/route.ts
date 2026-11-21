@@ -19,7 +19,7 @@ type Recipient = { studentId: string; student: string; phone: string; message: s
 const money = (n: number) => `Rs ${Math.round(n).toLocaleString("en-PK")}`;
 
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_MESSAGES_SEND");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const kind = str(b.kind);

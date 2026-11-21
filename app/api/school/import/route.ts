@@ -28,7 +28,7 @@ type Checked = { line: number; errors: string[]; warnings: string[]; data?: Reco
  * unless every row is valid or skipInvalid is set.
  */
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_STUDENTS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
   const rows: InRow[] = Array.isArray(b.rows) ? b.rows : [];

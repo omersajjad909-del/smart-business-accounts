@@ -4,7 +4,7 @@ import { bad, isResponse, num, parseDay, schoolGuard, str } from "@/lib/schoolAp
 
 /** GET → exams list; GET ?examId= → students of the exam's class with marks. */
 export async function GET(req: NextRequest) {
-  const ctx = await schoolGuard(req, false);
+  const ctx = await schoolGuard(req, false, "SCHOOL_VIEW");
   if (isResponse(ctx)) return ctx;
   const examId = str(new URL(req.url).searchParams.get("examId"));
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_EXAMS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const b = await req.json().catch(() => ({}));
 
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
 /** DELETE ?id= — removes an exam and every mark entered for it. */
 export async function DELETE(req: NextRequest) {
-  const ctx = await schoolGuard(req, true);
+  const ctx = await schoolGuard(req, true, "SCHOOL_EXAMS_MANAGE");
   if (isResponse(ctx)) return ctx;
   const id = new URL(req.url).searchParams.get("id") || "";
   const res = await prisma.schoolExam.deleteMany({ where: { id, companyId: ctx.companyId } });

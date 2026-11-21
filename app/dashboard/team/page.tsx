@@ -12,6 +12,9 @@ const ROLES = [
   { value: "CASHIER", label: "Cashier", color: "#9333ea" },
   { value: "AUDITOR", label: "Auditor", color: "#dc2626" },
   { value: "SECURITY", label: "Security / Gate", color: "#64748b" },
+  { value: "PRINCIPAL", label: "Principal", color: "#0f766e" },
+  { value: "SCHOOL_ACCOUNTANT", label: "School Accountant", color: "#4338ca" },
+  { value: "OFFICE_CLERK", label: "Office Clerk", color: "#b45309" },
   { value: "VIEWER", label: "Viewer (Read Only)", color: "#6b7280" },
 ];
 
@@ -323,6 +326,9 @@ export default function TeamPage() {
 function getRoleDescription(role: string): string {
   const descriptions: Record<string, string> = {
     ADMIN: "Full access to all features, settings, and user management.",
+    PRINCIPAL: "Runs the school: students, academics, attendance, exams and messages. No access to users, backups or billing.",
+    SCHOOL_ACCOUNTANT: "Fees, receipts, expenses and the books. Cannot change academics or admissions.",
+    OFFICE_CLERK: "Front desk: admissions, attendance and taking fees at the counter.",
     MANAGER: "Manage operations, approve transactions, and view reports.",
     ACCOUNTANT: "Access to accounting, invoices, expenses, and financial reports.",
     HR_MANAGER: "Manage employees, payroll, and HR-related data.",
