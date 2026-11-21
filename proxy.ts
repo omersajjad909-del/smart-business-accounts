@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminTokenFromRequest, getTokenFromRequest, verifyJwt } from "@/lib/auth";
-import { REF_COOKIE, REF_COOKIE_MAX_AGE, normalizeTrackingCode } from "@/lib/affiliateTracking";
+import { REF_COOKIE, REF_COOKIE_MAX_AGE, normalizeTrackingCode } from "@/lib/affiliateCookie";
 import {
   WAITLIST_PATH,
   getSignupsOpen,
