@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
   if (!assignment) return NextResponse.json({ error: "Assignment not found" }, { status: 404 });
   const student = await prisma.schoolStudent.findFirst({ where: { id: studentId, companyId: session.companyId, classId: assignment.classId } });
   if (!student) return NextResponse.json({ error: "Student is not in this assignment class" }, { status: 403 });
+  const previous = await prisma.schoolAssignmentSubmission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId } }, select: { gradedAt: true, marks: true } });
+  if (previous && (previous.gradedAt || previous.marks !== null)) return NextResponse.json({ error: "This homework has already been graded, so it cannot be submitted again. Ask the teacher to reopen it." }, { status: 409 });
   const row = await prisma.schoolAssignmentSubmission.upsert({
     where: { assignmentId_studentId: { assignmentId, studentId } },
     create: { companyId: session.companyId, assignmentId, studentId, detail: str(b.detail).slice(0, 5000) || null, attachmentUrl: str(b.attachmentUrl).slice(0, 2000) || null, status: "SUBMITTED" },

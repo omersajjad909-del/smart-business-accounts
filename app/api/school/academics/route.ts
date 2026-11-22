@@ -83,6 +83,16 @@ export async function DELETE(req: NextRequest) {
   const sp = new URL(req.url).searchParams;
   const type = kind(sp.get("type")), id = str(sp.get("id"));
   if (!type || !id) return bad("Record type and id are required");
+  // These deletes cascade to enrollments and course registrations — that is, to grades and transcripts.
+  // Refuse while anything is attached, rather than silently erasing academic records.
+  if (type === "session") {
+    const n = await prisma.educationEnrollment.count({ where: { sessionId: id, companyId: ctx.companyId } });
+    if (n > 0) return bad(`${n} student(s) are enrolled in this session, so it cannot be deleted. Mark it inactive instead.`, 409);
+  }
+  if (type === "course") {
+    const n = await prisma.educationCourseRegistration.count({ where: { courseId: id, companyId: ctx.companyId } });
+    if (n > 0) return bad(`${n} student registration(s) use this course, so it cannot be deleted.`, 409);
+  }
   let count = 0;
   if (type === "session") count = (await prisma.academicSession.deleteMany({ where: { id, companyId: ctx.companyId } })).count;
   if (type === "department") count = (await prisma.educationDepartment.deleteMany({ where: { id, companyId: ctx.companyId } })).count;
