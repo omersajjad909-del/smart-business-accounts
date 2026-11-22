@@ -15,6 +15,8 @@ const ROLES = [
   { value: "PRINCIPAL", label: "Principal", color: "#0f766e" },
   { value: "SCHOOL_ACCOUNTANT", label: "School Accountant", color: "#4338ca" },
   { value: "OFFICE_CLERK", label: "Office Clerk", color: "#b45309" },
+  { value: "PARENT", label: "Parent (portal login)", color: "#0ea5e9" },
+  { value: "TEACHER", label: "Teacher (portal login)", color: "#8b5cf6" },
   { value: "VIEWER", label: "Viewer (Read Only)", color: "#6b7280" },
 ];
 
@@ -328,6 +330,8 @@ function getRoleDescription(role: string): string {
     ADMIN: "Full access to all features, settings, and user management.",
     PRINCIPAL: "Runs the school: students, academics, attendance, exams and messages. No access to users, backups or billing.",
     SCHOOL_ACCOUNTANT: "Fees, receipts, expenses and the books. Cannot change academics or admissions.",
+    PARENT: "A parent signs in to see only their own children: fees, attendance, homework and announcements. Not counted as a staff seat.",
+    TEACHER: "A teacher signs in to mark attendance and enter marks for the classes assigned to them. Not counted as a staff seat.",
     OFFICE_CLERK: "Front desk: admissions, attendance and taking fees at the counter.",
     MANAGER: "Manage operations, approve transactions, and view reports.",
     ACCOUNTANT: "Access to accounting, invoices, expenses, and financial reports.",

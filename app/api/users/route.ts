@@ -103,8 +103,14 @@ export async function POST(req: NextRequest) {
 
     const maxUsers = await getEffectiveUserLimitForCompany(companyId, company?.plan);
 
-    if (maxUsers !== null && maxUsers !== undefined) {
-      const count = await prisma.userCompany.count({ where: { companyId } });
+    // A school's parents and teachers sign in to their own portals; they are not staff seats.
+    // Without this a Starter school (3 users) could never give more than three people a login.
+    const PORTAL_ROLES = ["PARENT", "TEACHER"];
+    const bodyForRole = await req.clone().json().catch(() => ({}));
+    const creatingPortalUser = PORTAL_ROLES.includes(String(bodyForRole?.role || "").toUpperCase());
+
+    if (maxUsers !== null && maxUsers !== undefined && !creatingPortalUser) {
+      const count = await prisma.userCompany.count({ where: { companyId, user: { role: { notIn: PORTAL_ROLES } } } });
       if (count >= maxUsers) {
         return NextResponse.json({ error: `User limit reached for your plan (max ${maxUsers} users).` }, { status: 400 });
       }

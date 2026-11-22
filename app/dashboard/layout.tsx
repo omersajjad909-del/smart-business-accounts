@@ -226,6 +226,9 @@ export default function DashboardLayout({
       : null;
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const isAdmin = currentUser?.role?.toUpperCase() === "ADMIN";
+  // Parents and teachers have their own portal pages and nothing else in the app.
+  const portalRole = (["PARENT", "TEACHER"] as const).find((r) => r === currentUser?.role?.toUpperCase()) ?? null;
+  const portalHome = portalRole === "PARENT" ? "/dashboard/school/parent" : "/dashboard/school/teacher";
   const [ready, setReady] = useState(false);
   const [allowedPlanPerms, setAllowedPlanPerms] = useState<Set<string> | null>(null);
   const [allowedDashboardFeatures, setAllowedDashboardFeatures] = useState<Set<string> | null>(null);
@@ -466,6 +469,9 @@ export default function DashboardLayout({
   // controls float over it, because a reserved empty band read as a bug.
   const [topbarCollapsed, setTopbarCollapsed] = useState(false);
   const pathname = usePathname();
+  useEffect(() => {
+    if (portalRole && pathname && !pathname.startsWith(portalHome)) router.replace(portalHome);
+  }, [portalRole, portalHome, pathname, router]);
   const isMobileDashboardHome = isMobileViewport && pathname === "/dashboard";
   const isDashboardHome = pathname === "/dashboard";
 
@@ -958,6 +964,7 @@ export default function DashboardLayout({
     hasPermission(currentUser, PERMISSIONS.TAX_CONFIGURATION) ||
     (!isCustomPlan && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD));
   const showSettingsSection =
+    !portalRole &&
     hasPermission(currentUser, PERMISSIONS.VIEW_SETTINGS) &&
     (!isCustomPlan ||
       hasCustomActiveModule("multi_branch") ||
@@ -1608,7 +1615,8 @@ export default function DashboardLayout({
           )}
 
           {/* ── SCHOOL WORKSPACE ── a school gets its own navigation, not the trading menus */}
-          {businessType === "school" && (
+          {portalRole && <NavLink href={portalHome} pathname={pathname}>{portalRole === "PARENT" ? "👨‍👩‍👧 My Children" : "🍎 My Classes"}</NavLink>}
+          {businessType === "school" && !portalRole && (
             <>
             <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>
             <NavLink href="/dashboard/school/setup" pathname={pathname}>🚀 Setup Wizard</NavLink>
@@ -1661,7 +1669,7 @@ export default function DashboardLayout({
             </>
           )}
 
-          {businessType !== "school" && (<>
+          {businessType !== "school" && !portalRole && (<>
           {/* Dashboard utilities */}
           {canShowDashboardUtilities && (
             <div style={{marginBottom:6}}>

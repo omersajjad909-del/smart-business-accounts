@@ -62,6 +62,8 @@ const ROLE_META: Record<string, { color: string; bg: string; border: string; des
   ACCOUNTANT:        { color: "var(--tx-818cf8, #818cf8)", bg: "rgba(99,102,241,.12)",  border: "rgba(99,102,241,.3)",   desc: "Access to accounting, invoices, expenses, and financial reports." },
   PRINCIPAL: { color: "#5eead4", bg: "rgba(45,212,191,.12)", border: "rgba(45,212,191,.3)", desc: "Runs the school: students, academics, attendance, exams and messages. No access to users, backups or billing." },
   SCHOOL_ACCOUNTANT: { color: "#5eead4", bg: "rgba(45,212,191,.12)", border: "rgba(45,212,191,.3)", desc: "Fees, receipts, expenses and the books. Cannot change academics or admissions." },
+  PARENT: { color: "#7dd3fc", bg: "rgba(56,189,248,.12)", border: "rgba(56,189,248,.3)", desc: "A parent signs in to see only their own children: fees, attendance, homework and announcements. Not counted as a staff seat." },
+  TEACHER: { color: "#7dd3fc", bg: "rgba(56,189,248,.12)", border: "rgba(56,189,248,.3)", desc: "A teacher signs in to mark attendance and enter marks for the classes assigned to them. Not counted as a staff seat." },
   OFFICE_CLERK: { color: "#5eead4", bg: "rgba(45,212,191,.12)", border: "rgba(45,212,191,.3)", desc: "Front desk: admissions, attendance and taking fees at the counter." },
   HR_MANAGER:        { color: "var(--tx-fbbf24, #fbbf24)", bg: "rgba(251,191,36,.12)",  border: "rgba(251,191,36,.3)",   desc: "Manage employees, payroll, and HR-related data." },
   SALES:             { color: "var(--tx-38bdf8, #38bdf8)", bg: "rgba(56,189,248,.12)",  border: "rgba(56,189,248,.3)",   desc: "Create sales orders, manage customers, and view sales reports." },

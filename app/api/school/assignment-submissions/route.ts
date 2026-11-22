@@ -9,6 +9,8 @@ export async function POST(req: NextRequest) {
   if (session.role !== "PARENT") return NextResponse.json({ error: "Parent access required" }, { status: 403 });
   const b = await req.json().catch(() => ({}));
   const assignmentId = str(b.assignmentId), studentId = str(b.studentId);
+  const attachment = str(b.attachmentUrl).slice(0, 2000);
+  if (attachment && !/^https?:\/\//i.test(attachment)) return NextResponse.json({ error: "The attachment link must start with http:// or https://" }, { status: 400 });
   if (!assignmentId || !studentId) return NextResponse.json({ error: "Assignment and student are required" }, { status: 400 });
   const grant = await prisma.schoolGuardianAccess.findFirst({ where: { companyId: session.companyId, userId: session.userId, studentId, active: true } });
   if (!grant) return NextResponse.json({ error: "Guardian access denied" }, { status: 403 });
