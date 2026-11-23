@@ -24,9 +24,9 @@ const fromRecord = (s?: StudentRecord) => ({
 export type Saved = { id: string; name: string; created: boolean; admissionFee: number; note?: string };
 
 /** New admission and edit share this form, so a field added once appears in both. */
-export function StudentForm({ student, classes, onClose, onSaved }: { student?: StudentRecord; classes: ClassRow[]; onClose: () => void; onSaved: (r: Saved) => void }) {
+export function StudentForm({ student, classes, prefill, title, onClose, onSaved }: { student?: StudentRecord; classes: ClassRow[]; prefill?: Partial<ReturnType<typeof fromRecord>>; title?: string; onClose: () => void; onSaved: (r: Saved) => void }) {
   const editing = Boolean(student);
-  const [form, setForm] = useState(fromRecord(student));
+  const [form, setForm] = useState({ ...fromRecord(student), ...(student ? {} : prefill) });
   const [photo, setPhoto] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -56,7 +56,7 @@ export function StudentForm({ student, classes, onClose, onSaved }: { student?: 
   }
 
   return (
-    <Modal title={editing ? `Edit ${student!.name}` : "New Admission"} subtitle={editing ? "Change anything below and save. The photo is changed from the student profile." : "Fields marked * are required. Everything else can be added later from the student profile."} width={820} onClose={onClose}
+    <Modal title={title ?? (editing ? `Edit ${student!.name}` : "New Admission")} subtitle={editing ? "Change anything below and save. The photo is changed from the student profile." : "Fields marked * are required. Everything else can be added later from the student profile."} width={820} onClose={onClose}
       footer={<><button style={ui.ghost} onClick={onClose}>Cancel</button><button style={ui.btn} disabled={busy} onClick={save}>{editing ? "Save changes" : "Admit student"}</button></>}>
       <ErrorLine text={error} />
       <FormSection title="Student">

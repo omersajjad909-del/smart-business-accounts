@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_SESSION_TTL_MS, getTokenFromRequest, signJwt } from "@/lib/auth";
 import { requireSuperAdmin } from "@/lib/adminAuth";
+import { ensureTestSession } from "@/lib/devTestSession";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
@@ -224,6 +225,9 @@ export async function POST(req: NextRequest) {
       testBusinessType: businessType,
       testPlan: plan,
     });
+
+    // Register the session the way a login would, so the school APIs (which check the Session table) accept it.
+    await ensureTestSession(testToken, { userId: sessionUserId, companyId: testCompanyId }, new Date(Date.now() + DEFAULT_SESSION_TTL_MS));
 
     // The token is returned as well as set: the console lives on its own
     // hostname, so this cookie never reaches the app domain. The page hands the

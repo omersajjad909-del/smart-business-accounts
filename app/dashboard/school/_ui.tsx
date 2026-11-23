@@ -64,6 +64,7 @@ export function Stat({ label, value, hint }: { label: string; value: ReactNode; 
 const BADGE: Record<string, string> = {
   PAID: "#16a34a", PARTIAL: "#ca8a04", PARTIAL_OVERDUE: "#ea580c", UNPAID: "#64748b", OVERDUE: "#dc2626",
   ACTIVE: "#16a34a", APPLICANT: "#0284c7", LEFT: "#64748b", GRADUATED: "#7c3aed",
+  SUBMITTED: "#0284c7", REVIEW: "#ca8a04", ACCEPTED: "#16a34a", REJECTED: "#dc2626", WAITLISTED: "#7c3aed",
   PRESENT: "#16a34a", ABSENT: "#dc2626", LATE: "#ca8a04", LEAVE: "#0284c7", PASS: "#16a34a", FAIL: "#dc2626",
 };
 export function Badge({ value }: { value: string }) {

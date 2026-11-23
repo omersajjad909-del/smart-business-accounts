@@ -3369,6 +3369,7 @@ model SchoolClass {
   subjects      SchoolClassSubject[]
   timetable     SchoolTimetableEntry[]
   fees          SchoolClassFee[]
+  applications  EducationApplication[]
   announcements SchoolAnnouncement[]
   assignments   SchoolAssignment[]
 
@@ -3768,19 +3769,26 @@ model EducationCourse {
 }
 
 model EducationApplication {
-  id            String            @id @default(uuid())
-  companyId     String
-  company       Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  studentId     String?
-  student       SchoolStudent?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
-  programId     String?
-  program       EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
-  applicationNo String
-  applicantName String
-  phone         String?
-  status        String            @default("SUBMITTED") // SUBMITTED | REVIEW | ACCEPTED | REJECTED | WAITLISTED
-  note          String?
-  createdAt     DateTime          @default(now())
+  id             String            @id @default(uuid())
+  companyId      String
+  company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  studentId      String?
+  student        SchoolStudent?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  programId      String?
+  program        EducationProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  applicationNo  String
+  applicantName  String
+  phone          String?
+  status         String            @default("SUBMITTED") // SUBMITTED | REVIEW | ACCEPTED | REJECTED | WAITLISTED
+  note           String?
+  // School admissions: who is applying, for which class
+  guardianName   String?
+  gender         String?
+  dob            DateTime?
+  previousSchool String?
+  applyClassId   String?
+  applyClass     SchoolClass?      @relation(fields: [applyClassId], references: [id], onDelete: SetNull)
+  createdAt      DateTime          @default(now())
 
   @@unique([companyId, applicationNo])
   @@index([companyId, status])

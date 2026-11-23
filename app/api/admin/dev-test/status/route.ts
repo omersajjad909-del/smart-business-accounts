@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureTestSession } from "@/lib/devTestSession";
 import {
   DEFAULT_SESSION_TTL_MS,
   cookieMaxAgeFor,
@@ -45,6 +46,11 @@ export async function GET(req: NextRequest) {
      across untouched apart from the timestamps. */
   if (isTestMode) {
     const remainingMs = cookieMaxAgeFor(payload) * 1000;
+    // A test session opened before sessions were recorded has no Session row, so its school pages load empty.
+    // Adopting it here fixes that without making the admin relaunch.
+    if (token && remainingMs > 0) {
+      await ensureTestSession(token, { userId: String(payload.userId), companyId: String(payload.companyId || "") }, new Date(Date.now() + remainingMs)).catch(() => false);
+    }
     if (remainingMs > 0 && remainingMs < RENEW_WHEN_REMAINING_MS) {
       const claims: Record<string, unknown> = { ...payload };
       // signJwt writes its own; carrying the old ones over would re-mint the
@@ -52,7 +58,9 @@ export async function GET(req: NextRequest) {
       delete claims.iat;
       delete claims.exp;
       delete claims.jti;
-      res.cookies.set("sb_auth", signJwt(claims), {
+      const renewed = signJwt(claims);
+      await ensureTestSession(renewed, { userId: String(payload.userId), companyId: String(payload.companyId || "") }, new Date(Date.now() + DEFAULT_SESSION_TTL_MS)).catch(() => false);
+      res.cookies.set("sb_auth", renewed, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
