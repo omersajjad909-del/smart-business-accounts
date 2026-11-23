@@ -3968,6 +3968,8 @@ model SchoolSettings {
   lateFeeGraceDays Int       @default(0)
   /// Most a PER_DAY fine can add up to; 0 = no cap
   lateFeeCap       Float     @default(0)
+  /// The school's ID card design (colours, layout, fields, back side) — see lib/idCardDesign.ts
+  idCardDesign     Json?
   /// Set when the owner hides the setup checklist or finishes the wizard
   setupDismissedAt DateTime?
   updatedAt        DateTime  @updatedAt

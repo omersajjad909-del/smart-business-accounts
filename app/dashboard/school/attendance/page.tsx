@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { api, Avatar, ClassRow, className, ErrorLine, Guide, Stat, thisPeriod, today, ui, useApi } from "../_ui";
+import { api, Avatar, ClassRow, className, ErrorLine, Guide, PrintDoc, printTd, printTh, Stat, thisPeriod, today, ui, useApi } from "../_ui";
 
 type Row = { id: string; name: string; admissionNo: string; photoUrl: string | null; status: string | null; remark: string };
 type Monthly = { days: number; daysMarked: number; rows: { id: string; name: string; admissionNo: string; marks: Record<number, string>; present: number; absent: number; late: number; leave: number; percent: number | null }[] };
@@ -170,6 +170,16 @@ export default function AttendancePage() {
                 </div>
               )}
               <p style={{ ...ui.sub, marginTop: 10 }}>Percentages below 75% are shown in red.</p>
+          {monthly && monthly.rows.length > 0 && (
+            <PrintDoc title="Monthly Attendance Register" subtitle={`${className(cls)} · ${month}`} landscape>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead><tr><th style={printTh}>Student</th>{Array.from({ length: monthly.days }, (_, i) => <th key={i} style={{ ...printTh, padding: "3px 1px", textAlign: "center", fontSize: 8.5 }}>{i + 1}</th>)}{["P", "A", "L", "V", "%"].map((h) => <th key={h} style={{ ...printTh, textAlign: "center" }}>{h}</th>)}</tr></thead>
+                <tbody>{monthly.rows.map((r) => <tr key={r.id}><td style={{ ...printTd, whiteSpace: "nowrap", fontSize: 9.5 }}>{r.admissionNo} · {r.name}</td>{Array.from({ length: monthly.days }, (_, i) => <td key={i} style={{ ...printTd, padding: "3px 1px", textAlign: "center", fontSize: 8.5 }}>{r.marks[i + 1] ? LETTER[r.marks[i + 1]] : ""}</td>)}<td style={{ ...printTd, textAlign: "center" }}>{r.present}</td><td style={{ ...printTd, textAlign: "center" }}>{r.absent}</td><td style={{ ...printTd, textAlign: "center" }}>{r.late}</td><td style={{ ...printTd, textAlign: "center" }}>{r.leave}</td><td style={{ ...printTd, textAlign: "center" }}>{r.percent === null ? "—" : `${r.percent}%`}</td></tr>)}</tbody>
+              </table>
+              <div style={{ fontSize: 10, marginTop: 6 }}>P = Present · A = Absent · L = Late · V = Leave</div>
+            </PrintDoc>
+          )}
+
             </>
           )}
         </>

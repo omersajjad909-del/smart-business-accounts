@@ -4,7 +4,7 @@ import { use } from "react";
 import { useRef, useState } from "react";
 import { AddChargeModal } from "../../fees/_AddCharge";
 import { StudentForm, type StudentRecord } from "../_form";
-import { api, Avatar, Badge, className, type ClassRow, money, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
+import { api, Avatar, Badge, className, type ClassRow, money, PrintDoc, PrintFacts, PrintSignatures, printTd, printTh, Stat, ui, uploadStudentPhoto, useApi } from "../../_ui";
 
 type Profile = {
   student: { rollNo: string | null; id: string; admissionNo: string; name: string; guardianName: string | null; phone: string | null; gender: string | null; address: string | null; dob: string | null; admissionDate: string; status: string; discount: number; class: { name: string; section: string } | null; bFormNo: string | null; religion: string | null; bloodGroup: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; guardianRelation: string | null; guardianRelationOther: string | null; guardianCnic: string | null; guardianOccupation: string | null; motherName: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null; medicalNotes: string | null; documents: string[]; photoUrl: string | null };
@@ -177,6 +177,34 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
       ))}
       {addCharge && <AddChargeModal student={{ id, name: s.name }} onClose={() => setAddCharge(false)} onSaved={(m) => { setAddCharge(false); setChargeMsg(m); void reload(); }} />}
       {editing && <StudentForm student={data.student as unknown as StudentRecord} classes={classList} onClose={() => setEditing(false)} onSaved={() => { setEditing(false); void reload(); }} />}
+      <PrintDoc title="Student Profile" subtitle={`${s.name} · Admission no. ${s.admissionNo}`}>
+        <div style={{ display: "flex", gap: 14, marginBottom: 10 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {s.photoUrl && <img src={s.photoUrl} alt="" style={{ width: 84, height: 104, objectFit: "cover", border: "1px solid #444" }} />}
+          <div style={{ flex: 1 }}>
+            <PrintFacts rows={[["Name", s.name], ["Admission no.", s.admissionNo], ["Class", className(s.class)], ["Roll no.", s.rollNo || "—"], ["Status", s.status], ["Admitted", s.admissionDate.slice(0, 10)]]} />
+          </div>
+        </div>
+        <PrintFacts rows={info} />
+        <div style={{ fontWeight: 700, margin: "12px 0 6px" }}>Fee summary</div>
+        <PrintFacts rows={[["Billed", money(data.fees.billed)], ["Paid", money(data.fees.paid)], ["Balance due", money(data.fees.balance)], ["Attendance (90 days)", data.attendance.percent === null ? "—" : `${data.attendance.percent}%`]]} />
+        {data.invoices.length > 0 && (
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+            <thead><tr>{["Period", "Fee", "Due date", "Payable", "Paid", "Balance"].map((h) => <th key={h} style={printTh}>{h}</th>)}</tr></thead>
+            <tbody>{data.invoices.map((i) => <tr key={i.id}><td style={printTd}>{i.period}</td><td style={printTd}>{i.title}</td><td style={printTd}>{i.dueDate.slice(0, 10)}</td><td style={printTd}>{money(i.payable)}</td><td style={printTd}>{money(i.paid)}</td><td style={printTd}>{money(i.balance)}</td></tr>)}</tbody>
+          </table>
+        )}
+        {data.reportCards.map((rc) => (
+          <div key={rc.exam} style={{ marginBottom: 10, pageBreakInside: "avoid" }}>
+            <div style={{ fontWeight: 700, margin: "10px 0 4px" }}>{rc.exam} — {rc.marks}/{rc.total} · {rc.percent}% · Grade {rc.grade} · {rc.passed ? "PASS" : "FAIL"}</div>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead><tr>{["Subject", "Marks", "Total", "%", "Grade"].map((h) => <th key={h} style={printTh}>{h}</th>)}</tr></thead>
+              <tbody>{rc.subjects.map((x) => <tr key={x.subject}><td style={printTd}>{x.subject}</td><td style={printTd}>{x.marks}</td><td style={printTd}>{x.total}</td><td style={printTd}>{x.percent}%</td><td style={printTd}>{x.grade}</td></tr>)}</tbody>
+            </table>
+          </div>
+        ))}
+        <PrintSignatures labels={["Class teacher", "Principal"]} />
+      </PrintDoc>
     </div>
   );
 }

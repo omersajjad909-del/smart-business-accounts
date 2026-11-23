@@ -234,3 +234,60 @@ export function PlanUsage({ compact = false }: { compact?: boolean }) {
     </div>
   );
 }
+
+// ── Printing ──────────────────────────────────────────────────────────────────
+// window.print() on a normal page prints the whole app: sidebar, header, buttons. A page that wants a clean
+// printout renders its document inside <PrintDoc>: hidden on screen, and — because the app's print stylesheet
+// shows only `.print-doc-a4` — the only thing that reaches the paper. Black on white, borders instead of
+// background fills (browsers drop backgrounds unless "Print backgrounds" is ticked).
+
+export const printTh: CSSProperties = { border: "1px solid #444", padding: "5px 7px", textAlign: "left", fontSize: 11, background: "#fff", fontWeight: 700 };
+export const printTd: CSSProperties = { border: "1px solid #bbb", padding: "5px 7px", fontSize: 11.5 };
+
+type PrintSchool = { name: string; logoUrl: string | null; address: string; city: string; phone: string };
+
+export function PrintDoc({ title, subtitle, landscape = false, children }: { title: string; subtitle?: string; landscape?: boolean; children: ReactNode }) {
+  const { data: school } = useApi<PrintSchool | null>("/api/school/settings", null);
+  const line = school ? [school.address, school.city, school.phone].filter(Boolean).join(" · ") : "";
+  return (
+    <>
+      <style>{`@media screen { .school-print-only { display: none !important; } } @media print { @page { size: ${landscape ? "A4 landscape" : "A4 portrait"}; margin: 12mm; } .school-print-only { display: block !important; } }`}</style>
+      <div className="print-doc-a4 school-print-only" style={{ background: "#fff", color: "#111", fontFamily: "Arial, Helvetica, sans-serif", fontSize: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, borderBottom: "2px solid #111", paddingBottom: 8, marginBottom: 12 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {school?.logoUrl && <img src={school.logoUrl} alt="" style={{ height: 52, width: "auto", objectFit: "contain" }} />}
+          <div style={{ flex: 1, textAlign: "center" }}>
+            <div style={{ fontSize: 20, fontWeight: 800 }}>{school?.name ?? ""}</div>
+            {line && <div style={{ fontSize: 11 }}>{line}</div>}
+          </div>
+        </div>
+        <div style={{ textAlign: "center", marginBottom: 14 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", textDecoration: "underline" }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 12, marginTop: 4 }}>{subtitle}</div>}
+        </div>
+        {children}
+        <div style={{ marginTop: 18, fontSize: 9.5, color: "#555", borderTop: "1px solid #bbb", paddingTop: 4 }}>Printed on {new Date().toLocaleDateString("en-GB")}</div>
+      </div>
+    </>
+  );
+}
+
+/** Two-column grid of label / value pairs for a printed document. */
+export function PrintFacts({ rows }: { rows: [string, string][] }) {
+  return (
+    <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+      <tbody>
+        {Array.from({ length: Math.ceil(rows.length / 2) }, (_, i) => rows.slice(i * 2, i * 2 + 2)).map((pair, i) => (
+          <tr key={i}>
+            {pair.map(([k, v]) => [<td key={k + "k"} style={{ ...printTd, width: "17%", fontWeight: 700 }}>{k}</td>, <td key={k + "v"} style={{ ...printTd, width: "33%" }}>{v}</td>])}
+            {pair.length === 1 && <><td style={printTd} /><td style={printTd} /></>}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+export function PrintSignatures({ labels }: { labels: string[] }) {
+  return <div style={{ display: "flex", justifyContent: "space-between", marginTop: 46, gap: 20 }}>{labels.map((l) => <div key={l} style={{ borderTop: "1px solid #111", paddingTop: 4, fontSize: 11, textAlign: "center", flex: 1 }}>{l}</div>)}</div>;
+}

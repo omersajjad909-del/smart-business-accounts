@@ -1,5 +1,5 @@
 "use client";
-import { className, money, Stat, ui, useApi } from "../_ui";
+import { className, money, PrintDoc, printTd, printTh, Stat, ui, useApi } from "../_ui";
 
 type Row = { classId: string; name: string; section: string; strength: number; billed: number; collected: number; outstanding: number; collectionRate: number | null; attendancePercent: number | null };
 
@@ -32,6 +32,12 @@ export default function SchoolReportsPage() {
           </tbody>
         </table>
       </div>
+      <PrintDoc title="Class-wise School Report" subtitle={`${data.totalStudents} active students · billed ${money(t.billed)} · collected ${money(t.collected)} · outstanding ${money(t.outstanding)}`} landscape>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead><tr>{["Class", "Students", "Attendance (30 days)", "Billed", "Collected", "Outstanding", "Collection rate"].map((h) => <th key={h} style={printTh}>{h}</th>)}</tr></thead>
+          <tbody>{data.rows.map((r) => <tr key={r.classId}><td style={printTd}>{className(r)}</td><td style={printTd}>{r.strength}</td><td style={printTd}>{r.attendancePercent === null ? "—" : `${r.attendancePercent}%`}</td><td style={printTd}>{money(r.billed)}</td><td style={printTd}>{money(r.collected)}</td><td style={printTd}>{money(r.outstanding)}</td><td style={printTd}>{r.collectionRate === null ? "—" : `${r.collectionRate}%`}</td></tr>)}</tbody>
+        </table>
+      </PrintDoc>
     </div>
   );
 }
