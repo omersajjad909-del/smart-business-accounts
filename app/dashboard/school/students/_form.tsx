@@ -5,7 +5,7 @@ import { api, ClassRow, ClassSelect, ErrorLine, Field, FormSection, Modal, Photo
 /** The student as the API returns it — only the fields the form reads. */
 export type StudentRecord = {
   id: string; name: string; admissionNo: string; rollNo: string | null; classId: string | null; status: string; gender: string | null; dob: string | null; bFormNo: string | null;
-  religion: string | null; bloodGroup: string | null; admissionDate: string; guardianName: string | null; guardianRelation: string | null; guardianCnic: string | null;
+  religion: string | null; bloodGroup: string | null; admissionDate: string; guardianName: string | null; guardianRelation: string | null; guardianRelationOther: string | null; guardianCnic: string | null;
   guardianOccupation: string | null; motherName: string | null; phone: string | null; alternatePhone: string | null; emergencyContact: string | null; emergencyPhone: string | null;
   address: string | null; city: string | null; previousSchool: string | null; previousClass: string | null; medicalNotes: string | null; discount: number; documents: string[];
 };
@@ -15,7 +15,7 @@ export const STUDENT_DOCS: [string, string][] = [["BFORM", "B-Form copy"], ["GUA
 const fromRecord = (s?: StudentRecord) => ({
   admissionNo: s?.admissionNo ?? "", rollNo: s?.rollNo ?? "", name: s?.name ?? "", gender: s?.gender ?? "", dob: s?.dob?.slice(0, 10) ?? "", bFormNo: s?.bFormNo ?? "", religion: s?.religion ?? "",
   bloodGroup: s?.bloodGroup ?? "", classId: s?.classId ?? "", admissionDate: s?.admissionDate?.slice(0, 10) ?? today(), status: s?.status ?? "ACTIVE",
-  guardianName: s?.guardianName ?? "", guardianRelation: s?.guardianRelation ?? "FATHER", guardianCnic: s?.guardianCnic ?? "", guardianOccupation: s?.guardianOccupation ?? "", motherName: s?.motherName ?? "",
+  guardianName: s?.guardianName ?? "", guardianRelation: s?.guardianRelation ?? "FATHER", guardianRelationOther: s?.guardianRelationOther ?? "", guardianCnic: s?.guardianCnic ?? "", guardianOccupation: s?.guardianOccupation ?? "", motherName: s?.motherName ?? "",
   phone: s?.phone ?? "", alternatePhone: s?.alternatePhone ?? "", emergencyContact: s?.emergencyContact ?? "", emergencyPhone: s?.emergencyPhone ?? "", address: s?.address ?? "", city: s?.city ?? "",
   previousSchool: s?.previousSchool ?? "", previousClass: s?.previousClass ?? "", medicalNotes: s?.medicalNotes ?? "",
   admissionFee: "", discount: s?.discount ? String(s.discount) : "", documents: s?.documents ?? ([] as string[]),
@@ -38,6 +38,7 @@ export function StudentForm({ student, classes, prefill, title, onClose, onSaved
     if (!form.name.trim()) return setError("Student name is required");
     if (!form.classId && form.status === "ACTIVE") return setError("Choose a class for an active student");
     if (!form.guardianName.trim() || !form.phone.trim()) return setError("Guardian name and phone are required");
+    if (form.guardianRelation === "OTHER" && !form.guardianRelationOther.trim()) return setError("Write who the guardian is (for example brother, sister, uncle)");
     setBusy(true); setError("");
     const body = { ...form, discount: Number(form.discount || 0), admissionFee: Number(form.admissionFee || 0) };
     // Moving a student to another class: their old roll number belongs to the old class.
@@ -82,6 +83,7 @@ export function StudentForm({ student, classes, prefill, title, onClose, onSaved
       <FormSection title="Parent / Guardian">
         <Field label="Guardian name *"><input style={ui.input} value={form.guardianName} onChange={set("guardianName")} /></Field>
         <Field label="Relation"><select style={ui.input} value={form.guardianRelation} onChange={set("guardianRelation")}><option value="FATHER">Father</option><option value="MOTHER">Mother</option><option value="OTHER">Other</option></select></Field>
+        {form.guardianRelation === "OTHER" && <Field label="Relation (write it) *"><input style={ui.input} value={form.guardianRelationOther} onChange={set("guardianRelationOther")} placeholder="e.g. brother, sister, uncle, grandfather" maxLength={40} autoFocus /></Field>}
         <Field label="Guardian CNIC (13 digits)"><input style={ui.input} inputMode="numeric" value={form.guardianCnic} onChange={set("guardianCnic")} /></Field>
         <Field label="Occupation"><input style={ui.input} value={form.guardianOccupation} onChange={set("guardianOccupation")} /></Field>
         <Field label="Mother's name"><input style={ui.input} value={form.motherName} onChange={set("motherName")} /></Field>
