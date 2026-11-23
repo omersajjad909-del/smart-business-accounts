@@ -22,7 +22,7 @@ export default function StudentsPage() {
     <div style={ui.page}>
       <div style={ui.head}>
         <div><h1 style={ui.h1}>Students</h1><p style={ui.sub}>Admissions and student records. Only ACTIVE students are billed and marked.</p></div>
-        <div style={{ display: "flex", gap: 10 }}><button style={ui.ghost} onClick={() => (classId ? (window.location.href = `/dashboard/school/print?kind=idcards&classId=${classId}`) : alert("Choose a class in the filter first, then print its ID cards."))}>🪪 ID cards</button><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setEditing({})}>+ New Admission</button></div>
+        <div style={{ display: "flex", gap: 10 }}><Link href={classId ? `/dashboard/school/id-cards?classId=${classId}` : "/dashboard/school/id-cards"} style={{ ...ui.ghost, textDecoration: "none" }}>🪪 ID cards</Link><Link href="/dashboard/school/students/promote" style={{ ...ui.ghost, textDecoration: "none" }}>Promote class</Link><button style={ui.btn} onClick={() => setEditing({})}>+ New Admission</button></div>
       </div>
       {justAdmitted && (
         <div style={{ ...ui.card, marginBottom: 14, borderColor: "rgba(34,197,94,.4)", background: "rgba(34,197,94,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>

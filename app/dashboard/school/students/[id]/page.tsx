@@ -80,7 +80,7 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} className="no-print">
           <button style={ui.btn} onClick={() => setEditing(true)}>✏️ Edit student</button>
-          <Link href={`/dashboard/school/print?kind=idcards&studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>🪪 ID card</Link>
+          <Link href={`/dashboard/school/id-cards?studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>🪪 ID card</Link>
           <Link href={`/dashboard/school/print?kind=certificate&type=leaving&studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Leaving certificate</Link>
           <Link href={`/dashboard/school/print?kind=certificate&type=character&studentId=${id}`} style={{ ...ui.ghost, textDecoration: "none" }}>Character certificate</Link>
           <button style={ui.ghost} onClick={() => window.print()}>Print profile / report card</button>

@@ -59,9 +59,9 @@ export async function GET(req: NextRequest) {
     const students = await prisma.schoolStudent.findMany({
       where: { companyId: ctx.companyId, status: "ACTIVE", ...(studentId ? { id: studentId } : { classId }) },
       orderBy: { admissionNo: "asc" },
-      select: { name: true, admissionNo: true, photoUrl: true, guardianName: true, phone: true, bloodGroup: true, dob: true, class: { select: { name: true, section: true } } },
+      select: { name: true, admissionNo: true, rollNo: true, photoUrl: true, guardianName: true, phone: true, bloodGroup: true, dob: true, address: true, city: true, emergencyPhone: true, class: { select: { name: true, section: true } } },
     });
-    return NextResponse.json({ school, students: students.map(({ class: c, ...s }) => ({ ...s, className: cls(c) })) });
+    return NextResponse.json({ school, students: students.map(({ class: c, city, address, ...s }) => ({ ...s, address: [address, city].filter(Boolean).join(", ") || null, className: cls(c) })) });
   }
 
   if (kind === "certificate") {

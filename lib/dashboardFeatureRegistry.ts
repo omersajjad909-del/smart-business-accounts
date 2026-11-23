@@ -1838,6 +1838,16 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["school"],
   },
   {
+    id: "SCHOOL_ID_CARDS",
+    permKey: "SCHOOL_VIEW",
+    label: "ID Cards",
+    route: "/dashboard/school/id-cards",
+    business: "school",
+    businessLabel: "School",
+    section: "Academic Desk",
+    businessTypes: ["school"],
+  },
+  {
     id: "SCHOOL_STUDENTS",
     permKey: "SCHOOL_VIEW",
     label: "Students & Admissions",

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, isResponse, schoolGuard, str } from "@/lib/schoolApi";
+import { sanitizeDesign } from "@/lib/idCardDesign";
 
 const FIELDS = ["address", "city", "phone", "email", "website", "principalName", "registrationNo"] as const;
 
@@ -11,7 +12,7 @@ export async function GET(req: NextRequest) {
     prisma.schoolSettings.findUnique({ where: { companyId: ctx.companyId } }),
     prisma.company.findUnique({ where: { id: ctx.companyId }, select: { name: true, logoUrl: true } }),
   ]);
-  return NextResponse.json({ name: company?.name ?? "", logoUrl: company?.logoUrl ?? null, ...Object.fromEntries(FIELDS.map((f) => [f, row?.[f] ?? ""])), setupDismissedAt: row?.setupDismissedAt ?? null, feeAccounting: row?.feeAccounting ?? "CASH", feeDueDay: row?.feeDueDay ?? 10, lateFeeType: row?.lateFeeType ?? "NONE", lateFeeAmount: row?.lateFeeAmount ?? 0, lateFeeGraceDays: row?.lateFeeGraceDays ?? 0, lateFeeCap: row?.lateFeeCap ?? 0 });
+  return NextResponse.json({ name: company?.name ?? "", logoUrl: company?.logoUrl ?? null, ...Object.fromEntries(FIELDS.map((f) => [f, row?.[f] ?? ""])), setupDismissedAt: row?.setupDismissedAt ?? null, feeAccounting: row?.feeAccounting ?? "CASH", feeDueDay: row?.feeDueDay ?? 10, lateFeeType: row?.lateFeeType ?? "NONE", lateFeeAmount: row?.lateFeeAmount ?? 0, lateFeeGraceDays: row?.lateFeeGraceDays ?? 0, lateFeeCap: row?.lateFeeCap ?? 0, idCardDesign: row?.idCardDesign ?? null });
 }
 
 /** PUT { address?, city?, phone?, email?, website?, principalName?, registrationNo?, dismissSetup? } */
@@ -28,6 +29,8 @@ export async function PUT(req: NextRequest) {
   for (const k of ["lateFeeAmount", "lateFeeCap"] as const) if (b[k] !== undefined) { const v = Number(b[k]); if (!Number.isFinite(v) || v < 0) return bad("Late fee amounts cannot be negative"); data[k] = v; }
   if (b.lateFeeGraceDays !== undefined) { const g = Math.floor(Number(b.lateFeeGraceDays)); if (!(g >= 0 && g <= 60)) return bad("Grace days must be between 0 and 60"); data.lateFeeGraceDays = g; }
   if (data.lateFeeType && data.lateFeeType !== "NONE" && Number(data.lateFeeAmount ?? 1) <= 0) return bad("Enter the late fee amount");
+  // The ID card design is stored as JSON, but only ever as the cleaned-up version.
+  if (b.idCardDesign !== undefined) data.idCardDesign = b.idCardDesign === null ? null : (sanitizeDesign(b.idCardDesign) as never);
   if (b.dismissSetup === true) data.setupDismissedAt = new Date();
   if (b.dismissSetup === false) data.setupDismissedAt = null;
   await prisma.schoolSettings.upsert({ where: { companyId: ctx.companyId }, create: { companyId: ctx.companyId, ...data }, update: data });
