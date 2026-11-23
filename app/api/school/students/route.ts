@@ -59,6 +59,12 @@ function admissionExtras(b: Record<string, unknown>, partial: boolean): { error:
     if (v && !["FATHER", "MOTHER", "OTHER"].includes(v)) return { error: "Invalid guardian relation" };
     data.guardianRelation = v || null;
   }
+  if (has("guardianRelation") || has("guardianRelationOther")) {
+    const rel = str(b.guardianRelation).toUpperCase();
+    const other = str(b.guardianRelationOther).slice(0, 40);
+    if (rel === "OTHER" && !other) return { error: "Write who the guardian is (for example brother, sister, uncle)" };
+    data.guardianRelationOther = rel === "OTHER" ? other : null;
+  }
   if (has("documents")) {
     const docs = Array.isArray(b.documents) ? b.documents.map(String).filter((d) => DOC_KEYS.includes(d)) : [];
     data.documents = [...new Set(docs)];

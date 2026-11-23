@@ -3399,24 +3399,26 @@ model SchoolStudent {
   createdAt     DateTime     @default(now())
 
   // ── Admission form details (all optional) ──
-  bFormNo            String? // B-Form / CRC number
-  religion           String?
-  bloodGroup         String?
-  city               String?
-  previousSchool     String?
-  previousClass      String?
-  guardianRelation   String? // FATHER | MOTHER | OTHER
-  guardianCnic       String?
-  guardianOccupation String?
-  motherName         String?
-  alternatePhone     String?
-  emergencyContact   String?
-  emergencyPhone     String?
-  medicalNotes       String?
+  bFormNo               String? // B-Form / CRC number
+  religion              String?
+  bloodGroup            String?
+  city                  String?
+  previousSchool        String?
+  previousClass         String?
+  guardianRelation      String? // FATHER | MOTHER | OTHER
+  /// What the guardian is when guardianRelation is OTHER — "brother", "uncle" …
+  guardianRelationOther String?
+  guardianCnic          String?
+  guardianOccupation    String?
+  motherName            String?
+  alternatePhone        String?
+  emergencyContact      String?
+  emergencyPhone        String?
+  medicalNotes          String?
   /// Documents received at admission: BFORM, PREV_RESULT, LEAVING_CERT, PHOTOS, GUARDIAN_CNIC, VACCINATION
-  documents          String[] @default([])
+  documents             String[] @default([])
   /// Profile photo on Cloudinary (kind "students"). Never a base64 blob — it would bloat every list query.
-  photoUrl           String?
+  photoUrl              String?
 
   invoices              SchoolFeeInvoice[]
   attendance            SchoolAttendance[]

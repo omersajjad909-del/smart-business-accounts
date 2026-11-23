@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     const bForm = digits(g("b_form")); if (bForm && bForm.length !== 13) errors.push("B-Form must be 13 digits");
     const cnic = digits(g("guardian_cnic")); if (cnic && cnic.length !== 13) errors.push("Guardian CNIC must be 13 digits");
     const gender = g("gender").toUpperCase(); if (gender && !["MALE", "FEMALE", "OTHER"].includes(gender)) errors.push("Gender must be Male, Female or Other");
-    const relation = (g("guardian_relation") || "FATHER").toUpperCase(); if (!["FATHER", "MOTHER", "OTHER"].includes(relation)) errors.push("Guardian relation must be Father, Mother or Other");
+    const relationRaw = g("guardian_relation") || "Father"; const relationUp = relationRaw.toUpperCase(); const relation = ["FATHER", "MOTHER"].includes(relationUp) ? relationUp : "OTHER"; const relationOther = relation === "OTHER" ? (relationUp === "OTHER" ? "" : relationRaw.slice(0, 40)) : null; if (relation === "OTHER" && !relationOther) errors.push("Write who the guardian is in guardian_relation (for example brother, uncle)");
     const discount = g("discount") ? Number(g("discount")) : 0; if (!Number.isFinite(discount) || discount < 0) errors.push("Discount must be a number");
 
     const rollNo = g("roll_no");
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       line: i + 2, errors, warnings, classKey, active: status === "ACTIVE", name,
       data: errors.length ? undefined : {
         companyId: ctx.companyId, admissionNo, rollNo: rollNo || null, name, gender: gender || null, dob, bFormNo: bForm || null, religion: g("religion") || null,
-        guardianName, guardianRelation: relation, guardianCnic: cnic || null, phone, motherName: g("mother_name") || null,
+        guardianName, guardianRelation: relation, guardianRelationOther: relationOther, guardianCnic: cnic || null, phone, motherName: g("mother_name") || null,
         address: g("address") || null, city: g("city") || null, previousSchool: g("previous_school") || null,
         admissionDate: admissionDate ?? new Date(), discount, status, documents: [] as string[],
       },
