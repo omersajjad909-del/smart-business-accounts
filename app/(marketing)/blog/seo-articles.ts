@@ -188,9 +188,9 @@ export const SEO_ARTICLES: Record<string, SeoArticle> = {
   // ---------------------------------------------------------------------
   "best-odoo-alternatives": {
     id: "best-odoo-alternatives",
-    title: "5 Best Odoo Alternatives for Small Businesses in 2026 (Honest Comparison)",
+    title: "5 Best Odoo Alternatives in 2026 (Honest Comparison)",
     excerpt:
-      "Odoo alternatives ranked by what's actually failing you — cost, complexity, or your implementation partner. Five real options, no vendor fluff.",
+      "Xero, QuickBooks, Zoho One, ERPNext, FinovaOS and more — matched to why Odoo is actually failing you: cost, complexity, or a bad implementation partner.",
     category: "business",
     categoryLabel: "Buyer's Guide",
     color: "var(--tx-34d399, #34d399)",
