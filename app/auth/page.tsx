@@ -287,6 +287,7 @@ function AuthPageInner() {
         @keyframes auth-fade-up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
         .auth-page { font-family:'Outfit',sans-serif; }
         .auth-input:focus { outline: none; border-color: rgba(99,102,241,0.6) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+        .auth-input:focus-within { outline: none; border-color: rgba(99,102,241,0.6) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
         .auth-input { transition: border-color 0.2s, box-shadow 0.2s; }
         .auth-btn-main:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
         .auth-btn-main { transition: opacity 0.2s, transform 0.2s; }
@@ -296,10 +297,12 @@ function AuthPageInner() {
         .auth-right-panel { animation: auth-fade-up 0.6s 0.1s ease both; }
         @media (max-width: 900px) {
           .auth-left-col { display: none !important; }
-          .auth-page { height: 100dvh !important; min-height: unset !important; overflow: hidden !important; }
-          .auth-grid { grid-template-columns: 1fr !important; height: 100dvh !important; min-height: unset !important; }
-          .auth-right-col { padding: 16px !important; height: 100dvh !important; overflow-y: auto !important; align-items: center !important; justify-content: center !important; }
+          .auth-page { height: auto !important; min-height: 100dvh !important; overflow-x: hidden !important; overflow-y: auto !important; }
+          .auth-grid { grid-template-columns: 1fr !important; height: auto !important; min-height: 100dvh !important; }
+          .auth-right-col { padding: 16px !important; height: auto !important; min-height: 100dvh !important; overflow: visible !important; align-items: flex-start !important; justify-content: center !important; }
           .auth-mobile-logo { display: inline-flex !important; }
+          .auth-input input { font-size: 16px !important; min-width: 0; width: 100%; }
+          .auth-card { width: 100% !important; max-width: 440px !important; }
         }
         @media (max-width: 480px) {
           .auth-card { padding: 20px 18px !important; border-radius: 20px !important; }
@@ -457,7 +460,6 @@ function AuthPageInner() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        autoFocus
                         autoComplete="email"
                         placeholder="you@company.com"
                         style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "var(--ink-solid, #fff)", fontFamily: "inherit" }}
