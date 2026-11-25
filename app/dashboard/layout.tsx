@@ -1548,7 +1548,7 @@ export default function DashboardLayout({
       {/* MOBILE OVERLAY */}
       {isMobileViewport && isMobileMenuOpen && (
         <div
-          style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:20}}
+          style={{position:"fixed",top:0,left:0,right:0,bottom:"calc(62px + env(safe-area-inset-bottom))",background:"rgba(0,0,0,0.6)",zIndex:20,overscrollBehavior:"none"}}
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -1560,7 +1560,7 @@ export default function DashboardLayout({
         onMouseLeave={() => { if (!isMobileViewport) setNavHover(false); }}
         style={{
         position:"fixed",
-        top:0, left:0, bottom:0,
+        top:0, left:0, bottom:isMobileViewport ? "calc(62px + env(safe-area-inset-bottom))" : 0,
         width: isMobileViewport ? "min(82vw, 320px)" : asideW,
         background:"var(--sidebar-bg)",
         borderRight:"1px solid var(--sidebar-border)",
@@ -1602,7 +1602,7 @@ export default function DashboardLayout({
         <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setManualCollapse(false), canShowHref: canShowDashboardHref, onNavigate: handleNavClick, onSectionOpen: handleSectionClick }}>
         {/* overscrollBehavior:"contain" so dragging past the end of the menu
             does not carry on and scroll the page behind the open drawer. */}
-        <nav style={{flex:1,overflowY:"auto",overscrollBehavior:"contain",padding:"8px 8px",paddingBottom:80}}>
+        <nav style={{flex:1,minHeight:0,overflowY:"auto",overscrollBehavior:"contain",WebkitOverflowScrolling:"touch",padding:"8px 8px",paddingBottom:isMobileViewport ? 8 : 80}}>
 
           {/* ── Main Dashboard link ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
@@ -3752,13 +3752,13 @@ export default function DashboardLayout({
       {/* ── MOBILE BOTTOM NAV ── */}
       {isMobileViewport && (
         <nav style={{
-          position:"fixed", bottom:0, left:0, right:0, zIndex:25,
+          position:"fixed", bottom:0, left:0, right:0, zIndex:40,
           background:"rgba(var(--dkr-080c1e, 8,12,30),0.97)", backdropFilter:"blur(24px)",
           borderTop:"1px solid rgba(var(--ink),0.08)",
           display:"flex", alignItems:"stretch",
           paddingBottom:"env(safe-area-inset-bottom)",
           height:"calc(62px + env(safe-area-inset-bottom))",
-        }}>
+        }} className="dashboard-bottom-nav">
           {/* Home */}
           <Link prefetch={false} href="/dashboard" style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
@@ -3829,7 +3829,7 @@ export default function DashboardLayout({
           })()}
 
           {/* More — opens sidebar */}
-          <button onClick={() => setIsMobileMenuOpen(true)} style={{
+          <button onClick={() => setIsMobileMenuOpen((open) => !open)} style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, background:"transparent", border:"none", cursor:"pointer",
             color: isMobileMenuOpen ? "var(--accent)" : "rgba(var(--ink),var(--ta-40, 0.4))",
