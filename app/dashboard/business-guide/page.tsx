@@ -574,7 +574,7 @@ export default function BusinessGuidePage() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, minWidth: 200 }}>
+          <div className="db-grid-exempt" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, minWidth: 200 }}>
             {[
               { label: "Modules Available", val: String(businessMeta.modules.length), color: "var(--tx-a5b4fc, #a5b4fc)" },
               { label: "Workflow Steps", val: String(flow.length), color: "var(--tx-34d399, #34d399)" },
